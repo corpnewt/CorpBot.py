@@ -1,0 +1,824 @@
+import asyncio
+import discord
+import random
+import configparser
+import os
+import configparser
+import json
+from discord.ext import commands
+from discord import errors
+import globals
+
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A that does stuff.... probably')
+settingsFile = "./Settings.txt"
+userFile = "./Users.txt"
+jsonFile = "Settings.json"
+globals.serverList = {}
+
+  ###           ###
+ # Initial Setup #
+###           ###
+
+def checkServer(server, serverDict):
+    # Assumes server = discord.Server and serverList is a dict
+    if not "Servers" in serverDict:
+        # Let's add an empty placeholder
+        serverDict["Servers"] = []
+    found = False
+    for x in serverDict["Servers"]:
+        if x["Name"] == server.name:
+            # We found our server
+            found = True
+            # print("Found our server: " + server.name)
+
+    if found == False:
+        # We didn't locate our server
+        # print("Server not located, adding...")
+        newServer = { "Name" : server.name, "ID" : server.id,
+											"AutoRole" : "No",
+											"DefaultRole" : "1",
+											"MinimumXPRole" : "1",
+											"XPApprovalChannel" : "",
+											"HourlyXP" : "0",
+											"IncreasePerRank" : "1",
+											"RequireOnline" : "Yes",
+											"AdminUnlimited" : "Yes",
+											"XPPromote" : "Yes",
+											"PromoteBy" : "Position",
+											"MaxPosition" : "5",
+											"RequiredXP" : "50",
+											"DifficultyMultiplier" : "2",
+											"PadXPRoles" : "1",
+											"XPDemote" : "No",
+											"PromotoionArray" : [],
+											"Members" : [] }
+        serverDict["Servers"].append(newServer)
+
+    return serverDict
+
+def checkUser(user, server, serverDict):
+	# Make sure our server exists in the list
+	serverDict = checkServer(server, serverDict)
+	# Check for our username
+	found = False
+	for x in serverDict["Servers"]:
+		if x["ID"] == server.id:
+			# We found our server, now to iterate users
+			for y in x["Members"]:
+				if y["ID"] == user.id:
+					found = True
+					# Check XP, ID, Discriminator
+					if not "XP" in y:
+						# print("No XP - adding...")
+						y["XP"] = 0
+					if not "XPReserve" in y:
+						# print("No XP - adding...")
+						y["XPReserve"] = 10
+					if not "ID" in y:
+						# print("No ID - adding...")
+						y["ID"] = user.id
+					if not "Discriminator" in y:
+						# print("No Discriminator - adding...")
+						y["Discriminator"] = user.discriminator
+					# print("Found our user: " + userName)
+			if not found:
+				# We didn't locate our user - add them
+				newUser = { "Name" : user.name, 
+							"XP" : 0,
+							"XPReserve" : 10,
+							"ID" : user.id, 
+							"Discriminator" : user.discriminator }
+				x["Members"].append(newUser)
+	# All done - return
+	return serverDict
+
+def incrementStat(user, server, serverDict, stat, incrementAmount):
+    serverDict = checkUser(user, server, serverDict)
+    for x in serverDict["Servers"]:
+        if x["Name"] == server.name:
+            # We found our server, now to iterate users
+            for y in x["Members"]:
+                if y["ID"] == user.id:
+                    tempStat = int(y[stat])
+                    tempStat += int(incrementAmount)
+                    y[stat] = tempStat
+    return serverDict
+	
+def getUserStat(user, server, serverDict, stat):
+	# Make sure our server exists in the list
+	serverDict = checkServer(server, serverDict)
+	# Check for our username
+	found = False
+	for x in serverDict["Servers"]:
+		if x["ID"] == server.id:
+			# We found our server, now to iterate users
+			for y in x["Members"]:
+				if y["ID"] == user.id:
+					return y[stat]
+	return None
+	
+def setUserStat(user, server, serverDict, stat, value):
+	# Make sure our server exists in the list
+	serverDict = checkServer(server, serverDict)
+	# Check for our username
+	found = False
+	for x in serverDict["Servers"]:
+		if x["ID"] == server.id:
+			# We found our server, now to iterate users
+			for y in x["Members"]:
+				if y["ID"] == user.id:
+					y[stat] == value
+	
+def getServerStat(server, serverDict, stat):
+	# Make sure our server exists in the list
+	serverDict = checkServer(server, serverDict)
+	# Check for our username
+	found = False
+	for x in serverDict["Servers"]:
+		if x["ID"] == server.id:
+			# We found our server, now to iterate users
+			return x[stat]
+	return None
+	
+def setServerStat(server, serverDict, stat, value):
+	# Make sure our server exists in the list
+	serverDict = checkServer(server, serverDict)
+	# Check for our username
+	found = False
+	for x in serverDict["Servers"]:
+		if x["ID"] == server.id:
+			# We found our server, now to iterate users
+			x[stat] = value
+
+async def setupSettings(config):
+	# Sets up default settings
+	config['BOTSETTINGS'] = 	{'NewUserRole' : 'Entry Level',
+								'PlayMusic' : 'yes'}
+	with open(settingsFile, 'w') as configfile:
+		config.write(configfile)
+
+async def setupUsers(config):
+	# Iterate through users and add their default xp
+	print("{}".format(bot))
+	theServer = bot.servers
+	print("{}".format(theServer))
+	'''await bot.request_offline_members(theServer)
+	for user in theServer.members:
+		print('User: {}'.format(user.name))
+		config[user.name] = {'xp': '0'}
+	with open(userFile, 'w') as configfile:
+		config.write(configfile)'''
+		
+async def flushSettings():
+	while not bot.is_closed:
+		print("Flushed Settings")
+		# print("ServerList Flush: {}".format(globals.serverList))
+		# Dump the json
+		json.dump(globals.serverList, open(jsonFile, 'w'), indent=2)
+		await asyncio.sleep(900) # runs only every 15 minutes
+	'''await bot.wait_until_ready()
+	counter = 0
+	channel = discord.Object(id='channel_id_here')
+	while not bot.is_closed:
+		counter += 1
+		await bot.send_message(channel, counter)
+		await asyncio.sleep(900) # task runs every 15 minutes'''
+
+async def addXP():
+	while not bot.is_closed:
+		print("Adding XP")
+		
+		for server in bot.servers:
+			
+			for role in server.roles:
+				if role.position == 1:
+					print("Entry role: {}".format(role.name))
+			
+			# Iterate through the servers and add them
+			globals.serverList = checkServer(server, globals.serverList)
+			xpAmount = getServerStat(server, globals.serverList, "HourlyXP")
+			onlyOnline = getServerStat(server, globals.serverList, "RequireOnline")
+			for user in server.members:
+				# print('{}: {}'.format(user.name, str(user.status)))
+				bumpXP = False
+				if onlyOnline.lower() == "yes":
+					if str(user.status).lower() == "online":
+						bumpXP = True
+				else:
+					bumpXP = True
+					
+				if bumpXP:
+					boost = int(getServerStat(server, globals.serverList, "IncreasePerRank"))
+					maxPos = int(getServerStat(server, globals.serverList, "MaxPosition"))
+					biggest = 0
+					xpPayload = 0
+					for role in user.roles:
+						if role.position <= maxPos and role.position > biggest:
+							biggest = role.position
+						
+					xpPayload = int(xpAmount)+biggest*boost
+					
+					#print("{} at level {} out of {}, gets {} XP".format(user.id, biggest, maxPos, xpPayload))
+					
+					globals.serverList = incrementStat(user, server, globals.serverList, "XPReserve", xpPayload)
+					
+		await quickFlush()
+		await asyncio.sleep(60) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
+		
+async def quickFlush():
+	# Dump the json
+	json.dump(globals.serverList, open(jsonFile, 'w'), indent=2)
+
+# --------------------------------------------- #
+
+  ###                        ###
+ # BEGIN: Setup for Playlists #
+###                        ###
+
+if not discord.opus.is_loaded():
+    # the 'opus' library here is opus.dll on windows
+    # or libopus.so on linux in the current directory
+    # you should replace this with the location the
+    # opus library is located in and with the proper filename.
+    # note that on windows this DLL is automatically provided for you
+    discord.opus.load_opus('opus')
+
+class VoiceEntry:
+    def __init__(self, message, player):
+        self.requester = message.author
+        self.channel = message.channel
+        self.player = player
+
+    def __str__(self):
+        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
+        duration = self.player.duration
+        if duration:
+            fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
+        return fmt.format(self.player, self.requester)
+
+class VoiceState:
+    def __init__(self, bot):
+        self.current = None
+        self.voice = None
+        self.bot = bot
+        self.play_next_song = asyncio.Event()
+        self.songs = asyncio.Queue()
+        self.skip_votes = set() # a set of user_ids that voted
+        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+
+    def is_playing(self):
+        if self.voice is None or self.current is None:
+            return False
+
+        player = self.current.player
+        return not player.is_done()
+
+    @property
+    def player(self):
+        return self.current.player
+
+    def skip(self):
+        self.skip_votes.clear()
+        if self.is_playing():
+            self.player.stop()
+
+    def toggle_next(self):
+        self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
+
+    async def audio_player_task(self):
+        while True:
+            self.play_next_song.clear()
+            self.current = await self.songs.get()
+            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
+            self.current.player.start()
+            await self.play_next_song.wait()
+
+class Music:
+    """Voice related commands.
+
+    Works in multiple servers at once.
+    """
+    def __init__(self, bot):
+        self.bot = bot
+        self.voice_states = {}
+
+    def get_voice_state(self, server):
+        state = self.voice_states.get(server.id)
+        if state is None:
+            state = VoiceState(self.bot)
+            self.voice_states[server.id] = state
+
+        return state
+
+    async def create_voice_client(self, channel):
+        voice = await self.bot.join_voice_channel(channel)
+        state = self.get_voice_state(channel.server)
+        state.voice = voice
+
+    def __unload(self):
+        for state in self.voice_states.values():
+            try:
+                state.audio_player.cancel()
+                if state.voice:
+                    self.bot.loop.create_task(state.voice.disconnect())
+            except:
+                pass
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def join(self, ctx, *, channel : discord.Channel):
+        """Joins a voice channel."""
+        try:
+            await self.create_voice_client(channel)
+        except discord.ClientException:
+            await self.bot.say('Already in a voice channel...')
+        except discord.InvalidArgument:
+            await self.bot.say('This is not a voice channel...')
+        else:
+            await self.bot.say('Ready to play audio in ' + channel.name)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def summon(self, ctx):
+        """Summons the bot to join your voice channel."""
+        summoned_channel = ctx.message.author.voice_channel
+        if summoned_channel is None:
+            await self.bot.say('You are not in a voice channel.')
+            return False
+
+        state = self.get_voice_state(ctx.message.server)
+        if state.voice is None:
+            state.voice = await self.bot.join_voice_channel(summoned_channel)
+        else:
+            await state.voice.move_to(summoned_channel)
+
+        return True
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def play(self, ctx, *, song : str):
+        """Plays a song.
+
+        If there is a song currently in the queue, then it is
+        queued until the next song is done playing.
+
+        This command automatically searches as well from YouTube.
+        The list of supported sites can be found here:
+        https://rg3.github.io/youtube-dl/supportedsites.html
+        """
+        state = self.get_voice_state(ctx.message.server)
+        opts = {
+            'default_search': 'auto',
+            'quiet': True,
+        }
+
+        if state.voice is None:
+            success = await ctx.invoke(self.summon)
+            if not success:
+                return
+
+        try:
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+        except Exception as e:
+            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
+            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+        else:
+            player.volume = 0.6
+            entry = VoiceEntry(ctx.message, player)
+            await self.bot.say('Enqueued ' + str(entry))
+            await state.songs.put(entry)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def volume(self, ctx, value : int):
+        """Sets the volume of the currently playing song."""
+
+        state = self.get_voice_state(ctx.message.server)
+        if state.is_playing():
+            player = state.player
+            player.volume = value / 100
+            await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def pause(self, ctx):
+        """Pauses the currently played song."""
+        state = self.get_voice_state(ctx.message.server)
+        if state.is_playing():
+            player = state.player
+            player.pause()
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def resume(self, ctx):
+        """Resumes the currently played song."""
+        state = self.get_voice_state(ctx.message.server)
+        if state.is_playing():
+            player = state.player
+            player.resume()
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def stop(self, ctx):
+        """Stops playing audio and leaves the voice channel.
+
+        This also clears the queue.
+        """
+        server = ctx.message.server
+        state = self.get_voice_state(server)
+
+        if state.is_playing():
+            player = state.player
+            player.stop()
+
+        try:
+            state.audio_player.cancel()
+            del self.voice_states[server.id]
+            await state.voice.disconnect()
+        except:
+            pass
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def skip(self, ctx):
+        """Vote to skip a song. The song requester can automatically skip.
+
+        3 skip votes are needed for the song to be skipped.
+        """
+
+        state = self.get_voice_state(ctx.message.server)
+        if not state.is_playing():
+            await self.bot.say('Not playing any music right now...')
+            return
+
+        voter = ctx.message.author
+        if voter == state.current.requester:
+            await self.bot.say('Requester requested skipping song...')
+            state.skip()
+        elif voter.id not in state.skip_votes:
+            state.skip_votes.add(voter.id)
+            total_votes = len(state.skip_votes)
+            if total_votes >= 3:
+                await self.bot.say('Skip vote passed, skipping song...')
+                state.skip()
+            else:
+                await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
+        else:
+            await self.bot.say('You have already voted to skip this song.')
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def playing(self, ctx):
+        """Shows info about the currently played song."""
+
+        state = self.get_voice_state(ctx.message.server)
+        if state.current is None:
+            await self.bot.say('Not playing anything.')
+        else:
+            skip_count = len(state.skip_votes)
+            await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+			
+  ###                      ###
+ # END: Setup for Playlists #
+###                      ###
+
+# --------------------------------------------- #
+
+  ###           ###
+ # BEGIN: Events #
+###           ###
+
+@bot.event
+async def on_member_join(member):
+	server = member.server
+	
+	# Initialize User
+	globals.serverList = checkUser(member, server, globals.serverList)
+	
+	fmt = 'Welcome {0.mention} to {1.name}!'
+	await bot.send_message(server, fmt.format(member, server))
+	# Scan through roles - find "Entry Level" and set them to that
+	
+	autoRole = getServerStat(server, globals.serverList, "AutoRole")
+	defaultRole = getServerStat(server, globals.serverList, "DefaultRole")
+	
+	if autoRole.lower() == "yes":
+		newRole = discord.utils.get(server.roles, position=int(defaultRole))
+		await bot.add_roles(member, newRole)
+		
+	await quickFlush()
+		
+		
+	
+@bot.event
+async def on_ready():
+	print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
+	# Now we give JSON a try
+	if os.path.exists(jsonFile):
+		globals.serverList = json.load(open(jsonFile))
+	else:
+		# No Users.json file - create a placeholder
+		globals.serverList = {}
+	
+	for server in bot.servers:
+		# Iterate through the servers and add them
+		globals.serverList = checkServer(server, globals.serverList)		
+		for user in server.members:
+			globals.serverList = checkUser(user, server, globals.serverList)
+		
+	# await flushSettings()
+	bot.loop.create_task(flushSettings())
+	bot.loop.create_task(addXP())
+	
+@bot.event
+async def on_message(message):
+	# Process commands - then check for mentions
+	await bot.process_commands(message)
+
+	'''if message.author == bot.user:
+		return
+	
+	for user in message.mentions:
+		print('User: {}'.format(user.name))
+		if user == bot.user:
+			msg = 'Hello {0.author.mention}'.format(message)
+			await bot.send_message(message.channel, msg)'''
+	# For adding roles - http://discordpy.readthedocs.io/en/latest/api.html#discord.Client.add_roles
+	
+  ###           ###
+ # END:   Events #
+###           ###
+
+# --------------------------------------------- #
+
+  ###             ###
+ # BEGIN: Commands #
+###             ###
+
+@bot.command()
+async def add(left : int, right : int):
+    """Adds two numbers together."""
+    await bot.say(left + right)
+
+@bot.command()
+async def roll(dice : str):
+    """Rolls a dice in NdN format."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await bot.say('Format has to be in NdN!')
+        return
+
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await bot.say(result)
+
+@bot.command(description='For when you wanna settle the score some other way')
+async def choose(*choices : str):
+    """Chooses between multiple choices."""
+    await bot.say(random.choice(choices))
+	
+@bot.command()
+async def joined(member : discord.Member):
+    """Says when a member joined."""
+    await bot.say('{0.name} joined in {0.joined_at}'.format(member))
+	
+@bot.command(pass_context=True)
+async def getOffline(ctx):
+	theServer = ctx.message.author.server
+	#print("Hello")
+	await bot.request_offline_members(theServer)
+	for user in theServer.members:
+		print('User: {}'.format(user.name))
+	#print('{}'.format(theServer.members))
+
+	
+	
+@bot.command(pass_context=True)
+async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
+	# Check for formatting issues
+	if xpAmount == None or member == None:
+		msg = 'Usage: $xp @User Amount'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if not type(xpAmount) is int:
+		msg = 'Usage: $xp @User Amount'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if xpAmount < 0:
+		msg = 'Usage: $xp @User Amount'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+	
+	
+	# Initialize User
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	adminUnlim = getServerStat(ctx.message.server, globals.serverList, "AdminUnlimited")
+	reserveXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve")
+	minRole = getServerStat(ctx.message.server, globals.serverList, "MinimumXPRole")
+	
+	approve = True
+	decrement = True
+	
+	# MinimumXPRole
+	if ctx.message.author.top_role.position < int(minRole):
+		approve = False
+		msg = 'You don\'t have the permissions to give XP.'
+	
+	if xpAmount > int(reserveXP):
+		approve = False
+		msg = 'You can\'t give {} XP, you only have {}'.format(xpAmount, reserveXP)
+	
+	if ctx.message.author == member:
+		approve = False
+		msg = 'You can\'t give yourself XP!  *Nice try...*'
+	
+	# Check admin last - so it overrides anything else
+	if isAdmin and adminUnlim.lower() == "yes":
+		# No limit - approve
+		approve = True
+		decrement = False
+	
+	userRole = member.top_role.position
+	
+	if approve:
+		msg = '{} was given {} XP!'.format(member.name, xpAmount)
+		globals.serverList = incrementStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
+		if decrement:
+			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
+		
+		xpPromote = getServerStat(ctx.message.server, globals.serverList, "XPPromote")
+		promoteBy = getServerStat(ctx.message.server, globals.serverList, "PromoteBy")
+		requiredXP = int(getServerStat(ctx.message.server, globals.serverList, "RequiredXP"))
+		maxPosition = getServerStat(ctx.message.server, globals.serverList, "MaxPosition")
+		padXP = getServerStat(ctx.message.server, globals.serverList, "PadXPRoles")
+		difficulty = int(getServerStat(ctx.message.server, globals.serverList, "DifficultyMultiplier"))
+		
+		userXP = getUserStat(member, ctx.message.server, globals.serverList, "XP")
+		userXP = int(userXP)+(int(requiredXP)*int(padXP))
+				
+		if xpPromote.lower() == "yes":
+			# We use XP to promote - let's check our levels
+			if promoteBy.lower() == "position":
+				# We use the position to promote
+				gotLevels = 0
+				for x in range(0, int(maxPosition)+1):
+					# Let's apply our difficulty multiplier
+					
+					print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
+					
+					required = (requiredXP*x) + (requiredXP*difficulty)
+					print("Level: {}\nXP: {}".format(x, required))
+					if userXP >= required:
+						gotLevels = x
+				if gotLevels > int(maxPosition):
+					# If we got too high - let's even out
+					gotLevels = int(maxPosition)
+				#print("Got: {} Have: {}".format(gotLevels, userRole))
+				#if gotLevels > userRole:
+					# We got promoted!
+					#msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+				gotLevels+=1
+				for x in range(0, gotLevels):
+					# fill in all the roles between
+					for role in ctx.message.server.roles:
+						if role.position < gotLevels:
+							if not role in member.roles:
+								# Only add if we need to
+								await bot.add_roles(member, role)
+								msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+				 
+	await bot.send_message(ctx.message.channel, msg)
+	#await quickFlush()
+
+@xp.error
+async def getxp_error(ctx, error):
+    # do stuff
+	msg = 'xp Error: {}'.format(ctx)
+	await bot.say(msg)
+	
+	
+
+@bot.command(pass_context=True)
+async def stats(ctx, member: discord.Member = None):
+	await bot.say("You tried this")
+	if member is None:
+		await bot.say('You\'re doing it wrong')
+		return
+	#if member is None:
+	#	bot.say("Usage: $stats @MemberName")
+	#	return
+
+	# Ensure user is setup
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+	# Get user's xp
+	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
+	
+	msg = 'User {} has {} XP!'.format(member, newStat)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+	
+@bot.command(pass_context=True)
+async def getStat(ctx, stat : str = None, member : discord.Member = None):
+	if member == None:
+		member = ctx.message.author
+		
+	if str == None:
+		msg = 'Usage: $getStat Stat @User'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+		
+	if member is None:
+		msg = 'Usage: $getStat Stat @User'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	try:
+		newStat = getUserStat(member, ctx.message.author.server, globals.serverList, stat)
+	except KeyError:
+		msg = '"{}" is not a valid stat for {}'.format(stat, member.name)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	msg = '{} for {} is {}'.format(stat, member.name, newStat)
+	await bot.send_message(ctx.message.channel, msg)
+	
+# Catch errors for stat
+@getStat.error
+async def getStat_error(ctx, error):
+    # do stuff
+	msg = 'getStat Error: {}'.format(ctx)
+	await bot.say(msg)
+
+	
+	
+@bot.command(pass_context=True)
+async def setSStat(ctx, stat : str = None, value : str = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		return
+	
+	if stat == None or value == None:
+		msg = 'Usage: $setSStat Stat Value'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	setServerStat(ctx.message.server, globals.serverList, stat, value)
+	
+	msg = '{} set to {}!'.format(stat, value)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def getSStat(ctx, stat : str = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		return
+	
+	if stat == None:
+		msg = 'Usage: $getSStat Stat'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	value = getServerStat(ctx.message.server, globals.serverList, stat)
+	
+	msg = '{} is currently {}!'.format(stat, value)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+	
+	
+
+	
+
+@bot.command(pass_context=True)
+async def flush(ctx):
+	# Flush settings
+	await quickFlush()
+	
+	
+  ###             ###
+ # END:   Commands #
+###             ###
+
+# --------------------------------------------- #
+
+  ###       ###
+ # Bot Start #
+###       ###	
+	
+bot.add_cog(Music(bot))
+# bot.loop.create_task(flushSettings())
+
+bot.run('MjI1NzQ4MjAzMTUxMTYzMzkz.CrtkCA.B4VKoA1_mVAAL1jXbdGi3dY_cdw')
+
+# --------------------------------------------- #
+
