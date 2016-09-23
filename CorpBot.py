@@ -1,13 +1,136 @@
 import asyncio
 import discord
 import random
-import configparser
 import os
 import configparser
 import json
 from discord.ext import commands
 from discord import errors
 import globals
+
+import urllib.request
+import urllib
+import re
+import webbrowser
+import platform
+import html
+import math
+import datetime as dt
+import sys
+
+  ###           ###
+ # Dilbert Stuff #
+###           ###
+
+try:
+    # Python 2.6-2.7
+    from HTMLParser import HTMLParser
+except ImportError:
+    # Python 3
+    from html.parser import HTMLParser
+
+import datetime
+
+def julianDate(my_date):
+    # Takes a date string MM-DD-YYYY and
+    # returns Julian Date
+    date = my_date.split("-")
+
+    month = int(date[0])
+    day   = int(date[1])
+    year  = int(date[2])
+
+    month=(month-14)/12
+    year=year+4800
+    JDate=1461*(year+month)/4+367*(month-2-12*month)/12-(3*((year+month+100)/100))/4+day-32075
+    return JDate
+
+# Function from:  https://gist.github.com/jiffyclub/1294443
+def date_to_jd(year,month,day):
+    if month == 1 or month == 2:
+        yearp = year - 1
+        monthp = month + 12
+    else:
+        yearp = year
+        monthp = month
+    # this checks where we are in relation to October 15, 1582, the beginning
+    # of the Gregorian calendar.
+    if ((year < 1582) or
+        (year == 1582 and month < 10) or
+        (year == 1582 and month == 10 and day < 15)):
+        # before start of Gregorian calendar
+        B = 0
+    else:
+        # after start of Gregorian calendar
+        A = math.trunc(yearp / 100.)
+        B = 2 - A + math.trunc(A / 4.)
+    if yearp < 0:
+        C = math.trunc((365.25 * yearp) - 0.75)
+    else:
+        C = math.trunc(365.25 * yearp)
+
+    D = math.trunc(30.6001 * (monthp + 1))
+
+    jd = B + C + D + day + 1720994.5
+    return jd
+
+# Function from:  https://gist.github.com/jiffyclub/1294443
+def jd_to_date(jd):
+    jd = jd + 0.5
+    F, I = math.modf(jd)
+    I = int(I)
+    A = math.trunc((I - 1867216.25)/36524.25)
+    if I > 2299160:
+        B = I + 1 + A - math.trunc(A / 4.)
+    else:
+        B = I
+    C = B + 1524
+    D = math.trunc((C - 122.1) / 365.25)
+    E = math.trunc(365.25 * D)
+    G = math.trunc((C - E) / 30.6001)
+    day = C - E + F - math.trunc(30.6001 * G)
+    if G < 13.5:
+        month = G - 1
+    else:
+        month = G - 13
+    if month > 2.5:
+        year = D - 4716
+    else:
+        year = D - 4715
+    return year, month, day
+	
+# Find string between 2 strings
+def find_between( s, first, last ):
+    try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
+
+def getImageHTML ( url ):
+    with urllib.request.urlopen(url) as f:
+        htmlSource = str(f.read())
+        return htmlSource
+
+def getImageURL ( html ):
+    imageURL = find_between( html, "data-image=", "data-date=" )
+    return imageURL.replace('"', '').strip()
+
+def getImageTitle ( html ):
+    imageTitle = find_between( html, "data-title=", "data-tags=" )
+    h = HTMLParser()
+    imageTitle = h.unescape(imageTitle)
+    #print(h.unescape(imageTitle))
+    return imageTitle.replace('"', '').strip()
+
+  ###           ###
+ # Dilbert Stuff #
+###           ###
+
+
+
+
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A that does stuff.... probably')
 settingsFile = "./Settings.txt"
@@ -239,7 +362,7 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
-        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
+        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.name}'
         duration = self.player.duration
         if duration:
             fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
@@ -475,7 +598,7 @@ async def on_member_join(member):
 	# Initialize User
 	globals.serverList = checkUser(member, server, globals.serverList)
 	
-	fmt = 'Welcome {0.mention} to {1.display_name}!'
+	fmt = 'Welcome {0.mention} to {1.name}!'
 	await bot.send_message(server, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
 	
@@ -579,7 +702,7 @@ async def getoffline(ctx):
 	#print("Hello")
 	await bot.request_offline_members(theServer)
 	for user in theServer.members:
-		print('User: {}'.format(user.display_name))
+		print('User: {}'.format(user.name))
 	#print('{}'.format(theServer.members))
 
 
@@ -630,7 +753,7 @@ async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 			return
 			
 	setUserStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
-	msg = '{}\'s xp was set to *{}!*'.format(member.display_name, xpAmount)				
+	msg = '{}\'s xp was set to *{}!*'.format(member.name, xpAmount)				
 	await bot.send_message(ctx.message.channel, msg)
 			
 			
@@ -672,7 +795,7 @@ async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = Non
 			return
 			
 	setUserStat(member, ctx.message.server, globals.serverList, "XPReserve", xpAmount)
-	msg = '{}\'s XPReserve was set to {}!'.format(member.display_name, xpAmount)				
+	msg = '{}\'s XPReserve was set to {}!'.format(member.name, xpAmount)				
 	await bot.send_message(ctx.message.channel, msg)
 			
 			
@@ -741,7 +864,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	userRole = member.top_role.position
 	
 	if approve:
-		msg = '{} was given *{} xp!*'.format(member.display_name, xpAmount)
+		msg = '{} was given *{} xp!*'.format(member.name, xpAmount)
 		globals.serverList = incrementStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
 		if decrement:
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
@@ -786,7 +909,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							if not role in member.roles:
 								# Only add if we need to
 								await bot.add_roles(member, role)
-								msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.display_name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+								msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
 			elif promoteBy.lower() == "array":
 				promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
 				serverRoles = ctx.message.server.roles
@@ -804,7 +927,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 						# Now see if we have it, and add it if we don't
 						if not currentRole in member.roles:
 							await bot.add_roles(member, currentRole)
-							msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.display_name, xpAmount, currentRole.name)
+							msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.name, xpAmount, currentRole.name)
 					else:
 						if xpDemote.lower() == "yes":
 							# Let's see if we have this role, and remove it.  Demote time!
@@ -818,7 +941,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							# Now see if we have it, and add it if we don't
 							if currentRole in member.roles:
 								await bot.remove_roles(member, currentRole)
-								msg = '{} was demoted from {}!'.format(member.display_name, currentRole.name)
+								msg = '{} was demoted from {}!'.format(member.name, currentRole.name)
 							
 							
 	await bot.send_message(ctx.message.channel, msg)
@@ -1027,7 +1150,7 @@ async def stats(ctx, member: discord.Member = None):
 	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
 	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
 	
-	msg = '{} has *{} xp*, and can gift up to *{} xp!*'.format(member.display_name, newStat, newState)
+	msg = '{} has *{} xp*, and can gift up to *{} xp!*'.format(member.name, newStat, newState)
 	await bot.send_message(ctx.message.channel, msg)
 	
 	
@@ -1058,11 +1181,11 @@ async def getstat(ctx, stat : str = None, member : discord.Member = None):
 	try:
 		newStat = getUserStat(member, ctx.message.author.server, globals.serverList, stat)
 	except KeyError:
-		msg = '"{}" is not a valid stat for {}'.format(stat, member.display_name)
+		msg = '"{}" is not a valid stat for {}'.format(stat, member.name)
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
-	msg = '{} for {} is {}'.format(stat, member.display_name, newStat)
+	msg = '{} for {} is {}'.format(stat, member.name, newStat)
 	await bot.send_message(ctx.message.channel, msg)
 	
 # Catch errors for stat
@@ -1200,6 +1323,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   joined       Says when a member joined.\n"
 	commandString = commandString + "   choose       Chooses between multiple choices.\n"
 	commandString = commandString + "   add          Adds two numbers together.\n"
+	commandString = commandString + "   randilbert   Randomly picks and displays a Dilbert comic.\n"
+	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
@@ -1266,6 +1391,120 @@ async def flush(ctx):
 		return
 	# Flush settings
 	await quickFlush()
+	msg = 'Flushed settings to disk.'
+	await bot.send_message(ctx.message.channel, msg)
+
+	
+	
+@bot.command(pass_context=True)
+async def randilbert(ctx):
+	"""Randomly picks and displays a Dilbert comic."""
+	# Get some preliminary values
+	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+	
+	# Can't be before this date.
+	firstDate = "04-16-1989"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+	
+	# Get a random Julian date between the first comic and today
+	startJDate = random.uniform(fJDate, tJDate)
+	
+	# Let's create our url
+	gDate = jd_to_date(startJDate)
+
+    # Prep dir names
+	yDir = str(gDate[0])
+	mDir = str(gDate[1])
+	dName = str(int(gDate[2]))
+
+	if (gDate[1] < 10):
+		mDir = "0"+mDir
+
+	if (gDate[2] < 10):
+		dName = "0"+dName
+		
+	# Get URL
+	getURL = "http://dilbert.com/strip/" + str(gDate[0]) + "-" + mDir + "-" + dName
+
+	# Retrieve html and info
+	imageHTML = getImageHTML(getURL)
+	imageURL  = getImageURL(imageHTML)
+	imageName = getImageTitle(imageHTML)
+	
+	msg = '{}\n{}'.format(imageName, imageURL)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def dilbert(ctx, date : str = None):
+	"""Displays the Dilbert comic for the passed date (MM-DD-YYYY)."""
+	if date == None:
+		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	try:
+		startDate = date.split("-")
+	except ValueError:
+		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	# Get some preliminary values
+	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+	
+	# Can't be before this date.
+	firstDate = "04-16-1989"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+	
+	
+	
+	# Get a a Julian date for the passed day
+	startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
+	
+	outOfRange = False
+
+	# Check date ranges
+	if startJDate < fJDate:
+		outOfRange = True
+	if startJDate > tJDate:
+		outOfRange = True
+	
+	if outOfRange:
+		msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	# Let's create our url
+	gDate = jd_to_date(startJDate)
+
+    # Prep dir names
+	yDir = str(gDate[0])
+	mDir = str(gDate[1])
+	dName = str(int(gDate[2]))
+
+	if (gDate[1] < 10):
+		mDir = "0"+mDir
+
+	if (gDate[2] < 10):
+		dName = "0"+dName
+		
+	# Get URL
+	getURL = "http://dilbert.com/strip/" + str(gDate[0]) + "-" + mDir + "-" + dName
+
+	# Retrieve html and info
+	imageHTML = getImageHTML(getURL)
+	imageURL  = getImageURL(imageHTML)
+	imageName = getImageTitle(imageHTML)
+	
+	msg = '{}\n{}'.format(imageName, imageURL)
+	await bot.send_message(ctx.message.channel, msg)
 	
 	
   ###             ###
