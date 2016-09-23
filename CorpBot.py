@@ -17,6 +17,8 @@ import html
 import math
 import datetime as dt
 import sys
+import tempfile
+import shutil
 
   ###           ###
  # Dilbert Stuff #
@@ -123,6 +125,19 @@ def getImageTitle ( html ):
     imageTitle = h.unescape(imageTitle)
     #print(h.unescape(imageTitle))
     return imageTitle.replace('"', '').strip()
+	
+# Download image to location
+def downloadImage( url, fileName ):
+    with urllib.request.urlopen(url) as f:
+        htmlSource = str(f.read())
+        imageURL = find_between( htmlSource, "data-image=", "data-date=" )
+        urlNoQuotes = imageURL.replace('"', '').strip()
+        #print("Image URL: " + str(urlNoQuotes))
+        #webbrowser.open(urlNoQuotes)
+        urllib.request.urlretrieve(urlNoQuotes, fileName)
+
+def downloadImageTo( url, fileName ):
+    urllib.request.urlretrieve(url, fileName)
 
   ###           ###
  # Dilbert Stuff #
@@ -1428,14 +1443,25 @@ async def randilbert(ctx):
 		
 	# Get URL
 	getURL = "http://dilbert.com/strip/" + str(gDate[0]) + "-" + mDir + "-" + dName
-
+	
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
 	imageURL  = getImageURL(imageHTML)
-	imageName = getImageTitle(imageHTML)
+	imageName = getImageTitle(imageHTML) + ".jpg"
 	
-	msg = '{}\n{}'.format(imageName, imageURL)
+	msg = '{}'.format(imageName)
 	await bot.send_message(ctx.message.channel, msg)
+	
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+	
+	shutil.rmtree(dirpath, ignore_errors=True)
+	
 	
 	
 @bot.command(pass_context=True)
@@ -1501,10 +1527,20 @@ async def dilbert(ctx, date : str = None):
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
 	imageURL  = getImageURL(imageHTML)
-	imageName = getImageTitle(imageHTML)
+	imageName = getImageTitle(imageHTML) + ".jpg"
 	
-	msg = '{}\n{}'.format(imageName, imageURL)
+	msg = '{}'.format(imageName)
 	await bot.send_message(ctx.message.channel, msg)
+	
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+	
+	shutil.rmtree(dirpath, ignore_errors=True)
 	
 	
   ###             ###
