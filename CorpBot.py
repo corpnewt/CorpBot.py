@@ -1169,6 +1169,64 @@ async def links(ctx):
 	await bot.send_message(ctx.message.channel, linkText)
 	
 	
+@bot.command(pass_context=True)
+async def quickhelp(ctx):
+	"""List compact member-only help."""
+	commandString = "```Quick Help:\n\n"
+	
+	commandString = commandString + "Music:\n"
+	commandString = commandString + "   volume       Sets the volume of the currently playing song.\n"
+	commandString = commandString + "   stop         Stops playing audio and leaves the voice channel.\n"
+	commandString = commandString + "   skip         Vote to skip a song. The song requester can automatically.\n"
+	commandString = commandString + "   join         Joins a voice channel.\n"
+	commandString = commandString + "   resume       Resumes the currently played song.\n"
+	commandString = commandString + "   pause        Pauses the currently played song.\n"
+	commandString = commandString + "   play         Plays a song.\n"
+	commandString = commandString + "   playing      Shows info about the currently played song.\n"
+	commandString = commandString + "   summon       Summons the bot to join your voice channel.\n"
+	
+	commandString = commandString + "User Commands:\n"
+	commandString = commandString + "   xp           Gift xp to other members.\n"
+	commandString = commandString + "   stats        List the xp and xp reserve of a listed member (case-sensitive).\n"
+	commandString = commandString + "   getstat      Gets the value for a specific stat for the listed member.\n"
+	commandString = commandString + "   listroles    Lists all roles, id's, and xp requirements for the xp promotion/demotion system.\n"
+	commandString = commandString + "   link         Retrieve a link from the link list.\n"
+	commandString = commandString + "   links        List all links in the link list.\n"
+	commandString = commandString + "   addlink      Add a link to the link list.\n"
+	commandString = commandString + "   removelink   Remove a link from the link list.\n"
+	commandString = commandString + "   joined       Says when a member joined.\n"
+	commandString = commandString + "   choose       Chooses between multiple choices.\n"
+	commandString = commandString + "   add          Adds two numbers together.\n"
+	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
+	commandString = commandString + "   help         Shows the main help message.\n"
+	commandString = commandString + "   quickhelp    Shows this help message.\n"
+	commandString = commandString + "   adminhelp    Shows the admin help message."
+	
+	commandString = commandString + "```"
+	
+	await bot.send_message(ctx.message.channel, commandString)
+	
+	
+@bot.command(pass_context=True)
+async def adminhelp(ctx):
+	"""List compact admin-only help."""
+	commandString = "```Admin Help:\n\n"
+	
+	commandString = commandString + "Admin Commands:\n"
+	commandString = commandString + "   addrole      Adds a new role to the xp promotion/demotion system (admin only).\n"
+	commandString = commandString + "   removerole   Removes a role from the xp promotion/demotion system (admin only).\n"
+	commandString = commandString + "   autorole     Sets the autorole value - can be No, ID, or Position (admin only).\n"
+	commandString = commandString + "   getsstat     Gets a server stat (admin only).\n"
+	commandString = commandString + "   setsstat     Sets a server stat (admin only).\n"
+	commandString = commandString + "   setxp        Sets an absolute value for the member's xp (admin only).\n"
+	commandString = commandString + "   setxpreserve Set's an absolute value for the member's xp reserve (admin only).\n"
+	commandString = commandString + "   playgame     Sets the playing status of the bot (admin only).\n"
+	commandString = commandString + "   flush        Flush the bot settings to disk (admin only).\n"
+	
+	commandString = commandString + "```"
+	
+	await bot.send_message(ctx.message.channel, commandString)
+	
 	
 @bot.command(pass_context=True)
 async def removelink(ctx, name : str = None):
