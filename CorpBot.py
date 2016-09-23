@@ -926,7 +926,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 		msg = 'You can\'t give yourself xp!  *Nice try...*'
 
 	if xpAmount < 0:
-		msg = 'Only mods can take away xp!'
+		msg = 'Only admins can take away xp!'
 		approve = False
 
 	# Check admin last - so it overrides anything else
