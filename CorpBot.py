@@ -39,7 +39,7 @@ def checkServer(server, serverDict):
 											"DefaultRole" : "1",
 											"MinimumXPRole" : "1",
 											"XPApprovalChannel" : "",
-											"HourlyXP" : "1",
+											"HourlyXP" : "3",
 											"IncreasePerRank" : "1",
 											"RequireOnline" : "Yes",
 											"AdminUnlimited" : "Yes",
@@ -51,6 +51,7 @@ def checkServer(server, serverDict):
 											"PadXPRoles" : "0",
 											"XPDemote" : "No",
 											"PromotionArray" : [],
+											"Links" : [],
 											"Members" : [] }
         serverDict["Servers"].append(newServer)
 
@@ -95,7 +96,7 @@ def checkUser(user, server, serverDict):
 def incrementStat(user, server, serverDict, stat, incrementAmount):
     serverDict = checkUser(user, server, serverDict)
     for x in serverDict["Servers"]:
-        if x["Name"] == server.name:
+        if x["ID"] == server.id:
             # We found our server, now to iterate users
             for y in x["Members"]:
                 if y["ID"] == user.id:
@@ -127,7 +128,7 @@ def setUserStat(user, server, serverDict, stat, value):
 			# We found our server, now to iterate users
 			for y in x["Members"]:
 				if y["ID"] == user.id:
-					y[stat] == value
+					y[stat] = value
 	
 def getServerStat(server, serverDict, stat):
 	# Make sure our server exists in the list
@@ -171,9 +172,9 @@ async def addXP():
 		
 		for server in bot.servers:
 			
-			for role in server.roles:
-				if role.position == 1:
-					print("Entry role: {}".format(role.name))
+			#for role in server.roles:
+				#if role.position == 1:
+					# print("Entry role: {}".format(role.name))
 			
 			# Iterate through the servers and add them
 			globals.serverList = checkServer(server, globals.serverList)
@@ -568,6 +569,102 @@ async def getOffline(ctx):
 		print('User: {}'.format(user.name))
 	#print('{}'.format(theServer.members))
 
+
+@bot.command(pass_context=True)
+async def playGame(ctx, game : str = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	
+	if game == None:
+		await bot.change_status(game=None)
+		return
+	
+	await bot.change_status(game=discord.Game(name=game))
+	
+	
+	
+@bot.command(pass_context=True)
+async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+		
+	# Check for formatting issues
+	if xpAmount == None or member == None:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if not type(xpAmount) is int:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if xpAmount < 0:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+			
+	setUserStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
+	msg = '{}\'s XP was set to {}!'.format(member.name, xpAmount)				
+	await bot.send_message(ctx.message.channel, msg)
+			
+			
+@setxp.error
+async def setxp_error(ctx, error):
+    # do stuff
+	msg = 'setxp Error: {}'.format(ctx)
+	await bot.say(msg)
+	
+	
+	
+@bot.command(pass_context=True)
+async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+		
+	# Check for formatting issues
+	if xpAmount == None or member == None:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if not type(xpAmount) is int:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if xpAmount < 0:
+		msg = 'Usage: `$setxp [member] [amount]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+			
+	setUserStat(member, ctx.message.server, globals.serverList, "XPReserve", xpAmount)
+	msg = '{}\'s XPReserve was set to {}!'.format(member.name, xpAmount)				
+	await bot.send_message(ctx.message.channel, msg)
+			
+			
+@setxpreserve.error
+async def setxpreserve_error(ctx, error):
+    # do stuff
+	msg = 'setxp Error: {}'.format(ctx)
+	await bot.say(msg)
 	
 	
 @bot.command(pass_context=True)
@@ -955,7 +1052,7 @@ async def getSStat(ctx, stat : str = None):
 		return
 	
 	if stat == None:
-		msg = 'Usage: $getSStat Stat'
+		msg = 'Usage: `$getSStat [stat]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
@@ -966,12 +1063,94 @@ async def getSStat(ctx, stat : str = None):
 	
 	
 	
+@bot.command(pass_context=True)
+async def addlink(ctx, name : str = None, link : str = None):	
+	if name == None or link == None:
+		msg = 'Usage: `$addlink "[link name]" [url]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
 	
-
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
+	if linkList == None:
+		linkList = []
+	
+	linkList.append({"Name" : name, "URL" : link})
+	
+	setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
+	
+	msg = '{} added to link list!'.format(name)
+	await bot.send_message(ctx.message.channel, msg)
 	
 
 @bot.command(pass_context=True)
+async def link(ctx, name : str = None):	
+	if name == None or link == None:
+		msg = 'Usage: `$link "[link name]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
+	if linkList == None or linkList == []:
+		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	for alink in linkList:
+		if alink['Name'].lower() == name.lower():
+			msg = '{}\n{}'.format(alink['Name'], alink['URL'])
+			await bot.send_message(ctx.message.channel, msg)
+	
+
+	
+	
+@bot.command(pass_context=True)
+async def links(ctx):	
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
+	if linkList == None or linkList == []:
+		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	linkText = ""
+	
+	for alink in linkList:
+		linkText = '{}{}\n'.format(linkText, alink['Name'])
+			
+	await bot.send_message(ctx.message.channel, linkText)
+	
+	
+	
+@bot.command(pass_context=True)
+async def removelink(ctx, name : str = None):		
+	if name == None:
+		msg = 'Usage: `$removelink "[link name]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
+	if linkList == None or linkList == []:
+		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	for alink in linkList:
+		if alink['Name'].lower() == name.lower():
+			linkList.remove(alink)
+			setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
+			msg = '{} removed from link list!'.format(name)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+	
+	msg = '{} not found in link list!'.format(name)
+	await bot.send_message(ctx.message.channel, msg)
+		
+		
+@bot.command(pass_context=True)
 async def flush(ctx):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		return
 	# Flush settings
 	await quickFlush()
 	
