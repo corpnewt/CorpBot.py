@@ -493,6 +493,9 @@ async def on_member_join(member):
 		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
 		await bot.send_message(server, fmt)
 		
+	fmt = 'Type `$quickhelp` for a list of available user commands.'
+	await bot.send_message(server, fmt)
+	
 	await quickFlush()
 		
 		
