@@ -1011,8 +1011,9 @@ async def stats(ctx, member: discord.Member = None):
 	"""List the xp and xp reserve of a listed member."""
 	# await bot.say("You tried this")
 	if member is None:
-		await bot.say('Usage: `$stats [member]`')
-		return
+		member = ctx.message.author
+		#await bot.say('Usage: `$stats [member]`')
+		#return
 	#if member is None:
 	#	bot.say("Usage: $stats @MemberName")
 	#	return
