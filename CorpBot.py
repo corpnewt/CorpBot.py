@@ -1589,9 +1589,10 @@ async def randilbert(ctx):
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
 	imageURL  = getImageURL(imageHTML)
-	imageName = getImageTitle(imageHTML) + ".jpg"
+	imageDisplayName = getImageTitle(imageHTML)
+	imageName = imageDisplayName + ".jpg"
 
-	msg = '{}'.format(imageName)
+	msg = '{}'.format(imageDisplayName)
 	await bot.send_message(ctx.message.channel, msg)
 
 	# Make temp dir, download image, upload to discord
