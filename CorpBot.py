@@ -627,7 +627,7 @@ async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 			return
 			
 	setUserStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
-	msg = '{}\'s XP was set to {}!'.format(member.display_name, xpAmount)				
+	msg = '{}\'s xp was set to *{}!*'.format(member.display_name, xpAmount)				
 	await bot.send_message(ctx.message.channel, msg)
 			
 			
@@ -719,7 +719,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	
 	if xpAmount > int(reserveXP):
 		approve = False
-		msg = 'You can\'t give {} xp, you only have {}'.format(xpAmount, reserveXP)
+		msg = 'You can\'t give *{} xp*, you only have *{}!*'.format(xpAmount, reserveXP)
 	
 	if ctx.message.author == member:
 		approve = False
@@ -738,7 +738,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	userRole = member.top_role.position
 	
 	if approve:
-		msg = '{} was given {} XP!'.format(member.display_name, xpAmount)
+		msg = '{} was given *{} xp!*'.format(member.display_name, xpAmount)
 		globals.serverList = incrementStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
 		if decrement:
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
@@ -774,7 +774,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 				#print("Got: {} Have: {}".format(gotLevels, userRole))
 				#if gotLevels > userRole:
 					# We got promoted!
-					#msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+					#msg = '{} was given {} xp, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
 				gotLevels+=1
 				for x in range(0, gotLevels):
 					# fill in all the roles between
@@ -783,7 +783,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							if not role in member.roles:
 								# Only add if we need to
 								await bot.add_roles(member, role)
-								msg = '{} was given {} XP, and was promoted to {}!'.format(member.display_name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+								msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.display_name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
 			elif promoteBy.lower() == "array":
 				promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
 				serverRoles = ctx.message.server.roles
@@ -801,7 +801,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 						# Now see if we have it, and add it if we don't
 						if not currentRole in member.roles:
 							await bot.add_roles(member, currentRole)
-							msg = '{} was given {} XP, and was promoted to {}!'.format(member.display_name, xpAmount, currentRole.name)
+							msg = '{} was given *{} xp*, and was promoted to {}!'.format(member.display_name, xpAmount, currentRole.name)
 					else:
 						if xpDemote.lower() == "yes":
 							# Let's see if we have this role, and remove it.  Demote time!
@@ -890,7 +890,7 @@ async def listroles(ctx):
 	roleText = "Current Roles:\n"
 	
 	for arole in promoArray:
-		roleText = '{}{} : {} : {} XP\n'.format(roleText, arole['Name'], arole['ID'], arole['XP'])
+		roleText = '{}**{}** : *{} XP* (ID : `{}`)\n'.format(roleText, arole['Name'], arole['XP'], arole['ID'])
 			
 	await bot.send_message(ctx.message.channel, roleText)
 	
@@ -1023,7 +1023,7 @@ async def stats(ctx, member: discord.Member = None):
 	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
 	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
 	
-	msg = '{} has *{}* XP, and can gift up to *{}* XP!'.format(member.display_name, newStat, newState)
+	msg = '{} has *{} xp*, and can gift up to *{} xp!*'.format(member.display_name, newStat, newState)
 	await bot.send_message(ctx.message.channel, msg)
 	
 	
