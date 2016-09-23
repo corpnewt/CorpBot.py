@@ -100,7 +100,7 @@ def jd_to_date(jd):
     else:
         year = D - 4715
     return year, month, day
-	
+
 # Find string between 2 strings
 def find_between( s, first, last ):
     try:
@@ -109,6 +109,25 @@ def find_between( s, first, last ):
         return s[start:end]
     except ValueError:
         return ""
+
+def find_first_between( source, start_sep, end_sep ):
+	result=[]
+	tmp=source.split(start_sep)
+	for par in tmp:
+		if end_sep in par:
+			result.append(par.split(end_sep)[0])
+	if len(result) == 0:
+		return None
+	else:
+		return result[0]
+
+def find_last_between( source, start_sep, end_sep ):
+    result=[]
+    tmp=source.split(start_sep)
+    for par in tmp:
+        if end_sep in par:
+            result.append(par.split(end_sep)[0])
+    return result[len(result)-1] # Return last item
 
 def getImageHTML ( url ):
     with urllib.request.urlopen(url) as f:
@@ -125,7 +144,46 @@ def getImageTitle ( html ):
     imageTitle = h.unescape(imageTitle)
     #print(h.unescape(imageTitle))
     return imageTitle.replace('"', '').strip()
+
+def getNewestXKCD ( html ):
+	comicBlock = find_last_between( html, 'div id="middleContainer"', "</div>")
+	imageURL = find_first_between( comicBlock, "href=", " title=" )
+	imageURL = imageURL.replace('/', '').strip()
+	return imageURL.replace('"', '').strip()
 	
+def getXKCDURL ( html, date ):
+	# YYYY-M(M)-D(D) format
+	# <a href="/17/" title="2006-1-1">What If</a>
+	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
+	
+	imageURL = find_first_between( html, "href=", " title=\"" + date + "\"" )
+	if imageURL == None:
+		return None
+	else:
+		return imageURL.replace('"', '').strip()
+
+def getXKCDImageURL ( html ):
+	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
+	
+	imageURL = find_last_between( comicBlock, "img src=", "title=" )
+	imageURL = imageURL.replace('"', '').strip()
+	
+	if imageURL[0:2] == "//":
+		# Add http?
+		return "http:" + imageURL
+	else:
+		return imageURL
+
+def getXKCDImageTitle ( html ):
+	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
+	
+	imageTitle = find_last_between( comicBlock, "alt=", ">" )
+	h = HTMLParser()
+	imageTitle = h.unescape(imageTitle)
+	imageTitle = imageTitle.replace('"', '').strip()
+	imageTitle = imageTitle.replace('/', '').strip()
+	return imageTitle
+
 # Download image to location
 def downloadImage( url, fileName ):
     with urllib.request.urlopen(url) as f:
@@ -226,11 +284,11 @@ def checkUser(user, server, serverDict):
 						y["DisplayName"] = user.display_name
 			if not found:
 				# We didn't locate our user - add them
-				newUser = { "Name" : user.name, 
+				newUser = { "Name" : user.name,
 							"DisplayName" : user.display_name,
 							"XP" : 0,
 							"XPReserve" : 10,
-							"ID" : user.id, 
+							"ID" : user.id,
 							"Discriminator" : user.discriminator }
 				x["Members"].append(newUser)
 	# All done - return
@@ -247,7 +305,7 @@ def incrementStat(user, server, serverDict, stat, incrementAmount):
                     tempStat += int(incrementAmount)
                     y[stat] = tempStat
     return serverDict
-	
+
 def getUserStat(user, server, serverDict, stat):
 	# Make sure our server exists in the list
 	serverDict = checkServer(server, serverDict)
@@ -260,7 +318,7 @@ def getUserStat(user, server, serverDict, stat):
 				if y["ID"] == user.id:
 					return y[stat]
 	return None
-	
+
 def setUserStat(user, server, serverDict, stat, value):
 	# Make sure our server exists in the list
 	serverDict = checkServer(server, serverDict)
@@ -272,7 +330,7 @@ def setUserStat(user, server, serverDict, stat, value):
 			for y in x["Members"]:
 				if y["ID"] == user.id:
 					y[stat] = value
-	
+
 def getServerStat(server, serverDict, stat):
 	# Make sure our server exists in the list
 	serverDict = checkServer(server, serverDict)
@@ -283,7 +341,7 @@ def getServerStat(server, serverDict, stat):
 			# We found our server, now to iterate users
 			return x[stat]
 	return None
-	
+
 def setServerStat(server, serverDict, stat, value):
 	# Make sure our server exists in the list
 	serverDict = checkServer(server, serverDict)
@@ -293,7 +351,7 @@ def setServerStat(server, serverDict, stat, value):
 		if x["ID"] == server.id:
 			# We found our server, now to iterate users
 			x[stat] = value
-		
+
 async def flushSettings():
 	while not bot.is_closed:
 		print("Flushed Settings")
@@ -312,13 +370,13 @@ async def flushSettings():
 async def addXP():
 	while not bot.is_closed:
 		print("Adding XP")
-		
+
 		for server in bot.servers:
-			
+
 			#for role in server.roles:
 				#if role.position == 1:
 					# print("Entry role: {}".format(role.name))
-			
+
 			# Iterate through the servers and add them
 			globals.serverList = checkServer(server, globals.serverList)
 			xpAmount = getServerStat(server, globals.serverList, "HourlyXP")
@@ -331,7 +389,7 @@ async def addXP():
 						bumpXP = True
 				else:
 					bumpXP = True
-					
+
 				if bumpXP:
 					boost = int(getServerStat(server, globals.serverList, "IncreasePerRank"))
 					maxPos = int(getServerStat(server, globals.serverList, "MaxPosition"))
@@ -340,18 +398,18 @@ async def addXP():
 					for role in user.roles:
 						if role.position <= maxPos and role.position > biggest:
 							biggest = role.position
-						
+
 					# xpPayload = int(xpAmount)+biggest*boost
-					
+
 					xpPayload = int(xpAmount)
-					
+
 					#print("{} at level {} out of {}, gets {} XP".format(user.id, biggest, maxPos, xpPayload))
-					
+
 					globals.serverList = incrementStat(user, server, globals.serverList, "XPReserve", xpPayload)
-					
+
 		await quickFlush()
 		await asyncio.sleep(3600) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
-		
+
 async def quickFlush():
 	# Dump the json
 	json.dump(globals.serverList, open(jsonFile, 'w'), indent=2)
@@ -595,7 +653,7 @@ class Music:
         else:
             skip_count = len(state.skip_votes)
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
-			
+
   ###                      ###
  # END: Setup for Playlists #
 ###                      ###
@@ -609,17 +667,17 @@ class Music:
 @bot.event
 async def on_member_join(member):
 	server = member.server
-	
+
 	# Initialize User
 	globals.serverList = checkUser(member, server, globals.serverList)
-	
+
 	fmt = 'Welcome {0.mention} to {1.name}!'
 	await bot.send_message(server, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
-	
+
 	autoRole = getServerStat(server, globals.serverList, "AutoRole")
 	defaultRole = getServerStat(server, globals.serverList, "DefaultRole")
-	
+
 	if autoRole.lower() == "position":
 		newRole = discord.utils.get(server.roles, position=int(defaultRole))
 		await bot.add_roles(member, newRole)
@@ -630,14 +688,14 @@ async def on_member_join(member):
 		await bot.add_roles(member, newRole)
 		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
 		await bot.send_message(server, fmt)
-		
+
 	fmt = 'Type `$quickhelp` for a list of available user commands.'
 	await bot.send_message(server, fmt)
-	
+
 	await quickFlush()
-		
-		
-	
+
+
+
 @bot.event
 async def on_ready():
 	print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
@@ -647,17 +705,17 @@ async def on_ready():
 	else:
 		# No Users.json file - create a placeholder
 		globals.serverList = {}
-	
+
 	for server in bot.servers:
 		# Iterate through the servers and add them
-		globals.serverList = checkServer(server, globals.serverList)		
+		globals.serverList = checkServer(server, globals.serverList)
 		for user in server.members:
 			globals.serverList = checkUser(user, server, globals.serverList)
-		
+
 	# await flushSettings()
 	bot.loop.create_task(flushSettings())
 	bot.loop.create_task(addXP())
-	
+
 @bot.event
 async def on_message(message):
 	# Process commands - then check for mentions
@@ -665,14 +723,14 @@ async def on_message(message):
 
 	'''if message.author == bot.user:
 		return
-	
+
 	for user in message.mentions:
 		print('User: {}'.format(user.name))
 		if user == bot.user:
 			msg = 'Hello {0.author.mention}'.format(message)
 			await bot.send_message(message.channel, msg)'''
 	# For adding roles - http://discordpy.readthedocs.io/en/latest/api.html#discord.Client.add_roles
-	
+
   ###           ###
  # END:   Events #
 ###           ###
@@ -704,12 +762,12 @@ async def roll(dice : str):
 async def choose(*choices : str):
     """Chooses between multiple choices."""
     await bot.say(random.choice(choices))
-	
+
 @bot.command()
 async def joined(member : discord.Member):
     """Says when a member joined."""
     await bot.say('{0.name} joined in {0.joined_at}'.format(member))
-	
+
 @bot.command(pass_context=True)
 async def getoffline(ctx):
 	"""Forces the server to account for offline members - only important to the backend."""
@@ -729,15 +787,15 @@ async def playgame(ctx, game : str = None):
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-	
+
 	if game == None:
 		await bot.change_status(game=None)
 		return
-	
+
 	await bot.change_status(game=discord.Game(name=game))
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 	"""Sets an absolute value for the member's xp (admin only)."""
@@ -746,7 +804,7 @@ async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-		
+
 	# Check for formatting issues
 	if xpAmount == None or member == None:
 		msg = 'Usage: `$setxp [member] [amount]`'
@@ -766,20 +824,20 @@ async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 		except:
 			print("That member does not exist")
 			return
-			
+
 	setUserStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
-	msg = '{}\'s xp was set to *{}!*'.format(member.name, xpAmount)				
+	msg = '{}\'s xp was set to *{}!*'.format(member.name, xpAmount)
 	await bot.send_message(ctx.message.channel, msg)
-			
-			
+
+
 @setxp.error
 async def setxp_error(ctx, error):
     # do stuff
 	msg = 'setxp Error: {}'.format(ctx)
 	await bot.say(msg)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = None):
 	"""Set's an absolute value for the member's xp reserve (admin only)."""
@@ -788,7 +846,7 @@ async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = Non
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-		
+
 	# Check for formatting issues
 	if xpAmount == None or member == None:
 		msg = 'Usage: `$setxpreserve [member] [amount]`'
@@ -808,20 +866,20 @@ async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = Non
 		except:
 			print("That member does not exist")
 			return
-			
+
 	setUserStat(member, ctx.message.server, globals.serverList, "XPReserve", xpAmount)
-	msg = '{}\'s XPReserve was set to {}!'.format(member.name, xpAmount)				
+	msg = '{}\'s XPReserve was set to {}!'.format(member.name, xpAmount)
 	await bot.send_message(ctx.message.channel, msg)
-			
-			
+
+
 @setxpreserve.error
 async def setxpreserve_error(ctx, error):
     # do stuff
 	msg = 'setxp Error: {}'.format(ctx)
 	await bot.say(msg)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	"""Gift xp to other members."""
@@ -840,8 +898,8 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 		except:
 			print("That member does not exist")
 			return
-	
-	
+
+
 	# Initialize User
 	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
 
@@ -849,41 +907,41 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	adminUnlim = getServerStat(ctx.message.server, globals.serverList, "AdminUnlimited")
 	reserveXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve")
 	minRole = getServerStat(ctx.message.server, globals.serverList, "MinimumXPRole")
-	
+
 	approve = True
 	decrement = True
-	
+
 	# MinimumXPRole
 	if ctx.message.author.top_role.position < int(minRole):
 		approve = False
 		msg = 'You don\'t have the permissions to give xp.'
-	
+
 	if xpAmount > int(reserveXP):
 		approve = False
 		msg = 'You can\'t give *{} xp*, you only have *{}!*'.format(xpAmount, reserveXP)
-	
+
 	if ctx.message.author == member:
 		approve = False
 		msg = 'You can\'t give yourself xp!  *Nice try...*'
-	
+
 	if xpAmount < 0:
 		msg = 'Only mods can take away xp!'
 		approve = False
-	
+
 	# Check admin last - so it overrides anything else
 	if isAdmin and adminUnlim.lower() == "yes":
 		# No limit - approve
 		approve = True
 		decrement = False
-	
+
 	userRole = member.top_role.position
-	
+
 	if approve:
 		msg = '{} was given *{} xp!*'.format(member.name, xpAmount)
 		globals.serverList = incrementStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
 		if decrement:
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
-		
+
 		xpPromote = getServerStat(ctx.message.server, globals.serverList, "XPPromote")
 		xpDemote = getServerStat(ctx.message.server, globals.serverList, "XPDemote")
 		promoteBy = getServerStat(ctx.message.server, globals.serverList, "PromoteBy")
@@ -891,10 +949,10 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 		maxPosition = getServerStat(ctx.message.server, globals.serverList, "MaxPosition")
 		padXP = getServerStat(ctx.message.server, globals.serverList, "PadXPRoles")
 		difficulty = int(getServerStat(ctx.message.server, globals.serverList, "DifficultyMultiplier"))
-		
+
 		userXP = getUserStat(member, ctx.message.server, globals.serverList, "XP")
 		userXP = int(userXP)+(int(requiredXP)*int(padXP))
-				
+
 		if xpPromote.lower() == "yes":
 			# We use XP to promote - let's check our levels
 			if promoteBy.lower() == "position":
@@ -902,9 +960,9 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 				gotLevels = 0
 				for x in range(0, int(maxPosition)+1):
 					# Let's apply our difficulty multiplier
-					
+
 					print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
-					
+
 					required = (requiredXP*x) + (requiredXP*difficulty)
 					print("Level: {}\nXP: {}".format(x, required))
 					if userXP >= required:
@@ -938,7 +996,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							if aRole.id == role['ID']:
 								# We found it
 								currentRole = aRole
-						
+
 						# Now see if we have it, and add it if we don't
 						if not currentRole in member.roles:
 							await bot.add_roles(member, currentRole)
@@ -952,13 +1010,13 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 								if aRole.id == role['ID']:
 									# We found it
 									currentRole = aRole
-						
+
 							# Now see if we have it, and add it if we don't
 							if currentRole in member.roles:
 								await bot.remove_roles(member, currentRole)
 								msg = '{} was demoted from {}!'.format(member.name, currentRole.name)
-							
-							
+
+
 	await bot.send_message(ctx.message.channel, msg)
 	#await quickFlush()
 
@@ -967,9 +1025,9 @@ async def getxp_error(ctx, error):
     # do stuff
 	msg = 'xp Error: {}'.format(ctx)
 	await bot.say(msg)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def addrole(ctx, role : discord.Role = None, xp : int = None):
 	"""Adds a new role to the xp promotion/demotion system (admin only)."""
@@ -978,7 +1036,7 @@ async def addrole(ctx, role : discord.Role = None, xp : int = None):
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-		
+
 	if role == None or xp == None:
 		msg = 'Usage: `$addrole [role] [required xp]`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -988,17 +1046,17 @@ async def addrole(ctx, role : discord.Role = None, xp : int = None):
 		msg = 'Usage: `$addrole [role] [required xp]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	if type(role) is str:
 		try:
 			role = discord.utils.get(message.server.roles, name=role)
 		except:
 			print("That role does not exist")
 			return
-			
+
 	# Now we see if we already have that role in our list
 	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
-	
+
 	for aRole in promoArray:
 		# Get the role that corresponds to the id
 		if aRole['ID'] == role.id:
@@ -1006,11 +1064,11 @@ async def addrole(ctx, role : discord.Role = None, xp : int = None):
 			msg = '{} is already in the list.  Required xp: {}'.format(role.name, aRole['XP'])
 			await bot.send_message(ctx.message.channel, msg)
 			return
-	
+
 	# If we made it this far - then we can add it
 	promoArray.append({ 'ID' : role.id, 'Name' : role.name, 'XP' : xp })
 	setServerStat(ctx.message.server, globals.serverList, "PromotionArray", promoArray)
-	
+
 	msg = '{} added to list.  Required xp: {}'.format(role.name, xp)
 	await bot.send_message(ctx.message.channel, msg)
 	return
@@ -1019,25 +1077,25 @@ async def addrole(ctx, role : discord.Role = None, xp : int = None):
 async def addrole_error(ctx, error):
     # do stuff
 	msg = 'addrole Error: {}'.format(ctx)
-	await bot.say(msg)		
+	await bot.say(msg)
 
-	
-	
+
+
 @bot.command(pass_context=True)
 async def listroles(ctx):
 	"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
-	
+
 	roleText = "Current Roles:\n"
-	
+
 	for arole in promoArray:
 		roleText = '{}**{}** : *{} XP* (ID : `{}`)\n'.format(roleText, arole['Name'], arole['XP'], arole['ID'])
-			
+
 	await bot.send_message(ctx.message.channel, roleText)
-	
-	
-	
-	
+
+
+
+
 @bot.command(pass_context=True)
 async def removerole(ctx, role : discord.Role = None):
 	"""Removes a role from the xp promotion/demotion system (admin only)."""
@@ -1046,22 +1104,22 @@ async def removerole(ctx, role : discord.Role = None):
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-		
+
 	if role == None:
 		msg = 'Usage: `$removerole [role]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	if type(role) is str:
 		try:
 			role = discord.utils.get(message.server.roles, name=role)
 		except:
 			print("That role does not exist")
 			return
-	
+
 	# If we're here - then the role is a real one
 	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
-	
+
 	for aRole in promoArray:
 		# Get the role that corresponds to the id
 		if aRole['ID'] == role.id:
@@ -1071,19 +1129,19 @@ async def removerole(ctx, role : discord.Role = None):
 			msg = '{} removed successfully.'.format(aRole['Name'])
 			await bot.send_message(ctx.message.channel, msg)
 			return
-	
+
 	# If we made it this far - then we didn't find it
 	msg = '{} not found in list.'.format(aRole['Name'])
 	await bot.send_message(ctx.message.channel, msg)
-	
+
 @removerole.error
 async def removerole_error(ctx, error):
     # do stuff
 	msg = 'removerole Error: {}'.format(ctx)
-	await bot.say(msg)		
-	
+	await bot.say(msg)
 
-	
+
+
 @bot.command(pass_context=True)
 async def autorole(ctx, setting : str = None, role : discord.Role = None):
 	"""Sets the autorole value - can be No, ID, or Position (admin only)."""
@@ -1096,29 +1154,29 @@ async def autorole(ctx, setting : str = None, role : discord.Role = None):
 	if setting == None:
 		await bot.send_message(ctx.message.channel, usageMessage)
 		return
-		
+
 	if not type(setting) == str:
 		await bot.send_message(ctx.message.channel, usageMessage)
 		return
-	
+
 	if setting.lower() == "no":
 		# We don't need a second var
 		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "No")
 		msg = 'AutoRole set to No'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	if role == None:
 		await bot.send_message(ctx.message.channel, usageMessage)
 		return
-		
+
 	if type(role) is str:
 		try:
 			role = discord.utils.get(message.server.roles, id=role)
 		except:
 			print("That role does not exist")
 			return
-		
+
 	if setting.lower() == "id":
 		# Found the role!  Let's add it
 		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "ID")
@@ -1126,26 +1184,26 @@ async def autorole(ctx, setting : str = None, role : discord.Role = None):
 		msg = 'AutoRole set to ID: {}'.format(role.id)
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
-	if setting.lower() == "position":		
+
+	if setting.lower() == "position":
 		# Found the role!  Let's add it
 		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "Position")
 		setServerStat(ctx.message.server, globals.serverList, "DefaultRole", str(role.position))
 		msg = 'AutoRole set to Position: {}'.format(role.position)
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	await bot.send_message(ctx.message.channel, usageMessage)
 	return
-	
-	
+
+
 @autorole.error
 async def autorole_error(ctx, error):
     # do stuff
 	msg = 'autorole Error: {}'.format(ctx)
-	await bot.say(msg)		
-		
-		
+	await bot.say(msg)
+
+
 
 @bot.command(pass_context=True)
 async def stats(ctx, member: discord.Member = None):
@@ -1164,18 +1222,18 @@ async def stats(ctx, member: discord.Member = None):
 	# Get user's xp
 	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
 	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
-	
+
 	msg = '{} has *{} xp*, and can gift up to *{} xp!*'.format(member.name, newStat, newState)
 	await bot.send_message(ctx.message.channel, msg)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def getstat(ctx, stat : str = None, member : discord.Member = None):
 	"""Gets the value for a specific stat for the listed member (case-sensitive)."""
 	if member == None:
 		member = ctx.message.author
-		
+
 	if str == None:
 		msg = 'Usage: `$getstat [stat] [member]`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -1187,22 +1245,22 @@ async def getstat(ctx, stat : str = None, member : discord.Member = None):
 		except:
 			print("That member does not exist")
 			return
-		
+
 	if member is None:
 		msg = 'Usage: `$getstat [stat] [member]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	try:
 		newStat = getUserStat(member, ctx.message.author.server, globals.serverList, stat)
 	except KeyError:
 		msg = '"{}" is not a valid stat for {}'.format(stat, member.name)
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	msg = '{} for {} is {}'.format(stat, member.name, newStat)
 	await bot.send_message(ctx.message.channel, msg)
-	
+
 # Catch errors for stat
 @getstat.error
 async def getstat_error(ctx, error):
@@ -1210,8 +1268,8 @@ async def getstat_error(ctx, error):
 	msg = 'getstat Error: {}'.format(ctx)
 	await bot.say(msg)
 
-	
-	
+
+
 @bot.command(pass_context=True)
 async def setsstat(ctx, stat : str = None, value : str = None):
 	"""Sets a server stat (admin only)."""
@@ -1219,18 +1277,18 @@ async def setsstat(ctx, stat : str = None, value : str = None):
 	# Only allow admins to change server stats
 	if not isAdmin:
 		return
-	
+
 	if stat == None or value == None:
 		msg = 'Usage: $setsstat Stat Value'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	setServerStat(ctx.message.server, globals.serverList, stat, value)
-	
+
 	msg = '{} set to {}!'.format(stat, value)
 	await bot.send_message(ctx.message.channel, msg)
-	
-	
+
+
 @bot.command(pass_context=True)
 async def getsstat(ctx, stat : str = None):
 	"""Gets a server stat (admin only)."""
@@ -1238,19 +1296,19 @@ async def getsstat(ctx, stat : str = None):
 	# Only allow admins to change server stats
 	if not isAdmin:
 		return
-	
+
 	if stat == None:
 		msg = 'Usage: `$getsstat [stat]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	value = getServerStat(ctx.message.server, globals.serverList, stat)
-	
+
 	msg = '{} is currently {}!'.format(stat, value)
 	await bot.send_message(ctx.message.channel, msg)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def addlink(ctx, name : str = None, link : str = None):
 	"""Add a link to the link list."""
@@ -1258,63 +1316,63 @@ async def addlink(ctx, name : str = None, link : str = None):
 		msg = 'Usage: `$addlink "[link name]" [url]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
 	if linkList == None:
 		linkList = []
-	
+
 	linkList.append({"Name" : name, "URL" : link})
-	
+
 	setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
-	
+
 	msg = '{} added to link list!'.format(name)
 	await bot.send_message(ctx.message.channel, msg)
-	
+
 
 @bot.command(pass_context=True)
-async def link(ctx, name : str = None):	
+async def link(ctx, name : str = None):
 	"""Retrieve a link from the link list."""
 	if name == None or link == None:
 		msg = 'Usage: `$link "[link name]"`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
 	if linkList == None or linkList == []:
 		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	for alink in linkList:
 		if alink['Name'].lower() == name.lower():
 			msg = '{}\n{}'.format(alink['Name'], alink['URL'])
 			await bot.send_message(ctx.message.channel, msg)
-	
 
-	
-	
+
+
+
 @bot.command(pass_context=True)
-async def links(ctx):	
+async def links(ctx):
 	"""List all links in the link list."""
 	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
 	if linkList == None or linkList == []:
 		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	linkText = ""
-	
+
 	for alink in linkList:
 		linkText = '{}{}\n'.format(linkText, alink['Name'])
-			
+
 	await bot.send_message(ctx.message.channel, linkText)
-	
-	
+
+
 @bot.command(pass_context=True)
 async def quickhelp(ctx):
 	"""List compact member-only help."""
 	commandString = "```Quick Help:\n\n"
-	
+
 	commandString = commandString + "Music:\n"
 	commandString = commandString + "   volume       Sets the volume of the currently playing song.\n"
 	commandString = commandString + "   stop         Stops playing audio and leaves the voice channel.\n"
@@ -1325,7 +1383,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   play         Plays a song.\n"
 	commandString = commandString + "   playing      Shows info about the currently played song.\n"
 	commandString = commandString + "   summon       Summons the bot to join your voice channel.\n"
-	
+
 	commandString = commandString + "User Commands:\n"
 	commandString = commandString + "   xp           Gift xp to other members.\n"
 	commandString = commandString + "   stats        List the xp and xp reserve of a listed member (case-sensitive).\n"
@@ -1340,21 +1398,23 @@ async def quickhelp(ctx):
 	commandString = commandString + "   add          Adds two numbers together.\n"
 	commandString = commandString + "   randilbert   Randomly picks and displays a Dilbert comic.\n"
 	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
+	commandString = commandString + "   randxkcd     Randomly picks and displays an XKCD comic.\n"
+	commandString = commandString + "   xkcd         Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found.\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
 	commandString = commandString + "   adminhelp    Shows the admin help message."
-	
+
 	commandString = commandString + "```"
-	
+
 	await bot.send_message(ctx.message.channel, commandString)
-	
-	
+
+
 @bot.command(pass_context=True)
 async def adminhelp(ctx):
 	"""List compact admin-only help."""
 	commandString = "```Admin Help:\n\n"
-	
+
 	commandString = commandString + "Admin Commands:\n"
 	commandString = commandString + "   addrole      Adds a new role to the xp promotion/demotion system (admin only).\n"
 	commandString = commandString + "   removerole   Removes a role from the xp promotion/demotion system (admin only).\n"
@@ -1365,12 +1425,12 @@ async def adminhelp(ctx):
 	commandString = commandString + "   setxpreserve Set's an absolute value for the member's xp reserve (admin only).\n"
 	commandString = commandString + "   playgame     Sets the playing status of the bot (admin only).\n"
 	commandString = commandString + "   flush        Flush the bot settings to disk (admin only).\n"
-	
+
 	commandString = commandString + "```"
-	
+
 	await bot.send_message(ctx.message.channel, commandString)
-	
-	
+
+
 @bot.command(pass_context=True)
 async def removelink(ctx, name : str = None):
 	"""Remove a link from the link list."""
@@ -1378,13 +1438,13 @@ async def removelink(ctx, name : str = None):
 		msg = 'Usage: `$removelink "[link name]"`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
 	if linkList == None or linkList == []:
 		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-		
+
 	for alink in linkList:
 		if alink['Name'].lower() == name.lower():
 			linkList.remove(alink)
@@ -1392,11 +1452,11 @@ async def removelink(ctx, name : str = None):
 			msg = '{} removed from link list!'.format(name)
 			await bot.send_message(ctx.message.channel, msg)
 			return
-	
+
 	msg = '{} not found in link list!'.format(name)
 	await bot.send_message(ctx.message.channel, msg)
-		
-		
+
+
 @bot.command(pass_context=True)
 async def flush(ctx):
 	"""Flush the bot settings to disk (admin only)."""
@@ -1409,8 +1469,8 @@ async def flush(ctx):
 	msg = 'Flushed settings to disk.'
 	await bot.send_message(ctx.message.channel, msg)
 
-	
-	
+
+
 @bot.command(pass_context=True)
 async def randilbert(ctx):
 	"""Randomly picks and displays a Dilbert comic."""
@@ -1418,15 +1478,15 @@ async def randilbert(ctx):
 	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
 	tDate = todayDate.split("-")
 	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
-	
+
 	# Can't be before this date.
 	firstDate = "04-16-1989"
 	fDate = firstDate.split("-")
 	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
-	
+
 	# Get a random Julian date between the first comic and today
 	startJDate = random.uniform(fJDate, tJDate)
-	
+
 	# Let's create our url
 	gDate = jd_to_date(startJDate)
 
@@ -1440,18 +1500,18 @@ async def randilbert(ctx):
 
 	if (gDate[2] < 10):
 		dName = "0"+dName
-		
+
 	# Get URL
 	getURL = "http://dilbert.com/strip/" + str(gDate[0]) + "-" + mDir + "-" + dName
-	
+
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
 	imageURL  = getImageURL(imageHTML)
 	imageName = getImageTitle(imageHTML) + ".jpg"
-	
+
 	msg = '{}'.format(imageName)
 	await bot.send_message(ctx.message.channel, msg)
-	
+
 	# Make temp dir, download image, upload to discord
 	# then remove temp dir
 	dirpath = tempfile.mkdtemp()
@@ -1459,41 +1519,39 @@ async def randilbert(ctx):
 	urllib.request.urlretrieve(imageURL, imagePath)
 	with open(imagePath, 'rb') as f:
 		await bot.send_file(ctx.message.channel, f)
-	
+
 	shutil.rmtree(dirpath, ignore_errors=True)
-	
-	
-	
+
+
+
 @bot.command(pass_context=True)
 async def dilbert(ctx, date : str = None):
 	"""Displays the Dilbert comic for the passed date (MM-DD-YYYY)."""
 	if date == None:
-		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
-		await bot.send_message(ctx.message.channel, msg)
-		return
-	
+        # Auto to today's date
+		date = dt.datetime.today().strftime("%m-%d-%Y")
 	try:
 		startDate = date.split("-")
 	except ValueError:
 		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	# Get some preliminary values
 	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
 	tDate = todayDate.split("-")
 	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
-	
+
 	# Can't be before this date.
 	firstDate = "04-16-1989"
 	fDate = firstDate.split("-")
 	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
-	
-	
-	
+
+
+
 	# Get a a Julian date for the passed day
 	startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
-	
+
 	outOfRange = False
 
 	# Check date ranges
@@ -1501,12 +1559,12 @@ async def dilbert(ctx, date : str = None):
 		outOfRange = True
 	if startJDate > tJDate:
 		outOfRange = True
-	
+
 	if outOfRange:
 		msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
 		await bot.send_message(ctx.message.channel, msg)
 		return
-	
+
 	# Let's create our url
 	gDate = jd_to_date(startJDate)
 
@@ -1520,18 +1578,19 @@ async def dilbert(ctx, date : str = None):
 
 	if (gDate[2] < 10):
 		dName = "0"+dName
-		
+
 	# Get URL
 	getURL = "http://dilbert.com/strip/" + str(gDate[0]) + "-" + mDir + "-" + dName
 
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
 	imageURL  = getImageURL(imageHTML)
-	imageName = getImageTitle(imageHTML) + ".jpg"
-	
-	msg = '{}'.format(imageName)
+	imageDisplayName = getImageTitle(imageHTML)
+	imageName = imageDisplayName + ".jpg"
+
+	msg = '{}'.format(imageDisplayName)
 	await bot.send_message(ctx.message.channel, msg)
-	
+
 	# Make temp dir, download image, upload to discord
 	# then remove temp dir
 	dirpath = tempfile.mkdtemp()
@@ -1539,10 +1598,171 @@ async def dilbert(ctx, date : str = None):
 	urllib.request.urlretrieve(imageURL, imagePath)
 	with open(imagePath, 'rb') as f:
 		await bot.send_file(ctx.message.channel, f)
-	
+
 	shutil.rmtree(dirpath, ignore_errors=True)
+
 	
+@bot.command(pass_context=True)
+async def randxkcd(ctx):
+	"""Displays a random XKCD comic."""
 	
+	# Must be a comic number
+	archiveURL = "http://xkcd.com/archive/"
+	archiveHTML = getImageHTML(archiveURL)
+	newest = int(getNewestXKCD(archiveHTML))
+	
+	date = random.randint(1, newest)
+		
+	if int(date) > int(newest) or int(date) < 1:
+		msg = "Comic out of range. Must be between 1 and {}".format(newest)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	comicURL = "/" + str(date) + "/"
+		
+	
+	if comicURL == None:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	comicURL = "http://xkcd.com" + comicURL
+
+    # now we get the actual comic info
+	imageHTML = getImageHTML(comicURL)
+	imageURL = getXKCDImageURL(imageHTML)
+	imageDisplayName = getXKCDImageTitle(imageHTML)
+	imageName = imageDisplayName + ".png"
+	# imageDest = dirPath + "/" + imageName + ".png"
+
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+	#with urllib.request.urlretrieve(imageURL) as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+
+
+@bot.command(pass_context=True)
+async def xkcd(ctx, date : str = None):
+	"""Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found."""
+	startDate = None
+	if date == None:
+		# Auto to today's date
+		date = dt.datetime.today().strftime("%m-%d-%Y")
+	try:
+		startDate = date.split("-")
+	except ValueError:
+		# If it's an int - let's see if it fits
+		if not type(date) == int:
+			msg = 'Usage: `$xkcd "[date MM-DD-YYYY]"`'
+			await bot.send_message(ctx.message.channel, msg)
+			return
+	
+	if len(startDate) < 3:
+		try:
+			date = int(date)
+		except:
+			return
+		# Must be a comic number
+		archiveURL = "http://xkcd.com/archive/"
+		archiveHTML = getImageHTML(archiveURL)
+		newest = int(getNewestXKCD(archiveHTML))
+		
+		if int(date) > int(newest) or int(date) < 1:
+			msg = "Comic out of range. Must be between 1 and {}".format(newest)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+		
+		comicURL = "/" + str(date) + "/"
+		
+	else:
+		
+		# Get some preliminary values
+		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+		tDate = todayDate.split("-")
+		tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+
+		# Can't be before this date.
+		firstDate = "01-01-2006"
+		fDate = firstDate.split("-")
+		fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+
+		# Get a a Julian date for the passed day
+		startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
+
+		outOfRange = False
+
+		# Check date ranges
+		if startJDate < fJDate:
+			outOfRange = True
+		if startJDate > tJDate:
+			outOfRange = True
+	
+		if outOfRange:
+			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+
+		# Let's create our url
+		gDate = jd_to_date(startJDate)
+
+		# Prep dir names
+		yDir = str(gDate[0])
+		mDir = str(gDate[1])
+		dName = str(int(gDate[2]))
+
+		if (gDate[1] < 10):
+			mDir = "0"+mDir
+
+		if (gDate[2] < 10):
+			dName = "0"+dName
+
+		# Get URL
+		archiveURL = "http://xkcd.com/archive/"
+		archiveHTML = getImageHTML(archiveURL)
+		#print(archiveHTML)
+		xkcdDate = "{}-{}-{}".format(int(yDir), int(mDir), int(dName))
+		comicURL = getXKCDURL( archiveHTML, xkcdDate )
+		
+		
+	
+	if comicURL == None:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	comicURL = "http://xkcd.com" + comicURL
+
+    # now we get the actual comic info
+	imageHTML = getImageHTML(comicURL)
+	imageURL = getXKCDImageURL(imageHTML)
+	imageDisplayName = getXKCDImageTitle(imageHTML)
+	imageName = imageDisplayName + ".png"
+	# imageDest = dirPath + "/" + imageName + ".png"
+
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+	#with urllib.request.urlretrieve(imageURL) as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+
+
   ###             ###
  # END:   Commands #
 ###             ###
@@ -1551,8 +1771,8 @@ async def dilbert(ctx, date : str = None):
 
   ###       ###
  # Bot Start #
-###       ###	
-	
+###       ###
+
 bot.add_cog(Music(bot))
 # bot.loop.create_task(flushSettings())
 
