@@ -82,9 +82,14 @@ def checkUser(user, server, serverDict):
 						# print("No Discriminator - adding...")
 						y["Discriminator"] = user.discriminator
 					# print("Found our user: " + userName)
+					if not "Name" in y:
+						y["Name"] = user.name
+					if not "DisplayName" in y:
+						y["DisplayName"] = user.display_name
 			if not found:
 				# We didn't locate our user - add them
 				newUser = { "Name" : user.name, 
+							"DisplayName" : user.display_name,
 							"XP" : 0,
 							"XPReserve" : 10,
 							"ID" : user.id, 
@@ -470,7 +475,7 @@ async def on_member_join(member):
 	# Initialize User
 	globals.serverList = checkUser(member, server, globals.serverList)
 	
-	fmt = 'Welcome {0.mention} to {1.name}!'
+	fmt = 'Welcome {0.mention} to {1.display_name}!'
 	await bot.send_message(server, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
 	
@@ -480,9 +485,13 @@ async def on_member_join(member):
 	if autoRole.lower() == "position":
 		newRole = discord.utils.get(server.roles, position=int(defaultRole))
 		await bot.add_roles(member, newRole)
+		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
+		await bot.send_message(server, fmt)
 	elif autoRole.lower() == "id":
 		newRole = discord.utils.get(server.roles, id=defaultRole)
 		await bot.add_roles(member, newRole)
+		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
+		await bot.send_message(server, fmt)
 		
 	await quickFlush()
 		
@@ -567,7 +576,7 @@ async def getoffline(ctx):
 	#print("Hello")
 	await bot.request_offline_members(theServer)
 	for user in theServer.members:
-		print('User: {}'.format(user.name))
+		print('User: {}'.format(user.display_name))
 	#print('{}'.format(theServer.members))
 
 
@@ -618,7 +627,7 @@ async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
 			return
 			
 	setUserStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
-	msg = '{}\'s XP was set to {}!'.format(member.name, xpAmount)				
+	msg = '{}\'s XP was set to {}!'.format(member.display_name, xpAmount)				
 	await bot.send_message(ctx.message.channel, msg)
 			
 			
@@ -660,7 +669,7 @@ async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = Non
 			return
 			
 	setUserStat(member, ctx.message.server, globals.serverList, "XPReserve", xpAmount)
-	msg = '{}\'s XPReserve was set to {}!'.format(member.name, xpAmount)				
+	msg = '{}\'s XPReserve was set to {}!'.format(member.display_name, xpAmount)				
 	await bot.send_message(ctx.message.channel, msg)
 			
 			
@@ -729,7 +738,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	userRole = member.top_role.position
 	
 	if approve:
-		msg = '{} was given {} XP!'.format(member.name, xpAmount)
+		msg = '{} was given {} XP!'.format(member.display_name, xpAmount)
 		globals.serverList = incrementStat(member, ctx.message.server, globals.serverList, "XP", xpAmount)
 		if decrement:
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
@@ -774,7 +783,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							if not role in member.roles:
 								# Only add if we need to
 								await bot.add_roles(member, role)
-								msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+								msg = '{} was given {} XP, and was promoted to {}!'.format(member.display_name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
 			elif promoteBy.lower() == "array":
 				promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
 				serverRoles = ctx.message.server.roles
@@ -792,7 +801,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 						# Now see if we have it, and add it if we don't
 						if not currentRole in member.roles:
 							await bot.add_roles(member, currentRole)
-							msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, currentRole.name)
+							msg = '{} was given {} XP, and was promoted to {}!'.format(member.display_name, xpAmount, currentRole.name)
 					else:
 						if xpDemote.lower() == "yes":
 							# Let's see if we have this role, and remove it.  Demote time!
@@ -806,7 +815,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 							# Now see if we have it, and add it if we don't
 							if currentRole in member.roles:
 								await bot.remove_roles(member, currentRole)
-								msg = '{} was demoted from {}!'.format(member.name, currentRole.name)
+								msg = '{} was demoted from {}!'.format(member.display_name, currentRole.name)
 							
 							
 	await bot.send_message(ctx.message.channel, msg)
@@ -1014,7 +1023,7 @@ async def stats(ctx, member: discord.Member = None):
 	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
 	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
 	
-	msg = 'User {} has `{}` XP, and can gift up to `{}` XP!'.format(member, newStat, newState)
+	msg = '{} has *{}* XP, and can gift up to *{}* XP!'.format(member.display_name, newStat, newState)
 	await bot.send_message(ctx.message.channel, msg)
 	
 	
@@ -1045,11 +1054,11 @@ async def getstat(ctx, stat : str = None, member : discord.Member = None):
 	try:
 		newStat = getUserStat(member, ctx.message.author.server, globals.serverList, stat)
 	except KeyError:
-		msg = '"{}" is not a valid stat for {}'.format(stat, member.name)
+		msg = '"{}" is not a valid stat for {}'.format(stat, member.display_name)
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
-	msg = '{} for {} is {}'.format(stat, member.name, newStat)
+	msg = '{} for {} is {}'.format(stat, member.display_name, newStat)
 	await bot.send_message(ctx.message.channel, msg)
 	
 # Catch errors for stat
