@@ -1717,7 +1717,7 @@ async def randxkcd(ctx):
 	imageName = imageDisplayName + ".png"
 	# imageDest = dirPath + "/" + imageName + ".png"
 
-	msg = '{}'.format(imageDisplayName)
+	msg = '{} (*{}*)'.format(imageDisplayName, date)
 	await bot.send_message(ctx.message.channel, msg)
 
 	# Make temp dir, download image, upload to discord
@@ -1820,7 +1820,7 @@ async def xkcd(ctx, date : str = None):
 		msg = 'No comic found for *{}*'.format(date)
 		await bot.send_message(ctx.message.channel, msg)
 		return
-
+	comicNumber = comicURL.replace('/', '').strip()
 	comicURL = "http://xkcd.com" + comicURL
 
     # now we get the actual comic info
@@ -1830,7 +1830,7 @@ async def xkcd(ctx, date : str = None):
 	imageName = imageDisplayName + ".png"
 	# imageDest = dirPath + "/" + imageName + ".png"
 
-	msg = '{}'.format(imageDisplayName)
+	msg = '{} (*{}*)'.format(imageDisplayName, comicNumber)
 	await bot.send_message(ctx.message.channel, msg)
 
 	# Make temp dir, download image, upload to discord
