@@ -561,7 +561,8 @@ async def joined(member : discord.Member):
     await bot.say('{0.name} joined in {0.joined_at}'.format(member))
 	
 @bot.command(pass_context=True)
-async def getOffline(ctx):
+async def getoffline(ctx):
+	"""Forces the server to account for offline members - only important to the backend."""
 	theServer = ctx.message.author.server
 	#print("Hello")
 	await bot.request_offline_members(theServer)
@@ -571,7 +572,8 @@ async def getOffline(ctx):
 
 
 @bot.command(pass_context=True)
-async def playGame(ctx, game : str = None):
+async def playgame(ctx, game : str = None):
+	"""Sets the playing status of the bot (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
@@ -588,6 +590,7 @@ async def playGame(ctx, game : str = None):
 	
 @bot.command(pass_context=True)
 async def setxp(ctx, member : discord.Member = None, xpAmount : int = None):
+	"""Sets an absolute value for the member's xp (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
@@ -629,6 +632,7 @@ async def setxp_error(ctx, error):
 	
 @bot.command(pass_context=True)
 async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = None):
+	"""Set's an absolute value for the member's xp reserve (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
@@ -637,15 +641,15 @@ async def setxpreserve(ctx, member : discord.Member = None, xpAmount : int = Non
 		
 	# Check for formatting issues
 	if xpAmount == None or member == None:
-		msg = 'Usage: `$setxp [member] [amount]`'
+		msg = 'Usage: `$setxpreserve [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if not type(xpAmount) is int:
-		msg = 'Usage: `$setxp [member] [amount]`'
+		msg = 'Usage: `$setxpreserve [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if xpAmount < 0:
-		msg = 'Usage: `$setxp [member] [amount]`'
+		msg = 'Usage: `$setxpreserve [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if type(member) is str:
@@ -667,18 +671,16 @@ async def setxpreserve_error(ctx, error):
 	await bot.say(msg)
 	
 	
+	
 @bot.command(pass_context=True)
 async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
+	"""Gift xp to other members."""
 	# Check for formatting issues
 	if xpAmount == None or member == None:
 		msg = 'Usage: `$xp [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if not type(xpAmount) is int:
-		msg = 'Usage: `$xp [member] [amount]`'
-		await bot.send_message(ctx.message.channel, msg)
-		return
-	if xpAmount < 0:
 		msg = 'Usage: `$xp [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
@@ -704,15 +706,19 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	# MinimumXPRole
 	if ctx.message.author.top_role.position < int(minRole):
 		approve = False
-		msg = 'You don\'t have the permissions to give XP.'
+		msg = 'You don\'t have the permissions to give xp.'
 	
 	if xpAmount > int(reserveXP):
 		approve = False
-		msg = 'You can\'t give {} XP, you only have {}'.format(xpAmount, reserveXP)
+		msg = 'You can\'t give {} xp, you only have {}'.format(xpAmount, reserveXP)
 	
 	if ctx.message.author == member:
 		approve = False
-		msg = 'You can\'t give yourself XP!  *Nice try...*'
+		msg = 'You can\'t give yourself xp!  *Nice try...*'
+	
+	if xpAmount < 0:
+		msg = 'Only mods can take away xp!'
+		approve = False
 	
 	# Check admin last - so it overrides anything else
 	if isAdmin and adminUnlim.lower() == "yes":
@@ -729,6 +735,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", (-1*xpAmount))
 		
 		xpPromote = getServerStat(ctx.message.server, globals.serverList, "XPPromote")
+		xpDemote = getServerStat(ctx.message.server, globals.serverList, "XPDemote")
 		promoteBy = getServerStat(ctx.message.server, globals.serverList, "PromoteBy")
 		requiredXP = int(getServerStat(ctx.message.server, globals.serverList, "RequiredXP"))
 		maxPosition = getServerStat(ctx.message.server, globals.serverList, "MaxPosition")
@@ -786,7 +793,22 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 						if not currentRole in member.roles:
 							await bot.add_roles(member, currentRole)
 							msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, currentRole.name)
+					else:
+						if xpDemote.lower() == "yes":
+							# Let's see if we have this role, and remove it.  Demote time!
+							currentRole = None
+							for aRole in serverRoles:
+								# Get the role that corresponds to the id
+								if aRole.id == role['ID']:
+									# We found it
+									currentRole = aRole
 						
+							# Now see if we have it, and add it if we don't
+							if currentRole in member.roles:
+								await bot.remove_roles(member, currentRole)
+								msg = '{} was demoted from {}!'.format(member.name, currentRole.name)
+							
+							
 	await bot.send_message(ctx.message.channel, msg)
 	#await quickFlush()
 
@@ -799,7 +821,8 @@ async def getxp_error(ctx, error):
 	
 	
 @bot.command(pass_context=True)
-async def addRole(ctx, role : discord.Role = None, xp : int = None):
+async def addrole(ctx, role : discord.Role = None, xp : int = None):
+	"""Adds a new role to the xp promotion/demotion system (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
@@ -807,12 +830,12 @@ async def addRole(ctx, role : discord.Role = None, xp : int = None):
 		return
 		
 	if role == None or xp == None:
-		msg = 'Usage: `$addRole [role] [required xp]`'
+		msg = 'Usage: `$addrole [role] [required xp]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 
 	if not type(xp) is int:
-		msg = 'Usage: `$addRole [role] [required xp]`'
+		msg = 'Usage: `$addrole [role] [required xp]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
@@ -842,24 +865,32 @@ async def addRole(ctx, role : discord.Role = None, xp : int = None):
 	await bot.send_message(ctx.message.channel, msg)
 	return
 
-@addRole.error
-async def addRole_error(ctx, error):
+@addrole.error
+async def addrole_error(ctx, error):
     # do stuff
-	msg = 'addRole Error: {}'.format(ctx)
+	msg = 'addrole Error: {}'.format(ctx)
 	await bot.say(msg)		
 
 	
 	
 @bot.command(pass_context=True)
-async def listRoles(ctx):
+async def listroles(ctx):
+	"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
-	msg = 'Current Roles: {}'.format(promoArray)
-	await bot.send_message(ctx.message.channel, msg)	
+	
+	roleText = "Current Roles:\n"
+	
+	for arole in promoArray:
+		roleText = '{}{} : {} : {} XP\n'.format(roleText, arole['Name'], arole['ID'], arole['XP'])
+			
+	await bot.send_message(ctx.message.channel, roleText)
+	
 	
 	
 	
 @bot.command(pass_context=True)
-async def removeRole(ctx, role : discord.Role = None):
+async def removerole(ctx, role : discord.Role = None):
+	"""Removes a role from the xp promotion/demotion system (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
@@ -867,7 +898,7 @@ async def removeRole(ctx, role : discord.Role = None):
 		return
 		
 	if role == None:
-		msg = 'Usage: `$removeRole [role]`'
+		msg = 'Usage: `$removerole [role]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
@@ -895,22 +926,23 @@ async def removeRole(ctx, role : discord.Role = None):
 	msg = '{} not found in list.'.format(aRole['Name'])
 	await bot.send_message(ctx.message.channel, msg)
 	
-@removeRole.error
-async def removeRole_error(ctx, error):
+@removerole.error
+async def removerole_error(ctx, error):
     # do stuff
-	msg = 'removeRole Error: {}'.format(ctx)
+	msg = 'removerole Error: {}'.format(ctx)
 	await bot.say(msg)		
 	
 
 	
 @bot.command(pass_context=True)
-async def autoRole(ctx, setting : str = None, role : discord.Role = None):
+async def autorole(ctx, setting : str = None, role : discord.Role = None):
+	"""Sets the autorole value - can be No, ID, or Position (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
-	usageMessage = 'Usage: `$autoRole [No/ID/Position] [role]`'
+	usageMessage = 'Usage: `$autorole [No/ID/Position] [role]`'
 	if setting == None:
 		await bot.send_message(ctx.message.channel, usageMessage)
 		return
@@ -957,16 +989,17 @@ async def autoRole(ctx, setting : str = None, role : discord.Role = None):
 	return
 	
 	
-@autoRole.error
-async def autoRole_error(ctx, error):
+@autorole.error
+async def autorole_error(ctx, error):
     # do stuff
-	msg = 'autoRole Error: {}'.format(ctx)
+	msg = 'autorole Error: {}'.format(ctx)
 	await bot.say(msg)		
 		
 		
 
 @bot.command(pass_context=True)
 async def stats(ctx, member: discord.Member = None):
+	"""List the xp and xp reserve of a listed member."""
 	# await bot.say("You tried this")
 	if member is None:
 		await bot.say('Usage: `$stats [member]`')
@@ -979,19 +1012,21 @@ async def stats(ctx, member: discord.Member = None):
 	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
 	# Get user's xp
 	newStat = getUserStat(member, ctx.message.server, globals.serverList, "XP")
+	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
 	
-	msg = 'User {} has {} XP!'.format(member, newStat)
+	msg = 'User {} has `{}` XP, and can gift up to `{}` XP!'.format(member, newStat, newState)
 	await bot.send_message(ctx.message.channel, msg)
 	
 	
 	
 @bot.command(pass_context=True)
-async def getStat(ctx, stat : str = None, member : discord.Member = None):
+async def getstat(ctx, stat : str = None, member : discord.Member = None):
+	"""Gets the value for a specific stat for the listed member (case-sensitive)."""
 	if member == None:
 		member = ctx.message.author
 		
 	if str == None:
-		msg = 'Usage: $getStat Stat @User'
+		msg = 'Usage: `$getstat [stat] [member]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 
@@ -1003,7 +1038,7 @@ async def getStat(ctx, stat : str = None, member : discord.Member = None):
 			return
 		
 	if member is None:
-		msg = 'Usage: $getStat Stat @User'
+		msg = 'Usage: `$getstat [stat] [member]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	
@@ -1018,23 +1053,24 @@ async def getStat(ctx, stat : str = None, member : discord.Member = None):
 	await bot.send_message(ctx.message.channel, msg)
 	
 # Catch errors for stat
-@getStat.error
-async def getStat_error(ctx, error):
+@getstat.error
+async def getstat_error(ctx, error):
     # do stuff
-	msg = 'getStat Error: {}'.format(ctx)
+	msg = 'getstat Error: {}'.format(ctx)
 	await bot.say(msg)
 
 	
 	
 @bot.command(pass_context=True)
-async def setSStat(ctx, stat : str = None, value : str = None):
+async def setsstat(ctx, stat : str = None, value : str = None):
+	"""Sets a server stat (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
 		return
 	
 	if stat == None or value == None:
-		msg = 'Usage: $setSStat Stat Value'
+		msg = 'Usage: $setsstat Stat Value'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
@@ -1045,14 +1081,15 @@ async def setSStat(ctx, stat : str = None, value : str = None):
 	
 	
 @bot.command(pass_context=True)
-async def getSStat(ctx, stat : str = None):
+async def getsstat(ctx, stat : str = None):
+	"""Gets a server stat (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
 		return
 	
 	if stat == None:
-		msg = 'Usage: `$getSStat [stat]`'
+		msg = 'Usage: `$getsstat [stat]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 		
@@ -1064,7 +1101,8 @@ async def getSStat(ctx, stat : str = None):
 	
 	
 @bot.command(pass_context=True)
-async def addlink(ctx, name : str = None, link : str = None):	
+async def addlink(ctx, name : str = None, link : str = None):
+	"""Add a link to the link list."""
 	if name == None or link == None:
 		msg = 'Usage: `$addlink "[link name]" [url]`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -1084,6 +1122,7 @@ async def addlink(ctx, name : str = None, link : str = None):
 
 @bot.command(pass_context=True)
 async def link(ctx, name : str = None):	
+	"""Retrieve a link from the link list."""
 	if name == None or link == None:
 		msg = 'Usage: `$link "[link name]"`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -1105,6 +1144,7 @@ async def link(ctx, name : str = None):
 	
 @bot.command(pass_context=True)
 async def links(ctx):	
+	"""List all links in the link list."""
 	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
 	if linkList == None or linkList == []:
 		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
@@ -1121,7 +1161,8 @@ async def links(ctx):
 	
 	
 @bot.command(pass_context=True)
-async def removelink(ctx, name : str = None):		
+async def removelink(ctx, name : str = None):
+	"""Remove a link from the link list."""
 	if name == None:
 		msg = 'Usage: `$removelink "[link name]"`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -1147,6 +1188,7 @@ async def removelink(ctx, name : str = None):
 		
 @bot.command(pass_context=True)
 async def flush(ctx):
+	"""Flush the bot settings to disk (admin only)."""
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
