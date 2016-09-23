@@ -234,6 +234,7 @@ def checkServer(server, serverDict):
 											"AutoRole" : "No", # No/ID/Position
 											"DefaultRole" : "1",
 											"MinimumXPRole" : "1",
+											"RequiredLinkRole" : "", #ID or blank for Admin-Only
 											"XPApprovalChannel" : "",
 											"HourlyXP" : "3",
 											"IncreasePerRank" : "1",
@@ -1276,6 +1277,7 @@ async def setsstat(ctx, stat : str = None, value : str = None):
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
 
 	if stat == None or value == None:
@@ -1295,6 +1297,7 @@ async def getsstat(ctx, stat : str = None):
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	# Only allow admins to change server stats
 	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 		return
 
 	if stat == None:
@@ -1307,11 +1310,69 @@ async def getsstat(ctx, stat : str = None):
 	msg = '{} is currently {}!'.format(stat, value)
 	await bot.send_message(ctx.message.channel, msg)
 
+	
+	
+@bot.command(pass_context=True)
+async def setlinkrole(ctx, role : discord.Role = None):
+	"""Sets the required role ID to add/remove links (admin only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
 
+	if role == None:
+		setServerStat(ctx.message.server, globals.serverList, "RequiredLinkRole", "")
+		msg = 'Add/remove links now *admin-only*.'
+		await bot.send_message(ctx.message.channel, msg)
+		return
 
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+
+	# If we made it this far - then we can add it
+	setServerStat(ctx.message.server, globals.serverList, "RequiredLinkRole", role.id)
+
+	msg = 'Role required for add/remove links set to *{}*.'.format(role.name)
+	await bot.send_message(ctx.message.channel, msg)
+	return
+
+@setlinkrole.error
+async def linkrole_error(ctx, error):
+    # do stuff
+	msg = 'setlinkrole Error: {}'.format(ctx)
+	await bot.say(msg)
+
+	
+	
 @bot.command(pass_context=True)
 async def addlink(ctx, name : str = None, link : str = None):
 	"""Add a link to the link list."""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredLinkRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+			
+	# Passed role requirements!
 	if name == None or link == None:
 		msg = 'Usage: `$addlink "[link name]" [url]`'
 		await bot.send_message(ctx.message.channel, msg)
@@ -1326,6 +1387,51 @@ async def addlink(ctx, name : str = None, link : str = None):
 	setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
 
 	msg = '{} added to link list!'.format(name)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def removelink(ctx, name : str = None):
+	"""Remove a link from the link list."""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredLinkRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	
+	if name == None:
+		msg = 'Usage: `$removelink "[link name]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
+	if linkList == None or linkList == []:
+		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	for alink in linkList:
+		if alink['Name'].lower() == name.lower():
+			linkList.remove(alink)
+			setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
+			msg = '{} removed from link list!'.format(name)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+
+	msg = '{} not found in link list!'.format(name)
 	await bot.send_message(ctx.message.channel, msg)
 
 
@@ -1419,6 +1525,7 @@ async def adminhelp(ctx):
 	commandString = commandString + "   addrole      Adds a new role to the xp promotion/demotion system (admin only).\n"
 	commandString = commandString + "   removerole   Removes a role from the xp promotion/demotion system (admin only).\n"
 	commandString = commandString + "   autorole     Sets the autorole value - can be No, ID, or Position (admin only).\n"
+	commandString = commandString + "   setlinkrole  Sets the required role ID to add/remove links (admin only).\n"
 	commandString = commandString + "   getsstat     Gets a server stat (admin only).\n"
 	commandString = commandString + "   setsstat     Sets a server stat (admin only).\n"
 	commandString = commandString + "   setxp        Sets an absolute value for the member's xp (admin only).\n"
@@ -1429,32 +1536,7 @@ async def adminhelp(ctx):
 	commandString = commandString + "```"
 
 	await bot.send_message(ctx.message.channel, commandString)
-
-
-@bot.command(pass_context=True)
-async def removelink(ctx, name : str = None):
-	"""Remove a link from the link list."""
-	if name == None:
-		msg = 'Usage: `$removelink "[link name]"`'
-		await bot.send_message(ctx.message.channel, msg)
-		return
-
-	linkList = getServerStat(ctx.message.server, globals.serverList, "Links")
-	if linkList == None or linkList == []:
-		msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
-		await bot.send_message(ctx.message.channel, msg)
-		return
-
-	for alink in linkList:
-		if alink['Name'].lower() == name.lower():
-			linkList.remove(alink)
-			setServerStat(ctx.message.server, globals.serverList, "Links", linkList)
-			msg = '{} removed from link list!'.format(name)
-			await bot.send_message(ctx.message.channel, msg)
-			return
-
-	msg = '{} not found in link list!'.format(name)
-	await bot.send_message(ctx.message.channel, msg)
+	
 
 
 @bot.command(pass_context=True)
