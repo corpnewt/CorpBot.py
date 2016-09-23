@@ -1466,10 +1466,10 @@ async def links(ctx):
 		await bot.send_message(ctx.message.channel, msg)
 		return
 
-	linkText = ""
+	linkText = "Current Links:\n\n"
 
 	for alink in linkList:
-		linkText = '{}{}, '.format(linkText, alink['Name'])
+		linkText = '{}*{}*, '.format(linkText, alink['Name'])
 
 	# Speak the link list while cutting off the end ", "
 	await bot.send_message(ctx.message.channel, linkText[:-2])
