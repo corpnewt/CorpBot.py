@@ -35,22 +35,22 @@ def checkServer(server, serverDict):
         # We didn't locate our server
         # print("Server not located, adding...")
         newServer = { "Name" : server.name, "ID" : server.id,
-											"AutoRole" : "No",
+											"AutoRole" : "No", # No/ID/Position
 											"DefaultRole" : "1",
 											"MinimumXPRole" : "1",
 											"XPApprovalChannel" : "",
-											"HourlyXP" : "0",
+											"HourlyXP" : "1",
 											"IncreasePerRank" : "1",
 											"RequireOnline" : "Yes",
 											"AdminUnlimited" : "Yes",
 											"XPPromote" : "Yes",
-											"PromoteBy" : "Position",
+											"PromoteBy" : "Array", # Position/Array
 											"MaxPosition" : "5",
-											"RequiredXP" : "50",
-											"DifficultyMultiplier" : "2",
-											"PadXPRoles" : "1",
+											"RequiredXP" : "0",
+											"DifficultyMultiplier" : "0",
+											"PadXPRoles" : "0",
 											"XPDemote" : "No",
-											"PromotoionArray" : [],
+											"PromotionArray" : [],
 											"Members" : [] }
         serverDict["Servers"].append(newServer)
 
@@ -149,25 +149,6 @@ def setServerStat(server, serverDict, stat, value):
 		if x["ID"] == server.id:
 			# We found our server, now to iterate users
 			x[stat] = value
-
-async def setupSettings(config):
-	# Sets up default settings
-	config['BOTSETTINGS'] = 	{'NewUserRole' : 'Entry Level',
-								'PlayMusic' : 'yes'}
-	with open(settingsFile, 'w') as configfile:
-		config.write(configfile)
-
-async def setupUsers(config):
-	# Iterate through users and add their default xp
-	print("{}".format(bot))
-	theServer = bot.servers
-	print("{}".format(theServer))
-	'''await bot.request_offline_members(theServer)
-	for user in theServer.members:
-		print('User: {}'.format(user.name))
-		config[user.name] = {'xp': '0'}
-	with open(userFile, 'w') as configfile:
-		config.write(configfile)'''
 		
 async def flushSettings():
 	while not bot.is_closed:
@@ -216,14 +197,16 @@ async def addXP():
 						if role.position <= maxPos and role.position > biggest:
 							biggest = role.position
 						
-					xpPayload = int(xpAmount)+biggest*boost
+					# xpPayload = int(xpAmount)+biggest*boost
+					
+					xpPayload = int(xpAmount)
 					
 					#print("{} at level {} out of {}, gets {} XP".format(user.id, biggest, maxPos, xpPayload))
 					
 					globals.serverList = incrementStat(user, server, globals.serverList, "XPReserve", xpPayload)
 					
 		await quickFlush()
-		await asyncio.sleep(60) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
+		await asyncio.sleep(3600) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
 		
 async def quickFlush():
 	# Dump the json
@@ -493,8 +476,11 @@ async def on_member_join(member):
 	autoRole = getServerStat(server, globals.serverList, "AutoRole")
 	defaultRole = getServerStat(server, globals.serverList, "DefaultRole")
 	
-	if autoRole.lower() == "yes":
+	if autoRole.lower() == "position":
 		newRole = discord.utils.get(server.roles, position=int(defaultRole))
+		await bot.add_roles(member, newRole)
+	elif autoRole.lower() == "id":
+		newRole = discord.utils.get(server.roles, id=defaultRole)
 		await bot.add_roles(member, newRole)
 		
 	await quickFlush()
@@ -588,15 +574,15 @@ async def getOffline(ctx):
 async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 	# Check for formatting issues
 	if xpAmount == None or member == None:
-		msg = 'Usage: $xp @User Amount'
+		msg = 'Usage: `$xp [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if not type(xpAmount) is int:
-		msg = 'Usage: $xp @User Amount'
+		msg = 'Usage: `$xp [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if xpAmount < 0:
-		msg = 'Usage: $xp @User Amount'
+		msg = 'Usage: `$xp [member] [amount]`'
 		await bot.send_message(ctx.message.channel, msg)
 		return
 	if type(member) is str:
@@ -685,7 +671,25 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 								# Only add if we need to
 								await bot.add_roles(member, role)
 								msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
-				 
+			elif promoteBy.lower() == "array":
+				promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+				serverRoles = ctx.message.server.roles
+				for role in promoArray:
+					# Iterate through the roles, and add what we can
+					if int(role['XP']) <= userXP:
+						# We *can* have this role, let's see if we already do
+						currentRole = None
+						for aRole in serverRoles:
+							# Get the role that corresponds to the id
+							if aRole.id == role['ID']:
+								# We found it
+								currentRole = aRole
+						
+						# Now see if we have it, and add it if we don't
+						if not currentRole in member.roles:
+							await bot.add_roles(member, currentRole)
+							msg = '{} was given {} XP, and was promoted to {}!'.format(member.name, xpAmount, currentRole.name)
+						
 	await bot.send_message(ctx.message.channel, msg)
 	#await quickFlush()
 
@@ -696,12 +700,179 @@ async def getxp_error(ctx, error):
 	await bot.say(msg)
 	
 	
+	
+@bot.command(pass_context=True)
+async def addRole(ctx, role : discord.Role = None, xp : int = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+		
+	if role == None or xp == None:
+		msg = 'Usage: `$addRole [role] [required xp]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if not type(xp) is int:
+		msg = 'Usage: `$addRole [role] [required xp]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+			
+	# Now we see if we already have that role in our list
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+	
+	for aRole in promoArray:
+		# Get the role that corresponds to the id
+		if aRole['ID'] == role.id:
+			# We found it - throw an error message and return
+			msg = '{} is already in the list.  Required xp: {}'.format(role.name, aRole['XP'])
+			await bot.send_message(ctx.message.channel, msg)
+			return
+	
+	# If we made it this far - then we can add it
+	promoArray.append({ 'ID' : role.id, 'Name' : role.name, 'XP' : xp })
+	setServerStat(ctx.message.server, globals.serverList, "PromotionArray", promoArray)
+	
+	msg = '{} added to list.  Required xp: {}'.format(role.name, xp)
+	await bot.send_message(ctx.message.channel, msg)
+	return
+
+@addRole.error
+async def addRole_error(ctx, error):
+    # do stuff
+	msg = 'addRole Error: {}'.format(ctx)
+	await bot.say(msg)		
+
+	
+	
+@bot.command(pass_context=True)
+async def listRoles(ctx):
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+	msg = 'Current Roles: {}'.format(promoArray)
+	await bot.send_message(ctx.message.channel, msg)	
+	
+	
+	
+@bot.command(pass_context=True)
+async def removeRole(ctx, role : discord.Role = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+		
+	if role == None:
+		msg = 'Usage: `$removeRole [role]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+	
+	# If we're here - then the role is a real one
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+	
+	for aRole in promoArray:
+		# Get the role that corresponds to the id
+		if aRole['ID'] == role.id:
+			# We found it - let's remove it
+			promoArray.remove(aRole)
+			setServerStat(ctx.message.server, globals.serverList, "PromotionArray", promoArray)
+			msg = '{} removed successfully.'.format(aRole['Name'])
+			await bot.send_message(ctx.message.channel, msg)
+			return
+	
+	# If we made it this far - then we didn't find it
+	msg = '{} not found in list.'.format(aRole['Name'])
+	await bot.send_message(ctx.message.channel, msg)
+	
+@removeRole.error
+async def removeRole_error(ctx, error):
+    # do stuff
+	msg = 'removeRole Error: {}'.format(ctx)
+	await bot.say(msg)		
+	
+
+	
+@bot.command(pass_context=True)
+async def autoRole(ctx, setting : str = None, role : discord.Role = None):
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	usageMessage = 'Usage: `$autoRole [No/ID/Position] [role]`'
+	if setting == None:
+		await bot.send_message(ctx.message.channel, usageMessage)
+		return
+		
+	if not type(setting) == str:
+		await bot.send_message(ctx.message.channel, usageMessage)
+		return
+	
+	if setting.lower() == "no":
+		# We don't need a second var
+		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "No")
+		msg = 'AutoRole set to No'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	if role == None:
+		await bot.send_message(ctx.message.channel, usageMessage)
+		return
+		
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, id=role)
+		except:
+			print("That role does not exist")
+			return
+		
+	if setting.lower() == "id":
+		# Found the role!  Let's add it
+		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "ID")
+		setServerStat(ctx.message.server, globals.serverList, "DefaultRole", '{}'.format(role.id))
+		msg = 'AutoRole set to ID: {}'.format(role.id)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	if setting.lower() == "position":		
+		# Found the role!  Let's add it
+		setServerStat(ctx.message.server, globals.serverList, "AutoRole", "Position")
+		setServerStat(ctx.message.server, globals.serverList, "DefaultRole", str(role.position))
+		msg = 'AutoRole set to Position: {}'.format(role.position)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	await bot.send_message(ctx.message.channel, usageMessage)
+	return
+	
+	
+@autoRole.error
+async def autoRole_error(ctx, error):
+    # do stuff
+	msg = 'autoRole Error: {}'.format(ctx)
+	await bot.say(msg)		
+		
+		
 
 @bot.command(pass_context=True)
 async def stats(ctx, member: discord.Member = None):
-	await bot.say("You tried this")
+	# await bot.say("You tried this")
 	if member is None:
-		await bot.say('You\'re doing it wrong')
+		await bot.say('Usage: `$stats [member]`')
 		return
 	#if member is None:
 	#	bot.say("Usage: $stats @MemberName")
