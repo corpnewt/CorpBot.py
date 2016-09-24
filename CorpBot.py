@@ -7,6 +7,7 @@ import json
 from discord.ext import commands
 from discord import errors
 import globals
+from operator import itemgetter
 
 import urllib.request
 import urllib
@@ -1120,10 +1121,14 @@ async def addrole_error(ctx, error):
 async def listroles(ctx):
 	"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
-
+	
+	# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+	
+	promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+	
 	roleText = "Current Roles:\n"
 
-	for arole in promoArray:
+	for arole in promoSorted:
 		roleText = '{}**{}** : *{} XP* (ID : `{}`)\n'.format(roleText, arole['Name'], arole['XP'], arole['ID'])
 
 	await bot.send_message(ctx.message.channel, roleText)
@@ -1955,7 +1960,7 @@ async def randgarfield(ctx):
 	
 		if not imageHTML == None:
 			imageURL  = getGMGImageURL(imageHTML)
-			print(imageURL)
+			#print(imageURL)
 	
 			if not imageURL == None:
 				gotComic = True
