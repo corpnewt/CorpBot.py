@@ -11,6 +11,7 @@ from operator import itemgetter
 
 import urllib.request
 import urllib
+import requests
 import re
 import webbrowser
 import platform
@@ -1547,12 +1548,22 @@ async def quickhelp(ctx):
 	commandString = commandString + "   randilbert   Randomly picks and displays a Dilbert comic.\n"
 	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
 	commandString = commandString + "   randxkcd     Randomly picks and displays an XKCD comic.\n"
+	
+	commandString = commandString + "```"
+	await bot.send_message(ctx.message.channel, commandString)
+	
+	commandString = "```"
+	
 	commandString = commandString + "   xkcd         Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found.\n"
 	commandString = commandString + "   randgarfield Randomly picks and displays a Garfield Minus Garfield comic.\n"
 	commandString = commandString + "   garfield     Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   randcalvin   Randomly picks and displays a Calvin & Hobbes comic.\n"
 	commandString = commandString + "   calvin       Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
+	commandString = commandString + "   thinkdeep    Spout out some intellectual brilliance.\n"
+	commandString = commandString + "   brainfart    Spout out some uh.... intellectual brilliance...\n"
+	commandString = commandString + "   nocontext    Spout out some intersexual brilliance.\n"
+	commandString = commandString + "   question     Spout out some interstellar questioning... ?\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
 	commandString = commandString + "   adminhelp    Shows the admin help message."
@@ -2244,7 +2255,51 @@ async def calvin(ctx, date : str = None):
 		await bot.send_file(ctx.message.channel, f)
 
 	shutil.rmtree(dirpath, ignore_errors=True)
+	
 
+@bot.command(pass_context=True)
+async def thinkdeep(ctx):
+	"""Spout out some intellectual brilliance."""
+	r = requests.get('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	randnum = random.randint(0,99)
+	theJSON = r.json()["data"]["children"][randnum]["data"]
+	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+
+@bot.command(pass_context=True)
+async def brainfart(ctx):
+	"""Spout out some uh... intellectual brilliance..."""
+	r = requests.get('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	randnum = random.randint(0,99)
+	theJSON = r.json()["data"]["children"][randnum]["data"]
+	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+# https://www.reddit.com/r/nocontext/top/?sort=top&t=week
+	
+
+@bot.command(pass_context=True)
+async def nocontext(ctx):
+	"""Spout out some intersexual brilliance."""
+	r = requests.get('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	randnum = random.randint(0,99)
+	theJSON = r.json()["data"]["children"][randnum]["data"]
+	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+
+@bot.command(pass_context=True)
+async def question(ctx):
+	"""Spout out some interstellar questioning... ?"""
+	r = requests.get('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	randnum = random.randint(0,99)
+	theJSON = r.json()["data"]["children"][randnum]["data"]
+	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
   ###             ###
  # END:   Commands #
 ###             ###
