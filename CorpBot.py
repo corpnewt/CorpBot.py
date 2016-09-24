@@ -1564,6 +1564,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   brainfart    Spout out some uh.... intellectual brilliance...\n"
 	commandString = commandString + "   nocontext    Spout out some intersexual brilliance.\n"
 	commandString = commandString + "   question     Spout out some interstellar questioning... ?\n"
+	commandString = commandString + "   fart         PrincessZoey :P\n"
+	commandString = commandString + "   wallpaper    Get something pretty to look at.\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
 	commandString = commandString + "   adminhelp    Shows the admin help message."
@@ -2299,6 +2301,62 @@ async def question(ctx):
 	msg = '{}'.format(theJSON["title"])
 	await bot.send_message(ctx.message.channel, msg)
 	
+
+@bot.command(pass_context=True)
+async def fart(ctx):
+	"""PrincessZoey :P"""
+	fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
+	randnum = random.randint(0, len(fartList)-1)
+	msg = '{}'.format(fartList[randnum])
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def wallpaper(ctx):
+	"""Get something pretty to look at."""
+	r = requests.get('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	extList = [".jpg", "jpeg", ".png", ".gif", "tiff"]
+	
+	gotImage = False
+	
+	while not gotImage:
+		randnum = random.randint(0,99)
+		theJSON = r.json()["data"]["children"][randnum]["data"]
+		if theJSON["url"][-4:] in extList:
+			gotImage = True
+	
+	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + theJSON["url"].rsplit('/', 1)[-1]
+	
+	# req = urllib.request.urlretrieve(theJSON["url"], imagePath)
+	
+	# req.add_header('User-agent', 'CorpNewt DeepThoughtBot')
+	
+	#with open(imagePath, 'rb') as f:
+		#await bot.send_file(ctx.message.channel, f)
+
+	rImage = requests.get(theJSON["url"], stream = True, headers = {'User-agent': 'CorpNewt DeepThoughtBot'})	
+	with open(imagePath, 'wb') as f:
+		for chunk in rImage.iter_content(chunk_size=1024):
+			if chunk:
+				f.write(chunk)
+	
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, imagePath)
+	
+	
+	shutil.rmtree(dirpath, ignore_errors=True)
+	
+@wallpaper.error
+async def wallpaper_error(ctx, error):
+    # do stuff
+	msg = 'wallpaper Error: {}'.format(ctx)
+	await bot.say(msg)
 	
   ###             ###
  # END:   Commands #
