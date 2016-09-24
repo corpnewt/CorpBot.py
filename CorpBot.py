@@ -122,17 +122,23 @@ def find_first_between( source, start_sep, end_sep ):
 		return result[0]
 
 def find_last_between( source, start_sep, end_sep ):
-    result=[]
-    tmp=source.split(start_sep)
-    for par in tmp:
-        if end_sep in par:
-            result.append(par.split(end_sep)[0])
-    return result[len(result)-1] # Return last item
+	result=[]
+	tmp=source.split(start_sep)
+	for par in tmp:
+		if end_sep in par:
+			result.append(par.split(end_sep)[0])
+	if len(result) == 0:
+		return None
+	else:
+		return result[len(result)-1] # Return last item
 
 def getImageHTML ( url ):
-    with urllib.request.urlopen(url) as f:
-        htmlSource = str(f.read())
-        return htmlSource
+	try:
+		with urllib.request.urlopen(url) as f:
+			htmlSource = str(f.read())
+			return htmlSource
+	except:
+		return None
 
 def getImageURL ( html ):
     imageURL = find_between( html, "data-image=", "data-date=" )
@@ -145,8 +151,14 @@ def getImageTitle ( html ):
     #print(h.unescape(imageTitle))
     return imageTitle.replace('"', '').strip()
 
+# XKCD Methods	
+
 def getNewestXKCD ( html ):
 	comicBlock = find_last_between( html, 'div id="middleContainer"', "</div>")
+	
+	if comicBlock == None:
+		return None
+	
 	imageURL = find_first_between( comicBlock, "href=", " title=" )
 	imageURL = imageURL.replace('/', '').strip()
 	return imageURL.replace('"', '').strip()
@@ -156,6 +168,9 @@ def getXKCDURL ( html, date ):
 	# <a href="/17/" title="2006-1-1">What If</a>
 	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
 	
+	if comicBlock == None:
+		return None
+	
 	imageURL = find_first_between( html, "href=", " title=\"" + date + "\"" )
 	if imageURL == None:
 		return None
@@ -164,6 +179,9 @@ def getXKCDURL ( html, date ):
 
 def getXKCDImageURL ( html ):
 	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
+	
+	if comicBlock == None:
+		return None
 	
 	imageURL = find_last_between( comicBlock, "img src=", "title=" )
 	imageURL = imageURL.replace('"', '').strip()
@@ -177,6 +195,9 @@ def getXKCDImageURL ( html ):
 def getXKCDImageTitle ( html ):
 	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
 	
+	if comicBlock == None:
+		return None
+	
 	imageTitle = find_last_between( comicBlock, "alt=", ">" )
 	h = HTMLParser()
 	imageTitle = h.unescape(imageTitle)
@@ -184,6 +205,19 @@ def getXKCDImageTitle ( html ):
 	imageTitle = imageTitle.replace('/', '').strip()
 	return imageTitle
 
+# Garfield Minus Garfield Methods
+
+def getGMGImageURL ( html ):
+	comicBlock = find_last_between( html, 'div class="photo"', "</a>")
+	
+	if comicBlock == None:
+		return None
+	
+	imageURL = find_last_between( comicBlock, "img src=", " alt=" )
+	imageURL = imageURL.replace('"', '').strip()
+	
+	return imageURL	
+	
 # Download image to location
 def downloadImage( url, fileName ):
     with urllib.request.urlopen(url) as f:
@@ -1507,6 +1541,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
 	commandString = commandString + "   randxkcd     Randomly picks and displays an XKCD comic.\n"
 	commandString = commandString + "   xkcd         Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found.\n"
+	commandString = commandString + "   randgarfield Randomly picks and displays a Garfield Minus Garfield comic.\n"
+	commandString = commandString + "   garfield     Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
@@ -1589,6 +1625,12 @@ async def randilbert(ctx):
 
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
+	
+	if imageHTML == None:
+		# No image for that day - try again
+		await randilbert(ctx)
+		return
+	
 	imageURL  = getImageURL(imageHTML)
 	imageDisplayName = getImageTitle(imageHTML)
 	imageName = imageDisplayName + ".jpg"
@@ -1668,6 +1710,12 @@ async def dilbert(ctx, date : str = None):
 
 	# Retrieve html and info
 	imageHTML = getImageHTML(getURL)
+	
+	if imageHTML == None:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
 	imageURL  = getImageURL(imageHTML)
 	imageDisplayName = getImageTitle(imageHTML)
 	imageName = imageDisplayName + ".jpg"
@@ -1714,6 +1762,12 @@ async def randxkcd(ctx):
 
     # now we get the actual comic info
 	imageHTML = getImageHTML(comicURL)
+	
+	if imageHTML == None:
+		# No comic for that day - try again
+		await randxkcd(ctx)
+		return
+	
 	imageURL = getXKCDImageURL(imageHTML)
 	imageDisplayName = getXKCDImageTitle(imageHTML)
 	imageName = imageDisplayName + ".png"
@@ -1812,6 +1866,7 @@ async def xkcd(ctx, date : str = None):
 		# Get URL
 		archiveURL = "http://xkcd.com/archive/"
 		archiveHTML = getImageHTML(archiveURL)
+		
 		#print(archiveHTML)
 		xkcdDate = "{}-{}-{}".format(int(yDir), int(mDir), int(dName))
 		comicURL = getXKCDURL( archiveHTML, xkcdDate )
@@ -1846,6 +1901,180 @@ async def xkcd(ctx, date : str = None):
 
 	shutil.rmtree(dirpath, ignore_errors=True)
 
+	
+	
+	
+@bot.command(pass_context=True)
+async def randgarfield(ctx):
+	"""Randomly picks and displays a Garfield Minus Garfield comic."""
+	# Get some preliminary values
+	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+
+	# Can't be before this date.
+	firstDate = "02-13-2008"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+
+	# Get a random Julian date between the first comic and today
+	gotComic = False
+	tries = 0
+	while gotComic == False:
+	
+		if tries >= 3:
+			msg = 'Failed to find working link.'
+			await bot.send_message(ctx.message.channel, msg)
+			break
+			return
+			
+		startJDate = random.uniform(fJDate, tJDate)
+
+		# Let's create our url
+		gDate = jd_to_date(startJDate)
+
+		# Prep dir names
+		yDir = str(gDate[0])
+		mDir = str(gDate[1])
+		dName = str(int(gDate[2]))
+
+		if (gDate[1] < 10):
+			mDir = "0"+mDir
+
+		if (gDate[2] < 10):
+			dName = "0"+dName
+
+		# Get URL
+		getURL = "http://garfieldminusgarfield.net/day/" + yDir + "/" + mDir + "/" + dName
+
+	
+		#print(getURL)
+	
+		# Retrieve html and info
+		imageHTML = getImageHTML(getURL)
+	
+		if not imageHTML == None:
+			imageURL  = getGMGImageURL(imageHTML)
+			print(imageURL)
+	
+			if not imageURL == None:
+				gotComic = True
+			
+		++tries
+		
+	imageDisplayName = "Day " + yDir + "-" + mDir + "-" + dName
+	imageName = imageDisplayName + ".png"
+	
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+
+
+
+@bot.command(pass_context=True)
+async def garfield(ctx, date : str = None):
+	"""Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found."""
+	if date == None:
+        # Auto to today's date
+		date = dt.datetime.today().strftime("%m-%d-%Y")
+	try:
+		startDate = date.split("-")
+	except ValueError:
+		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	# Get some preliminary values
+	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+
+	# Can't be before this date.
+	firstDate = "02-13-2008"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+
+
+
+	# Get a a Julian date for the passed day
+	startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
+
+	outOfRange = False
+
+	# Check date ranges
+	if startJDate < fJDate:
+		outOfRange = True
+	if startJDate > tJDate:
+		outOfRange = True
+
+	if outOfRange:
+		msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	# Let's create our url
+	gDate = jd_to_date(startJDate)
+
+    # Prep dir names
+	yDir = str(gDate[0])
+	mDir = str(gDate[1])
+	dName = str(int(gDate[2]))
+
+	if (gDate[1] < 10):
+		mDir = "0"+mDir
+
+	if (gDate[2] < 10):
+		dName = "0"+dName
+
+	# Get URL
+	getURL = "http://garfieldminusgarfield.net/day/" + yDir + "/" + mDir + "/" + dName
+	
+	#print(getURL)
+
+	# Retrieve html and info
+	imageHTML = getImageHTML(getURL)
+	
+	if imageHTML == None:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	imageURL  = getGMGImageURL(imageHTML)
+	
+	#print(imageURL)
+	
+	if imageURL == None:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	imageDisplayName = "Day " + yDir + "-" + mDir + "-" + dName
+	imageName = imageDisplayName + ".png"
+
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+
+	
+	
 
   ###             ###
  # END:   Commands #
