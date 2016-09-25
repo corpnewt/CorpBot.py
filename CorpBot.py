@@ -2567,16 +2567,18 @@ async def gamble(ctx, bet : int = None):
 	"""Gamble your xp reserves for a chance at winning xp!"""
 	# bet must be a multiple of 10, member must have enough xpreserve to bet
 	msg = 'Usage: `gamble [xp reserve bet] (must be multiple of 10)`'
-	betChance = 100
+	betChance = 20
 	
 	if bet == None:
 		await bot.send_message(ctx.message.channel, msg)
+		return
 		
 	if not type(bet) == int:
 		await bot.send_message(ctx.message.channel, msg)
-	
+		return
+		
 	# Initialize User
-	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+	globals.serverList = checkUser(ctx.message.author, ctx.message.server, globals.serverList)
 
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 	adminUnlim = getServerStat(ctx.message.server, globals.serverList, "AdminUnlimited")
@@ -2615,15 +2617,18 @@ async def gamble(ctx, bet : int = None):
 		globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", takeReserve)
 		# 1/betChance that user will win - and payout is 1/10th of the bet
 		randnum = random.randint(1, betChance)
+		# print('{} : {}'.format(randnum, betChance))
 		if randnum == betChance:
 			# YOU WON!!
 			payout = bet/10
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", payout)
-			msg = '{} bet {} and ***WON** *{} xp!*'.format(ctx.message.author.name, bet, payout)
+			msg = '{} bet {} and ***WON*** *{} xp!*'.format(ctx.message.author.name, bet, int(payout))
 		else:
 			msg = '{} bet {} and.... *didn\'t* win.  Better luck next time!'.format(ctx.message.author.name, bet)
+			
 		
 	await bot.send_message(ctx.message.channel, msg)
+	await flushSettings()
 			
 			
 		
@@ -2642,7 +2647,7 @@ async def gamble(ctx, bet : int = None):
 bot.add_cog(Music(bot))
 # bot.loop.create_task(flushSettings())
 
-bot.run('MjI1NzQ4MjAzMTUxMTYzMzkz.CrtkCA.B4VKoA1_mVAAL1jXbdGi3dY_cdw')
+bot.run('MjI1NzQ4MjAzMTUxMTYzMzkz.Csi0PA.VaAs_5vNcFesBYM-7xKToKqRNDs')
 
 # --------------------------------------------- #
 
