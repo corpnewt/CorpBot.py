@@ -2181,7 +2181,7 @@ async def randgarfield(ctx):
 	tries = 0
 	while gotComic == False:
 	
-		if tries >= 5:
+		if tries >= 10:
 			break
 			
 		startJDate = random.uniform(fJDate, tJDate)
@@ -2218,7 +2218,7 @@ async def randgarfield(ctx):
 			
 		tries += 1
 
-	if tries >= 5:
+	if tries >= 10:
 		msg = 'Failed to find working link.'
 		await bot.send_message(ctx.message.channel, msg)
 		return
@@ -2356,7 +2356,7 @@ async def randcalvin(ctx):
 	tries = 0
 	while gotComic == False:
 	
-		if tries >= 5:
+		if tries >= 10:
 			break
 					
 		startJDate = random.uniform(fJDate, tJDate)
@@ -2390,7 +2390,7 @@ async def randcalvin(ctx):
 			
 		tries += 1
 		
-	if tries >= 5:
+	if tries >= 10:
 		msg = 'Failed to find working link.'
 		await bot.send_message(ctx.message.channel, msg)
 		return
