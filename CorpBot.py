@@ -1755,6 +1755,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   answer       Spout out some interstellar answering... ?\n"
 	commandString = commandString + "   fart         PrincessZoey :P\n"
 	commandString = commandString + "   wallpaper    Get something pretty to look at.\n"
+	commandString = commandString + "   gamble       Gamble your xp reserves for a chance at winning xp!\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
 	commandString = commandString + "   adminhelp    Shows the admin help message."
@@ -2644,10 +2645,13 @@ async def gamble(ctx, bet : int = None):
  # Bot Start #
 ###       ###
 
+with open('token.txt', 'r') as f:
+  token = f.read()
+  
 bot.add_cog(Music(bot))
 # bot.loop.create_task(flushSettings())
 
-bot.run('MjI1NzQ4MjAzMTUxMTYzMzkz.Csi0PA.VaAs_5vNcFesBYM-7xKToKqRNDs')
+bot.run(token)
 
 # --------------------------------------------- #
 
