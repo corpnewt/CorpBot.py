@@ -273,8 +273,10 @@ def checkServer(server, serverDict):
 											"DefaultRole" : "1",
 											"MinimumXPRole" : "1",
 											"RequiredLinkRole" : "", #ID or blank for Admin-Only
+											"RequiredHackRole" : "", #ID or blank for Admin-Only
 											"XPApprovalChannel" : "",
-											"HourlyXP" : "3",
+											"LastAnswer" : "",
+											"HourlyXP" : "1",
 											"IncreasePerRank" : "1",
 											"RequireOnline" : "Yes",
 											"AdminUnlimited" : "Yes",
@@ -286,6 +288,7 @@ def checkServer(server, serverDict):
 											"PadXPRoles" : "0",
 											"XPDemote" : "No",
 											"PromotionArray" : [],
+											"Hacks" : [],
 											"Links" : [],
 											"Members" : [] }
         serverDict["Servers"].append(newServer)
@@ -408,8 +411,10 @@ async def flushSettings():
 
 async def addXP():
 	while not bot.is_closed:
-		print("Adding XP")
+		await asyncio.sleep(3600) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
 
+		print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
+		
 		for server in bot.servers:
 
 			#for role in server.roles:
@@ -447,7 +452,6 @@ async def addXP():
 					globals.serverList = incrementStat(user, server, globals.serverList, "XPReserve", xpPayload)
 
 		await quickFlush()
-		await asyncio.sleep(3600) # runs only every 1 minute  #### CHANGE TO 3600 AT SOME POINT ####
 
 async def quickFlush():
 	# Dump the json
@@ -1057,7 +1061,7 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 
 
 	await bot.send_message(ctx.message.channel, msg)
-	#await quickFlush()
+	await quickFlush()
 
 @xp.error
 async def getxp_error(ctx, error):
@@ -1382,6 +1386,7 @@ async def setlinkrole(ctx, role : discord.Role = None):
 
 	msg = 'Role required for add/remove links set to *{}*.'.format(role.name)
 	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
 	return
 
 @setlinkrole.error
@@ -1430,6 +1435,7 @@ async def addlink(ctx, name : str = None, link : str = None):
 
 	msg = '{} added to link list!'.format(name)
 	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
 	
 	
 @bot.command(pass_context=True)
@@ -1475,6 +1481,7 @@ async def removelink(ctx, name : str = None):
 
 	msg = '{} not found in link list!'.format(name)
 	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
 
 
 @bot.command(pass_context=True)
@@ -1515,6 +1522,183 @@ async def links(ctx):
 
 	# Speak the link list while cutting off the end ", "
 	await bot.send_message(ctx.message.channel, linkText[:-2])
+	
+	
+	
+	
+	
+	
+	
+@bot.command(pass_context=True)
+async def sethackrole(ctx, role : discord.Role = None):
+	"""Sets the required role ID to add/remove hacks (admin only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+
+	if role == None:
+		setServerStat(ctx.message.server, globals.serverList, "RequiredHackRole", "")
+		msg = 'Add/remove hacks now *admin-only*.'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+
+	# If we made it this far - then we can add it
+	setServerStat(ctx.message.server, globals.serverList, "RequiredHackRole", role.id)
+
+	msg = 'Role required for add/remove hacks set to *{}*.'.format(role.name)
+	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
+	return
+
+@sethackrole.error
+async def hackrole_error(ctx, error):
+    # do stuff
+	msg = 'sethackrole Error: {}'.format(ctx)
+	await bot.say(msg)
+
+	
+	
+@bot.command(pass_context=True)
+async def addhack(ctx, name : str = None, hack : str = None):
+	"""Add a hack to the hack list."""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredHackRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+			
+	# Passed role requirements!
+	if name == None or hack == None:
+		msg = 'Usage: `$addlink "[hack name]" [hack]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	hackList = getServerStat(ctx.message.server, globals.serverList, "Hacks")
+	if hackList == None:
+		hackList = []
+
+	hackList.append({"Name" : name, "Hack" : hack})
+
+	setServerStat(ctx.message.server, globals.serverList, "Hacks", hackList)
+
+	msg = '{} added to hack list!'.format(name)
+	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
+	
+	
+@bot.command(pass_context=True)
+async def removehack(ctx, name : str = None):
+	"""Remove a hack from the hack list."""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredHackRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	
+	if name == None:
+		msg = 'Usage: `$removehack "[hack name]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Hacks")
+	if linkList == None or linkList == []:
+		msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	for alink in linkList:
+		if alink['Name'].lower() == name.lower():
+			linkList.remove(alink)
+			setServerStat(ctx.message.server, globals.serverList, "Hacks", linkList)
+			msg = '{} removed from hack list!'.format(name)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+
+	msg = '{} not found in hack list!'.format(name)
+	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
+
+
+@bot.command(pass_context=True)
+async def hack(ctx, name : str = None):
+	"""Retrieve a hack from the hack list."""
+	if name == None:
+		msg = 'Usage: `$hack "[hack name]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Hacks")
+	if linkList == None or linkList == []:
+		msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	for alink in linkList:
+		if alink['Name'].lower() == name.lower():
+			msg = '{}\n{}'.format(alink['Name'], alink['Hack'])
+			await bot.send_message(ctx.message.channel, msg)
+
+
+
+
+@bot.command(pass_context=True)
+async def hacks(ctx):
+	"""List all links in the link list."""
+	linkList = getServerStat(ctx.message.server, globals.serverList, "Hacks")
+	if linkList == None or linkList == []:
+		msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	linkText = "Current Hacks:\n\n"
+
+	for alink in linkList:
+		linkText = '{}*{}*, '.format(linkText, alink['Name'])
+
+	# Speak the hack list while cutting off the end ", "
+	await bot.send_message(ctx.message.channel, linkText[:-2])
+	
+	
+	
+	
+	
+	
 
 
 @bot.command(pass_context=True)
@@ -1542,18 +1726,22 @@ async def quickhelp(ctx):
 	commandString = commandString + "   links        List all links in the link list.\n"
 	commandString = commandString + "   addlink      Add a link to the link list.\n"
 	commandString = commandString + "   removelink   Remove a link from the link list.\n"
-	commandString = commandString + "   joined       Says when a member joined.\n"
-	commandString = commandString + "   choose       Chooses between multiple choices.\n"
-	commandString = commandString + "   add          Adds two numbers together.\n"
-	commandString = commandString + "   randilbert   Randomly picks and displays a Dilbert comic.\n"
-	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
-	commandString = commandString + "   randxkcd     Randomly picks and displays an XKCD comic.\n"
+	commandString = commandString + "   hack         Retrieve a hack from the hack list.\n"
+	commandString = commandString + "   hacks        List all hacks in the hack list.\n"
+	commandString = commandString + "   addhack      Add a hack to the hack list.\n"
+	commandString = commandString + "   removehack   Remove a hack from the hack list.\n"
 	
 	commandString = commandString + "```"
 	await bot.send_message(ctx.message.channel, commandString)
 	
 	commandString = "```"
 	
+	commandString = commandString + "   joined       Says when a member joined.\n"
+	commandString = commandString + "   choose       Chooses between multiple choices.\n"
+	commandString = commandString + "   add          Adds two numbers together.\n"
+	commandString = commandString + "   randilbert   Randomly picks and displays a Dilbert comic.\n"
+	commandString = commandString + "   dilbert      Displays the Dilbert comic for the passed date (MM-DD-YYYY).\n"
+	commandString = commandString + "   randxkcd     Randomly picks and displays an XKCD comic.\n"
 	commandString = commandString + "   xkcd         Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found.\n"
 	commandString = commandString + "   randgarfield Randomly picks and displays a Garfield Minus Garfield comic.\n"
 	commandString = commandString + "   garfield     Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found.\n"
@@ -1564,6 +1752,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   brainfart    Spout out some uh.... intellectual brilliance...\n"
 	commandString = commandString + "   nocontext    Spout out some intersexual brilliance.\n"
 	commandString = commandString + "   question     Spout out some interstellar questioning... ?\n"
+	commandString = commandString + "   answer       Spout out some interstellar answering... ?\n"
 	commandString = commandString + "   fart         PrincessZoey :P\n"
 	commandString = commandString + "   wallpaper    Get something pretty to look at.\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
@@ -1585,6 +1774,7 @@ async def adminhelp(ctx):
 	commandString = commandString + "   removerole   Removes a role from the xp promotion/demotion system (admin only).\n"
 	commandString = commandString + "   autorole     Sets the autorole value - can be No, ID, or Position (admin only).\n"
 	commandString = commandString + "   setlinkrole  Sets the required role ID to add/remove links (admin only).\n"
+	commandString = commandString + "   sethackrole  Sets the required role ID to add/remove hacks (admin only).\n"
 	commandString = commandString + "   getsstat     Gets a server stat (admin only).\n"
 	commandString = commandString + "   setsstat     Sets a server stat (admin only).\n"
 	commandString = commandString + "   setxp        Sets an absolute value for the member's xp (admin only).\n"
@@ -2298,7 +2488,19 @@ async def question(ctx):
 	r = requests.get('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
 	randnum = random.randint(0,99)
 	theJSON = r.json()["data"]["children"][randnum]["data"]
+	setServerStat(ctx.message.server, globals.serverList, "LastAnswer", theJSON["url"])
 	msg = '{}'.format(theJSON["title"])
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def answer(ctx):
+	"""Spout out some interstellar answering... ?"""
+	answer = getServerStat(ctx.message.server, globals.serverList, "LastAnswer")
+	if answer == "":
+		msg = 'You need to ask a $question first!'
+	else:
+		msg = '{}'.format(answer)
 	await bot.send_message(ctx.message.channel, msg)
 	
 
