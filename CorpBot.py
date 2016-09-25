@@ -324,6 +324,8 @@ def checkUser(user, server, serverDict):
 						y["Name"] = user.name
 					if not "DisplayName" in y:
 						y["DisplayName"] = user.display_name
+					if not "Parts" in y:
+						y["Parts"] = ""
 			if not found:
 				# We didn't locate our user - add them
 				newUser = { "Name" : user.name,
@@ -1004,10 +1006,10 @@ async def xp(ctx, member : discord.Member = None, xpAmount : int = None):
 				for x in range(0, int(maxPosition)+1):
 					# Let's apply our difficulty multiplier
 
-					print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
+					# print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
 
 					required = (requiredXP*x) + (requiredXP*difficulty)
-					print("Level: {}\nXP: {}".format(x, required))
+					# print("Level: {}\nXP: {}".format(x, required))
 					if userXP >= required:
 						gotLevels = x
 				if gotLevels > int(maxPosition):
@@ -1699,6 +1701,48 @@ async def hacks(ctx):
 	
 	
 	
+@bot.command(pass_context=True)
+async def parts(ctx, member : discord.Member = None):
+	"""Retrieve a member's parts list."""
+	if member == None:
+		member = ctx.message.author
+
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+
+	# Initialize User
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+	parts = getUserStat(member, ctx.message.server, globals.serverList, "Parts")
+	
+	if parts == None or parts == "":
+		msg = '{} has not added their parts yet!  They can add them with the `$setparts "[parts text]"` command!'.format(member.name)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	msg = '{}\'s Parts:\n\n{}'.format(member.name, parts)
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def setparts(ctx, parts : str = None):
+	"""Set your own parts - can be a url, formatted text, or nothing to clear."""
+	globals.serverList = checkUser(ctx.message.author, ctx.message.server, globals.serverList)
+	if parts == None:
+		parts = ""
+		
+	setUserStat(ctx.message.author, ctx.message.server, globals.serverList, "Parts", parts)
+	msg = '{}\'s parts have been set to:\n\n{}'.format(ctx.message.author.name, parts)
+	await bot.send_message(ctx.message.channel, msg)
+	await flushSettings()
+	
+	
+	
+	
+	
 
 
 @bot.command(pass_context=True)
@@ -1730,6 +1774,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   hacks        List all hacks in the hack list.\n"
 	commandString = commandString + "   addhack      Add a hack to the hack list.\n"
 	commandString = commandString + "   removehack   Remove a hack from the hack list.\n"
+	commandString = commandString + "   parts        Retrieve a member's parts list.\n"
+	commandString = commandString + "   setparts     Set your own parts - can be a url, formatted text, or nothing to clear."
 	
 	commandString = commandString + "```"
 	await bot.send_message(ctx.message.channel, commandString)
@@ -2135,11 +2181,8 @@ async def randgarfield(ctx):
 	tries = 0
 	while gotComic == False:
 	
-		if tries >= 3:
-			msg = 'Failed to find working link.'
-			await bot.send_message(ctx.message.channel, msg)
+		if tries >= 5:
 			break
-			return
 			
 		startJDate = random.uniform(fJDate, tJDate)
 
@@ -2174,7 +2217,11 @@ async def randgarfield(ctx):
 				gotComic = True
 			
 		tries += 1
-		
+
+	if tries >= 5:
+		msg = 'Failed to find working link.'
+		await bot.send_message(ctx.message.channel, msg)
+	
 	imageDisplayName = "Day " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".png"
 	
@@ -2308,12 +2355,9 @@ async def randcalvin(ctx):
 	tries = 0
 	while gotComic == False:
 	
-		if tries >= 3:
-			msg = 'Failed to find working link.'
-			await bot.send_message(ctx.message.channel, msg)
+		if tries >= 5:
 			break
-			return
-			
+					
 		startJDate = random.uniform(fJDate, tJDate)
 
 		# Let's create our url
@@ -2344,6 +2388,10 @@ async def randcalvin(ctx):
 			gotComic = True
 			
 		tries += 1
+		
+	if tries >= 5:
+		msg = 'Failed to find working link.'
+		await bot.send_message(ctx.message.channel, msg)
 		
 	imageDisplayName = "Calvin & Hobbes " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".gif"
@@ -2568,7 +2616,6 @@ async def gamble(ctx, bet : int = None):
 	"""Gamble your xp reserves for a chance at winning xp!"""
 	# bet must be a multiple of 10, member must have enough xpreserve to bet
 	msg = 'Usage: `gamble [xp reserve bet] (must be multiple of 10)`'
-	betChance = 20
 	
 	if bet == None:
 		await bot.send_message(ctx.message.channel, msg)
@@ -2616,13 +2663,24 @@ async def gamble(ctx, bet : int = None):
 		# Bet was approved - let's take the XPReserve right away
 		takeReserve = -1*bet
 		globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", takeReserve)
+		
+		# Bet more, less chance of winning, but more winnings!
+		if bet < 100:
+			betChance = 20
+			payout = int(bet/10)
+		elif bet < 500:
+			betChance = 50
+			payout = int(bet/4)
+		else:
+			betChance = 100
+			payout = int(bet/2)
+		
 		# 1/betChance that user will win - and payout is 1/10th of the bet
 		randnum = random.randint(1, betChance)
 		# print('{} : {}'.format(randnum, betChance))
 		if randnum == betChance:
 			# YOU WON!!
-			payout = bet/10
-			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", payout)
+			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", int(payout))
 			msg = '{} bet {} and ***WON*** *{} xp!*'.format(ctx.message.author.name, bet, int(payout))
 		else:
 			msg = '{} bet {} and.... *didn\'t* win.  Better luck next time!'.format(ctx.message.author.name, bet)
