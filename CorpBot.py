@@ -2173,7 +2173,7 @@ async def randgarfield(ctx):
 			if not imageURL == None:
 				gotComic = True
 			
-		++tries
+		tries += 1
 		
 	imageDisplayName = "Day " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".png"
@@ -2343,7 +2343,7 @@ async def randcalvin(ctx):
 			imageURL  = getURL
 			gotComic = True
 			
-		++tries
+		tries += 1
 		
 	imageDisplayName = "Calvin & Hobbes " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".gif"
