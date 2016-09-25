@@ -1740,6 +1740,11 @@ async def setparts(ctx, parts : str = None):
 	await flushSettings()
 	
 	
+@bot.command(pass_context=True)
+async def partstemp(ctx):
+	"""Gives a copy & paste style template for setting a parts list."""
+	msg = '\"\`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`\"'	
+	await bot.send_message(ctx.message.channel, msg)
 	
 	
 	
@@ -1775,7 +1780,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   addhack      Add a hack to the hack list.\n"
 	commandString = commandString + "   removehack   Remove a hack from the hack list.\n"
 	commandString = commandString + "   parts        Retrieve a member's parts list.\n"
-	commandString = commandString + "   setparts     Set your own parts - can be a url, formatted text, or nothing to clear."
+	commandString = commandString + "   setparts     Set your own parts - can be a url, formatted text, or nothing to clear.\n"
+	commandString = commandString + "   partstemp    Gives a copy & paste style template for setting a parts list."
 	
 	commandString = commandString + "```"
 	await bot.send_message(ctx.message.channel, commandString)
