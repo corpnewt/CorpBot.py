@@ -2560,6 +2560,75 @@ async def wallpaper_error(ctx, error):
 	msg = 'wallpaper Error: {}'.format(ctx)
 	await bot.say(msg)
 	
+	
+
+@bot.command(pass_context=True)
+async def gamble(ctx, bet : int = None):
+	"""Gamble your xp reserves for a chance at winning xp!"""
+	# bet must be a multiple of 10, member must have enough xpreserve to bet
+	msg = 'Usage: `gamble [xp reserve bet] (must be multiple of 10)`'
+	betChance = 100
+	
+	if bet == None:
+		await bot.send_message(ctx.message.channel, msg)
+		
+	if not type(bet) == int:
+		await bot.send_message(ctx.message.channel, msg)
+	
+	# Initialize User
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	adminUnlim = getServerStat(ctx.message.server, globals.serverList, "AdminUnlimited")
+	reserveXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve")
+	minRole = getServerStat(ctx.message.server, globals.serverList, "MinimumXPRole")
+
+	approve = True
+
+	# Check Bet
+		
+	if not bet % 10 == 0:
+		approve = False
+		msg = 'Bets must be in multiples of *10!*'
+		
+	if bet > int(reserveXP):
+		approve = False
+		msg = 'You can\'t bet *{}*, you only have *{}* xp reserve!'.format(bet, reserveXP)
+		
+	if bet < 0:
+		msg = 'You can\'t bet negative amounts!'
+		approve = False
+		
+	if ctx.message.author.top_role.position < int(minRole):
+		approve = False
+		msg = 'You don\'t have the permissions to bet.'
+		
+	# Check admin last - so it overrides anything else
+	'''if isAdmin and adminUnlim.lower() == "yes":
+		# No limit - approve
+		approve = True
+		decrement = False'''
+		
+	if approve:
+		# Bet was approved - let's take the XPReserve right away
+		takeReserve = -1*bet
+		globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", takeReserve)
+		# 1/betChance that user will win - and payout is 1/10th of the bet
+		randnum = random.randint(1, betChance)
+		if randnum == betChance:
+			# YOU WON!!
+			payout = bet/10
+			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", payout)
+			msg = '{} bet {} and ***WON** *{} xp!*'.format(ctx.message.author.name, bet, payout)
+		else:
+			msg = '{} bet {} and.... *didn\'t* win.  Better luck next time!'.format(ctx.message.author.name, bet)
+		
+	await bot.send_message(ctx.message.channel, msg)
+			
+			
+		
+	# globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", incrementAmount)
+	
   ###             ###
  # END:   Commands #
 ###             ###
