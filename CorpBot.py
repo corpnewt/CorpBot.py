@@ -2221,6 +2221,7 @@ async def randgarfield(ctx):
 	if tries >= 5:
 		msg = 'Failed to find working link.'
 		await bot.send_message(ctx.message.channel, msg)
+		return
 	
 	imageDisplayName = "Day " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".png"
@@ -2392,6 +2393,7 @@ async def randcalvin(ctx):
 	if tries >= 5:
 		msg = 'Failed to find working link.'
 		await bot.send_message(ctx.message.channel, msg)
+		return
 		
 	imageDisplayName = "Calvin & Hobbes " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".gif"
