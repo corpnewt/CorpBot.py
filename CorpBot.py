@@ -290,7 +290,8 @@ def checkServer(server, serverDict):
 											"PromotionArray" : [],
 											"Hacks" : [],
 											"Links" : [],
-											"Members" : [] }
+											"Members" : [],
+											"ChannelMOTD" : []}
         serverDict["Servers"].append(newServer)
 
     return serverDict
@@ -454,6 +455,52 @@ async def addXP():
 					globals.serverList = incrementStat(user, server, globals.serverList, "XPReserve", xpPayload)
 
 		await quickFlush()
+		
+async def checkMOTD():		
+	# print("MOTD Called")
+	
+	while not bot.is_closed:
+		await asyncio.sleep(300)
+		await quickMOTD()
+		
+					
+async def quickMOTD():
+	# print("MOTD Called")
+	for server in bot.servers:
+			
+		globals.serverList = checkServer(server, globals.serverList)
+		try:
+			channelMOTDList = getServerStat(server, globals.serverList, "ChannelMOTD")
+		except KeyError:
+			channelMOTDList = []
+		
+		# print(channelMOTDList)
+		
+		if len(channelMOTDList) > 0:
+			members = 0
+			membersOnline = 0
+			for member in server.members:
+				members += 1
+				if str(member.status).lower() == "online":
+					membersOnline += 1
+			
+		for id in channelMOTDList:
+			channel = bot.get_channel(id['ID'])
+			# print(channel.id)
+			if channel:
+				# Got our channel - let's update
+				motd = id['MOTD'] # A markdown message of the day
+				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?
+					
+				if listOnline.lower() == "yes":
+					msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+				else:
+					msg = motd
+						
+				# print(msg)
+						
+				await bot.edit_channel(channel, topic=msg)			
+
 
 async def quickFlush():
 	# Dump the json
@@ -739,7 +786,42 @@ async def on_member_join(member):
 
 	await quickFlush()
 
-
+@bot.event
+async def on_member_update(before, after):
+	server = before.server
+			
+	globals.serverList = checkServer(server, globals.serverList)
+	try:
+		channelMOTDList = getServerStat(server, globals.serverList, "ChannelMOTD")
+	except KeyError:
+		channelMOTDList = []
+		
+	# print(channelMOTDList)
+		
+	if len(channelMOTDList) > 0:
+		members = 0
+		membersOnline = 0
+		for member in server.members:
+			members += 1
+			if str(member.status).lower() == "online":
+				membersOnline += 1
+			
+	for id in channelMOTDList:
+		channel = bot.get_channel(id['ID'])
+		# print(channel.id)
+		if channel:
+			# Got our channel - let's update
+			motd = id['MOTD'] # A markdown message of the day
+			listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?
+					
+			if listOnline.lower() == "yes":
+				msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+			else:
+				msg = motd
+						
+			# print(msg)
+						
+			await bot.edit_channel(channel, topic=msg)	
 
 @bot.event
 async def on_ready():
@@ -760,6 +842,7 @@ async def on_ready():
 	# await flushSettings()
 	bot.loop.create_task(flushSettings())
 	bot.loop.create_task(addXP())
+	#bot.loop.create_task(checkMOTD())
 
 @bot.event
 async def on_message(message):
@@ -1071,6 +1154,103 @@ async def getxp_error(ctx, error):
 	msg = 'xp Error: {}'.format(ctx)
 	await bot.say(msg)
 
+@bot.command(pass_context=True)
+async def removemotd(ctx, channel : discord.Channel = None):
+	"""Removes the message of the day from the selected channel."""
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	if channel == None:
+		msg = 'Usage: `$removemotd [channel]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return	
+	if type(channel) is str:
+		try:
+			channel = discord.utils.get(message.server.channels, name=channel)
+		except:
+			print("That channel does not exist")
+			return
+	# At this point - we should have the necessary stuff
+	motdArray = getServerStat(ctx.message.server, globals.serverList, "ChannelMOTD")
+	for a in motdArray:
+		# Get the channel that corresponds to the id
+		if a['ID'] == channel.id:
+			# We found it - throw an error message and return
+			motdArray.remove(a)
+			setServerStat(ctx.message.server, globals.serverList, "ChannelMOTD", motdArray)
+			
+			msg = 'MOTD for {} removed.'.format(channel.name)
+			await bot.send_message(ctx.message.channel, msg)
+			await bot.edit_channel(channel, topic=None)
+			await quickMOTD()
+			await flushSettings()
+			return		
+	msg = 'MOTD for {} not found.'.format(channel.name)
+	await bot.send_message(ctx.message.channel, msg)
+	return		
+	
+@removemotd.error
+async def removemotd_error(ctx, error):
+    # do stuff
+	msg = 'removemotd Error: {}'.format(ctx)
+	await bot.say(msg)	
+			
+			
+	
+@bot.command(pass_context=True)
+async def setmotd(ctx, channel : discord.Channel = None, message : str = None, users : str = "No"):
+	"""Adds a message of the day to the selected channel."""
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	if channel == None or message == None:
+		msg = 'Usage: `$setmotd [channel] "[message]" [usercount Yes/No (default is No)]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return	
+	if type(channel) is str:
+		try:
+			channel = discord.utils.get(message.server.channels, name=channel)
+		except:
+			print("That channel does not exist")
+			return
+	
+	# At this point - we should have the necessary stuff
+	motdArray = getServerStat(ctx.message.server, globals.serverList, "ChannelMOTD")
+	for a in motdArray:
+		# Get the channel that corresponds to the id
+		if a['ID'] == channel.id:
+			# We found it - throw an error message and return
+			
+			a['MOTD'] = message
+			a['ListOnline'] = users
+			setServerStat(ctx.message.server, globals.serverList, "ChannelMOTD", motdArray)
+			
+			msg = 'MOTD for {} changed.'.format(channel.name)
+			await bot.send_message(ctx.message.channel, msg)
+			await quickMOTD()
+			await flushSettings()
+			return
+
+	# If we made it this far - then we can add it
+	motdArray.append({ 'ID' : channel.id, 'MOTD' : message, 'ListOnline' : users })
+	setServerStat(ctx.message.server, globals.serverList, "ChannelMOTD", motdArray)
+
+	msg = 'MOTD for {} added.'.format(channel.name)
+	await bot.send_message(ctx.message.channel, msg)
+	await quickMOTD()
+	await flushSettings()
+	return
+
+	
+@setmotd.error
+async def setmotd_error(ctx, error):
+    # do stuff
+	msg = 'setmotd Error: {}'.format(ctx)
+	await bot.say(msg)		
 
 
 @bot.command(pass_context=True)
@@ -1273,6 +1453,35 @@ async def stats(ctx, member: discord.Member = None):
 	newState = getUserStat(member, ctx.message.server, globals.serverList, "XPReserve")
 
 	msg = '{} has *{} xp*, and can gift up to *{} xp!*'.format(member.name, newStat, newState)
+	await bot.send_message(ctx.message.channel, msg)
+	
+@bot.command(pass_context=True)
+async def rank(ctx, member: discord.Member = None):
+	"""Say the highest rank of a listed member."""
+	
+	if member is None:
+		member = ctx.message.author
+		
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+	# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+	promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+	
+	highestRole = ""
+	
+	for role in promoSorted:
+		# We *can* have this role, let's see if we already do
+		currentRole = None
+		for aRole in member.roles:
+			# Get the role that corresponds to the id
+			if aRole.id == role['ID']:
+				# We found it
+				highestRole = aRole.name
+
+	if highestRole == "":
+		msg = '{} has not acquired a rank yet.'.format(member.name)
+	else:
+		msg = '{} is a **{}**'.format(member.name, highestRole)
+		
 	await bot.send_message(ctx.message.channel, msg)
 
 
@@ -1743,9 +1952,22 @@ async def setparts(ctx, parts : str = None):
 @bot.command(pass_context=True)
 async def partstemp(ctx):
 	"""Gives a copy & paste style template for setting a parts list."""
-	msg = '\"\`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`\"'	
+	msg = '\$setparts \"\`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`\"'	
 	await bot.send_message(ctx.message.channel, msg)
 	
+	
+@bot.command(pass_context=True)
+async def online(ctx):
+	"""Lists the number of users online."""
+	server = ctx.message.server
+	members = 0
+	membersOnline = 0
+	for member in server.members:
+		members += 1
+		if str(member.status).lower() == "online":
+			membersOnline += 1
+	msg = 'There are *{}* out of *{}* users online.'.format(membersOnline, members)
+	await bot.send_message(ctx.message.channel, msg)
 	
 	
 
@@ -1758,7 +1980,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "Music:\n"
 	commandString = commandString + "   volume       Sets the volume of the currently playing song.\n"
 	commandString = commandString + "   stop         Stops playing audio and leaves the voice channel.\n"
-	commandString = commandString + "   skip         Vote to skip a song. The song requester can automatically.\n"
+	commandString = commandString + "   skip         Vote to skip a song. The song requester can automatically skip.\n"
 	commandString = commandString + "   join         Joins a voice channel.\n"
 	commandString = commandString + "   resume       Resumes the currently played song.\n"
 	commandString = commandString + "   pause        Pauses the currently played song.\n"
@@ -1771,6 +1993,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   stats        List the xp and xp reserve of a listed member (case-sensitive).\n"
 	commandString = commandString + "   getstat      Gets the value for a specific stat for the listed member.\n"
 	commandString = commandString + "   listroles    Lists all roles, id's, and xp requirements for the xp promotion/demotion system.\n"
+	commandString = commandString + "   rank         Say the highest rank of a listed member.\n"
 	commandString = commandString + "   link         Retrieve a link from the link list.\n"
 	commandString = commandString + "   links        List all links in the link list.\n"
 	commandString = commandString + "   addlink      Add a link to the link list.\n"
@@ -1800,6 +2023,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   randcalvin   Randomly picks and displays a Calvin & Hobbes comic.\n"
 	commandString = commandString + "   calvin       Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
+	commandString = commandString + "   online       Lists the number of users online.\n"
 	commandString = commandString + "   thinkdeep    Spout out some intellectual brilliance.\n"
 	commandString = commandString + "   brainfart    Spout out some uh.... intellectual brilliance...\n"
 	commandString = commandString + "   nocontext    Spout out some intersexual brilliance.\n"
@@ -1832,6 +2056,8 @@ async def adminhelp(ctx):
 	commandString = commandString + "   setsstat     Sets a server stat (admin only).\n"
 	commandString = commandString + "   setxp        Sets an absolute value for the member's xp (admin only).\n"
 	commandString = commandString + "   setxpreserve Set's an absolute value for the member's xp reserve (admin only).\n"
+	commandString = commandString + "   setmotd      Adds a message of the day to the selected channel.\n"
+	commandString = commandString + "   removemotd   Removes the message of the day from the selected channel.\n"
 	commandString = commandString + "   playgame     Sets the playing status of the bot (admin only).\n"
 	commandString = commandString + "   flush        Flush the bot settings to disk (admin only).\n"
 
