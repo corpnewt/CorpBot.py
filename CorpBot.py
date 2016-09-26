@@ -2107,6 +2107,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   answer       Spout out some interstellar answering... ?\n"
 	commandString = commandString + "   fart         PrincessZoey :P\n"
 	commandString = commandString + "   wallpaper    Get something pretty to look at.\n"
+	commandString = commandString + "   earthporn    Earth is good.\n"
 	commandString = commandString + "   gamble       Gamble your xp reserves for a chance at winning xp!\n"
 	commandString = commandString + "   help         Shows the main help message.\n"
 	commandString = commandString + "   quickhelp    Shows this help message.\n"
@@ -3048,6 +3049,83 @@ async def fart(ctx):
 	randnum = random.randint(0, len(fartList)-1)
 	msg = '{}'.format(fartList[randnum])
 	await bot.send_message(ctx.message.channel, msg)
+
+	
+@bot.command(pass_context=True)
+async def earthporn(ctx):
+	"""Earth is good."""
+	r = requests.get('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
+	extList = ["jpg", "jpeg", "png", "gif", "tiff"]
+	
+	gotImage = False
+	
+	while not gotImage:
+		randnum = random.randint(0,99)
+		theJSON = r.json()["data"]["children"][randnum]["data"]
+		if get_ext(theJSON["url"]) in extList:
+			gotImage = True
+	
+	
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	
+	tempFileName = theJSON["url"].rsplit('/', 1)[-1]
+	# Strip question mark
+	tempFileName = tempFileName.split('?')[0]
+	
+	imagePath = dirpath + "/" + tempFileName
+	
+	# req = urllib.request.urlretrieve(theJSON["url"], imagePath)
+	
+	# req.add_header('User-agent', 'CorpNewt DeepThoughtBot')
+	
+	#with open(imagePath, 'rb') as f:
+		#await bot.send_file(ctx.message.channel, f)
+
+	rImage = requests.get(theJSON["url"], stream = True, headers = {'User-agent': 'CorpNewt DeepThoughtBot'})	
+	with open(imagePath, 'wb') as f:
+		for chunk in rImage.iter_content(chunk_size=1024):
+			if chunk:
+				f.write(chunk)
+	
+	# Let's make sure it's less than 8MB
+	# myimage = Image.open(imagePath)
+	# print('Image Size Before: {}'.format(myimage.size))
+	# myimage = to_python(imagePath, 8000000)
+	# print('Image Size After : {}'.format(myimage.size))
+	
+	imageSize = os.stat(imagePath)
+	
+	if int(imageSize.st_size) > 8000000:
+		# print("Image is too big ({}b) - resizing...".format(imageSize.st_size))
+		myimage = Image.open(imagePath)
+		xsize, ysize = myimage.size
+		ratio = 8000000/int(imageSize.st_size)
+		# print("Current Size: {} x {}".format(xsize, ysize))
+		xsize *= ratio
+		ysize *= ratio
+		# print("Resized: {} x {}".format(int(xsize), int(ysize)))
+		msg = '{} - Resized to [{} x {}]'.format(theJSON["title"], int(xsize), int(ysize))
+		await bot.send_message(ctx.message.channel, msg)
+		myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
+		myimage.save(imagePath)
+	else:
+		msg = '{}'.format(theJSON["title"])
+		await bot.send_message(ctx.message.channel, msg)
+	
+	# print(imageSize.st_size)
+	
+	
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, imagePath)
+	
+	
+	shutil.rmtree(dirpath, ignore_errors=True)
+	
+	
+	
+	
 	
 	
 @bot.command(pass_context=True)
