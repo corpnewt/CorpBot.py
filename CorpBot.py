@@ -22,6 +22,7 @@ import sys
 import tempfile
 import shutil
 from os.path import splitext
+from PIL import Image
 
 try:
     from urllib.parse import urlparse
@@ -288,6 +289,29 @@ def downloadImageTo( url, fileName ):
   ###           ###
  # Dilbert Stuff #
 ###           ###
+
+
+
+def to_python(image, size):
+	limit = size # 500000 = 500kb
+	img = Image.open(image)
+	image = Image.open(image)
+	width, height = img.size
+	ratio = float(width) / float(height)
+	quality = 100
+	while len(image.read()) > limit:
+		width -= 100
+		quality -= 10
+		height = int(width / ratio)
+		img.resize((width, height), Image.ANTIALIAS)
+		img.save(image.name, "JPEG", quality=quality)
+		image = open(image.name)
+		# reset the file pointer to the beginning so the while loop can read properly
+		image.seek(0)
+	return image
+
+
+
 
 
 
@@ -3040,13 +3064,16 @@ async def wallpaper(ctx):
 		if get_ext(theJSON["url"]) in extList:
 			gotImage = True
 	
-	msg = '{}'.format(theJSON["title"])
-	await bot.send_message(ctx.message.channel, msg)
 	
 	# Make temp dir, download image, upload to discord
 	# then remove temp dir
 	dirpath = tempfile.mkdtemp()
-	imagePath = dirpath + "/" + theJSON["url"].rsplit('/', 1)[-1]
+	
+	tempFileName = theJSON["url"].rsplit('/', 1)[-1]
+	# Strip question mark
+	tempFileName = tempFileName.split('?')[0]
+	
+	imagePath = dirpath + "/" + tempFileName
 	
 	# req = urllib.request.urlretrieve(theJSON["url"], imagePath)
 	
@@ -3061,18 +3088,46 @@ async def wallpaper(ctx):
 			if chunk:
 				f.write(chunk)
 	
+	# Let's make sure it's less than 8MB
+	# myimage = Image.open(imagePath)
+	# print('Image Size Before: {}'.format(myimage.size))
+	# myimage = to_python(imagePath, 8000000)
+	# print('Image Size After : {}'.format(myimage.size))
+	
+	imageSize = os.stat(imagePath)
+	
+	if int(imageSize.st_size) > 8000000:
+		# print("Image is too big ({}b) - resizing...".format(imageSize.st_size))
+		myimage = Image.open(imagePath)
+		xsize, ysize = myimage.size
+		ratio = 8000000/int(imageSize.st_size)
+		# print("Current Size: {} x {}".format(xsize, ysize))
+		xsize *= ratio
+		ysize *= ratio
+		# print("Resized: {} x {}".format(int(xsize), int(ysize)))
+		msg = '{} - Resized to [{} x {}]'.format(theJSON["title"], int(xsize), int(ysize))
+		await bot.send_message(ctx.message.channel, msg)
+		myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
+		myimage.save(imagePath)
+	else:
+		msg = '{}'.format(theJSON["title"])
+		await bot.send_message(ctx.message.channel, msg)
+	
+	# print(imageSize.st_size)
+	
+	
 	with open(imagePath, 'rb') as f:
 		await bot.send_file(ctx.message.channel, imagePath)
 	
 	
 	shutil.rmtree(dirpath, ignore_errors=True)
 	
-@wallpaper.error
+'''@wallpaper.error
 async def wallpaper_error(ctx, error):
     # do stuff
 	msg = 'wallpaper Error: {}'.format(ctx)
 	await bot.say(msg)
-	
+'''	
 	
 
 @bot.command(pass_context=True)
