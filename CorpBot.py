@@ -21,6 +21,12 @@ import datetime as dt
 import sys
 import tempfile
 import shutil
+from os.path import splitext
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
   ###           ###
  # Dilbert Stuff #
@@ -34,6 +40,12 @@ except ImportError:
     from html.parser import HTMLParser
 
 import datetime
+
+def get_ext(url):
+    """Return the filename extension from url, or ''."""
+    parsed = urlparse(url)
+    root, ext = splitext(parsed.path)
+    return ext[1:]  # or ext if you want the leading '.'
 
 def julianDate(my_date):
     # Takes a date string MM-DD-YYYY and
@@ -153,6 +165,44 @@ def getImageTitle ( html ):
     #print(h.unescape(imageTitle))
     return imageTitle.replace('"', '').strip()
 
+# C&H Methods
+
+def getCHURL ( html, date ):
+	# YYYY.MM.DD format
+	# <a href="[comic url]">2005.01.31</a>
+	comicBlock = find_last_between( html, '<a href="', "\">" + date + "</a>")
+	
+	if comicBlock == None:
+		return None
+	else:
+		return comicBlock.replace('"', '').strip()
+		
+		
+def getCHImageURL ( html ):
+	# comicBlock = find_last_between( html, 'div id="comic-container"', "</div>")
+	
+	# if comicBlock == None:
+		# return None
+	
+	imageURL = find_last_between( html, 'id="main-comic" src=', '>' )
+	
+	if imageURL == None:
+		return None
+	
+	imageURL = imageURL.replace('"', '').strip()
+	
+	imageURL = imageURL.split("?t=")[0]
+	
+	if imageURL[0:2] == "//":
+		# Add http?
+		imageURL = "http:" + imageURL
+	if imageURL[-1:] == "/":
+		# Strip trailing /
+		return imageURL[0:-1]
+	else:
+		return imageURL
+
+	
 # XKCD Methods	
 
 def getNewestXKCD ( html ):
@@ -2022,6 +2072,8 @@ async def quickhelp(ctx):
 	commandString = commandString + "   garfield     Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   randcalvin   Randomly picks and displays a Calvin & Hobbes comic.\n"
 	commandString = commandString + "   calvin       Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.\n"
+	commandString = commandString + "   randcyanide  Randomly picks and displays a Cyanide & Happiness comic.\n"
+	commandString = commandString + "   cyanide      Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if found.\n"
 	commandString = commandString + "   roll         Rolls a dice in NdN format.\n"
 	commandString = commandString + "   online       Lists the number of users online.\n"
 	commandString = commandString + "   thinkdeep    Spout out some intellectual brilliance.\n"
@@ -2664,11 +2716,9 @@ async def calvin(ctx, date : str = None):
 	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
 
 	# Can't be before this date.
-	firstDate = "11-18-1985"
+	firstDate = "01-26-2005"
 	fDate = firstDate.split("-")
 	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
-
-
 
 	# Get a a Julian date for the passed day
 	startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
@@ -2717,6 +2767,186 @@ async def calvin(ctx, date : str = None):
 
 	imageDisplayName = "Calvin & Hobbes " + yDir + "-" + mDir + "-" + dName
 	imageName = imageDisplayName + ".gif"
+
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+	
+	
+@bot.command(pass_context=True)
+async def randcyanide(ctx):
+	"""Randomly picks and displays a Cyanide & Happiness comic."""
+	# Get some preliminary values
+	todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+
+	# Can't be before this date.
+	firstDate = "01-26-2005"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+
+	# Get a random Julian date between the first comic and today
+	gotComic = False
+	tries = 0
+	while gotComic == False:
+	
+		if tries >= 10:
+			break
+					
+		startJDate = random.uniform(fJDate, tJDate)
+
+		# Let's create our url
+		gDate = jd_to_date(startJDate)
+
+		# Prep dir names
+		yDir = str(gDate[0])
+		mDir = str(gDate[1])
+		dName = str(int(gDate[2]))
+
+		if (gDate[1] < 10):
+			mDir = "0"+mDir
+
+		if (gDate[2] < 10):
+			dName = "0"+dName
+
+		# Get URL
+		getURL = "http://explosm.net/comics/archive/" + yDir + "/" + mDir
+
+	
+		#print(getURL)
+	
+		# Retrieve html and info
+		imageHTML = getImageHTML(getURL)
+		if imageHTML:
+			imagePage = getCHURL(imageHTML, yDir + "." + mDir + "." + dName)
+			if imagePage:
+				comicHTML = getImageHTML(imagePage)
+				if comicHTML:
+					imageURL  = getCHImageURL( comicHTML )
+					# print("{} : {} : {}".format(gDate, imagePage, imageURL))
+					if imageURL:
+						gotComic = True
+			
+		tries += 1
+		
+	if tries >= 10:
+		msg = 'Failed to find working link.'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	imageDisplayName = "Cyanide & Happiness " + yDir + "-" + mDir + "-" + dName
+	imageName = imageURL.rsplit('/', 1)[-1]
+	if get_ext(imageName) == "":
+		# Add gif because?
+		imageName = imageName + ".gif"
+	
+	msg = '{}'.format(imageDisplayName)
+	await bot.send_message(ctx.message.channel, msg)
+
+	# Make temp dir, download image, upload to discord
+	# then remove temp dir
+	dirpath = tempfile.mkdtemp()
+	imagePath = dirpath + "/" + imageName
+	urllib.request.urlretrieve(imageURL, imagePath)
+	with open(imagePath, 'rb') as f:
+		await bot.send_file(ctx.message.channel, f)
+
+	shutil.rmtree(dirpath, ignore_errors=True)
+
+
+
+@bot.command(pass_context=True)
+async def cyanide(ctx, date : str = None):
+	"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if found."""
+	if date == None:
+        # Auto to today's date
+		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	try:
+		startDate = date.split("-")
+	except ValueError:
+		msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	# Get some preliminary values
+	todayDate = todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+	tDate = todayDate.split("-")
+	tJDate = date_to_jd(int(tDate[2]), int(tDate[0]), int(tDate[1]))
+
+	# Can't be before this date.
+	firstDate = "01-26-2005"
+	fDate = firstDate.split("-")
+	fJDate = date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
+
+
+
+	# Get a a Julian date for the passed day
+	startJDate = date_to_jd(int(startDate[2]), int(startDate[0]), int(startDate[1]))
+
+	outOfRange = False
+
+	# Check date ranges
+	if startJDate < fJDate:
+		outOfRange = True
+	if startJDate > tJDate:
+		outOfRange = True
+
+	if outOfRange:
+		msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	# Let's create our url
+	gDate = jd_to_date(startJDate)
+
+    # Prep dir names
+	yDir = str(gDate[0])
+	mDir = str(gDate[1])
+	dName = str(int(gDate[2]))
+
+	if (gDate[1] < 10):
+		mDir = "0"+mDir
+
+	if (gDate[2] < 10):
+		dName = "0"+dName
+
+	# Get URL
+	getURL = "http://explosm.net/comics/archive/" + yDir + "/" + mDir
+	
+	#print(getURL)
+
+	gotComic = False
+	imageHTML = getImageHTML(getURL)
+	if imageHTML:
+		imagePage = getCHURL(imageHTML, yDir + "." + mDir + "." + dName)
+		if imagePage:
+			comicHTML = getImageHTML(imagePage)
+			if comicHTML:
+				imageURL  = getCHImageURL( comicHTML )
+				# print("{} : {} : {}".format(gDate, imagePage, imageURL))
+				if imageURL:
+					gotComic = True
+	
+	if not gotComic:
+		msg = 'No comic found for *{}*'.format(date)
+		await bot.send_message(ctx.message.channel, msg)
+		return
+	
+	imageDisplayName = "Cyanide & Happiness " + yDir + "-" + mDir + "-" + dName
+	imageName = imageURL.rsplit('/', 1)[-1]
+	if get_ext(imageName) == "":
+		# Add gif because?
+		imageName = imageName + ".gif"
 
 	msg = '{}'.format(imageDisplayName)
 	await bot.send_message(ctx.message.channel, msg)
@@ -2800,14 +3030,14 @@ async def fart(ctx):
 async def wallpaper(ctx):
 	"""Get something pretty to look at."""
 	r = requests.get('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100', headers = {'User-agent': 'CorpNewt DeepThoughtBot'})
-	extList = [".jpg", "jpeg", ".png", ".gif", "tiff"]
+	extList = ["jpg", "jpeg", "png", "gif", "tiff"]
 	
 	gotImage = False
 	
 	while not gotImage:
 		randnum = random.randint(0,99)
 		theJSON = r.json()["data"]["children"][randnum]["data"]
-		if theJSON["url"][-4:] in extList:
+		if get_ext(theJSON["url"]) in extList:
 			gotImage = True
 	
 	msg = '{}'.format(theJSON["title"])
