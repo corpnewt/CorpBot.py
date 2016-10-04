@@ -844,8 +844,8 @@ async def on_member_join(member):
 	# Initialize User
 	globals.serverList = checkUser(member, server, globals.serverList)
 
-	fmt = 'Welcome to *{}*!'.format(server.name)
-	#await bot.send_message(member, fmt.format(member, server))
+	fmt = 'Welcome *{}* to *{}*!'.format(member.name, server.name)
+	await bot.send_message(server, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
 
 	autoRole = getServerStat(server, globals.serverList, "AutoRole")
@@ -855,19 +855,21 @@ async def on_member_join(member):
 	if autoRole.lower() == "position":
 		newRole = discord.utils.get(server.roles, position=int(defaultRole))
 		await bot.add_roles(member, newRole)
-		fmt = '{}\n\nYou\'ve been auto-assigned the role *{}*!'.format(fmt, newRole.name)
-		#await bot.send_message(member, fmt)
+		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
+		await bot.send_message(server, fmt)
 	elif autoRole.lower() == "id":
 		newRole = discord.utils.get(server.roles, id=defaultRole)
 		await bot.add_roles(member, newRole)
-		fmt = '{}\n\nYou\'ve been auto-assigned the role *{}*!'.format(fmt, newRole.name)
-		#await bot.send_message(member, fmt)
+		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
+		await bot.send_message(server, fmt)
 
-	fmt = "{}\n\n*{}* Rules:\n{}".format(fmt, server.name, rules)
-	#await bot.send_message(member, fmt)
-	fmt = '{}\n\nType `$quickhelp` for a list of available user commands.'.format(fmt)
+	fmt = 'Type `$quickhelp` for a list of available user commands.'
+	await bot.send_message(server, fmt)
+
+	# PM User
+	fmt = "*{}* Rules:\n{}".format(server.name, rules)
 	await bot.send_message(member, fmt)
-
+	
 	await quickFlush()
 
 @bot.event
@@ -936,11 +938,21 @@ async def on_message(message):
 		await bot.process_commands(message)
 		return
 	
+	# Initialize User
+	globals.serverList = checkUser(message.author, message.server, globals.serverList)
+	
 	# Check if user is muted
 	isMute = getUserStat(message.author, message.server, globals.serverList, "Muted")
 	if isMute.lower() == "yes":
 		# print('{} is muted.  Deleting message....'.format(message.author))
 		isAdmin = message.author.permissions_in(message.channel).administrator
+		if not isAdmin:
+			checkAdmin = getServerStat(message.server, globals.serverList, "AdminArray")
+			for role in message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
 		# Only mute non-admins
 		if not isAdmin:
 			await bot.delete_message(message)
