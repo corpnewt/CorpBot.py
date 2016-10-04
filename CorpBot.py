@@ -3324,7 +3324,7 @@ async def gamble(ctx, bet : int = None):
 		# 1/betChance that user will win - and payout is 1/10th of the bet
 		randnum = random.randint(1, betChance)
 		# print('{} : {}'.format(randnum, betChance))
-		if randnum == betChance:
+		if randnum == 1:
 			# YOU WON!!
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", int(payout))
 			msg = '{} bet {} and ***WON*** *{} xp!*'.format(ctx.message.author.name, bet, int(payout))
@@ -3410,8 +3410,8 @@ async def gamble(ctx, bet : int = None):
 			
 		else:
 			msg = '{} bet {} and.... *didn\'t* win.  Better luck next time!'.format(ctx.message.author.name, bet)
-			
-		await bot.send_message(ctx.message.channel, msg)
+		
+	await bot.send_message(ctx.message.channel, msg)
 		
 	await flushSettings()
 			
