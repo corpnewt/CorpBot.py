@@ -345,6 +345,7 @@ def checkServer(server, serverDict):
         newServer = { "Name" : server.name, "ID" : server.id,
 											"AutoRole" : "No", # No/ID/Position
 											"DefaultRole" : "1",
+											"AdminLock" : "No",
 											"MinimumXPRole" : "1",
 											"RequiredLinkRole" : "", #ID or blank for Admin-Only
 											"RequiredHackRole" : "", #ID or blank for Admin-Only
@@ -361,6 +362,7 @@ def checkServer(server, serverDict):
 											"DifficultyMultiplier" : "0",
 											"PadXPRoles" : "0",
 											"XPDemote" : "No",
+											"Rules" : "Be nice to each other.",
 											"PromotionArray" : [],
 											"Hacks" : [],
 											"Links" : [],
@@ -401,6 +403,10 @@ def checkUser(user, server, serverDict):
 						y["DisplayName"] = user.display_name
 					if not "Parts" in y:
 						y["Parts"] = ""
+					if not "Muted" in y:
+						y["Muted"] = "No"
+					if not "LastOnline" in y:
+						y["LastOnline"] = "Unknown"
 			if not found:
 				# We didn't locate our user - add them
 				newUser = { "Name" : user.name,
@@ -837,26 +843,29 @@ async def on_member_join(member):
 	# Initialize User
 	globals.serverList = checkUser(member, server, globals.serverList)
 
-	fmt = 'Welcome {0.mention} to {1.name}!'
-	await bot.send_message(server, fmt.format(member, server))
+	fmt = 'Welcome to *{}*!'.format(server.name)
+	#await bot.send_message(member, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
 
 	autoRole = getServerStat(server, globals.serverList, "AutoRole")
 	defaultRole = getServerStat(server, globals.serverList, "DefaultRole")
-
+	rules = getServerStat(member.server, globals.serverList, "Rules")
+	
 	if autoRole.lower() == "position":
 		newRole = discord.utils.get(server.roles, position=int(defaultRole))
 		await bot.add_roles(member, newRole)
-		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
-		await bot.send_message(server, fmt)
+		fmt = '{}\n\nYou\'ve been auto-assigned the role *{}*!'.format(fmt, newRole.name)
+		#await bot.send_message(member, fmt)
 	elif autoRole.lower() == "id":
 		newRole = discord.utils.get(server.roles, id=defaultRole)
 		await bot.add_roles(member, newRole)
-		fmt = 'You\'ve been auto-assigned the role {}!'.format(newRole.name)
-		await bot.send_message(server, fmt)
+		fmt = '{}\n\nYou\'ve been auto-assigned the role *{}*!'.format(fmt, newRole.name)
+		#await bot.send_message(member, fmt)
 
-	fmt = 'Type `$quickhelp` for a list of available user commands.'
-	await bot.send_message(server, fmt)
+	fmt = "{}\n\n*{}* Rules:\n{}".format(fmt, server.name, rules)
+	#await bot.send_message(member, fmt)
+	fmt = '{}\n\nType `$quickhelp` for a list of available user commands.'.format(fmt)
+	await bot.send_message(member, fmt)
 
 	await quickFlush()
 
@@ -921,6 +930,29 @@ async def on_ready():
 @bot.event
 async def on_message(message):
 	# Process commands - then check for mentions
+	if not message.server:
+		# This wasn't said in a server, process commands, then return
+		await bot.process_commands(message)
+		return
+	
+	# Check if user is muted
+	isMute = getUserStat(message.author, message.server, globals.serverList, "Muted")
+	if isMute.lower() == "yes":
+		# print('{} is muted.  Deleting message....'.format(message.author))
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		# Only mute non-admins
+		if not isAdmin:
+			await bot.delete_message(message)
+	
+	# Check for AdminLock
+	needAdmin = getServerStat(message.server, globals.serverList, "AdminLock")
+	if needAdmin.lower() == "yes":
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		# Only allow admins to call the bot
+		if not isAdmin:
+			# await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	
 	await bot.process_commands(message)
 
 	'''if message.author == bot.user:
@@ -3263,13 +3295,13 @@ async def gamble(ctx, bet : int = None):
 		
 		# Bet more, less chance of winning, but more winnings!
 		if bet < 100:
-			betChance = 20
+			betChance = 10
 			payout = int(bet/10)
 		elif bet < 500:
-			betChance = 50
+			betChance = 25
 			payout = int(bet/4)
 		else:
-			betChance = 100
+			betChance = 50
 			payout = int(bet/2)
 		
 		# 1/betChance that user will win - and payout is 1/10th of the bet
@@ -3289,6 +3321,160 @@ async def gamble(ctx, bet : int = None):
 			
 		
 	# globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", incrementAmount)
+	
+@bot.command(pass_context=True)
+async def nickname(ctx, name : str = None):
+	"""Set the bot's nickname (admin-only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	
+	# Let's get the bot's member in the current server
+	botName = "{}#{}".format(bot.user.name, bot.user.discriminator)
+	botMember = ctx.message.server.get_member_named(botName)
+	await bot.change_nickname(botMember, name)
+	
+	
+@bot.command(pass_context=True)
+async def setrules(ctx, rules : str = None):
+	"""Set the server's rules (admin-only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	
+	if rules == None:
+		rules = ""
+		
+	setServerStat(ctx.message.server, globals.serverList, "Rules", rules)
+	msg = 'Rules now set to:\n{}'.format(rules)
+	
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def rules(ctx):
+	"""Display the server's rules."""
+	rules = getServerStat(ctx.message.server, globals.serverList, "Rules")
+	msg = "{} Rules:\n{}".format(ctx.message.server.name, rules)
+	await bot.send_message(ctx.message.channel, msg)
+	
+
+@bot.command(pass_context=True)
+async def lock(ctx):
+	"""Toggles whether the bot only responds to admins (admin-only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+	
+	isLocked = getServerStat(ctx.message.server, globals.serverList, "AdminLock")
+	if isLocked.lower() == "yes":
+		msg = 'Admin lock now *Off*.'
+		setServerStat(ctx.message.server, globals.serverList, "AdminLock", "No")
+	else:
+		msg = 'Admin lock now *On*.'
+		setServerStat(ctx.message.server, globals.serverList, "AdminLock", "Yes")
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def islocked(ctx):
+	"""Says whether the bot only responds to admins."""
+	
+	isLocked = getServerStat(ctx.message.server, globals.serverList, "AdminLock")
+	if isLocked.lower() == "yes":
+		msg = 'Admin lock is *On*.'
+	else:
+		msg = 'Admin lock is *Off*.'
+		
+	await bot.send_message(ctx.message.channel, msg)
+	
+	
+@bot.command(pass_context=True)
+async def mute(ctx, member : discord.Member = None):
+	"""Toggles whether a member can send messages in chat (admin-only)."""
+
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+		
+	if member == None:
+		msg = 'Usage: `mute [member]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+
+	# Initialize User
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+			
+	isMute = getUserStat(member, ctx.message.server, globals.serverList, "Muted")
+	if isMute.lower() == "yes":
+		msg = '{} has been *Unmuted*.'.format(member)
+		setUserStat(member, ctx.message.server, globals.serverList, "Muted", "No")
+	
+	else:
+		msg = '{} has been *Muted*.'.format(member)
+		setUserStat(member, ctx.message.server, globals.serverList, "Muted", "Yes")
+
+	await bot.send_message(ctx.message.channel, msg)
+	
+@mute.error
+async def mute_error(ctx, error):
+    # do stuff
+	msg = 'mute Error: {}'.format(ctx)
+	await bot.say(msg)
+
+	
+	
+@bot.command(pass_context=True)
+async def ismuted(ctx, member : discord.Member = None):
+	"""Says whether a member is muted in chat."""
+		
+	if member == None:
+		msg = 'Usage: `ismuted [member]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(member) is str:
+		try:
+			member = discord.utils.get(message.server.members, name=member)
+		except:
+			print("That member does not exist")
+			return
+
+	# Initialize User
+	globals.serverList = checkUser(member, ctx.message.server, globals.serverList)
+			
+	isMute = getUserStat(member, ctx.message.server, globals.serverList, "Muted")
+	if isMute.lower() == "yes":
+		msg = '{} is *Muted*.'.format(member)	
+	else:
+		msg = '{} is *Unmuted*.'.format(member)
+		
+	await bot.send_message(ctx.message.channel, msg)
+	
+@ismuted.error
+async def ismuted_error(ctx, error):
+    # do stuff
+	msg = 'ismuted Error: {}'.format(ctx)
+	await bot.say(msg)
+	
 	
   ###             ###
  # END:   Commands #
