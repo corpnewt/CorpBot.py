@@ -367,6 +367,7 @@ def checkServer(server, serverDict):
 											"Hacks" : [],
 											"Links" : [],
 											"Members" : [],
+											"AdminArray" : [],
 											"ChannelMOTD" : []}
         serverDict["Servers"].append(newServer)
 
@@ -3370,6 +3371,7 @@ async def lock(ctx):
 	"""Toggles whether the bot only responds to admins (admin-only)."""
 	
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	
 	# Only allow admins to change server stats
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
@@ -3403,6 +3405,13 @@ async def mute(ctx, member : discord.Member = None):
 	"""Toggles whether a member can send messages in chat (admin-only)."""
 
 	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	if not isAdmin:
+		checkAdmin = getServerStat(ctx.message.server, globals.serverList, "AdminArray")
+		for role in ctx.message.author.roles:
+			for aRole in checkAdmin:
+				# Get the role that corresponds to the id
+				if aRole['ID'] == role.id:
+					isAdmin = True
 	# Only allow admins to change server stats
 	if not isAdmin:
 		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
@@ -3439,8 +3448,6 @@ async def mute_error(ctx, error):
     # do stuff
 	msg = 'mute Error: {}'.format(ctx)
 	await bot.say(msg)
-
-	
 	
 @bot.command(pass_context=True)
 async def ismuted(ctx, member : discord.Member = None):
@@ -3475,6 +3482,119 @@ async def ismuted_error(ctx, error):
 	msg = 'ismuted Error: {}'.format(ctx)
 	await bot.say(msg)
 	
+	
+@bot.command(pass_context=True)
+async def addadmin(ctx, role : discord.Role = None):
+	"""Adds a new role to the xp promotion/demotion system (admin only)."""
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+
+	if role == None:
+		msg = 'Usage: `$addadmin [role]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+
+	# Now we see if we already have that role in our list
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "AdminArray")
+
+	for aRole in promoArray:
+		# Get the role that corresponds to the id
+		if aRole['ID'] == role.id:
+			# We found it - throw an error message and return
+			msg = '{} is already in the list.'.format(role.name)
+			await bot.send_message(ctx.message.channel, msg)
+			return
+
+	# If we made it this far - then we can add it
+	promoArray.append({ 'ID' : role.id, 'Name' : role.name })
+	setServerStat(ctx.message.server, globals.serverList, "AdminArray", promoArray)
+
+	msg = '{} added to list.'.format(role.name)
+	await bot.send_message(ctx.message.channel, msg)
+	return
+
+@addadmin.error
+async def addadmin_error(ctx, error):
+    # do stuff
+	msg = 'addadmin Error: {}'.format(ctx)
+	await bot.say(msg)
+
+
+
+@bot.command(pass_context=True)
+async def listadmin(ctx):
+	"""Lists admin roles and id's."""
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "AdminArray")
+	
+	# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+	
+	promoSorted = sorted(promoArray, key=itemgetter('Name'))
+	
+	roleText = "Current Admin Roles:\n"
+
+	for arole in promoSorted:
+		roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, arole['Name'], arole['ID'])
+
+	await bot.send_message(ctx.message.channel, roleText)
+
+
+
+
+@bot.command(pass_context=True)
+async def removeadmin(ctx, role : discord.Role = None):
+	"""Removes a role from the admin list (admin only)."""
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+
+	if role == None:
+		msg = 'Usage: `$removeadmin [role]`'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+
+	# If we're here - then the role is a real one
+	promoArray = getServerStat(ctx.message.server, globals.serverList, "AdminArray")
+
+	for aRole in promoArray:
+		# Get the role that corresponds to the id
+		if aRole['ID'] == role.id:
+			# We found it - let's remove it
+			promoArray.remove(aRole)
+			setServerStat(ctx.message.server, globals.serverList, "AdminArray", promoArray)
+			msg = '{} removed successfully.'.format(aRole['Name'])
+			await bot.send_message(ctx.message.channel, msg)
+			return
+
+	# If we made it this far - then we didn't find it
+	msg = '{} not found in list.'.format(aRole['Name'])
+	await bot.send_message(ctx.message.channel, msg)
+
+@removeadmin.error
+async def removeadmin_error(ctx, error):
+    # do stuff
+	msg = 'removeadmin Error: {}'.format(ctx)
+	await bot.say(msg)
+	
+
 	
   ###             ###
  # END:   Commands #
