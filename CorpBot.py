@@ -3324,11 +3324,91 @@ async def gamble(ctx, bet : int = None):
 			# YOU WON!!
 			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", int(payout))
 			msg = '{} bet {} and ***WON*** *{} xp!*'.format(ctx.message.author.name, bet, int(payout))
+			#await bot.send_message(ctx.message.channel, msg)
+			
+			# Got XP - let's see if we need to promote
+			xpPromote = getServerStat(ctx.message.server, globals.serverList, "XPPromote")
+			xpDemote = getServerStat(ctx.message.server, globals.serverList, "XPDemote")
+			promoteBy = getServerStat(ctx.message.server, globals.serverList, "PromoteBy")
+			requiredXP = int(getServerStat(ctx.message.server, globals.serverList, "RequiredXP"))
+			maxPosition = getServerStat(ctx.message.server, globals.serverList, "MaxPosition")
+			padXP = getServerStat(ctx.message.server, globals.serverList, "PadXPRoles")
+			difficulty = int(getServerStat(ctx.message.server, globals.serverList, "DifficultyMultiplier"))
+
+			userXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XP")
+			userXP = int(userXP)+(int(requiredXP)*int(padXP))
+
+			if xpPromote.lower() == "yes":
+				# We use XP to promote - let's check our levels
+				if promoteBy.lower() == "position":
+					# We use the position to promote
+					gotLevels = 0
+					for x in range(0, int(maxPosition)+1):
+						# Let's apply our difficulty multiplier
+
+						# print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
+
+						required = (requiredXP*x) + (requiredXP*difficulty)
+						# print("Level: {}\nXP: {}".format(x, required))
+						if userXP >= required:
+							gotLevels = x
+					if gotLevels > int(maxPosition):
+						# If we got too high - let's even out
+						gotLevels = int(maxPosition)
+					#print("Got: {} Have: {}".format(gotLevels, userRole))
+					#if gotLevels > userRole:
+						# We got promoted!
+						#msg = '{} was given {} xp, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+					gotLevels+=1
+					for x in range(0, gotLevels):
+						# fill in all the roles between
+						for role in ctx.message.server.roles:
+							if role.position < gotLevels:
+								if not role in ctx.message.author.roles:
+									# Only add if we need to
+									await bot.add_roles(ctx.message.author, role)
+									msg = '{} bet {} and ***WON*** *{} xp*, promoting them to {}!'.format(ctx.message.author.name, bet, int(payout), discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+				elif promoteBy.lower() == "array":
+					promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+					serverRoles = ctx.message.server.roles
+					for role in promoArray:
+						# Iterate through the roles, and add what we can
+						if int(role['XP']) <= userXP:
+							# We *can* have this role, let's see if we already do
+							currentRole = None
+							for aRole in serverRoles:
+								# Get the role that corresponds to the id
+								if aRole.id == role['ID']:
+									# We found it
+									currentRole = aRole
+
+							# Now see if we have it, and add it if we don't
+							if not currentRole in ctx.message.author.roles:
+								await bot.add_roles(ctx.message.author, currentRole)
+								msg = '{} bet {} and ***WON*** *{} xp*, promoting them to {}!'.format(ctx.message.author.name, bet, int(payout), currentRole.name)
+						else:
+							if xpDemote.lower() == "yes":
+								# Let's see if we have this role, and remove it.  Demote time!
+								currentRole = None
+								for aRole in serverRoles:
+									# Get the role that corresponds to the id
+									if aRole.id == role['ID']:
+										# We found it
+										currentRole = aRole
+
+							# Now see if we have it, and add it if we don't
+								if currentRole in ctx.message.author.roles:
+									await bot.remove_roles(ctx.message.author, currentRole)
+									msg = '{} was demoted from {}!'.format(ctx.message.author.name, currentRole.name)
+			
+			
+			
+			
 		else:
 			msg = '{} bet {} and.... *didn\'t* win.  Better luck next time!'.format(ctx.message.author.name, bet)
 			
+		await bot.send_message(ctx.message.channel, msg)
 		
-	await bot.send_message(ctx.message.channel, msg)
 	await flushSettings()
 			
 			
