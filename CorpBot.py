@@ -798,27 +798,27 @@ class Music:
 
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
-            await self.bot.say('Not playing any music right now...')
+            await self.bot.say('Not playing anything right now...')
             return
 
         voter = ctx.message.author
         if voter == state.current.requester:
-            await self.bot.say('Requester requested skipping song...')
+            await self.bot.say('Requester requested skipping...')
             state.skip()
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
             if total_votes >= 3:
-                await self.bot.say('Skip vote passed, skipping song...')
+                await self.bot.say('Skip vote passed, skipping...')
                 state.skip()
             else:
                 await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
         else:
-            await self.bot.say('You have already voted to skip this song.')
+            await self.bot.say('You have already voted to skip this.')
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
-        """Shows info about the currently played song."""
+        """Shows info about currently playing."""
 
         state = self.get_voice_state(ctx.message.server)
         if state.current is None:
@@ -3291,6 +3291,10 @@ async def gamble(ctx, bet : int = None):
 		msg = 'You can\'t bet negative amounts!'
 		approve = False
 		
+	if bet == 0:
+		msg = 'You can\'t bet *nothing!*'
+		approve = False
+		
 	if ctx.message.author.top_role.position < int(minRole):
 		approve = False
 		msg = 'You don\'t have the permissions to bet.'
@@ -3308,13 +3312,13 @@ async def gamble(ctx, bet : int = None):
 		
 		# Bet more, less chance of winning, but more winnings!
 		if bet < 100:
-			betChance = 10
+			betChance = 5
 			payout = int(bet/10)
 		elif bet < 500:
-			betChance = 25
+			betChance = 15
 			payout = int(bet/4)
 		else:
-			betChance = 50
+			betChance = 25
 			payout = int(bet/2)
 		
 		# 1/betChance that user will win - and payout is 1/10th of the bet
