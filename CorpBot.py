@@ -349,6 +349,7 @@ def checkServer(server, serverDict):
 											"MinimumXPRole" : "1",
 											"RequiredLinkRole" : "", #ID or blank for Admin-Only
 											"RequiredHackRole" : "", #ID or blank for Admin-Only
+											"RequiredKillRole" : "", #ID or blank for Admin-Only
 											"XPApprovalChannel" : "",
 											"LastAnswer" : "",
 											"HourlyXP" : "1",
@@ -362,8 +363,11 @@ def checkServer(server, serverDict):
 											"DifficultyMultiplier" : "0",
 											"PadXPRoles" : "0",
 											"XPDemote" : "No",
+											"Killed" : "No",
 											"Rules" : "Be nice to each other.",
 											"PromotionArray" : [],
+											"Hunger" : "0",
+											"HungerLock" : "Yes",
 											"Hacks" : [],
 											"Links" : [],
 											"Members" : [],
@@ -492,6 +496,26 @@ async def flushSettings():
 		counter += 1
 		await bot.send_message(channel, counter)
 		await asyncio.sleep(900) # task runs every 15 minutes'''
+		
+async def getHungry():
+	while not bot.is_closed:
+		# Add The Hunger
+		await asyncio.sleep(900) # runs every 15 minutes
+		for server in bot.servers:
+			# Iterate through the servers and add them
+			globals.serverList = checkServer(server, globals.serverList)
+			isKill = getServerStat(server, globals.serverList, "Killed")
+			
+			if isKill.lower() == "no":
+				hunger = int(getServerStat(server, globals.serverList, "Hunger"))
+				# Check if hunger is 100% and increase by 1 if not
+				hunger += 1
+			
+				if hunger > 100:
+					hunger = 100
+				
+				setServerStat(server, globals.serverList, "Hunger", hunger)
+		
 
 async def addXP():
 	while not bot.is_closed:
@@ -928,6 +952,7 @@ async def on_ready():
 	# await flushSettings()
 	bot.loop.create_task(flushSettings())
 	bot.loop.create_task(addXP())
+	bot.loop.create_task(getHungry())
 	#bot.loop.create_task(checkMOTD())
 
 @bot.event
@@ -940,6 +965,23 @@ async def on_message(message):
 	
 	# Initialize User
 	globals.serverList = checkUser(message.author, message.server, globals.serverList)
+	
+	# Admin Override
+	isAdmin = message.author.permissions_in(message.channel).administrator
+	if isAdmin:
+		await bot.process_commands(message)
+		return
+	
+	isKilled = getServerStat(message.server, globals.serverList, "Killed")
+	hunger = int(getServerStat(message.server, globals.serverList, "Hunger"))
+	if isKilled.lower() == "yes":
+		if not message.content.startswith('$resurrect'):
+			if not message.content.startswith('$iskill'):
+				if hunger <= -150:
+					if not message.contents.startswith('$hunger'):
+						return
+				else:
+					return
 	
 	# Check if user is muted
 	isMute = getUserStat(message.author, message.server, globals.serverList, "Muted")
@@ -965,6 +1007,19 @@ async def on_message(message):
 		if not isAdmin:
 			# await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 			return
+			
+	# Check hunger level - allow admins through still
+	hunger = int(getServerStat(message.server, globals.serverList, "Hunger"))
+	hungerLock = getServerStat(message.server, globals.serverList, "HungerLock")
+	if hungerLock.lower() == "yes" and not isAdmin:
+		if hunger == 100:
+			if message.content.startswith('$feed'):
+				await bot.process_commands(message)
+			elif message.content.startswith('$'):
+				# Hunger at 100% - bot is *too* hungry to help
+				msg = '{} is *too* hungry to help.  Feed him first!'.format(bot.user.name)
+				await bot.send_message(message.channel, msg)
+				return
 	
 	await bot.process_commands(message)
 
@@ -2151,6 +2206,7 @@ async def quickhelp(ctx):
 	commandString = commandString + "   question     Spout out some interstellar questioning... ?\n"
 	commandString = commandString + "   answer       Spout out some interstellar answering... ?\n"
 	commandString = commandString + "   fart         PrincessZoey :P\n"
+	commandString = commandString + "   feed         Feed the bot!\n"
 	commandString = commandString + "   wallpaper    Get something pretty to look at.\n"
 	commandString = commandString + "   earthporn    Earth is good.\n"
 	commandString = commandString + "   gamble       Gamble your xp reserves for a chance at winning xp!\n"
@@ -3689,7 +3745,346 @@ async def removeadmin_error(ctx, error):
     # do stuff
 	msg = 'removeadmin Error: {}'.format(ctx)
 	await bot.say(msg)
+
 	
+@bot.command(pass_context=True)
+async def hunger(ctx):
+	"""How hungry is the bot?"""
+	hunger = int(getServerStat(ctx.message.server, globals.serverList, "Hunger"))
+	if hunger < 0:
+		overweight = hunger * -1
+		
+		if hunger <= -1:
+			msg = '{} is stuffed ({}% overweight)... maybe he should take a break from eating...'.format(bot.user.name, overweight)
+		if hunger <= -10:
+			msg = '{} is pudgy ({}% overweight)... He may get fat if he keeps going.'.format(bot.user.name, overweight)
+		if hunger <= -25:
+			msg = '{} is, well fat ({}% overweight)... Diet time?'.format(bot.user.name, overweight)
+		if hunger <= -50:
+			msg = '{} is obese ({}% overweight)... Eating is his enemy right now.'.format(bot.user.name, overweight)
+		if hunger <= -75:
+			msg = '{} looks fat to an extremely unhealthy degree ({}% overweight)... maybe you should think about his health?'.format(bot.user.name, overweight)
+		if hunger <= -100:
+			msg = '{} is essentially dead from over-eating ({}% overweight).  I hope you\'re happy.'.format(bot.user.name, overweight)
+		if hunger <= -150:
+			msg = '{} *is* dead from over-eating ({}% overweight).  You will have to `$ressurect` him to get him back.'.format(bot.user.name, overweight)
+		
+		# msg = '{} is... well, {} is *fat*.  {}% overweight.'.format(bot.user.name, bot.user.name, overweight)
+	elif hunger == 0:
+		msg = '{} is full ({}%).  You are safe.  *For now.*'.format(bot.user.name, hunger)
+	elif hunger <= 15:
+		msg = '{} feels mostly full ({}%).  He is appeased.'.format(bot.user.name, hunger)
+	elif hunger <= 25:
+		msg = '{} feels a bit peckish ({}%).  A snack is in order.'.format(bot.user.name, hunger)
+	elif hunger <= 50:
+		msg = '{} is hungry ({}%).  Present your offerings.'.format(bot.user.name, hunger)
+	elif hunger <= 75:
+		msg = '{} is *starving* ({}%)!  Do you want him to starve to death?'.format(bot.user.name, hunger)
+	else:
+		msg = '{} is ***hangry*** ({}%)!  Feed him or feel his wrath!'.format(bot.user.name, hunger)
+		
+	await bot.send_message(ctx.message.channel, msg)
+
+	
+	
+@bot.command(pass_context=True)
+async def feed(ctx, food : int = None):
+	"""Feed the bot some xp!"""
+	# feed the bot, and maybe you'll get something in return!
+	msg = 'Usage: `feed [xp reserve feeding]`'
+	
+	if food == None:
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	if not type(food) == int:
+		await bot.send_message(ctx.message.channel, msg)
+		return
+		
+	# Initialize User
+	globals.serverList = checkUser(ctx.message.author, ctx.message.server, globals.serverList)
+
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	adminUnlim = getServerStat(ctx.message.server, globals.serverList, "AdminUnlimited")
+	reserveXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve")
+	minRole = getServerStat(ctx.message.server, globals.serverList, "MinimumXPRole")
+	hunger = int(getServerStat(ctx.message.server, globals.serverList, "Hunger"))
+	isKill = getServerStat(ctx.message.server, globals.serverList, "Killed")
+
+	approve = True
+
+	# Check Food
+	
+	'''if food > hunger:
+		await bot.send_message(ctx.message.channel, '{} is only {}% hungry - your offering has been adjusted to {}'.format(bot.user.name, hunger, food))
+		food = hunger'''
+		
+	
+	if food > int(reserveXP):
+		approve = False
+		msg = 'You can\'t feed the bot *{}*, you only have *{}* xp reserve!'.format(food, reserveXP)
+		
+	if food < 0:
+		msg = 'You can\'t feed less than nothing to the bot! You think this is funny?!'
+		approve = False
+		
+	if food == 0:
+		msg = 'You can\'t feed *nothing!*'
+		approve = False
+		
+	if ctx.message.author.top_role.position < int(minRole):
+		approve = False
+		msg = 'You don\'t have the permissions to feed this beautiful bot.'
+		
+	# Check admin last - so it overrides anything else
+	'''if isAdmin and adminUnlim.lower() == "yes":
+		# No limit - approve
+		approve = True
+		decrement = False'''
+		
+	if isKill.lower() == "yes":
+		# Bot's dead...
+		msg = '{} carlessly shoves {} xp into the carcass of {}... maybe resurrect them first next time?'.format(ctx.message.author.name, food, bot.user.name)
+		await bot.send_message(ctx.message.channel, msg)
+		await flushSettings()
+		return
+		
+	if approve:
+		# Bet was approved - let's take the XPReserve right away
+		
+		# Apply food - then check health
+		hunger -= food
+		
+		setServerStat(ctx.message.server, globals.serverList, "Hunger", hunger)
+		takeReserve = -1*food
+		globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", takeReserve)
+		
+		# Bet more, less chance of winning, but more winnings!
+		chanceToWin = 100
+		payout = int(food*2)
+		
+		# 1/betChance that user will win - and payout is 1/10th of the bet
+		randnum = random.randint(1, chanceToWin)
+		# print('{} : {}'.format(randnum, chanceToWin))
+		if randnum == 1:
+			# YOU WON!!
+			globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XP", int(payout))
+			msg = '{} fed {} to the bot and received a magical package with *{} xp!*'.format(ctx.message.author.name, food, int(payout))
+			#await bot.send_message(ctx.message.channel, msg)
+			
+			# Got XP - let's see if we need to promote
+			xpPromote = getServerStat(ctx.message.server, globals.serverList, "XPPromote")
+			xpDemote = getServerStat(ctx.message.server, globals.serverList, "XPDemote")
+			promoteBy = getServerStat(ctx.message.server, globals.serverList, "PromoteBy")
+			requiredXP = int(getServerStat(ctx.message.server, globals.serverList, "RequiredXP"))
+			maxPosition = getServerStat(ctx.message.server, globals.serverList, "MaxPosition")
+			padXP = getServerStat(ctx.message.server, globals.serverList, "PadXPRoles")
+			difficulty = int(getServerStat(ctx.message.server, globals.serverList, "DifficultyMultiplier"))
+
+			userXP = getUserStat(ctx.message.author, ctx.message.server, globals.serverList, "XP")
+			userXP = int(userXP)+(int(requiredXP)*int(padXP))
+
+			if xpPromote.lower() == "yes":
+				# We use XP to promote - let's check our levels
+				if promoteBy.lower() == "position":
+					# We use the position to promote
+					gotLevels = 0
+					for x in range(0, int(maxPosition)+1):
+						# Let's apply our difficulty multiplier
+
+						# print("{} + {}".format((requiredXP*x), ((requiredXP*x)*difficulty)))
+
+						required = (requiredXP*x) + (requiredXP*difficulty)
+						# print("Level: {}\nXP: {}".format(x, required))
+						if userXP >= required:
+							gotLevels = x
+					if gotLevels > int(maxPosition):
+						# If we got too high - let's even out
+						gotLevels = int(maxPosition)
+					#print("Got: {} Have: {}".format(gotLevels, userRole))
+					#if gotLevels > userRole:
+						# We got promoted!
+						#msg = '{} was given {} xp, and was promoted to {}!'.format(member.name, xpAmount, discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+					gotLevels+=1
+					for x in range(0, gotLevels):
+						# fill in all the roles between
+						for role in ctx.message.server.roles:
+							if role.position < gotLevels:
+								if not role in ctx.message.author.roles:
+									# Only add if we need to
+									await bot.add_roles(ctx.message.author, role)
+									msg = '{} fed {} to the bot and received a magical package with *{} xp*, promoting them to {}!'.format(ctx.message.author.name, food, int(payout), discord.utils.get(ctx.message.server.roles, position=gotLevels).name)
+				elif promoteBy.lower() == "array":
+					promoArray = getServerStat(ctx.message.server, globals.serverList, "PromotionArray")
+					serverRoles = ctx.message.server.roles
+					for role in promoArray:
+						# Iterate through the roles, and add what we can
+						if int(role['XP']) <= userXP:
+							# We *can* have this role, let's see if we already do
+							currentRole = None
+							for aRole in serverRoles:
+								# Get the role that corresponds to the id
+								if aRole.id == role['ID']:
+									# We found it
+									currentRole = aRole
+
+							# Now see if we have it, and add it if we don't
+							if not currentRole in ctx.message.author.roles:
+								await bot.add_roles(ctx.message.author, currentRole)
+								msg = '{} fed {} to the bot and received a magical package with *{} xp*, promoting them to {}!'.format(ctx.message.author.name, food, int(payout), currentRole.name)
+						else:
+							if xpDemote.lower() == "yes":
+								# Let's see if we have this role, and remove it.  Demote time!
+								currentRole = None
+								for aRole in serverRoles:
+									# Get the role that corresponds to the id
+									if aRole.id == role['ID']:
+										# We found it
+										currentRole = aRole
+
+							# Now see if we have it, and add it if we don't
+								if currentRole in ctx.message.author.roles:
+									await bot.remove_roles(ctx.message.author, currentRole)
+									msg = '{} was demoted from {}!'.format(ctx.message.author.name, currentRole.name)
+			
+			
+			
+			
+		else:
+			msg = '{} fed {} to the bot! Thanks, you kind soul! But, you could\'ve brought more...'.format(ctx.message.author.name, food)
+				
+			#await bot.send_message(ctx.message.channel, msg)
+	
+		if hunger <= -150:
+			# Kill the bot here
+			setServerStat(ctx.message.server, globals.serverList, "Killed", "Yes")
+			msg = '{}\nI am kill...'.format(msg)
+		elif hunger <= -100:
+			msg = '{}\n\nYou *are* going to kill {}.  Stop *now* if you have a heart!'.format(msg, bot.user.name)
+		elif hunger <= -75:
+			msg = '{}\n\n{} looks fat to an extremely unhealthy degree... maybe you should think about his health?'.format(msg, bot.user.name)
+		elif hunger <= -50:
+			msg = '{}\n\n{} is obese... Eating is his enemy right now.'.format(msg, bot.user.name)
+		elif hunger <= -25:
+			msg = '{}\n\n{} is kinda fat... Diet time?'.format(msg, bot.user.name)	
+		elif hunger <= -10:
+			msg = '{}\n\n{} is getting pudgy... He may get fat if he keeps going.'.format(msg, bot.user.name)
+		elif hunger <= -1:
+			msg = '{}\n\n{} is getting stuffed... maybe he should take a break from eating...'.format(msg, bot.user.name)
+		elif hunger == 0:
+			msg = '{}\n\nIf you keep over-feeding the bot, he may get fat...'.format(msg)
+			#await bot.send_message(ctx.message.channel, msg)
+	
+	await bot.send_message(ctx.message.channel, msg)
+		
+	await flushSettings()
+			
+			
+		
+	# globals.serverList = incrementStat(ctx.message.author, ctx.message.server, globals.serverList, "XPReserve", incrementAmount)
+	
+	
+@bot.command(pass_context=True)
+async def kill(ctx):
+	"""Kill the bot... you heartless soul."""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredKillRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	
+	setServerStat(ctx.message.server, globals.serverList, "Killed", "Yes")
+	await bot.send_message(ctx.message.channel, 'I am kill...')
+	
+@bot.command(pass_context=True)
+async def resurrect(ctx):
+	"""Restore life to the bot.  What magic is this?"""
+	
+	# Check for role requirements
+	requiredRole = getServerStat(ctx.message.server, globals.serverList, "RequiredKillRole")
+	if requiredRole == "":
+		#admin only
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	else:
+		#role requirement
+		hasPerms = False
+		for role in ctx.message.author.roles:
+			if role.id == requiredRole:
+				hasPerms = True
+		if not hasPerms:
+			await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+	
+	setServerStat(ctx.message.server, globals.serverList, "Killed", "No")
+	setServerStat(ctx.message.server, globals.serverList, "Hunger", "0")
+	await bot.send_message(ctx.message.channel, 'Guess who\'s back??')
+	
+@bot.command(pass_context=True)
+async def iskill(ctx):
+	"""Check the ded of the bot."""
+	
+	isKill = getServerStat(ctx.message.server, globals.serverList, "Killed")
+	msg = 'I have no idea what you\'re talking about... Should I be worried?'
+	if isKill.lower() == "yes":
+		msg = '*Whispers from beyond the grave*\nI am kill...'
+	else:
+		msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
+		
+	await bot.send_message(ctx.message.channel, msg)
+	
+
+@bot.command(pass_context=True)
+async def setkillrole(ctx, role : discord.Role = None):
+	"""Sets the required role ID to add/remove hacks (admin only)."""
+	
+	isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+	# Only allow admins to change server stats
+	if not isAdmin:
+		await bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+		return
+
+	if role == None:
+		setServerStat(ctx.message.server, globals.serverList, "RequiredKillRole", "")
+		msg = 'Kill/resurrect now *admin-only*.'
+		await bot.send_message(ctx.message.channel, msg)
+		return
+
+	if type(role) is str:
+		try:
+			role = discord.utils.get(message.server.roles, name=role)
+		except:
+			print("That role does not exist")
+			return
+
+	# If we made it this far - then we can add it
+	setServerStat(ctx.message.server, globals.serverList, "RequiredKillRole", role.id)
+
+	msg = 'Role required for kill/resurrect set to *{}*.'.format(role.name)
+	await bot.send_message(ctx.message.channel, msg)
+	await quickFlush()
+	return
+
+@setkillrole.error
+async def killrole_error(ctx, error):
+    # do stuff
+	msg = 'setkillrole Error: {}'.format(ctx)
+	await bot.say(msg)
 
 	
   ###             ###
