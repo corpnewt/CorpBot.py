@@ -364,6 +364,7 @@ def checkServer(server, serverDict):
 											"PadXPRoles" : "0",
 											"XPDemote" : "No",
 											"Killed" : "No",
+											"KilledBy" : "",
 											"Rules" : "Be nice to each other.",
 											"PromotionArray" : [],
 											"Hunger" : "0",
@@ -975,13 +976,8 @@ async def on_message(message):
 	isKilled = getServerStat(message.server, globals.serverList, "Killed")
 	hunger = int(getServerStat(message.server, globals.serverList, "Hunger"))
 	if isKilled.lower() == "yes":
-		if not message.content.startswith('$resurrect'):
-			if not message.content.startswith('$iskill'):
-				if hunger <= -150:
-					if not message.contents.startswith('$hunger'):
-						return
-				else:
-					return
+		if not (message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed')):
+			return
 	
 	# Check if user is muted
 	isMute = getUserStat(message.author, message.server, globals.serverList, "Muted")
@@ -3751,6 +3747,7 @@ async def removeadmin_error(ctx, error):
 async def hunger(ctx):
 	"""How hungry is the bot?"""
 	hunger = int(getServerStat(ctx.message.server, globals.serverList, "Hunger"))
+	isKill = getServerStat(ctx.message.server, globals.serverList, "Killed")
 	if hunger < 0:
 		overweight = hunger * -1
 		
@@ -3782,6 +3779,9 @@ async def hunger(ctx):
 		msg = '{} is *starving* ({}%)!  Do you want him to starve to death?'.format(bot.user.name, hunger)
 	else:
 		msg = '{} is ***hangry*** ({}%)!  Feed him or feel his wrath!'.format(bot.user.name, hunger)
+		
+	if isKill.lower() == "yes" and hunger > -150:
+		msg = '{} *is* dead.  Likely from *lack* of care.  You will have to `$ressurect` him to get him back.'.format(bot.user.name, overweight)
 		
 	await bot.send_message(ctx.message.channel, msg)
 
@@ -3958,7 +3958,8 @@ async def feed(ctx, food : int = None):
 		if hunger <= -150:
 			# Kill the bot here
 			setServerStat(ctx.message.server, globals.serverList, "Killed", "Yes")
-			msg = '{}\nI am kill...'.format(msg)
+			setServerStat(ctx.message.server, globals.serverList, "KilledBy", ctx.message.author.name)
+			msg = '{}\nI am kill...\n\n{} did it...'.format(msg, ctx.message.author.name)			
 		elif hunger <= -100:
 			msg = '{}\n\nYou *are* going to kill {}.  Stop *now* if you have a heart!'.format(msg, bot.user.name)
 		elif hunger <= -75:
@@ -4007,7 +4008,8 @@ async def kill(ctx):
 			return
 	
 	setServerStat(ctx.message.server, globals.serverList, "Killed", "Yes")
-	await bot.send_message(ctx.message.channel, 'I am kill...')
+	setServerStat(ctx.message.server, globals.serverList, "KilledBy", ctx.message.author.name)
+	await bot.send_message(ctx.message.channel, 'I am kill...\n\n{} did it...'.format(ctx.message.author.name))
 	
 @bot.command(pass_context=True)
 async def resurrect(ctx):
@@ -4033,16 +4035,18 @@ async def resurrect(ctx):
 	
 	setServerStat(ctx.message.server, globals.serverList, "Killed", "No")
 	setServerStat(ctx.message.server, globals.serverList, "Hunger", "0")
-	await bot.send_message(ctx.message.channel, 'Guess who\'s back??')
+	killedBy = getServerStat(ctx.message.server, globals.serverList, "KilledBy")
+	await bot.send_message(ctx.message.channel, 'Guess who\'s back??\n\n{} may have tried to keep me down - but I *just keep coming back!*'.format(killedBy))
 	
 @bot.command(pass_context=True)
 async def iskill(ctx):
 	"""Check the ded of the bot."""
 	
 	isKill = getServerStat(ctx.message.server, globals.serverList, "Killed")
+	killedBy = getServerStat(ctx.message.server, globals.serverList, "KilledBy")
 	msg = 'I have no idea what you\'re talking about... Should I be worried?'
 	if isKill.lower() == "yes":
-		msg = '*Whispers from beyond the grave*\nI am kill...'
+		msg = '*Whispers from beyond the grave*\nI am kill...\n\n{} did it...'.format(killedBy)
 	else:
 		msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
 		
