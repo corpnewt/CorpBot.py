@@ -67,6 +67,7 @@ class Settings:
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
+				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"XPApprovalChannel" 	: "", 		# Not Used
 				"LastAnswer" 			: "",		# URL to last $question post
 				"HourlyXP" 				: "1",		# How much xp reserve per hour
