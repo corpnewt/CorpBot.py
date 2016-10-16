@@ -2,6 +2,7 @@ import asyncio
 import discord
 import random
 from   discord.ext import commands
+from   Cogs import Settings
 		
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -103,9 +104,10 @@ class Music:
 
 	Works in multiple servers at once.
 	"""
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
 		self.voice_states = {}
+		self.settings = settings
 
 	def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -231,6 +233,29 @@ class Music:
 
 		This also clears the queue.
 		"""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		# Check for role requirements
+		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
+		if requiredRole == "":
+			#admin only
+			isAdmin = author.permissions_in(channel).administrator
+			if not isAdmin:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+		else:
+			#role requirement
+			hasPerms = False
+			for role in author.roles:
+				if role.id == requiredRole:
+					hasPerms = True
+			if not hasPerms:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+		
 		server = ctx.message.server
 		state = self.get_voice_state(server)
 
