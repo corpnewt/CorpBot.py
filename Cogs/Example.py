@@ -202,6 +202,10 @@ class Music:
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
 			player = state.player
+			if value < 0:
+				value = 0
+			if value > 100:
+				value = 100
 			player.volume = value / 100
 			await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
 
