@@ -4,6 +4,7 @@ import datetime as dt
 import urllib.request
 import urllib
 import requests
+# from   lxml import html
 try:
     # Python 2.6-2.7
     from HTMLParser import HTMLParser
@@ -112,13 +113,14 @@ def find_last_between( source, start_sep, end_sep ):
 	else:
 		return result[len(result)-1] # Return last item
 
-def getImageHTML ( url ):
-	try:
-		with urllib.request.urlopen(url) as f:
-			htmlSource = str(f.read())
-			return htmlSource
-	except:
-		return None
+def getImageHTML ( url, ua : str = '' ):
+    try:
+        req = urllib.request.Request(url, data=None,headers={'User-Agent': ua})
+        with urllib.request.urlopen(req) as f:
+            htmlSource = str(f.read())
+            return htmlSource
+    except Exception as e:
+        return None
 
 def getImageURL ( html ):
     imageURL = find_between( html, "data-image=", "data-date=" )
@@ -246,6 +248,21 @@ def getGImageURL ( html ):
 		return None
 		
 	comicBlock = find_last_between( html, 'img class="img-responsive" src=', ' width')
+	
+	if not comicBlock:
+		return None
+
+	imageURL = comicBlock.replace('"', '').strip()
+	
+	return imageURL	
+	
+# Peanuts Methods
+
+def getPeanutsImageURL ( html ):
+	if not html:
+		return None
+		
+	comicBlock = find_last_between( html, 'src=', ' />')
 	
 	if not comicBlock:
 		return None
