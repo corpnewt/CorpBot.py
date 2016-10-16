@@ -238,3 +238,18 @@ def getGMGImageURL ( html ):
 	imageURL = imageURL.replace('"', '').strip()
 	
 	return imageURL	
+	
+# Garfield Methods
+
+def getGImageURL ( html ):
+	if not html:
+		return None
+		
+	comicBlock = find_last_between( html, 'img class="img-responsive" src=', ' width')
+	
+	if not comicBlock:
+		return None
+
+	imageURL = comicBlock.replace('"', '').strip()
+	
+	return imageURL	
