@@ -223,6 +223,42 @@ class Admin:
 		await self.bot.say(msg)
 		
 	@commands.command(pass_context=True)
+	async def setstoprole(self, ctx, role : discord.Role = None):
+		"""Sets the required role ID to stop the music player (admin only)."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if role == None:
+			self.settings.setServerStat(ctx.message.server, "RequiredStopRole", "")
+			msg = 'Add/remove links now *admin-only*.'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(role) is str:
+			try:
+				role = discord.utils.get(message.server.roles, name=role)
+			except:
+				print("That role does not exist")
+				return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.server, "RequiredStopRole", role.id)
+
+		msg = 'Role required to stop the music player set to **{}**.'.format(role.name)
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	
+	@setstoprole.error
+	async def stoprole_error(self, ctx, error):
+		# do stuff
+		msg = 'setstoprole Error: {}'.format(ctx)
+		await self.bot.say(msg)
+		
+	@commands.command(pass_context=True)
 	async def setlinkrole(self, ctx, role : discord.Role = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
 		
