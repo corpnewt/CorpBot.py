@@ -16,6 +16,7 @@ from Cogs import Lists
 from Cogs import Bot
 from Cogs import Example
 from Cogs import Humor
+from Cogs import Help
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -29,15 +30,15 @@ with open('token.txt', 'r') as f:
 # Create our cog classes
 cogList = []
 
-# Examples - there are 2 parts here, Example, and Music
-example = Example.Example(bot)
-music = Example.Music(bot)
-cogList.append(example)
-cogList.append(music)
-
 # Settings
 settings = Settings.Settings(bot, jsonFile)
 cogList.append(settings)
+
+# Examples - there are 2 parts here, Example, and Music
+example = Example.Example(bot)
+music = Example.Music(bot, settings)
+cogList.append(example)
+cogList.append(music)
 
 # Xp
 xp = Xp.Xp(bot, settings)
@@ -71,8 +72,14 @@ cogList.append(lists)
 botCog = Bot.Bot(bot, settings)
 cogList.append(botCog)
 
+# Humor
 humor = Humor.Humor(bot)
 cogList.append(humor)
+
+# Help - Must be last
+#help = Help.Help(bot, cogList)
+#cogList.append(help)
+
 
 # Main bot events
 @bot.event
