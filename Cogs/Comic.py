@@ -663,6 +663,11 @@ class Comic:
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
+		
+	  # ######## #
+	 # Garfield #
+	# ######## #
+		
 	@commands.command(pass_context=True)
 	async def randgarfield(self, ctx):
 		"""Randomly picks and displays a Garfield comic."""
@@ -754,6 +759,112 @@ class Comic:
 			return'''
 		
 		imageURL  = ComicHelper.getGImageURL(imageHTML)
+
+		if not imageURL:
+			msg = 'No comic found for *{}*'.format(date)
+			await self.bot.send_message(channel, msg)
+			return
+
+		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		# Download Image
+		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		
+		
+	  # ####### #	
+	 # Peanuts #
+	# ####### #
+	
+	@commands.command(pass_context=True)
+	async def randpeanuts(self, ctx):
+		"""Randomly picks and displays a Peanuts comic."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+
+		# Can't be after this date.
+		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+		# Can't be before this date.
+		firstDate = "10-02-1950"
+
+		# Get a random Julian date between the first comic and today
+		gotComic = False
+		tries = 0
+		while not gotComic:
+		
+			if tries >= 10:
+				break
+				
+			date = self.getRandDateBetween(firstDate, todayDate)
+			# Get URL
+			getURL = "http://www.gocomics.com/printable/peanuts/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
+			# Retrieve html and info
+			imageHTML = ComicHelper.getImageHTML(getURL)
+		
+			if imageHTML:
+				imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
+				if imageURL:
+					gotComic = True
+				
+			tries += 1
+
+		if tries >= 10:
+			msg = 'Failed to find working link.'
+			await self.bot.send_message(channel, msg)
+			return
+		
+		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		# Download Image
+		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		
+	@commands.command(pass_context=True)
+	async def peanuts(self, ctx, date : str = None):
+		"""Displays the Peanuts comic for the passed date (MM-DD-YYYY) if found."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+			
+		if not date:
+			# Auto to today
+			date = dt.datetime.today().strftime("%m-%d-%Y")
+			
+		if not self.dateIsValid(date):
+			msg = 'Usage: `$garfield "[date MM-DD-YYYY]"`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		# Can't be after this date.
+		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
+		# Can't be before this date.
+		firstDate = "10-02-1950"
+
+		if not self.isDateBetween(date, firstDate, todayDate):
+			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
+			await self.bot.send_message(channel, msg)
+			return
+
+		dateDict = self.dateDict(date)
+
+		# Get URL
+		getURL = "http://www.gocomics.com/printable/peanuts/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
+		
+		# Retrieve html and info
+		imageHTML = ComicHelper.getImageHTML(getURL)
+		
+		# Comment out to test
+		'''if imageHTML == None:
+			msg = 'No comic found for *{}*'.format(date)
+			await self.bot.send_message(channel, msg)
+			return'''
+		
+		imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
 
 		if not imageURL:
 			msg = 'No comic found for *{}*'.format(date)
