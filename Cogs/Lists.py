@@ -1,8 +1,10 @@
 import asyncio
 import discord
+import time
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import ReadableTime
 
 # This is the lists module.
 
@@ -56,14 +58,17 @@ class Lists:
 			linkList = []
 		
 		found = False
+		currentTime = int(time.time())	
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
 				# The link exists!
 				msg = '*{}* updated!'.format(name)
 				alink['URL'] = link
+				alink['UpdatedBy'] = author.name
+				alink['Updated'] = currentTime
 				found = True
-		if not found:		
-			linkList.append({"Name" : name, "URL" : link})
+		if not found:	
+			linkList.append({"Name" : name, "URL" : link, "CreatedBy" : author.name, "Created" : currentTime})
 			msg = '*{}* added to link list!'.format(name)
 		
 		self.settings.setServerStat(server, "Links", linkList)
@@ -141,6 +146,55 @@ class Lists:
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
 				msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
+				await self.bot.send_message(channel, msg)
+				return
+				
+		await self.bot.send_message(channel, 'Link "*{}*" not found!'.format(name))		
+
+	@commands.command(pass_context=True)
+	async def linkinfo(self, ctx, name : str = None):
+		"""Displays info about a link from the link list."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not name:
+			msg = 'Usage: `$linkinfo "[link name]"`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		linkList = self.settings.getServerStat(server, "Links")
+		if not linkList or linkList == []:
+			msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+			await self.bot.send_message(channel, msg)
+			return
+
+		for alink in linkList:
+			if alink['Name'].lower() == name.lower():
+				currentTime = int(time.time())
+				msg = '**{}:**'.format(alink['Name'])
+				try:
+					msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+				except KeyError as e:
+					msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
+				try:
+					createdTime = int(alink['Created'])
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
+				except KeyError as e:
+					pass
+				try:
+					msg = '{}\nUpdated By: *{}*'.format(msg, alink['UpdatedBy'])
+				except KeyError as e:
+					pass
+				try:
+					createdTime = alink['Updated']
+					createdTime = int(createdTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
+				except:
+					pass
 				await self.bot.send_message(channel, msg)
 				return
 				

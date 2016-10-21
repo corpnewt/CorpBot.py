@@ -4,7 +4,7 @@ import datetime as dt
 import urllib.request
 import urllib
 import requests
-# from   lxml import html
+
 try:
     # Python 2.6-2.7
     from HTMLParser import HTMLParser

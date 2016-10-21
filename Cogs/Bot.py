@@ -46,3 +46,24 @@ class Bot:
 			return
 
 		await self.bot.change_presence(game=discord.Game(name=game))
+
+	@commands.command(pass_context=True)
+	async def setbotparts(self, ctx, parts : str = None):
+		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		if not parts:
+			parts = ""
+			
+		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(self.bot.user.name, parts)
+		await self.bot.send_message(channel, msg)

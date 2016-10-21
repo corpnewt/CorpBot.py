@@ -53,6 +53,18 @@ class Reddit:
 		if answer or image:
 			# We need the image or the answer
 			return {'title' : theJSON['title'], 'url' : theJSON["url"]}
+			
+	def canDisplay(self, server):
+		# Check if we can display images
+		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
+		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
+		if not GetImage.canDisplay( lastTime, threshold ):
+			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+			return False
+		
+		# If we made it here - set the LastPicture method
+		self.settings.setServerStat(server, "LastPicture", int(time.time()))
+		return True
 
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
@@ -96,6 +108,40 @@ class Reddit:
 
 		
 	@commands.command(pass_context=True)
+	async def meirl(self, ctx):
+		"""Me in real life."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+
+
+	@commands.command(pass_context=True)
+	async def starterpack(self, ctx):
+		"""Starterpacks."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+
+
+	@commands.command(pass_context=True)
 	async def earthporn(self, ctx):
 		"""Earth is good."""
 		
@@ -103,15 +149,8 @@ class Reddit:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# To say, or not to say - uncomment to have the bot notify of too many images.
-			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+		if not self.canDisplay(server):
 			return
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		
 		# Grab our image title and url
 		infoDict = self.getTitle('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100', False, True)
@@ -127,18 +166,27 @@ class Reddit:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# To say, or not to say - uncomment to have the bot notify of too many images.
-			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+		if not self.canDisplay(server):
 			return
-		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		
 		# Grab our image title and url
 		infoDict = self.getTitle('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		
+		
+	@commands.command(pass_context=True)
+	async def abandoned(self, ctx):
+		"""Get something abandoned to look at."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100', False, True)
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)

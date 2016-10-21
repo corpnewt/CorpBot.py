@@ -1,6 +1,16 @@
 # Token file
 token.txt
 
+# FFMpeg.exe
+ffmpeg.exe
+
+# Hidden stuff
+.git
+.vscode
+
+# Settings
+Settings*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

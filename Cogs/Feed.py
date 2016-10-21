@@ -26,8 +26,9 @@ class Feed:
 		hungerLock = self.settings.getServerStat(message.server, "HungerLock")
 		isKill = self.settings.getServerStat(message.server, "Killed")
 		if isKill.lower() == "yes":
-			if not (message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed')):
-				ignore = True
+			ignore = True
+			if message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed'):
+				ignore = False
 				
 		if hunger >= 100 and hungerLock.lower() == "yes":
 			ignore = True
@@ -62,8 +63,8 @@ class Feed:
 		
 		hunger = int(self.settings.getServerStat(server, "Hunger"))
 		isKill = self.settings.getServerStat(server, "Killed")
+		overweight = hunger * -1
 		if hunger < 0:
-			overweight = hunger * -1
 			
 			if hunger <= -1:
 				msg = 'I\'m stuffed ({}% overweight)... maybe I should take a break from eating...'.format(overweight)
@@ -152,7 +153,7 @@ class Feed:
 			
 		if isKill.lower() == "yes":
 			# Bot's dead...
-			msg = '{} carlessly shoves {} xp into the carcass of {}... maybe resurrect them first next time?'.format(author.name, food, self.bot.user.name)
+			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(author.name, food, self.bot.user.name)
 			await self.bot.send_message(channel, msg)
 			return
 			
@@ -175,12 +176,12 @@ class Feed:
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '{}\'s offering of *{}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{} xp!*'.format(author.name, food, int(payout))
+				msg = '*{}\'s* offering of *{}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{} xp!*'.format(author.name, food, int(payout))
 				
 				# Got XP - let's see if we need to promote
 				await self.xp.checkroles(author, channel)
 			else:
-				msg = '{} fed me *{} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(author.name, food)
+				msg = '*{}* fed me *{} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(author.name, food)
 		
 			if hunger <= -150:
 				# Kill the bot here
@@ -232,7 +233,7 @@ class Feed:
 		
 		self.settings.setServerStat(server, "Killed", "Yes")
 		self.settings.setServerStat(server, "KilledBy", author.name)
-		await self.bot.send_message(channel, 'I am kill...\n\n{} did it...'.format(author.name))
+		await self.bot.send_message(channel, 'I am kill...\n\n*{}* did it...'.format(author.name))
 		
 	@commands.command(pass_context=True)
 	async def resurrect(self, ctx):
