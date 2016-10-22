@@ -35,17 +35,29 @@ class Reddit:
 		# Load url - with self.posts number of posts
 		r = requests.get(url, headers = {'User-agent': self.ua})
 		# If we need an image - make sure we have a valid one
-		if image:
-			extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
-			gotImage = False
-			while not gotImage:
+		gotLink = False
+		while not gotLink:
+			if image:
+				extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
+				gotImage = False
+				while not gotImage:
+					randnum = random.randint(0,self.posts)
+				
+					try:
+						theJSON = r.json()["data"]["children"][randnum]["data"]
+					except IndexError:
+						theJSON = ""
+
+					if GetImage.get_ext(theJSON["url"]) in extList:
+						gotImage = True
+						gotLink  = True
+			else:
 				randnum = random.randint(0,self.posts)
-				theJSON = r.json()["data"]["children"][randnum]["data"]
-				if GetImage.get_ext(theJSON["url"]) in extList:
-					gotImage = True
-		else:
-			randnum = random.randint(0,self.posts)
-			theJSON = r.json()["data"]["children"][randnum]["data"]
+				try:
+					theJSON = r.json()["data"]["children"][randnum]["data"]
+					gotLink = True
+				except IndexError:
+					theJSON = ""
 		
 		if not (answer or image):
 			# Just return the title
@@ -106,7 +118,41 @@ class Reddit:
 			msg = '{}'.format(answer)
 		await self.bot.send_message(ctx.message.channel, msg)
 
+
+	@commands.command(pass_context=True)
+	async def dankmemes(self, ctx):
+		"""Only the dankest."""
 		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+
+
+	@commands.command(pass_context=True)
+	async def techsupport(self, ctx):
+		"""Tech support irl."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		
+
 	@commands.command(pass_context=True)
 	async def meirl(self, ctx):
 		"""Me in real life."""

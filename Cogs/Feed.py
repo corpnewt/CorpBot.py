@@ -187,7 +187,7 @@ class Feed:
 				# Kill the bot here
 				self.settings.setServerStat(server, "Killed", "Yes")
 				self.settings.setServerStat(server, "KilledBy", author.name)
-				msg = '{}\nI am kill...\n\n{} did it...'.format(msg, author.name)			
+				msg = '{}\n\nI am kill...\n\n{} did it...'.format(msg, author.name)			
 			elif hunger <= -100:
 				msg = '{}\n\nYou *are* going to kill me...  Stop *now* if you have a heart!'.format(msg)
 			elif hunger <= -75:
@@ -201,7 +201,7 @@ class Feed:
 			elif hunger <= -1:
 				msg = '{}\n\nI\'m getting stuffed... maybe I should take a break from eating...'.format(msg)
 			elif hunger == 0:
-				msg = '{}\n\nIf you keep over-feeding me, I *may* get fat...'.format(msg)
+				msg = '{}\n\nIf you keep feeding me, I *may* get fat...'.format(msg)
 		
 		await self.bot.send_message(channel, msg)
 		
