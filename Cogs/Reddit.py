@@ -46,7 +46,8 @@ class Reddit:
 					try:
 						theJSON = r.json()["data"]["children"][randnum]["data"]
 					except IndexError:
-						theJSON = ""
+						# Failed - set to none
+						theJSON = { "url" : "" }
 
 					if GetImage.get_ext(theJSON["url"]) in extList:
 						gotImage = True
@@ -58,7 +59,7 @@ class Reddit:
 					theJSON = r.json()["data"]["children"][randnum]["data"]
 					gotLink = True
 				except IndexError:
-					theJSON = ""
+					theJSON = { "url" : "" }
 		
 		if not (answer or image):
 			# Just return the title
