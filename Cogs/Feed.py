@@ -32,6 +32,8 @@ class Feed:
 				
 		if hunger >= 100 and hungerLock.lower() == "yes":
 			ignore = True
+			if message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed'):
+				ignore = False
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 		
