@@ -28,52 +28,6 @@ class Admin:
 		if not isAdmin and adminLock.lower() == "yes":
 			ignore = True
 		return { 'Ignore' : ignore, 'Delete' : delete}
-		
-	@commands.command(pass_context=True)
-	async def setxp(self, ctx, member : discord.Member = None, xpAmount : int = None):
-		"""Sets an absolute value for the member's xp (admin only)."""
-		
-		author  = ctx.message.author
-		server  = ctx.message.server
-		channel = ctx.message.channel
-		
-		isAdmin = author.permissions_in(channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-			return
-
-		# Check for formatting issues
-		if not (xpAmount or member):
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if not type(xpAmount) is int:
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if xpAmount < 0:
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
-				return
-
-		self.settings.setUserStat(member, server, "XP", xpAmount)
-		msg = '*{}\'s* xp was set to *{}!*'.format(member.name, xpAmount)
-		await self.bot.send_message(channel, msg)
-
-
-	@setxp.error
-	async def setxp_error(self, ctx, error):
-		# do stuff
-		msg = 'setxp Error: {}'.format(ctx)
-		await self.bot.say(msg)
-
 
 
 	@commands.command(pass_context=True)
