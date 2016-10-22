@@ -17,6 +17,7 @@ from Cogs import Bot
 from Cogs import Example
 from Cogs import Humor
 from Cogs import Help
+from Cogs import Uptime
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -75,6 +76,10 @@ cogList.append(botCog)
 # Humor
 humor = Humor.Humor(bot)
 cogList.append(humor)
+
+# Humor
+uptime = Uptime.Uptime(bot)
+cogList.append(uptime)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
