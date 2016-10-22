@@ -53,6 +53,7 @@ class Reddit:
 						gotLink  = True
 			else:
 				randnum = random.randint(0,self.posts)
+				
 				try:
 					theJSON = r.json()["data"]["children"][randnum]["data"]
 					gotLink = True
