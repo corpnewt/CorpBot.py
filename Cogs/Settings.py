@@ -43,6 +43,10 @@ class Settings:
 		# This module doesn't need to cancel messages.
 		return { 'Ignore' : False, 'Delete' : False}
 
+	def getServerDict(self):
+		# Returns the server dictionary
+		return self.serverDict
+
 	# Let's make sure the server is in our list
 	def checkServer(self, server):
 		# Checks the server agains the globals.serverList variable
@@ -246,6 +250,78 @@ class Settings:
 				x[stat] = value
 				self.flushSettings()
 
+	
+	@commands.command(pass_context=True)
+	async def owner(self, ctx, member : discord.Member = None):
+		"""Sets the bot owner - once set, can only be changed by the current owner."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		if member == None:
+			member = author
+
+		if type(member) is str:
+			try:
+				member = discord.utils.get(server.members, name=member)
+			except:
+				print("That member does not exist")
+				return
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			self.serverDict['Owner'] = member.id
+			self.flushSettings()
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
+				await self.bot.send_message(channel, msg)
+				return
+			self.serverDict['Owner'] = member.id
+			self.flushSettings()
+
+		msg = 'I have been claimed by *{}!*'.format(member.name)
+		await self.bot.send_message(channel, msg)
+
+	@owner.error
+	async def owner_error(ctx, error):
+		msg = 'owner Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
+	async def disown(self, ctx):
+		"""Revokes ownership of the bot."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I have already been disowned...'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can disown me.'
+				await self.bot.send_message(channel, msg)
+				return
+			self.serverDict['Owner'] = None
+			self.flushSettings()
+
+		msg = 'I have been disowned by *{}!*'.format(author.name)
+		await self.bot.send_message(channel, msg)
+
 
 	@commands.command(pass_context=True)
 	async def getstat(self, ctx, stat : str = None, member : discord.Member = None):
@@ -256,7 +332,7 @@ class Settings:
 		channel = ctx.message.channel
 		
 		if member == None:
-			member = ctx.message.author
+			member = author
 
 		if str == None:
 			msg = 'Usage: `$getstat [stat] [member]`'

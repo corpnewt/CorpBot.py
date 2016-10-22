@@ -553,7 +553,40 @@ class Admin:
 		msg = 'removemotd Error: {}'.format(ctx)
 		await self.bot.say(msg)	
 				
-				
+
+	@commands.command(pass_context=True)
+	async def broadcast(self, ctx, message : str = None):
+		"""Broadcasts a message to all connected servers.  Can only be done by the owner."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+
+		if message == None:
+			msg = 'Usage: `$broadcast [message]`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can broadcast.'
+				await self.bot.send_message(channel, msg)
+				return
+		
+		for server in self.bot.servers:
+			await self.bot.send_message(server, message)
+
 		
 	@commands.command(pass_context=True)
 	async def setmotd(self, ctx, channel : discord.Channel = None, message : str = None, users : str = "No"):
