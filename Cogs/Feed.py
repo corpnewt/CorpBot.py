@@ -81,7 +81,7 @@ class Feed:
 			if hunger <= -100:
 				msg = 'I am essentially dead from over-eating ({}% overweight).  I hope you\'re happy.'.format(overweight)
 			if hunger <= -150:
-				msg = 'I *AM* dead from over-eating ({}% overweight).  You will have to `$ressurect` me to get me back.'.format(overweight)
+				msg = 'I *AM* dead from over-eating ({}% overweight).  You will have to `$resurrect` me to get me back.'.format(overweight)
 				
 		elif hunger == 0:
 			msg = 'I\'m full ({}%).  You are safe.  *For now.*'.format(hunger)
@@ -97,7 +97,7 @@ class Feed:
 			msg = 'I\'m ***hangry*** ({}%)!  Feed me or feel me *wrath!*'.format(hunger)
 			
 		if isKill.lower() == "yes" and hunger > -150:
-			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `$ressurect` me to get me back.'.format(overweight)
+			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `$resurrect` me to get me back.'.format(overweight)
 			
 		await self.bot.send_message(channel, msg)
 		
