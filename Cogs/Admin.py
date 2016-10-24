@@ -20,11 +20,22 @@ class Admin:
 		delete = False
 		# Check if user is muted
 		isMute = self.settings.getUserStat(message.author, message.server, "Muted")
-		if isMute.lower() == "yes":
+
+		# Check for admin status
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(message.server, "AdminArray")
+			for role in message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+
+		if not isAdmin and isMute.lower() == "yes":
 			ignore = True
 			delete = True
+
 		adminLock = self.settings.getServerStat(message.server, "AdminLock")
-		isAdmin = message.author.permissions_in(message.channel).administrator
 		if not isAdmin and adminLock.lower() == "yes":
 			ignore = True
 		return { 'Ignore' : ignore, 'Delete' : delete}
