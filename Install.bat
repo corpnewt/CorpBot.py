@@ -1,0 +1,68 @@
+:::::::::::::::::::::::::::::::::::::::::
+:: Automatically check & get admin rights
+:::::::::::::::::::::::::::::::::::::::::
+@echo off
+CLS
+ECHO.
+ECHO =============================
+ECHO Running Admin shell
+ECHO =============================
+
+:checkPrivileges
+NET FILE 1>NUL 2>NUL
+if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges )
+
+:getPrivileges
+if '%1'=='ELEV' (shift & goto gotPrivileges)
+ECHO.
+ECHO **************************************
+ECHO Invoking UAC for Privilege Escalation
+ECHO **************************************
+
+setlocal DisableDelayedExpansion
+set "batchPath=%~0"
+setlocal EnableDelayedExpansion
+ECHO Set UAC = CreateObject^("Shell.Application"^) > "%temp%\OEgetPrivileges.vbs"
+ECHO UAC.ShellExecute "!batchPath!", "ELEV", "", "runas", 1 >> "%temp%\OEgetPrivileges.vbs"
+"%temp%\OEgetPrivileges.vbs"
+exit /B
+
+:gotPrivileges
+::::::::::::::::::::::::::::
+::START
+::::::::::::::::::::::::::::
+
+
+@echo off
+
+cls
+echo   ###                ###
+echo  # CorpBot - CorpNewt #
+echo ###                ###
+echo.
+echo Installing Discord...
+echo.
+call :install "discord.py[voice]"
+echo.
+
+echo Installing Pillow...
+echo.
+call :install "Pillow"
+echo.
+
+echo Installing Youtube-dl...
+echo.
+call :install "youtube-dl"
+echo.
+
+echo Installing Requests...
+echo.
+call :install "requests"
+echo.
+
+echo Done.
+timeout 5 > nul
+exit /b
+
+:install <module>
+pip install -U %~1
