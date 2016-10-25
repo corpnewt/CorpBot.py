@@ -302,7 +302,7 @@ class Music:
 		"""Shows info about currently playing."""
 
 		state = self.get_voice_state(ctx.message.server)
-		if state.current is None:
+		if not state.is_playing():
 			await self.bot.say('Not playing anything.')
 		else:
 			skip_count = len(state.skip_votes)
