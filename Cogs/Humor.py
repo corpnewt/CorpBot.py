@@ -27,6 +27,6 @@ class Humor:
 	async def shart(self, ctx):
 		"""PrincessZoey was here <3"""
 		shartList = ["Oops not again!", "Son of a biscuit eating whore", "Really? God Damnit"]
-		randnum = random.randinit(0, len(fartList)-1)
-		msg = '{}'.format(fartList[randnum])
+		randnum = random.randinit(0, len(shartList)-1)
+		msg = '{}'.format(shartList[randnum])
 		await self.bot.send_message(ctx.message.channel, msg)
