@@ -85,7 +85,53 @@ class Admin:
 		# do stuff
 		msg = 'setxp Error: {}'.format(ctx)
 		await self.bot.say(msg)
-		
+	
+	@commands.command(pass_context=True)
+	async def defaultrole(self, ctx, role : discord.Role = None):
+		"""Sets the default role or position for auto-role assignment."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		isAdmin = author.permissions_in(channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if role is None:
+			msg = 'Usage: `$defaultrole [role/position]`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		if type(role) is int:
+			# Likely a position listed
+			self.settings.setServerStat(server, "DefaultRole", role)
+			try:
+				rolename = discord.utils.get(server.roles, position=role)
+				await self.bot.send_message(channel, 'Default role set to *{}!*'.format(rolename.name))
+			except:
+				print("That role does not exist")
+				return
+
+		if type(role) is str:
+			try:
+				role = discord.utils.get(server.roles, name=role)
+			except:
+				print("That role does not exist")
+				return
+
+		self.settings.setServerStat(server, "DefaultRole", role.id)
+		await self.bot.send_message(channel, 'Default role set to *{}!*'.format(role.name))
+
+
+	@defaultrole.error
+	async def defaultrole_error(self, ctx, error):
+		# do stuff
+		msg = 'defaultrole Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+
 	@commands.command(pass_context=True)
 	async def addrole(self, ctx, role : discord.Role = None, xp : int = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""

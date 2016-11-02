@@ -111,7 +111,7 @@ async def on_member_join(member):
 		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
 		await bot.send_message(server, fmt)
 	elif autoRole.lower() == "id":
-		newRole = discord.utils.get(server.roles, id=defaultRole)
+		newRole = discord.utils.get(server.roles, id=str(defaultRole))
 		await bot.add_roles(member, newRole)
 		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
 		await bot.send_message(server, fmt)
