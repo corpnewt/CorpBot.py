@@ -115,6 +115,11 @@ class Bot:
 	@commands.command(pass_context=True)
 	async def playgame(self, ctx, game : str = None):
 		"""Sets the playing status of the bot (owner-only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
 		# Only allow owner to change server stats
 		serverDict = self.settings.serverDict
 
