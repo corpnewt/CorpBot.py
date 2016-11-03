@@ -565,7 +565,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def removemotd(self, ctx, channel : discord.Channel = None):
+	async def removemotd(self, ctx, chan : discord.Channel = None):
 		"""Removes the message of the day from the selected channel."""
 		
 		channel = ctx.message.channel
@@ -577,13 +577,13 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
-		if channel == None:
+		if chan == None:
 			msg = 'Usage: `$removemotd [channel]`'
 			await self.bot.send_message(channel, msg)
 			return	
-		if type(channel) is str:
+		if type(chan) is str:
 			try:
-				channel = discord.utils.get(server.channels, name=channel)
+				chan = discord.utils.get(server.channels, name=chan)
 			except:
 				print("That channel does not exist")
 				return
@@ -591,7 +591,7 @@ class Admin:
 		motdArray = self.settings.getServerStat(server, "ChannelMOTD")
 		for a in motdArray:
 			# Get the channel that corresponds to the id
-			if a['ID'] == channel.id:
+			if a['ID'] == chan.id:
 				# We found it - throw an error message and return
 				motdArray.remove(a)
 				self.settings.setServerStat(server, "ChannelMOTD", motdArray)
@@ -601,7 +601,7 @@ class Admin:
 				await self.bot.edit_channel(channel, topic=None)
 				await self.updateMOTD()
 				return		
-		msg = 'MOTD for *{}* not found.'.format(channel.name)
+		msg = 'MOTD for *{}* not found.'.format(chan.name)
 		await self.bot.send_message(channel, msg)	
 		
 	@removemotd.error
@@ -646,7 +646,7 @@ class Admin:
 
 		
 	@commands.command(pass_context=True)
-	async def setmotd(self, ctx, channel : discord.Channel = None, message : str = None, users : str = "No"):
+	async def setmotd(self, ctx, chan : discord.Channel = None, message : str = None, users : str = "No"):
 		"""Adds a message of the day to the selected channel."""
 		
 		channel = ctx.message.channel
@@ -658,13 +658,13 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
-		if not (channel or message):
+		if not (chan or message):
 			msg = 'Usage: `$setmotd [channel] "[message]" [usercount Yes/No (default is No)]`'
 			await self.bot.send_message(channel, msg)
 			return	
-		if type(channel) is str:
+		if type(chan) is str:
 			try:
-				channel = discord.utils.get(server.channels, name=channel)
+				chan = discord.utils.get(server.channels, name=chan)
 			except:
 				print("That channel does not exist")
 				return
@@ -673,22 +673,22 @@ class Admin:
 		motdArray = self.settings.getServerStat(server, "ChannelMOTD")
 		for a in motdArray:
 			# Get the channel that corresponds to the id
-			if a['ID'] == channel.id:
+			if a['ID'] == chan.id:
 				# We found it - throw an error message and return
 				a['MOTD'] = message
 				a['ListOnline'] = users
 				self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 				
-				msg = 'MOTD for {} changed.'.format(channel.name)
+				msg = 'MOTD for {} changed.'.format(chan.name)
 				await self.bot.send_message(channel, msg)
 				await self.updateMOTD()
 				return
 
 		# If we made it this far - then we can add it
-		motdArray.append({ 'ID' : channel.id, 'MOTD' : message, 'ListOnline' : users })
+		motdArray.append({ 'ID' : chan.id, 'MOTD' : message, 'ListOnline' : users })
 		self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 
-		msg = 'MOTD for {} added.'.format(channel.name)
+		msg = 'MOTD for {} added.'.format(chan.name)
 		await self.bot.send_message(channel, msg)
 		await self.updateMOTD()
 
