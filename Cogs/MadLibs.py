@@ -67,6 +67,8 @@ class MadLibs:
 			msg = 'I\'m already playing MadLibs - use `$ml [your word]` to submit answers.'
 			await self.bot.send_message(channel, msg)
 			return
+		
+		self.isPlaying = True
 
 		# Get a random madlib from those available
 		randnum = random.randint(0, (len(choices)-1))
