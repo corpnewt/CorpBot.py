@@ -3,6 +3,7 @@ import discord
 import re
 import os
 import random
+import string
 from   discord.ext import commands
 from   Cogs import Settings
 
@@ -96,6 +97,11 @@ class MadLibs:
 				word = word[4:]
 			if word.startswith('$ml'):
 				word = word[3:]
+			
+			# Check capitalization
+			if words[i][:3].isupper():
+				# Capitalized
+				word = string.capwords(word)
 
 			# Add to our list
 			subs.append(word)
