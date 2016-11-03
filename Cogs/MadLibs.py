@@ -13,6 +13,7 @@ class MadLibs:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.isPlaying = False
 		# Setup/compile our regex
 		self.regex = re.compile(r"\[\[[^\[\]]+\]\]")
 		
@@ -43,8 +44,6 @@ class MadLibs:
 				await self.bot.send_message(channel, msg)
 				return
 
-		
-
 		# Check if our folder exists
 		if not os.path.isdir("./Cogs/MadLibs"):
 			msg = 'I\'m not configured for MadLibs yet...'
@@ -60,6 +59,12 @@ class MadLibs:
 		if len(choices) == 0:
 			# No madlibs...
 			msg = 'I\'m not configured for MadLibs yet...'
+			await self.bot.send_message(channel, msg)
+			return
+		
+		# Check if we're already in a game
+		if self.isPlaying:
+			msg = 'I\'m already playing MadLibs - use `$ml [your word]` to submit answers.'
 			await self.bot.send_message(channel, msg)
 			return
 
