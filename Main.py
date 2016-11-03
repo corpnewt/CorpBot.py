@@ -98,6 +98,48 @@ async def on_ready():
 	settings.flushSettings()
 
 @bot.event
+async def on_voice_state_update(before, after):
+	# Let's get all the users in our voice channel, if we're in one
+
+	if not bot.is_voice_connected(before.server):
+		return
+
+	voiceChannel = bot.voice_client_in(before.server)
+	if not voiceChannel:
+		return
+	voiceChannel = voiceChannel.channel
+
+	if not before.voice_channel:
+		# Not pertaining to our channel
+		return
+
+	# Get all the members connected
+	voiceList = voiceChannel.voice_members
+
+	if len(voiceList) > 1:
+		# We are not alone - hang out still
+		return
+
+	# if we made it here - then we're alone - disconnect
+	server = before.server
+	state = music.get_voice_state(server)
+
+	if state.is_playing():
+		player = state.player
+		player.stop()
+	try:
+		state.audio_player.cancel()
+		del music.voice_states[server.id]
+		await state.voice.disconnect()
+	except:
+		pass
+
+@bot.event
+async def on_member_remove(member):
+	server = member.server
+	settings.removeUser(member, server)
+
+@bot.event
 async def on_member_join(member):
 	server = member.server
 	# Initialize the user

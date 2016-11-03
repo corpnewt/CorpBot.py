@@ -157,7 +157,24 @@ class Settings:
 					x["Members"].append(newUser)
 				if needsUpdate:
 					self.flushSettings()
-	
+
+	# Let's make sure the user is in the specified server
+	def removeUser(self, user, server):
+		# Make sure our server exists in the list
+		self.checkServer(server)
+		# Check for our username
+		found = False
+		for x in self.serverDict["Servers"]:
+			if x["ID"] == server.id:
+				# We found our server, now to iterate users
+				for y in x["Members"]:
+					if y["ID"] == user.id:
+						found = True
+						# Found our user - remove
+						x["Members"].remove(y)
+		if found:
+			self.flushSettings()
+
 	
 	# Return the requested stat
 	def getUserStat(self, user, server, stat):
