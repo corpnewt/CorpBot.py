@@ -88,7 +88,7 @@ class MadLibs:
 		i = 0
 		while i < len(words):
 			# Ask for the next word
-			msg = "I need a/an **{}** (type `$ml [your word]` to respond).".format(words[i][2:-2])
+			msg = "I need a/an **{}** (word *{}/{}*).  `$ml [your word]`".format(words[i][2:-2], str(i+1), str(len(words)))
 			await self.bot.send_message(channel, msg)
 
 			# Setup the check
