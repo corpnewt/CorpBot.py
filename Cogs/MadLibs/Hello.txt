@@ -1,0 +1,3 @@
+Hello, my name is [[Name]], and I'm here to talk to you about [[topic of discussion]].
+
+Have you ever felt so [[adjective]] that you just [[verb]]?

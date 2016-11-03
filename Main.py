@@ -18,6 +18,7 @@ from Cogs import Example
 from Cogs import Humor
 from Cogs import Help
 from Cogs import Uptime
+from Cogs import MadLibs
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -80,6 +81,10 @@ cogList.append(humor)
 # Humor
 uptime = Uptime.Uptime(bot)
 cogList.append(uptime)
+
+# MadLibs
+madlibs = MadLibs.MadLibs(bot, settings)
+cogList.append(madlibs)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
