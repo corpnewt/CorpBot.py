@@ -136,3 +136,4 @@ class MadLibs:
 
 		# Message the output
 		await self.bot.send_message(channel, data)
+		self.isPlaying = False
