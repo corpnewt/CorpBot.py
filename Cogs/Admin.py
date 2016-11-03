@@ -40,6 +40,41 @@ class Admin:
 			ignore = True
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
+	@commands.command(pass_context=True)
+	async def setmadlibschannel(self, ctx, channel : discord.Channel = None):
+		"""Sets the required role ID to stop the music player (admin only)."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if channel == None:
+			self.settings.setServerStat(ctx.message.server, "MadLibsChannel", "")
+			msg = 'MadLibs works in *any channel* now.'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(channel) is str:
+			try:
+				role = discord.utils.get(message.server.channels, name=role)
+			except:
+				print("That channel does not exist")
+				return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.server, "MadLibsChannel", channel.id)
+
+		msg = 'MadLibs channel set to **{}**.'.format(channel.name)
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	
+	@setmadlibschannel.error
+	async def setmadlibschannel_error(self, ctx, error):
+		# do stuff
+		msg = 'setmadlibschannel Error: {}'.format(ctx)
+		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
 	async def setxpreserve(self, ctx, member : discord.Member = None, xpAmount : int = None):

@@ -73,6 +73,7 @@ class Settings:
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"XPApprovalChannel" 	: "", 		# Not Used
+				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"LastAnswer" 			: "",		# URL to last $question post
 				"HourlyXP" 				: "1",		# How much xp reserve per hour
 				"IncreasePerRank" 		: "1",		# Extra XP per rank

@@ -31,6 +31,20 @@ class MadLibs:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
+		# Check if we have a MadLibs channel - and if so, restrict to that
+		channelID = self.settings.getServerStat(server, "MadLibsChannel")
+		if not (not channelID or channelID == ""):
+			# We need the channel id
+			if not channelID == channel.id:
+				msg = 'This isn\'t the channel for that...'
+				for chan in server.channels:
+					if chan.id == channelID:
+						msg = 'This isn\'t the channel for that.  Take the MadLibs to the **{}** channel.'.format(chan.name)
+				await self.bot.send_message(channel, msg)
+				return
+
+		
+
 		# Check if our folder exists
 		if not os.path.isdir("./Cogs/MadLibs"):
 			msg = 'I\'m not configured for MadLibs yet...'
@@ -82,7 +96,7 @@ class MadLibs:
 				return msg.content.startswith('$ml')
 
 			# Wait for a response
-			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=25)
+			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
 
 			if not talk:
 				# We timed out - leave the loop
