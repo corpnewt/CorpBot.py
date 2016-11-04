@@ -109,6 +109,7 @@ class MadLibs:
 				# We timed out - leave the loop
 				msg = "*{}*, I'm done waiting... we'll play another time.".format(author.name)
 				await self.bot.send_message(channel, msg)
+				self.isPlaying = False
 				return
 
 			# We got a relevant message
@@ -134,6 +135,7 @@ class MadLibs:
 			# Only replace the first occurence
 			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
 
+		self.isPlaying = False
+		
 		# Message the output
 		await self.bot.send_message(channel, data)
-		self.isPlaying = False
