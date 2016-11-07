@@ -26,7 +26,7 @@ class MadLibs:
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
-		"""Let's play MadLibs!"""
+		"""Let's play MadLibs!  Start with $madlibs, select works with $ml [your word], and leave with $mleave."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -104,6 +104,16 @@ class MadLibs:
 
 			# Wait for a response
 			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
+            
+            # Check if the message is to leave
+            if talk.content.startswith('$mleave'):
+                # Check for originator
+                if talk.author is author:
+                    # The originator wants to leave
+                    msg = "Alright, *{}*.  We'll play another time.".format(author.name)
+                    await self.bot.send_message(channel, msg)
+                    self.isPlaying = False
+                    return
 
 			if not talk:
 				# We timed out - leave the loop
