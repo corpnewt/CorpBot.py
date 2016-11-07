@@ -99,21 +99,24 @@ class MadLibs:
 			await self.bot.send_message(channel, msg)
 
 			# Setup the check
-			def check(msg):
+			def check(msg):	
 				return msg.content.startswith('$ml')
 
 			# Wait for a response
 			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
             
             # Check if the message is to leave
-            if talk.content.startswith('$mleave'):
-                # Check for originator
-                if talk.author is author:
-                    # The originator wants to leave
-                    msg = "Alright, *{}*.  We'll play another time.".format(author.name)
-                    await self.bot.send_message(channel, msg)
-                    self.isPlaying = False
-                    return
+			if talk.content.startswith('$mleave'):
+				if talk.author is author:
+					msg = "Alright, *{}*.  We'll play another time.".format(author.name)
+					await self.bot.send_message(channel, msg)
+					self.isPlaying = False
+					return True
+				else:
+					# Not the originator
+					msg = "Only the originator (*{}*) can leave the MadLibs.".format(author.name)
+					await self.bot.send_message(channel, msg)
+					continue
 
 			if not talk:
 				# We timed out - leave the loop
