@@ -89,7 +89,7 @@ cogList.append(madlibs)
 
 # Dr Beer
 
-drbeer = DrBeer.DrBeer(bot)
+drbeer = DrBeer.DrBeer(bot, settings)
 cogList.append(drbeer)
 
 # Help - Must be last

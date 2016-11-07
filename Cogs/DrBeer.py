@@ -2,14 +2,16 @@ import asyncio
 import discord
 import random
 from   discord.ext import commands
+from   Cogs import Settings
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
 class DrBeer:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
+		self.settings = settings
 
 	def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -19,6 +21,23 @@ class DrBeer:
 	@commands.command(pass_context=True)
 	async def drbeer(self, ctx):
 		"""Put yourself in your place."""
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins
+		if not isAdmin:
+			return
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
 		beerList = ["Hey, yall. Quit ya horsin' around now. Can't you see I'm busy tryin'a shoot'n all them summersquash?",
 					"Now I don't know how to use all them 5-dollah words y'all sprayin' around, but sure seems to me like y'all need to mind your peas and queues.",
 					"As long as I can keep practicin' and protectin' all my favorite amendments, like the second and thirty-first, I am all dandy.",
@@ -27,4 +46,7 @@ class DrBeer:
 					"Well, my daddy always said a man is only as good as his words and the thrust and torque of his good ole John Deere."]
 		randnum = random.randint(0, len(beerList)-1)
 		msg = '{}'.format(beerList[randnum])
+		# Remove original message
+		await self.bot.delete_message(ctx.message)
+		# Say new message
 		await self.bot.send_message(ctx.message.channel, msg)
