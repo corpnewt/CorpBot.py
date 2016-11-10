@@ -104,7 +104,14 @@ class MadLibs:
 
 			# Wait for a response
 			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
-            
+
+			if not talk:
+				# We timed out - leave the loop
+				msg = "*{}*, I'm done waiting... we'll play another time.".format(author.name)
+				await self.bot.send_message(channel, msg)
+				self.isPlaying = False
+				return
+
 			# Check if the message is to leave
 			if talk.content.startswith('$mleave'):
 				if talk.author is author:
@@ -117,13 +124,6 @@ class MadLibs:
 					msg = "Only the originator (*{}*) can leave the MadLibs.".format(author.name)
 					await self.bot.send_message(channel, msg)
 					continue
-
-			if not talk:
-				# We timed out - leave the loop
-				msg = "*{}*, I'm done waiting... we'll play another time.".format(author.name)
-				await self.bot.send_message(channel, msg)
-				self.isPlaying = False
-				return
 
 			# We got a relevant message
 			word = talk.content
