@@ -110,6 +110,14 @@ class Bot:
 
 			
 
+	@commands.command(pass_context=True)
+	async def servers(self, ctx):
+		"""Lists the number of servers I'm connected to!"""
+		total = 0
+		for server in self.bot.servers:
+			total += 1
+		msg = 'I am a part of *{}* servers!'.format(total)
+		await self.bot.send_message(channel, msg)
 		
 		
 	@commands.command(pass_context=True)
