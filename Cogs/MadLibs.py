@@ -152,3 +152,10 @@ class MadLibs:
 		
 		# Message the output
 		await self.bot.send_message(channel, data)
+
+	@madlibs.error
+	async def madlibs_error(self, ctx, error):
+		# Reset playing status and display error
+		self.isPlaying = False
+		msg = 'madlibs Error: {}'.format(ctx)
+		await self.bot.say(msg)
