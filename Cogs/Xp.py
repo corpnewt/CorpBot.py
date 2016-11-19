@@ -396,6 +396,59 @@ class Xp:
 	async def rank_error(self, ctx, error):
 		msg = 'rank Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+
+	# List the top 10 xp-holders
+	@commands.command(pass_context=True)
+	async def topxp(self, ctx):
+		"""List the top 10 xp-holders - or all members, if there are less than 10 total."""
+		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
+		promoSorted = sorted(promoArray, key=itemgetter('XP'))
+
+		startIndex = 0
+		total = 10
+		msg = ""
+
+		if len(promoSorted) < 9:
+			total = len(promoSorted)
+		
+		if len(promoSorted):
+			# makes sure we have at least 1 user - shouldn't be necessary though
+			startIndex = (len(promoSorted)-1)-total
+			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.server.name)
+
+		for i in range(0, total):
+			# Loop through from startIndex to startIndex+total-1
+			index = startIndex-i
+			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, promoSorted[index]['Name'], promoSorted[index]['XP'])
+
+		await self.bot.send_message(ctx.message.channel, msg)
+
+		
+	# List the top 10 xp-holders
+	@commands.command(pass_context=True)
+	async def bottomxp(self, ctx):
+		"""List the bottom 10 xp-holders - or all members, if there are less than 10 total."""
+		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
+		promoSorted = sorted(promoArray, key=itemgetter('XP'))
+
+		startIndex = 0
+		total = 10
+		msg = ""
+
+		if len(promoSorted) < 9:
+			total = len(promoSorted)
+		
+		if len(promoSorted):
+			# makes sure we have at least 1 user - shouldn't be necessary though
+			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.server.name)
+
+		for i in range(0, total):
+			# Loop through from startIndex to startIndex+total-1
+			index = startIndex+i
+			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, promoSorted[index]['Name'], promoSorted[index]['XP'])
+
+		await self.bot.send_message(ctx.message.channel, msg)
 		
 		
 	# List the xp and xp reserve of a user
