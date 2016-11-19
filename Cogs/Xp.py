@@ -414,7 +414,7 @@ class Xp:
 		
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
-			startIndex = (len(promoSorted)-1)-total
+			startIndex = len(promoSorted)-1
 			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.server.name)
 
 		for i in range(0, total):
