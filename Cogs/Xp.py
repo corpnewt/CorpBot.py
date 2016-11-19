@@ -420,7 +420,22 @@ class Xp:
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex-i
-			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, promoSorted[index]['Name'], promoSorted[index]['XP'])
+			cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
+
+			if ctx.message.server.get_member_named(cMemName):
+				# Member exists
+				cMember = ctx.message.server.get_member_named(cMemName)
+			else:
+				cMember = None
+			if cMember:
+				if cMember.nick:
+					cMemberDisplay = cMember.nick
+				else:
+					cMemberDisplay = cMember.name
+			else:
+				cMemberDisplay = promoSorted[index]['Name']
+
+			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
 		await self.bot.send_message(ctx.message.channel, msg)
 
@@ -446,7 +461,20 @@ class Xp:
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex+i
-			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, promoSorted[index]['Name'], promoSorted[index]['XP'])
+			cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
+			if ctx.message.server.get_member_named(cMemName):
+				# Member exists
+				cMember = ctx.message.server.get_member_named(cMemName)
+			else:
+				cMember = None
+			if cMember:
+				if cMember.nick:
+					cMemberDisplay = cMember.nick
+				else:
+					cMemberDisplay = cMember.name
+			else:
+				cMemberDisplay = promoSorted[index]['Name']
+			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
