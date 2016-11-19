@@ -417,6 +417,40 @@ class Xp:
 		newState = self.settings.getUserStat(member, ctx.message.server, "XPReserve")
 
 		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(member.name, newStat, newState)
+
+		# Get user's current role
+		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
+		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		
+		highestRole = None
+		if len(promoSorted):
+			nextRole = promoSorted[0]
+		else:
+			nextRole = None
+
+		for role in promoSorted:
+			if nextRole['XP'] < newStat:
+				nextRole = role
+			# We *can* have this role, let's see if we already do
+			currentRole = None
+			for aRole in member.roles:
+				# Get the role that corresponds to the id
+				if aRole.id == role['ID']:
+					# We found it
+					highestRole = aRole.name
+					if len(promoSorted) > (promoSorted.index(role)+1):
+						# There's more roles above this
+						nextRole = role
+
+
+		if highestRole:
+			msg = '{}\nThey are a **{}**!'.format(msg, highestRole)
+		else:
+			msg = '{}\nThey have not acquired a rank yet.'.format(msg)
+		
+		if nextRole and (newStat < nextRole['XP']):
+			msg = '{}\nThey need *{}* more xp to advance to **{}**!'.format(msg, nextRole['XP'] - newStat, nextRole['Name'])
+
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	@stats.error
