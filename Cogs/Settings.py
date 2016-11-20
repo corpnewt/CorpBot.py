@@ -190,7 +190,7 @@ class Settings:
 							y["Muted"] = "No"
 							needsUpdate = True
 						if not "LastOnline" in y:
-							y["LastOnline"] = "Unknown"
+							y["LastOnline"] = None
 							needsUpdate = True
 						if not "Cooldown" in y:
 							y["Cooldown"] = None

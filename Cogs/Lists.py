@@ -532,3 +532,51 @@ class Lists:
 				membersOnline += 1
 		msg = 'There are *{}* out of *{}* users online.'.format(membersOnline, members)
 		await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def lastonline(self, ctx, member : discord.Member = None):
+		"""Lists the last time a user was online if known."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		if not member:
+			msg = 'Usage: `$lastonline "[member]"`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		if type(member) is str:
+			try:
+				member = discord.utils.get(server.members, name=member)
+			except:
+				print("That member does not exist")
+				return
+		if member.nick:
+			name = member.nick
+		else:
+			name = member.name
+
+		# We have a member here
+		if not str(member.status).lower() == "offline":
+			msg = '*{}* is here right now.'.format(name)
+		else:
+			lastOnline = self.settings.getUserStat(member, server, "LastOnline")
+			if lastOnline == "Unknown":
+				self.settings.setUserStat(member, server, "LastOnline", None)
+				lastOnline = None
+			if lastOnline:
+				currentTime = int(time.time())
+				timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime)
+				msg = '*{}* was last online *{} ago*.'.format(name, timeString)
+			else:
+				msg = 'I don\'t know when *{}* was last online.  Sorry.'.format(name)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+
+	@lastonline.error
+	async def lastonline_error(self, ctx, error):
+		# do stuff
+		msg = 'lastonline Error: {}'.format(ctx)
+		await self.bot.say(msg)

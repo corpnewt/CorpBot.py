@@ -1,7 +1,9 @@
 import asyncio
 import discord
-from discord.ext import commands
-from discord import errors
+import time
+from   discord.ext import commands
+from   discord import errors
+from   Cogs import ReadableTime
 
 # Import the cogs
 
@@ -186,6 +188,11 @@ async def on_member_join(member):
 @bot.event
 async def on_member_update(before, after):
 	server = after.server
+
+	# Check if the member went offline and log the time
+	if str(after.status).lower() == "offline":
+		currentTime = int(time.time())
+		settings.setUserStat(after, server, "LastOnline", currentTime)
 			
 	settings.checkServer(server)
 	try:
