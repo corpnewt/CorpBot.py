@@ -4,6 +4,7 @@ import time
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import ReadableTime
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -604,14 +605,12 @@ class Admin:
 		else:
 			cooldownFinal = None
 
-				
 		if cooldown:
 			mins = "minutes"
-			if cooldown == 1:
-				mins = "minute"
-			msg = '*{}* has been **Muted** for *{} {}*.'.format(member, cooldown, mins)
+			checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+			msg = '*{}* has been **Muted** for *{}*.'.format(member, checkRead)
 		else:
-			msg = '*{}* has been **Muted** until further notice.'.format(member)
+			msg = '*{}* has been **Muted** *until further notice*.'.format(member)
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
 

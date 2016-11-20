@@ -4,6 +4,7 @@ import time
 from   discord.ext import commands
 from   operator import itemgetter
 from   Cogs import Settings
+from   Cogs import ReadableTime
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -59,21 +60,28 @@ class Channel:
 				
 		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
 
-		checkTime = self.settings.getUserStat(ctx.message.author, ctx.message.server, "Cooldown")
+		checkTime = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
 		if checkTime:
 			checkTime = int(checkTime)
 		currentTime = int(time.time())
+		checkRead = None
+
 		# Check if they've outlasted their time
-		if checkTime and currentTime >= checkTime:
+		if checkTime and (currentTime >= checkTime):
 			# We have passed the check time
 			ignore = False
 			delete = False
-			self.settings.setUserStat(ctx.message.author, ctx.message.server, "Cooldown", None)
-			self.settings.setUserStat(ctx.message.author, ctx.message.server, "Muted", "No")
+			self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
+			self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
 			isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
+		elif checkTime:
+			checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
 
 		if isMute.lower() == "yes":
-			msg = '{} is *Muted*.'.format(member)	
+			if checkRead:
+				msg = '{} is *Muted* - *{}* remain.'.format(member, checkRead)	
+			else:
+				msg = '{} is *Muted*.'.format(member)	
 		else:
 			msg = '{} is *Unmuted*.'.format(member)
 			

@@ -21,9 +21,13 @@ def getReadableTimeBetween(first, last):
             msg = '{}{} minute, '.format(msg, str(minutes))
         else:
             msg = '{}{} minutes, '.format(msg, str(minutes))
-    if seconds == 1:
-        msg = '{}{} second, '.format(msg, str(seconds))
-    else:
-        msg = '{}{} seconds, '.format(msg, str(seconds))
+    if seconds > 0:
+        if seconds == 1:
+            msg = '{}{} second, '.format(msg, str(seconds))
+        else:
+            msg = '{}{} seconds, '.format(msg, str(seconds))
 
-    return msg[:-2]	
+    if not msg:
+        return "0 seconds"
+    else:
+        return msg[:-2]	
