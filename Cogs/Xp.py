@@ -346,9 +346,9 @@ class Xp:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					msg = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
+					roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
-				msg = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
+				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
 
 		await self.bot.send_message(channel, roleText)
 		
