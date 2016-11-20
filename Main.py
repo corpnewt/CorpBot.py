@@ -218,9 +218,9 @@ async def on_message(message):
 		return
 
 	# Admin Override - always allow admin commands
-	if message.author.permissions_in(message.channel).administrator:
-		await bot.process_commands(message)
-		return
+	#if message.author.permissions_in(message.channel).administrator:
+		#await bot.process_commands(message)
+		#return
 	
 	# Check if we need to ignore or delete the message
 	ignore = delete = False

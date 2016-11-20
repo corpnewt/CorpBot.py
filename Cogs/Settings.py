@@ -190,6 +190,9 @@ class Settings:
 						if not "LastOnline" in y:
 							y["LastOnline"] = "Unknown"
 							needsUpdate = True
+						if not "Cooldown" in y:
+							y["Cooldown"] = None
+							needsUpdate = True
 				if not found:
 					needsUpdate = True
 					# We didn't locate our user - add them

@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import time
 from   discord.ext import commands
 from   operator import itemgetter
 from   Cogs import Settings
@@ -57,6 +58,20 @@ class Channel:
 				return
 				
 		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
+
+		checkTime = self.settings.getUserStat(ctx.message.author, ctx.message.server, "Cooldown")
+		if checkTime:
+			checkTime = int(checkTime)
+		currentTime = int(time.time())
+		# Check if they've outlasted their time
+		if checkTime and currentTime >= checkTime:
+			# We have passed the check time
+			ignore = False
+			delete = False
+			self.settings.setUserStat(ctx.message.author, ctx.message.server, "Cooldown", None)
+			self.settings.setUserStat(ctx.message.author, ctx.message.server, "Muted", "No")
+			isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
+
 		if isMute.lower() == "yes":
 			msg = '{} is *Muted*.'.format(member)	
 		else:
@@ -68,7 +83,7 @@ class Channel:
 	async def ismuted_error(self, ctx, error):
 		# do stuff
 		msg = 'ismuted Error: {}'.format(ctx)
-		await bot.say(msg)
+		await self.bot.say(msg)
 		
 		
 	@commands.command(pass_context=True)

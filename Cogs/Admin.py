@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import time
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
@@ -32,9 +33,20 @@ class Admin:
 					if aRole['ID'] == role.id:
 						isAdmin = True
 
-		if not isAdmin and isMute.lower() == "yes":
+		if isMute.lower() == "yes":
 			ignore = True
 			delete = True
+			checkTime = self.settings.getUserStat(message.author, message.server, "Cooldown")
+			if checkTime:
+				checkTime = int(checkTime)
+			currentTime = int(time.time())
+
+			if checkTime and currentTime >= checkTime:
+				# We have passed the check time
+				ignore = False
+				delete = False
+				self.settings.setUserStat(message.author, message.server, "Cooldown", None)
+				self.settings.setUserStat(message.author, message.server, "Muted", "No")
 		
 		ignoreList = self.settings.getServerStat(message.server, "IgnoredUsers")
 		for user in ignoreList:
@@ -45,6 +57,11 @@ class Admin:
 		adminLock = self.settings.getServerStat(message.server, "AdminLock")
 		if not isAdmin and adminLock.lower() == "yes":
 			ignore = True
+
+		if isAdmin:
+			ignore = False
+			delete = False
+		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
 	@commands.command(pass_context=True)
@@ -548,8 +565,8 @@ class Admin:
 		
 	
 	@commands.command(pass_context=True)
-	async def mute(self, ctx, member : discord.Member = None):
-		"""Toggles whether a member can send messages in chat (admin-only)."""
+	async def mute(self, ctx, member : discord.Member = None, cooldown : int = None):
+		"""Prevents a member from sending messages in chat (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -565,7 +582,7 @@ class Admin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `mute [member]`'
+			msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -575,15 +592,28 @@ class Admin:
 			except:
 				print("That member does not exist")
 				return
-				
-		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
-		if isMute.lower() == "yes":
-			msg = '*{}* has been **Unmuted**.'.format(member)
-			self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
-		
+
+		# Set cooldown - or clear it
+		if type(cooldown) is int:
+			if cooldown < 0:
+				msg = 'Cooldown cannot be a negative number!'
+				await self.bot.send_message(ctx.message.channel, msg)
+				return
+			currentTime = int(time.time())
+			cooldownFinal = currentTime+(cooldown*60)
 		else:
-			msg = '*{}* has been **Muted**.'.format(member)
-			self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
+			cooldownFinal = None
+
+				
+		if cooldown:
+			mins = "minutes"
+			if cooldown == 1:
+				mins = "minute"
+			msg = '*{}* has been **Muted** for *{} {}*.'.format(member, cooldown, mins)
+		else:
+			msg = '*{}* has been **Muted** until further notice.'.format(member)
+		self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
+		self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
@@ -625,6 +655,7 @@ class Admin:
 
 		msg = '*{}* has been **Unmuted**.'.format(member)
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
+		self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
