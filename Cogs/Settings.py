@@ -585,8 +585,10 @@ class Settings:
 
 		if removedServers is 1:
 			serverWord = "server"
+		if removedChannels is 1:
+			channelWord = "channel"
 		if removedUsers is 1:
 			usersWord = "user"
 		
-		msg = 'Pruned *{} {}*, *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedChannels, channelWord removedServers, serverWord)
+		msg = 'Pruned *{} {}*, *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedChannels, channelWord, removedServers, serverWord)
 		await self.bot.send_message(ctx.message.channel, msg)

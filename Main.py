@@ -155,7 +155,7 @@ async def on_server_remove(server):
 
 @bot.event
 async def on_channel_delete(channel):
-	settings.removeChannel(channel.id, channel.server)
+	settings.removeChannelID(channel.id, channel.server)
 
 @bot.event
 async def on_member_join(member):
