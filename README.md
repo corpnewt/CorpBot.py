@@ -5,7 +5,7 @@ A sample of his `$help` command:
 
 -
 
-    A bot that does stuff.... probably
+```    A bot that does stuff.... probably
 
 Admin:
   setxprole          Sets the required role ID to give xp, gamble, or feed th...
