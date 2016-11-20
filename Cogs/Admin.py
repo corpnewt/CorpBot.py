@@ -168,7 +168,7 @@ class Admin:
 		await self.bot.say(msg)
 	
 	@commands.command(pass_context=True)
-	async def defaultrole(self, ctx, role : discord.Role = None):
+	async def setdefaultrole(self, ctx, role : discord.Role = None):
 		"""Sets the default role or position for auto-role assignment."""
 		author  = ctx.message.author
 		server  = ctx.message.server
@@ -181,7 +181,9 @@ class Admin:
 			return
 
 		if role is None:
-			msg = 'Usage: `$defaultrole [role/position]`'
+			# Disable auto-role and set default to none
+			self.settings.setServerStat(server, "DefaultRole", "")
+			msg = 'Auto-role management now **disabled**.'
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -190,7 +192,7 @@ class Admin:
 			self.settings.setServerStat(server, "DefaultRole", role)
 			try:
 				rolename = discord.utils.get(server.roles, position=role)
-				await self.bot.send_message(channel, 'Default role set to *{}!*'.format(rolename.name))
+				await self.bot.send_message(channel, 'Default role set to **{}**!'.format(rolename.name))
 			except:
 				print("That role does not exist")
 				return
@@ -203,18 +205,18 @@ class Admin:
 				return
 
 		self.settings.setServerStat(server, "DefaultRole", role.id)
-		await self.bot.send_message(channel, 'Default role set to *{}!*'.format(role.name))
+		await self.bot.send_message(channel, 'Default role set to **{}**!'.format(role.name))
 
 
-	@defaultrole.error
-	async def defaultrole_error(self, ctx, error):
+	@setdefaultrole.error
+	async def setdefaultrole_error(self, ctx, error):
 		# do stuff
-		msg = 'defaultrole Error: {}'.format(ctx)
+		msg = 'setdefaultrole Error: {}'.format(ctx)
 		await self.bot.say(msg)
 
 
 	@commands.command(pass_context=True)
-	async def addrole(self, ctx, role : discord.Role = None, xp : int = None):
+	async def addxprole(self, ctx, role : discord.Role = None, xp : int = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -227,11 +229,11 @@ class Admin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
 		if role == None or xp == None:
-			msg = 'Usage: `$addrole [role] [required xp]`'
+			msg = 'Usage: `$addxprole [role] [required xp]`'
 			await self.bot.send_message(channel, msg)
 			return
 		if not type(xp) is int:
-			msg = 'Usage: `$addrole [role] [required xp]`'
+			msg = 'Usage: `$addxprole [role] [required xp]`'
 			await self.bot.send_message(channel, msg)
 			return
 		if type(role) is str:
@@ -258,15 +260,15 @@ class Admin:
 		await self.bot.send_message(channel, msg)
 		return
 
-	@addrole.error
-	async def addrole_error(self, ctx, error):
+	@addxprole.error
+	async def addxprole_error(self, ctx, error):
 		# do stuff
-		msg = 'addrole Error: {}'.format(ctx)
+		msg = 'addxprole Error: {}'.format(ctx)
 		await self.bot.say(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removerole(self, ctx, role : discord.Role = None):
+	async def removexprole(self, ctx, role : discord.Role = None):
 		"""Removes a role from the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -280,7 +282,7 @@ class Admin:
 			return
 
 		if role == None:
-			msg = 'Usage: `$removerole [role]`'
+			msg = 'Usage: `$removexprole [role]`'
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -308,10 +310,10 @@ class Admin:
 		msg = '{} not found in list.'.format(aRole['Name'])
 		await self.bot.send_message(channel, msg)
 
-	@removerole.error
-	async def removerole_error(self, ctx, error):
+	@removexprole.error
+	async def removexprole_error(self, ctx, error):
 		# do stuff
-		msg = 'removerole Error: {}'.format(ctx)
+		msg = 'removexprole Error: {}'.format(ctx)
 		await self.bot.say(msg)
 
 
@@ -356,7 +358,7 @@ class Admin:
 		"""Lists the required role to give xp, gamble, or feed the bot."""
 		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
 		if role == None or role == "":
-			msg = '**Everyone** can give xp, gamble, and feed the bot.'.format(ctx)
+			msg = '**Everyone** can give xp, gamble, and feed the bot.'
 			await self.bot.say(msg)
 		else:
 			# Role is set - let's get its name
@@ -410,7 +412,7 @@ class Admin:
 		"""Lists the required role to stop the bot from playing music."""
 		role = self.settings.getServerStat(ctx.message.server, "RequiredStopRole")
 		if role == None or role == "":
-			msg = '**Only Admins** can use stop.'.format(ctx)
+			msg = '**Only Admins** can use stop.'
 			await self.bot.say(msg)
 		else:
 			# Role is set - let's get its name

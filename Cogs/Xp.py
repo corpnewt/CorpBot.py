@@ -38,21 +38,7 @@ class Xp:
 							bumpXP = True
 							
 					if bumpXP:
-						boost          = int(self.settings.getServerStat(server, "IncreasePerRank"))
-						promoteBy      = self.settings.getServerStat(server,     "PromoteBy")
-						if promoteBy.lower() == "position":
-							maxPos     = int(self.settings.getServerStat(server, "MaxPosition"))
-						else:
-							promoArray = self.settings.getServerStat(server, "PromotionArray")
-							maxPos     = len(promoArray)-1
-						biggest        = 0
-						xpPayload      = 0
-						for role in user.roles:
-							if role.position <= maxPos and role.position > biggest:
-								biggest = role.position
-
-						xpPayload = int(xpAmount)
-						self.settings.incrementStat(user, server, "XPReserve", xpPayload)
+						self.settings.incrementStat(user, server, "XPReserve", int(xpAmount))
 
 	@commands.command(pass_context=True)
 	async def setxp(self, ctx, member : discord.Member = None, xpAmount : int = None):
@@ -127,16 +113,10 @@ class Xp:
 		isAdmin    = author.permissions_in(channel).administrator
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
-		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 
 		approve = True
 		decrement = True
-
-		# MinimumXPRole
-		#if author.top_role.position < int(minRole):
-			#approve = False
-			#msg = 'You don\'t have the permissions to give xp.'
 
 		# RequiredXPRole
 		foundRole = False
@@ -165,8 +145,6 @@ class Xp:
 			approve = True
 			decrement = False
 
-		userRole = member.top_role.position
-
 		if approve:
 			# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 			msg = '*{}* was given *{} xp!*'.format(member.name, xpAmount)
@@ -183,6 +161,24 @@ class Xp:
 	async def xp_error(self, ctx, error):
 		msg = 'xp Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+	@commands.command(pass_context=True)
+	async def defaultrole(self, ctx):
+		"""Lists the default role that new users are assigned."""
+		role = self.settings.getServerStat(ctx.message.server, "DefaultRole")
+		if role == None or role == "":
+			msg = 'New users are not assigned a role on joining this server.'
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'New users will be assigned to **{}**.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
 	async def gamble(self, ctx, bet : int = None):
@@ -229,10 +225,6 @@ class Xp:
 		if bet == 0:
 			msg = 'You can\'t bet *nothing!*'
 			approve = False
-			
-		#if author.top_role.position < int(minRole):
-			#approve = False
-			#msg = 'You don\'t have the permissions to bet.'
 
 		# RequiredXPRole
 		foundRole = False
@@ -289,76 +281,46 @@ class Xp:
 		msg         = None
 		xpPromote   = self.settings.getServerStat(server,     "XPPromote")
 		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
-		promoteBy   = self.settings.getServerStat(server,     "PromoteBy")
-		requiredXP  = int(self.settings.getServerStat(server, "RequiredXP"))
-		maxPosition = self.settings.getServerStat(server,     "MaxPosition")
-		padXP       = self.settings.getServerStat(server,     "PadXPRoles")
 		difficulty  = int(self.settings.getServerStat(server, "DifficultyMultiplier"))
 		userXP      = self.settings.getUserStat(user, server, "XP")
-		# Apply the pad
-		userXP      = int(userXP)+(int(requiredXP)*int(padXP))
 		
 		if xpPromote.lower() == "yes":
-			# We use XP to promote - let's check our levels
-			if promoteBy.lower() == "position":
-				# We use the position to promote
-				# For now, this should be unused - it's unreliable
-				gotLevels = 0
-				for x in range(0, int(maxPosition)+1):
-					# Get required xp per level
-					required = (requiredXP*x) + (requiredXP*difficulty)
-					if userXP >= required:
-						gotLevels = x
-				if gotLevels > int(maxPosition):
-					# If we got too high - let's even out
-					gotLevels = int(maxPosition)
-				# Add 1 for our range, since it goes from 0 -> (gotLevels-1)
-				gotLevels+=1
-				for x in range(0, gotLevels):
-					# fill in all the roles between
-					for role in server.roles:
-						if role.position < gotLevels:
-							if not role in user.roles:
-								# Only add if we need to
-								await self.bot.add_roles(user, role)
-								msg = '*{}* was promoted to **{}**!'.format(user.name, discord.utils.get(server.roles, position=gotLevels).name)
-			elif promoteBy.lower() == "array":
-				# This is, by far, the more functional way
-				promoArray = self.settings.getServerStat(server, "PromotionArray")
-				for role in promoArray:
-					# Iterate through the roles, and add which we have xp for
-					if int(role['XP']) <= userXP:
-						# We *can* have this role, let's see if we already do
+			# This is, by far, the more functional way
+			promoArray = self.settings.getServerStat(server, "PromotionArray")
+			for role in promoArray:
+				# Iterate through the roles, and add which we have xp for
+				if int(role['XP']) <= userXP:
+					# We *can* have this role, let's see if we already do
+					currentRole = None
+					for aRole in server.roles:
+						# Get the role that corresponds to the id
+						if aRole.id == role['ID']:
+							# We found it
+							currentRole = aRole
+					# Now see if we have it, and add it if we don't
+					if not currentRole in user.roles:
+						await self.bot.add_roles(user, currentRole)
+						msg = '*{}* was promoted to **{}**!'.format(user.name, currentRole.name)
+				else:
+					if xpDemote.lower() == "yes":
+						# Let's see if we have this role, and remove it.  Demote time!
 						currentRole = None
 						for aRole in server.roles:
 							# Get the role that corresponds to the id
 							if aRole.id == role['ID']:
 								# We found it
 								currentRole = aRole
-						# Now see if we have it, and add it if we don't
-						if not currentRole in user.roles:
-							await self.bot.add_roles(user, currentRole)
-							msg = '*{}* was promoted to **{}**!'.format(user.name, currentRole.name)
-					else:
-						if xpDemote.lower() == "yes":
-							# Let's see if we have this role, and remove it.  Demote time!
-							currentRole = None
-							for aRole in server.roles:
-								# Get the role that corresponds to the id
-								if aRole.id == role['ID']:
-									# We found it
-									currentRole = aRole
-							# Now see if we have it, and take it away!
-							if currentRole in user.roles:
-								await self.bot.remove_roles(user, currentRole)
-								msg = '*{}* was demoted from **{}**!'.format(user.name, currentRole.name)
+						# Now see if we have it, and take it away!
+						if currentRole in user.roles:
+							await self.bot.remove_roles(user, currentRole)
+							msg = '*{}* was demoted from **{}**!'.format(user.name, currentRole.name)
 		# Check if we have a message to display - and display it
 		if msg:
 			await self.bot.send_message(channel, msg)
 
 
 	@commands.command(pass_context=True)
-	async def listroles(self, ctx):
+	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 		
 		server  = ctx.message.server
@@ -373,6 +335,20 @@ class Xp:
 		roleText = "Current Roles:\n"
 		for arole in promoSorted:
 			roleText = '{}**{}** : *{} XP*\n'.format(roleText, arole['Name'], arole['XP'], arole['ID'])
+
+		# Get the required role for using the xp system
+		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
+		if role == None or role == "":
+			roleText = '{}\n**Everyone** can give xp, gamble, and feed the bot.'.format(roleText)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
+			if not found:
+				msg = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
 
 		await self.bot.send_message(channel, roleText)
 		

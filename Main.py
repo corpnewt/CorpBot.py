@@ -166,16 +166,10 @@ async def on_member_join(member):
 	await bot.send_message(server, fmt.format(member, server))
 	# Scan through roles - find "Entry Level" and set them to that
 
-	autoRole    = settings.getServerStat(server, "AutoRole")
 	defaultRole = settings.getServerStat(server, "DefaultRole")
 	rules       = settings.getServerStat(server, "Rules")
 	
-	if autoRole.lower() == "position":
-		newRole = discord.utils.get(server.roles, position=int(defaultRole))
-		await bot.add_roles(member, newRole)
-		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
-		await bot.send_message(server, fmt)
-	elif autoRole.lower() == "id":
+	if defaultRole:
 		newRole = discord.utils.get(server.roles, id=str(defaultRole))
 		await bot.add_roles(member, newRole)
 		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)

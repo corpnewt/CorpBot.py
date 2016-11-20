@@ -64,37 +64,30 @@ class Settings:
 			# We didn't locate our server
 			# print("Server not located, adding...")
 			newServer = { "Name" : server.name, "ID" : server.id,
-				"AutoRole" 				: "No", 	# No/ID/Position
-				"DefaultRole" 			: "1", 		# Auto-assigned role position
+				"DefaultRole" 			: "", 		# Auto-assigned role position
+				"DefaultXP"				: "0",		# Default xp given to each new member on join
+				"DefaultXPReserve"		: "10",		# Default xp reserve given to new members on join
 				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
-				"MinimumXPRole" 		: "1", 		# Minimum role position for XP
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
-				"XPApprovalChannel" 	: "", 		# Not Used
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"LastAnswer" 			: "",		# URL to last $question post
 				"HourlyXP" 				: "1",		# How much xp reserve per hour
-				"IncreasePerRank" 		: "1",		# Extra XP per rank
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
-				"PromoteBy" 			: "Array", 	# Position/Array
-				"MaxPosition" 			: "5",		# Furthest position xp can promote you to
-				"RequiredXP" 			: "0",		# Required xp per level in positional promotion
-				"DifficultyMultiplier" 	: "0",		# How much MORE xp you need per role increase (position only)
-				"PadXPRoles" 			: "0",		# How many roles worth of padding to give
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastPicture" 			: "0",		# UTC Timestamp of last picture uploaded
-				"PictureThreshold" 		: "10",		# 
+				"PictureThreshold" 		: "10",		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: "0",		# The bot's hunger % 0-100 (can also go negative)
-				"HungerLock" 			: "Yes",	# Will the bot stop answering at 100% hunger?
+				"HungerLock" 			: "No",	# Will the bot stop answering at 100% hunger?
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
 				"Members" 				: [],		# List of members
