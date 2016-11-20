@@ -313,6 +313,61 @@ class Admin:
 		# do stuff
 		msg = 'removerole Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
+	async def setxprole(self, ctx, role : discord.Role = None):
+		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if role == None:
+			self.settings.setServerStat(ctx.message.server, "RequiredXPRole", "")
+			msg = 'Giving xp, gambling, and feeding the bot now available to *everyone*.'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(role) is str:
+			try:
+				role = discord.utils.get(message.server.roles, name=role)
+			except:
+				print("That role does not exist")
+				return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.server, "RequiredXPRole", role.id)
+
+		msg = 'Role required to give xp, gamble, or feed the bot set to **{}**.'.format(role.name)
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	
+	@setxprole.error
+	async def xprole_error(self, ctx, error):
+		# do stuff
+		msg = 'setxprole Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+	@commands.command(pass_context=True)
+	async def xprole(self, ctx):
+		"""Lists the required role to give xp, gamble, or feed the bot."""
+		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
+		if role == None or role == "":
+			msg = '**Everyone** can give xp, gamble, and feed the bot.'.format(ctx)
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'You need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
 	async def setstoprole(self, ctx, role : discord.Role = None):
@@ -326,7 +381,7 @@ class Admin:
 
 		if role == None:
 			self.settings.setServerStat(ctx.message.server, "RequiredStopRole", "")
-			msg = 'Add/remove links now *admin-only*.'
+			msg = 'Stopping the music now *admin-only*.'
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -349,6 +404,25 @@ class Admin:
 		# do stuff
 		msg = 'setstoprole Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+	@commands.command(pass_context=True)
+	async def stoprole(self, ctx):
+		"""Lists the required role to stop the bot from playing music."""
+		role = self.settings.getServerStat(ctx.message.server, "RequiredStopRole")
+		if role == None or role == "":
+			msg = '**Only Admins** can use stop.'.format(ctx)
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'You need to be a/an **{}** to use stop.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
+
 		
 	@commands.command(pass_context=True)
 	async def setlinkrole(self, ctx, role : discord.Role = None):
@@ -422,7 +496,6 @@ class Admin:
 		# do stuff
 		msg = 'sethackrole Error: {}'.format(ctx)
 		await self.bot.say(msg)
-		
 		
 		
 	@commands.command(pass_context=True)

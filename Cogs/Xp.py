@@ -128,12 +128,22 @@ class Xp:
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
+		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 
 		approve = True
 		decrement = True
 
 		# MinimumXPRole
-		if author.top_role.position < int(minRole):
+		#if author.top_role.position < int(minRole):
+			#approve = False
+			#msg = 'You don\'t have the permissions to give xp.'
+
+		# RequiredXPRole
+		foundRole = False
+		for checkRole in author.roles:
+			if checkRole.id == requiredXP:
+				foundRole = True
+		if not foundRole:
 			approve = False
 			msg = 'You don\'t have the permissions to give xp.'
 
@@ -197,6 +207,7 @@ class Xp:
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
+		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 
 		approve = True
 		decrement = True
@@ -219,9 +230,18 @@ class Xp:
 			msg = 'You can\'t bet *nothing!*'
 			approve = False
 			
-		if author.top_role.position < int(minRole):
+		#if author.top_role.position < int(minRole):
+			#approve = False
+			#msg = 'You don\'t have the permissions to bet.'
+
+		# RequiredXPRole
+		foundRole = False
+		for checkRole in author.roles:
+			if checkRole.id == requiredXP:
+				foundRole = True
+		if not foundRole:
 			approve = False
-			msg = 'You don\'t have the permissions to bet.'
+			msg = 'You don\'t have the permissions to gamble.'
 			
 		# Check admin last - so it overrides anything else
 		if isAdmin and adminUnlim.lower() == "yes":

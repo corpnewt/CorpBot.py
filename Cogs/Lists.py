@@ -223,7 +223,25 @@ class Lists:
 
 		# Speak the link list while cutting off the end ", "
 		await self.bot.send_message(channel, linkText[:-2])
-		
+
+
+	@commands.command(pass_context=True)
+	async def linkrole(self, ctx):
+		"""Lists the required role to add links."""
+		role = self.settings.getServerStat(ctx.message.server, "RequiredLinkRole")
+		if role == None or role == "":
+			msg = '**Only Admins** can add links.'.format(ctx)
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'You need to be a/an **{}** to add links.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -359,7 +377,7 @@ class Lists:
 
 	@commands.command(pass_context=True)
 	async def hacks(self, ctx):
-		"""List all links in the link list."""
+		"""List all hacks in the hack list."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -380,6 +398,25 @@ class Lists:
 
 		# Speak the hack list while cutting off the end ", "
 		await self.bot.send_message(channel, linkText[:-2])
+
+
+	@commands.command(pass_context=True)
+	async def hackrole(self, ctx):
+		"""Lists the required role to add hacks."""
+		role = self.settings.getServerStat(ctx.message.server, "RequiredHackRole")
+		if role == None or role == "":
+			msg = '**Only Admins** can add hacks.'.format(ctx)
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'You need to be a/an **{}** to add hacks.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
 		
 		
 	@commands.command(pass_context=True)

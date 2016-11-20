@@ -68,6 +68,7 @@ class Settings:
 				"DefaultRole" 			: "1", 		# Auto-assigned role position
 				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
 				"MinimumXPRole" 		: "1", 		# Minimum role position for XP
+				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only

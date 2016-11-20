@@ -123,6 +123,7 @@ class Feed:
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
+		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 		hunger     = int(self.settings.getServerStat(server, "Hunger"))
 		isKill     = self.settings.getServerStat(server, "Killed")
 
@@ -143,10 +144,19 @@ class Feed:
 			msg = 'You can\'t feed me *nothing!*'
 			approve = False
 			
-		if author.top_role.position < int(minRole):
+		#if author.top_role.position < int(minRole):
+			#approve = False
+			#msg = 'You don\'t have the permissions to feed me.'
+		
+		# RequiredXPRole
+		foundRole = False
+		for checkRole in author.roles:
+			if checkRole.id == requiredXP:
+				foundRole = True
+		if not foundRole:
 			approve = False
 			msg = 'You don\'t have the permissions to feed me.'
-			
+
 		# Check admin last - so it overrides anything else
 		if isAdmin and adminUnlim.lower() == "yes":
 			# No limit - approve
@@ -325,3 +335,21 @@ class Feed:
 		# do stuff
 		msg = 'setkillrole Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+	@commands.command(pass_context=True)
+	async def killrole(self, ctx):
+		"""Lists the required role to kill/resurrect the bot."""
+		role = self.settings.getServerStat(ctx.message.server, "RequiredKillRole")
+		if role == None or role == "":
+			msg = '**Only Admins** can kill/ressurect the bot.'.format(ctx)
+			await self.bot.say(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in ctx.message.server.roles:
+				if arole.id == role:
+					found = True
+					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
+			if not found:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			await self.bot.send_message(ctx.message.channel, msg)
