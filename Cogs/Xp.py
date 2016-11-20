@@ -149,7 +149,7 @@ class Xp:
 			# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 			msg = '*{}* was given *{} xp!*'.format(member.name, xpAmount)
 			await self.bot.send_message(channel, msg)
-			newXP = self.settings.incrementStat(member, server, "XP", xpAmount)
+			self.settings.incrementStat(member, server, "XP", xpAmount)
 			if decrement:
 				self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 			# Now we check for promotions
@@ -281,7 +281,6 @@ class Xp:
 		msg         = None
 		xpPromote   = self.settings.getServerStat(server,     "XPPromote")
 		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
-		difficulty  = int(self.settings.getServerStat(server, "DifficultyMultiplier"))
 		userXP      = self.settings.getUserStat(user, server, "XP")
 		
 		if xpPromote.lower() == "yes":

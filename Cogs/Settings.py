@@ -22,8 +22,8 @@ class Settings:
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
-				"DefaultXP"				: "0",		# Default xp given to each new member on join
-				"DefaultXPReserve"		: "10",		# Default xp reserve given to new members on join
+				"DefaultXP"				: 0,		# Default xp given to each new member on join
+				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
 				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
@@ -32,21 +32,21 @@ class Settings:
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"LastAnswer" 			: "",		# URL to last $question post
-				"HourlyXP" 				: "3",		# How much xp reserve per hour
+				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
-				"LastPicture" 			: "0",		# UTC Timestamp of last picture uploaded
-				"PictureThreshold" 		: "10",		# Number of seconds to wait before allowing pictures
+				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
+				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
 				"PromotionArray" 		: [],		# An array of roles for promotions
-				"Hunger" 				: "0",		# The bot's hunger % 0-100 (can also go negative)
+				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
 				"Volume"				: "",		# Float volume for music player
-				"DefaultVolume"			: "0.6",	# Default volume for music player
+				"DefaultVolume"			: 0.6,	# Default volume for music player
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
