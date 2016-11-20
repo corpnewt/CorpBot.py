@@ -83,6 +83,9 @@ class Channel:
 		roleText = "Current Admin Roles:\n"
 
 		for arole in promoSorted:
-			roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, arole['Name'], arole['ID'])
+			for role in ctx.message.server.roles:
+				if role.id == arole["ID"]:
+					# Found the role ID
+					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
 
 		await self.bot.send_message(ctx.message.channel, roleText)

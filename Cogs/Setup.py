@@ -20,7 +20,12 @@ class Setup:
 	@commands.command(pass_context=True)
 	async def setup(self, ctx):
 		"""Runs first-time setup."""
+		#############################
+		# Role Management:
+		#############################
 		# 1. Auto role? Yes/no
-		#  a. If yes - ID or position
-		#  b. get ID or position
-		# 2. 
+		#  a. If yes - get role ID (let's move away from position)
+		# 2. Use XP? Yes/no
+		#  a. If yes:
+		#    * how much reserve per hour
+		#    * how much xp/reserve to start

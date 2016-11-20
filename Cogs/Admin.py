@@ -34,6 +34,12 @@ class Admin:
 		if not isAdmin and isMute.lower() == "yes":
 			ignore = True
 			delete = True
+		
+		ignoreList = self.settings.getServerStat(message.server, "IgnoredUsers")
+		for user in ignoreList:
+			if not isAdmin and message.author.id == user["ID"]:
+				# Found our user - ignored
+				ignore = True
 
 		adminLock = self.settings.getServerStat(message.server, "AdminLock")
 		if not isAdmin and adminLock.lower() == "yes":
@@ -626,6 +632,115 @@ class Admin:
 		# do stuff
 		msg = 'unmute Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
+	async def ignore(self, ctx, member : discord.Member = None):
+		"""Adds a member to the bot's "ignore" list (admin-only)."""
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+			
+		if member == None:
+			msg = 'Usage: `ignore [member]`'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(member) is str:
+			try:
+				member = discord.utils.get(message.server.members, name=member)
+			except:
+				print("That member does not exist")
+				return
+
+		ignoreList = self.settings.getServerStat(ctx.message.server, "IgnoredUsers")
+
+		found = False
+		for user in ignoreList:
+			if member.id == user["ID"]:
+				# Found our user - already ignored
+				found = True
+				msg = '*{}* is already being ignored.'.format(user["Name"])
+		if not found:
+			# Let's ignore someone
+			ignoreList.append({ "Name" : member.name, "ID" : member.id })
+			msg = '*{}* is now being ignored.'.format(member.name)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	@ignore.error
+	async def ignore_error(self, ctx, error):
+		# do stuff
+		msg = 'ignore Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
+	async def listen(self, ctx, member : discord.Member = None):
+		"""Removes a member from the bot's "ignore" list (admin-only)."""
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+			
+		if member == None:
+			msg = 'Usage: `listen [member]`'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(member) is str:
+			try:
+				member = discord.utils.get(message.server.members, name=member)
+			except:
+				print("That member does not exist")
+				return
+
+		ignoreList = self.settings.getServerStat(ctx.message.server, "IgnoredUsers")
+
+		found = False
+		for user in ignoreList:
+			if member.id == user["ID"]:
+				# Found our user - already ignored
+				found = True
+				msg = '*{}* no longer being ignored.'.format(user["Name"])
+				ignoreList.remove(user)
+
+		if not found:
+			# Whatchu talkin bout Willis?
+			msg = '*{}* wasn\'t being ignored...'.format(member.name)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	@listen.error
+	async def listen_error(self, ctx, error):
+		# do stuff
+		msg = 'listen Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
+	async def ignored(self, ctx):
+		"""Lists the users currently being ignored."""
+
 		
 		
 	@commands.command(pass_context=True)
@@ -661,7 +776,7 @@ class Admin:
 				return
 
 		# If we made it this far - then we can add it
-		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
+		promoArray.append({ 'ID' : role.id })
 		self.settings.setServerStat(ctx.message.server, "AdminArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
@@ -705,7 +820,7 @@ class Admin:
 				# We found it - let's remove it
 				promoArray.remove(aRole)
 				self.settings.setServerStat(ctx.message.server, "AdminArray", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
+				msg = '**{}** removed successfully.'.format(role.name)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
