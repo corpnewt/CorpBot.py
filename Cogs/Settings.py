@@ -19,6 +19,37 @@ class Settings:
 		self.file = file
 		self.bot = bot
 		self.serverDict = {}
+
+		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
+				"DefaultRole" 			: "", 		# Auto-assigned role position
+				"DefaultXP"				: "0",		# Default xp given to each new member on join
+				"DefaultXPReserve"		: "10",		# Default xp reserve given to new members on join
+				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
+				"RequiredXPRole"		: "",		# ID or blank for Everyone
+				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
+				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
+				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
+				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
+				"MadLibsChannel"        : "",       # ID or blank for any channel
+				"LastAnswer" 			: "",		# URL to last $question post
+				"HourlyXP" 				: "3",		# How much xp reserve per hour
+				"RequireOnline" 		: "Yes",	# Must be online for xp?
+				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
+				"XPPromote" 			: "Yes",	# Can xp raise your rank?
+				"XPDemote" 				: "No",		# Can xp lower your rank?
+				"Killed" 				: "No",		# Is the bot dead?
+				"KilledBy" 				: "",		# Who killed the bot?
+				"LastPicture" 			: "0",		# UTC Timestamp of last picture uploaded
+				"PictureThreshold" 		: "10",		# Number of seconds to wait before allowing pictures
+				"Rules" 				: "Be nice to each other.",
+				"PromotionArray" 		: [],		# An array of roles for promotions
+				"Hunger" 				: "0",		# The bot's hunger % 0-100 (can also go negative)
+				"HungerLock" 			: "No",	# Will the bot stop answering at 100% hunger?
+				"Hacks" 				: [],		# List of hack tips
+				"Links" 				: [],		# List of links
+				"Members" 				: [],		# List of members
+				"AdminArray"	 		: [],		# List of admin roles
+				"ChannelMOTD" 			: []}		# List of channel messages of the day
 		
 		# Let's load our settings file
 		if os.path.exists(file):
@@ -49,8 +80,6 @@ class Settings:
 
 	# Let's make sure the server is in our list
 	def checkServer(self, server):
-		# Checks the server agains the globals.serverList variable
-		
 		# Assumes server = discord.Server and serverList is a dict
 		if not "Servers" in self.serverDict:
 			# Let's add an empty placeholder
@@ -60,39 +89,19 @@ class Settings:
 			if x["Name"] == server.name:
 				# We found our server
 				found = True
-		if found == False:
+				# Verify all the default keys have values
+				for key in self.defaultServer:
+					if not key in x:
+						x[key] = self.defaultServer[key]
+
+		if not found:
 			# We didn't locate our server
 			# print("Server not located, adding...")
-			newServer = { "Name" : server.name, "ID" : server.id,
-				"DefaultRole" 			: "", 		# Auto-assigned role position
-				"DefaultXP"				: "0",		# Default xp given to each new member on join
-				"DefaultXPReserve"		: "10",		# Default xp reserve given to new members on join
-				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
-				"RequiredXPRole"		: "",		# ID or blank for Everyone
-				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
-				"MadLibsChannel"        : "",       # ID or blank for any channel
-				"LastAnswer" 			: "",		# URL to last $question post
-				"HourlyXP" 				: "1",		# How much xp reserve per hour
-				"RequireOnline" 		: "Yes",	# Must be online for xp?
-				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
-				"XPPromote" 			: "Yes",	# Can xp raise your rank?
-				"XPDemote" 				: "No",		# Can xp lower your rank?
-				"Killed" 				: "No",		# Is the bot dead?
-				"KilledBy" 				: "",		# Who killed the bot?
-				"LastPicture" 			: "0",		# UTC Timestamp of last picture uploaded
-				"PictureThreshold" 		: "10",		# Number of seconds to wait before allowing pictures
-				"Rules" 				: "Be nice to each other.",
-				"PromotionArray" 		: [],		# An array of roles for promotions
-				"Hunger" 				: "0",		# The bot's hunger % 0-100 (can also go negative)
-				"HungerLock" 			: "No",	# Will the bot stop answering at 100% hunger?
-				"Hacks" 				: [],		# List of hack tips
-				"Links" 				: [],		# List of links
-				"Members" 				: [],		# List of members
-				"AdminArray"	 		: [],		# List of admin roles
-				"ChannelMOTD" 			: []}		# List of channel messages of the day
+			# Set name and id - then compare to default server
+			newServer = { "Name" : server.name, "ID" : server.id }
+			for key in self.defaultServer:
+				newServer[key] = self.defaultServer[key]
+			
 			self.serverDict["Servers"].append(newServer)
 			self.flushSettings()
 
@@ -154,10 +163,10 @@ class Settings:
 						found = True
 						needsUpdate = False
 						if not "XP" in y:
-							y["XP"] = 0
+							y["XP"] = self.getServerStat(server, "DefaultXP")
 							needsUpdate = True
 						if not "XPReserve" in y:
-							y["XPReserve"] = 10
+							y["XPReserve"] = self.getServerStat(server, "DefaultXPReserve")
 							needsUpdate = True
 						if not "ID" in y:
 							y["ID"] = user.id
@@ -185,8 +194,8 @@ class Settings:
 					# We didn't locate our user - add them
 					newUser = { "Name" 			: user.name,
 								"DisplayName" 	: user.display_name,
-								"XP" 			: 0,
-								"XPReserve" 	: 10,
+								"XP" 			: self.getServerStat(server, "DefaultXP"),
+								"XPReserve" 	: self.getServerStat(server, "DefaultXPReserve"),
 								"ID" 			: user.id,
 								"Discriminator" : user.discriminator,
 								"Parts"			: "",
@@ -509,6 +518,105 @@ class Settings:
 		json.dump(self.serverDict, open(self.file, 'w'), indent=2)
 
 	@commands.command(pass_context=True)
+	async def prunelocalsettings(self, ctx):
+		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
+				await self.bot.send_message(channel, msg)
+				return
+
+		removedSettings = 0
+		settingsWord = "settings"
+
+		for serv in self.serverDict["Servers"]:
+			if serv["ID"] == server.id:
+				# Found it - let's check settings
+				removeKeys = []
+				for key in serv:
+					if not key in self.defaultServer:
+						if key == "Name" or key == "ID":
+							continue
+						# Key isn't in default list - clear it
+						removeKeys.append(key)
+						removedSettings += 1
+				for key in removeKeys:
+					serv.pop(key, None)
+
+		if removedSettings is 1:
+			settingsWord = "setting"
+		
+		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+		await self.bot.send_message(ctx.message.channel, msg)
+		# Flush settings
+		self.flushSettings()
+
+
+	@commands.command(pass_context=True)
+	async def prunesettings(self, ctx):
+		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
+				await self.bot.send_message(channel, msg)
+				return
+
+		removedSettings = 0
+		settingsWord = "settings"
+
+		for serv in self.serverDict["Servers"]:
+			# Found it - let's check settings
+			removeKeys = []
+			for key in serv:
+				if not key in self.defaultServer:
+					if key == "Name" or key == "ID":
+						continue
+					# Key isn't in default list - clear it
+					removeKeys.append(key)
+					removedSettings += 1
+			for key in removeKeys:
+				serv.pop(key, None)
+
+		if removedSettings is 1:
+			settingsWord = "setting"
+		
+		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+		await self.bot.send_message(ctx.message.channel, msg)
+		# Flush settings
+		self.flushSettings()
+
+
+	@commands.command(pass_context=True)
 	async def prune(self, ctx):
 		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
 		
@@ -539,8 +647,6 @@ class Settings:
 		channelWord = "channels"
 		serverWord = "servers"
 		usersWord = "users"
-
-		msg = "Start"
 
 		for botServer in self.serverDict["Servers"]:
 			# Let's check through each server first - then members

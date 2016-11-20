@@ -172,7 +172,7 @@ async def on_member_join(member):
 	if defaultRole:
 		newRole = discord.utils.get(server.roles, id=str(defaultRole))
 		await bot.add_roles(member, newRole)
-		fmt = 'You\'ve been auto-assigned the role *{}*!'.format(newRole.name)
+		fmt = 'You\'ve been auto-assigned the role **{}**!'.format(newRole.name)
 		await bot.send_message(server, fmt)
 
 	help = 'Type `$help` for a list of available user commands.'
