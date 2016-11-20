@@ -398,7 +398,8 @@ class Xp:
 	async def topxp(self, ctx):
 		"""List the top 10 xp-holders - or all members, if there are less than 10 total."""
 		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
-		promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
 
 		startIndex = 0
 		total = 10
@@ -440,7 +441,8 @@ class Xp:
 	async def bottomxp(self, ctx):
 		"""List the bottom 10 xp-holders - or all members, if there are less than 10 total."""
 		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
-		promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 
 		startIndex = 0
 		total = 10
