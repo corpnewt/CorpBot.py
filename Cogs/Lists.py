@@ -281,6 +281,7 @@ class Lists:
 			hackList = []
 
 		found = False
+		currentTime = int(time.time())
 		for ahack in hackList:
 			if ahack['Name'].lower() == name.lower():
 				# The hack exists!
@@ -422,7 +423,7 @@ class Lists:
 				return
 				
 		await self.bot.send_message(channel, 'Hack "*{}*" not found!'.format(name))
-		
+
 
 	@commands.command(pass_context=True)
 	async def hacks(self, ctx):
