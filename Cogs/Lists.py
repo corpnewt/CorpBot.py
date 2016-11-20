@@ -569,7 +569,7 @@ class Lists:
 			if lastOnline:
 				currentTime = int(time.time())
 				timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime)
-				msg = '*{}* was last online *{} ago*.'.format(name, timeString)
+				msg = 'The last time I saw *{}* was *{} ago*.'.format(name, timeString)
 			else:
 				msg = 'I don\'t know when *{}* was last online.  Sorry.'.format(name)
 
