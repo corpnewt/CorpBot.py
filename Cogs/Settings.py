@@ -124,6 +124,26 @@ class Settings:
 				self.serverDict["Servers"].remove(x)
 		if found:
 			self.flushSettings()
+
+
+	def removeChannel(self, channel):
+		motdArray = self.settings.getServerStat(channel.server, "ChannelMOTD")
+		for a in motdArray:
+			# Get the channel that corresponds to the id
+			if a['ID'] == channel.id:
+				# We found it - throw an error message and return
+				motdArray.remove(a)
+				self.setServerStat(server, "ChannelMOTD", motdArray)
+
+
+	def removeChannelID(self, id, server):
+		found = False
+		for x in self.serverDict["Servers"]:
+			if x["ID"] == server.id:
+				for y in x["ChannelMOTD"]:
+					if y["ID"] == id:
+						found = True
+						x["ChannelMOTD"].remove(y)
 	
 	
 	# Let's make sure the user is in the specified server
@@ -514,13 +534,15 @@ class Settings:
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can prune.'
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
 				await self.bot.send_message(channel, msg)
 				return
 		
 		# Set up vars
 		removedUsers = 0
+		removedChannels = 0
 		removedServers = 0
+		channelWord = "channels"
 		serverWord = "servers"
 		usersWord = "users"
 
@@ -529,21 +551,32 @@ class Settings:
 		for botServer in self.serverDict["Servers"]:
 			# Let's check through each server first - then members
 			foundServer = False
-			for server in self.bot.servers:
+			for serve in self.bot.servers:
 				# Check ID in case of name change
-				if botServer["ID"] == server.id:
+				if botServer["ID"] == serve.id:
 					foundServer = True
 					# Now we check users...
 					for botMember in botServer["Members"]:
 						foundMember = False
-						for member in server.members:
+						for member in serve.members:
 							if botMember["ID"] == member.id:
 								foundMember = True
 							
 						if not foundMember:
 							# We didn't find this member - remove them
-							self.removeUserID(botMember['ID'], server)
+							self.removeUserID(botMember['ID'], serve)
 							removedUsers +=1
+
+					for botChannel in botServer["ChannelMOTD"]:
+						foundChannel = False
+						for chan in serve.channels:
+							if botChannel['ID'] == chan.id:
+								foundChannel = True
+						
+						if not foundChannel:
+							# We didn't find this channel - remove
+							self.removeChannelID(botChannel['ID'], serve)
+							removedChannels += 1
 						
 			if not foundServer:
 				# We didn't find this server - remove it
@@ -555,5 +588,5 @@ class Settings:
 		if removedUsers is 1:
 			usersWord = "user"
 		
-		msg = 'Removed *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedServers, serverWord)
+		msg = 'Pruned *{} {}*, *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedChannels, channelWord removedServers, serverWord)
 		await self.bot.send_message(ctx.message.channel, msg)

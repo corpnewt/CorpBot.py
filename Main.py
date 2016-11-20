@@ -154,6 +154,10 @@ async def on_server_remove(server):
 	settings.removeServer(server)
 
 @bot.event
+async def on_channel_delete(channel):
+	settings.removeChannel(channel.id, channel.server)
+
+@bot.event
 async def on_member_join(member):
 	server = member.server
 	# Initialize the user
