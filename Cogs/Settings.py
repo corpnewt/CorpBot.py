@@ -45,6 +45,8 @@ class Settings:
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: "0",		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
+				"Volume"				: "",		# Float volume for music player
+				"DefaultVolume"			: "0.6",	# Default volume for music player
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links

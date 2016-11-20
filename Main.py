@@ -130,6 +130,8 @@ async def on_voice_state_update(before, after):
 	server = before.server
 	state = music.get_voice_state(server)
 
+	settings.setServerStat(server, "Volume", None)
+
 	if state.is_playing():
 		player = state.player
 		player.stop()

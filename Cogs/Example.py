@@ -186,16 +186,23 @@ class Music:
 			if not success:
 				return
 
+		volume = self.settings.getServerStat(ctx.message.server, "Volume")
+		if volume:
+			volume = float(volume)
+		else:
+			volume = float(self.settings.getServerStat(ctx.message.server, "DefaultVolume"))
+
 		try:
 			player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
 		except Exception as e:
 			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
 			await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 		else:
-			player.volume = 0.6
+			player.volume = volume
 			entry = VoiceEntry(ctx.message, player)
 			await self.bot.say('Enqueued ' + str(entry))
 			await state.songs.put(entry)
+		print("Playing at {} volume".format(player.volume))
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def volume(self, ctx, value : int):
@@ -209,6 +216,7 @@ class Music:
 			if value > 100:
 				value = 100
 			player.volume = value / 100
+			self.settings.setServerStat(ctx.message.server, "Volume", player.volume)
 			await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -258,6 +266,8 @@ class Music:
 		
 		server = ctx.message.server
 		state = self.get_voice_state(server)
+
+		self.settings.setServerStat(ctx.message.server, "Volume", None)
 
 		if state.is_playing():
 			player = state.player

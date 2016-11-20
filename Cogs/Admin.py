@@ -50,10 +50,11 @@ class Admin:
 				self.settings.setUserStat(message.author, message.server, "Muted", "No")
 		
 		ignoreList = self.settings.getServerStat(message.server, "IgnoredUsers")
-		for user in ignoreList:
-			if not isAdmin and message.author.id == user["ID"]:
-				# Found our user - ignored
-				ignore = True
+		if ignoreList:
+			for user in ignoreList:
+				if not isAdmin and message.author.id == user["ID"]:
+					# Found our user - ignored
+					ignore = True
 
 		adminLock = self.settings.getServerStat(message.server, "AdminLock")
 		if not isAdmin and adminLock.lower() == "yes":
