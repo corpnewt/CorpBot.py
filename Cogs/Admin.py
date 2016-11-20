@@ -1,5 +1,6 @@
 import asyncio
 import discord
+from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
 
@@ -740,7 +741,26 @@ class Admin:
 	@commands.command(pass_context=True)
 	async def ignored(self, ctx):
 		"""Lists the users currently being ignored."""
+		ignoreArray = self.settings.getServerStat(ctx.message.server, "IgnoredUsers")
+		
+		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+		
+		promoSorted = sorted(ignoreArray, key=itemgetter('Name'))
+		
+		roleText = "Currently Ignored Users:\n"
 
+		for arole in promoSorted:
+			for role in ctx.message.server.members:
+				if role.id == arole["ID"]:
+					# Found the role ID
+					name = ""
+					if role.nick:
+						name = role.nick
+					else:
+						name = role.name
+					roleText = '{}*{}*\n'.format(roleText, name)
+
+		await self.bot.send_message(ctx.message.channel, roleText)
 		
 		
 	@commands.command(pass_context=True)
