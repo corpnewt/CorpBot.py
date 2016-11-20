@@ -280,16 +280,17 @@ class Lists:
 		if hackList == None:
 			hackList = []
 
-			
 		found = False
 		for ahack in hackList:
 			if ahack['Name'].lower() == name.lower():
 				# The hack exists!
 				msg = '*{}* updated!'.format(name)
 				ahack['Hack'] = hack
+				ahack['UpdatedBy'] = author.name
+				ahack['Updated'] = currentTime
 				found = True
 		if not found:		
-			hackList.append({"Name" : name, "Hack" : hack})
+			hackList.append({"Name" : name, "Hack" : hack, "CreatedBy" : author.name, "Created" : currentTime})
 			msg = '*{}* added to link list!'.format(name)
 		
 		self.settings.setServerStat(server, "Hacks", hackList)
@@ -373,7 +374,55 @@ class Lists:
 				
 		await self.bot.send_message(channel, 'Hack "*{}*" not found!'.format(name))
 
+	@commands.command(pass_context=True)
+	async def hackinfo(self, ctx, name : str = None):
+		"""Displays info about a hack from the hack list."""
 
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not name:
+			msg = 'Usage: `$hackinfo "[hack name]"`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		linkList = self.settings.getServerStat(server, "Hacks")
+		if not linkList or linkList == []:
+			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+			await self.bot.send_message(channel, msg)
+			return
+
+		for alink in linkList:
+			if alink['Name'].lower() == name.lower():
+				currentTime = int(time.time())
+				msg = '**{}:**'.format(alink['Name'])
+				try:
+					msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+				except KeyError as e:
+					msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
+				try:
+					createdTime = int(alink['Created'])
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
+				except KeyError as e:
+					pass
+				try:
+					msg = '{}\nUpdated By: *{}*'.format(msg, alink['UpdatedBy'])
+				except KeyError as e:
+					pass
+				try:
+					createdTime = alink['Updated']
+					createdTime = int(createdTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
+				except:
+					pass
+				await self.bot.send_message(channel, msg)
+				return
+				
+		await self.bot.send_message(channel, 'Hack "*{}*" not found!'.format(name))
+		
 
 	@commands.command(pass_context=True)
 	async def hacks(self, ctx):
