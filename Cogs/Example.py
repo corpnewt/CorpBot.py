@@ -202,7 +202,6 @@ class Music:
 			entry = VoiceEntry(ctx.message, player)
 			await self.bot.say('Enqueued ' + str(entry))
 			await state.songs.put(entry)
-		print("Playing at {} volume".format(player.volume))
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def volume(self, ctx, value : int):
