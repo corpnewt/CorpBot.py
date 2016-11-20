@@ -41,6 +41,52 @@ class Admin:
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
 	@commands.command(pass_context=True)
+	async def setuserparts(self, ctx, member : discord.Member = None, parts : str = None):
+		"""Set another user's parts list (admin only)."""
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+			
+		if member == None:
+			msg = 'Usage: `setuserparts [member] "[parts text]"`'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		if type(member) is str:
+			try:
+				member = discord.utils.get(message.server.members, name=member)
+			except:
+				print("That member does not exist")
+				return
+
+		channel = ctx.message.channel
+		server  = ctx.message.server
+
+		if not parts:
+			parts = ""
+			
+		self.settings.setUserStat(member, server, "Parts", parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(member.name, parts)
+		await self.bot.send_message(channel, msg)
+
+	@setuserparts.error
+	async def setuserparts_error(self, ctx, error):
+		# do stuff
+		msg = 'setuserparts Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
+
+	@commands.command(pass_context=True)
 	async def setmadlibschannel(self, ctx, channel : discord.Channel = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		

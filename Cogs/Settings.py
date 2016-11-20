@@ -101,6 +101,29 @@ class Settings:
 				"ChannelMOTD" 			: []}		# List of channel messages of the day
 			self.serverDict["Servers"].append(newServer)
 			self.flushSettings()
+
+	# Let's make sure the user is in the specified server
+	def removeServer(self, server):
+		# Check for our server name
+		found = False
+		for x in self.serverDict["Servers"]:
+			if x["ID"] == server.id:
+				found = True
+				# We found our server - remove
+				self.serverDict["Servers"].remove(x)
+		if found:
+			self.flushSettings()
+
+	def removeServerID(self, id):
+		# Check for our server ID
+		found = False
+		for x in self.serverDict["Servers"]:
+			if x["ID"] == id:
+				found = True
+				# We found our server - remove
+				self.serverDict["Servers"].remove(x)
+		if found:
+			self.flushSettings()
 	
 	
 	# Let's make sure the user is in the specified server
@@ -170,6 +193,24 @@ class Settings:
 				# We found our server, now to iterate users
 				for y in x["Members"]:
 					if y["ID"] == user.id:
+						found = True
+						# Found our user - remove
+						x["Members"].remove(y)
+		if found:
+			self.flushSettings()
+
+
+	# Let's make sure the user is in the specified server
+	def removeUserID(self, id, server):
+		# Make sure our server exists in the list
+		self.checkServer(server)
+		# Check for our username
+		found = False
+		for x in self.serverDict["Servers"]:
+			if x["ID"] == server.id:
+				# We found our server, now to iterate users
+				for y in x["Members"]:
+					if y["ID"] == id:
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
@@ -452,3 +493,67 @@ class Settings:
 	# Flush settings to disk
 	def flushSettings(self):
 		json.dump(self.serverDict, open(self.file, 'w'), indent=2)
+
+	@commands.command(pass_context=True)
+	async def prune(self, ctx):
+		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
+		
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can prune.'
+				await self.bot.send_message(channel, msg)
+				return
+		
+		# Set up vars
+		removedUsers = 0
+		removedServers = 0
+		serverWord = "servers"
+		usersWord = "users"
+
+		msg = "Start"
+
+		for botServer in self.serverDict["Servers"]:
+			# Let's check through each server first - then members
+			foundServer = False
+			for server in self.bot.servers:
+				# Check ID in case of name change
+				if botServer["ID"] == server.id:
+					foundServer = True
+					# Now we check users...
+					for botMember in botServer["Members"]:
+						foundMember = False
+						for member in server.members:
+							if botMember["ID"] == member.id:
+								foundMember = True
+							
+						if not foundMember:
+							# We didn't find this member - remove them
+							self.removeUserID(botMember['ID'], server)
+							removedUsers +=1
+						
+			if not foundServer:
+				# We didn't find this server - remove it
+				self.removeServerID(botServer['ID'])
+				removedServers += 1
+
+		if removedServers is 1:
+			serverWord = "server"
+		if removedUsers is 1:
+			usersWord = "user"
+		
+		msg = 'Removed *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedServers, serverWord)
+		await self.bot.send_message(ctx.message.channel, msg)

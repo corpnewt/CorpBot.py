@@ -146,6 +146,14 @@ async def on_member_remove(member):
 	settings.removeUser(member, server)
 
 @bot.event
+async def on_server_join(server):
+	settings.checkServer(server)
+
+@bot.event
+async def on_server_remove(server):
+	settings.removeServer(server)
+
+@bot.event
 async def on_member_join(member):
 	server = member.server
 	# Initialize the user
