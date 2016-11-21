@@ -124,11 +124,9 @@ class Feed:
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-		hunger     = int(self.settings.getServerStat(server, "Hunger"))
-		isKill     = self.settings.getServerStat(server, "Killed")
 
-		approve    = True
-		decrement  = True
+		approve = True
+		decrement = True
 
 		# Check Food
 
@@ -149,13 +147,14 @@ class Feed:
 			#msg = 'You don\'t have the permissions to feed me.'
 		
 		# RequiredXPRole
-		foundRole = False
-		for checkRole in author.roles:
-			if checkRole.id == requiredXP:
-				foundRole = True
-		if not foundRole:
-			approve = False
-			msg = 'You don\'t have the permissions to feed me.'
+		if requiredXP:
+			foundRole = False
+			for checkRole in author.roles:
+				if checkRole.id == requiredXP:
+					foundRole = True
+			if not foundRole:
+				approve = False
+				msg = 'You don\'t have the permissions to feed me.'
 
 		# Check admin last - so it overrides anything else
 		if isAdmin and adminUnlim.lower() == "yes":
