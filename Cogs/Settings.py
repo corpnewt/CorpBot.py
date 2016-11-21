@@ -89,12 +89,13 @@ class Settings:
 			self.serverDict["Servers"] = []
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["Name"] == server.name:
+			if x["ID"] == server.id:
 				# We found our server
 				found = True
 				# Verify all the default keys have values
 				for key in self.defaultServer:
 					if not key in x:
+						print("Adding: {}".format(key))
 						x[key] = self.defaultServer[key]
 
 		if not found:
