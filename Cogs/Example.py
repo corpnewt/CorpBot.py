@@ -187,10 +187,15 @@ class Music:
 				return
 
 		volume = self.settings.getServerStat(ctx.message.server, "Volume")
+		defVolume = self.settings.getServerStat(ctx.message.server, "DefaultVolume")
 		if volume:
 			volume = float(volume)
 		else:
-			volume = float(self.settings.getServerStat(ctx.message.server, "DefaultVolume"))
+			if defVolume:
+				volume = float(self.settings.getServerStat(ctx.message.server, "DefaultVolume"))
+			else:
+				# No volume or default volume in settings - go with 60%
+				volume = 0.6
 
 		try:
 			player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
