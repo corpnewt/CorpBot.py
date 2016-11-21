@@ -119,13 +119,14 @@ class Xp:
 		decrement = True
 
 		# RequiredXPRole
-		foundRole = False
-		for checkRole in author.roles:
-			if checkRole.id == requiredXP:
-				foundRole = True
-		if not foundRole:
-			approve = False
-			msg = 'You don\'t have the permissions to give xp.'
+		if requiredXP:
+			foundRole = False
+			for checkRole in author.roles:
+				if checkRole.id == requiredXP:
+					foundRole = True
+			if not foundRole:
+				approve = False
+				msg = msg = 'You don\'t have the permissions to give xp.'
 
 		if xpAmount > int(reserveXP):
 			approve = False
@@ -227,13 +228,14 @@ class Xp:
 			approve = False
 
 		# RequiredXPRole
-		foundRole = False
-		for checkRole in author.roles:
-			if checkRole.id == requiredXP:
-				foundRole = True
-		if not foundRole:
-			approve = False
-			msg = 'You don\'t have the permissions to gamble.'
+		if requiredXP:
+			foundRole = False
+			for checkRole in author.roles:
+				if checkRole.id == requiredXP:
+					foundRole = True
+			if not foundRole:
+				approve = False
+				msg = msg = 'You don\'t have the permissions to gamble.'
 			
 		# Check admin last - so it overrides anything else
 		if isAdmin and adminUnlim.lower() == "yes":
