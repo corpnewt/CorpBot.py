@@ -125,6 +125,7 @@ class Feed:
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 		isKill = self.settings.getServerStat(server, "Killed")
+		hunger = int(self.settings.getServerStat(server, "Hunger"))
 
 		approve = True
 		decrement = True
