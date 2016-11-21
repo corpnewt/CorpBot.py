@@ -124,7 +124,7 @@ class Feed:
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-		isKill = self.settings.getServerStat(message.server, "Killed")
+		isKill = self.settings.getServerStat(server, "Killed")
 
 		approve = True
 		decrement = True
