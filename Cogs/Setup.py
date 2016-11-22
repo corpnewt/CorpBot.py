@@ -513,6 +513,10 @@ class Setup:
 				else:
 					try:
 						talkInt = int(talk.content)
+						if talkInt > 100:
+							talkInt = 100
+						if talkInt < 1:
+							talkInt = 1
 						await self.bot.send_message(author, 'Default volume is now *{}!*'.format(talkInt))
 						self.settings.setServerStat(server, "DefaultVolume", (talkInt/100))
 					except ValueError:

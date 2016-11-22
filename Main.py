@@ -23,6 +23,7 @@ from Cogs import Uptime
 from Cogs import MadLibs
 from Cogs import DrBeer
 from Cogs import Setup
+from Cogs import Invite
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -99,6 +100,11 @@ cogList.append(drbeer)
 
 setup = Setup.Setup(bot, settings)
 cogList.append(setup)
+
+# Invite
+
+invite = Invite.Invite(bot)
+cogList.append(invite)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

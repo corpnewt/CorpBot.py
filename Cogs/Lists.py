@@ -513,6 +513,12 @@ class Lists:
 
 		msg = '***{}\'s*** **Parts:**\n{}'.format(DisplayName.name(member), parts)
 		await self.bot.send_message(channel, msg)
+
+	@parts.error
+	async def parts_error(self, ctx, error):
+		# do stuff
+		msg = 'parts Error: {}'.format(ctx)
+		await self.bot.say(msg)
 		
 		
 	@commands.command(pass_context=True)
