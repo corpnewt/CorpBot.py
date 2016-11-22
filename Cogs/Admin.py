@@ -823,7 +823,7 @@ class Admin:
 				return
 
 		# If we made it this far - then we can add it
-		promoArray.append({ 'ID' : role.id })
+		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
 		self.settings.setServerStat(ctx.message.server, "AdminArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
