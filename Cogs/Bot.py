@@ -4,6 +4,7 @@ import os
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import DisplayName
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -176,5 +177,5 @@ class Bot:
 			parts = ""
 			
 		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(self.bot.user.name, parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(self.bot.user), parts)
 		await self.bot.send_message(channel, msg)

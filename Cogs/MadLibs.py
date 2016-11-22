@@ -6,6 +6,7 @@ import random
 import string
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import DisplayName
 
 class MadLibs:
 
@@ -107,7 +108,7 @@ class MadLibs:
 
 			if not talk:
 				# We timed out - leave the loop
-				msg = "*{}*, I'm done waiting... we'll play another time.".format(author.name)
+				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
 				await self.bot.send_message(channel, msg)
 				self.isPlaying = False
 				return
@@ -115,13 +116,13 @@ class MadLibs:
 			# Check if the message is to leave
 			if talk.content.startswith('$mleave'):
 				if talk.author is author:
-					msg = "Alright, *{}*.  We'll play another time.".format(author.name)
+					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await self.bot.send_message(channel, msg)
 					self.isPlaying = False
 					return
 				else:
 					# Not the originator
-					msg = "Only the originator (*{}*) can leave the MadLibs.".format(author.name)
+					msg = "Only the originator (*{}*) can leave the MadLibs.".format(DisplayName.name(author))
 					await self.bot.send_message(channel, msg)
 					continue
 

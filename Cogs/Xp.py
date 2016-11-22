@@ -5,6 +5,7 @@ import random
 from   discord.ext import commands
 from   operator import itemgetter
 from   Cogs import Settings
+from   Cogs import DisplayName
 
 # This is the xp module.  It's likely to be retarded.
 
@@ -75,7 +76,7 @@ class Xp:
 				return
 
 		self.settings.setUserStat(member, server, "XP", xpAmount)
-		msg = '*{}\'s* xp was set to *{}!*'.format(member.name, xpAmount)
+		msg = '*{}\'s* xp was set to *{}!*'.format(DisplayName.name(member), xpAmount)
 		await self.bot.send_message(channel, msg)
 		await self.checkroles(member, channel)
 
@@ -148,7 +149,7 @@ class Xp:
 
 		if approve:
 			# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
-			msg = '*{}* was given *{} xp!*'.format(member.name, xpAmount)
+			msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
 			await self.bot.send_message(channel, msg)
 			self.settings.incrementStat(member, server, "XP", xpAmount)
 			if decrement:
@@ -266,9 +267,9 @@ class Xp:
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '{} bet {} and ***WON*** *{} xp!*'.format(author.name, bet, int(payout))
+				msg = '*{}* bet *{}* and ***WON*** *{} xp!*'.format(DisplayName.name(author), bet, int(payout))
 			else:
-				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(author.name, bet)
+				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
 		await self.bot.send_message(ctx.message.channel, msg)
 			
@@ -301,7 +302,7 @@ class Xp:
 					# Now see if we have it, and add it if we don't
 					if not currentRole in user.roles:
 						await self.bot.add_roles(user, currentRole)
-						msg = '*{}* was promoted to **{}**!'.format(user.name, currentRole.name)
+						msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), currentRole.name)
 				else:
 					if xpDemote.lower() == "yes":
 						# Let's see if we have this role, and remove it.  Demote time!
@@ -314,7 +315,7 @@ class Xp:
 						# Now see if we have it, and take it away!
 						if currentRole in user.roles:
 							await self.bot.remove_roles(user, currentRole)
-							msg = '*{}* was demoted from **{}**!'.format(user.name, currentRole.name)
+							msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), currentRole.name)
 		# Check if we have a message to display - and display it
 		if msg:
 			await self.bot.send_message(channel, msg)
@@ -383,9 +384,9 @@ class Xp:
 					highestRole = aRole.name
 
 		if highestRole == "":
-			msg = '*{}* has not acquired a rank yet.'.format(member.name)
+			msg = '*{}* has not acquired a rank yet.'.format(DisplayName.name(member))
 		else:
-			msg = '*{}* is a **{}**!'.format(member.name, highestRole)
+			msg = '*{}* is a **{}**!'.format(DisplayName.name(member), highestRole)
 			
 		await self.bot.send_message(ctx.message.channel, msg)
 		
@@ -426,10 +427,7 @@ class Xp:
 			else:
 				cMember = None
 			if cMember:
-				if cMember.nick:
-					cMemberDisplay = cMember.nick
-				else:
-					cMemberDisplay = cMember.name
+				cMemberDisplay = DisplayName.name(cMember)
 			else:
 				cMemberDisplay = promoSorted[index]['Name']
 
@@ -467,10 +465,7 @@ class Xp:
 			else:
 				cMember = None
 			if cMember:
-				if cMember.nick:
-					cMemberDisplay = cMember.nick
-				else:
-					cMemberDisplay = cMember.name
+					cMemberDisplay = DisplayName.name(cMember)
 			else:
 				cMemberDisplay = promoSorted[index]['Name']
 			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
@@ -496,7 +491,7 @@ class Xp:
 		newStat = self.settings.getUserStat(member, ctx.message.server, "XP")
 		newState = self.settings.getUserStat(member, ctx.message.server, "XPReserve")
 
-		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(member.name, newStat, newState)
+		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")

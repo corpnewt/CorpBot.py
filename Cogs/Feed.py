@@ -166,7 +166,7 @@ class Feed:
 			
 		if isKill.lower() == "yes":
 			# Bot's dead...
-			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(author.name, food, self.bot.user.name)
+			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.name(self.bot.user))
 			await self.bot.send_message(channel, msg)
 			return
 			
@@ -189,18 +189,18 @@ class Feed:
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}\'s* offering of *{}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{} xp!*'.format(author.name, food, int(payout))
+				msg = '*{}\'s* offering of *{}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{} xp!*'.format(DisplayName.name(author), food, int(payout))
 				
 				# Got XP - let's see if we need to promote
 				await self.xp.checkroles(author, channel)
 			else:
-				msg = '*{}* fed me *{} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(author.name, food)
+				msg = '*{}* fed me *{} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
 		
 			if hunger <= -150:
 				# Kill the bot here
 				self.settings.setServerStat(server, "Killed", "Yes")
-				self.settings.setServerStat(server, "KilledBy", author.name)
-				msg = '{}\n\nI am kill...\n\n{} did it...'.format(msg, author.name)			
+				self.settings.setServerStat(server, "KilledBy", DisplayName.name(author))
+				msg = '{}\n\nI am kill...\n\n{} did it...'.format(msg, DisplayName.name(author))			
 			elif hunger <= -100:
 				msg = '{}\n\nYou *are* going to kill me...  Stop *now* if you have a heart!'.format(msg)
 			elif hunger <= -75:
@@ -245,8 +245,8 @@ class Feed:
 				return
 		
 		self.settings.setServerStat(server, "Killed", "Yes")
-		self.settings.setServerStat(server, "KilledBy", author.name)
-		await self.bot.send_message(channel, 'I am kill...\n\n*{}* did it...'.format(author.name))
+		self.settings.setServerStat(server, "KilledBy", DisplayName.name(author))
+		await self.bot.send_message(channel, 'I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
 		
 	@commands.command(pass_context=True)
 	async def resurrect(self, ctx):
@@ -328,7 +328,7 @@ class Feed:
 		# If we made it this far - then we can add it
 		self.settings.setServerStat(server, "RequiredKillRole", role.id)
 
-		msg = 'Role required for kill/resurrect set to *{}*.'.format(role.name)
+		msg = 'Role required for kill/resurrect set to **{}**.'.format(role.name)
 		await self.bot.send_message(channel, msg)
 
 	@setkillrole.error

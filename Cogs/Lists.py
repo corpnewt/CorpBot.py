@@ -5,6 +5,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
+from   Cogs import DisplayName
 
 # This is the lists module.
 
@@ -64,11 +65,12 @@ class Lists:
 				# The link exists!
 				msg = '*{}* updated!'.format(name)
 				alink['URL'] = link
-				alink['UpdatedBy'] = author.name
+				alink['UpdatedBy'] = DisplayName.name(author)
+				alink['UpdatedID'] = author.id
 				alink['Updated'] = currentTime
 				found = True
 		if not found:	
-			linkList.append({"Name" : name, "URL" : link, "CreatedBy" : author.name, "Created" : currentTime})
+			linkList.append({"Name" : name, "URL" : link, "CreatedBy" : DisplayName.name(author), "CreatedID": author.id, "Created" : currentTime})
 			msg = '*{}* added to link list!'.format(name)
 		
 		self.settings.setServerStat(server, "Links", linkList)
@@ -175,9 +177,16 @@ class Lists:
 				currentTime = int(time.time())
 				msg = '**{}:**'.format(alink['Name'])
 				try:
-					msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+					memID = DisplayName.memberForID(alink['CreatedID'], server)
 				except KeyError as e:
-					msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
+					memID = None
+				if memID:
+					msg = '{}\nCreated By: *{}*'.format(msg, DisplayName.name(memID))
+				else:
+					try:	
+						msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+					except KeyError as e:
+						msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
 				try:
 					createdTime = int(alink['Created'])
 					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
@@ -288,10 +297,11 @@ class Lists:
 				msg = '*{}* updated!'.format(name)
 				ahack['Hack'] = hack
 				ahack['UpdatedBy'] = author.name
+				ahack['UpdatedID'] = DisplayName.name(author)
 				ahack['Updated'] = currentTime
 				found = True
 		if not found:		
-			hackList.append({"Name" : name, "Hack" : hack, "CreatedBy" : author.name, "Created" : currentTime})
+			hackList.append({"Name" : name, "Hack" : hack, "CreatedBy" : DisplayName.name(author), "CreatedID": author.id, "Created" : currentTime})
 			msg = '*{}* added to link list!'.format(name)
 		
 		self.settings.setServerStat(server, "Hacks", hackList)
@@ -399,9 +409,16 @@ class Lists:
 				currentTime = int(time.time())
 				msg = '**{}:**'.format(alink['Name'])
 				try:
-					msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+					memID = DisplayName.memberForID(alink['CreatedID'], server)
 				except KeyError as e:
-					msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
+					memID = None
+				if memID:
+					msg = '{}\nCreated By: *{}*'.format(msg, DisplayName.name(memID))
+				else:
+					try:	
+						msg = '{}\nCreated By: *{}*'.format(msg, alink['CreatedBy'])
+					except KeyError as e:
+						msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
 				try:
 					createdTime = int(alink['Created'])
 					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
@@ -490,11 +507,11 @@ class Lists:
 		parts = self.settings.getUserStat(member, server, "Parts")
 		
 		if not parts or parts == "":
-			msg = '*{}* has not added their parts yet!  They can add them with the `$setparts "[parts text]"` command!'.format(member.name)
+			msg = '*{}* has not added their parts yet!  They can add them with the `$setparts "[parts text]"` command!'.format(DisplayName.name(member))
 			await self.bot.send_message(channel, msg)
 			return
 
-		msg = '***{}\'s*** **Parts:**\n{}'.format(member.name, parts)
+		msg = '***{}\'s*** **Parts:**\n{}'.format(DisplayName.name(member), parts)
 		await self.bot.send_message(channel, msg)
 		
 		
@@ -510,7 +527,7 @@ class Lists:
 			parts = ""
 			
 		self.settings.setUserStat(author, server, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(author.name, parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(author), parts)
 		await self.bot.send_message(channel, msg)
 		
 		
@@ -553,10 +570,7 @@ class Lists:
 			except:
 				print("That member does not exist")
 				return
-		if member.nick:
-			name = member.nick
-		else:
-			name = member.name
+		name = DisplayName.name(member)
 
 		# We have a member here
 		if not str(member.status).lower() == "offline":

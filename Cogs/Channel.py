@@ -5,6 +5,7 @@ from   discord.ext import commands
 from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import ReadableTime
+from   Cogs import DisplayName
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -38,7 +39,7 @@ class Channel:
 	async def rules(self, ctx):
 		"""Display the server's rules."""
 		rules = self.settings.getServerStat(ctx.message.server, "Rules")
-		msg = "{} Rules:\n{}".format(ctx.message.server.name, rules)
+		msg = "*{}* Rules:\n{}".format(ctx.message.server.name, rules)
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 		

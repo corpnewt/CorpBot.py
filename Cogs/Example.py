@@ -3,6 +3,7 @@ import discord
 import random
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import DisplayName
 		
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -47,7 +48,8 @@ class Example:
 	@commands.command()
 	async def joined(self, member : discord.Member):
 		"""Says when a member joined."""
-		await self.bot.say('{0.name} joined in {0.joined_at}'.format(member))
+
+		await self.bot.say('{} joined in {}'.format(DisplayName.name(member), member.joined_at))
 
 class VoiceEntry:
     def __init__(self, message, player):

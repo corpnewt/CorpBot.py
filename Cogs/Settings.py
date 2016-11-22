@@ -3,6 +3,7 @@ import discord
 from   discord.ext import commands
 import json
 import os
+from   Cogs import DisplayName
 
 
 # This is the settings module - it allows the other modules to work with
@@ -374,7 +375,7 @@ class Settings:
 			self.serverDict['Owner'] = member.id
 			self.flushSettings()
 
-		msg = 'I have been claimed by *{}!*'.format(member.name)
+		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await self.bot.send_message(channel, msg)
 
 	@owner.error
@@ -408,7 +409,7 @@ class Settings:
 			self.serverDict['Owner'] = None
 			self.flushSettings()
 
-		msg = 'I have been disowned by *{}!*'.format(author.name)
+		msg = 'I have been disowned by *{}!*'.format(DisplayName.name(author))
 		await self.bot.send_message(channel, msg)
 
 
@@ -443,11 +444,11 @@ class Settings:
 		try:
 			newStat = self.getUserStat(member, server, stat)
 		except KeyError:
-			msg = '"{}" is not a valid stat for {}'.format(stat, member.name)
+			msg = '"{}" is not a valid stat for *{}*'.format(stat, DisplayName.name(member))
 			await self.bot.send_message(channel, msg)
 			return
 
-		msg = '**{}** for *{}* is *{}!*'.format(stat, member.name, newStat)
+		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
 		await self.bot.send_message(channel, msg)
 
 	# Catch errors for stat
