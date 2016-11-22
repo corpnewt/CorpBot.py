@@ -500,6 +500,8 @@ class Xp:
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
+		print("PromoSorted: {}".format(promoSorted))
+		
 		highestRole = None
 		if len(promoSorted):
 			nextRole = promoSorted[0]
