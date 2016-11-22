@@ -158,6 +158,12 @@ async def on_member_remove(member):
 @bot.event
 async def on_server_join(server):
 	settings.checkServer(server)
+	owner = server.owner
+	# Let's message hello in the main chat - then pm the owner
+	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my command by typing `$help` either in chat or in PM. (PM is probably better though - I can get *kinda* spammy)'
+	await bot.send_message(server, msg)
+	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `$setup` in the main chat.  Thanks!'
+	await bot.send_message(owner, msg)
 
 @bot.event
 async def on_server_remove(server):
