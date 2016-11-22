@@ -490,8 +490,8 @@ class Xp:
 				return
 
 		# Get user's xp
-		newStat = self.settings.getUserStat(member, ctx.message.server, "XP")
-		newState = self.settings.getUserStat(member, ctx.message.server, "XPReserve")
+		newStat = int(self.settings.getUserStat(member, ctx.message.server, "XP"))
+		newState = int(self.settings.getUserStat(member, ctx.message.server, "XPReserve"))
 
 		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
