@@ -5,6 +5,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
+from   Cogs import DisplayName
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -102,7 +103,7 @@ class Admin:
 			parts = ""
 			
 		self.settings.setUserStat(member, server, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(member.name, parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(member), parts)
 		await self.bot.send_message(channel, msg)
 
 	@setuserparts.error
@@ -183,7 +184,7 @@ class Admin:
 				return
 
 		self.settings.setUserStat(member, server, "XPReserve", xpAmount)
-		msg = '*{}\'s* XPReserve was set to *{}*!'.format(member.name, xpAmount)
+		msg = '*{}\'s* XPReserve was set to *{}*!'.format(DisplayName.name(member), xpAmount)
 		await self.bot.send_message(channel, msg)
 
 
@@ -706,7 +707,7 @@ class Admin:
 		if not found:
 			# Let's ignore someone
 			ignoreList.append({ "Name" : member.name, "ID" : member.id })
-			msg = '*{}* is now being ignored.'.format(member.name)
+			msg = '*{}* is now being ignored.'.format(DisplayName.name(member))
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
@@ -758,7 +759,7 @@ class Admin:
 
 		if not found:
 			# Whatchu talkin bout Willis?
-			msg = '*{}* wasn\'t being ignored...'.format(member.name)
+			msg = '*{}* wasn\'t being ignored...'.format(DisplayName.name(member))
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
@@ -784,12 +785,7 @@ class Admin:
 			for role in ctx.message.server.members:
 				if role.id == arole["ID"]:
 					# Found the role ID
-					name = ""
-					if role.nick:
-						name = role.nick
-					else:
-						name = role.name
-					roleText = '{}*{}*\n'.format(roleText, name)
+					roleText = '{}*{}*\n'.format(roleText, DisplayName.name(role))
 
 		await self.bot.send_message(ctx.message.channel, roleText)
 		
@@ -1001,7 +997,7 @@ class Admin:
 				a['ListOnline'] = users
 				self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 				
-				msg = 'MOTD for {} changed.'.format(chan.name)
+				msg = 'MOTD for *{}* changed.'.format(chan.name)
 				await self.bot.send_message(channel, msg)
 				await self.updateMOTD()
 				return
@@ -1010,7 +1006,7 @@ class Admin:
 		motdArray.append({ 'ID' : chan.id, 'MOTD' : message, 'ListOnline' : users })
 		self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 
-		msg = 'MOTD for {} added.'.format(chan.name)
+		msg = 'MOTD for *{}* added.'.format(chan.name)
 		await self.bot.send_message(channel, msg)
 		await self.updateMOTD()
 
