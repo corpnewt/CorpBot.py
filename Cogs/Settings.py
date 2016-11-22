@@ -169,10 +169,10 @@ class Settings:
 						found = True
 						needsUpdate = False
 						if not "XP" in y:
-							y["XP"] = self.getServerStat(server, "DefaultXP")
+							y["XP"] = int(self.getServerStat(server, "DefaultXP"))
 							needsUpdate = True
 						if not "XPReserve" in y:
-							y["XPReserve"] = self.getServerStat(server, "DefaultXPReserve")
+							y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
 							needsUpdate = True
 						if not "ID" in y:
 							y["ID"] = user.id
@@ -208,8 +208,8 @@ class Settings:
 					# We didn't locate our user - add them
 					newUser = { "Name" 			: user.name,
 								"DisplayName" 	: user.display_name,
-								"XP" 			: self.getServerStat(server, "DefaultXP"),
-								"XPReserve" 	: self.getServerStat(server, "DefaultXPReserve"),
+								"XP" 			: int(self.getServerStat(server, "DefaultXP")),
+								"XPReserve" 	: (self.getServerStat(server, "DefaultXPReserve")),
 								"ID" 			: user.id,
 								"Discriminator" : user.discriminator,
 								"Parts"			: "",
