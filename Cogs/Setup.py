@@ -495,7 +495,7 @@ class Setup:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
-		dVol = self.settings.getServerStat(server, "DefaultVolume")
+		dVol = float(self.settings.getServerStat(server, "DefaultVolume"))
 		if not dVol:
 			dVol = 0.6
 		msg = 'What would you like the default volume of the music player to be? (values can be 1-100)\n\nCurrent is *{}*.'.format(int(dVol*100))
