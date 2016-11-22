@@ -332,7 +332,8 @@ class Xp:
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
 
 		# Sort by XP first, then by name
-		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']), key=lambda x:x['Name'])
 		
 		roleText = "Current Roles:\n"
 		for arole in promoSorted:
@@ -370,7 +371,8 @@ class Xp:
 				return
 			
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
-		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']), key=lambda x:x['Name'])
 		
 		highestRole = ""
 		
@@ -495,7 +497,8 @@ class Xp:
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
-		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']), key=lambda x:x['Name'])
 		
 		highestRole = None
 		if len(promoSorted):
