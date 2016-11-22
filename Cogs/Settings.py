@@ -32,6 +32,7 @@ class Settings:
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"MadLibsChannel"        : "",       # ID or blank for any channel
+				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last $question post
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
@@ -96,7 +97,7 @@ class Settings:
 				# Verify all the default keys have values
 				for key in self.defaultServer:
 					if not key in x:
-						print("Adding: {}".format(key))
+						#print("Adding: {} -> {}".format(key, server.name))
 						x[key] = self.defaultServer[key]
 
 		if not found:

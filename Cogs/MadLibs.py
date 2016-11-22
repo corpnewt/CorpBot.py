@@ -14,7 +14,6 @@ class MadLibs:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.isPlaying = False
 		# Setup/compile our regex
 		self.regex = re.compile(r"\[\[[^\[\]]+\]\]")
 		
@@ -64,12 +63,12 @@ class MadLibs:
 			return
 		
 		# Check if we're already in a game
-		if self.isPlaying:
+		if self.settings.getServerStat(server, "PlayingMadLibs"):
 			msg = 'I\'m already playing MadLibs - use `$ml [your word]` to submit answers.'
 			await self.bot.send_message(channel, msg)
 			return
 		
-		self.isPlaying = True
+		self.settings.setServerStat(server, "PlayingMadLibs", "Yes")
 
 		# Get a random madlib from those available
 		randnum = random.randint(0, (len(choices)-1))
@@ -110,7 +109,7 @@ class MadLibs:
 				# We timed out - leave the loop
 				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
 				await self.bot.send_message(channel, msg)
-				self.isPlaying = False
+				self.settings.setServerStat(server, "PlayingMadLibs", None)
 				return
 
 			# Check if the message is to leave
@@ -118,7 +117,7 @@ class MadLibs:
 				if talk.author is author:
 					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await self.bot.send_message(channel, msg)
-					self.isPlaying = False
+					self.settings.setServerStat(server, "PlayingMadLibs", None)
 					return
 				else:
 					# Not the originator
@@ -149,7 +148,7 @@ class MadLibs:
 			# Only replace the first occurence
 			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
 
-		self.isPlaying = False
+		self.settings.setServerStat(server, "PlayingMadLibs", None)
 		
 		# Message the output
 		await self.bot.send_message(channel, data)
@@ -157,6 +156,6 @@ class MadLibs:
 	@madlibs.error
 	async def madlibs_error(self, ctx, error):
 		# Reset playing status and display error
-		self.isPlaying = False
+		self.settings.setServerStat(server, "PlayingMadLibs", None)
 		msg = 'madlibs Error: {}'.format(ctx)
 		await self.bot.say(msg)

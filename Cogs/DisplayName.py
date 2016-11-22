@@ -16,3 +16,15 @@ def memberForID(id, server):
         if member.id == id:
             return member
     return None
+
+def roleForID(id, server):
+    for role in server.roles:
+        if role.id == id:
+            return role
+    return None
+
+def roleForName(name, server):
+    for role in server.roles:
+        if role.name == name:
+            return role
+    return None
