@@ -509,8 +509,8 @@ class Xp:
 			nextRole = None
 
 		for role in promoSorted:
-			print("{} : {}".format(int(nextRole['XP']), newStat)
-			if nextRole['XP'] < newStat:
+			print("{} : {}".format(int(nextRole['XP']), newStat))
+			if int(nextRole['XP']) < newStat:
 				nextRole = role
 				print("New: {}".format(role))
 			# We *can* have this role, let's see if we already do
