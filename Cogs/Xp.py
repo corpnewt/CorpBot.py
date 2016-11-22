@@ -509,7 +509,7 @@ class Xp:
 			nextRole = None
 
 		for role in promoSorted:
-			if nextRole['XP'] < newStat:
+			if int(nextRole['XP']) < newStat:
 				nextRole = role
 			# We *can* have this role, let's see if we already do
 			currentRole = None
@@ -528,8 +528,8 @@ class Xp:
 		else:
 			msg = '{}\nThey have not acquired a rank yet.'.format(msg)
 		
-		if nextRole and (newStat < nextRole['XP']):
-			msg = '{}\nThey need *{}* more xp to advance to **{}**!'.format(msg, nextRole['XP'] - newStat, nextRole['Name'])
+		if nextRole and (newStat < int(nextRole['XP'])):
+			msg = '{}\nThey need *{}* more xp to advance to **{}**!'.format(msg, int(nextRole['XP']) - newStat, int(nextRole['Name']))
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
