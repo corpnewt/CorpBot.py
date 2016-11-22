@@ -496,8 +496,8 @@ class Xp:
 		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
 		# Get user's current role
-		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
-		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		# promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
+		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
 		print("PromoSorted: {}".format(promoSorted))
