@@ -198,6 +198,11 @@ class Settings:
 						if not "Cooldown" in y:
 							y["Cooldown"] = None
 							needsUpdate = True
+						# Check for empty values that need numbers
+						if not y["XP"]:
+							y["XP"] = 0
+						if not y["XPReserve"]:
+							y["XPReserve"] = 0
 				if not found:
 					needsUpdate = True
 					# We didn't locate our user - add them
@@ -210,6 +215,10 @@ class Settings:
 								"Parts"			: "",
 								"Muted"			: "No",
 								"LastOnline"	: "Unknown" }
+					if not newUser["XP"]:
+						newUser["XP"] = 0
+					if not newUser["XPReserve"]:
+						newUser["XPReserve"] = 0
 					x["Members"].append(newUser)
 				if needsUpdate:
 					self.flushSettings()
