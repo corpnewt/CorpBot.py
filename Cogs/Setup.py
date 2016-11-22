@@ -435,7 +435,7 @@ class Setup:
 
 		threshold = self.settings.getServerStat(server, "PictureThreshold")
 
-		msg = 'As an anti-spam proction measure, I have a cooldown between each picture I can display.  What would you like this cooldown delay to be (in seconds)?\n\nCurrent is *{}*.'.format(threshold)
+		msg = 'As an anti-spam protection measure, I have a cooldown between each picture I can display.  What would you like this cooldown delay to be (in seconds)?\n\nCurrent is *{}*.'.format(threshold)
 		await self.bot.send_message(author, msg)
 		gotIt = False
 		while not gotIt:
