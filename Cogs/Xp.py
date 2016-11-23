@@ -555,13 +555,14 @@ class Xp:
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 		xpStr = None
 
-		if xpProm.lower() is "yes" and xpDem.lower() is "yes":
+		if (xpProm.lower() == "yes") and (xpDem.lower() == "yes"):
 			# Bot promote and demote
 			xpStr = "This is what I check to handle promotions and demotions.\n"
-		elif xpProm.lower() is "yes":
-			xpStr = "This is what I check to handle promotions.\n"
-		elif xpDem.lower() is "yes":
-			xpStr = "This is what I check to handle demotions.\n"
+		else:
+			if xpProm.lower() == "yes":
+				xpStr = "This is what I check to handle promotions.\n"
+			elif xpDem.lower() == "yes":
+				xpStr = "This is what I check to handle demotions.\n"
 
 		msg = "__***{}'s*** **XP System**__\n\n__What's What:__\n\n".format(serverName)
 		msg = "{}**XP:** This is the xp you have *earned.*\nIt comes from other users gifting you xp, or if you're lucky enough to `$gamble` and win.\n".format(msg)
