@@ -610,9 +610,9 @@ class Admin:
 		if cooldown:
 			mins = "minutes"
 			checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
-			msg = '*{}* has been **Muted** for *{}*.'.format(member, checkRead)
+			msg = '*{}* has been **Muted** for *{}*.'.format(DisplayName.name(member), checkRead)
 		else:
-			msg = '*{}* has been **Muted** *until further notice*.'.format(member)
+			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
 
@@ -654,7 +654,7 @@ class Admin:
 				print("That member does not exist")
 				return
 
-		msg = '*{}* has been **Unmuted**.'.format(member)
+		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
 
