@@ -507,10 +507,8 @@ class Xp:
 			nextRole = None
 
 		for role in promoSorted:
-			# print("{} : {}".format(int(nextRole['XP']), newStat))
 			if int(nextRole['XP']) < newStat:
 				nextRole = role
-				# print("New: {}".format(role))
 			# We *can* have this role, let's see if we already do
 			currentRole = None
 			for aRole in member.roles:
@@ -518,14 +516,10 @@ class Xp:
 				if aRole.id == role['ID']:
 					# We found it
 					highestRole = aRole.name
-					print("Highest role: {}".format(highestRole))
-					print("{} : {}".format(len(promoSorted), (promoSorted.index(role)+1)))
 					if len(promoSorted) > (promoSorted.index(role)+1):
 						# There's more roles above this
-						# nextRole = role
 						nRoleIndex = promoSorted.index(role)+1
 						nextRole = promoSorted[nRoleIndex]
-						print("Next role: {}".format(role['Name']))
 
 
 		if highestRole:
@@ -542,3 +536,73 @@ class Xp:
 	async def stats_error(self, ctx, error):
 		msg = 'stats Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+
+	# List the xp and xp reserve of a user
+	@commands.command(pass_context=True)
+	async def xpinfo(self, ctx):
+		"""Gives a quick rundown of the xp system."""
+
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		serverName = server.name
+		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
+		if not hourlyXP:
+			hourlyXP = 0
+		onlyOnline = self.settings.getServerStat(server, "RequireOnline")
+		xpProm = self.settings.getServerStat(server, "XPPromote")
+		xpDem = self.settings.getServerStat(server, "XPDemote")
+		xpStr = None
+
+		if xpProm.lower() is "yes" and xpDem.lower() is "yes":
+			# Bot promote and demote
+			xpStr = "This is what I check to handle promotions and demotions.\n"
+		elif xpProm.lower() is "yes":
+			xpStr = "This is what I check to handle promotions.\n"
+		elif xpDem.lower() is "yes":
+			xpStr = "This is what I check to handle demotions.\n"
+
+		msg = "__***{}'s*** **XP System**__\n\n__What's What:__\n\n".format(serverName)
+		msg = "{}**XP:** This is the xp you have *earned.*\nIt comes from other users gifting you xp, or if you're lucky enough to `$gamble` and win.\n".format(msg)
+		if xpStr:
+			msg = "{}{}".format(msg, xpStr)
+		msg = "{}This can only be taken away by an *admin*.\n\n".format(msg)
+		msg = "{}**XP Reserve:** This is the xp you can *gift*, *gamble*, or use to *feed* me.\n".format(msg)
+
+		hourStr = None
+		if hourlyXP > 0:
+			hourStr = "Currently, you receive *{} xp reserve* each hour".format(hourlyXP)
+		
+		if hourStr:
+			msg = "{}{}".format(msg, hourStr)
+
+		msg = "{}\n\n__How Do I Use It?:__\n\nYou can gift other users xp by using the `$xp [user] [amount]` command.\n".format(msg)
+		msg = "{}This pulls from your *xp reserve*, and adds to their *xp*.\n".format(msg)
+		msg = "{}It does not change the *xp* you have *earned*.\n\n".format(msg)
+
+		msg = "{}You can gamble your *xp reserve* to have a chance to win a percentage back as *xp* for yourself.\n".format(msg)
+		msg = "{}You do so by using the `$gamble [amount in multiple of 10]` command.\n".format(msg)
+		msg = "{}This pulls from your *xp reserve* - and if you win, adds to your *xp*.\n\n".format(msg)
+
+		msg = "{}You can also *feed* me.\n".format(msg)
+		msg = "{}This is done with the `$feed [amount]` command.\n".format(msg)
+		msg = "{}This pulls from your *xp reserve* - and doesn't affect your *xp*.\n\n".format(msg)
+
+		# Get the required role for using the xp system
+		role = self.settings.getServerStat(server, "RequiredXPRole")
+		if role == None or role == "":
+			msg = '{}Currently, **Everyone** can *give xp*, *gamble*, and *feed* the bot.\n\n'.format(msg)
+		else:
+			# Role is set - let's get its name
+			found = False
+			for arole in server.roles:
+				if arole.id == role:
+					found = True
+					msg = '{}Currently, you need to be a/an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+			if not found:
+				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that settings.\n\n'.format(msg, role)
+
+		msg = "{}Hopefully that clears things up!".format(msg)
+
+		await self.bot.send_message(ctx.message.channel, msg)
