@@ -594,6 +594,9 @@ class Xp:
 		msg = "{}You can also *feed* me.\n".format(msg)
 		msg = "{}This is done with the `$feed [amount]` command.\n".format(msg)
 		msg = "{}This pulls from your *xp reserve* - and doesn't affect your *xp*.\n\n".format(msg)
+		
+		msg = "{}You can check your *xp*, *xp reserve*, current role, and next role using the `$stats` command.\n".format(msg)
+		msg = "{}You can check another user's stats with the `$stat [user]` command.\n\n".format(msg)
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(server, "RequiredXPRole")
