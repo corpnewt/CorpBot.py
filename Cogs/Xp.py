@@ -421,13 +421,13 @@ class Xp:
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex-i
-			cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-
-			if ctx.message.server.get_member_named(cMemName):
+			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
+			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.server)
+			#if ctx.message.server.get_member_named(cMemName):
 				# Member exists
-				cMember = ctx.message.server.get_member_named(cMemName)
-			else:
-				cMember = None
+				#cMember = ctx.message.server.get_member_named(cMemName)
+			#else:
+				#cMember = None
 			if cMember:
 				cMemberDisplay = DisplayName.name(cMember)
 			else:
@@ -460,12 +460,13 @@ class Xp:
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex+i
-			cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			if ctx.message.server.get_member_named(cMemName):
+			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
+			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.server)
+			#if ctx.message.server.get_member_named(cMemName):
 				# Member exists
-				cMember = ctx.message.server.get_member_named(cMemName)
-			else:
-				cMember = None
+				#cMember = ctx.message.server.get_member_named(cMemName)
+			#else:
+				#cMember = None
 			if cMember:
 					cMemberDisplay = DisplayName.name(cMember)
 			else:
