@@ -573,6 +573,10 @@ class Xp:
 		hourStr = None
 		if hourlyXP > 0:
 			hourStr = "Currently, you receive *{} xp reserve* each hour".format(hourlyXP)
+			if onlyOnline.lower() == "yes":
+				hourStr = "{} (but *only* if your status is *Online*).".format(hourStr)
+			else:
+				hourStr = "{}.".format(hourStr)
 		
 		if hourStr:
 			msg = "{}{}".format(msg, hourStr)
