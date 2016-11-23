@@ -497,10 +497,8 @@ class Xp:
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
-		promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
-		# promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
-		
-		print("PromoSorted: {}".format(promoSorted))
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
 		highestRole = None
 		if len(promoSorted):
@@ -520,9 +518,14 @@ class Xp:
 				if aRole.id == role['ID']:
 					# We found it
 					highestRole = aRole.name
+					print("Highest role: {}".format(highestRole))
+					print("{} : {}".format(len(promoSorted), (promoSorted.index(role)+1)))
 					if len(promoSorted) > (promoSorted.index(role)+1):
 						# There's more roles above this
-						nextRole = role
+						# nextRole = role
+						nRoleIndex = promoSorted.index(role)+1
+						nextRole = promoSorted[nRoleIndex]
+						print("Next role: {}".format(role['Name']))
 
 
 		if highestRole:
