@@ -607,16 +607,21 @@ class Admin:
 		else:
 			cooldownFinal = None
 
+		pm = 'You have been **Muted** by *{}*.'.format(DisplayName.name(ctx.message.author))
+
 		if cooldown:
 			mins = "minutes"
 			checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 			msg = '*{}* has been **Muted** for *{}*.'.format(DisplayName.name(member), checkRead)
+			pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), checkRead, ctx.message.server.name)
 		else:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
+			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), ctx.message.server.name)
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
 
 		await self.bot.send_message(ctx.message.channel, msg)
+		await self.bot.send_message(member, pm)
 		
 	@mute.error
 	async def mute_error(self, ctx, error):
@@ -654,11 +659,13 @@ class Admin:
 				print("That member does not exist")
 				return
 
+		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), ctx.message.server.name)
 		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
 		self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
 
 		await self.bot.send_message(ctx.message.channel, msg)
+		await self.bot.send_message(member, pm)
 		
 	@unmute.error
 	async def unmute_error(self, ctx, error):
