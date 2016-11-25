@@ -44,7 +44,7 @@ class Channel:
 		
 		
 	@commands.command(pass_context=True)
-	async def ismuted(self, ctx, member : discord.Member = None):
+	async def ismuted(self, ctx, *, member : discord.Member = None):
 		"""Says whether a member is muted in chat."""
 			
 		if member == None:
