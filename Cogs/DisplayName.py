@@ -28,3 +28,9 @@ def roleForName(name, server):
         if role.name == name:
             return role
     return None
+
+def serverNick(user, server):
+    for member in server.members:
+        if member.id == user.id:
+            return self.name(member)
+    return None
