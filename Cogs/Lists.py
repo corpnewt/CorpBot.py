@@ -78,7 +78,7 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def removelink(self, ctx, name : str = None):
+	async def removelink(self, ctx, *, name : str = None):
 		"""Remove a link from the link list."""
 		
 		channel = ctx.message.channel
@@ -127,7 +127,7 @@ class Lists:
 
 
 	@commands.command(pass_context=True)
-	async def link(self, ctx, name : str = None):
+	async def link(self, ctx, *, name : str = None):
 		"""Retrieve a link from the link list."""
 		
 		channel = ctx.message.channel
@@ -154,7 +154,7 @@ class Lists:
 		await self.bot.send_message(channel, 'Link "*{}*" not found!'.format(name))		
 
 	@commands.command(pass_context=True)
-	async def linkinfo(self, ctx, name : str = None):
+	async def linkinfo(self, ctx, *, name : str = None):
 		"""Displays info about a link from the link list."""
 
 		channel = ctx.message.channel
@@ -310,7 +310,7 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def removehack(self, ctx, name : str = None):
+	async def removehack(self, ctx, *, name : str = None):
 		"""Remove a hack from the hack list."""
 		
 		channel = ctx.message.channel
@@ -359,7 +359,7 @@ class Lists:
 
 
 	@commands.command(pass_context=True)
-	async def hack(self, ctx, name : str = None):
+	async def hack(self, ctx, *, name : str = None):
 		"""Retrieve a hack from the hack list."""
 		
 		channel = ctx.message.channel
@@ -386,7 +386,7 @@ class Lists:
 		await self.bot.send_message(channel, 'Hack "*{}*" not found!'.format(name))
 
 	@commands.command(pass_context=True)
-	async def hackinfo(self, ctx, name : str = None):
+	async def hackinfo(self, ctx, *, name : str = None):
 		"""Displays info about a hack from the hack list."""
 
 		channel = ctx.message.channel
@@ -487,7 +487,7 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def parts(self, ctx, member : discord.Member = None):
+	async def parts(self, ctx, *, member : discord.Member = None):
 		"""Retrieve a member's parts list."""
 		
 		channel = ctx.message.channel
@@ -522,7 +522,7 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def setparts(self, ctx, parts : str = None):
+	async def setparts(self, ctx, *, parts : str = None):
 		"""Set your own parts - can be a url, formatted text, or nothing to clear."""
 		
 		channel = ctx.message.channel
@@ -558,7 +558,7 @@ class Lists:
 
 
 	@commands.command(pass_context=True)
-	async def lastonline(self, ctx, member : discord.Member = None):
+	async def lastonline(self, ctx, *, member : discord.Member = None):
 		"""Lists the last time a user was online if known."""
 
 		author  = ctx.message.author
