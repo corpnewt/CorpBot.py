@@ -68,7 +68,7 @@ class Admin:
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
 	@commands.command(pass_context=True)
-	async def setuserparts(self, ctx, member : discord.Member = None, parts : str = None):
+	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
 		"""Set another user's parts list (admin only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -114,7 +114,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def setmadlibschannel(self, ctx, channel : discord.Channel = None):
+	async def setmadlibschannel(self, ctx, *, channel : discord.Channel = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -195,7 +195,7 @@ class Admin:
 		await self.bot.say(msg)
 	
 	@commands.command(pass_context=True)
-	async def setdefaultrole(self, ctx, role : discord.Role = None):
+	async def setdefaultrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the default role or position for auto-role assignment."""
 		author  = ctx.message.author
 		server  = ctx.message.server
@@ -295,7 +295,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def removexprole(self, ctx, role : discord.Role = None):
+	async def removexprole(self, ctx, *, role : discord.Role = None):
 		"""Removes a role from the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -345,7 +345,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def setxprole(self, ctx, role : discord.Role = None):
+	async def setxprole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -399,7 +399,7 @@ class Admin:
 			await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
-	async def setstoprole(self, ctx, role : discord.Role = None):
+	async def setstoprole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -454,7 +454,7 @@ class Admin:
 
 		
 	@commands.command(pass_context=True)
-	async def setlinkrole(self, ctx, role : discord.Role = None):
+	async def setlinkrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -491,7 +491,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def sethackrole(self, ctx, role : discord.Role = None):
+	async def sethackrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -528,7 +528,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def setrules(self, ctx, rules : str = None):
+	async def setrules(self, ctx, *, rules : str = None):
 		"""Set the server's rules (admin-only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -631,7 +631,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def unmute(self, ctx, member : discord.Member = None):
+	async def unmute(self, ctx, *, member : discord.Member = None):
 		"""Allows a muted member to send messages in chat (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -675,7 +675,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def ignore(self, ctx, member : discord.Member = None):
+	async def ignore(self, ctx, *, member : discord.Member = None):
 		"""Adds a member to the bot's "ignore" list (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -726,7 +726,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def listen(self, ctx, member : discord.Member = None):
+	async def listen(self, ctx, *, member : discord.Member = None):
 		"""Removes a member from the bot's "ignore" list (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -798,7 +798,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def addadmin(self, ctx, role : discord.Role = None):
+	async def addadmin(self, ctx, *, role : discord.Role = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
@@ -845,7 +845,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def removeadmin(self, ctx, role : discord.Role = None):
+	async def removeadmin(self, ctx, *, role : discord.Role = None):
 		"""Removes a role from the admin list (admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
@@ -890,7 +890,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def removemotd(self, ctx, chan : discord.Channel = None):
+	async def removemotd(self, ctx, *, chan : discord.Channel = None):
 		"""Removes the message of the day from the selected channel."""
 		
 		channel = ctx.message.channel
@@ -937,7 +937,7 @@ class Admin:
 				
 
 	@commands.command(pass_context=True)
-	async def broadcast(self, ctx, message : str = None):
+	async def broadcast(self, ctx, *, message : str = None):
 		"""Broadcasts a message to all connected servers.  Can only be done by the owner."""
 
 		channel = ctx.message.channel
