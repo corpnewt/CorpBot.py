@@ -357,7 +357,7 @@ class Xp:
 		
 		
 	@commands.command(pass_context=True)
-	async def rank(self, ctx, member: discord.Member = None):
+	async def rank(self, ctx, *, member: discord.Member = None):
 		"""Say the highest rank of a listed member."""
 		
 		if member is None:
@@ -478,7 +478,7 @@ class Xp:
 		
 	# List the xp and xp reserve of a user
 	@commands.command(pass_context=True)
-	async def stats(self, ctx, member: discord.Member = None):
+	async def stats(self, ctx, *, member: discord.Member = None):
 		"""List the xp and xp reserve of a listed member."""
 		if member is None:
 			member = ctx.message.author
