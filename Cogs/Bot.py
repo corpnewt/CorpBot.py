@@ -177,5 +177,5 @@ class Bot:
 			parts = ""
 			
 		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(self.bot.user), parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
 		await self.bot.send_message(channel, msg)
