@@ -497,7 +497,7 @@ class Xp:
 		memName = member.name
 		if member.nick:
 			# We have a nickname
-			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.nick, member.name)
+			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
 		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at)
