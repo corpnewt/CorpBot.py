@@ -500,7 +500,7 @@ class Xp:
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
-		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.split()[0]) # I think this will work
+		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %H:%M")) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
 
