@@ -5,6 +5,7 @@ import datetime
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Xp
+from   Cogs import DisplayName
 
 # This is the feed module.  It allows the bot to be fed,
 # get hungry, die, be resurrected, etc.
