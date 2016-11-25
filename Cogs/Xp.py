@@ -493,8 +493,18 @@ class Xp:
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.server, "XP"))
 		newState = int(self.settings.getUserStat(member, ctx.message.server, "XPReserve"))
+		
+		memName = member.name
+		if member.nick:
+			# We have a nickname
+			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.nick, member.name)
+		else:
+			msg = "__***{}:***__\n\n".format(member.name)
+		msg = "**Joined:** *{}*\n".format(member.joined_at)
+		msg = "**XP:** *{}*\n".format(newStat)
+		msg = "**XP Reserve:** *{}*\n".format(newState)
 
-		msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
+		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
@@ -524,12 +534,12 @@ class Xp:
 
 
 		if highestRole:
-			msg = '{}\nThey are a **{}**!'.format(msg, highestRole)
+			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
 		else:
-			msg = '{}\nThey have not acquired a rank yet.'.format(msg)
+			msg = '{}They have not acquired a rank yet.\n'.format(msg)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
-			msg = '{}\nThey need *{}* more xp to advance to **{}**!'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
+			msg = '{}*{}* more xp require to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
