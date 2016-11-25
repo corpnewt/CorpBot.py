@@ -536,7 +536,9 @@ class Xp:
 		if highestRole:
 			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
 		else:
-			msg = '{}They have not acquired a rank yet.\n'.format(msg)
+			if len(promoSorted):
+				# Need to have ranks to acquire one
+				msg = '{}They have not acquired a rank yet.\n'.format(msg)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
 			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
