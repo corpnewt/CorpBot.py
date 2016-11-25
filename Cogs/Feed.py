@@ -167,7 +167,7 @@ class Feed:
 			
 		if isKill.lower() == "yes":
 			# Bot's dead...
-			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.name(self.bot.user))
+			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
 			await self.bot.send_message(channel, msg)
 			return
 			
