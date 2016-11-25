@@ -180,7 +180,7 @@ class Comic:
 		
 		
 	@commands.command(pass_context=True)
-	async def dilbert(self, ctx, date : str = None):
+	async def dilbert(self, ctx, *, date : str = None):
 		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY)."""
 		
 		channel = ctx.message.channel
@@ -279,7 +279,7 @@ class Comic:
 
 
 	@commands.command(pass_context=True)
-	async def xkcd(self, ctx, date : str = None):
+	async def xkcd(self, ctx, *, date : str = None):
 		"""Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found."""
 		
 		channel = ctx.message.channel
@@ -404,7 +404,7 @@ class Comic:
 
 
 	@commands.command(pass_context=True)
-	async def cyanide(self, ctx, date : str = None):
+	async def cyanide(self, ctx, *, date : str = None):
 		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if found."""
 		
 		channel = ctx.message.channel
@@ -510,7 +510,7 @@ class Comic:
 
 
 	@commands.command(pass_context=True)
-	async def calvin(self, ctx, date : str = None):
+	async def calvin(self, ctx, *, date : str = None):
 		"""Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found."""
 		
 		channel = ctx.message.channel
@@ -609,7 +609,7 @@ class Comic:
 
 
 	@commands.command(pass_context=True)
-	async def gmg(self, ctx, date : str = None):
+	async def gmg(self, ctx, *, date : str = None):
 		"""Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found."""
 		
 		channel = ctx.message.channel
@@ -715,7 +715,7 @@ class Comic:
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
 	@commands.command(pass_context=True)
-	async def garfield(self, ctx, date : str = None):
+	async def garfield(self, ctx, *, date : str = None):
 		"""Displays the Garfield comic for the passed date (MM-DD-YYYY) if found."""
 		
 		channel = ctx.message.channel
@@ -821,7 +821,7 @@ class Comic:
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
 	@commands.command(pass_context=True)
-	async def peanuts(self, ctx, date : str = None):
+	async def peanuts(self, ctx, *, date : str = None):
 		"""Displays the Peanuts comic for the passed date (MM-DD-YYYY) if found."""
 		
 		channel = ctx.message.channel
