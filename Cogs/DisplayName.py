@@ -32,5 +32,5 @@ def roleForName(name, server):
 def serverNick(user, server):
     for member in server.members:
         if member.id == user.id:
-            return self.name(member)
+            return name(member)
     return None
