@@ -23,7 +23,7 @@ class Lists:
 
 		
 	@commands.command(pass_context=True)
-	async def addlink(self, ctx, name : str = None, link : str = None):
+	async def addlink(self, ctx, name : str = None, *, link : str = None):
 		"""Add a link to the link list."""
 		
 		channel = ctx.message.channel
@@ -254,7 +254,7 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def addhack(self, ctx, name : str = None, hack : str = None):
+	async def addhack(self, ctx, name : str = None, *, hack : str = None):
 		"""Add a hack to the hack list."""
 		
 		channel = ctx.message.channel
