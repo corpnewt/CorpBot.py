@@ -500,9 +500,9 @@ class Xp:
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.nick, member.name)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
-		msg = "**Joined:** *{}*\n".format(member.joined_at)
-		msg = "**XP:** *{}*\n".format(newStat)
-		msg = "**XP Reserve:** *{}*\n".format(newState)
+		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at)
+		msg = "{}**XP:** *{}*\n".format(msg, newStat)
+		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
 
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
