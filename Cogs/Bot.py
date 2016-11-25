@@ -21,7 +21,7 @@ class Bot:
 		return { 'Ignore' : False, 'Delete' : False}
 		
 	@commands.command(pass_context=True)
-	async def nickname(self, ctx, name : str = None):
+	async def nickname(self, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -127,7 +127,7 @@ class Bot:
 		
 		
 	@commands.command(pass_context=True)
-	async def playgame(self, ctx, game : str = None):
+	async def playgame(self, ctx, *, game : str = None):
 		"""Sets the playing status of the bot (owner-only)."""
 
 		channel = ctx.message.channel
@@ -160,7 +160,7 @@ class Bot:
 		await self.bot.change_presence(game=discord.Game(name=game))
 
 	@commands.command(pass_context=True)
-	async def setbotparts(self, ctx, parts : str = None):
+	async def setbotparts(self, ctx, *, parts : str = None):
 		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
