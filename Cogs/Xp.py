@@ -500,7 +500,7 @@ class Xp:
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
-		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at)
+		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.split()[0]) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
 
@@ -539,7 +539,7 @@ class Xp:
 			msg = '{}They have not acquired a rank yet.\n'.format(msg)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
-			msg = '{}\n*{}* more xp require to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
+			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		
