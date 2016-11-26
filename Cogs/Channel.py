@@ -103,6 +103,11 @@ class Channel:
 		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
 		
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
+
+		if not len(promoSorted):
+			roleText = "There are no admin roles set yet.  Use `$addadmin [role]` to add some."
+			await self.bot.send_message(ctx.message.channel, roleText)
+			return
 		
 		roleText = "Current Admin Roles:\n"
 
@@ -113,3 +118,44 @@ class Channel:
 					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
 
 		await self.bot.send_message(ctx.message.channel, roleText)
+
+	@commands.command(pass_context=True)
+	async def rolecall(self, ctx, *, role : discord.Role = None):
+		"""Lists the number of users in a current role."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		if role == None:
+			msg = 'Usage: `$rolecall [role]`'
+			await self.bot.send_message(channel, msg)
+			return
+
+		if type(role) is str:
+			try:
+				role = discord.utils.get(server.roles, name=role)
+			except:
+				print("That role does not exist")
+				return
+
+		# We have a role
+		memberCount = 0
+		for member in server.members:
+			roles = member.roles
+			if role in roles:
+				# We found it
+				memberCount += 1
+
+		if memberCount == 1:
+			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
+		else:
+			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
+		await self.bot.send_message(channel, msg)
+
+
+	@rolecall.error
+	async def rolecall_error(self, ctx, error):
+		# do stuff
+		msg = 'rolecall Error: {}'.format(ctx)
+		await self.bot.say(msg)
