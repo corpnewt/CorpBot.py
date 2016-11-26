@@ -313,7 +313,7 @@ class Xp:
 		msg         = None
 		xpPromote   = self.settings.getServerStat(server,     "XPPromote")
 		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
-		userXP      = self.settings.getUserStat(user, server, "XP")
+		userXP      = int(self.settings.getUserStat(user, server, "XP"))
 
 		changed = False
 		
