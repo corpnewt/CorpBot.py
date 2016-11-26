@@ -568,7 +568,7 @@ class Admin:
 		
 	
 	@commands.command(pass_context=True)
-	async def mute(self, ctx, member : discord.Member = None, cooldown : int = None):
+	async def mute(self, ctx, *, member = None, cooldown : int = None):
 		"""Prevents a member from sending messages in chat (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -583,6 +583,36 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 			return
+
+		if cooldown == None:
+			# Either a cooldown wasn't set - or it's the last section
+			if type(member) is str:
+				# It' a string - the hope continues
+				theList = member.split()
+				try:
+					# Turn the last item in the list into an int
+					theCooldown = int(theList[len(theList)-1])
+					# At this point - we're an int - let's check if that's valid
+					newMemberName = " ".join(theList[:-1])
+					for amember in ctx.message.server.members:
+						if amember.nick == newMemberName:
+							member = amember
+							cooldown = theCooldown
+							break
+						if amember.name == newMemberName:
+							member = amember
+							cooldown = theCooldown
+							break
+				except ValueError:
+					for amember in ctx.message.server.members:
+						if amember.nick == member:
+							member = amember
+							break
+						if amember.name == member:
+							member = amember
+							break
+					cooldown = None
+
 			
 		if member == None:
 			msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
@@ -593,7 +623,8 @@ class Admin:
 			try:
 				member = discord.utils.get(message.server.members, name=member)
 			except:
-				print("That member does not exist")
+				msg = 'Couldn\'t fine user *{}*.'.format(member)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		# Set cooldown - or clear it
