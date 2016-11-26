@@ -4,6 +4,7 @@ import requests
 import string
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import Message
 
 # This module grabs Urban Dictionary definitions
 
@@ -39,8 +40,9 @@ class UrbanDict:
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
 		
-		await self.bot.send_message(ctx.message.channel, msg)
-		
+		# await self.bot.send_message(ctx.message.channel, msg)
+		await Message.say(self.bot, msg, ctx.message.channel)
+
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
 		"""Gives a random word and its definition."""
@@ -54,4 +56,5 @@ class UrbanDict:
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
 		
-		await self.bot.send_message(ctx.message.channel, msg)
+		# await self.bot.send_message(ctx.message.channel, msg)
+		await Message.say(self.bot, msg, ctx.message.channel)
