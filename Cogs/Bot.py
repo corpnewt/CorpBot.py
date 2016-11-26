@@ -179,3 +179,10 @@ class Bot:
 		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
 		await self.bot.send_message(channel, msg)
+
+	@commands.command(pass_context=True)
+	async def source(self, ctx):
+		"""Link the github source."""
+		source = "https://github.com/corpnewt/CorpBot.py"
+		msg = '**My insides are located at:**\n\n{}'.format(source)
+		await self.bot.send_message(ctx.message.channel, msg)
