@@ -301,6 +301,30 @@ class Xp:
 		else:
 			await self.bot.send_message(channel, 'Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
+	@commands.command(pass_context=True)
+	async def recheckrole(self, ctx, *, user : discord.Member = None):
+		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		isAdmin = author.permissions_in(channel).administrator
+
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if not user:
+			user = author
+
+		# Now we check for promotions
+		if await self.checkroles(user, channel):
+			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was updated.'.format(DisplayName.name(user)))
+		else:
+			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was not updated.'.format(DisplayName.name(user)))
+
 
 			
 	async def checkroles(self, user, channel, suppress : bool = False):
