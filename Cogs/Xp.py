@@ -268,13 +268,42 @@ class Xp:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
 				msg = '*{}* bet *{}* and ***WON*** *{} xp!*'.format(DisplayName.name(author), bet, int(payout))
+				# Now we check for promotions
+				await self.checkroles(author, channel)
 			else:
 				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
 		await self.bot.send_message(ctx.message.channel, msg)
 			
+	@commands.command(pass_context=True)
+	async def recheckroles(self, ctx):
+		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		isAdmin = author.permissions_in(channel).administrator
+
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		changeCount = 0
+		for member in server.members:
+			# Now we check for promotions
+			if await self.checkroles(member, channel, True):
+				changeCount += 1
+		
+		if changeCount == 1:
+			await self.bot.send_message(channel, 'Done checking roles.\n\n*1 user* updated.')
+		else:
+			await self.bot.send_message(channel, 'Done checking roles.\n\n*{} users* updated.'.format(changeCount))
+
+
 			
-	async def checkroles(self, user, channel):
+	async def checkroles(self, user, channel, suppress : bool = False):
 		# This method checks whether we need to promote, demote, or whatever
 		# then performs the said action, and outputs.
 		
@@ -285,6 +314,8 @@ class Xp:
 		xpPromote   = self.settings.getServerStat(server,     "XPPromote")
 		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
 		userXP      = self.settings.getUserStat(user, server, "XP")
+
+		changed = False
 		
 		if xpPromote.lower() == "yes":
 			# This is, by far, the more functional way
@@ -303,6 +334,7 @@ class Xp:
 					if not currentRole in user.roles:
 						await self.bot.add_roles(user, currentRole)
 						msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), currentRole.name)
+						changed = True
 				else:
 					if xpDemote.lower() == "yes":
 						# Let's see if we have this role, and remove it.  Demote time!
@@ -316,9 +348,11 @@ class Xp:
 						if currentRole in user.roles:
 							await self.bot.remove_roles(user, currentRole)
 							msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), currentRole.name)
+							changed = True
 		# Check if we have a message to display - and display it
-		if msg:
+		if msg and (not suppress):
 			await self.bot.send_message(channel, msg)
+		return changed
 
 
 	@commands.command(pass_context=True)

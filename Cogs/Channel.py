@@ -159,3 +159,30 @@ class Channel:
 		# do stuff
 		msg = 'rolecall Error: {}'.format(ctx)
 		await self.bot.say(msg)
+
+	@commands.command(pass_context=True)
+	async def clean(self, ctx, messages : int = 100, *, chan : discord.Channel = None):
+		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		# Check for admin status
+		isAdmin = author.permissions_in(channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(server, "AdminArray")
+			for role in author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if not chan:
+			chan = channel
+
+		await self.bot.purge_from(chan, limit=messages)

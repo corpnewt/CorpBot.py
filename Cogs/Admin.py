@@ -243,7 +243,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def addxprole(self, ctx, role : discord.Role = None, xp : int = None):
+	async def addxprole(self, ctx, xp : int = None, *, role : discord.Role = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -903,9 +903,7 @@ class Admin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
 		if chan == None:
-			msg = 'Usage: `$removemotd [channel]`'
-			await self.bot.send_message(channel, msg)
-			return	
+			chan = channel
 		if type(chan) is str:
 			try:
 				chan = discord.utils.get(server.channels, name=chan)
@@ -971,7 +969,7 @@ class Admin:
 
 		
 	@commands.command(pass_context=True)
-	async def setmotd(self, ctx, chan : discord.Channel = None, message : str = None, users : str = "No"):
+	async def setmotd(self, ctx, message : str = None, users : str = "No", chan : discord.Channel = None):
 		"""Adds a message of the day to the selected channel."""
 		
 		channel = ctx.message.channel
@@ -983,10 +981,12 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
-		if not (chan or message):
-			msg = 'Usage: `$setmotd [channel] "[message]" [usercount Yes/No (default is No)]`'
+		if not message:
+			msg = 'Usage: `$setmotd "[message]" [usercount Yes/No (default is No)] [channel] `'
 			await self.bot.send_message(channel, msg)
 			return	
+		if not chan:
+			chan = channel
 		if type(chan) is str:
 			try:
 				chan = discord.utils.get(server.channels, name=chan)
