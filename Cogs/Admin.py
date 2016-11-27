@@ -256,11 +256,11 @@ class Admin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
 		if role == None or xp == None:
-			msg = 'Usage: `$addxprole [role] [required xp]`'
+			msg = 'Usage: `$addxprole [required xp] [role]`'
 			await self.bot.send_message(channel, msg)
 			return
 		if not type(xp) is int:
-			msg = 'Usage: `$addxprole [role] [required xp]`'
+			msg = 'Usage: `$addxprole [required xp] [role]`'
 			await self.bot.send_message(channel, msg)
 			return
 		if type(role) is str:
