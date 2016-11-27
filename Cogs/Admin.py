@@ -243,7 +243,7 @@ class Admin:
 
 
 	@commands.command(pass_context=True)
-	async def addxprole(self, ctx, xp : int = None, *, role : discord.Role = None):
+	async def addxprole(self, ctx, *, role = None, xp : int = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -255,20 +255,27 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
-		if role == None or xp == None:
-			msg = 'Usage: `$addxprole [required xp] [role]`'
+		if xp == None:
+			# Either xp wasn't set - or it's the last section
+			if type(role) is str:
+				# It' a string - the hope continues
+				roleCheck = DisplayName.checkRoleForInt(role, server)
+				if not roleCheck:
+					msg = 'Usage: `$addxprole [role] [required xp]`'
+					await self.bot.send_message(ctx.message.channel, msg)
+					return
+				role = roleCheck["Role"]
+				xp   = roleCheck["Int"]
+
+		if xp == None:
+			msg = 'Usage: `$addxprole [role] [required xp]`'
 			await self.bot.send_message(channel, msg)
 			return
 		if not type(xp) is int:
-			msg = 'Usage: `$addxprole [required xp] [role]`'
+			msg = 'Usage: `$addxprole [role] [required xp]`'
 			await self.bot.send_message(channel, msg)
 			return
-		if type(role) is str:
-			try:
-				role = discord.utils.get(server.roles, name=role)
-			except:
-				print("That role does not exist")
-				return
+
 		# Now we see if we already have that role in our list
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
 		for aRole in promoArray:
@@ -334,7 +341,7 @@ class Admin:
 				return
 
 		# If we made it this far - then we didn't find it
-		msg = '{} not found in list.'.format(aRole['Name'])
+		msg = '{} not found in list.'.format(role.name)
 		await self.bot.send_message(channel, msg)
 
 	@removexprole.error
@@ -343,6 +350,40 @@ class Admin:
 		msg = 'removexprole Error: {}'.format(ctx)
 		await self.bot.say(msg)
 
+	@commands.command(pass_context=True)
+	async def prunexproles(self, ctx):
+		"""Removes any roles from the xp promotion/demotion system that are no longer on the server (admin only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		isAdmin = author.permissions_in(channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		# Get the array
+		promoArray = self.settings.getServerStat(server, "PromotionArray")
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+		
+		removed = 0
+		for arole in promoSorted:
+			# Get current role name based on id
+			foundRole = False
+			for role in server.roles:
+				if role.id == arole['ID']:
+					# We found it
+					foundRole = True
+			if not foundRole:
+				promoArray.remove(arole)
+				removed += 1
+
+		msg = 'Removed *{}* orphaned roles.'.format(removed)
+		await self.bot.send_message(ctx.message.channel, msg)
+		
 
 	@commands.command(pass_context=True)
 	async def setxprole(self, ctx, *, role : discord.Role = None):
@@ -588,30 +629,13 @@ class Admin:
 			# Either a cooldown wasn't set - or it's the last section
 			if type(member) is str:
 				# It' a string - the hope continues
-				theList = member.split()
-				try:
-					# Turn the last item in the list into an int
-					theCooldown = int(theList[len(theList)-1])
-					# At this point - we're an int - let's check if that's valid
-					newMemberName = " ".join(theList[:-1])
-					for amember in ctx.message.server.members:
-						if amember.nick == newMemberName:
-							member = amember
-							cooldown = theCooldown
-							break
-						if amember.name == newMemberName:
-							member = amember
-							cooldown = theCooldown
-							break
-				except ValueError:
-					for amember in ctx.message.server.members:
-						if amember.nick == member:
-							member = amember
-							break
-						if amember.name == member:
-							member = amember
-							break
-					cooldown = None
+				memCheck = DisplayName.checkNameForInt(member, ctx.message.server)
+				if not memCheck:
+					msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
+					await self.bot.send_message(ctx.message.channel, msg)
+					return
+				member   = memCheck["Member"]
+				cooldown = memCheck["Int"]
 
 			
 		if member == None:
@@ -623,7 +647,7 @@ class Admin:
 			try:
 				member = discord.utils.get(message.server.members, name=member)
 			except:
-				msg = 'Couldn\'t fine user *{}*.'.format(member)
+				msg = 'Couldn\'t find user *{}*.'.format(member)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 

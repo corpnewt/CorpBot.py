@@ -88,15 +88,37 @@ class Xp:
 		await self.bot.say(msg)
 	
 	@commands.command(pass_context=True)
-	async def xp(self, ctx, member : discord.Member = None, xpAmount : int = None):
+	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
-		
+
+		if member == None:
+			msg = 'Usage: `$xp [member] [amount]`'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
 		# Check for formatting issues
-		if xpAmount == None or member == None:
+		if xpAmount == None:
+			# Either xp wasn't set - or it's the last section
+			if type(member) is str:
+				# It' a string - the hope continues
+				nameCheck = DisplayName.checkNameForInt(member, server)
+				if not nameCheck:
+					msg = 'Usage: `$xp [member] [amount]`'
+					await self.bot.send_message(ctx.message.channel, msg)
+					return
+				if not nameCheck["Member"]:
+					msg = 'I couldn\'t find *{}* on the server.'.format(member)
+					await self.bot.send_message(ctx.message.channel, msg)
+					return
+				member   = nameCheck["Member"]
+				xpAmount = nameCheck["Int"]
+
+		if xpAmount == None:
+			# Still no xp
 			msg = 'Usage: `$xp [member] [amount]`'
 			await self.bot.send_message(channel, msg)
 			return
@@ -104,11 +126,14 @@ class Xp:
 			msg = 'Usage: `$xp [member] [amount]`'
 			await self.bot.send_message(channel, msg)
 			return
+
 		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
+			amember = DisplayName.memberForName(member, server)
+			if amember:
+				member = amember
+			else:
+				msg = 'Usage: `$xp [member/role] [amount]`'
+				await self.bot.send_message(channel, msg)
 				return
 		# Get our user/server stats
 		isAdmin    = author.permissions_in(channel).administrator
