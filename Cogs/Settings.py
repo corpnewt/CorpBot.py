@@ -44,6 +44,7 @@ class Settings:
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
+				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?

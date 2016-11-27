@@ -25,6 +25,7 @@ from Cogs import DrBeer
 from Cogs import Setup
 from Cogs import Invite
 from Cogs import UrbanDict
+from Cogs import Server
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -111,6 +112,11 @@ cogList.append(invite)
 
 urban = UrbanDict.UrbanDict(bot, settings)
 cogList.append(urban)
+
+# Server Info
+
+server = Server.Server(bot, settings)
+cogList.append(server)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
