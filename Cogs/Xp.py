@@ -395,7 +395,15 @@ class Xp:
 		
 		roleText = "Current Roles:\n"
 		for arole in promoSorted:
-			roleText = '{}**{}** : *{} XP*\n'.format(roleText, arole['Name'], arole['XP'], arole['ID'])
+			# Get current role name based on id
+			foundRole = False
+			for role in server.roles:
+				if role.id == arole['ID']:
+					# We found it
+					foundRole = True
+					roleText = '{}**{}** : *{} XP*\n'.format(roleText, role.name, arole['XP'])
+			if not foundRole:
+				roleText = '{}**{}** : *{} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
