@@ -185,4 +185,7 @@ class Channel:
 		if not chan:
 			chan = channel
 
+		# Remove original message
+		await self.bot.delete_message(ctx.message)
+		# Remove the rest
 		await self.bot.purge_from(chan, limit=messages)
