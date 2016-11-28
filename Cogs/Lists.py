@@ -507,7 +507,7 @@ class Lists:
 		parts = self.settings.getUserStat(member, server, "Parts")
 		
 		if not parts or parts == "":
-			msg = '*{}* has not added their parts yet!  They can add them with the `$setparts "[parts text]"` command!'.format(DisplayName.name(member))
+			msg = '*{}* has not added their parts yet!  They can add them with the `$setparts [parts text]` command!'.format(DisplayName.name(member))
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -540,7 +540,7 @@ class Lists:
 	@commands.command(pass_context=True)
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
-		msg = '\$setparts \"\`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`\"'	
+		msg = '\$setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'	
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
