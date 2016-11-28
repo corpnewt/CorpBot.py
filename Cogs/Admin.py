@@ -265,7 +265,7 @@ class Admin:
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				if not roleCheck["Role"]:
-					msg = 'I couldn\'t find *{}* on the server.'.format(member)
+					msg = 'I couldn\'t find *{}* on the server.'.format(role)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				role = roleCheck["Role"]

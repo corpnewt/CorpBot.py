@@ -106,6 +106,7 @@ class Xp:
 			if type(member) is str:
 				# It' a string - the hope continues
 				nameCheck = DisplayName.checkNameForInt(member, server)
+				print(nameCheck)
 				if not nameCheck:
 					msg = 'Usage: `$xp [member] [amount]`'
 					await self.bot.send_message(ctx.message.channel, msg)

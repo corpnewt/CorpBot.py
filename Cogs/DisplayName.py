@@ -56,8 +56,16 @@ def checkNameForInt(name, server):
             # We at least have a member
             return { "Member" : amember, "Int" : None }
         else:
-            # Nothing was right about this...
-            return { "Member" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, name)))
+            newMem = memberForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Member" : newMem, "Int" : None }
+            else:
+                # Nothing was right about this...
+                return { "Member" : None, "Int" : None }
     try:
         # Let's cast the last item as an int and catch any exceptions
         theInt = int(theList[len(theList)-1])
@@ -66,8 +74,16 @@ def checkNameForInt(name, server):
         if amember:
             return { "Member" : amember, "Int" : theInt }
         else:
-            # Nothing was right about this...
-            return { "Member" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, newMemberName)))
+            newMem = memberForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Member" : newMem, "Int" : theInt }
+            else:
+                # Nothing was right about this...
+                return { "Member" : None, "Int" : None }
     except ValueError:
         # Last section wasn't an int
         amember = memberForName(name, server)
@@ -75,7 +91,16 @@ def checkNameForInt(name, server):
             # Name was just a member - return
             return { "Member" : amember, "Int" : None }
         else:
-            return { "Member" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, name)))
+            newMem = memberForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Member" : newMem, "Int" : None }
+            else:
+                # Nothing was right about this...
+                return { "Member" : None, "Int" : None }
     # Should never get here
     return None
 
@@ -90,8 +115,16 @@ def checkRoleForInt(name, server):
             # We at least have a member
             return { "Role" : amember, "Int" : None }
         else:
-            # Nothing was right about this...
-            return { "Role" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, name)))
+            newMem = roleForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Role" : newMem, "Int" : None }
+            else:
+                # Nothing was right about this...
+                return { "Role" : None, "Int" : None }
     try:
         # Let's cast the last item as an int and catch any exceptions
         theInt = int(theList[len(theList)-1])
@@ -100,8 +133,16 @@ def checkRoleForInt(name, server):
         if amember:
             return { "Role" : amember, "Int" : theInt }
         else:
-            # Nothing was right about this...
-            return { "Role" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, newMemberName)))
+            newMem = roleForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Role" : newMem, "Int" : theInt }
+            else:
+                # Nothing was right about this...
+                return { "Role" : None, "Int" : None }
     except ValueError:
         # Last section wasn't an int
         amember = roleForName(name, server)
@@ -109,6 +150,15 @@ def checkRoleForInt(name, server):
             # Name was just a role - return
             return { "Role" : amember, "Int" : None }
         else:
-            return { "Role" : None, "Int" : None }
+            # Now we check if we got an ID instead
+            # Get just the numbers
+            memID = ''.join(list(filter(str.isdigit, name)))
+            newMem = roleForID(memID, server)
+            if newMem:
+                # We FOUND it!
+                return { "Role" : newMem, "Int" : None }
+            else:
+                # Nothing was right about this...
+                return { "Role" : None, "Int" : None }
     # Should never get here
     return None
