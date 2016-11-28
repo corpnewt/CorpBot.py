@@ -532,6 +532,6 @@ class Setup:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
-		await self.bot.send_message(author, '__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `$help`.\n\nThanks!'.format(server.name, DisplayName.name(author)))
+		await self.bot.send_message(author, '__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `$help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(server.name, DisplayName.name(author)))
 
 # Calling a bot command:  await self.setup.callback(self, ctx)
