@@ -302,7 +302,7 @@ class Lists:
 				found = True
 		if not found:		
 			hackList.append({"Name" : name, "Hack" : hack, "CreatedBy" : DisplayName.name(author), "CreatedID": author.id, "Created" : currentTime})
-			msg = '*{}* added to link list!'.format(name)
+			msg = '*{}* added to hack list!'.format(name)
 		
 		self.settings.setServerStat(server, "Hacks", hackList)
 		await self.bot.send_message(channel, msg)
