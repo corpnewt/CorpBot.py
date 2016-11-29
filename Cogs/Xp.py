@@ -202,7 +202,7 @@ class Xp:
 					if xpAmount > len(memSorted):
 						# More xp than members
 						leftover = xpAmount % len(memSorted)
-						eachXP = xpAmount/len(memSorted)
+						eachXP = (xpAmount-leftover)/len(memSorted)
 						for i in range(0, len(memSorted)):
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							if leftover>0:
