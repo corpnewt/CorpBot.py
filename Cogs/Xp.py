@@ -199,18 +199,24 @@ class Xp:
 				if len(memSorted):
 					# There actually ARE members in said role
 					totalXP = xpAmount
-					while xpAmount > 0:
+					if xpAmount > len(memSorted):
+						# More xp than members
+						leftover = xpAmount % len(memSorted)
+						eachXP = xpAmount/len(memSorted)
 						for i in range(0, len(memSorted)):
-							if xpAmount <= 0:
-								break
+							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
+							if leftover>0:
+								self.settings.incrementStat(cMember, server, "XP", eachXP+1)
+								leftover -= 1
+							else:
+								self.settings.incrementStat(cMember, server, "XP", eachXP)
+							await self.checkroles(cMember, channel)
+					else:
+						for i in range(0, xpAmount):
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							self.settings.incrementStat(cMember, server, "XP", 1)
-							xpAmount -= 1
-					# After looping
-					for i in range(0, len(memSorted)):
-						# Check each member in our list for role changes
-						cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
-						await self.checkroles(cMember, channel)
+							await self.checkroles(cMember, channel)
+
 					# Decrement if needed
 					if decrement:
 						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
