@@ -1,9 +1,11 @@
 import asyncio
 import discord
+from   datetime    import datetime
 from   discord.ext import commands
+from   shutil      import copyfile
 import json
 import os
-from   Cogs import DisplayName
+from   Cogs        import DisplayName
 
 
 # This is the settings module - it allows the other modules to work with
@@ -18,6 +20,7 @@ class Settings:
 			file = "Settings.json"
 		
 		self.file = file
+		self.backupDir = "Settings-Backup"
 		self.bot = bot
 		self.serverDict = {}
 
@@ -49,36 +52,60 @@ class Settings:
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
 				"Volume"				: "",		# Float volume for music player
-				"DefaultVolume"			: 0.6,	# Default volume for music player
+				"DefaultVolume"			: 0.6,		# Default volume for music player
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
 				"Members" 				: [],		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
 				"ChannelMOTD" 			: []}		# List of channel messages of the day
-		
+
 		# Let's load our settings file
 		if os.path.exists(file):
 			self.serverDict = json.load(open(file))
 		else:
 			# File doesn't exist - create a placeholder
 			self.serverDict = {}
-		
-		# Removed for now as it may not be necessary,
-		# Servers should auto-add whenever a user/server value
-		# is requested or changed
-		'''# Now we go through all the servers the bot is in and
-		# make sure they're initialized
-		for server in bot.servers:
-			# Iterate through the servers and add them
-			checkServer(server, globals.serverList)
-			for user in server.members:
-				checkUser(user, server, globals.serverList)'''
+
+		self.bot.loop.create_task(self.backup())
 
 	def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 		return { 'Ignore' : False, 'Delete' : False}
+
+	async def backup(self):
+		while not self.bot.is_closed:
+			# Initial backup - then wait
+			if not os.path.exists(self.backupDir):
+				# Create it
+				os.makedirs(self.backupDir)
+			# Flush settings - then backup
+			self.flushSettings()
+			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+			copyfile("./{}".format(self.file), "./{}/Backup-{}.json".format(self.backupDir, timeStamp))
+
+			# Get curr dir and change curr dir
+			retval = os.getcwd()
+			os.chdir(self.backupDir)
+
+			# Get reverse sorted backups
+			backups = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+			numberToRemove = None
+			if len(backups) > self.backupMax:
+				# We have more than 100 backups right now, let's prune
+				numberToRemove = len(backups)-self.backupMax
+				for i in range(0, numberToRemove):
+					os.remove(backups[i])
+			
+			# Restore curr dir
+			os.chdir(retval)
+			if numberToRemove:
+				print("Settings Backed Up ({} removed): {}".format(numberToRemove, timeStamp))
+			else:
+				print("Settings Backed Up: {}".format(timeStamp))
+			await asyncio.sleep(self.backupTime)
+
 
 	def getServerDict(self):
 		# Returns the server dictionary
