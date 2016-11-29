@@ -21,6 +21,8 @@ class Settings:
 		
 		self.file = file
 		self.backupDir = "Settings-Backup"
+		self.backupMax = 100
+		self.backupTime = 7200 # runs every 2 hours
 		self.bot = bot
 		self.serverDict = {}
 
