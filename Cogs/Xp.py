@@ -227,6 +227,9 @@ class Xp:
 					await self.bot.send_message(channel, msg)
 
 			else:
+				# Decrement if needed
+				if decrement:
+					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 				msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
 				await self.bot.send_message(channel, msg)
