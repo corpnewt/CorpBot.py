@@ -64,6 +64,22 @@ class Admin:
 		if isAdmin:
 			ignore = False
 			delete = False
+
+		# Get Owner and OwnerLock
+		try:
+			ownerLock = self.settings.serverDict['OwnerLock']
+		except KeyError:
+			ownerLock = "No"
+		try:
+			owner = self.settings.serverDict['Owner']
+		except KeyError:
+			owner = None
+		# Check if owner exists - and we're in OwnerLock
+		if owner and ownerLock.lower() == "yes":
+			# Check if the message author is the owner or not
+			if not message.author.id == owner:
+				# Not the owner - ignore
+				ignore = True
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
@@ -845,6 +861,11 @@ class Admin:
 		
 		promoSorted = sorted(ignoreArray, key=itemgetter('Name'))
 		
+		if not len(promoSorted):
+			msg = 'I\'m not currently ignoring anyone.'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
 		roleText = "Currently Ignored Users:\n"
 
 		for arole in promoSorted:

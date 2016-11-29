@@ -351,6 +351,46 @@ class Settings:
 				x[stat] = value
 				self.flushSettings()
 
+	@commands.command(pass_context=True)
+	async def ownerlock(self, ctx):
+		"""Locks/unlocks the bot to only respond to the owner."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I cannot be locked until I have an owner.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
+				await self.bot.send_message(channel, msg)
+				return
+			# We have an owner - and the owner is talking to us
+			# Let's try and get the OwnerLock setting and toggle it
+			try:
+				ownerLock = self.serverDict['OwnerLock']
+			except KeyError:
+				ownerLock = "No"
+			# OwnerLock defaults to "No"
+			if ownerLock.lower() == "no":
+				self.serverDict['OwnerLock'] = "Yes"
+				msg = 'Owner lock **Enabled**.'
+				await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
+			else:
+				self.serverDict['OwnerLock'] = "No"
+				msg = 'Owner lock **Disabled**.'
+				await self.bot.change_presence(game=None)
+			await self.bot.send_message(channel, msg)
+			self.flushSettings()
+
 	
 	@commands.command(pass_context=True)
 	async def owner(self, ctx, member : discord.Member = None):
