@@ -42,7 +42,7 @@ class Xp:
 						self.settings.incrementStat(user, server, "XPReserve", int(xpAmount))
 
 	@commands.command(pass_context=True)
-	async def setxp(self, ctx, member : discord.Member = None, xpAmount : int = None):
+	async def setxp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Sets an absolute value for the member's xp (admin only)."""
 		
 		author  = ctx.message.author
