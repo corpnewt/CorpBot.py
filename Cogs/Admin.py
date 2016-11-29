@@ -178,12 +178,26 @@ class Admin:
 		if not isAdmin:
 			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 			return
-
+		if xpAmount == None:
+			# Check if we have trailing xp
+			nameCheck = DisplayName.checkNameForInt(member, server)
+			if not nameCheck:
+				await self.bot.send_message(ctx.message.channel, usage)
+				return
+			if not nameCheck["Member"]:
+				msg = 'I couldn\'t find *{}* on the server.'.format(member)
+				await self.bot.send_message(ctx.message.channel, msg)
+				return
+			member   = nameCheck["Member"]
+			xpAmount = nameCheck["Int"]
+			
 		# Check for formatting issues
-		if not (xpAmount or member):
+		if not xpAmount:
+			# Still no xp
 			msg = 'Usage: `$setxpreserve [member] [amount]`'
 			await self.bot.send_message(channel, msg)
 			return
+		
 		if not type(xpAmount) is int:
 			msg = 'Usage: `$setxpreserve [member] [amount]`'
 			await self.bot.send_message(channel, msg)
