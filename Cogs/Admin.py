@@ -166,7 +166,7 @@ class Admin:
 		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
-	async def setxpreserve(self, ctx, member : discord.Member = None, xpAmount : int = None):
+	async def setxpreserve(self, ctx, *, member = None, xpAmount : int = None):
 		"""Set's an absolute value for the member's xp reserve (admin only)."""
 		
 		author  = ctx.message.author
