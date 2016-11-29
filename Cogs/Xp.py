@@ -95,9 +95,12 @@ class Xp:
 		server  = ctx.message.server
 		channel = ctx.message.channel
 
+		usage = 'Usage: `$xp [role/member] [amount]`'
+
+		isRole = False
+
 		if member == None:
-			msg = 'Usage: `$xp [member] [amount]`'
-			await self.bot.send_message(ctx.message.channel, msg)
+			await self.bot.send_message(ctx.message.channel, usage)
 			return
 
 		# Check for formatting issues
@@ -105,37 +108,37 @@ class Xp:
 			# Either xp wasn't set - or it's the last section
 			if type(member) is str:
 				# It' a string - the hope continues
-				nameCheck = DisplayName.checkNameForInt(member, server)
-				print(nameCheck)
-				if not nameCheck:
-					msg = 'Usage: `$xp [member] [amount]`'
-					await self.bot.send_message(ctx.message.channel, msg)
-					return
-				if not nameCheck["Member"]:
+				roleCheck = DisplayName.checkRoleForInt(member, server)
+				if not roleCheck:
+					# Returned nothing - means there isn't even an int
 					msg = 'I couldn\'t find *{}* on the server.'.format(member)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
-				member   = nameCheck["Member"]
-				xpAmount = nameCheck["Int"]
+				if roleCheck["Role"]:
+					isRole = True
+					member   = roleCheck["Role"]
+					xpAmount = roleCheck["Int"]
+				else:
+					# Role is invalid - check for member instead
+					nameCheck = DisplayName.checkNameForInt(member, server)
+					if not nameCheck:
+						await self.bot.send_message(ctx.message.channel, usage)
+						return
+					if not nameCheck["Member"]:
+						msg = 'I couldn\'t find *{}* on the server.'.format(member)
+						await self.bot.send_message(ctx.message.channel, msg)
+						return
+					member   = nameCheck["Member"]
+					xpAmount = nameCheck["Int"]
 
 		if xpAmount == None:
 			# Still no xp
-			msg = 'Usage: `$xp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
+			await self.bot.send_message(ctx.message.channel, usage)
 			return
 		if not type(xpAmount) is int:
-			msg = 'Usage: `$xp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
+			await self.bot.send_message(ctx.message.channel, usage)
 			return
 
-		if type(member) is str:
-			amember = DisplayName.memberForName(member, server)
-			if amember:
-				member = amember
-			else:
-				msg = 'Usage: `$xp [member/role] [amount]`'
-				await self.bot.send_message(channel, msg)
-				return
 		# Get our user/server stats
 		isAdmin    = author.permissions_in(channel).administrator
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
@@ -174,14 +177,56 @@ class Xp:
 			decrement = False
 
 		if approve:
-			# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
-			msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
-			await self.bot.send_message(channel, msg)
-			self.settings.incrementStat(member, server, "XP", xpAmount)
-			if decrement:
-				self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
-			# Now we check for promotions
-			await self.checkroles(member, channel)
+
+			if isRole:
+				# XP was approved - let's iterate through the users of that role,
+				# starting with the lowest xp
+				#
+				# Work through our members
+				memberList = []
+				sMemberList = self.settings.getServerStat(server, "Members")
+				for amem in server.members:
+					roles = amem.roles
+					if member in roles:
+						# This member has our role
+						# Add to our list
+						for smem in sMemberList:
+							# Find our server entry
+							if smem["ID"] == amem.id:
+								# Add it.
+								memberList.append(smem)
+				memSorted = sorted(memberList, key=lambda x:int(x['XP']))
+				if len(memSorted):
+					# There actually ARE members in said role
+					totalXP = xpAmount
+					while xpAmount > 0:
+						for i in range(0, len(memSorted)):
+							if xpAmount <= 0:
+								break
+							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
+							self.settings.incrementStat(cMember, server, "XP", 1)
+							xpAmount -= 1
+					# After looping
+					for i in range(0, len(memSorted)):
+						# Check each member in our list for role changes
+						cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
+						await self.checkroles(cMember, channel)
+					# Decrement if needed
+					if decrement:
+						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
+					msg = '*{} collective xp* was given to *{}!*'.format(totalXP, member.name)
+					await self.bot.send_message(channel, msg)
+				else:
+					msg = 'There are no members in *{}!*'.format(member.name)
+					await self.bot.send_message(channel, msg)
+
+			else:
+				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
+				msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
+				await self.bot.send_message(channel, msg)
+				self.settings.incrementStat(member, server, "XP", xpAmount)
+				# Now we check for promotions
+				await self.checkroles(member, channel)
 		else:
 			await self.bot.send_message(channel, msg)
 			
