@@ -23,6 +23,7 @@ class Settings:
 		self.backupDir = "Settings-Backup"
 		self.backupMax = 100
 		self.backupTime = 7200 # runs every 2 hours
+		self.backupWait = 10 # initial wait time before first backup
 		self.bot = bot
 		self.serverDict = {}
 
@@ -77,15 +78,16 @@ class Settings:
 		return { 'Ignore' : False, 'Delete' : False}
 
 	async def backup(self):
+		# Wait initial time - then start loop
+		await asyncio.sleep(self.backupWait)
 		while not self.bot.is_closed:
 			# Initial backup - then wait
 			if not os.path.exists(self.backupDir):
 				# Create it
 				os.makedirs(self.backupDir)
-			# Flush settings - then backup
-			self.flushSettings()
+			# Flush backup
 			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-			copyfile("./{}".format(self.file), "./{}/Backup-{}.json".format(self.backupDir, timeStamp))
+			self.flushSettings("./{}/Backup-{}.json".format(self.backupDir, timeStamp))
 
 			# Get curr dir and change curr dir
 			retval = os.getcwd()
@@ -602,8 +604,13 @@ class Settings:
 				
 				
 	# Flush settings to disk
-	def flushSettings(self):
-		json.dump(self.serverDict, open(self.file, 'w'), indent=2)
+	def flushSettings(self, file = None):
+		if not file:
+			file = self.file
+		if os.path.exists(file):
+			# Delete file - then flush new settings
+			os.remove(file)
+		json.dump(self.serverDict, open(file, 'w'), indent=2)
 
 	@commands.command(pass_context=True)
 	async def prunelocalsettings(self, ctx):
