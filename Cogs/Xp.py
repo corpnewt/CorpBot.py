@@ -199,6 +199,8 @@ class Xp:
 				memberList = []
 				sMemberList = self.settings.getServerStat(server, "Members")
 				for amem in server.members:
+					if amem == author:
+						continue
 					roles = amem.roles
 					if member in roles:
 						# This member has our role
@@ -236,7 +238,7 @@ class Xp:
 					msg = '*{} collective xp* was given to *{}!*'.format(totalXP, member.name)
 					await self.bot.send_message(channel, msg)
 				else:
-					msg = 'There are no members in *{}!*'.format(member.name)
+					msg = 'There are no eligible members in *{}!*'.format(member.name)
 					await self.bot.send_message(channel, msg)
 
 			else:
