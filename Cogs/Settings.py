@@ -189,6 +189,13 @@ class Settings:
 	
 	# Let's make sure the user is in the specified server
 	def checkUser(self, user, server):
+		# Preliminary check *if* it's a user
+		try:
+			tempID = user.id
+			print("User")
+		except:
+			print("Not real user")
+			return
 		# Make sure our server exists in the list
 		self.checkServer(server)
 		# Check for our username
