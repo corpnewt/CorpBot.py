@@ -256,6 +256,13 @@ async def on_message(message):
 		await bot.process_commands(message)
 		return
 
+	try:
+		message.author.roles
+	except AttributeError:
+		# Not a User
+		await bot.process_commands(message)
+		return
+
 	# Admin Override - always allow admin commands
 	#if message.author.permissions_in(message.channel).administrator:
 		#await bot.process_commands(message)
