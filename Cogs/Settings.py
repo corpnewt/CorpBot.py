@@ -194,7 +194,7 @@ class Settings:
 			tempID = user.id
 			print("User: {} ({})".format(user.name, user.id))
 		except:
-			print("Not real user")
+			print("Not real user: {}".format(user))
 			return
 		# Make sure our server exists in the list
 		self.checkServer(server)
