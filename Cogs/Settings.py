@@ -192,7 +192,7 @@ class Settings:
 		# Preliminary check *if* it's a user
 		try:
 			tempID = user.id
-			print("User")
+			print("User: {} ({})".format(user.name, user.id))
 		except:
 			print("Not real user")
 			return
