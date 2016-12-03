@@ -26,6 +26,7 @@ from Cogs import Setup
 from Cogs import Invite
 from Cogs import UrbanDict
 from Cogs import Server
+from Cogs import Fliptime
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -117,6 +118,11 @@ cogList.append(urban)
 
 server = Server.Server(bot, settings)
 cogList.append(server)
+
+# Flip
+
+fliptime = Fliptime.Fliptime(bot, settings)
+cogList.append(fliptime)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
@@ -269,21 +275,30 @@ async def on_message(message):
 		#return
 	
 	# Check if we need to ignore or delete the message
+	# or respond or replace
 	ignore = delete = False
+	respond = None
 	for cog in cogList:
 		check = cog.message(message)
 		if check['Delete']:
 			delete = True
 		if check['Ignore']:
 			ignore = True
-	
+		try:
+			respond = check['Respond']
+		except KeyError:
+			pass
+
+	if respond:
+		# We have something to say
+		await bot.send_message(message.channel, respond)
 	if delete:
+		# We need to delete the message - top priority
 		await bot.delete_message(message)
-	if ignore:
-		return
-	
-	settings.flushSettings()
-	await bot.process_commands(message)
+
+	if not ignore:
+		# We're processing commands here
+		await bot.process_commands(message)
 	
 	
 
