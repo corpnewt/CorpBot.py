@@ -30,16 +30,41 @@ class Fliptime:
 						isAdmin = True
 
 		# Check if the message contains the flip chars
-		if message.content.startswith('(') and message.content.endswith('┻'):
+
+		# if message.content.startswith('(') and message.content.endswith('┻'):
+		conts = message.content
+		face = table = False
+		if '(' in conts:
+			if ')' in conts or '）' in conts:
+				face = True
+		if '┻' in conts:
+			table = True
+		if face and table:
+			# Contains all characters
 			# Table flip - add time
 			currentTime = int(time.time())
 			cooldownFinal = currentTime+60
-			coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 			alreadyMuted = self.settings.getUserStat(message.author, message.server, "Muted")
-			if not isAdmin and alreadyMuted.lower() == "no":
-				self.settings.setUserStat(message.author, message.server, "Muted", "Yes")
+			if not isAdmin:
+				# Check if we're muted already
+				previousCooldown = self.settings.getUserStat(message.author, message.server, "Cooldown")
+				if not previousCooldown:
+					if alreadyMuted.lower() == "yes":
+						# We're perma-muted - ignore
+						return { 'Ignore' : False, 'Delete' : False}
+
+					previousCooldown = 0
+				if int(previousCooldown) > currentTime:
+					# Already cooling down - add to it.
+					cooldownFinal = previousCooldown+60
+					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, I understand that you\'re frustrated, but we still don\'t flip tables here.  Why don\'t you cool down for *{}* instead.'.format(DisplayName.name(message.author), coolText)
+				else:
+					# Not cooling down - start it
+					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
 				self.settings.setUserStat(message.author, message.server, "Cooldown", cooldownFinal)
-				res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
+				self.settings.setUserStat(message.author, message.server, "Muted", "Yes")
 				return { 'Ignore' : True, 'Delete' : True, 'Respond' : res }		
 
 		return { 'Ignore' : False, 'Delete' : False}

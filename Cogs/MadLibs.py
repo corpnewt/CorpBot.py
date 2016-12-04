@@ -16,6 +16,9 @@ class MadLibs:
 		self.settings = settings
 		# Setup/compile our regex
 		self.regex = re.compile(r"\[\[[^\[\]]+\]\]")
+		self.botPrefix = "$"
+		self.prefix = "$ml"
+		self.leavePrefix = "$mleave"
 		
 
 	def message(self, message):
@@ -26,7 +29,7 @@ class MadLibs:
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
-		"""Let's play MadLibs!  Start with $madlibs, select works with $ml [your word], and leave with $mleave."""
+		"""Let's play MadLibs!"""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -64,7 +67,7 @@ class MadLibs:
 		
 		# Check if we're already in a game
 		if self.settings.getServerStat(server, "PlayingMadLibs"):
-			msg = 'I\'m already playing MadLibs - use `$ml [your word]` to submit answers.'
+			msg = 'I\'m already playing MadLibs - use `{} [your word]` to submit answers.'.format(self.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 		
@@ -95,12 +98,12 @@ class MadLibs:
 		i = 0
 		while i < len(words):
 			# Ask for the next word
-			msg = "I need a/an **{}** (word *{}/{}*).  `$ml [your word]`".format(words[i][2:-2], str(i+1), str(len(words)))
+			msg = "I need a/an **{}** (word *{}/{}*).  `{} [your word]`".format(words[i][2:-2], str(i+1), str(len(words)), self.prefix)
 			await self.bot.send_message(channel, msg)
 
 			# Setup the check
 			def check(msg):	
-				return msg.content.startswith('$ml')
+				return msg.content.startswith(self.prefix)
 
 			# Wait for a response
 			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
@@ -113,7 +116,7 @@ class MadLibs:
 				return
 
 			# Check if the message is to leave
-			if talk.content.startswith('$mleave'):
+			if talk.content.startswith(self.leavePrefix):
 				if talk.author is author:
 					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await self.bot.send_message(channel, msg)
@@ -128,9 +131,9 @@ class MadLibs:
 			# We got a relevant message
 			word = talk.content
 			# Let's remove the $ml prefix (with or without space)
-			if word.startswith('$ml '):
+			if word.startswith('{} '.format(self.prefix)):
 				word = word[4:]
-			if word.startswith('$ml'):
+			if word.startswith(self.prefix):
 				word = word[3:]
 			
 			# Check capitalization
