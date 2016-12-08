@@ -566,7 +566,7 @@ class Xp:
 		total = 10
 		msg = ""
 
-		if len(promoSorted) < 9:
+		if len(promoSorted) < 10:
 			total = len(promoSorted)
 		
 		if len(promoSorted):
@@ -606,7 +606,7 @@ class Xp:
 		total = 10
 		msg = ""
 
-		if len(promoSorted) < 9:
+		if len(promoSorted) < 10:
 			total = len(promoSorted)
 		
 		if len(promoSorted):

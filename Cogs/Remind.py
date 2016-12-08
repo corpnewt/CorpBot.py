@@ -40,6 +40,9 @@ class Remind:
 		if not str(member.status).lower() == "offline":
 			# Well, they're not Offline...
 			reminders = self.settings.getUserStat(member, member.server, "Reminders")
+			# Verify reminder is still valid
+			if not reminder in reminders:
+				return
 			server = reminder['Server']
 			message = reminder['Message']
 
@@ -113,6 +116,48 @@ class Remind:
 		# Confirm the reminder
 		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.format(DisplayName.name(ctx.message.author), readableTime)
 		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def reminders(self, ctx):
+		"""List up to 10 pending reminders."""
+		member = ctx.message.author
+		myReminders = self.settings.getUserStat(member, member.server, "Reminders")
+		msg = 'You don\'t currently have any reminders set.  You can add some with the `$remindme "[message]" [time]` command.'
+		
+		if not len(myReminders):
+			# No reminders
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+		
+		mySorted = sorted(myReminders, key=lambda x:int(x['End']))
+		currentTime = int(time.time())
+		total  = 10 # Max number to list
+		remain = 0
+
+		if len(mySorted) < 10:
+			# Less than 10 - set the total
+			total = len(mySorted)
+		else:
+			# More than 10 - let's find out how many remain after
+			remain = len(mySorted)-10
+
+		if len(mySorted):
+			# We have at least 1 item
+			msg = '***{}\'s*** **Remaining Reminders:**\n'.format(DisplayName.name(member))
+
+		for i in range(0, total):
+			endTime = int(mySorted[i]['End'])
+			# Get our readable time
+			readableTime = ReadableTime.getReadableTimeBetween(currentTime, endTime)
+			msg = '{}\n{}. {} - in *{}*'.format(msg, i+1, mySorted[i]['Message'], readableTime)
+		
+		if remain == 1:
+			msg = '{}\n\nYou have *{}* additional reminder.'.format(msg, remain)
+		elif remain > 1:
+			msg = '{}\n\nYou have *{}* additional reminders.'.format(msg, remain)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+
 
 	@commands.command(pass_context=True)
 	async def clearmind(self, ctx):
