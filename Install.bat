@@ -65,6 +65,11 @@ echo.
 call :install "parsedatetime"
 echo.
 
+echo Installing Psutil...
+echo.
+call :install "psutil"
+echo.
+
 echo Done.
 timeout 5 > nul
 exit /b

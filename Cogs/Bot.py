@@ -1,10 +1,14 @@
 import asyncio
 import discord
 import os
+import psutil
+import platform
+import time
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import ReadableTime
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -14,6 +18,7 @@ class Bot:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.startTime = int(time.time())
 		
 	@commands.command(pass_context=True)
 	async def nickname(self, ctx, *, name : str = None):
@@ -29,6 +34,35 @@ class Bot:
 		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
 		botMember = ctx.message.server.get_member_named(botName)
 		await self.bot.change_nickname(botMember, name)
+
+	@commands.command(pass_context=True)
+	async def hostinfo(self, ctx):
+		"""List info about the bot's host environment."""
+		cpuCores    = psutil.cpu_count(logical=False)
+		cpuThred    = psutil.cpu_count()
+		cpuUsage    = psutil.cpu_percent(interval=1)
+		memStats    = psutil.virtual_memory()
+		memPerc     = memStats.percent
+		memTotal    = memStats.total
+		memTotalGB  = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
+		currentOS   = platform.platform()
+		system      = platform.system()
+		release     = platform.release()
+		version     = platform.version()
+		processor   = platform.processor()
+		botMember   = DisplayName.memberForID(self.bot.user.id, ctx.message.server)
+		botName     = DisplayName.name(botMember)
+		currentTime = int(time.time())
+		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+
+		msg = '***{}\'s*** **Home:**\n\n'.format(botName)
+		msg += '*{}*\n'.format(currentOS)
+		msg += '*{}% of {} ({} cores/{} threads)*\n'.format(cpuUsage, processor, cpuCores, cpuThred)
+		msg += '*{}% of {}GB RAM*\n'.format(memPerc, memTotalGB)
+		msg += '*{} uptime*'.format(timeString)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+
 
 	@commands.command(pass_context=True)
 	async def avatar(self, ctx, filename : str = None, sizeLimit : int = 8000000):

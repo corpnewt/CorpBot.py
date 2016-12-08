@@ -26,6 +26,11 @@ function main () {
     echo
     update "parsedatetime"
     echo
+
+    echo Updating Psutil...
+    echo
+    update "psutil"
+    echo
     
     echo Done.
     sleep 5
