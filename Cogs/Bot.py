@@ -38,8 +38,9 @@ class Bot:
 	@commands.command(pass_context=True)
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
-		cpuCores    = psutil.cpu_count(logical=False)
-		cpuThred    = psutil.cpu_count()
+		# cpuCores    = psutil.cpu_count(logical=False)
+		# cpuThred    = psutil.cpu_count()
+		cpuThred    = os.cpu_count()
 		cpuUsage    = psutil.cpu_percent(interval=1)
 		memStats    = psutil.virtual_memory()
 		memPerc     = memStats.percent
@@ -57,7 +58,7 @@ class Bot:
 
 		msg = '***{}\'s*** **Home:**\n\n'.format(botName)
 		msg += '*{}*\n'.format(currentOS)
-		msg += '*{}% of {} ({} cores/{} threads)*\n'.format(cpuUsage, processor, cpuCores, cpuThred)
+		msg += '*{}% of {} ({} thread[s])*\n'.format(cpuUsage, processor, cpuCores, cpuThred)
 		msg += '*{}% of {}GB RAM*\n'.format(memPerc, memTotalGB)
 		msg += '*{} uptime*'.format(timeString)
 
