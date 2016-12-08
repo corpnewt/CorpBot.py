@@ -1135,6 +1135,84 @@ class Admin:
 		await self.bot.say(msg)
 		
 		
+	@commands.command(pass_context=True)
+	async def kick(self, ctx, *, member : discord.Member = None):
+		"""Kicks the selected member (admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to kick
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+		
+		if not member:
+			await self.bot.send_message(ctx.message.channel, 'Usage: `$kick [member]`')
+			return
+		
+		# Check if the targeted user is admin
+		isTAdmin = member.permissions_in(ctx.message.channel).administrator
+		if not isTAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in member.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isTAdmin = True
+		
+		# Can't kick other admins
+		if isTAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You can\'t kick other admins with this command.')
+			return
+		
+		# We can kick
+		await self.bot.send_message(ctx.message.channel, 'If this were live - you would have kicked *{}*'.format(DisplayName.name(member)))
+		
+		
+	@commands.command(pass_context=True)
+	async def ban(self, ctx, *, member : discord.Member = None):
+		"""Bans the selected member (admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to ban
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+		
+		if not member:
+			await self.bot.send_message(ctx.message.channel, 'Usage: `$ban [member]`')
+			return
+		
+		# Check if the targeted user is admin
+		isTAdmin = member.permissions_in(ctx.message.channel).administrator
+		if not isTAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in member.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isTAdmin = True
+		
+		# Can't ban other admins
+		if isTAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You can\'t ban other admins with this command.')
+			return
+		
+		# We can ban
+		await self.bot.send_message(ctx.message.channel, 'If this were live - you would have **banned** *{}*'.format(DisplayName.name(member)))
+		
+		
 	async def updateMOTD(self):
 		for server in self.bot.servers:
 			try:
