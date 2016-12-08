@@ -65,6 +65,7 @@ class Fliptime:
 					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
 				self.settings.setUserStat(message.author, message.server, "Cooldown", cooldownFinal)
 				self.settings.setUserStat(message.author, message.server, "Muted", "Yes")
-				return { 'Ignore' : True, 'Delete' : True, 'Respond' : res }		
+				await self.bot.send_message(message.channel, res)
+				return { 'Ignore' : True, 'Delete' : True }		
 
 		return { 'Ignore' : False, 'Delete' : False}
