@@ -6,6 +6,7 @@ from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
+from   Cogs import DisplayName
 
 # This is the Remind module. It sends a pm to a user after a specified amount of time
 
@@ -39,11 +40,13 @@ class Remind:
 		if not str(member.status).lower() == "offline":
 			# Well, they're not Offline...
 			reminders = self.settings.getUserStat(member, member.server, "Reminders")
+			server = reminder['Server']
 			message = reminder['Message']
 
 			if not message:
 				message = 'You wanted me to remind you of something...'
-			await self.bot.send_message(member, message)
+			msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
+			await self.bot.send_message(member, msg)
 			reminders.remove(reminder)
 			self.settings.setUserStat(member, member.server, "Reminders", reminders)
 					
@@ -63,9 +66,11 @@ class Remind:
 					if timeLeft <= 0:
 						# Out of time - PM
 						message = reminder['Message']
+						server  = reminder['Server']
 						if not message:
 							message = 'You wanted me to remind you of something...'
-						await self.bot.send_message(member, message)
+						msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
+						await self.bot.send_message(member, msg)
 						removeList.append(reminder)
 			if len(removeList):
 				# We have spent reminders
@@ -98,7 +103,7 @@ class Remind:
 
 		# Add reminder
 		reminders = self.settings.getUserStat(ctx.message.author, ctx.message.server, "Reminders")
-		reminder = { 'End' : end, 'Message' : message }
+		reminder = { 'End' : end, 'Message' : message, 'Server' : ctx.message.server.name }
 		reminders.append(reminder)
 		self.settings.setUserStat(ctx.message.author, ctx.message.server, "Reminders", reminders)
 
@@ -106,7 +111,7 @@ class Remind:
 		self.bot.loop.create_task(self.checkRemind(ctx.message.author, reminder))
 		
 		# Confirm the reminder
-		msg = 'I\'ll remind you in *{}*.'.format(readableTime)
+		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.format(DisplayName.name(ctx.message.author), readableTime)
 		await self.bot.send_message(ctx.message.channel, msg)
 
 	@commands.command(pass_context=True)
@@ -116,5 +121,5 @@ class Remind:
 
 		self.settings.setUserStat(member, member.server, "Reminders", [])
 
-		msg = 'Your calendar has been cleared of reminders!'
+		msg = 'Alright *{}*, your calendar has been cleared of reminders!'.format(DisplayName.name(ctx.message.author))
 		await self.bot.send_message(ctx.message.channel, msg)
