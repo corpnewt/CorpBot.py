@@ -21,6 +21,11 @@ function main () {
     echo
     update "Requests"
     echo
+
+    echo Updating ParseDateTime...
+    echo
+    update "parsedatetime"
+    echo
     
     echo Done.
     sleep 5

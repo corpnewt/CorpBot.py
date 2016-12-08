@@ -60,6 +60,11 @@ echo.
 call :install "requests"
 echo.
 
+echo Installing ParseDateTime...
+echo.
+call :install "parsedatetime"
+echo.
+
 echo Done.
 timeout 5 > nul
 exit /b

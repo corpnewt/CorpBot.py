@@ -25,11 +25,6 @@ class Reddit:
 			posts = 100
 		self.posts = posts
 		self.ua = 'CorpNewt DeepThoughtBot'
-		
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
 
 	def getTitle(self, url, answer : bool = False, image : bool = False):
 		# Load url - with self.posts number of posts

@@ -14,11 +14,6 @@ class Uptime:
 		self.bot = bot
 		self.startTime = int(time.time())
 
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
-
 	@commands.command(pass_context=True)
 	async def uptime(self, ctx):
 		"""Lists the bot's uptime."""

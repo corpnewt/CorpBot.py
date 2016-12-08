@@ -17,11 +17,6 @@ class Example:
 
 	def __init__(self, bot):
 		self.bot = bot
-		
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
 	
 	@commands.command()
 	async def add(self, left : int, right : int):

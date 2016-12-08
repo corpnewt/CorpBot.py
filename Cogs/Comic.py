@@ -17,11 +17,6 @@ class Comic:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
 	
 	def getRandDateBetween(self, first, last):
 		# Takes two date strings "MM-DD-YYYY" and

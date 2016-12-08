@@ -15,11 +15,6 @@ class UrbanDict:
 		self.bot = bot
 		self.settings = settings
 		self.ua = 'CorpNewt DeepThoughtBot'
-		
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
 
 	@commands.command(pass_context=True)
 	async def define(self, ctx, *, word : str):

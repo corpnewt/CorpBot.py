@@ -72,11 +72,6 @@ class Settings:
 
 		self.bot.loop.create_task(self.backup())
 
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
-
 	async def backup(self):
 		# Wait initial time - then start loop
 		await asyncio.sleep(self.backupWait)
@@ -230,6 +225,9 @@ class Settings:
 						if not "Cooldown" in y:
 							y["Cooldown"] = None
 							needsUpdate = True
+						if not "Reminders" in y:
+							y["Reminders"] = []
+							needsUpdate = True
 						# Check for empty values that need numbers
 						if not y["XP"]:
 							y["XP"] = 0
@@ -246,7 +244,8 @@ class Settings:
 								"Discriminator" : user.discriminator,
 								"Parts"			: "",
 								"Muted"			: "No",
-								"LastOnline"	: "Unknown" }
+								"LastOnline"	: "Unknown",
+								"Reminders"		: [] }
 					if not newUser["XP"]:
 						newUser["XP"] = 0
 					if not newUser["XPReserve"]:

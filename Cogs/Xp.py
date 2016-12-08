@@ -17,11 +17,6 @@ class Xp:
 		self.settings = settings
 		self.bot.loop.create_task(self.addXP())
 		
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
-		
 	async def addXP(self):
 		while not self.bot.is_closed:
 			await asyncio.sleep(3600) # runs only every 1 hour (3600 seconds)
