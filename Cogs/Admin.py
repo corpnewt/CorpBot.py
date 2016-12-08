@@ -17,11 +17,12 @@ class Admin:
 		self.bot = bot
 		self.settings = settings
 		
-	def message(self, message):
+	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 		ignore = False
 		delete = False
+		res    = None
 		# Check if user is muted
 		isMute = self.settings.getUserStat(message.author, message.server, "Muted")
 
@@ -42,13 +43,24 @@ class Admin:
 			if checkTime:
 				checkTime = int(checkTime)
 			currentTime = int(time.time())
+			
+			# Build our PM
+			if checkTime:
+				# We have a cooldown
+				checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
+				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, message.server.name)
+			else:
+				# No cooldown - muted indefinitely
+				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(message.server.name)
 
 			if checkTime and currentTime >= checkTime:
 				# We have passed the check time
 				ignore = False
 				delete = False
+				res    = None
 				self.settings.setUserStat(message.author, message.server, "Cooldown", None)
 				self.settings.setUserStat(message.author, message.server, "Muted", "No")
+			
 		
 		ignoreList = self.settings.getServerStat(message.server, "IgnoredUsers")
 		if ignoreList:
@@ -80,6 +92,10 @@ class Admin:
 			if not message.author.id == owner:
 				# Not the owner - ignore
 				ignore = True
+				
+		if res:
+			# We have a response - PM it
+			await self.bot.send_message(message.author, res)
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
