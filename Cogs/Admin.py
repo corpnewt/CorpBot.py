@@ -1136,7 +1136,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def kick(self, ctx, *, member : discord.Member = None):
+	async def kick(self, ctx, *, member : str = None):
 		"""Kicks the selected member (admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -1154,6 +1154,15 @@ class Admin:
 		if not member:
 			await self.bot.send_message(ctx.message.channel, 'Usage: `$kick [member]`')
 			return
+		
+		# Resolve member name -> member
+		newMem = DisplayName.memberForName(member, ctx.message.server)
+		if not newMem:
+			await self.bot.send_message(ctx.message.channel, 'I couldn\'t find *{}*.'.format(member))
+			return
+		
+		# newMem = valid member
+		member = newMem
 		
 		if member.id == ctx.message.author.id:
 			await self.bot.send_message(ctx.message.channel, 'Stop kicking yourself.  Stop kicking yourself.')
@@ -1175,11 +1184,11 @@ class Admin:
 			return
 		
 		# We can kick
-		await self.bot.send_message(ctx.message.channel, 'If this were live - you would have kicked *{}*'.format(DisplayName.name(member)))
+		await self.bot.send_message(ctx.message.channel, 'If this were live - you would have **kicked** *{}*'.format(DisplayName.name(member)))
 		
 		
 	@commands.command(pass_context=True)
-	async def ban(self, ctx, *, member : discord.Member = None):
+	async def ban(self, ctx, *, member : str = None):
 		"""Bans the selected member (admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -1197,6 +1206,15 @@ class Admin:
 		if not member:
 			await self.bot.send_message(ctx.message.channel, 'Usage: `$ban [member]`')
 			return
+		
+		# Resolve member name -> member
+		newMem = DisplayName.memberForName(member, ctx.message.server)
+		if not newMem:
+			await self.bot.send_message(ctx.message.channel, 'I couldn\'t find *{}*.'.format(member))
+			return
+		
+		# newMem = valid member
+		member = newMem
 		
 		if member.id == ctx.message.author.id:
 			await self.bot.send_message(ctx.message.channel, 'Ahh - the ol\' self-ban.  Good try.')
