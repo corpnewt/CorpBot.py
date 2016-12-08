@@ -105,11 +105,6 @@ class Music:
 		self.bot = bot
 		self.voice_states = {}
 		self.settings = settings
-
-	def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		return { 'Ignore' : False, 'Delete' : False}
 		
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
