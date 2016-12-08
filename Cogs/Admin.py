@@ -1155,6 +1155,10 @@ class Admin:
 			await self.bot.send_message(ctx.message.channel, 'Usage: `$kick [member]`')
 			return
 		
+		if member.id == ctx.message.author.id:
+			await self.bot.send_message(ctx.message.channel, 'Stop kicking yourself.  Stop kicking yourself.')
+			return
+		
 		# Check if the targeted user is admin
 		isTAdmin = member.permissions_in(ctx.message.channel).administrator
 		if not isTAdmin:
@@ -1192,6 +1196,10 @@ class Admin:
 		
 		if not member:
 			await self.bot.send_message(ctx.message.channel, 'Usage: `$ban [member]`')
+			return
+		
+		if member.id == ctx.message.author.id:
+			await self.bot.send_message(ctx.message.channel, 'Ahh - the ol\' self-ban.  Good try.')
 			return
 		
 		# Check if the targeted user is admin
