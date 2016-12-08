@@ -302,7 +302,7 @@ async def on_message(message):
 	respond = None
 	for cog in cogList:
 		try:
-			check = cog.message(message)
+			check = await cog.message(message)
 		except AttributeError:
 			# Onto the next
 			continue
