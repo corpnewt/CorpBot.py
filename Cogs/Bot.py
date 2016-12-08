@@ -58,7 +58,7 @@ class Bot:
 
 		msg = '***{}\'s*** **Home:**\n\n'.format(botName)
 		msg += '*{}*\n'.format(currentOS)
-		msg += '*{}% of {} ({} thread[s])*\n'.format(cpuUsage, processor, cpuCores, cpuThred)
+		msg += '*{}% of {} ({} thread[s])*\n'.format(cpuUsage, processor, cpuThred)
 		msg += '*{}% of {}GB RAM*\n'.format(memPerc, memTotalGB)
 		msg += '*{} uptime*'.format(timeString)
 
