@@ -19,7 +19,7 @@ class Feed:
 		self.xp = xp
 		self.bot.loop.create_task(self.getHungry())
 		
-	def message(self, message):
+	async def message(self, message):
 		# Check the message and see if we should allow it.
 		ignore = False
 		delete = False
