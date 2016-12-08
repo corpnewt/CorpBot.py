@@ -4,8 +4,8 @@ def getReadableTimeBetween(first, last):
     weeks   = int(timeBetween/604800)
     days    = int((timeBetween-(weeks*604800))/86400)
     hours   = int((timeBetween-(days*86400 + weeks*604800))/3600)
-    minutes = int((timeBetween-(hours*3600 + days*86400))/60)
-    seconds = int(timeBetween-(minutes*60 + hours*3600 + days*86400))
+    minutes = int((timeBetween-(hours*3600 + days*86400 + weeks*604800))/60)
+    seconds = int(timeBetween-(minutes*60 + hours*3600 + days*86400 + weeks*604800))
     msg = ""
     
     if weeks > 0:

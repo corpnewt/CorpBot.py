@@ -108,3 +108,13 @@ class Remind:
 		# Confirm the reminder
 		msg = 'I\'ll remind you in *{}*.'.format(readableTime)
 		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def clearmind(self, ctx):
+		"""Clear all reminders."""
+		member = ctx.message.author
+
+		self.settings.setUserStat(member, member.server, "Reminders", [])
+
+		msg = 'Your calendar has been cleared of reminders!'
+		await self.bot.send_message(ctx.message.channel, msg)
