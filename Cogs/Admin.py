@@ -866,7 +866,7 @@ class Admin:
 			if member.id == user["ID"]:
 				# Found our user - already ignored
 				found = True
-				msg = '*{}* no longer being ignored.'.format(user["Name"])
+				msg = '*{}* no longer being ignored.'.format(DisplayName.name(member))
 				ignoreList.remove(user)
 
 		if not found:
