@@ -28,10 +28,10 @@ def memberForID(id, server):
 def memberForName(name, server):
     # Check nick first - then name
     for member in server.members:
-        if member.nick == name:
+        if member.nick.lower() == name.lower():
             return member
     for member in server.members:
-        if member.name == name:
+        if member.name.lower() == name.lower():
             return member
     # No member yet - try ID
     memID = ''.join(list(filter(str.isdigit, name)))
@@ -48,7 +48,7 @@ def roleForID(id, server):
 
 def roleForName(name, server):
     for role in server.roles:
-        if role.name == name:
+        if role.name.lower() == name.lower():
             return role
     return None
 
