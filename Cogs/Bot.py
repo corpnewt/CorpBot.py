@@ -20,6 +20,18 @@ class Bot:
 		self.settings = settings
 		self.startTime = int(time.time())
 		
+	async def onready(self):
+		# Get ready - play game!
+		game = None
+		try:
+			game = self.settings.serverDict['Game']
+		except KeyError:
+			pass
+		if game:
+			await self.bot.change_presence(game=discord.Game(name=game))
+		else:
+			await self.bot.change_presence(game=None)
+		
 	@commands.command(pass_context=True)
 	async def nickname(self, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
@@ -184,11 +196,11 @@ class Bot:
 				return
 
 		if game == None:
-			self.settings.setServerStat(server, "Game", None)
+			self.settings.serverDict['Game'] = None
 			await self.bot.change_presence(game=None)
 			return
 
-		self.settings.setServerStat(server, "Game", game)
+		self.settings.serverDict['Game'] = game
 		await self.bot.change_presence(game=discord.Game(name=game))
 
 	@commands.command(pass_context=True)
