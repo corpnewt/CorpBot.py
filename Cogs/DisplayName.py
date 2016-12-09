@@ -33,6 +33,11 @@ def memberForName(name, server):
     for member in server.members:
         if member.name == name:
             return member
+    # No member yet - try ID
+    memID = ''.join(list(filter(str.isdigit, name)))
+    newMem = memberForID(memID, server)
+    if newMem:
+        return newMem
     return None
 
 def roleForID(id, server):

@@ -93,7 +93,7 @@ class Admin:
 				# Not the owner - ignore
 				ignore = True
 				
-		if res:
+		if not isAdmin and res:
 			# We have a response - PM it
 			await self.bot.send_message(message.author, res)
 		
