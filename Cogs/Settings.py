@@ -48,6 +48,7 @@ class Settings:
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
+				"Game"				: "",		# The last seen game - in case of reset
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
 				"Info"					: "",		# This is where you can say a bit about your server
