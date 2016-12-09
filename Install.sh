@@ -31,6 +31,11 @@ function main () {
     echo
     update "psutil"
     echo
+
+    echo Updating Xmltodict...
+    echo
+    update "xmltodict"
+    echo
     
     echo Done.
     sleep 5

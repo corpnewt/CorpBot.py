@@ -134,6 +134,23 @@ class Reddit:
 
 
 	@commands.command(pass_context=True)
+	async def cablefail(self, ctx):
+		"""Might as well be a noose..."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+
+
+	@commands.command(pass_context=True)
 	async def techsupport(self, ctx):
 		"""Tech support irl."""
 		

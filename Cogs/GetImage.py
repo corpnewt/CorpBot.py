@@ -41,7 +41,11 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	tempFileName = tempFileName.split('?')[0]
 	imagePath = dirpath + "/" + tempFileName
 	
-	rImage = requests.get(url, stream = True, headers = {'User-agent': ua})	
+	try:
+		rImage = requests.get(url, stream = True, headers = {'User-agent': ua})
+	except:
+		return None
+
 	with open(imagePath, 'wb') as f:
 		for chunk in rImage.iter_content(chunk_size=1024):
 			if chunk:
@@ -89,6 +93,10 @@ async def get(url, bot, channel, title : str = 'Unknown', ua : str = 'CorpNewt D
 	"""Download passed image, and upload it to passed channel."""
 	message = await bot.send_message(channel, 'Downloading...')
 	file = download(url)
+	if not file:
+		await bot.edit_message(message, 'Oh *shoot* - I couldn\'t get that image...')
+		return
+
 	message = await bot.edit_message(message, 'Uploading...')
 	await upload(file, bot, channel)
 	await bot.edit_message(message, title)

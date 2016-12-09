@@ -29,6 +29,7 @@ from Cogs import Server
 from Cogs import Fliptime
 from Cogs import Remind
 from Cogs import Face
+from Cogs import Cats
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -127,6 +128,10 @@ cogList.append(remind)
 # Faces
 face = Face.Face(bot)
 cogList.append(face)
+
+# Cats
+cats = Cats.Cats(bot, settings)
+cogList.append(cats)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

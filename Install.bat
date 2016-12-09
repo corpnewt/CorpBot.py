@@ -70,6 +70,11 @@ echo.
 call :install "psutil"
 echo.
 
+echo Installing Xmltodict...
+echo.
+call :install "xmltodict"
+echo.
+
 echo Done.
 timeout 5 > nul
 exit /b
