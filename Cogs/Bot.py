@@ -184,9 +184,11 @@ class Bot:
 				return
 
 		if game == None:
+			self.settings.setServerStat(server, "Game", None)
 			await self.bot.change_presence(game=None)
 			return
 
+		self.settings.setServerStat(server, "Game", game)
 		await self.bot.change_presence(game=discord.Game(name=game))
 
 	@commands.command(pass_context=True)
