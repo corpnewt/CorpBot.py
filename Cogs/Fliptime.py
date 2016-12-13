@@ -37,7 +37,7 @@ class Fliptime:
 		if '(' in conts:
 			if ')' in conts or '）' in conts:
 				face = True
-		if '┻' in conts or '┻':
+		if '┻' in conts or '┻' or '╙' in conts or '╨' in conts or '╜' in conts:
 			table = True
 		if face and table:
 			# Contains all characters
