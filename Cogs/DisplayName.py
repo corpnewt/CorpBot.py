@@ -28,8 +28,9 @@ def memberForID(id, server):
 def memberForName(name, server):
     # Check nick first - then name
     for member in server.members:
-        if member.nick.lower() == name.lower():
-            return member
+        if member.nick:
+            if member.nick.lower() == name.lower():
+                return member
     for member in server.members:
         if member.name.lower() == name.lower():
             return member
