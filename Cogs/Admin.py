@@ -694,6 +694,7 @@ class Admin:
 					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
 					end         = None
 					if memFromName:
+						print("Got member: {}".format(memFromName))
 						# We got a member - let's check for time
 						# Get current time - and end time
 						try:
@@ -703,6 +704,7 @@ class Admin:
 							endTime     = time.mktime(start.timetuple())
 						except:
 							pass
+						print("End Time: {}".format(endTime))
 						if not endTime == None:
 							# We got a member and a time - break
 							break
