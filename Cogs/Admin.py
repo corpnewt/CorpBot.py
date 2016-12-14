@@ -683,8 +683,8 @@ class Admin:
 				# Let's search for a name at the beginning - and a time at the end
 				parts = member.split()
 				memFromName = None
-				endTime     = None
 				for i in range(len(parts)):
+					endTime     = None
 					# Name = 0 up to i joined by space
 					nameStr = ' '.join(parts[0:i+1])
 					print("Checking Name: {}".format(nameStr))
@@ -692,16 +692,20 @@ class Admin:
 					timeStr = ' '.join(parts[i+1:])
 					print("Checking Time: {}".format(timeStr))
 					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
-					end         = None
 					if memFromName:
 						print("Got member: {}".format(memFromName))
 						# We got a member - let's check for time
 						# Get current time - and end time
 						try:
+							# Get current time - and end time
+							currentTime = int(time.time())
 							cal         = parsedatetime.Calendar()
 							time_struct, parse_status = cal.parse(timeStr)
 							start       = datetime(*time_struct[:6])
-							endTime     = time.mktime(start.timetuple())
+							end         = time.mktime(start.timetuple())
+
+							# Get the time from now to end time
+							endTime = end-currentTime
 						except:
 							pass
 						print("End Time: {}".format(endTime))
@@ -709,15 +713,13 @@ class Admin:
 							# We got a member and a time - break
 							break
 				
-				if memFromName == None or endTime == None:
+				if memFromName == None:
 					# We couldn't find one or the other
 					msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 					
-				# Get the time from now to end time
-				currentTime = int(time.time())
-				cooldown = endTime-currentTime
+				cooldown = endTime
 				member   = memFromName
 
 			
