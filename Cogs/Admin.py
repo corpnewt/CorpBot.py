@@ -683,8 +683,8 @@ class Admin:
 				# It' a string - the hope continues
 				# Let's search for a name at the beginning - and a time at the end
 				parts = member.split()
-				memFromName = None
 				for i in range(len(parts)):
+					memFromName = None
 					endTime     = None
 					# Name = 0 up to i joined by space
 					nameStr = ' '.join(parts[0:i+1])
