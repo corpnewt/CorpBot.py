@@ -513,17 +513,18 @@ class Xp:
 		
 		
 	@commands.command(pass_context=True)
-	async def rank(self, ctx, *, member: discord.Member = None):
+	async def rank(self, ctx, *, member = None):
 		"""Say the highest rank of a listed member."""
 		
 		if member is None:
 			member = ctx.message.author
 			
 		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 			
 		# Create blank embed
@@ -663,10 +664,11 @@ class Xp:
 			member = ctx.message.author
 		
 		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		# Create blank embed
