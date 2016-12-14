@@ -654,8 +654,8 @@ class Xp:
 		newState = int(self.settings.getUserStat(member, ctx.message.server, "XPReserve"))
 		
 		# Add XP and XP Reserve
-		stat_embed.add_field("XP", newStat, inline=True)
-		stat_embed.add_field("XP Reserve", newState, inline=True)
+		stat_embed.add_field(name="XP", value=newStat, inline=True)
+		stat_embed.add_field(name="XP Reserve", value=newState, inline=True)
 		
 		memName = member.name
 		if member.nick:
@@ -663,18 +663,18 @@ class Xp:
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 			
 			# Add to embed
-			stat_embed.set_author('{}, who currently goes by {}'.format(member.name, member.nick), icon_url=member.avatar_url)
+			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=member.avatar_url)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
-			stat_embed.set_author('{}'.format(member.name), icon_url=member.avatar_url)
+			stat_embed.set_author(name='{}'.format(member.name), icon_url=member.avatar_url)
 			
 		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %H:%M")) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
 		
 		# Add Joined
-		stat_embed.add_field("Joined", member.joined_at.strftime("%Y-%m-%d %H:%M"), inline=True)
+		stat_embed.add_field(name="Joined", value=member.joined_at.strftime("%Y-%m-%d %H:%M"), inline=True)
 
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
@@ -708,18 +708,18 @@ class Xp:
 		if highestRole:
 			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
 			# Add Rank
-			stat_embed.add_field("Current Rank", highestRole, inline=True)
+			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
 		else:
 			if len(promoSorted):
 				# Need to have ranks to acquire one
 				msg = '{}They have not acquired a rank yet.\n'.format(msg)
 				# Add Rank
-				stat_embed.add_field("Current Rank", 'None acquired yet', inline=True)
+				stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
 			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
 			# Add Next Rank
-			stat_embed.add_field("Next Rank", '{} ({} more xp)'.format(nextRole['Name'], int(nextRole['XP'])), inline=True)
+			stat_embed.add_field(name="Next Rank", value='{} ({} more xp)'.format(nextRole['Name'], int(nextRole['XP'])), inline=True)
 			
 		await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
