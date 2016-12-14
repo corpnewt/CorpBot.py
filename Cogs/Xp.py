@@ -646,19 +646,35 @@ class Xp:
 				print("That member does not exist")
 				return
 
+		# Create blank embed
+		stat_embed = discord.Embed(color=member.color)
+					    
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.server, "XP"))
 		newState = int(self.settings.getUserStat(member, ctx.message.server, "XPReserve"))
+		
+		# Add XP and XP Reserve
+		stat_embed.add_field("XP", newStat, inline=True)
+		stat_embed.add_field("XP Reserve", newState, inline=True)
 		
 		memName = member.name
 		if member.nick:
 			# We have a nickname
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
+			
+			# Add to embed
+			stat_embed.set_author('{}, who currently goes by {}'.format(member.name, member.nick), icon_url=member.avatar_url)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
+			# Add to embed
+			stat_embed.set_author('{}'.format(member.name), icon_url=member.avatar_url)
+			
 		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %H:%M")) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
+		
+		# Add Joined
+		stat_embed.add_field("Joined", member.joined_at.strftime("%Y-%m-%d %H:%M"), inline=True)
 
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
@@ -691,15 +707,22 @@ class Xp:
 
 		if highestRole:
 			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
+			# Add Rank
+			stat_embed.add_field("Current Rank", highestRole, inline=True)
 		else:
 			if len(promoSorted):
 				# Need to have ranks to acquire one
 				msg = '{}They have not acquired a rank yet.\n'.format(msg)
+				# Add Rank
+				stat_embed.add_field("Current Rank", 'None acquired yet', inline=True)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
 			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
-
+			# Add Next Rank
+			stat_embed.add_field("Next Rank", '{} ({} more xp)'.format(nextRole['Name'], int(nextRole['XP'])), inline=True)
+			
 		await self.bot.send_message(ctx.message.channel, msg)
+		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
 		
 	@stats.error
 	async def stats_error(self, ctx, error):
