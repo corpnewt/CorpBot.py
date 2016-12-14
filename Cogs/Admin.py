@@ -688,13 +688,10 @@ class Admin:
 					endTime     = None
 					# Name = 0 up to i joined by space
 					nameStr = ' '.join(parts[0:i+1])
-					print("Checking Name: {}".format(nameStr))
 					# Time = end of name -> end of parts joined by space
 					timeStr = ' '.join(parts[i+1:])
-					print("Checking Time: {}".format(timeStr))
 					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
 					if memFromName:
-						print("Got member: {}".format(memFromName))
 						# We got a member - let's check for time
 						# Get current time - and end time
 						try:
@@ -710,7 +707,6 @@ class Admin:
 						except:
 							pass
 							
-						print("End Time: {}".format(endTime))
 						if not endTime == None:
 							# We got a member and a time - break
 							break
@@ -765,11 +761,11 @@ class Admin:
 		await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(member, pm)
 		
-	#@mute.error
-	#async def mute_error(self, ctx, error):
+	@mute.error
+	async def mute_error(self, ctx, error):
 		# do stuff
-		#msg = 'mute Error: {}'.format(ctx)
-		#await self.bot.say(msg)
+		msg = 'mute Error: {}'.format(ctx)
+		await self.bot.say(msg)
 		
 		
 	@commands.command(pass_context=True)
