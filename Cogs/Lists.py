@@ -482,21 +482,22 @@ class Lists:
 		
 		
 	@commands.command(pass_context=True)
-	async def parts(self, ctx, *, member : discord.Member = None):
+	async def parts(self, ctx, *, member = None):
 		"""Retrieve a member's parts list."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
 		
-		if member == None:
-			member = author
-
+		if member is None:
+			member = ctx.message.author
+			
 		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		parts = self.settings.getUserStat(member, server, "Parts")
@@ -553,7 +554,7 @@ class Lists:
 
 
 	@commands.command(pass_context=True)
-	async def lastonline(self, ctx, *, member : discord.Member = None):
+	async def lastonline(self, ctx, *, member = None):
 		"""Lists the last time a user was online if known."""
 
 		author  = ctx.message.author
@@ -566,10 +567,11 @@ class Lists:
 			return
 
 		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 		name = DisplayName.name(member)
 
