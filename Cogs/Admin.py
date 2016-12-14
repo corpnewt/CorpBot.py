@@ -687,8 +687,10 @@ class Admin:
 				for i in range(len(parts)):
 					# Name = 0 up to i joined by space
 					nameStr = ' '.join(parts[0:i+1])
+					print("Checking Name: {}".format(nameStr))
 					# Time = end of name -> end of parts joined by space
 					timeStr = ' '.join(parts[i+1:])
+					print("Checking Time: {}".format(timeStr))
 					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
 					end         = None
 					if memFromName:
