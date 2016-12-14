@@ -721,7 +721,7 @@ class Xp:
 			# Add Next Rank
 			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])), inline=True)
 			
-		await self.bot.send_message(ctx.message.channel, msg)
+		#await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
 		
 	@stats.error
