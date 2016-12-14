@@ -526,9 +526,27 @@ class Xp:
 				print("That member does not exist")
 				return
 			
+		# Create blank embed
+		stat_embed = discord.Embed(color=member.color)
+			
 		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+		
+		
+		memName = member.name
+		# Get member's avatar url
+		avURL = member.avatar_url
+		if not len(avURL):
+			avURL = member.default_avatar_url
+		if member.nick:
+			# We have a nickname
+			# Add to embed
+			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=avURL)
+		else:
+			# Add to embed
+			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
+			
 		
 		highestRole = ""
 		
@@ -543,10 +561,14 @@ class Xp:
 
 		if highestRole == "":
 			msg = '*{}* has not acquired a rank yet.'.format(DisplayName.name(member))
+			# Add Rank
+			stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
 		else:
 			msg = '*{}* is a **{}**!'.format(DisplayName.name(member), highestRole)
+			# Add Rank
+			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
 			
-		await self.bot.send_message(ctx.message.channel, msg)
+		# await self.bot.send_message(ctx.message.channel, msg)
 		
 	@rank.error
 	async def rank_error(self, ctx, error):
