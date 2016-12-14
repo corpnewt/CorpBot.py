@@ -658,16 +658,20 @@ class Xp:
 		stat_embed.add_field(name="XP Reserve", value=newState, inline=True)
 		
 		memName = member.name
+		# Get member's avatar url
+		avURL = member.avatar_url
+		if not len(avURL):
+			avURL = member.default_avatar_url
 		if member.nick:
 			# We have a nickname
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 			
 			# Add to embed
-			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=member.avatar_url)
+			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=avURL)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
-			stat_embed.set_author(name='{}'.format(member.name), icon_url=member.avatar_url)
+			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
 			
 		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %H:%M")) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
