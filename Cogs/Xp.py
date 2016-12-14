@@ -719,7 +719,7 @@ class Xp:
 		if nextRole and (newStat < int(nextRole['XP'])):
 			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
 			# Add Next Rank
-			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])), inline=True)
+			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
 			
 		#await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
