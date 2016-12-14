@@ -658,11 +658,11 @@ class Xp:
 		
 	# List the xp and xp reserve of a user
 	@commands.command(pass_context=True)
-	async def stats(self, ctx, *, member: discord.Member = None):
+	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
 		if member is None:
 			member = ctx.message.author
-		
+			
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.server)
