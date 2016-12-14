@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+import parsedatetime
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
@@ -659,7 +660,7 @@ class Admin:
 		
 	
 	@commands.command(pass_context=True)
-	async def mute(self, ctx, *, member = None, cooldown : int = None):
+	async def mute(self, ctx, *, member = None, cooldown = None):
 		"""Prevents a member from sending messages in chat (admin-only)."""
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -679,13 +680,41 @@ class Admin:
 			# Either a cooldown wasn't set - or it's the last section
 			if type(member) is str:
 				# It' a string - the hope continues
-				memCheck = DisplayName.checkNameForInt(member, ctx.message.server)
-				if not memCheck:
+				# Let's search for a name at the beginning - and a time at the end
+				parts = member.split()
+				memFromName = None
+				endTime     = None
+				for i in range(len(parts)):
+					# Name = 0 up to i joined by space
+					nameStr = ' '.join(parts[0:i+1])
+					# Time = end of name -> end of parts joined by space
+					timeStr = ' '.join(parts[i+1:])
+					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
+					end         = None
+					if memFromName:
+						# We got a member - let's check for time
+						# Get current time - and end time
+						try:
+							cal         = parsedatetime.Calendar()
+							time_struct, parse_status = cal.parse(timeStr)
+							start       = datetime(*time_struct[:6])
+							endTime     = time.mktime(start.timetuple())
+						except:
+							pass
+						if not endTime == None:
+							# We got a member and a time - break
+							break
+				
+				if memFromName == None or endTime == None:
+					# We couldn't find one or the other
 					msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
-				member   = memCheck["Member"]
-				cooldown = memCheck["Int"]
+					
+				# Get the time from now to end time
+				currentTime = int(time.time())
+				cooldown = endTime-currentTime
+				member   = memFromName
 
 			
 		if member == None:
