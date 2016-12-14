@@ -707,7 +707,7 @@ class Admin:
 							# Get the time from now to end time
 							endTime = end-currentTime
 						except:
-							pass
+							print("Error checking time.")
 						print("End Time: {}".format(endTime))
 						if not endTime == None:
 							# We got a member and a time - break
