@@ -745,7 +745,7 @@ class Admin:
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 			currentTime = int(time.time())
-			cooldownFinal = currentTime+(cooldown*60)
+			cooldownFinal = currentTime+cooldown
 		else:
 			cooldownFinal = None
 
