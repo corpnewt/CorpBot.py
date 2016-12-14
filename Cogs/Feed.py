@@ -95,7 +95,7 @@ class Feed:
 		elif hunger <= 75:
 			msg = 'I\'m *starving* ({}%)!  Do you want me to starve to death?'.format(hunger)
 		else:
-			msg = 'I\'m ***hangry*** ({}%)!  Feed me or feel me *wrath!*'.format(hunger)
+			msg = 'I\'m ***hangry*** ({}%)!  Feed me or feel my *wrath!*'.format(hunger)
 			
 		if isKill.lower() == "yes" and hunger > -150:
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `$resurrect` me to get me back.'.format(overweight)
