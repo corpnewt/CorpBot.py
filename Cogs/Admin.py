@@ -739,7 +739,7 @@ class Admin:
 				return
 
 		# Set cooldown - or clear it
-		if type(cooldown) is int:
+		if type(cooldown) is int or type(cooldown) is float:
 			if cooldown < 0:
 				msg = 'Cooldown cannot be a negative number!'
 				await self.bot.send_message(ctx.message.channel, msg)
