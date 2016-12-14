@@ -765,11 +765,11 @@ class Admin:
 		await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(member, pm)
 		
-	@mute.error
-	async def mute_error(self, ctx, error):
+	#@mute.error
+	#async def mute_error(self, ctx, error):
 		# do stuff
-		msg = 'mute Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		#msg = 'mute Error: {}'.format(ctx)
+		#await self.bot.say(msg)
 		
 		
 	@commands.command(pass_context=True)
