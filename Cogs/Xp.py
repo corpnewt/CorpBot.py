@@ -569,6 +569,7 @@ class Xp:
 			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
 			
 		# await self.bot.send_message(ctx.message.channel, msg)
+		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
 		
 	@rank.error
 	async def rank_error(self, ctx, error):
