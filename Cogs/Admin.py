@@ -697,15 +697,18 @@ class Admin:
 						print("Got member: {}".format(memFromName))
 						# We got a member - let's check for time
 						# Get current time - and end time
-						# Get current time - and end time
-						currentTime = int(time.time())
-						cal         = parsedatetime.Calendar()
-						time_struct, parse_status = cal.parse(timeStr)
-						start       = datetime(*time_struct[:6])
-						end         = time.mktime(start.timetuple())
+						try:
+							# Get current time - and end time
+							currentTime = int(time.time())
+							cal         = parsedatetime.Calendar()
+							time_struct, parse_status = cal.parse(timeStr)
+							start       = datetime(*time_struct[:6])
+							end         = time.mktime(start.timetuple())
 
-						# Get the time from now to end time
-						endTime = end-currentTime
+							# Get the time from now to end time
+							endTime = end-currentTime
+						except:
+							pass
 							
 						print("End Time: {}".format(endTime))
 						if not endTime == None:
