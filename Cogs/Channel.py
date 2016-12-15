@@ -153,12 +153,14 @@ class Channel:
 				# We found it
 				memberCount += 1
 
-		if memberCount == 1:
+		'''if memberCount == 1:
 			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
 			role_embed.add_field(name="Members", value='1 user', inline=True)
 		else:
 			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
-			role_embed.add_field(name="Members", value='{} users'.format(memberCount), inline=True)
+			role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)'''
+		
+		role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)
 			
 		# await self.bot.send_message(channel, msg)
 		await self.bot.send_message(channel, embed=role_embed)
