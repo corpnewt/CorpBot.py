@@ -39,7 +39,7 @@ class Channel:
 		
 		
 	@commands.command(pass_context=True)
-	async def ismuted(self, ctx, *, member : discord.Member = None):
+	async def ismuted(self, ctx, *, member = None):
 		"""Says whether a member is muted in chat."""
 			
 		if member == None:
@@ -48,10 +48,11 @@ class Channel:
 			return
 
 		if type(member) is str:
-			try:
-				member = discord.utils.get(message.server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 				
 		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
@@ -126,12 +127,13 @@ class Channel:
 			msg = 'Usage: `$rolecall [role]`'
 			await self.bot.send_message(channel, msg)
 			return
-
+			
 		if type(role) is str:
-			try:
-				role = discord.utils.get(server.roles, name=role)
-			except:
-				print("That role does not exist")
+			roleName = role
+			role = DisplayName.roleForName(roleName, ctx.message.server)
+			if not role:
+				msg = 'I couldn\'t find *{}*...'.format(roleName)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		# We have a role
