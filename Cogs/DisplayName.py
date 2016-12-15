@@ -51,6 +51,11 @@ def roleForName(name, server):
     for role in server.roles:
         if role.name.lower() == name.lower():
             return role
+    # No role yet - try ID
+    roleID = ''.join(list(filter(str.isdigit, name)))
+    newRole = roleForID(roleID, server)
+    if newRole:
+        return newRole
     return None
 
 def serverNick(user, server):
