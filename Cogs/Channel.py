@@ -143,7 +143,8 @@ class Channel:
 		if not len(avURL):
 			avURL = discord.User.default_avatar_url
 		# Add the server icon
-		role_embed.set_author(name='{}'.format(role.name), icon_url=avURL)
+		# role_embed.set_author(name='{}'.format(role.name), icon_url=avURL)
+		role_embed.set_author(name='{}'.format(role.name))
 
 		# We have a role
 		memberCount = 0
