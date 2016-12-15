@@ -135,6 +135,15 @@ class Channel:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
+		
+		# Create blank embed
+		role_embed = discord.Embed(color=role.color)
+		# Get server's icon url if one exists - otherwise grab the default blank Discord avatar
+		avURL = server.icon_url
+		if not len(avURL):
+			avURL = discord.User.default_avatar_url
+		# Add the server icon
+		role_embed.set_author(name='{}'.format(role.name), icon_url=avURL)
 
 		# We have a role
 		memberCount = 0
@@ -146,9 +155,13 @@ class Channel:
 
 		if memberCount == 1:
 			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
+			role_embed.add_field(name="Members", value='1 user', inline=True)
 		else:
 			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
-		await self.bot.send_message(channel, msg)
+			role_embed.add_field(name="Members", value='{} users'.foramt(memberCount), inline=True)
+			
+		# await self.bot.send_message(channel, msg)
+		await self.bot.send_message(channel, embed=role_embed)
 
 
 	@rolecall.error
