@@ -116,7 +116,7 @@ class Channel:
 		await self.bot.send_message(ctx.message.channel, roleText)
 
 	@commands.command(pass_context=True)
-	async def rolecall(self, ctx, *, role : discord.Role = None):
+	async def rolecall(self, ctx, *, role = None):
 		"""Lists the number of users in a current role."""
 
 		author  = ctx.message.author
