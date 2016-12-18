@@ -718,8 +718,11 @@ class Admin:
 					msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
-					
-				cooldown = endTime
+				
+				if endTime == 0:
+					coolDown = None
+				else:
+					cooldown = endTime
 				member   = memFromName
 
 			
