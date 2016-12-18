@@ -354,7 +354,7 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
-	async def removexprole(self, ctx, *, role : discord.Role = None):
+	async def removexprole(self, ctx, *, role = None):
 		"""Removes a role from the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
@@ -373,13 +373,41 @@ class Admin:
 			return
 
 		if type(role) is str:
-			try:
-				role = discord.utils.get(server.roles, name=role)
-			except:
-				print("That role does not exist")
-				return
+			# It' a string - the hope continues
+			roleCheck = DisplayName.roleForName(role, server)
+			if not roleCheck:
+				# Nothing was returned - might be an old name
+				promoArray = self.settings.getServerStat(server, "PromotionArray")
 
-		# If we're here - then the role is an actual role
+				for aRole in promoArray:
+					# Get the role that corresponds to the name
+					if aRole['Name'].lower() == role.lower():
+						# We found it - let's remove it
+						promoArray.remove(aRole)
+						self.settings.setServerStat(server, "PromotionArray", promoArray)
+						msg = '**{}** removed successfully.'.format(aRole['Name'])
+						await self.bot.send_message(channel, msg)
+						return
+				# At this point - no name
+				# If we made it this far - then we didn't find it
+				msg = '{} not found in list.'.format(role.name)
+				await self.bot.send_message(channel, msg)
+			else:
+				# We got a role
+				# If we're here - then the role is an actual role
+				promoArray = self.settings.getServerStat(server, "PromotionArray")
+
+				for aRole in promoArray:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == roleCheck.id:
+						# We found it - let's remove it
+						promoArray.remove(aRole)
+						self.settings.setServerStat(server, "PromotionArray", promoArray)
+						msg = '**{}** removed successfully.'.format(aRole['Name'])
+						await self.bot.send_message(channel, msg)
+						return
+
+		# If we're here - then the role is an actual role - I think?
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
 
 		for aRole in promoArray:
