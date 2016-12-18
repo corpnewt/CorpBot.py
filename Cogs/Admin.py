@@ -374,26 +374,24 @@ class Admin:
 
 		if type(role) is str:
 			# It' a string - the hope continues
-			roleCheck = DisplayName.roleForName(role, server)
-			if not roleCheck:
-				# Nothing was returned - might be an old name
-				promoArray = self.settings.getServerStat(server, "PromotionArray")
+			# Let's clear out by name first - then by role id
+			promoArray = self.settings.getServerStat(server, "PromotionArray")
 
-				for aRole in promoArray:
-					# Get the role that corresponds to the name
-					if aRole['Name'].lower() == role.lower():
-						# We found it - let's remove it
-						promoArray.remove(aRole)
-						self.settings.setServerStat(server, "PromotionArray", promoArray)
-						msg = '**{}** removed successfully.'.format(aRole['Name'])
-						await self.bot.send_message(channel, msg)
-						return
-				# At this point - no name
-				# If we made it this far - then we didn't find it
-				msg = '{} not found in list.'.format(role)
-				await self.bot.send_message(channel, msg)
-				return
-			else:
+			for aRole in promoArray:
+				# Get the role that corresponds to the name
+				if aRole['Name'].lower() == role.lower():
+					# We found it - let's remove it
+					promoArray.remove(aRole)
+					self.settings.setServerStat(server, "PromotionArray", promoArray)
+					msg = '**{}** removed successfully.'.format(aRole['Name'])
+					await self.bot.send_message(channel, msg)
+					return
+			# At this point - no name
+			# Let's see if it's a role that's had a name change
+
+
+			roleCheck = DisplayName.roleForName(role, server)
+			if roleCheck:
 				# We got a role
 				# If we're here - then the role is an actual role
 				promoArray = self.settings.getServerStat(server, "PromotionArray")
@@ -407,10 +405,11 @@ class Admin:
 						msg = '**{}** removed successfully.'.format(aRole['Name'])
 						await self.bot.send_message(channel, msg)
 						return
-				# If we made it this far - then we didn't find it
-				msg = '{} not found in list.'.format(roleCheck.name)
-				await self.bot.send_message(channel, msg)
-				return
+				
+			# If we made it this far - then we didn't find it
+			msg = '{} not found in list.'.format(roleCheck.name)
+			await self.bot.send_message(channel, msg)
+			return
 
 		# If we're here - then the role is an actual role - I think?
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
