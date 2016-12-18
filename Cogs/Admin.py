@@ -390,7 +390,7 @@ class Admin:
 						return
 				# At this point - no name
 				# If we made it this far - then we didn't find it
-				msg = '{} not found in list.'.format(role.name)
+				msg = '{} not found in list.'.format(role)
 				await self.bot.send_message(channel, msg)
 				return
 			else:
@@ -408,7 +408,7 @@ class Admin:
 						await self.bot.send_message(channel, msg)
 						return
 				# If we made it this far - then we didn't find it
-				msg = '{} not found in list.'.format(role.name)
+				msg = '{} not found in list.'.format(roleCheck.name)
 				await self.bot.send_message(channel, msg)
 				return
 
