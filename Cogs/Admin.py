@@ -392,6 +392,7 @@ class Admin:
 				# If we made it this far - then we didn't find it
 				msg = '{} not found in list.'.format(role.name)
 				await self.bot.send_message(channel, msg)
+				return
 			else:
 				# We got a role
 				# If we're here - then the role is an actual role
@@ -406,6 +407,10 @@ class Admin:
 						msg = '**{}** removed successfully.'.format(aRole['Name'])
 						await self.bot.send_message(channel, msg)
 						return
+				# If we made it this far - then we didn't find it
+				msg = '{} not found in list.'.format(role.name)
+				await self.bot.send_message(channel, msg)
+				return
 
 		# If we're here - then the role is an actual role - I think?
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
