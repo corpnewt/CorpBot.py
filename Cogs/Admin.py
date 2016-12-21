@@ -210,26 +210,11 @@ class Admin:
 			xpAmount = nameCheck["Int"]
 			
 		# Check for formatting issues
-		if not xpAmount:
+		if xpAmount == None:
 			# Still no xp
 			msg = 'Usage: `$setxpreserve [member] [amount]`'
 			await self.bot.send_message(channel, msg)
 			return
-		
-		if not type(xpAmount) is int:
-			msg = 'Usage: `$setxpreserve [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if xpAmount < 0:
-			msg = 'Usage: `$setxpreserve [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
-				return
 
 		self.settings.setUserStat(member, server, "XPReserve", xpAmount)
 		msg = '*{}\'s* XPReserve was set to *{}*!'.format(DisplayName.name(member), xpAmount)

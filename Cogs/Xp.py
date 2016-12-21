@@ -63,25 +63,11 @@ class Xp:
 			xpAmount = nameCheck["Int"]
 			
 		# Check for formatting issues
-		if not xpAmount:
+		if xpAmount == None:
 			# Still no xp...
 			msg = 'Usage: `$setxp [member] [amount]`'
 			await self.bot.send_message(channel, msg)
 			return
-		if not type(xpAmount) is int:
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if xpAmount < 0:
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
-				return
 
 		self.settings.setUserStat(member, server, "XP", xpAmount)
 		msg = '*{}\'s* xp was set to *{}!*'.format(DisplayName.name(member), xpAmount)
