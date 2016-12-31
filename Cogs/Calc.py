@@ -34,7 +34,7 @@ class NumericStringParser(object):
     def __init__(self):
         """
         expop   :: '^'
-        multop  :: '*' | '/'
+        multop  :: 'x' | '/'
         addop   :: '+' | '-'
         integer :: ['+' | '-'] '0'..'9'+
         atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'
@@ -50,7 +50,7 @@ class NumericStringParser(object):
         ident = Word(alphas, alphas+nums+"_$")       
         plus  = Literal( "+" )
         minus = Literal( "-" )
-        mult  = Literal( "*" )
+        mult  = Literal( "x" )
         div   = Literal( "/" )
         lpar  = Literal( "(" ).suppress()
         rpar  = Literal( ")" ).suppress()
@@ -78,7 +78,7 @@ class NumericStringParser(object):
         epsilon = 1e-12
         self.opn = { "+" : operator.add,
                 "-" : operator.sub,
-                "*" : operator.mul,
+                "x" : operator.mul,
                 "/" : operator.truediv,
                 "^" : operator.pow }
         self.fn  = { "sin" : math.sin,
@@ -92,7 +92,7 @@ class NumericStringParser(object):
         op = s.pop()
         if op == 'unary -':
             return -self.evaluateStack( s )
-        if op in "+-*/^":
+        if op in "+-x/^":
             op2 = self.evaluateStack( s )
             op1 = self.evaluateStack( s )
             return self.opn[op]( op1, op2 )
@@ -134,7 +134,7 @@ class Calc:
 			msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula)
 			msg += 'I understand the following syntax:\n```\n'
 			msg += "expop   :: '^'\n"
-			msg += "multop  :: '*' | '/'\n"
+			msg += "multop  :: 'x' | '/'\n"
 			msg += "addop   :: '+' | '-'\n"
 			msg += "integer :: ['+' | '-'] '0'..'9'+\n"
 			msg += "atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'\n"
