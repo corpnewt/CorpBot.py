@@ -70,9 +70,9 @@ echo.
 call :install "psutil"
 echo.
 
-echo Installing Xmltodict...
+echo Installing PyParsing...
 echo.
-call :install "xmltodict"
+call :install "pyparsing"
 echo.
 
 echo Done.

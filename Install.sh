@@ -32,9 +32,9 @@ function main () {
     update "psutil"
     echo
 
-    echo Updating Xmltodict...
+    echo Updating PyParsing...
     echo
-    update "xmltodict"
+    update "pyparsing"
     echo
     
     echo Done.

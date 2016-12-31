@@ -684,12 +684,12 @@ class Xp:
 			# Add to embed
 			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
 			
-		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %H:%M")) # I think this will work
+		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %I:%M %p")) # I think this will work
 		msg = "{}**XP:** *{}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
 		
 		# Add Joined
-		stat_embed.add_field(name="Joined", value=member.joined_at.strftime("%Y-%m-%d %H:%M"), inline=True)
+		stat_embed.add_field(name="Joined", value=member.joined_at.strftime("%Y-%m-%d %I:%M %p"), inline=True)
 
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 

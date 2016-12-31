@@ -40,11 +40,14 @@ class Example:
 		"""Chooses between multiple choices."""
 		await self.bot.say(random.choice(choices))
 
-	@commands.command()
-	async def joined(self, member : discord.Member):
+	@commands.command(pass_context=True)
+	async def joined(self, ctx, member : discord.Member = None):
 		"""Says when a member joined."""
+		
+		if member == None:
+			member = ctx.message.author
 
-		await self.bot.say('{} joined in {}'.format(DisplayName.name(member), member.joined_at))
+		await self.bot.say('{} joined {}'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
     def __init__(self, message, player):

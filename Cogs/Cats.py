@@ -3,7 +3,6 @@ import discord
 import random
 import requests
 import time
-import xmltodict
 from   os.path import splitext
 from   discord.ext import commands
 from   Cogs import Settings
@@ -50,12 +49,11 @@ class Cats:
 		if not self.canDisplay(server):
 			return
 		
-		url = 'http://thecatapi.com/api/images/get?format=xml&results_per_page=1'
+		url = 'http://random.cat/meow'
 
 		# Grab our image url
 		r = requests.get(url, headers = {'User-agent': self.ua})
-		# Decode the xml
-		decoded = xmltodict.parse(r.content)
-		catURL = decoded['response']['data']['images']['image']['url']
+
+		catURL = r.json()['file']
 		
 		await GetImage.get(catURL, self.bot, channel, 'A cat for you!', self.ua)
