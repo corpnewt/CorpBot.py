@@ -4,6 +4,7 @@ from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import TinyURL
 
 class Search:
 
@@ -20,9 +21,9 @@ class Search:
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
-		#query = query.replace(" ", "+")
 		lmgtfy = "http://lmgtfy.com/?q={}".format(quote(query))
-		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfy)
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
 		await self.bot.send_message(ctx.message.channel, msg)
 
@@ -35,8 +36,23 @@ class Search:
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
-		#query = query.replace(" ", "+")
 		lmgtfy = "http://letmebingthatforyou.com/?q={}".format(quote(query))
-		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfy)
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		# Say message
+		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def duck(self, ctx, *, query = None):
+		"""Duck Duck... GOOSE."""
+
+		if query == None:
+			msg = 'You need a topic for me to DuckDuckGo.'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
+		lmgtfy = "https://lmddgtfy.net/?q={}".format(quote(query))
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
 		await self.bot.send_message(ctx.message.channel, msg)

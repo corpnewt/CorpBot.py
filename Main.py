@@ -34,6 +34,7 @@ from Cogs import EightBall
 from Cogs import Calc
 from Cogs import Time
 from Cogs import Search
+from Cogs import Eat
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -149,9 +150,13 @@ cogList.append(calc)
 atime = Time.Time(bot)
 cogList.append(atime)
 
-# LMG(B)TFY
+# LMG(B)(DDG)TFY
 search = Search.Search(bot)
 cogList.append(search)
+
+# Eat something...
+eat = Eat.Eat(bot)
+cogList.append(eat)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
