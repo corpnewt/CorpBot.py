@@ -77,13 +77,20 @@ class Setup:
 		server  = ctx.message.server
 
 		defRole = self.settings.getServerStat(server, "DefaultRole")
+		verify = int(self.settings.getServerStat(server, "VerificationTime"))
 
 		msg = '**__Auto-Role Management__**:\n\nWould you like me to auto-assign a role to new users when they join? (y/n/skip)'
 		if defRole:
 			auto = 'set to: **{}**.'.format(DisplayName.roleForID(defRole, server))
 		else:
 			auto = '*disabled*.'
-		msg = '{}\n\nCurrently {}'.format(msg, auto)
+
+		if verify == 0:
+			verifyString = 'No delay before applying.'
+		else:
+			verifyString = '{} minute delay before applying.'
+
+		msg = '{}\n\nCurrently {}\n{}'.format(msg, auto, verifyString)
 		
 		await self.bot.send_message(author, msg)
 			
