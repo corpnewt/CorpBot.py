@@ -136,6 +136,30 @@ class Setup:
 					await self.bot.send_message(author, msg)
 					self.settings.setServerStat(server, "DefaultRole", role.id)
 					gotIt = True
+		# Let's find out how long to wait for auto role to apply
+		verify = int(self.settings.getServerStat(server, "VerificationTime"))
+		msg = 'If you have a higher security server - or just want a delay before applying a default role, I can help with that.  What would you like this delay to be (in minutes)?\n\nCurrent is *{}*.'.format(verify)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content == "skip":
+					await self.bot.send_message(author, 'Auto-role delay time will remian *{} minutes*.'.format(threshold))
+				else:
+					try:
+						talkInt = int(talk.content)
+						await self.bot.send_message(author, 'Auto-role delay time is now *{} minutes!*'.format(talkInt))
+						self.settings.setServerStat(server, "VerificationTime", talkInt)
+					except ValueError:
+						await self.bot.send_message(author, 'Auto-role delay time needs to be a whole number - try again.')
+						continue
+				gotIt = True
 		# Onward
 		await self.xpSystem(ctx)
 

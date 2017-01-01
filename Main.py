@@ -242,10 +242,18 @@ async def on_member_join(member):
 	rules       = settings.getServerStat(server, "Rules")
 	
 	if defaultRole:
-		newRole = discord.utils.get(server.roles, id=str(defaultRole))
+		# Check for join functions
+		for cog in cogList:
+			try:
+				check = await cog.onjoin(member, server)
+			except AttributeError:
+				# Onto the next
+				continue
+
+		'''newRole = discord.utils.get(server.roles, id=str(defaultRole))
 		await bot.add_roles(member, newRole)
 		fmt = 'You\'ve been auto-assigned the role **{}**!'.format(newRole.name)
-		await bot.send_message(server, fmt)
+		await bot.send_message(server, fmt)'''
 
 	help = 'Type `$help` for a list of available user commands.'
 

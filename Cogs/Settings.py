@@ -3,6 +3,7 @@ import discord
 from   datetime    import datetime
 from   discord.ext import commands
 from   shutil      import copyfile
+import time
 import json
 import os
 from   Cogs        import DisplayName
@@ -47,6 +48,7 @@ class Settings:
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
+				"VerificationTime"		: 0,		# Time to wait (in minutes) before assigning default role
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
@@ -71,6 +73,53 @@ class Settings:
 			self.serverDict = {}
 
 		self.bot.loop.create_task(self.backup())
+
+	async def onjoin(self, member, server):
+		# Welcome - and initialize timers
+		self.bot.loop.create_task(self.giveRole(member, server))
+
+
+	async def onready(self):
+		# Check all verifications - and start timers if needed
+		for server in self.bot.servers:
+			# Get default role
+			defRole = self.getServerStat(server, "DefaultRole")
+			defRole = DisplayName.roleForID(defRole, server)
+			if defRole:
+				# We have a default - check for it
+				for member in server.members:
+					foundRole = False
+					for role in member.roles:
+						if role == defRole:
+							# We have our role
+							foundRole = True
+					if not foundRole:
+						# We don't have the role - set a timer
+						self.bot.loop.create_task(self.giveRole(member, server))
+
+	async def giveRole(self, member, server):
+		# Start the countdown
+		verifiedAt  = int(self.getUserStat(member, server, "VerificationTime"))
+		currentTime = int(time.time())
+		timeRemain  = verifiedAt - currentTime
+		if timeRemain > 0:
+			# We have to wait for verification still
+			await asyncio.sleep(timeRemain)
+		
+		# We're already verified - make sure we have the role
+		defRole = self.getServerStat(server, "DefaultRole")
+		defRole = DisplayName.roleForID(defRole, server)
+		if defRole:
+			# We have a default - check for it
+			foundRole = False
+			for role in member.roles:
+				if role == defRole:
+					# We have our role
+					foundRole = True
+			if not foundRole:
+				await self.bot.add_roles(member, defRole)
+				fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
+				await self.bot.send_message(member, fmt)
 
 	async def backup(self):
 		# Wait initial time - then start loop
@@ -228,6 +277,10 @@ class Settings:
 						if not "Reminders" in y:
 							y["Reminders"] = []
 							needsUpdate = True
+						if not "VerificationTime" in y:
+							currentTime = int(time.time())
+							waitTime = int(self.getServerStat(server, "VerificationTime"))
+							y["VerificationTime"] = currentTime + (waitTime * 60)
 						# Check for empty values that need numbers
 						if not y["XP"]:
 							y["XP"] = 0
