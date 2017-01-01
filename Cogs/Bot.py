@@ -31,6 +31,13 @@ class Bot:
 			await self.bot.change_presence(game=discord.Game(name=game))
 		else:
 			await self.bot.change_presence(game=None)
+
+	@commands.command(pass_context=True)
+	async def ping(self, ctx):
+		"""Feeling lonely?"""
+		msg = '*{}*, PONG!'.format(DisplayName.name(ctx.message.author))
+		await self.bot.send_message(ctx.message.channel, msg)
+
 		
 	@commands.command(pass_context=True)
 	async def nickname(self, ctx, *, name : str = None):
