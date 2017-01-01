@@ -88,7 +88,7 @@ class Setup:
 		if verify == 0:
 			verifyString = 'No delay before applying.'
 		else:
-			verifyString = '{} minute delay before applying.'
+			verifyString = '{} minute delay before applying.'.format(verify)
 
 		msg = '{}\n\nCurrently {}\n{}'.format(msg, auto, verifyString)
 		
