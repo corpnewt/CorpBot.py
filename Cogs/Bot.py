@@ -35,7 +35,7 @@ class Bot:
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
 		"""Feeling lonely?"""
-		msg = '*{}*, PONG!'.format(DisplayName.name(ctx.message.author))
+		msg = '*{}*, PONG!'.format(DisplayName.name(ctx.message.author.mention))
 		await self.bot.send_message(ctx.message.channel, msg)
 
 		
