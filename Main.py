@@ -33,6 +33,7 @@ from Cogs import Cats
 from Cogs import EightBall
 from Cogs import Calc
 from Cogs import Time
+from Cogs import Google
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -147,6 +148,10 @@ cogList.append(calc)
 # Time
 atime = Time.Time(bot)
 cogList.append(atime)
+
+# LMGTFY
+google = Google.Google(bot)
+cogList.append(google)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
