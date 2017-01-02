@@ -30,12 +30,21 @@ class Eat:
 		# Check if we're eating a member
 		memberCheck = DisplayName.memberForName(member, ctx.message.server)
 		if memberCheck:
-			memName = DisplayName.name(memberCheck)
-			memberList = [ 'you unhinge your jaw and consume *{}* in one bite.'.format(memName),
-							'you try to eat *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...'.format(memName),
-							'you take a quick bite out of *{}*.  They probably didn\'t even notice.'.format(memName),
-							'you sink your teeth into *{}\'s* shoulder - they turn to face you, eyes wide as you try your best to scurry away and hide.'.format(memName),
-							'your jaw crunches down on *{}* - a satisfying *crunch* emanates as you finish your newest meal.'.format(memName)]
+			# We're eating a member - let's do a bot-check
+			if memberCheck.id == self.bot.user.id:
+				# It's me!
+				memberList = [  'you try to eat *me* - but unfortunately, I saw it coming - your jaw hangs open as I deftly sidestep.',
+								'your mouth hangs open for a brief second before you realize that *I\'m* eating *you*.',
+								'I\'m a bot.  You can\'t eat me.',
+								'your jaw clamps down on... wait... on nothing, because I\'m *digital!*.',
+								'what kind of bot would I be if I let you eat me?']
+			else:
+				memName = DisplayName.name(memberCheck)
+				memberList = [ 'you unhinge your jaw and consume *{}* in one bite.'.format(memName),
+								'you try to eat *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...'.format(memName),
+								'you take a quick bite out of *{}*.  They probably didn\'t even notice.'.format(memName),
+								'you sink your teeth into *{}\'s* shoulder - they turn to face you, eyes wide as you try your best to scurry away and hide.'.format(memName),
+								'your jaw clamps down on *{}* - a satisfying *crunch* emanates as you finish your newest meal.'.format(memName)]
 			randnum = random.randint(0, len(memberList)-1)
 			msg = '*{}*, {}'.format(authorName, memberList[randnum])				
 			await self.bot.send_message(ctx.message.channel, msg)
