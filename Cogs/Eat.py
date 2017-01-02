@@ -31,7 +31,7 @@ class Eat:
 		memberCheck = DisplayName.memberForName(member, ctx.message.server)
 		if memberCheck:
 			memName = DisplayName.name(memberCheck)
-			memberList = [ 'you uhninge your jaw and consume *{}* in one bite.'.format(memName),
+			memberList = [ 'you unhinge your jaw and consume *{}* in one bite.'.format(memName),
 							'you try to eat *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...'.format(memName),
 							'you take a quick bite out of *{}*.  They probably didn\'t even notice.'.format(memName),
 							'you sink your teeth into *{}\'s* shoulder - they turn to face you, eyes wide as you try your best to scurry away and hide.'.format(memName),
