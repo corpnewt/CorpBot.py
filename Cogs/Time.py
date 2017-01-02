@@ -11,22 +11,33 @@ class Time:
 		self.bot = bot
 
 	@commands.command(pass_context=True)
-	async def time(self, ctx, offset : int = 0):
+	async def time(self, ctx, offset : str = '0:0'):
 		"""Get UTC time +- an offset."""
+
+		# Split time string by : and get hour/minute values
+		try:
+			hours, minutes = map(int, offset.split(':'))
+		except Exception:
+			try:
+				hours = int(offset)
+				minutes = 0
+			except Exception:
+				await self.bot.say('Offset has to be in +-H:M!')
+				return
 
 		msg = 'UTC'
 		# Get the time
 		t = datetime.datetime.utcnow()
 		# Apply offset
-		if offset > 0:
+		if hours > 0:
 			# Apply positive offset
 			msg += '+{}'.format(offset)
-			td = datetime.timedelta(hours=offset)
+			td = datetime.timedelta(hours=hours, minutes=minutes)
 			newTime = t + td
-		elif offset < 0:
+		elif hours < 0:
 			# Apply negative offset
 			msg += '{}'.format(offset)
-			td = datetime.timedelta(hours=(-1*offset))
+			td = datetime.timedelta(hours=(-1*hours), minutes=(-1*minutes))
 			newTime = t - td
 		else:
 			# No offset
