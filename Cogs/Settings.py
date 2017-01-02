@@ -72,8 +72,6 @@ class Settings:
 			# File doesn't exist - create a placeholder
 			self.serverDict = {}
 
-		self.bot.loop.create_task(self.backup())
-
 	async def onjoin(self, member, server):
 		# Welcome - and initialize timers
 		self.bot.loop.create_task(self.giveRole(member, server))
@@ -96,6 +94,8 @@ class Settings:
 					if not foundRole:
 						# We don't have the role - set a timer
 						self.bot.loop.create_task(self.giveRole(member, server))
+		# Start the backup loop
+		self.bot.loop.create_task(self.backup())
 
 	async def giveRole(self, member, server):
 		# Start the countdown
