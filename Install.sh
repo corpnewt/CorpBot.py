@@ -4,7 +4,7 @@ function main () {
     echo \#\#\# Updating CorpBot \#\#\#
 
     # Check for some linux
-    "unamestr = $(uname)"
+    unamestr = "$(uname)"
     if [[ "$unamestr" == "Linux" ]]; then
         # Install linux dependencies
         echo Installing libffi-dev \(run as sudo if this fails\)...
