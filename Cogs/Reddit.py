@@ -267,3 +267,20 @@ class Reddit:
 		infoDict = self.getTitle('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100', False, True)
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+
+
+	@commands.command(pass_context=True)
+	async def dragon(self, ctx):
+		"""From the past - when great winged beast soared the skies."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getTitle('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100', False, True)
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
