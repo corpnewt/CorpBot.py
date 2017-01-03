@@ -134,7 +134,6 @@ class Bot:
 			if not os.path.isfile('./{}'.format(filename)):
 				await self.bot.edit_message(status, '*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
 				# File doesn't exist
-				await self.bot.send_message(channel, msg)
 				return
 			else:
 				# Local file name
