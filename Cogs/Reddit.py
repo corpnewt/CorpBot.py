@@ -271,7 +271,7 @@ class Reddit:
 
 	@commands.command(pass_context=True)
 	async def dragon(self, ctx):
-		"""From the past - when great winged beast soared the skies."""
+		"""From the past - when great winged beasts soared the skies."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
