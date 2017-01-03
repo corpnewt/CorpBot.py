@@ -2,6 +2,22 @@
 
 function main () {
     echo \#\#\# Updating CorpBot \#\#\#
+
+    # Check for some linux
+    "unamestr = $(uname)"
+    if [[ "$unamestr" == "Linux" ]]; then
+        # Install linux dependencies
+        echo Installing libffi-dev (run as sudo if this fails)...
+        echo
+        sudo apt-get install libffi-dev
+        echo
+
+        echo Installing python-dev (run as sudo if this fails)...
+        echo
+        sudo apt-get install python-dev
+        echo
+    fi
+    
     echo Updating Discord...
     echo
     update "discord.py[voice]"
