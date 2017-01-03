@@ -10,6 +10,7 @@ from   Cogs import ReadableTime
 from Cogs import Settings
 from Cogs import Xp
 from Cogs import Admin
+from Cogs import BotAdmin
 from Cogs import Channel
 from Cogs import Feed
 from Cogs import Reddit
@@ -65,6 +66,10 @@ cogList.append(xp)
 # Admin
 admin = Admin.Admin(bot, settings)
 cogList.append(admin)
+
+# BotAdmin
+botadmin = BotAdmin.BotAdmin(bot, settings)
+cogList.append(botadmin)
 
 # Channel
 channel = Channel.Channel(bot, settings)
@@ -131,7 +136,7 @@ remind = Remind.Remind(bot, settings)
 cogList.append(remind)
 
 # Faces
-face = Face.Face(bot)
+face = Face.Face(bot, settings)
 cogList.append(face)
 
 # Cats

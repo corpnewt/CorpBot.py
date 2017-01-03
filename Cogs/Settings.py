@@ -48,6 +48,8 @@ class Settings:
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
+				"LastShrug"				: "",		# Who shrugged last?
+				"LastLenny"				: "", 		# Who Lenny'ed last?
 				"VerificationTime"		: 0,		# Time to wait (in minutes) before assigning default role
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
@@ -59,6 +61,7 @@ class Settings:
 				"Volume"				: "",		# Float volume for music player
 				"DefaultVolume"			: 0.6,		# Default volume for music player
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
+				"LastComic"				: [],		# List of julian dates for last comic
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
 				"Members" 				: [],		# List of members

@@ -44,6 +44,7 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	try:
 		rImage = requests.get(url, stream = True, headers = {'User-agent': ua})
 	except:
+		remove(dirpath)
 		return None
 
 	with open(imagePath, 'wb') as f:

@@ -164,6 +164,10 @@ class Xp:
 			msg = 'Only admins can take away xp!'
 			approve = False
 
+		if xpAmount == 0:
+			msg = 'Wow, very generous of you...'
+			approve = False
+
 		# Check admin last - so it overrides anything else
 		if isAdmin and adminUnlim.lower() == "yes":
 			# No limit - approve

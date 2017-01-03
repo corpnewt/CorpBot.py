@@ -9,6 +9,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
+from   Cogs import GetImage
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -86,7 +87,7 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def avatar(self, ctx, filename : str = None, sizeLimit : int = 8000000):
-		"""Sets the bot's avatar (owner-only)."""
+		"""Sets the bot's avatar (owner only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -113,12 +114,31 @@ class Bot:
 		if filename is None:
 			await self.bot.edit_profile(avatar=None)
 			return
-		
-		if not os.path.isfile('./{}'.format(filename)):
-			# File doesn't exist
-			msg = '*{}* doesn\'t exist in my working directory.'.format(filename)
-			await self.bot.send_message(channel, msg)
-			return
+
+		# Check if we created a temp folder for this image
+		isTemp = False
+
+		status = await self.bot.send_message(channel, 'Checking if url (and downloading if valid)...')
+
+		# File name is *something* - let's first check it as a url, then a file
+		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
+		if GetImage.get_ext(filename) in extList:
+			# URL has an image extension
+			file = GetImage.download(filename)
+			if file:
+				# we got a download - let's reset and continue
+				filename = file
+				isTemp = True
+
+		if not os.path.isfile(filename):
+			if not os.path.isfile('./{}'.format(filename)):
+				await self.bot.edit_message(status, '*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
+				# File doesn't exist
+				await self.bot.send_message(channel, msg)
+				return
+			else:
+				# Local file name
+				filename = './{}'.format(filename)
 		
 		# File exists - check if image
 		img = Image.open(filename)
@@ -126,19 +146,36 @@ class Bot:
 
 		if not ext:
 			# File isn't a valid image
-			msg = '*{}* isn\'t a valid image format.'.format(filename)
-			await self.bot.send_message(channel, msg)
+			await self.bot.edit_message(status, '*{}* isn\'t a valid image format.'.format(filename))
 			return
 
+		wasConverted = False
 		# Is an image PIL understands
 		if not ext.lower == "png":
 			# Not a PNG - let's convert
+			await self.bot.edit_message(status, 'Converting to png...')
 			filename = '{}.png'.format(filename)
 			img.save(filename)
-		# Should be a png here - let's check size
+			wasConverted = True
+
+		# We got it - crop and go from there
+		w, h = img.size
+		dw = dh = 0
+		if w > h:
+			# Wide
+			dw = int((w-h)/2)
+		elif h > w:
+			# Tall
+			dh = int((h-w)/2)
+		# Run the crop
+		await self.bot.edit_message(status, 'Cropping (if needed)...')
+		img.crop((dw, dh, w-dw, h-dh)).save(filename)
+
+		# Should be a square png here - let's check size
 		# Let's make sure it's less than the passed limit
 
 		imageSize = os.stat(filename)
+		await self.bot.edit_message(status, 'Resizing (if needed)...')
 		while int(imageSize.st_size) > sizeLimit:
 			# Image is too big - resize
 			myimage = Image.open(filename)
@@ -154,10 +191,18 @@ class Bot:
 		ext = img.format
 		img.close()
 
+		await self.bot.edit_message(status, 'Uploading and applying avatar...')
 		with open(filename, 'rb') as f:
 			newAvatar = f.read()
 			await self.bot.edit_profile(avatar=newAvatar)
-
+		# Cleanup - try removing with shutil.rmtree, then with os.remove()
+		await self.bot.edit_message(status, 'Cleaning up...')
+		if isTemp:
+			GetImage.remove(filename)
+		else:
+			if wasConverted:
+				os.remove(filename)
+		await self.bot.edit_message(status, 'Avatar set!')
 			
 
 	@commands.command(pass_context=True)
