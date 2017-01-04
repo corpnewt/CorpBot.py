@@ -251,11 +251,23 @@ class Bot:
 
 		if game == None:
 			self.settings.serverDict['Game'] = None
+			msg = 'Removing my playing status...'
+			status = await self.bot.send_message(channel, msg)
+
 			await self.bot.change_presence(game=None)
+			
+			await self.bot.edit_message(status, 'Playing status removed!')
+			self.settings.flushSettings()
 			return
 
 		self.settings.serverDict['Game'] = game
+		msg = 'Setting my playing status to *{}*...'.format(game)
+		status = await self.bot.send_message(channel, msg)
+
 		await self.bot.change_presence(game=discord.Game(name=game))
+
+		await self.bot.edit_message(status, 'Playing status set to *{}!*'.format(game))
+		self.settings.flushSettings()
 
 	@commands.command(pass_context=True)
 	async def setbotparts(self, ctx, *, parts : str = None):

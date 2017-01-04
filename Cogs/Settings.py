@@ -477,9 +477,64 @@ class Settings:
 			await self.bot.send_message(channel, msg)
 			self.flushSettings()
 
+
+	@commands.command(pass_context=True)
+	async def owner(self, ctx):
+		"""Lists the bot's current owner."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner:
+			# We got an owner
+			member = DisplayName.memberForID(owner, server)
+			if not member:
+				# Not on this server
+				msg = 'My owner (id: *{}*) does not appear to be a part of this server.'.format(owner)
+			else:
+				# Gotem!
+				msg = 'I am owned by *{}*.'.format(DisplayName.name(member))
+		else:
+			# No owner
+			msg = 'I have not been claimed, *yet*.'
+		await self.bot.send_message(channel, msg)
+
 	
 	@commands.command(pass_context=True)
-	async def owner(self, ctx, member : discord.Member = None):
+	async def claim(self, ctx):
+		"""Claims the bot - once set, can only be changed by the current owner."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+		member = author
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			self.serverDict['Owner'] = member.id
+			self.flushSettings()
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
+				await self.bot.send_message(channel, msg)
+				return
+			self.serverDict['Owner'] = member.id
+			self.flushSettings()
+		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
+		await self.bot.send_message(channel, msg)
+	
+
+	@commands.command(pass_context=True)
+	async def setowner(self, ctx, *, member : str = None):
 		"""Sets the bot owner - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
 		server  = ctx.message.server
@@ -488,12 +543,13 @@ class Settings:
 		if member == None:
 			member = author
 
-		if type(member) is str:
-			try:
-				member = discord.utils.get(server.members, name=member)
-			except:
-				print("That member does not exist")
-				return
+		memberCheck = DisplayName.memberForName(member, server)
+		if memberCheck:
+			member = memberCheck
+		else:
+			msg = 'I couldn\'t find *{}*.'.format(member)
+			await self.bot.send_message(channel, msg)
+			return
 
 		try:
 			owner = self.serverDict['Owner']
