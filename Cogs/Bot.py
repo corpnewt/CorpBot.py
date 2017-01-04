@@ -215,7 +215,10 @@ class Bot:
 		total = 0
 		for server in self.bot.servers:
 			total += 1
-		msg = 'I am a part of *{}* servers!'.format(total)
+		if total == 1:
+			msg = 'I am a part of *1* server!'
+		else:
+			msg = 'I am a part of *{}* servers!'.format(total)
 		await self.bot.send_message(channel, msg)
 		
 		
