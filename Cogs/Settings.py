@@ -280,6 +280,9 @@ class Settings:
 						if not "Reminders" in y:
 							y["Reminders"] = []
 							needsUpdate = True
+						if not "Profiles" in y:
+							y["Profiles"] = []
+							needsUpdate = True
 						if not "VerificationTime" in y:
 							currentTime = int(time.time())
 							waitTime = int(self.getServerStat(server, "VerificationTime"))
@@ -301,7 +304,8 @@ class Settings:
 								"Parts"			: "",
 								"Muted"			: "No",
 								"LastOnline"	: "Unknown",
-								"Reminders"		: [] }
+								"Reminders"		: [],
+								"Profiles"		: [] }
 					if not newUser["XP"]:
 						newUser["XP"] = 0
 					if not newUser["XPReserve"]:

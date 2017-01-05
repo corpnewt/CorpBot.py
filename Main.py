@@ -36,6 +36,7 @@ from Cogs import Calc
 from Cogs import Time
 from Cogs import Search
 from Cogs import Eat
+from Cogs import Profile
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
@@ -162,6 +163,10 @@ cogList.append(search)
 # Eat something...
 eat = Eat.Eat(bot)
 cogList.append(eat)
+
+# Profile
+prof = Profile.Profile(bot, settings)
+cogList.append(prof)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
