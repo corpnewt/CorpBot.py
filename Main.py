@@ -379,6 +379,57 @@ async def on_message(message):
 	if not ignore:
 		# We're processing commands here
 		await bot.process_commands(message)
+		
+@bot.event
+async def on_message_edit(before, message):
+	# Run through the on_message commands, but on edits.
+	if not message.server:
+		# This wasn't said in a server, process commands, then return
+		await bot.process_commands(message)
+		return
+
+	try:
+		message.author.roles
+	except AttributeError:
+		# Not a User
+		await bot.process_commands(message)
+		return
+	
+	# Check if we need to ignore or delete the message
+	# or respond or replace
+	ignore = delete = False
+	respond = None
+	for cog in cogList:
+		try:
+			check = await cog.message(message)
+		except AttributeError:
+			# Onto the next
+			continue
+		try:
+			if check['Delete']:
+				delete = True
+		except KeyError:
+			pass
+		try:
+			if check['Ignore']:
+				ignore = True
+		except KeyError:
+			pass
+		try:
+			respond = check['Respond']
+		except KeyError:
+			pass
+
+	if respond:
+		# We have something to say
+		await bot.send_message(message.channel, respond)
+	if delete:
+		# We need to delete the message - top priority
+		await bot.delete_message(message)
+
+	if not ignore:
+		# We're processing commands here
+		await bot.process_commands(message)
 	
 	
 
