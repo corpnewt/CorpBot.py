@@ -212,6 +212,15 @@ class Lists:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		argList = ctx.message.content.split()
+
+		if len(argList) > 1:
+			extraArgs = ' '.join(argList[1:len(argList)])
+			# We have a random attempt at a passed variable - Thanks Sydney!
+			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `$link {}`?'.format(extraArgs, extraArgs)
+			await self.bot.send_message(channel, msg)
+			return
 		
 		linkList = self.settings.getServerStat(server, "Links")
 		if linkList == None or linkList == []:
