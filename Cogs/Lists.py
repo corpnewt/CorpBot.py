@@ -454,6 +454,15 @@ class Lists:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		
+		argList = ctx.message.content.split()
+
+		if len(argList) > 1:
+			extraArgs = ' '.join(argList[1:len(argList)])
+			# We have a random attempt at a passed variable - Thanks Sydney!
+			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `$hack {}`?'.format(extraArgs, extraArgs)
+			await self.bot.send_message(channel, msg)
+			return
+
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
 			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
