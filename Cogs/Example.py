@@ -325,8 +325,10 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def playlist(self, ctx):
 		"""Shows current songs in the playlist."""
-
 		state = self.get_voice_state(ctx.message.server)
+		if len(state.playlist) <= 0:
+                        await self.bot.say('No songs in the playlist')
+                        return
 		playlist_string  = '**Current PlayList**\n'
 		playlist_string += '```Markdown\n'
 		count = 1
