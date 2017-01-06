@@ -69,6 +69,7 @@ class VoiceState:
         self.bot = bot
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
+        self.playlist = []
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
 
@@ -98,6 +99,7 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
+            del self.playlist[0]
 
 class Music:
 	"""Voice related commands.
@@ -202,6 +204,7 @@ class Music:
 			entry = VoiceEntry(ctx.message, player)
 			await self.bot.say('Enqueued ' + str(entry))
 			await state.songs.put(entry)
+			state.playlist.append(entry)
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def volume(self, ctx, value : int):
@@ -275,6 +278,7 @@ class Music:
 		try:
 			state.audio_player.cancel()
 			del self.voice_states[server.id]
+			state.playlist = []
 			await state.voice.disconnect()
 		except:
 			pass
@@ -316,3 +320,18 @@ class Music:
 		else:
 			skip_count = len(state.skip_votes)
 			await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+
+	
+	@commands.command(pass_context=True, no_pm=True)
+	async def playlist(self, ctx):
+		"""Shows current songs in the playlist."""
+
+		state = self.get_voice_state(ctx.message.server)
+		playlist_string  = '**Current PlayList**\n'
+		playlist_string += '```Markdown\n'
+		count = 1
+		for i in state.playlist:
+                        playlist_string += '[#{}] {}\n\n'.format(count, str(i))
+                        count = count + 1
+		playlist_string += '```'
+		await self.bot.say(playlist_string)
