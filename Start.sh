@@ -1,4 +1,4 @@
- a#!/bin/bash
+#!/bin/bash
 
 # Turn on case-insensitive matching
 shopt -s nocasematch
