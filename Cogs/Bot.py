@@ -10,6 +10,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
 from   Cogs import GetImage
+from   Cogs import Nullify
 
 # This is the Bot module - it contains things like nickname, status, etc
 
