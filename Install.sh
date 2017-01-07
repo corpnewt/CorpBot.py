@@ -16,6 +16,11 @@ function main () {
         echo
         sudo apt-get install python-dev
         echo
+
+        echo Installing ffmpeg \(run as sudo if this fails\)...
+        echo
+        sudo apt-get install ffmpeg
+        echo
     fi
     
     echo Updating Discord...
