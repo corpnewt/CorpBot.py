@@ -3,6 +3,7 @@ import discord
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the Face module. It sends faces.
 
@@ -16,6 +17,13 @@ class Face:
 	@commands.command(pass_context=True)
 	async def lenny(self, ctx, *, message : str = None):
 		"""Give me some Lenny."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		# Log the user
 		self.settings.setServerStat(ctx.message.server, "LastLenny", ctx.message.author.id)
 		# Remove original message
@@ -23,6 +31,9 @@ class Face:
 		msg = "( ͡° ͜ʖ ͡°)"
 		if message:
 			msg += "\n{}".format(message)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 
 	@commands.command(pass_context=True)
@@ -43,6 +54,13 @@ class Face:
 	@commands.command(pass_context=True)
 	async def shrug(self, ctx, *, message : str = None):
 		"""Shrug it off."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		# Log the user
 		self.settings.setServerStat(ctx.message.server, "LastShrug", ctx.message.author.id)
 		# Remove original message
@@ -50,6 +68,9 @@ class Face:
 		msg = "¯\_(ツ)_/¯"
 		if message:
 			msg += "\n{}".format(message)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 
 	

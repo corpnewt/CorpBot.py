@@ -10,6 +10,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
 from   Cogs import GetImage
+from   Cogs import Nullify
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -230,6 +231,12 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		# Only allow owner to change server stats
 		serverDict = self.settings.serverDict
 
@@ -262,10 +269,15 @@ class Bot:
 
 		self.settings.serverDict['Game'] = game
 		msg = 'Setting my playing status to *{}*...'.format(game)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		status = await self.bot.send_message(channel, msg)
 
 		await self.bot.change_presence(game=discord.Game(name=game))
-
+		# Check for suppress
+		if suppress:
+			game = Nullify.clean(game)
 		await self.bot.edit_message(status, 'Playing status set to *{}!*'.format(game))
 		self.settings.flushSettings()
 

@@ -19,7 +19,6 @@ from Cogs import Lists
 from Cogs import Bot
 from Cogs import Example
 from Cogs import Humor
-from Cogs import Help
 from Cogs import Uptime
 from Cogs import MadLibs
 from Cogs import DrBeer
@@ -153,7 +152,7 @@ calc = Calc.Calc(bot)
 cogList.append(calc)
 
 # Time
-atime = Time.Time(bot)
+atime = Time.Time(bot, settings)
 cogList.append(atime)
 
 # LMG(B)(DDG)TFY

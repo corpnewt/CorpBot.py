@@ -8,6 +8,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 
 class BotAdmin:
@@ -20,6 +21,12 @@ class BotAdmin:
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
 		"""Set another user's parts list (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -54,11 +61,20 @@ class BotAdmin:
 			
 		self.settings.setUserStat(member, server, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(member), parts)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 
 	@commands.command(pass_context=True)
 	async def mute(self, ctx, *, member = None, cooldown = None):
 		"""Prevents a member from sending messages in chat (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -132,6 +148,9 @@ class BotAdmin:
 				member = discord.utils.get(message.server.members, name=member)
 			except:
 				msg = 'Couldn\'t find user *{}*.'.format(member)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
@@ -173,6 +192,12 @@ class BotAdmin:
 	async def unmute(self, ctx, *, member = None):
 		"""Allows a muted member to send messages in chat (bot-admin only)."""
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
@@ -196,6 +221,9 @@ class BotAdmin:
 			member = DisplayName.memberForName(memberName, ctx.message.server)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
@@ -215,8 +243,14 @@ class BotAdmin:
 
 
 	@commands.command(pass_context=True)
-	async def ignore(self, ctx, *, member : discord.Member = None):
+	async def ignore(self, ctx, *, member = None):
 		"""Adds a member to the bot's "ignore" list (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -237,10 +271,14 @@ class BotAdmin:
 			return
 
 		if type(member) is str:
-			try:
-				member = discord.utils.get(message.server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		ignoreList = self.settings.getServerStat(ctx.message.server, "IgnoredUsers")
@@ -250,7 +288,7 @@ class BotAdmin:
 			if member.id == user["ID"]:
 				# Found our user - already ignored
 				found = True
-				msg = '*{}* is already being ignored.'.format(user["Name"])
+				msg = '*{}* is already being ignored.'.format(DisplayName.name(member))
 		if not found:
 			# Let's ignore someone
 			ignoreList.append({ "Name" : member.name, "ID" : member.id })
@@ -268,6 +306,12 @@ class BotAdmin:
 	@commands.command(pass_context=True)
 	async def listen(self, ctx, *, member : discord.Member = None):
 		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -288,10 +332,14 @@ class BotAdmin:
 			return
 
 		if type(member) is str:
-			try:
-				member = discord.utils.get(message.server.members, name=member)
-			except:
-				print("That member does not exist")
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		ignoreList = self.settings.getServerStat(ctx.message.server, "IgnoredUsers")
@@ -344,6 +392,13 @@ class BotAdmin:
 	@commands.command(pass_context=True)
 	async def kick(self, ctx, *, member : str = None):
 		"""Kicks the selected member (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
@@ -364,7 +419,11 @@ class BotAdmin:
 		# Resolve member name -> member
 		newMem = DisplayName.memberForName(member, ctx.message.server)
 		if not newMem:
-			await self.bot.send_message(ctx.message.channel, 'I couldn\'t find *{}*.'.format(member))
+			msg = 'I couldn\'t find *{}*.'.format(member)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await self.bot.send_message(ctx.message.channel, msg)
 			return
 		
 		# newMem = valid member
@@ -396,6 +455,13 @@ class BotAdmin:
 	@commands.command(pass_context=True)
 	async def ban(self, ctx, *, member : str = None):
 		"""Bans the selected member (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
@@ -416,7 +482,11 @@ class BotAdmin:
 		# Resolve member name -> member
 		newMem = DisplayName.memberForName(member, ctx.message.server)
 		if not newMem:
-			await self.bot.send_message(ctx.message.channel, 'I couldn\'t find *{}*.'.format(member))
+			msg = 'I couldn\'t find *{}*.'.format(member)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await self.bot.send_message(ctx.message.channel, msg)
 			return
 		
 		# newMem = valid member

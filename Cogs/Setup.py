@@ -551,6 +551,36 @@ class Setup:
 						continue
 				gotIt = True
 
+		await self.suppress(ctx)
+
+
+	async def suppress(self, ctx):
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		hLock = self.settings.getServerStat(server, "SuppressMentions")
+		msg = 'Would you like me to suppress @​everyone and @​here mentions in my own output? (y/n)\n\nCurrent is *{}*.'.format(hLock)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.startswith('y'):
+					self.settings.setServerStat(server, "SuppressMentions", "Yes")
+					await self.bot.send_message(author, 'I *will* suppress @​everyone and @​here mentions.')
+				elif talk.content.startswith('n'):
+					self.settings.setServerStat(server, "SuppressMentions", "No")
+					await self.bot.send_message(author, 'I *will not* suppress @​everyone and @​here mentions.')
+				else:
+					# Skipping
+					await self.bot.send_message(author, '@​everyone and @​here mention suppression shall remain *{}*'.format(hLock))
+				gotIt = True
 		await self.setupComplete(ctx)
 
 	async def setupComplete(self, ctx):

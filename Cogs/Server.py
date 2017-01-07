@@ -5,6 +5,7 @@ import string
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
+from   Cogs import Nullify
 
 # This module sets/gets some server info
 
@@ -47,9 +48,19 @@ class Server:
 	async def info(self, ctx):
 		"""Displays the server info if any."""
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		serverInfo = self.settings.getServerStat(ctx.message.server, "Info")
 		msg = 'I have no info on *{}* yet.'.format(ctx.message.server.name)
 		if serverInfo:
 			msg = '*{}*:\n\n{}'.format(ctx.message.server.name, serverInfo)
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 
 		await self.bot.send_message(ctx.message.channel, msg)

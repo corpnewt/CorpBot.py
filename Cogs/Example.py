@@ -4,6 +4,7 @@ import random
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import Nullify
 		
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -38,7 +39,9 @@ class Example:
 	@commands.command(description='For when you wanna settle the score some other way')
 	async def choose(self, *choices : str):
 		"""Chooses between multiple choices."""
-		await self.bot.say(random.choice(choices))
+		msg = random.choice(choices)
+		msg = Nullify.clean(msg)
+		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
 	async def joined(self, ctx, member : discord.Member = None):
@@ -329,11 +332,11 @@ class Music:
 		if len(state.playlist) <= 0:
                         await self.bot.say('No songs in the playlist')
                         return
-		playlist_string  = '**Current PlayList**\n'
-		playlist_string += '```Markdown\n'
+		playlist_string  = '**Current PlayList**\n\n'
+		#playlist_string += '```Markdown\n'
 		count = 1
 		for i in state.playlist:
-                        playlist_string += '[#{}] {}\n\n'.format(count, str(i))
+                        playlist_string += '{}. {}\n'.format(count, str(i))
                         count = count + 1
-		playlist_string += '```'
+		#playlist_string += '```'
 		await self.bot.say(playlist_string)

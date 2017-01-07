@@ -25,6 +25,7 @@ class Settings:
 		self.backupMax = 100
 		self.backupTime = 7200 # runs every 2 hours
 		self.backupWait = 10 # initial wait time before first backup
+		self.settingsDump = 300 # runs every 5 minutes
 		self.bot = bot
 		self.serverDict = {}
 
@@ -58,6 +59,7 @@ class Settings:
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
+				"SuppressMentions"		: "Yes",	# Will the bot suppress @here and @everyone in its own output?
 				"Volume"				: "",		# Float volume for music player
 				"DefaultVolume"			: 0.6,		# Default volume for music player
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
@@ -99,6 +101,8 @@ class Settings:
 						self.bot.loop.create_task(self.giveRole(member, server))
 		# Start the backup loop
 		self.bot.loop.create_task(self.backup())
+		# Start the settings loop
+		self.bot.loop.create_task(self.flushLoop())
 
 	async def giveRole(self, member, server):
 		# Start the countdown
@@ -188,7 +192,7 @@ class Settings:
 				newServer[key] = self.defaultServer[key]
 			
 			self.serverDict["Servers"].append(newServer)
-			self.flushSettings()
+			#self.flushSettings()
 
 	# Let's make sure the user is in the specified server
 	def removeServer(self, server):
@@ -199,8 +203,8 @@ class Settings:
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
-		if found:
-			self.flushSettings()
+		#if found:
+			#self.flushSettings()
 
 	def removeServerID(self, id):
 		# Check for our server ID
@@ -210,8 +214,8 @@ class Settings:
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
-		if found:
-			self.flushSettings()
+		#if found:
+			#self.flushSettings()
 
 
 	def removeChannel(self, channel):
@@ -283,6 +287,9 @@ class Settings:
 						if not "Profiles" in y:
 							y["Profiles"] = []
 							needsUpdate = True
+						if not "UTCOffset" in y:
+							y["UTCOffset"] = None
+							needsUpdate = True
 						if not "VerificationTime" in y:
 							currentTime = int(time.time())
 							waitTime = int(self.getServerStat(server, "VerificationTime"))
@@ -311,8 +318,8 @@ class Settings:
 					if not newUser["XPReserve"]:
 						newUser["XPReserve"] = 0
 					x["Members"].append(newUser)
-				if needsUpdate:
-					self.flushSettings()
+				#if needsUpdate:
+					#self.flushSettings()
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
@@ -328,8 +335,8 @@ class Settings:
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
-		if found:
-			self.flushSettings()
+		#if found:
+			#self.flushSettings()
 
 
 	# Let's make sure the user is in the specified server
@@ -346,8 +353,8 @@ class Settings:
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
-		if found:
-			self.flushSettings()
+		#if found:
+			#self.flushSettings()
 
 	
 	# Return the requested stat
@@ -383,7 +390,7 @@ class Settings:
 					if y["ID"] == user.id:
 						# Found our user - let's set the stat
 						y[stat] = value
-						self.flushSettings()
+						#self.flushSettings()
 						
 					
 	# Increment a specified user stat by a provided amount
@@ -403,12 +410,12 @@ class Settings:
 							tempStat = int(y[stat])
 							tempStat += int(incrementAmount)
 							y[stat] = tempStat
-							self.flushSettings()
+							#self.flushSettings()
 							return tempStat
 						else:
 							# No stat - set stat to increment amount
 							y[stat] = incrementAmount
-							self.flushSettings()
+							#self.flushSettings()
 							return incrementAmount
 		# If we made it here - we failed somewhere, return None
 		return None
@@ -439,7 +446,7 @@ class Settings:
 			if x["ID"] == server.id:
 				# We found our server - set the stat
 				x[stat] = value
-				self.flushSettings()
+				#self.flushSettings()
 
 	@commands.command(pass_context=True)
 	async def ownerlock(self, ctx):
@@ -479,7 +486,7 @@ class Settings:
 				msg = 'Owner lock **Disabled**.'
 				await self.bot.change_presence(game=None)
 			await self.bot.send_message(channel, msg)
-			self.flushSettings()
+			#self.flushSettings()
 
 
 	@commands.command(pass_context=True)
@@ -525,14 +532,14 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			self.serverDict['Owner'] = member.id
-			self.flushSettings()
+			#self.flushSettings()
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
 				await self.bot.send_message(channel, msg)
 				return
 			self.serverDict['Owner'] = member.id
-			self.flushSettings()
+			#self.flushSettings()
 		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await self.bot.send_message(channel, msg)
 	
@@ -563,14 +570,14 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			self.serverDict['Owner'] = member.id
-			self.flushSettings()
+			#self.flushSettings()
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
 				await self.bot.send_message(channel, msg)
 				return
 			self.serverDict['Owner'] = member.id
-			self.flushSettings()
+			#self.flushSettings()
 
 		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await self.bot.send_message(channel, msg)
@@ -604,7 +611,7 @@ class Settings:
 				await self.bot.send_message(channel, msg)
 				return
 			self.serverDict['Owner'] = None
-			self.flushSettings()
+			#self.flushSettings()
 
 		msg = 'I have been disowned by *{}!*'.format(DisplayName.name(author))
 		await self.bot.send_message(channel, msg)
@@ -717,6 +724,15 @@ class Settings:
 		msg = 'Flushed settings to disk.'
 		await self.bot.send_message(ctx.message.channel, msg)
 				
+
+	# Flush loop - run every 10 minutes
+	async def flushLoop(self, file = None):
+		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
+		if not file:
+			file = self.file
+		while not self.bot.is_closed:
+			await asyncio.sleep(self.settingsDump)
+			self.flushSettings()
 				
 	# Flush settings to disk
 	def flushSettings(self, file = None):
