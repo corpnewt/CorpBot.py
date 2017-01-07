@@ -332,11 +332,11 @@ class Music:
 		if len(state.playlist) <= 0:
                         await self.bot.say('No songs in the playlist')
                         return
-		playlist_string  = '**Current PlayList**\n'
-		playlist_string += '```Markdown\n'
+		playlist_string  = '**Current PlayList**\n\n'
+		#playlist_string += '```Markdown\n'
 		count = 1
 		for i in state.playlist:
-                        playlist_string += '[#{}] {}\n\n'.format(count, str(i))
+                        playlist_string += '{}. {}\n'.format(count, str(i))
                         count = count + 1
-		playlist_string += '```'
+		#playlist_string += '```'
 		await self.bot.say(playlist_string)
