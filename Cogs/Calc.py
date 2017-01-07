@@ -4,9 +4,10 @@ import discord
 import random
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import Nullify
 
 from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
-                       ZeroOrMore,Forward,nums,alphas,oneOf)
+                    ZeroOrMore,Forward,nums,alphas,oneOf)
 import math
 import operator
 
@@ -45,8 +46,8 @@ class NumericStringParser(object):
         point = Literal( "." )
         e     = CaselessLiteral( "E" )
         fnumber = Combine( Word( "+-"+nums, nums ) + 
-                           Optional( point + Optional( Word( nums ) ) ) +
-                           Optional( e + Word( "+-"+nums, nums ) ) )
+                        Optional( point + Optional( Word( nums ) ) ) +
+                        Optional( e + Word( "+-"+nums, nums ) ) )
         ident = Word(alphas, alphas+nums+"_$")       
         plus  = Literal( "+" )
         minus = Literal( "-" )
@@ -60,7 +61,7 @@ class NumericStringParser(object):
         pi    = CaselessLiteral( "PI" )
         expr = Forward()
         atom = ((Optional(oneOf("- +")) +
-                 (pi|e|fnumber|ident+lpar+expr+rpar).setParseAction(self.pushFirst))
+                (pi|e|fnumber|ident+lpar+expr+rpar).setParseAction(self.pushFirst))
                 | Optional(oneOf("- +")) + Group(lpar+expr+rpar)
                 ).setParseAction(self.pushUMinus)       
         # by defining exponentiation as "atom [ ^ factor ]..." instead of 
@@ -114,36 +115,37 @@ class NumericStringParser(object):
 
 class Calc:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
-		self.bot = bot
-		self.nsp=NumericStringParser()
+    # Init with the bot reference, and a reference to the settings var
+    def __init__(self, bot):
+        self.bot = bot
+        self.nsp=NumericStringParser()
 
-	@commands.command(pass_context=True)
-	async def calc(self, ctx, *, formula = None):
-		"""Do some math."""
+    @commands.command(pass_context=True)
+    async def calc(self, ctx, *, formula = None):
+        """Do some math."""
 
-		if formula == None:
-			msg = 'Usage: `$calc [formula]`'
-			await self.bot.send_message(ctx.message.channel, msg)
-			return
+        if formula == None:
+            msg = 'Usage: `$calc [formula]`'
+            await self.bot.send_message(ctx.message.channel, msg)
+            return
 
-		try:
-			answer=self.nsp.eval(formula)
-		except:
-			msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula)
-			msg += 'I understand the following syntax:\n```\n'
-			msg += "expop   :: '^'\n"
-			msg += "multop  :: 'x' | '/'\n"
-			msg += "addop   :: '+' | '-'\n"
-			msg += "integer :: ['+' | '-'] '0'..'9'+\n"
-			msg += "atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'\n"
-			msg += "factor  :: atom [ expop factor ]*\n"
-			msg += "term    :: factor [ multop factor ]*\n"
-			msg += "expr    :: term [ addop term ]*```"
-			await self.bot.send_message(ctx.message.channel, msg)
-			return
+        try:
+            answer=self.nsp.eval(formula)
+        except:
+            msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula)
+            msg += 'I understand the following syntax:\n```\n'
+            msg += "expop   :: '^'\n"
+            msg += "multop  :: 'x' | '/'\n"
+            msg += "addop   :: '+' | '-'\n"
+            msg += "integer :: ['+' | '-'] '0'..'9'+\n"
+            msg += "atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'\n"
+            msg += "factor  :: atom [ expop factor ]*\n"
+            msg += "term    :: factor [ multop factor ]*\n"
+            msg += "expr    :: term [ addop term ]*```"
+            msg = Nullify.clean(msg)
+            await self.bot.send_message(ctx.message.channel, msg)
+            return
 
-		msg = '{} = {}'.format(formula, answer)
-		# Say message
-		await self.bot.send_message(ctx.message.channel, msg)
+        msg = '{} = {}'.format(formula, answer)
+        # Say message
+        await self.bot.send_message(ctx.message.channel, msg)

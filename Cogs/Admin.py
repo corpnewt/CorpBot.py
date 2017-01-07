@@ -8,6 +8,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -145,6 +146,12 @@ class Admin:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -159,6 +166,9 @@ class Admin:
 				return
 			if not nameCheck["Member"]:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 			member   = nameCheck["Member"]
@@ -189,6 +199,12 @@ class Admin:
 		server  = ctx.message.server
 		channel = ctx.message.channel
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -207,6 +223,9 @@ class Admin:
 			self.settings.setServerStat(server, "DefaultRole", role)
 			try:
 				rolename = discord.utils.get(server.roles, position=role)
+				# Check for suppress
+				if suppress:
+					rolename = Nullify.clean(rolename)
 				await self.bot.send_message(channel, 'Default role set to **{}**!'.format(rolename.name))
 			except:
 				print("That role does not exist")
@@ -220,7 +239,11 @@ class Admin:
 				return
 
 		self.settings.setServerStat(server, "DefaultRole", role.id)
-		await self.bot.send_message(channel, 'Default role set to **{}**!'.format(role.name))
+		rolename = role.name
+		# Check for suppress
+		if suppress:
+			rolename = Nullify.clean(rolename)
+		await self.bot.send_message(channel, 'Default role set to **{}**!'.format(rolename))
 
 
 	@setdefaultrole.error
@@ -237,6 +260,12 @@ class Admin:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -254,6 +283,9 @@ class Admin:
 					return
 				if not roleCheck["Role"]:
 					msg = 'I couldn\'t find *{}* on the server.'.format(role)
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				role = roleCheck["Role"]
@@ -275,6 +307,9 @@ class Admin:
 			if aRole['ID'] == role.id:
 				# We found it - throw an error message and return
 				msg = '**{}** is already in the list.  Required xp: *{}*'.format(role.name, aRole['XP'])
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				return
 
@@ -283,6 +318,9 @@ class Admin:
 		self.settings.setServerStat(server, "PromotionArray", promoArray)
 
 		msg = '**{}** added to list.  Required xp: *{}*'.format(role.name, xp)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 		return
 
@@ -292,7 +330,6 @@ class Admin:
 		msg = 'addxprole Error: {}'.format(ctx)
 		await self.bot.say(msg)
 		
-		
 	@commands.command(pass_context=True)
 	async def removexprole(self, ctx, *, role = None):
 		"""Removes a role from the xp promotion/demotion system (admin only)."""
@@ -300,6 +337,12 @@ class Admin:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -324,6 +367,9 @@ class Admin:
 					promoArray.remove(aRole)
 					self.settings.setServerStat(server, "PromotionArray", promoArray)
 					msg = '**{}** removed successfully.'.format(aRole['Name'])
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
 					await self.bot.send_message(channel, msg)
 					return
 			# At this point - no name
@@ -343,11 +389,17 @@ class Admin:
 						promoArray.remove(aRole)
 						self.settings.setServerStat(server, "PromotionArray", promoArray)
 						msg = '**{}** removed successfully.'.format(aRole['Name'])
+						# Check for suppress
+						if suppress:
+							msg = Nullify.clean(msg)
 						await self.bot.send_message(channel, msg)
 						return
 				
 			# If we made it this far - then we didn't find it
 			msg = '{} not found in list.'.format(roleCheck.name)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -361,11 +413,17 @@ class Admin:
 				promoArray.remove(aRole)
 				self.settings.setServerStat(server, "PromotionArray", promoArray)
 				msg = '**{}** removed successfully.'.format(aRole['Name'])
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				return
 
 		# If we made it this far - then we didn't find it
 		msg = '{} not found in list.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 
 	@removexprole.error
@@ -413,6 +471,12 @@ class Admin:
 	async def setxprole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
 		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -436,6 +500,9 @@ class Admin:
 		self.settings.setServerStat(ctx.message.server, "RequiredXPRole", role.id)
 
 		msg = 'Role required to give xp, gamble, or feed the bot set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	
@@ -448,6 +515,13 @@ class Admin:
 	@commands.command(pass_context=True)
 	async def xprole(self, ctx):
 		"""Lists the required role to give xp, gamble, or feed the bot."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
 		if role == None or role == "":
 			msg = '**Everyone** can give xp, gamble, and feed the bot.'
@@ -461,12 +535,21 @@ class Admin:
 					msg = 'You need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
 			await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
 	async def setstoprole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -490,6 +573,9 @@ class Admin:
 		self.settings.setServerStat(ctx.message.server, "RequiredStopRole", role.id)
 
 		msg = 'Role required to stop the music player set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	
@@ -502,6 +588,13 @@ class Admin:
 	@commands.command(pass_context=True)
 	async def stoprole(self, ctx):
 		"""Lists the required role to stop the bot from playing music."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		role = self.settings.getServerStat(ctx.message.server, "RequiredStopRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can use stop.'
@@ -515,6 +608,9 @@ class Admin:
 					msg = 'You need to be a/an **{}** to use stop.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
 			await self.bot.send_message(ctx.message.channel, msg)
 
 		
@@ -522,6 +618,12 @@ class Admin:
 	async def setlinkrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
 		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -545,6 +647,9 @@ class Admin:
 		self.settings.setServerStat(ctx.message.server, "RequiredLinkRole", role.id)
 
 		msg = 'Role required for add/remove links set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	
@@ -559,6 +664,12 @@ class Admin:
 	async def sethackrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -582,6 +693,9 @@ class Admin:
 		self.settings.setServerStat(ctx.message.server, "RequiredHackRole", role.id)
 
 		msg = 'Role required for add/remove hacks set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 
 
@@ -635,6 +749,13 @@ class Admin:
 	@commands.command(pass_context=True)
 	async def addadmin(self, ctx, *, role : discord.Role = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -661,6 +782,9 @@ class Admin:
 			if aRole['ID'] == role.id:
 				# We found it - throw an error message and return
 				msg = '**{}** is already in the list.'.format(role.name)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
@@ -669,6 +793,9 @@ class Admin:
 		self.settings.setServerStat(ctx.message.server, "AdminArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 		return
 
@@ -682,6 +809,13 @@ class Admin:
 	@commands.command(pass_context=True)
 	async def removeadmin(self, ctx, *, role : discord.Role = None):
 		"""Removes a role from the admin list (admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -710,11 +844,17 @@ class Admin:
 				promoArray.remove(aRole)
 				self.settings.setServerStat(ctx.message.server, "AdminArray", promoArray)
 				msg = '**{}** removed successfully.'.format(role.name)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
 		# If we made it this far - then we didn't find it
 		msg = '**{}** not found in list.'.format(aRole['Name'])
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
 
 	@removeadmin.error
@@ -731,6 +871,12 @@ class Admin:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -760,6 +906,9 @@ class Admin:
 				await self.updateMOTD()
 				return		
 		msg = 'MOTD for *{}* not found.'.format(chan.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)	
 		
 	@removemotd.error

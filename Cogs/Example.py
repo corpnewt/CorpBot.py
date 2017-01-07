@@ -4,6 +4,7 @@ import random
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import Nullify
 		
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -38,7 +39,9 @@ class Example:
 	@commands.command(description='For when you wanna settle the score some other way')
 	async def choose(self, *choices : str):
 		"""Chooses between multiple choices."""
-		await self.bot.say(random.choice(choices))
+		msg = random.choice(choices)
+		msg = Nullify.clean(msg)
+		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
 	async def joined(self, ctx, member : discord.Member = None):

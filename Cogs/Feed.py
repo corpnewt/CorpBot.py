@@ -6,6 +6,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Xp
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the feed module.  It allows the bot to be fed,
 # get hungry, die, be resurrected, etc.
@@ -244,6 +245,12 @@ class Feed:
 			if not hasPerms:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 				return
+
+		iskill = self.settings.getServerStat(server, "Killed")
+		if iskill.lower() == 'yes':
+			killedby = self.settings.getServerStat(server, "KilledBy")
+			await self.bot.send_message(channel, 'I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
+			return
 		
 		self.settings.setServerStat(server, "Killed", "Yes")
 		self.settings.setServerStat(server, "KilledBy", DisplayName.name(author))
@@ -274,6 +281,11 @@ class Feed:
 			if not hasPerms:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 				return
+
+		iskill = self.settings.getServerStat(server, "Killed")
+		if iskill.lower() == 'no':
+			await self.bot.send_message(channel, 'Trying to bring back the *already-alive* - well aren\'t you special!')
+			return
 		
 		self.settings.setServerStat(server, "Killed", "No")
 		self.settings.setServerStat(server, "Hunger", "0")
@@ -306,6 +318,12 @@ class Feed:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -330,6 +348,9 @@ class Feed:
 		self.settings.setServerStat(server, "RequiredKillRole", role.id)
 
 		msg = 'Role required for kill/resurrect set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 
 	@setkillrole.error
@@ -341,6 +362,13 @@ class Feed:
 	@commands.command(pass_context=True)
 	async def killrole(self, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		role = self.settings.getServerStat(ctx.message.server, "RequiredKillRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can kill/ressurect the bot.'.format(ctx)
@@ -354,4 +382,7 @@ class Feed:
 					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
 			await self.bot.send_message(ctx.message.channel, msg)

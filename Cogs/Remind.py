@@ -7,6 +7,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the Remind module. It sends a pm to a user after a specified amount of time
 
@@ -120,6 +121,13 @@ class Remind:
 	@commands.command(pass_context=True)
 	async def reminders(self, ctx):
 		"""List up to 10 pending reminders."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		member = ctx.message.author
 		myReminders = self.settings.getUserStat(member, member.server, "Reminders")
 		msg = 'You don\'t currently have any reminders set.  You can add some with the `$remindme "[message]" [time]` command.'
@@ -155,6 +163,10 @@ class Remind:
 			msg = '{}\n\nYou have *{}* additional reminder.'.format(msg, remain)
 		elif remain > 1:
 			msg = '{}\n\nYou have *{}* additional reminders.'.format(msg, remain)
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 
 		await self.bot.send_message(ctx.message.channel, msg)
 

@@ -6,6 +6,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the profiles module.
 
@@ -20,6 +21,12 @@ class Profile:
 	@commands.command(pass_context=True)
 	async def addprofile(self, ctx, name : str = None, *, link : str = None):
 		"""Add a profile to your profile list."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -59,12 +66,18 @@ class Profile:
 			if alink['Name'].lower() == name.lower():
 				# The link exists!
 				msg = '*{}\'s* *{}* profile was updated!'.format(DisplayName.name(author), name)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				alink['URL'] = link
 				alink['Updated'] = currentTime
 				found = True
 		if not found:	
 			linkList.append({"Name" : name, "URL" : link, "Created" : currentTime})
 			msg = '*{}* added to *{}\'s* profile list!'.format(name, DisplayName.name(author))
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
 		
 		self.settings.setUserStat(author, server, "Profiles", linkList)
 		await self.bot.send_message(channel, msg)
@@ -77,6 +90,12 @@ class Profile:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredXPRole")
@@ -112,10 +131,16 @@ class Profile:
 				linkList.remove(alink)
 				self.settings.setUserStat(author, server, "Profiles", linkList)
 				msg = '*{}* removed from *{}\'s* profile list!'.format(alink['Name'], DisplayName.name(author))
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				return
 
 		msg = '*{}* not found in *{}\'s* profile list!'.format(name, DisplayName.name(author))
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 
 
@@ -126,6 +151,12 @@ class Profile:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		if not member:
 			msg = 'Usage: `$profile [member] [profile name]`'
@@ -159,6 +190,9 @@ class Profile:
 							if alink['Name'].lower() == profileStr.lower():
 								# Found the link - return it.
 								msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(memFromName), alink['Name'], alink['URL'])
+								# Check for suppress
+								if suppress:
+									msg = Nullify.clean(msg)
 								await self.bot.send_message(channel, msg)
 								return
 		# Check if there is no member specified
@@ -170,6 +204,9 @@ class Profile:
 			if alink['Name'].lower() == member.lower():
 				# Found the link - return it.
 				msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(author), alink['Name'], alink['URL'])
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				return
 
@@ -185,6 +222,12 @@ class Profile:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		if not member:
 			msg = 'Usage: `$profileinfo [member] [link name]`'
@@ -255,6 +298,9 @@ class Profile:
 			msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
 		except:
 			pass
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 		return
 
@@ -267,6 +313,12 @@ class Profile:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		if not member:
 			member = author
 		else:
@@ -274,6 +326,9 @@ class Profile:
 			if not newMember:
 				# no member found by that name
 				msg = 'I couldn\'t find *{}* on this server.'.format(member)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				return
 			else:
@@ -292,6 +347,10 @@ class Profile:
 		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
 		for alink in linkList:
 			linkText = '{}*{}*, '.format(linkText, alink['Name'])
+
+		# Check for suppress
+		if suppress:
+			linkText = Nullify.clean(linkText)
 
 		# Speak the link list while cutting off the end ", "
 		await self.bot.send_message(channel, linkText[:-2])

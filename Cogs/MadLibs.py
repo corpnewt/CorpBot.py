@@ -7,6 +7,7 @@ import string
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 class MadLibs:
 
@@ -28,6 +29,12 @@ class MadLibs:
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		# Check if we have a MadLibs channel - and if so, restrict to that
 		channelID = self.settings.getServerStat(server, "MadLibsChannel")
@@ -147,6 +154,9 @@ class MadLibs:
 
 		self.settings.setServerStat(server, "PlayingMadLibs", None)
 		
+		# Check for suppress
+		if suppress:
+			data = Nullify.clean(data)
 		# Message the output
 		await self.bot.send_message(channel, data)
 

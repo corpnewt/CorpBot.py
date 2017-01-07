@@ -3,6 +3,7 @@ import discord
 import random
 from   discord.ext import commands
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 class Eat:
 
@@ -24,6 +25,7 @@ class Eat:
 
 			randnum = random.randint(0, len(nothingList)-1)
 			msg = '*{}*, {}'.format(authorName, nothingList[randnum])
+			msg = Nullify.clean(msg)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 		
@@ -38,6 +40,12 @@ class Eat:
 								'I\'m a bot.  You can\'t eat me.',
 								'your jaw clamps down on... wait... on nothing, because I\'m *digital!*.',
 								'what kind of bot would I be if I let you eat me?']
+			elif memberCheck.id == ctx.message.author.id:
+				# We're eating... ourselves?
+				memberList = [  'you clamp down on your own forearm - not surprisingly, it hurts.',
+								'you place a finger into your mouth, but *just cant\'t* force yourself to bite down.',
+								'you happily munch away, but can now only wave with your left hand.',
+								'wait - you\'re not a sandwich!']
 			else:
 				memName = DisplayName.name(memberCheck)
 				memberList = [ 'you unhinge your jaw and consume *{}* in one bite.'.format(memName),
@@ -46,7 +54,8 @@ class Eat:
 								'you sink your teeth into *{}\'s* shoulder - they turn to face you, eyes wide as you try your best to scurry away and hide.'.format(memName),
 								'your jaw clamps down on *{}* - a satisfying *crunch* emanates as you finish your newest meal.'.format(memName)]
 			randnum = random.randint(0, len(memberList)-1)
-			msg = '*{}*, {}'.format(authorName, memberList[randnum])				
+			msg = '*{}*, {}'.format(authorName, memberList[randnum])
+			msg = Nullify.clean(msg)				
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -56,6 +65,7 @@ class Eat:
 						'you attempt to bite into *{}*, but you\'re clumsier than you remember - and fail...'.format(member),]
 
 		randnum = random.randint(0, len(itemList)-1)
-		msg = '*{}*, {}'.format(authorName, itemList[randnum])				
+		msg = '*{}*, {}'.format(authorName, itemList[randnum])
+		msg = Nullify.clean(msg)			
 		await self.bot.send_message(ctx.message.channel, msg)
 		return				

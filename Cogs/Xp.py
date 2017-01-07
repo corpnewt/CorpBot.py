@@ -6,6 +6,7 @@ from   discord.ext import commands
 from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the xp module.  It's likely to be retarded.
 
@@ -43,6 +44,12 @@ class Xp:
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -57,6 +64,9 @@ class Xp:
 				return
 			if not nameCheck["Member"]:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 			member   = nameCheck["Member"]
@@ -71,6 +81,9 @@ class Xp:
 
 		self.settings.setUserStat(member, server, "XP", xpAmount)
 		msg = '*{}\'s* xp was set to *{}!*'.format(DisplayName.name(member), xpAmount)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
 		await self.checkroles(member, channel)
 
@@ -84,10 +97,16 @@ class Xp:
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
-		
+
 		author  = ctx.message.author
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		usage = 'Usage: `$xp [role/member] [amount]`'
 
@@ -106,6 +125,9 @@ class Xp:
 				if not roleCheck:
 					# Returned nothing - means there isn't even an int
 					msg = 'I couldn\'t find *{}* on the server.'.format(member)
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				if roleCheck["Role"]:
@@ -120,6 +142,9 @@ class Xp:
 						return
 					if not nameCheck["Member"]:
 						msg = 'I couldn\'t find *{}* on the server.'.format(member)
+						# Check for suppress
+						if suppress:
+							msg = Nullify.clean(msg)
 						await self.bot.send_message(ctx.message.channel, msg)
 						return
 					member   = nameCheck["Member"]
@@ -221,6 +246,9 @@ class Xp:
 					if decrement:
 						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 					msg = '*{} collective xp* was given to *{}!*'.format(totalXP, member.name)
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
 					await self.bot.send_message(channel, msg)
 				else:
 					msg = 'There are no eligible members in *{}!*'.format(member.name)
@@ -232,6 +260,9 @@ class Xp:
 					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 				msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(channel, msg)
 				self.settings.incrementStat(member, server, "XP", xpAmount)
 				# Now we check for promotions
@@ -247,6 +278,13 @@ class Xp:
 	@commands.command(pass_context=True)
 	async def defaultrole(self, ctx):
 		"""Lists the default role that new users are assigned."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		role = self.settings.getServerStat(ctx.message.server, "DefaultRole")
 		if role == None or role == "":
 			msg = 'New users are not assigned a role on joining this server.'
@@ -258,6 +296,9 @@ class Xp:
 				if arole.id == role:
 					found = True
 					msg = 'New users will be assigned to **{}**.'.format(arole.name)
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await self.bot.send_message(ctx.message.channel, msg)
@@ -419,6 +460,12 @@ class Xp:
 		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
 		userXP      = int(self.settings.getUserStat(user, server, "XP"))
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppressed = True
+		else:
+			suppressed = False
+
 		changed = False
 		
 		if xpPromote.lower() == "yes":
@@ -455,6 +502,9 @@ class Xp:
 							changed = True
 		# Check if we have a message to display - and display it
 		if msg and (not suppress):
+			# Check for suppress
+			if suppressed:
+				msg = Nullify.clean(msg)
 			await self.bot.send_message(channel, msg)
 		return changed
 
@@ -465,6 +515,12 @@ class Xp:
 		
 		server  = ctx.message.server
 		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		
 		# Get the array
 		promoArray = self.settings.getServerStat(server, "PromotionArray")
@@ -499,6 +555,10 @@ class Xp:
 			if not found:
 				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
 
+		# Check for suppress
+		if suppress:
+			roleText = Nullify.clean(roleText)
+
 		await self.bot.send_message(channel, roleText)
 		
 		
@@ -506,6 +566,12 @@ class Xp:
 	async def rank(self, ctx, *, member = None):
 		"""Say the highest rank of a listed member."""
 		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		if member is None:
 			member = ctx.message.author
 			
@@ -514,6 +580,9 @@ class Xp:
 			member = DisplayName.memberForName(memberName, ctx.message.server)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 			
@@ -570,17 +639,20 @@ class Xp:
 
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
-	async def topxp(self, ctx):
-		"""List the top 10 xp-holders - or all members, if there are less than 10 total."""
+	async def leaderboard(self, ctx, total : int = 10):
+		"""List the top xp-holders (max of 50)."""
 		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
 
 		startIndex = 0
-		total = 10
+		if total > 50:
+			total = 50
+		if total < 1:
+			total = 1
 		msg = ""
 
-		if len(promoSorted) < 10:
+		if len(promoSorted) < total:
 			total = len(promoSorted)
 		
 		if len(promoSorted):
@@ -610,17 +682,20 @@ class Xp:
 		
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
-	async def bottomxp(self, ctx):
-		"""List the bottom 10 xp-holders - or all members, if there are less than 10 total."""
+	async def bottomxp(self, ctx, total : int = 10):
+		"""List the bottom xp-holders (max of 50)."""
 		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 
 		startIndex = 0
-		total = 10
+		if total > 50:
+			total = 50
+		if total < 1:
+			total = 1
 		msg = ""
 
-		if len(promoSorted) < 10:
+		if len(promoSorted) < total:
 			total = len(promoSorted)
 		
 		if len(promoSorted):
@@ -650,6 +725,13 @@ class Xp:
 	@commands.command(pass_context=True)
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
+		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
 		if member is None:
 			member = ctx.message.author
 			
@@ -658,6 +740,9 @@ class Xp:
 			member = DisplayName.memberForName(memberName, ctx.message.server)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
@@ -757,6 +842,12 @@ class Xp:
 		server  = ctx.message.server
 		channel = ctx.message.channel
 
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		serverName = server.name
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		if not hourlyXP:
@@ -823,5 +914,9 @@ class Xp:
 				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that settings.\n\n'.format(msg, role)
 
 		msg = "{}Hopefully that clears things up!".format(msg)
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 
 		await self.bot.send_message(ctx.message.channel, msg)

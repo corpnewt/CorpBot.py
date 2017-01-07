@@ -6,6 +6,7 @@ from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -41,6 +42,12 @@ class Channel:
 	@commands.command(pass_context=True)
 	async def ismuted(self, ctx, *, member = None):
 		"""Says whether a member is muted in chat."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 			
 		if member == None:
 			msg = 'Usage: `ismuted [member]`'
@@ -52,6 +59,9 @@ class Channel:
 			member = DisplayName.memberForName(memberName, ctx.message.server)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 				
@@ -94,6 +104,13 @@ class Channel:
 	@commands.command(pass_context=True)
 	async def listadmin(self, ctx):
 		"""Lists admin roles and id's."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
 		promoArray = self.settings.getServerStat(ctx.message.server, "AdminArray")
 		
 		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
@@ -113,11 +130,21 @@ class Channel:
 					# Found the role ID
 					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
 
+		# Check for suppress
+		if suppress:
+			roleText = Nullify.clean(roleText)
+
 		await self.bot.send_message(ctx.message.channel, roleText)
 
 	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, role = None):
 		"""Lists the number of users in a current role."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		author  = ctx.message.author
 		server  = ctx.message.server
@@ -133,6 +160,9 @@ class Channel:
 			role = DisplayName.roleForName(roleName, ctx.message.server)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 		
