@@ -71,7 +71,7 @@ class VoiceState:
         self.voice = None
         self.bot = bot
         self.play_next_song = asyncio.Event()
-        self.songs = asyncio.Queue()
+        #self.songs = asyncio.Queue()
         self.playlist = []
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
@@ -98,7 +98,12 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             self.play_next_song.clear()
-            self.current = await self.songs.get()
+
+            if len(self.playlist) <= 0:
+            	await asyncio.sleep(1)
+            	continue
+
+            self.current = self.playlist[0]
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
@@ -206,7 +211,7 @@ class Music:
 			player.volume = volume
 			entry = VoiceEntry(ctx.message, player)
 			await self.bot.say('Enqueued ' + str(entry))
-			await state.songs.put(entry)
+			#await state.songs.put(entry)
 			state.playlist.append(entry)
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -340,3 +345,27 @@ class Music:
                         count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
+
+	
+	@commands.command(pass_context=True, no_pm=True)
+	async def removesong(self, ctx, idx : int):
+		"""Removes a song in the playlist by the index."""
+		
+		# I'm not sure how to check for mod status can you add this part Corp? :D
+		# isAdmin = author.permissions_in(channel).administrator
+		# # Only allow admins to change server stats
+		# if not isAdmin:
+		# 	await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+		# 	return
+
+		idx = idx - 1
+		state = self.get_voice_state(ctx.message.server)
+		if idx < 0 or idx >= len(state.playlist):
+			await self.bot.say('Invalid song index, please refer to $playlist for the song index.')
+			return
+		song = state.playlist[idx]
+		await self.bot.say('Deleted {} from playlist'.format(str(song)))
+		if idx == 0:
+			await self.bot.say('Cannot delete currently playing song, use $skip instead')
+			return
+		del state.playlist[idx]

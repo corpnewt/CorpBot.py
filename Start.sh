@@ -18,7 +18,8 @@ function runBot () {
     python3 Main.py
     echo
     echo "$(timestamp): CorpBot died."
-    echo Restarting...
+    echo "Restarting in 10 seconds..."
+    sleep 10
     runBot
 }
 
