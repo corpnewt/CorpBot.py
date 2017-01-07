@@ -1,4 +1,4 @@
-#!/bin/bash
+ a#!/bin/bash
 
 # Turn on case-insensitive matching
 shopt -s nocasematch
@@ -18,7 +18,8 @@ function runBot () {
     python3 Main.py
     echo
     echo "$(timestamp): CorpBot died."
-    echo Restarting...
+    echo "Restarting in 10 seconds..."
+    sleep 10
     runBot
 }
 
