@@ -280,7 +280,7 @@ class Xp:
 		"""Lists the default role that new users are assigned."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -567,7 +567,7 @@ class Xp:
 		"""Say the highest rank of a listed member."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False

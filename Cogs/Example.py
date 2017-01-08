@@ -348,24 +348,43 @@ class Music:
 
 	
 	@commands.command(pass_context=True, no_pm=True)
-	async def removesong(self, ctx, idx : int):
+	async def removesong(self, ctx, idx : int = None):
 		"""Removes a song in the playlist by the index."""
 		
-		# I'm not sure how to check for mod status can you add this part Corp? :D
-		# isAdmin = author.permissions_in(channel).administrator
-		# # Only allow admins to change server stats
-		# if not isAdmin:
-		# 	await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-		# 	return
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		# Check for role requirements
+		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
+		if requiredRole == "":
+			#admin only
+			isAdmin = author.permissions_in(channel).administrator
+			if not isAdmin:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+		else:
+			#role requirement
+			hasPerms = False
+			for role in author.roles:
+				if role.id == requiredRole:
+					hasPerms = True
+			if not hasPerms:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+
+		if idx == None:
+			await self.bot.say('Umm... Okay.  I successfully removed *0* songs from the playlist.  That\'s what you wanted, right?')
+			return
 
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to $playlist for the song index.')
+			await self.bot.say('Invalid song index, please refer to `$playlist` for the song index.')
 			return
 		song = state.playlist[idx]
-		await self.bot.say('Deleted {} from playlist'.format(str(song)))
 		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use $skip instead')
+			await self.bot.say('Cannot delete currently playing song, use `$skip` instead')
 			return
+		await self.bot.say('Deleted {} from playlist'.format(str(song)))
 		del state.playlist[idx]

@@ -13,8 +13,15 @@ class Time:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
-	async def setoffset(self, ctx, offset : str = '0:0'):
+	async def setoffset(self, ctx, offset : str = None):
 		"""Set your UTC offset."""
+
+		if offset == None:
+			self.settings.setUserStat(ctx.message.author, ctx.message.server, "UTCOffset", None)
+			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
 		offset = offset.replace('+', '')
 
 		# Split time string by : and get hour/minute values
@@ -90,17 +97,21 @@ class Time:
 
 
 	@commands.command(pass_context=True)
-	async def time(self, ctx, offset : str = '0:0'):
+	async def time(self, ctx, offset : str = None):
 		"""Get UTC time +- an offset."""
 
-		# Try to get a user first
-		member = DisplayName.memberForName(offset, ctx.message.server)
+		if offset == None:
+			member = ctx.message.author
+		else:
+			# Try to get a user first
+			member = DisplayName.memberForName(offset, ctx.message.server)
+
 		if member:
 			# We got one
 			offset = self.settings.getUserStat(member, ctx.message.server, "UTCOffset")
 		
 		if offset == None:
-			msg = '*{}* hasn\'t set their offset yet - they can do so with the `$setoffset [+-offset]` command.'.format(DisplayName.name(member))
+			msg = '*{}* hasn\'t set their offset yet - they can do so with the `$setoffset [+-offset]` command.\nThe current UTC time is *{}*.'.format(DisplayName.name(member), datetime.datetime.utcnow().strftime("%I:%M %p"))
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
