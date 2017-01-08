@@ -38,7 +38,7 @@ from Cogs import Eat
 from Cogs import Profile
 
 # This should be the main soul of the bot - everything should load from here
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A bot that does stuff.... probably')
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
 # Open our token
