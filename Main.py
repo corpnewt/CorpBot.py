@@ -42,6 +42,7 @@ from Cogs import Ascii
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
+corpSiteAuth = "corpSiteAuth.txt"
 # Open our token
 with open('token.txt', 'r') as f:
 	token = f.read()
@@ -157,7 +158,7 @@ atime = Time.Time(bot, settings)
 cogList.append(atime)
 
 # LMG(B)(DDG)TFY
-search = Search.Search(bot)
+search = Search.Search(bot, corpSiteAuth)
 cogList.append(search)
 
 # Eat something...
