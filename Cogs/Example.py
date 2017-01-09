@@ -346,7 +346,7 @@ class Music:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
-			await self.bot.say('Now playing {:02d}:{:02d} - {} [skips: {}/3]'.format(round(minutes), round(seconds), state.current, skip_count))
+			await self.bot.say('Now playing - {} [{:02d}:{:02d}] [skips: {}/3]'.format(state.current, round(minutes), round(seconds), skip_count))
 
 	
 	@commands.command(pass_context=True, no_pm=True)
