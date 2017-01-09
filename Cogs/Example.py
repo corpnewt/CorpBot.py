@@ -360,13 +360,6 @@ class Music:
 	async def removesong(self, ctx, idx : int):
 		"""Removes a song in the playlist by the index."""
 		
-		# I'm not sure how to check for mod status can you add this part Corp? :D
-		# isAdmin = author.permissions_in(channel).administrator
-		# # Only allow admins to change server stats
-		# if not isAdmin:
-		# 	await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-		# 	return
-
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
