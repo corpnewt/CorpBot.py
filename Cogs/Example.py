@@ -367,6 +367,32 @@ class Music:
 		# 	await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 		# 	return
 
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		# Check for role requirements
+		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
+		if requiredRole == "":
+			#admin only
+			isAdmin = author.permissions_in(channel).administrator
+			if not isAdmin:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+		else:
+			#role requirement
+			hasPerms = False
+			for role in author.roles:
+				if role.id == requiredRole:
+					hasPerms = True
+			if not hasPerms:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				return
+
+		if idx == None:
+			await self.bot.say('Umm... Okay.  I successfully removed *0* songs from the playlist.  That\'s what you wanted, right?')
+			return
+
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
