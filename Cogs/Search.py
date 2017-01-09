@@ -67,7 +67,7 @@ class Search:
 
 
 	@commands.command(pass_context=True)
-	async def searchsite(self, ctx, category_name = None, query = None):
+	async def searchsite(self, ctx, category_name = None, *, query = None):
 		"""Search corpnewt.com forums."""
 
 		auth = self.site_auth
@@ -97,9 +97,12 @@ class Search:
 		search_json = json.loads(r.text)
 		posts = search_json["posts"]
 		result_string = '**Found {} Results for: {}**\n\n'.format(len(posts), query)
-
+		limit = 5
+		ctr = 0
 		for post in posts:
-			result_string += '```{}``` \n\n https://corpnewt.com/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
+                        if ctr < limit:
+                                ctr = ctr + 1
+                                result_string += '```{}``` \n\n https://corpnewt.com/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
 			
 		await self.bot.say(result_string)
 
