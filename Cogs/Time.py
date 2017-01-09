@@ -13,7 +13,7 @@ class Time:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
-	async def setoffset(self, ctx, offset : str = None):
+	async def setoffset(self, ctx, *, offset : str = None):
 		"""Set your UTC offset."""
 
 		if offset == None:
@@ -40,7 +40,7 @@ class Time:
 		await self.bot.send_message(ctx.message.channel, msg)
 
 	@commands.command(pass_context=True)
-	async def offset(self, ctx, member = None):
+	async def offset(self, ctx, *, member = None):
 		"""See a member's UTC offset."""
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -97,7 +97,7 @@ class Time:
 
 
 	@commands.command(pass_context=True)
-	async def time(self, ctx, offset : str = None):
+	async def time(self, ctx, *, offset : str = None):
 		"""Get UTC time +- an offset."""
 
 		if offset == None:
