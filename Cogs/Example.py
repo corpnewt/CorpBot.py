@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import random
+import datetime
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
@@ -59,7 +60,7 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
-        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.name}'
+        fmt = '*{0.title}* requested by {1.name}'
         duration = self.player.duration
         if duration:
             fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
@@ -75,6 +76,7 @@ class VoiceState:
         self.playlist = []
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+        self.start_time = datetime.datetime.now()
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -103,8 +105,10 @@ class VoiceState:
             	await asyncio.sleep(1)
             	continue
 
+            self.start_time = datetime.datetime.now()
             self.current = self.playlist[0]
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
+			
             self.current.player.start()
             await self.play_next_song.wait()
             del self.playlist[0]
@@ -327,7 +331,12 @@ class Music:
 			await self.bot.say('Not playing anything.')
 		else:
 			skip_count = len(state.skip_votes)
-			await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+			diff_time = datetime.datetime.now() - state.start_time
+			seconds = diff_time.total_seconds()
+			hours = seconds // 3600
+			minutes = (seconds % 3600) // 60
+			seconds = seconds % 60
+			await self.bot.say('Now playing {:02d}:{:02d} - {} [skips: {}/3]'.format(round(minutes), round(seconds), state.current, skip_count))
 
 	
 	@commands.command(pass_context=True, no_pm=True)
@@ -348,7 +357,7 @@ class Music:
 
 	
 	@commands.command(pass_context=True, no_pm=True)
-	async def removesong(self, ctx, idx : int = None):
+	async def removesong(self, ctx, idx : int):
 		"""Removes a song in the playlist by the index."""
 		
 		channel = ctx.message.channel
@@ -380,11 +389,11 @@ class Music:
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to `$playlist` for the song index.')
+			await self.bot.say('Invalid song index, please refer to $playlist for the song index.')
 			return
 		song = state.playlist[idx]
-		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use `$skip` instead')
-			return
 		await self.bot.say('Deleted {} from playlist'.format(str(song)))
+		if idx == 0:
+			await self.bot.say('Cannot delete currently playing song, use $skip instead')
+			return
 		del state.playlist[idx]
