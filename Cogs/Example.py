@@ -77,6 +77,8 @@ class VoiceState:
         self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
         self.start_time = datetime.datetime.now()
+        self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
+        self.is_paused = False
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -240,6 +242,8 @@ class Music:
 		if state.is_playing():
 			player = state.player
 			player.pause()
+			state.total_playing_time += (datetime.datetime.now() - state.start_time)
+			state.is_paused = True
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def resume(self, ctx):
@@ -248,6 +252,8 @@ class Music:
 		if state.is_playing():
 			player = state.player
 			player.resume()
+			state.start_time = datetime.datetime.now()
+			state.is_paused = False
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def stop(self, ctx):
@@ -331,7 +337,11 @@ class Music:
 			await self.bot.say('Not playing anything.')
 		else:
 			skip_count = len(state.skip_votes)
-			diff_time = datetime.datetime.now() - state.start_time
+			diff_time = state.total_playing_time  + (datetime.datetime.now() - state.start_time)
+
+			if state.is_paused:
+				diff_time = state.total_playing_time
+
 			seconds = diff_time.total_seconds()
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
