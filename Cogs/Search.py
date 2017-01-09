@@ -8,12 +8,17 @@ from   Cogs import TinyURL
 import urllib
 import requests
 import json
+import os
 
 class Search:
 
 	# Init with the bot reference
-	def __init__(self, bot):
+	def __init__(self, bot, auth_file: str = None):
 		self.bot = bot
+		self.site_auth = None
+		if os.path.isfile(auth_file):
+		        with open(auth_file, 'r') as f:
+		                self.site_auth = f.read()
 
 	@commands.command(pass_context=True)
 	async def google(self, ctx, *, query = None):
@@ -65,8 +70,11 @@ class Search:
 	async def searchsite(self, ctx, category_name = None, query = None):
 		"""Search corpnewt.com forums."""
 
-                #Hey Corp replace this with the authorization code :D
-		auth = '<replace authorizaton code here>'
+		auth = self.site_auth
+
+		if auth == None:
+                        await self.bot.say("Sorry this feature is not supported!")
+                        return
 
 		if query == None or category_name == None:
 			msg = "Usage: $searchsite [category] [search term]\n\n Categories can be found at:\n\nhttps://corpnewt.com/"
@@ -102,7 +110,6 @@ class Search:
 		
 		for category in categories:
                         
-                        print(category["name"].lower())
                         if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
                                 return category
 
