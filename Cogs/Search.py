@@ -105,7 +105,7 @@ class Search:
 		for post in posts:
 			if ctr < limit:
 				ctr = ctr + 1
-				result_string += '__{}__\nhttps://corpnewt.com/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
+				result_string += '__{}__\nhttps://corpnewt.com/topic/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
 			
 		await self.bot.say(result_string)
 
