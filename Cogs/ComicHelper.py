@@ -219,6 +219,8 @@ def getXKCDImageTitle ( html ):
 		return None
 	
 	imageTitle = find_last_between( comicBlock, "alt=", ">" )
+	# Drop srcset= if there
+	imageTitle = imageTitle.split('srcset=')[0]
 	h = HTMLParser()
 	imageTitle = h.unescape(imageTitle)
 	imageTitle = imageTitle.replace('"', '').strip()

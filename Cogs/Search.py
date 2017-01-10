@@ -73,8 +73,8 @@ class Search:
 		auth = self.site_auth
 
 		if auth == None:
-                        await self.bot.say("Sorry this feature is not supported!")
-                        return
+			await self.bot.say("Sorry this feature is not supported!")
+			return
 
 		if query == None or category_name == None:
 			msg = "Usage: $searchsite [category] [search term]\n\n Categories can be found at:\n\nhttps://corpnewt.com/"
@@ -96,13 +96,16 @@ class Search:
 		r = requests.get(search_url, headers={'Authorization': auth})
 		search_json = json.loads(r.text)
 		posts = search_json["posts"]
-		result_string = '**Found {} Results for: {}**\n\n'.format(len(posts), query)
+		resultString = 'Results'
+		if len(posts) == 1 :
+			resultString = 'Result'
+		result_string = '**Found {} {} for:** ***{}***\n\n'.format(len(posts), resultString, query)
 		limit = 5
 		ctr = 0
 		for post in posts:
-                        if ctr < limit:
-                                ctr = ctr + 1
-                                result_string += '```{}``` \n\n https://corpnewt.com/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
+			if ctr < limit:
+				ctr = ctr + 1
+				result_string += '__{}__\nhttps://corpnewt.com/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
 			
 		await self.bot.say(result_string)
 

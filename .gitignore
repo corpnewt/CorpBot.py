@@ -1,6 +1,9 @@
 # Token file
 token.txt
 
+# Auth file
+corpSiteAuth.txt
+
 # FFMpeg.exe
 ffmpeg.exe
 
