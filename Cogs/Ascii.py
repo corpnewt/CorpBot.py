@@ -42,4 +42,4 @@ class Ascii:
 			url += '&font={}'.format(font)
 		get_request = self.bot.loop.run_in_executor(None, requests.get, url)
 		response = await get_request
-		await self.bot.say("```Markup\n {} ```".format(response.text))
+		await self.bot.say("```Markup\n{}```".format(response.text))
