@@ -312,11 +312,11 @@ class Music:
 			return
 
 		voter = ctx.message.author
-		vote = await self.has_voted(state.current.requester, state.votes)
+		vote = await self.has_voted(ctx.message.author, state.votes)
 		if vote != False:
 			vote["value"] = 'skip'
 		else:
-			state.votes.append({ 'user': state.current.requester, 'value': 'skip' })
+			state.votes.append({ 'user': ctx.message.author, 'value': 'skip' })
 		
 		result = await self._vote_stats(ctx)
 
@@ -351,11 +351,11 @@ class Music:
 			return
 
 		voter = ctx.message.author
-		vote = await self.has_voted(state.current.requester, state.votes)
+		vote = await self.has_voted(ctx.message.author, state.votes)
 		if vote != False:
 			vote["value"] = 'keep'
 		else:
-			state.votes.append({ 'user': state.current.requester, 'value': 'keep' })
+			state.votes.append({ 'user': ctx.message.author, 'value': 'keep' })
 		
 		await self._vote_stats(ctx)
 		
@@ -396,7 +396,6 @@ class Music:
 		if not state.is_playing():
 			await self.bot.say('Not playing anything.')
 		else:
-			skip_count = len(state.skip_votes)
 			diff_time = state.total_playing_time  + (datetime.datetime.now() - state.start_time)
 
 			if state.is_paused:
@@ -406,7 +405,7 @@ class Music:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
-			await self.bot.say('Now playing - {} [{:02d}:{:02d}:{:02d}] [skips: {}/3]'.format(state.current,round(hours), round(minutes), round(seconds), skip_count))
+			await self.bot.say('Now playing - {} [{:02d}:{:02d}:{:02d}]'.format(state.current,round(hours), round(minutes), round(seconds)))
 
 
 	@commands.command(pass_context=True, no_pm=True)
