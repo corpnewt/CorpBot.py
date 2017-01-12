@@ -6,20 +6,20 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
-		
+
 if not discord.opus.is_loaded():
-    # the 'opus' library here is opus.dll on windows
-    # or libopus.so on linux in the current directory
-    # you should replace this with the location the
-    # opus library is located in and with the proper filename.
-    # note that on windows this DLL is automatically provided for you
-    discord.opus.load_opus('opus')
-	
+	# the 'opus' library here is opus.dll on windows
+	# or libopus.so on linux in the current directory
+	# you should replace this with the location the
+	# opus library is located in and with the proper filename.
+	# note that on windows this DLL is automatically provided for you
+	discord.opus.load_opus('opus')
+
 class Example:
 
 	def __init__(self, bot):
 		self.bot = bot
-	
+
 	@commands.command()
 	async def add(self, left : int, right : int):
 		"""Adds two numbers together."""
@@ -47,73 +47,73 @@ class Example:
 	@commands.command(pass_context=True)
 	async def joined(self, ctx, member : discord.Member = None):
 		"""Says when a member joined."""
-		
+
 		if member == None:
 			member = ctx.message.author
 
 		await self.bot.say('{} joined {}'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
-    def __init__(self, message, player):
-        self.requester = message.author
-        self.channel = message.channel
-        self.player = player
+	def __init__(self, message, player):
+		self.requester = message.author
+		self.channel = message.channel
+		self.player = player
 
-    def __str__(self):
-        fmt = '*{0.title}* requested by {1.name}'
-        duration = self.player.duration
-        if duration:
-            fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
-        return fmt.format(self.player, self.requester)
+	def __str__(self):
+		fmt = '*{0.title}* requested by {1.name}'
+		duration = self.player.duration
+		if duration:
+			fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
+		return fmt.format(self.player, self.requester)
 
 class VoiceState:
-    def __init__(self, bot):
-        self.current = None
-        self.voice = None
-        self.bot = bot
-        self.play_next_song = asyncio.Event()
-        #self.songs = asyncio.Queue()
-        self.playlist = []
-        self.skip_votes = set() # a set of user_ids that voted
-        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-        self.start_time = datetime.datetime.now()
-        self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
-        self.is_paused = False
+	def __init__(self, bot):
+		self.current = None
+		self.voice = None
+		self.bot = bot
+		self.play_next_song = asyncio.Event()
+		self.playlist = []
+		self.votes = []
+		self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+		self.start_time = datetime.datetime.now()
+		self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
+		self.is_paused = False
 
-    def is_playing(self):
-        if self.voice is None or self.current is None:
-            return False
+	def is_playing(self):
+		if self.voice is None or self.current is None:
+			return False
 
-        player = self.current.player
-        return not player.is_done()
+		player = self.current.player
+		return not player.is_done()
 
-    @property
-    def player(self):
-        return self.current.player
+	@property
+	def player(self):
+		return self.current.player
 
-    def skip(self):
-        self.skip_votes.clear()
-        if self.is_playing():
-            self.player.stop()
+	def skip(self):
+		self.votes = []
+		if self.is_playing():
+			self.player.stop()
 
-    def toggle_next(self):
-        self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
+	def toggle_next(self):
+		self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
-    async def audio_player_task(self):
-        while True:
-            self.play_next_song.clear()
+	async def audio_player_task(self):
+		while True:
+			self.play_next_song.clear()
 
-            if len(self.playlist) <= 0:
-            	await asyncio.sleep(1)
-            	continue
+			if len(self.playlist) <= 0:
+				await asyncio.sleep(1)
+				continue
 
-            self.start_time = datetime.datetime.now()
-            self.current = self.playlist[0]
-            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
-			
-            self.current.player.start()
-            await self.play_next_song.wait()
-            del self.playlist[0]
+			self.start_time = datetime.datetime.now()
+			self.current = self.playlist[0]
+			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
+			await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
+
+			self.current.player.start()
+			await self.play_next_song.wait()
+			del self.playlist[0]
 
 class Music:
 	"""Voice related commands.
@@ -124,7 +124,7 @@ class Music:
 		self.bot = bot
 		self.voice_states = {}
 		self.settings = settings
-		
+
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
 		if state is None:
@@ -255,17 +255,18 @@ class Music:
 			state.start_time = datetime.datetime.now()
 			state.is_paused = False
 
+
 	@commands.command(pass_context=True, no_pm=True)
 	async def stop(self, ctx):
 		"""Stops playing audio and leaves the voice channel.
 
 		This also clears the queue.
 		"""
-		
+
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
-		
+
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
 		if requiredRole == "":
@@ -283,7 +284,7 @@ class Music:
 			if not hasPerms:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 				return
-		
+
 		server = ctx.message.server
 		state = self.get_voice_state(server)
 
@@ -303,10 +304,7 @@ class Music:
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def skip(self, ctx):
-		"""Vote to skip a song. The song requester can automatically skip.
-
-		3 skip votes are needed for the song to be skipped.
-		"""
+		"""Vote to skip a song. The song requester can automatically skip."""
 
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
@@ -314,19 +312,81 @@ class Music:
 			return
 
 		voter = ctx.message.author
-		if voter == state.current.requester:
-			await self.bot.say('Requester requested skipping...')
-			state.skip()
-		elif voter.id not in state.skip_votes:
-			state.skip_votes.add(voter.id)
-			total_votes = len(state.skip_votes)
-			if total_votes >= 3:
-				await self.bot.say('Skip vote passed, skipping...')
-				state.skip()
-			else:
-				await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
+		vote = await self.has_voted(state.current.requester, state.votes)
+		if vote != False:
+			vote["value"] = 'skip'
 		else:
-			await self.bot.say('You have already voted to skip this.')
+			state.votes.append({ 'user': state.current.requester, 'value': 'skip' })
+		
+		result = await self._vote_stats(ctx)
+
+		if(result["total_skips"] >= result["total_keeps"]):
+			await self.bot.say('Looks like skips WINS! sorry guys, skipping the song...')
+			state.skip()
+		# if voter == state.current.requester:
+		# 	await self.bot.say('Requester requested skipping...')
+		# 	state.skip()
+		# elif voter.id not in state.skip_votes:
+		# 	state.skip_votes.add(voter.id)
+		# 	total_votes = len(state.skip_votes)
+		# 	if total_votes >= 3:
+		# 		await self.bot.say('Skip vote passed, skipping the song...')
+		# 		state.skip()
+		# 	else:
+		# 		await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
+		# else:
+		# 	await self.bot.say('You have already voted to skip this.')
+
+	# @commands.command(pass_context=True, no_pm=True)
+	# async def keep(self, ctx):
+	# 	"""Vote to keep a song. The song requester can automatically skip.
+	# 	"""
+
+	@commands.command(pass_context=True, no_pm=True)
+	async def keep(self, ctx):
+		"""Vote to keep a song."""
+		state = self.get_voice_state(ctx.message.server)
+		if not state.is_playing():
+			await self.bot.say('Not playing anything right now...')
+			return
+
+		voter = ctx.message.author
+		vote = await self.has_voted(state.current.requester, state.votes)
+		if vote != False:
+			vote["value"] = 'keep'
+		else:
+			state.votes.append({ 'user': state.current.requester, 'value': 'keep' })
+		
+		await self._vote_stats(ctx)
+		
+	
+	@commands.command(pass_context=True, no_pm=True)
+	async def vote_stats(self, ctx):
+		return await self._vote_stats(ctx)
+
+	async def _vote_stats(self, ctx):
+		state = self.get_voice_state(ctx.message.server)
+		total_skips = 0
+		total_keeps = 0
+		for vote in state.votes:
+			XP = self.settings.getUserStat(vote["user"], ctx.message.server, "XP")
+			if vote["value"] == 'skip':
+				total_skips = total_skips + XP
+			else:
+				total_keeps = total_keeps + XP
+		
+		await self.bot.say('**Total Votes**:\nKeeps Score: {}\nSkips Score : {}'.format(total_keeps, total_skips))
+
+		return {'total_skips': total_skips, 'total_keeps': total_keeps}
+
+	async def has_voted(self, user , votes):
+
+		for vote in votes:
+			if(user == vote["user"]):
+				return vote
+
+		return False
+
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def playing(self, ctx):
@@ -346,34 +406,34 @@ class Music:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
-			await self.bot.say('Now playing - {} [{:02d}:{:02d}] [skips: {}/3]'.format(state.current, round(minutes), round(seconds), skip_count))
+			await self.bot.say('Now playing - {} [{:02d}:{:02d}:{:02d}] [skips: {}/3]'.format(state.current,round(hours), round(minutes), round(seconds), skip_count))
 
-	
+
 	@commands.command(pass_context=True, no_pm=True)
 	async def playlist(self, ctx):
 		"""Shows current songs in the playlist."""
 		state = self.get_voice_state(ctx.message.server)
 		if len(state.playlist) <= 0:
-                        await self.bot.say('No songs in the playlist')
-                        return
+						await self.bot.say('No songs in the playlist')
+						return
 		playlist_string  = '**Current PlayList**\n\n'
 		#playlist_string += '```Markdown\n'
 		count = 1
 		for i in state.playlist:
-                        playlist_string += '{}. {}\n'.format(count, str(i))
-                        count = count + 1
+						playlist_string += '{}. {}\n'.format(count, str(i))
+						count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
 
-	
+
 	@commands.command(pass_context=True, no_pm=True)
 	async def removesong(self, ctx, idx : int):
 		"""Removes a song in the playlist by the index."""
-		
+
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
-		
+
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
 		if requiredRole == "":
