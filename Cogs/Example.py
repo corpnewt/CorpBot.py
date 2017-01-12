@@ -358,6 +358,31 @@ class Music:
 			state.votes.append({ 'user': ctx.message.author, 'value': 'keep' })
 		
 		await self._vote_stats(ctx)
+
+	
+	@commands.command(pass_context=True, no_pm=True)
+	async def unvote(self, ctx):
+		"""Remove your song vote."""
+		state = self.get_voice_state(ctx.message.server)
+		if not state.is_playing():
+			await self.bot.say('Not playing anything right now...')
+			return
+
+		voter = ctx.message.author
+		vote = await self.has_voted(ctx.message.author, state.votes)
+		if vote != False:
+			for voted in state.votes:
+				if(ctx.message.author == voted["user"]):
+					# Found our vote - remove it
+					state.votes.remove(voted)
+		else:
+			await self.bot.say('Your non-existent vote has been removed.')
+
+		result = await self._vote_stats(ctx)
+
+		if(result["total_skips"] >= result["total_keeps"]):
+			await self.bot.say('Looks like skips WINS! sorry guys, skipping the song...')
+			state.skip()
 		
 	
 	@commands.command(pass_context=True, no_pm=True)
