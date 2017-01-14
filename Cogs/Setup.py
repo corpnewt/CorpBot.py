@@ -123,6 +123,7 @@ class Setup:
 				elif talk.content.startswith('n'):
 					self.settings.setServerStat(server, "DefaultRole", None)
 					await self.bot.send_message(author, 'Auto-role *disabled.*')
+					await self.xpSystem(ctx)
 				else:
 					# Skipping
 					await self.bot.send_message(author, 'Auto-role shall remain {}'.format(auto))
