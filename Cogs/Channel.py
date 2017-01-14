@@ -125,10 +125,14 @@ class Channel:
 		roleText = "Current Admin Roles:\n"
 
 		for arole in promoSorted:
+			found = False
 			for role in ctx.message.server.roles:
 				if role.id == arole["ID"]:
 					# Found the role ID
+					found = True
 					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
+			if not found:
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
 
 		# Check for suppress
 		if suppress:
