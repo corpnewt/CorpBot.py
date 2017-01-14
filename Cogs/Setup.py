@@ -26,10 +26,24 @@ class Setup:
 			await self.bot.send_message(author, msg)
 			return
 
-		if not author is server.owner:
+		'''if not author is server.owner:
 			msg = 'The server *owner* needs to set me up.'
 			await self.bot.send_message(channel, msg)
+			return'''
+
+		# Allow admins to run Setup
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 			return
+
 
 		# If we're here, begin the setup
 
