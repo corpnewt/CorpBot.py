@@ -445,8 +445,10 @@ class Music:
 		#playlist_string += '```Markdown\n'
 		count = 1
 		for i in state.playlist:
-						playlist_string += '{}. {}\n'.format(count, str(i))
-						count = count + 1
+			if count > 15:
+				break
+			playlist_string += '{}. {}\n'.format(count, str(i))
+			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
 
