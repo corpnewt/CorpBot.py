@@ -36,63 +36,6 @@ class Xp:
 							
 					if bumpXP:
 						self.settings.incrementStat(user, server, "XPReserve", int(xpAmount))
-
-	@commands.command(pass_context=True)
-	async def setxp(self, ctx, *, member = None, xpAmount : int = None):
-		"""Sets an absolute value for the member's xp (admin only)."""
-		
-		author  = ctx.message.author
-		server  = ctx.message.server
-		channel = ctx.message.channel
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
-			suppress = True
-		else:
-			suppress = False
-		
-		isAdmin = author.permissions_in(channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-			return
-		if xpAmount == None:
-			# Check if we have trailing xp
-			nameCheck = DisplayName.checkNameForInt(member, server)
-			if not nameCheck:
-				await self.bot.send_message(ctx.message.channel, usage)
-				return
-			if not nameCheck["Member"]:
-				msg = 'I couldn\'t find *{}* on the server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
-				return
-			member   = nameCheck["Member"]
-			xpAmount = nameCheck["Int"]
-			
-		# Check for formatting issues
-		if xpAmount == None:
-			# Still no xp...
-			msg = 'Usage: `$setxp [member] [amount]`'
-			await self.bot.send_message(channel, msg)
-			return
-
-		self.settings.setUserStat(member, server, "XP", xpAmount)
-		msg = '*{}\'s* xp was set to *{}!*'.format(DisplayName.name(member), xpAmount)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
-		await self.checkroles(member, channel)
-
-
-	@setxp.error
-	async def setxp_error(self, ctx, error):
-		# do stuff
-		msg = 'setxp Error: {}'.format(ctx)
-		await self.bot.say(msg)
 	
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
@@ -108,7 +51,7 @@ class Xp:
 		else:
 			suppress = False
 
-		usage = 'Usage: `$xp [role/member] [amount]`'
+		usage = 'Usage: `{}xp [role/member] [amount]`'.format(ctx.prefix)
 
 		isRole = False
 
@@ -312,7 +255,7 @@ class Xp:
 		channel = ctx.message.channel
 		
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
-		msg = 'Usage: `gamble [xp reserve bet] (must be multiple of 10)`'
+		msg = 'Usage: `{}gamble [xp reserve bet] (must be multiple of 10)`'.format(ctx.prefix)
 		
 		if not (bet or type(bet) == int):
 			await self.bot.send_message(channel, msg)
@@ -867,7 +810,7 @@ class Xp:
 				xpStr = "This is what I check to handle demotions.\n"
 
 		msg = "__***{}'s*** **XP System**__\n\n__What's What:__\n\n".format(serverName)
-		msg = "{}**XP:** This is the xp you have *earned.*\nIt comes from other users gifting you xp, or if you're lucky enough to `$gamble` and win.\n".format(msg)
+		msg = "{}**XP:** This is the xp you have *earned.*\nIt comes from other users gifting you xp, or if you're lucky enough to `{}gamble` and win.\n".format(msg, ctx.prefix)
 		if xpStr:
 			msg = "{}{}".format(msg, xpStr)
 		msg = "{}This can only be taken away by an *admin*.\n\n".format(msg)
@@ -884,20 +827,20 @@ class Xp:
 		if hourStr:
 			msg = "{}{}".format(msg, hourStr)
 
-		msg = "{}\n\n__How Do I Use It?:__\n\nYou can gift other users xp by using the `$xp [user] [amount]` command.\n".format(msg)
+		msg = "{}\n\n__How Do I Use It?:__\n\nYou can gift other users xp by using the `{}xp [user] [amount]` command.\n".format(msg, ctx.prefix)
 		msg = "{}This pulls from your *xp reserve*, and adds to their *xp*.\n".format(msg)
 		msg = "{}It does not change the *xp* you have *earned*.\n\n".format(msg)
 
 		msg = "{}You can gamble your *xp reserve* to have a chance to win a percentage back as *xp* for yourself.\n".format(msg)
-		msg = "{}You do so by using the `$gamble [amount in multiple of 10]` command.\n".format(msg)
+		msg = "{}You do so by using the `{}gamble [amount in multiple of 10]` command.\n".format(msg, ctx.prefix)
 		msg = "{}This pulls from your *xp reserve* - and if you win, adds to your *xp*.\n\n".format(msg)
 
 		msg = "{}You can also *feed* me.\n".format(msg)
-		msg = "{}This is done with the `$feed [amount]` command.\n".format(msg)
+		msg = "{}This is done with the `{}feed [amount]` command.\n".format(msg, ctx.prefix)
 		msg = "{}This pulls from your *xp reserve* - and doesn't affect your *xp*.\n\n".format(msg)
 		
-		msg = "{}You can check your *xp*, *xp reserve*, current role, and next role using the `$stats` command.\n".format(msg)
-		msg = "{}You can check another user's stats with the `$stat [user]` command.\n\n".format(msg)
+		msg = "{}You can check your *xp*, *xp reserve*, current role, and next role using the `{}stats` command.\n".format(msg, ctx.prefix)
+		msg = "{}You can check another user's stats with the `{}stat [user]` command.\n\n".format(msg, ctx.prefix)
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(server, "RequiredXPRole")

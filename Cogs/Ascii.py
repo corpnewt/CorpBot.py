@@ -18,7 +18,7 @@ class Ascii:
 		"""Beautify some text (font list at http://artii.herokuapp.com/fonts_list)."""
 
 		if text == None:
-			await self.bot.send_message(ctx.message.channel, 'Usage: `$ascii [font (optional)] [text]`\n(font list at http://artii.herokuapp.com/fonts_list)')
+			await self.bot.send_message(ctx.message.channel, 'Usage: `{}ascii [font (optional)] [text]`\n(font list at http://artii.herokuapp.com/fonts_list)'.format(ctx.prefix))
 			return
 
 		# Get list of fonts

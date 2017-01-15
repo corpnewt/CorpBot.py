@@ -125,7 +125,7 @@ class Calc:
         """Do some math."""
 
         if formula == None:
-            msg = 'Usage: `$calc [formula]`'
+            msg = 'Usage: `{}calc [formula]`'.format(ctx.prefix)
             await self.bot.send_message(ctx.message.channel, msg)
             return
 

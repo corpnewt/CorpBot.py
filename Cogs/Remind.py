@@ -88,7 +88,7 @@ class Remind:
 		"""Set a reminder."""
 
 		if not endtime or not message:
-			msg = 'Usage: `$remindme "[message]" [endtime]`'
+			msg = 'Usage: `{}remindme "[message]" [endtime]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -130,7 +130,7 @@ class Remind:
 
 		member = ctx.message.author
 		myReminders = self.settings.getUserStat(member, member.server, "Reminders")
-		msg = 'You don\'t currently have any reminders set.  You can add some with the `$remindme "[message]" [time]` command.'
+		msg = 'You don\'t currently have any reminders set.  You can add some with the `{}remindme "[message]" [time]` command.'.format(ctx.prefix)
 		
 		if not len(myReminders):
 			# No reminders

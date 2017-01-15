@@ -77,7 +77,7 @@ class Search:
 			return
 
 		if query == None or category_name == None:
-			msg = "Usage: $searchsite [category] [search term]\n\n Categories can be found at:\n\nhttps://corpnewt.com/"
+			msg = "Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -89,7 +89,7 @@ class Search:
 		category = await self.find_category(categories, category_name)
 
 		if category == None:
-			await self.bot.say("Usage: $searchsite [category] [search term]\n\n Categories can be found at:\n\nhttps://corpnewt.com/")
+			await self.bot.say("Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix))
 			return
 
 		search_url = "https://corpnewt.com/api/search?term={}&in=titlesposts&categories[]={}&searchChildren=true&showAs=posts".format(query, category["cid"])

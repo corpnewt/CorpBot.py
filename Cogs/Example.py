@@ -484,11 +484,11 @@ class Music:
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to $playlist for the song index.')
+			await self.bot.say('Invalid song index, please refer to {}playlist for the song index.'.format(ctx.prefix))
 			return
 		song = state.playlist[idx]
 		await self.bot.say('Deleted {} from playlist'.format(str(song)))
 		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use $skip instead')
+			await self.bot.say('Cannot delete currently playing song, use {}skip instead'.format(ctx.prefix))
 			return
 		del state.playlist[idx]

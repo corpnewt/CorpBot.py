@@ -14,11 +14,12 @@ from   Cogs import Nullify
 class Feed:
 
 	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings, xp):
+	def __init__(self, bot, settings, xp, prefix):
 		self.bot = bot
 		self.settings = settings
 		self.xp = xp
 		self.bot.loop.create_task(self.getHungry())
+		self.prefix = prefix
 		
 	async def message(self, message):
 		# Check the message and see if we should allow it.
@@ -29,12 +30,12 @@ class Feed:
 		isKill = self.settings.getServerStat(message.server, "Killed")
 		if isKill.lower() == "yes":
 			ignore = True
-			if message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed'):
+			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
 				ignore = False
 				
 		if hunger >= 100 and hungerLock.lower() == "yes":
 			ignore = True
-			if message.content.startswith('$iskill') or message.content.startswith('$resurrect') or message.content.startswith('$hunger') or message.content.startswith('$feed'):
+			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
 				ignore = False
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
@@ -83,7 +84,7 @@ class Feed:
 			if hunger <= -100:
 				msg = 'I am essentially dead from over-eating ({}% overweight).  I hope you\'re happy.'.format(overweight)
 			if hunger <= -150:
-				msg = 'I *AM* dead from over-eating ({}% overweight).  You will have to `$resurrect` me to get me back.'.format(overweight)
+				msg = 'I *AM* dead from over-eating ({}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
 				
 		elif hunger == 0:
 			msg = 'I\'m full ({}%).  You are safe.  *For now.*'.format(hunger)
@@ -99,7 +100,7 @@ class Feed:
 			msg = 'I\'m ***hangry*** ({}%)!  Feed me or feel my *wrath!*'.format(hunger)
 			
 		if isKill.lower() == "yes" and hunger > -150:
-			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `$resurrect` me to get me back.'.format(overweight)
+			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, self.prefix)
 			
 		await self.bot.send_message(channel, msg)
 		
@@ -107,7 +108,7 @@ class Feed:
 	async def feed(self, ctx, food : int = None):
 		"""Feed the bot some xp!"""
 		# feed the bot, and maybe you'll get something in return!
-		msg = 'Usage: `feed [xp reserve feeding]`'
+		msg = 'Usage: `{}feed [xp reserve feeding]`'.format(ctx.prefix)
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author

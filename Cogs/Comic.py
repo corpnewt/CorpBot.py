@@ -190,7 +190,7 @@ class Comic:
 			date = dt.datetime.today().strftime("%m-%d-%Y")
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$dilbert "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}dilbert "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 		
@@ -293,7 +293,7 @@ class Comic:
 			try:
 				date = int(date)
 			except:
-				msg = 'Usage: `$xkcd "[date MM-DD-YYYY]"`'
+				msg = 'Usage: `{}xkcd "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 				await self.bot.send_message(channel, msg)
 				return
 			# Must be a comic number
@@ -414,7 +414,7 @@ class Comic:
 			date = dt.datetime.today().strftime("%m-%d-%Y")
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$cyanide "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}cyanide "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -520,7 +520,7 @@ class Comic:
 			date = "12-31-1995"
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$calvin "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}calvin "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -619,7 +619,7 @@ class Comic:
 			date = dt.datetime.today().strftime("%m-%d-%Y")
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$gmg "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}gmg "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -725,7 +725,7 @@ class Comic:
 			date = dt.datetime.today().strftime("%m-%d-%Y")
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$garfield "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}garfield "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -831,7 +831,7 @@ class Comic:
 			date = dt.datetime.today().strftime("%m-%d-%Y")
 			
 		if not self.dateIsValid(date):
-			msg = 'Usage: `$garfield "[date MM-DD-YYYY]"`'
+			msg = 'Usage: `{}peanuts "[date MM-DD-YYYY]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 

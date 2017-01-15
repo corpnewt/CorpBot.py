@@ -113,7 +113,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -142,7 +142,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -166,7 +166,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -215,7 +215,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -247,7 +247,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -276,7 +276,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -305,7 +305,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -332,7 +332,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -361,7 +361,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -391,7 +391,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -416,7 +416,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -441,7 +441,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -463,7 +463,7 @@ class Setup:
 		xpProm = self.settings.getServerStat(server, "XPPromote")
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 		if xpProm.lower() == "yes" or xpDem.lower() == "yes":
-			msg = 'To set up your xp promotion/demotion roles - use the `$addxprole [role] [required xp]` and `$removexprole [role]` in the main chat.'
+			msg = 'To set up your xp promotion/demotion roles - use the `{}addxprole [role] [required xp]` and `{}removexprole [role]` in the main chat.'.format(ctx.prefix, ctx.prefix)
 			await self.bot.send_message(author, msg)
 
 		await self.picThresh(ctx)
@@ -482,7 +482,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -513,7 +513,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -545,7 +545,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -581,7 +581,7 @@ class Setup:
 		while not gotIt:
 			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
 			if not talk:
-				msg = "*{}*, I'm out of time... type `$setup` in the main chat to start again.".format(DisplayName.name(author))
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
 				await self.bot.send_message(author, msg)
 				return
 			else:
@@ -603,6 +603,6 @@ class Setup:
 		author  = ctx.message.author
 		server  = ctx.message.server
 
-		await self.bot.send_message(author, '__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `$help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(server.name, DisplayName.name(author)))
+		await self.bot.send_message(author, '__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `{}help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(server.name, DisplayName.name(author), ctx.prefix))
 
 # Calling a bot command:  await self.setup.callback(self, ctx)

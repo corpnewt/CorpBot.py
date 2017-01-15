@@ -42,7 +42,7 @@ class BotAdmin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `setuserparts [member] "[parts text]"`'
+			msg = 'Usage: `{}setuserparts [member] "[parts text]"`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -127,7 +127,7 @@ class BotAdmin:
 				
 				if memFromName == None:
 					# We couldn't find one or the other
-					msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
+					msg = 'Usage: `{}mute [member] [cooldown in minutes - optional]`'.format(ctx.prefix)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				
@@ -139,7 +139,7 @@ class BotAdmin:
 
 			
 		if member == None:
-			msg = 'Usage: `mute [member] [cooldown in minutes - optional]`'
+			msg = 'Usage: `{}mute [member] [cooldown in minutes - optional]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -212,7 +212,7 @@ class BotAdmin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `mute [member]`'
+			msg = 'Usage: `{}mute [member]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -266,7 +266,7 @@ class BotAdmin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `ignore [member]`'
+			msg = 'Usage: `{}ignore [member]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -327,7 +327,7 @@ class BotAdmin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `listen [member]`'
+			msg = 'Usage: `{}listen [member]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -413,7 +413,7 @@ class BotAdmin:
 			return
 		
 		if not member:
-			await self.bot.send_message(ctx.message.channel, 'Usage: `$kick [member]`')
+			await self.bot.send_message(ctx.message.channel, 'Usage: `{}kick [member]`'.format(ctx.prefix))
 			return
 		
 		# Resolve member name -> member
@@ -476,7 +476,7 @@ class BotAdmin:
 			return
 		
 		if not member:
-			await self.bot.send_message(ctx.message.channel, 'Usage: `$ban [member]`')
+			await self.bot.send_message(ctx.message.channel, 'Usage: `{}ban [member]`'.format(ctx.prefix))
 			return
 		
 		# Resolve member name -> member
