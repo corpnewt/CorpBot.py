@@ -535,8 +535,8 @@ class Music:
 		if idx < 0 or idx >= len(state.playlist):
 			await self.bot.say('Invalid song index, please refer to {}playlist for the song index.'.format(ctx.prefix))
 			return
-		song = state.playlist[idx]
-		await self.bot.say('Deleted {} from playlist'.format(str(song)))
+		current = state.playlist[idx]
+		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		if idx == 0:
 			await self.bot.say('Cannot delete currently playing song, use {}skip instead'.format(ctx.prefix))
 			return
