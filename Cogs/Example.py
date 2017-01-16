@@ -109,6 +109,12 @@ class VoiceState:
 			
 			self.start_time = datetime.datetime.now()
 			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["song"])
+
+			#Check if youtube-dl found the song
+			if self.current == False:
+				del self.playlist[0]
+				continue
+
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
 			await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
@@ -139,6 +145,7 @@ class VoiceState:
 		except Exception as e:
 			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
 			await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+			return False
 		else:
 			player.volume = volume
 			entry = VoiceEntry(ctx.message, player, ctx)
@@ -191,12 +198,17 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
 		"""Summons the bot to join your voice channel."""
+		state = self.get_voice_state(ctx.message.server)
+
+		if state.is_playing():
+			await self.bot.say('I\`m already playing on a channel, Join me there instead! :D')
+			return
+
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
 			await self.bot.say('You are not in a voice channel.')
 			return False
 
-		state = self.get_voice_state(ctx.message.server)
 		if state.voice is None:
 			state.voice = await self.bot.join_voice_channel(summoned_channel)
 		else:
