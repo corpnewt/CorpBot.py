@@ -54,10 +54,11 @@ class Example:
 		await self.bot.say('{} joined {}'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
-	def __init__(self, message, player):
+	def __init__(self, message, player, ctx):
 		self.requester = message.author
 		self.channel = message.channel
 		self.player = player
+		self.ctx = ctx
 
 	def __str__(self):
 		fmt = '*{}* requested by {}'.format(self.player.title, DisplayName.name(self.requester))
@@ -67,7 +68,7 @@ class VoiceEntry:
 		return fmt
 
 class VoiceState:
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.current = None
 		self.voice = None
 		self.bot = bot
@@ -78,6 +79,7 @@ class VoiceState:
 		self.start_time = datetime.datetime.now()
 		self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
 		self.is_paused = False
+		self.settings = settings
 
 	def is_playing(self):
 		if self.voice is None or self.current is None:
@@ -101,13 +103,12 @@ class VoiceState:
 	async def audio_player_task(self):
 		while True:
 			self.play_next_song.clear()
-
 			if len(self.playlist) <= 0:
 				await asyncio.sleep(1)
 				continue
-
+			
 			self.start_time = datetime.datetime.now()
-			self.current = self.playlist[0]
+			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["song"])
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
 			await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
@@ -115,6 +116,33 @@ class VoiceState:
 			self.current.player.start()
 			await self.play_next_song.wait()
 			del self.playlist[0]
+	
+	async def create_youtube_entry(self, ctx, song: str):
+
+		opts = {
+			'default_search': 'auto',
+			'quiet': True,
+		}
+		volume = self.settings.getServerStat(ctx.message.server, "Volume")
+		defVolume = self.settings.getServerStat(ctx.message.server, "DefaultVolume")
+		if volume:
+			volume = float(volume)
+		else:
+			if defVolume:
+				volume = float(self.settings.getServerStat(ctx.message.server, "DefaultVolume"))
+			else:
+				# No volume or default volume in settings - go with 60%
+				volume = 0.6
+
+		try:
+			player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
+		except Exception as e:
+			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
+			await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+		else:
+			player.volume = volume
+			entry = VoiceEntry(ctx.message, player, ctx)
+			return entry;
 
 class Music:
 	"""Voice related commands.
@@ -129,7 +157,7 @@ class Music:
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
 		if state is None:
-			state = VoiceState(self.bot)
+			state = VoiceState(self.bot, self.settings)
 			self.voice_states[server.id] = state
 
 		return state
@@ -188,38 +216,17 @@ class Music:
 		https://rg3.github.io/youtube-dl/supportedsites.html
 		"""
 		state = self.get_voice_state(ctx.message.server)
-		opts = {
-			'default_search': 'auto',
-			'quiet': True,
-		}
-
+		
 		if state.voice is None:
 			success = await ctx.invoke(self.summon)
 			if not success:
 				return
 
-		volume = self.settings.getServerStat(ctx.message.server, "Volume")
-		defVolume = self.settings.getServerStat(ctx.message.server, "DefaultVolume")
-		if volume:
-			volume = float(volume)
-		else:
-			if defVolume:
-				volume = float(self.settings.getServerStat(ctx.message.server, "DefaultVolume"))
-			else:
-				# No volume or default volume in settings - go with 60%
-				volume = 0.6
+		await self.bot.say('Enqueued - ' + song)
+		#await state.songs.put(entry)
+		state.playlist.append({ 'song': song, 'ctx': ctx})
 
-		try:
-			player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
-		except Exception as e:
-			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-			await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-		else:
-			player.volume = volume
-			entry = VoiceEntry(ctx.message, player)
-			await self.bot.say('Enqueued ' + str(entry))
-			#await state.songs.put(entry)
-			state.playlist.append(entry)
+	
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def volume(self, ctx, value : int):
@@ -447,7 +454,7 @@ class Music:
 		for i in state.playlist:
 			if count > 15:
 				break
-			playlist_string += '{}. {}\n'.format(count, str(i))
+			playlist_string += '{}. {}\n'.format(count, str(i["song"]))
 			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
