@@ -6,6 +6,8 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
+import youtube_dl
+import functools
 
 if not discord.opus.is_loaded():
 	# the 'opus' library here is opus.dll on windows
@@ -62,9 +64,12 @@ class VoiceEntry:
 
 	def __str__(self):
 		fmt = '*{}* requested by {}'.format(self.player.title, DisplayName.name(self.requester))
-		duration = self.player.duration
-		if duration:
-			fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
+		seconds = self.player.duration
+		if seconds:
+			hours = seconds // 3600
+			minutes = (seconds % 3600) // 60
+			seconds = seconds % 60
+			fmt = fmt + ' [length: {:02d}h:{:02d}m:{:02d}s]'.format(round(hours), round(minutes), round(seconds))
 		return fmt
 
 class VoiceState:
@@ -234,9 +239,23 @@ class Music:
 			if not success:
 				return
 
-		await self.bot.say('Enqueued - ' + song)
 		#await state.songs.put(entry)
-		state.playlist.append({ 'song': song, 'ctx': ctx})
+
+		opts = {
+			'format': 'webm[abr>0]/bestaudio/best',
+			'default_search': 'auto',
+			'quiet': True,
+		}
+
+		ydl = youtube_dl.YoutubeDL(opts)
+		func = functools.partial(ydl.extract_info, song, download=False)
+		info = await self.bot.loop.run_in_executor(None, func)
+
+		if "entries" in info:
+			info = info['entries'][0]
+		
+		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx})
+		await self.bot.say('Enqueued - ' + info.get('title'))
 
 	
 
@@ -450,7 +469,10 @@ class Music:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
-			await self.bot.say('Now playing - {} [{:02d}:{:02d}:{:02d}]'.format(state.current,round(hours), round(minutes), round(seconds)))
+
+			percent = diff_time.total_seconds() / state.current.player.duration * 100
+
+			await self.bot.say('Now playing - {} [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.current,round(hours), round(minutes), round(seconds), round(percent)))
 
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -466,7 +488,13 @@ class Music:
 		for i in state.playlist:
 			if count > 15:
 				break
-			playlist_string += '{}. {}\n'.format(count, str(i["song"]))
+
+			seconds = i["duration"]
+			hours = seconds // 3600
+			minutes = (seconds % 3600) // 60
+			seconds = seconds % 60
+
+			playlist_string += '{}. {} - [{:02d}h:{:02d}m:{:02d}s]\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds))
 			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
