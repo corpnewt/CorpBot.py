@@ -53,7 +53,7 @@ class Example:
 		if member == None:
 			member = ctx.message.author
 
-		await self.bot.say('{} joined {}'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
+		await self.bot.say('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
 	def __init__(self, message, player, ctx):
@@ -63,7 +63,7 @@ class VoiceEntry:
 		self.ctx = ctx
 
 	def __str__(self):
-		fmt = '*{}* requested by {}'.format(self.player.title, DisplayName.name(self.requester))
+		fmt = '*{}* requested by *{}*'.format(self.player.title, DisplayName.name(self.requester))
 		seconds = self.player.duration
 		if seconds:
 			hours = seconds // 3600
@@ -439,7 +439,7 @@ class Music:
 			else:
 				total_keeps = total_keeps + XP
 		
-		await self.bot.say('**Total Votes**:\nKeeps Score: {}\nSkips Score : {}'.format(total_keeps, total_skips))
+		await self.bot.say('**Total Votes**:\nKeeps Score: *{}*\nSkips Score : *{}*'.format(total_keeps, total_skips))
 
 		return {'total_skips': total_skips, 'total_keeps': total_keeps}
 
@@ -501,7 +501,7 @@ class Music:
 
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def removesong(self, ctx, idx : int):
+	async def removesong(self, ctx, idx : int = None):
 		"""Removes a song in the playlist by the index."""
 
 		channel = ctx.message.channel
@@ -530,14 +530,18 @@ class Music:
 			await self.bot.say('Umm... Okay.  I successfully removed *0* songs from the playlist.  That\'s what you wanted, right?')
 			return
 
+		if not type(idx) == int:
+			await self.bot.say('Indexes need to be integers, yo.')
+			return
+
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to {}playlist for the song index.'.format(ctx.prefix))
+			await self.bot.say('Invalid song index, please refer to `{}playlist` for the song index.'.format(ctx.prefix))
 			return
 		current = state.playlist[idx]
-		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use {}skip instead'.format(ctx.prefix))
+			await self.bot.say('Cannot delete currently playing song, use `{}skip` instead'.format(ctx.prefix))
 			return
+		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		del state.playlist[idx]
