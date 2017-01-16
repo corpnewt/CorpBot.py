@@ -122,7 +122,7 @@ class VoiceState:
 
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
-			await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
+			await self.bot.send_message(self.current.channel, 'Now playing ' + self.playlist[0]["song"])
 
 			self.current.player.start()
 			await self.play_next_song.wait()
