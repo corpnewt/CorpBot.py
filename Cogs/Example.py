@@ -126,6 +126,7 @@ class VoiceState:
 
 			self.current.player.start()
 			await self.play_next_song.wait()
+			self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
 			del self.playlist[0]
 	
 	async def create_youtube_entry(self, ctx, song: str):
