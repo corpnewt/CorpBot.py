@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+import os
 from   discord.ext import commands
 from   discord import errors
 from   Cogs import ReadableTime
@@ -38,15 +39,21 @@ from Cogs import Eat
 from Cogs import Profile
 from Cogs import Ascii
 
+# Let's load our prefix file
+prefix = '$'
+if os.path.exists('prefix.txt'):
+	with open('prefix.txt') as f:
+		prefix = f.read()
+	if not prefix:
+		prefix = '$'
 # This should be the main soul of the bot - everything should load from here
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), pm_help=None, description='A bot that does stuff.... probably')
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
 corpSiteAuth = "corpSiteAuth.txt"
 # Open our token
 with open('token.txt', 'r') as f:
 	token = f.read()
-
 
 # Create our cog classes
 cogList = []
@@ -78,7 +85,7 @@ channel = Channel.Channel(bot, settings)
 cogList.append(channel)
 
 # Feed
-feed = Feed.Feed(bot, settings, xp)
+feed = Feed.Feed(bot, settings, xp, prefix)
 cogList.append(feed)
 
 # Reddit

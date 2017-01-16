@@ -45,9 +45,9 @@ class Face:
 			# Got someone
 			memberName = DisplayName.name(DisplayName.memberForID(lastLen, ctx.message.server))
 			if memberName:
-				msg = '*{}* was the last person to use the `$lenny` command.'.format(memberName)
+				msg = '*{}* was the last person to use the `{}lenny` command.'.format(memberName, ctx.prefix)
 			else:
-				msg = 'The user that last used the `$lenny` command is no longer on this server.'
+				msg = 'The user that last used the `{}lenny` command is no longer on this server.'.format(ctx.prefix)
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 
@@ -83,7 +83,7 @@ class Face:
 			# Got someone
 			memberName = DisplayName.name(DisplayName.memberForID(lastLen, ctx.message.server))
 			if memberName:
-				msg = '*{}* was the last person to use the `$shrug` command.'.format(memberName)
+				msg = '*{}* was the last person to use the `{}shrug` command.'.format(memberName, ctx.prefix)
 			else:
-				msg = 'The user that last used the `$shrug` command is no longer on this server.'
+				msg = 'The user that last used the `{}shrug` command is no longer on this server.'.format(ctx.prefix)
 		await self.bot.send_message(ctx.message.channel, msg)

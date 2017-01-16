@@ -41,7 +41,7 @@ class Settings:
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
-				"LastAnswer" 			: "",		# URL to last $question post
+				"LastAnswer" 			: "",		# URL to last {prefix}question post
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
@@ -629,7 +629,7 @@ class Settings:
 			member = author
 
 		if str == None:
-			msg = 'Usage: `$getstat [stat] [member]`'
+			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -641,7 +641,7 @@ class Settings:
 				return
 
 		if member is None:
-			msg = 'Usage: `$getstat [stat] [member]`'
+			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -677,7 +677,7 @@ class Settings:
 			return
 
 		if stat == None or value == None:
-			msg = 'Usage: $setsstat Stat Value'
+			msg = 'Usage: `{}setsstat Stat Value`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -702,7 +702,7 @@ class Settings:
 			return
 
 		if stat == None:
-			msg = 'Usage: `$getsstat [stat]`'
+			msg = 'Usage: `{}getsstat [stat]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 

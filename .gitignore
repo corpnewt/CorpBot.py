@@ -4,6 +4,9 @@ token.txt
 # Auth file
 corpSiteAuth.txt
 
+# Prefix file
+prefix.txt
+
 # FFMpeg.exe
 ffmpeg.exe
 

@@ -28,7 +28,7 @@ class UrbanDict:
 			suppress = False
 
 		if not word:
-			msg = 'Usage: `$define [word]`'
+			msg = 'Usage: `{}define [word]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 		rword = word.replace(" ", "+")

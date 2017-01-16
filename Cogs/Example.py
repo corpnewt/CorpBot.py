@@ -60,11 +60,11 @@ class VoiceEntry:
 		self.player = player
 
 	def __str__(self):
-		fmt = '*{0.title}* requested by {1.name}'
+		fmt = '*{}* requested by {}'.format(self.player.title, DisplayName.name(self.requester))
 		duration = self.player.duration
 		if duration:
 			fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
-		return fmt.format(self.player, self.requester)
+		return fmt
 
 class VoiceState:
 	def __init__(self, bot):
@@ -445,8 +445,10 @@ class Music:
 		#playlist_string += '```Markdown\n'
 		count = 1
 		for i in state.playlist:
-						playlist_string += '{}. {}\n'.format(count, str(i))
-						count = count + 1
+			if count > 15:
+				break
+			playlist_string += '{}. {}\n'.format(count, str(i))
+			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
 
@@ -484,11 +486,11 @@ class Music:
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to $playlist for the song index.')
+			await self.bot.say('Invalid song index, please refer to {}playlist for the song index.'.format(ctx.prefix))
 			return
 		song = state.playlist[idx]
 		await self.bot.say('Deleted {} from playlist'.format(str(song)))
 		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use $skip instead')
+			await self.bot.say('Cannot delete currently playing song, use {}skip instead'.format(ctx.prefix))
 			return
 		del state.playlist[idx]

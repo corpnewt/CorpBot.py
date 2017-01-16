@@ -67,7 +67,7 @@ class Time:
 		# We got one
 		offset = self.settings.getUserStat(member, ctx.message.server, "UTCOffset")
 		if offset == None:
-			msg = '*{}* hasn\'t set their offset yet - they can do so with the `$setoffset [+-offset]` command.'.format(DisplayName.name(member))
+			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -111,7 +111,7 @@ class Time:
 			offset = self.settings.getUserStat(member, ctx.message.server, "UTCOffset")
 		
 		if offset == None:
-			msg = '*{}* hasn\'t set their offset yet - they can do so with the `$setoffset [+-offset]` command.\nThe current UTC time is *{}*.'.format(DisplayName.name(member), datetime.datetime.utcnow().strftime("%I:%M %p"))
+			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.\nThe current UTC time is *{}*.'.format(DisplayName.name(member), ctx.prefix, datetime.datetime.utcnow().strftime("%I:%M %p"))
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 

@@ -50,7 +50,7 @@ class Channel:
 			suppress = False
 			
 		if member == None:
-			msg = 'Usage: `ismuted [member]`'
+			msg = 'Usage: `{}ismuted [member]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
@@ -118,17 +118,21 @@ class Channel:
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
 
 		if not len(promoSorted):
-			roleText = "There are no admin roles set yet.  Use `$addadmin [role]` to add some."
+			roleText = "There are no admin roles set yet.  Use `{}addadmin [role]` to add some.".format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, roleText)
 			return
 		
 		roleText = "Current Admin Roles:\n"
 
 		for arole in promoSorted:
+			found = False
 			for role in ctx.message.server.roles:
 				if role.id == arole["ID"]:
 					# Found the role ID
+					found = True
 					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
+			if not found:
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
 
 		# Check for suppress
 		if suppress:
@@ -151,7 +155,7 @@ class Channel:
 		channel = ctx.message.channel
 
 		if role == None:
-			msg = 'Usage: `$rolecall [role]`'
+			msg = 'Usage: `{}rolecall [role]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 			

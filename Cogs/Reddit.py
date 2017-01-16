@@ -110,7 +110,7 @@ class Reddit:
 		"""Spout out some interstellar answering... ?"""
 		answer = self.settings.getServerStat(ctx.message.server, "LastAnswer")
 		if answer == "":
-			msg = 'You need to ask a `$question` first!'
+			msg = 'You need to ask a `{}question` first!'.format(ctx.prefix)
 		else:
 			msg = '{}'.format(answer)
 		await self.bot.send_message(ctx.message.channel, msg)

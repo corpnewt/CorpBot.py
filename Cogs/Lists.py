@@ -52,7 +52,7 @@ class Lists:
 				
 		# Passed role requirements!
 		if not (name or link):
-			msg = 'Usage: `$addlink "[link name]" [url]`'
+			msg = 'Usage: `{}addlink "[link name]" [url]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -115,13 +115,13 @@ class Lists:
 				return
 		
 		if name == None:
-			msg = 'Usage: `$removelink "[link name]"`'
+			msg = 'Usage: `{}removelink "[link name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
-			msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -158,13 +158,13 @@ class Lists:
 			suppress = False
 		
 		if not name:
-			msg = 'Usage: `$link "[link name]"`'
+			msg = 'Usage: `{}link "[link name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
-			msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -198,13 +198,13 @@ class Lists:
 			suppress = False
 		
 		if not name:
-			msg = 'Usage: `$linkinfo "[link name]"`'
+			msg = 'Usage: `{}linkinfo "[link name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
-			msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -271,7 +271,7 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `$link {}`?'.format(extraArgs, extraArgs)
+			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -280,7 +280,7 @@ class Lists:
 		
 		linkList = self.settings.getServerStat(server, "Links")
 		if linkList == None or linkList == []:
-			msg = 'No links in list!  You can add some with the `$addlink "[link name]" [url]` command!'
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 			
@@ -360,7 +360,7 @@ class Lists:
 				
 		# Passed role requirements!
 		if not (name or hack):
-			msg = 'Usage: `$addlink "[hack name]" [hack]`'
+			msg = 'Usage: `{}addhack "[hack name]" [hack]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -424,13 +424,13 @@ class Lists:
 				return
 		
 		if name == None:
-			msg = 'Usage: `$removehack "[hack name]"`'
+			msg = 'Usage: `{}removehack "[hack name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
-			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -467,13 +467,13 @@ class Lists:
 			suppress = False
 		
 		if not name:
-			msg = 'Usage: `$hack "[hack name]"`'
+			msg = 'Usage: `{}hack "[hack name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
-			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -506,13 +506,13 @@ class Lists:
 			suppress = False
 		
 		if not name:
-			msg = 'Usage: `$hackinfo "[hack name]"`'
+			msg = 'Usage: `{}hackinfo "[hack name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
-			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -579,7 +579,7 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `$hack {}`?'.format(extraArgs, extraArgs)
+			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -588,7 +588,7 @@ class Lists:
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
-			msg = 'No hacks in list!  You can add some with the `$addhack "[hack name]" [hack]` command!'
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -666,7 +666,7 @@ class Lists:
 		parts = self.settings.getUserStat(member, server, "Parts")
 		
 		if not parts or parts == "":
-			msg = '*{}* has not added their parts yet!  They can add them with the `$setparts [parts text]` command!'.format(DisplayName.name(member))
+			msg = '*{}* has not added their parts yet!  They can add them with the `{}setparts [parts text]` command!'.format(DisplayName.name(member), ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -711,7 +711,7 @@ class Lists:
 	@commands.command(pass_context=True)
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
-		msg = '\$setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'	
+		msg = '\{}setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'.format(ctx.prefix)	
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	@commands.command(pass_context=True)
@@ -743,7 +743,7 @@ class Lists:
 			suppress = False
 
 		if not member:
-			msg = 'Usage: `$lastonline "[member]"`'
+			msg = 'Usage: `{}lastonline "[member]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 

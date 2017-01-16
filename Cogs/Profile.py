@@ -52,7 +52,7 @@ class Profile:
 				
 		# Passed role requirements!
 		if not (name or link):
-			msg = 'Usage: `$addprofile "[profile name]" [link]`'
+			msg = 'Usage: `{}addprofile "[profile name]" [link]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -116,13 +116,13 @@ class Profile:
 				return
 		
 		if name == None:
-			msg = 'Usage: `$removeprofile "[profile name]"`'
+			msg = 'Usage: `{}removeprofile "[profile name]"`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
 		linkList = self.settings.getUserStat(author, server, "Profiles")
 		if not linkList or linkList == []:
-			msg = '*{}* has no profiles set!  They can add some with the `$addprofile "[profile name]" [url]` command!'.format(DisplayName.name(author))
+			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(author), ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -159,7 +159,7 @@ class Profile:
 			suppress = False
 		
 		if not member:
-			msg = 'Usage: `$profile [member] [profile name]`'
+			msg = 'Usage: `{}profile [member] [profile name]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -230,7 +230,7 @@ class Profile:
 			suppress = False
 		
 		if not member:
-			msg = 'Usage: `$profileinfo [member] [link name]`'
+			msg = 'Usage: `{}profileinfo [member] [profile name]`'.format(ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 
@@ -338,7 +338,7 @@ class Profile:
 		
 		linkList = self.settings.getUserStat(member, server, "Profiles")
 		if linkList == None or linkList == []:
-			msg = '*{}* hasn\'t added any profiles yet!  They can do so with the `$addprofile "[profile name]" [url]` command!'.format(DisplayName.name(member))
+			msg = '*{}* hasn\'t added any profiles yet!  They can do so with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(member), ctx.prefix)
 			await self.bot.send_message(channel, msg)
 			return
 			
