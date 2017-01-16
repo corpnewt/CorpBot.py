@@ -122,7 +122,7 @@ class VoiceState:
 
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
-			await self.bot.send_message(self.current.channel, 'Now playing ' + self.playlist[0]["song"])
+			await self.bot.send_message(self.current.channel, 'Now playing *{}* - requested by *{}*'.format(self.playlist[0]["song"], DisplayName.name(self.playlist[0]['requester'])))
 
 			self.current.player.start()
 			await self.play_next_song.wait()
@@ -255,8 +255,8 @@ class Music:
 		if "entries" in info:
 			info = info['entries'][0]
 		
-		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx})
-		await self.bot.say('Enqueued - ' + info.get('title'))
+		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author})
+		await self.bot.say('Enqueued - *{}* - requested by *{}*'.format(info.get('title'), DisplayName.name(ctx.message.author)))
 
 	
 
@@ -495,7 +495,7 @@ class Music:
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
 
-			playlist_string += '{}. {} - [{:02d}h:{:02d}m:{:02d}s]\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds))
+			playlist_string += '{}. *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds), DisplayName.name(i['requester']))
 			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
