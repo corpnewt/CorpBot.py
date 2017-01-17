@@ -473,7 +473,7 @@ class Music:
 
 			percent = diff_time.total_seconds() / state.current.player.duration * 100
 
-			await self.bot.say('Now playing - {} [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.current,round(hours), round(minutes), round(seconds), round(percent)))
+			await self.bot.say('Now playing - {} [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.current,round(hours), round(minutes), round(seconds), round(percent, 2)))
 
 
 	@commands.command(pass_context=True, no_pm=True)
