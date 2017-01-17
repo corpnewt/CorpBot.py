@@ -109,11 +109,11 @@ class VoiceState:
 		while True:
 			self.play_next_song.clear()
 			if len(self.playlist) <= 0:
-				await asyncio.sleep(1)
+				await asyncio.sleep(3)
 				continue
-			
+
 			self.start_time = datetime.datetime.now()
-			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["song"])
+			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"])
 
 			#Check if youtube-dl found the song
 			if self.current == False:
@@ -128,7 +128,8 @@ class VoiceState:
 			await self.play_next_song.wait()
 			self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
 			del self.playlist[0]
-	
+
+
 	async def create_youtube_entry(self, ctx, song: str):
 
 		opts = {
@@ -262,7 +263,7 @@ class Music:
 		return True
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def play(self, ctx, *, song : str):
+	async def play(self, ctx, *, song : str = None):
 		"""Plays a song.
 
 		If there is a song currently in the queue, then it is
@@ -277,6 +278,10 @@ class Music:
 		userInVoice = await self._user_in_voice(ctx)
 		if userInVoice == False:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+
+		if song == None:
+			await self.bot.say('Sweet.  I will *totally* add nothing to my list.  Thanks for the *superb* musical suggestion...')
 			return
 
 		state = self.get_voice_state(ctx.message.server)
@@ -301,7 +306,7 @@ class Music:
 		if "entries" in info:
 			info = info['entries'][0]
 		
-		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author})
+		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
 		await self.bot.say('Enqueued - *{}* - requested by *{}*'.format(info.get('title'), DisplayName.name(ctx.message.author)))
 
 	
