@@ -456,6 +456,19 @@ class Music:
 			await self.bot.say('Not playing anything right now...')
 			return
 
+		# Get song requester
+		state = self.get_voice_state(ctx.message.server)
+		requester = state.playlist[0]['requester']
+		requesterAdmin = requester.permissions_in(ctx.message.channel).administrator
+		if not requesterAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in requester.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						requesterAdmin = True
+
+
 		# Check if user is admin
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
@@ -466,10 +479,12 @@ class Music:
 					if aRole['ID'] == role.id:
 						isAdmin = True
 		if isAdmin:
-			# Auto skip.
-			await self.bot.say('My *Admin-Override* module is telling me to skip.')
-			state.skip()
-			return
+			# Check if the requester is also an admin
+			if not requesterAdmin:
+				# Auto skip.
+				await self.bot.say('My *Admin-Override* module is telling me to skip.')
+				state.skip()
+				return
 
 		voter = ctx.message.author
 		vote = await self.has_voted(ctx.message.author, state.votes)
