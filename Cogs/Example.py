@@ -53,7 +53,7 @@ class Example:
 		if member == None:
 			member = ctx.message.author
 
-		await self.bot.say('{} joined {}'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
+		await self.bot.say('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
 	def __init__(self, message, player, ctx):
@@ -63,7 +63,7 @@ class VoiceEntry:
 		self.ctx = ctx
 
 	def __str__(self):
-		fmt = '*{}* requested by {}'.format(self.player.title, DisplayName.name(self.requester))
+		fmt = '*{}* requested by *{}*'.format(self.player.title, DisplayName.name(self.requester))
 		seconds = self.player.duration
 		if seconds:
 			hours = seconds // 3600
@@ -122,7 +122,7 @@ class VoiceState:
 
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
-			await self.bot.send_message(self.current.channel, 'Now playing ' + self.playlist[0]["song"])
+			await self.bot.send_message(self.current.channel, 'Now playing *{}* - requested by *{}*'.format(self.playlist[0]["song"], DisplayName.name(self.playlist[0]['requester'])))
 
 			self.current.player.start()
 			await self.play_next_song.wait()
@@ -255,8 +255,8 @@ class Music:
 		if "entries" in info:
 			info = info['entries'][0]
 		
-		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx})
-		await self.bot.say('Enqueued - ' + info.get('title'))
+		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author})
+		await self.bot.say('Enqueued - *{}* - requested by *{}*'.format(info.get('title'), DisplayName.name(ctx.message.author)))
 
 	
 
@@ -440,7 +440,7 @@ class Music:
 			else:
 				total_keeps = total_keeps + XP
 		
-		await self.bot.say('**Total Votes**:\nKeeps Score: {}\nSkips Score : {}'.format(total_keeps, total_skips))
+		await self.bot.say('**Total Votes**:\nKeeps Score: *{}*\nSkips Score : *{}*'.format(total_keeps, total_skips))
 
 		return {'total_skips': total_skips, 'total_keeps': total_keeps}
 
@@ -495,14 +495,14 @@ class Music:
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
 
-			playlist_string += '{}. {} - [{:02d}h:{:02d}m:{:02d}s]\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds))
+			playlist_string += '{}. *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds), DisplayName.name(i['requester']))
 			count = count + 1
 		#playlist_string += '```'
 		await self.bot.say(playlist_string)
 
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def removesong(self, ctx, idx : int):
+	async def removesong(self, ctx, idx : int = None):
 		"""Removes a song in the playlist by the index."""
 
 		channel = ctx.message.channel
@@ -531,14 +531,18 @@ class Music:
 			await self.bot.say('Umm... Okay.  I successfully removed *0* songs from the playlist.  That\'s what you wanted, right?')
 			return
 
+		if not type(idx) == int:
+			await self.bot.say('Indexes need to be integers, yo.')
+			return
+
 		idx = idx - 1
 		state = self.get_voice_state(ctx.message.server)
 		if idx < 0 or idx >= len(state.playlist):
-			await self.bot.say('Invalid song index, please refer to {}playlist for the song index.'.format(ctx.prefix))
+			await self.bot.say('Invalid song index, please refer to `{}playlist` for the song index.'.format(ctx.prefix))
 			return
 		current = state.playlist[idx]
-		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		if idx == 0:
-			await self.bot.say('Cannot delete currently playing song, use {}skip instead'.format(ctx.prefix))
+			await self.bot.say('Cannot delete currently playing song, use `{}skip` instead'.format(ctx.prefix))
 			return
+		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		del state.playlist[idx]
