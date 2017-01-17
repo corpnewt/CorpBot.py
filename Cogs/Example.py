@@ -486,11 +486,13 @@ class Music:
 		playlist_string  = '**Current PlayList**\n\n'
 		#playlist_string += '```Markdown\n'
 		count = 1
+		total_seconds = 0
 		for i in state.playlist:
 			if count > 15:
 				break
 
 			seconds = i["duration"]
+			total_seconds += seconds
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
@@ -498,6 +500,12 @@ class Music:
 			playlist_string += '{}. *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds), DisplayName.name(i['requester']))
 			count = count + 1
 		#playlist_string += '```'
+		hours = total_seconds // 3600
+		minutes = (total_seconds % 3600) // 60
+		seconds = total_seconds % 60
+		playlist_string  += '**Total Time: **[{:02d}h:{:02d}m:{:02d}s]'.format(round(hours), round(minutes), round(seconds))
+
+
 		await self.bot.say(playlist_string)
 
 
