@@ -19,8 +19,9 @@ if not discord.opus.is_loaded():
 
 class Example:
 
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
+		self.settings = settings
 
 	@commands.command()
 	async def add(self, left : int, right : int):
@@ -47,11 +48,28 @@ class Example:
 		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
-	async def joined(self, ctx, member : discord.Member = None):
+	async def joined(self, ctx, *, member : str = None):
 		"""Says when a member joined."""
 
-		if member == None:
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		if member is None:
 			member = ctx.message.author
+			
+		if type(member) is str:
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.server)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await self.bot.send_message(ctx.message.channel, msg)
+				return
 
 		await self.bot.say('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 

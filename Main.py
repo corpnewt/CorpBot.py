@@ -63,7 +63,7 @@ settings = Settings.Settings(bot, jsonFile)
 cogList.append(settings)
 
 # Examples - there are 2 parts here, Example, and Music
-example = Example.Example(bot)
+example = Example.Example(bot, settings)
 music = Example.Music(bot, settings)
 cogList.append(example)
 cogList.append(music)
