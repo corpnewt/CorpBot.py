@@ -388,7 +388,14 @@ class Music:
 		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
+			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+			if not isAdmin:
+				checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+				for role in ctx.message.author.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if aRole['ID'] == role.id:
+							isAdmin = True
 			if not isAdmin:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 				return
@@ -442,6 +449,21 @@ class Music:
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
 			await self.bot.say('Not playing anything right now...')
+			return
+
+		# Check if user is admin
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		if isAdmin:
+			# Auto skip.
+			await self.bot.say('My *Admin-Override* module is telling me to skip.')
+			state.skip()
 			return
 
 		voter = ctx.message.author
