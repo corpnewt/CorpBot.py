@@ -322,6 +322,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
@@ -345,6 +346,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
@@ -364,6 +366,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
@@ -416,6 +419,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		server = ctx.message.server
 		state = self.get_voice_state(server)
@@ -445,6 +449,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
@@ -508,6 +513,7 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
@@ -636,28 +642,28 @@ class Music:
 			return
 		elif userInVoice == None:
 			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.server
 
+		canRemove = False
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredStopRole")
 		if requiredRole == "":
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-				return
+			if isAdmin:
+				canRemove = True
 		else:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
 				if role.id == requiredRole:
 					hasPerms = True
-			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
-				return
+			if hasPerms:
+				canRemove = True
 
 		if idx == None:
 			await self.bot.say('Umm... Okay.  I successfully removed *0* songs from the playlist.  That\'s what you wanted, right?')
@@ -676,5 +682,10 @@ class Music:
 		if idx == 0:
 			await self.bot.say('Cannot delete currently playing song, use `{}skip` instead'.format(ctx.prefix))
 			return
+		if not current['requester'].id == ctx.message.author.id:
+			# Not the owner of the song - check if we *can* delete
+			if not canRemove:
+				await self.bot.send_message(channel, 'You do not have sufficient privileges to remove *other* users\' songs.')
+				return
 		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
 		del state.playlist[idx]
