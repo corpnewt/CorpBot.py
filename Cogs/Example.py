@@ -189,6 +189,38 @@ class Music:
 			except:
 				pass
 
+	async def _user_in_voice(self, ctx):
+		# Check if we're in a voice channel
+		voiceChannel = self.bot.voice_client_in(ctx.message.server)
+		if not voiceChannel:
+			# We're not in a voice channel
+			return None
+		voiceChannel = voiceChannel.channel
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		# Check if user is admin
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		if isAdmin:
+			return True
+		
+		# Here, user is not admin - make sure they're in the voice channel
+		# Check if the user in question is in a voice channel
+		if ctx.message.author in voiceChannel.voice_members:
+			return True
+		# If we're here - we're not admin, and not in the same channel, deny
+		return False
+
+
 	@commands.command(pass_context=True, no_pm=True)
 	async def join(self, ctx, *, channel : discord.Channel):
 		"""Joins a voice channel."""
@@ -204,6 +236,13 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
 		"""Summons the bot to join your voice channel."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+
 		state = self.get_voice_state(ctx.message.server)
 
 		if state.is_playing():
@@ -233,6 +272,13 @@ class Music:
 		The list of supported sites can be found here:
 		https://rg3.github.io/youtube-dl/supportedsites.html
 		"""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+
 		state = self.get_voice_state(ctx.message.server)
 		
 		if state.voice is None:
@@ -264,6 +310,14 @@ class Music:
 	async def volume(self, ctx, value : int):
 		"""Sets the volume of the currently playing song."""
 
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
 			player = state.player
@@ -278,6 +332,15 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def pause(self, ctx):
 		"""Pauses the currently played song."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
 			player = state.player
@@ -288,6 +351,15 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def resume(self, ctx):
 		"""Resumes the currently played song."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
 			player = state.player
@@ -325,6 +397,14 @@ class Music:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
 				return
 
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+
 		server = ctx.message.server
 		state = self.get_voice_state(server)
 
@@ -345,6 +425,14 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def skip(self, ctx):
 		"""Vote to skip a song. The song requester can automatically skip."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
@@ -385,6 +473,15 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def keep(self, ctx):
 		"""Vote to keep a song."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+
 		state = self.get_voice_state(ctx.message.server)
 		if not state.is_playing():
 			await self.bot.say('Not playing anything right now...')
@@ -504,6 +601,14 @@ class Music:
 	@commands.command(pass_context=True, no_pm=True)
 	async def removesong(self, ctx, idx : int = None):
 		"""Removes a song in the playlist by the index."""
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
