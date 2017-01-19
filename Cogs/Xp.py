@@ -840,7 +840,7 @@ class Xp:
 		msg = "{}This pulls from your *xp reserve* - and doesn't affect your *xp*.\n\n".format(msg)
 		
 		msg = "{}You can check your *xp*, *xp reserve*, current role, and next role using the `{}stats` command.\n".format(msg, ctx.prefix)
-		msg = "{}You can check another user's stats with the `{}stat [user]` command.\n\n".format(msg, ctx.prefix)
+		msg = "{}You can check another user's stats with the `{}stats [user]` command.\n\n".format(msg, ctx.prefix)
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(server, "RequiredXPRole")
