@@ -140,7 +140,6 @@ class VoiceState:
 				
 			
 			seconds = self.playlist[0]["duration"]
-			total_seconds += seconds
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
@@ -332,7 +331,6 @@ class Music:
 			info = info['entries'][0]
 		
 		seconds = info.get('duration')
-		total_seconds += seconds
 		hours = seconds // 3600
 		minutes = (seconds % 3600) // 60
 		seconds = seconds % 60
