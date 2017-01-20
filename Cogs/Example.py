@@ -744,5 +744,5 @@ class Music:
 			if not canRemove:
 				await self.bot.send_message(channel, 'You do not have sufficient privileges to remove *other* users\' songs.')
 				return
-		await self.bot.say('Deleted {} from playlist'.format(str(current["song"])))
+		await self.bot.say('Deleted *{}* from playlist'.format(str(current["song"])))
 		del state.playlist[idx]
