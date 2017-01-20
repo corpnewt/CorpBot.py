@@ -127,7 +127,7 @@ class VoiceState:
 		while True:
 			self.play_next_song.clear()
 			if len(self.playlist) <= 0:
-				await asyncio.sleep(3)
+				await asyncio.sleep(1)
 				continue
 
 			self.start_time = datetime.datetime.now()
@@ -646,7 +646,12 @@ class Music:
 		if len(state.playlist) <= 0:
 						await self.bot.say('No songs in the playlist')
 						return
-		playlist_string  = '**Current PlayList**\n\n'
+		# Get our length
+		totalSongs = len(state.playlist)
+		if totalSongs > 15:
+			playlist_string  = '**__Current Playlist (showing 1-15 out of {}):__**\n\n'.format(totalSongs)
+		else:
+			playlist_string  = '**__Current Playlist (1-{}):__**\n\n'.format(totalSongs)
 		#playlist_string += '```Markdown\n'
 		count = 1
 		total_seconds = 0
@@ -666,7 +671,7 @@ class Music:
 		hours = total_seconds // 3600
 		minutes = (total_seconds % 3600) // 60
 		seconds = total_seconds % 60
-		playlist_string  += '**Total Time: **[{:02d}h:{:02d}m:{:02d}s]'.format(round(hours), round(minutes), round(seconds))
+		playlist_string  += '\n**Total Time: **[{:02d}h:{:02d}m:{:02d}s]'.format(round(hours), round(minutes), round(seconds))
 
 
 		await self.bot.say(playlist_string)
