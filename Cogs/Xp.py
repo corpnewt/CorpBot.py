@@ -852,7 +852,11 @@ class Xp:
 			for arole in server.roles:
 				if arole.id == role:
 					found = True
-					msg = '{}Currently, you need to be a/an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						msg = '{}Currently, you need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+					else:
+						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
 			if not found:
 				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that settings.\n\n'.format(msg, role)
 
