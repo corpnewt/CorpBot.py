@@ -137,10 +137,17 @@ class VoiceState:
 			if self.current == False:
 				del self.playlist[0]
 				continue
+				
+			
+			seconds = self.playlist[0]["duration"]
+			total_seconds += seconds
+			hours = seconds // 3600
+			minutes = (seconds % 3600) // 60
+			seconds = seconds % 60
 
 			self.votes = []
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
-			await self.bot.send_message(self.current.channel, 'Now playing *{}* - requested by *{}*'.format(self.playlist[0]["song"], DisplayName.name(self.playlist[0]['requester'])))
+			await self.bot.send_message(self.current.channel, 'Now playing *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"], round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
 
 			self.current.player.start()
 			await self.play_next_song.wait()
@@ -324,8 +331,14 @@ class Music:
 		if "entries" in info:
 			info = info['entries'][0]
 		
+		seconds = info.get('duration')
+		total_seconds += seconds
+		hours = seconds // 3600
+		minutes = (seconds % 3600) // 60
+		seconds = seconds % 60
+		
 		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
-		await self.bot.say('Enqueued - *{}* - requested by *{}*'.format(info.get('title'), DisplayName.name(ctx.message.author)))
+		await self.bot.say('Enqueued - *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
 	
 
