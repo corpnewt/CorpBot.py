@@ -9,6 +9,7 @@ from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import CheckRoles
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -193,7 +194,7 @@ class Admin:
 		if suppress:
 			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
-		await self.checkroles(member, channel)
+		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 
 
 	@setxp.error

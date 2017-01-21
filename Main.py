@@ -38,6 +38,7 @@ from Cogs import Search
 from Cogs import Eat
 from Cogs import Profile
 from Cogs import Ascii
+from Cogs import Promote
 
 # Let's load our prefix file
 prefix = '$'
@@ -179,6 +180,10 @@ cogList.append(askey)
 # Profile
 prof = Profile.Profile(bot, settings)
 cogList.append(prof)
+
+# Promote/Demote
+prom = Promote.Promote(bot, settings)
+cogList.append(prom)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

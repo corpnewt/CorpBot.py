@@ -127,7 +127,7 @@ class BotAdmin:
 				
 				if memFromName == None:
 					# We couldn't find one or the other
-					msg = 'Usage: `{}mute [member] [cooldown in minutes - optional]`'.format(ctx.prefix)
+					msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
 					await self.bot.send_message(ctx.message.channel, msg)
 					return
 				
@@ -139,7 +139,7 @@ class BotAdmin:
 
 			
 		if member == None:
-			msg = 'Usage: `{}mute [member] [cooldown in minutes - optional]`'.format(ctx.prefix)
+			msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
