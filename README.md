@@ -27,156 +27,207 @@ A sample of his `$help` command:
 	A bot that does stuff.... probably
 
 	Admin:
-	  setrules           Set the server's rules (admin-only).
-	  stoprole           Lists the required role to stop the bot from playing music.
-	  removexprole       Removes a role from the xp promotion/demotion system (ad...
-	  mute               Prevents a member from sending messages in chat (admin-o...
-	  setuserparts       Set another user's parts list (admin only).
-	  setmadlibschannel  Sets the required role ID to stop the music player (admi...
-	  lock               Toggles whether the bot only responds to admins (admin-o...
-	  setxprole          Sets the required role ID to give xp, gamble, or feed th...
-	  setdefaultrole     Sets the default role or position for auto-role assignment.
-	  xprole             Lists the required role to give xp, gamble, or feed the ...
-	  removemotd         Removes the message of the day from the selected channel.
-	  addxprole          Adds a new role to the xp promotion/demotion system (adm...
-	  prunexproles       Removes any roles from the xp promotion/demotion system ...
-	  unmute             Allows a muted member to send messages in chat (admin-on...
-	  broadcast          Broadcasts a message to all connected servers.  Can only...
-	  addadmin           Adds a new role to the xp promotion/demotion system (adm...
-	  ignore             Adds a member to the bot's "ignore" list (admin-only).
-	  setstoprole        Sets the required role ID to stop the music player (admi...
 	  setmotd            Adds a message of the day to the selected channel.
-	  sethackrole        Sets the required role ID to add/remove hacks (admin only).
-	  removeadmin        Removes a role from the admin list (admin only).
-	  setlinkrole        Sets the required role ID to add/remove links (admin only).
-	  listen             Removes a member from the bot's "ignore" list (admin-only).
+	  prunexproles       Removes any roles from the xp promotion/demotion system ...
+	  removemotd         Removes the message of the day from the selected channel.
 	  setxpreserve       Set's an absolute value for the member's xp reserve (adm...
-	  ignored            Lists the users currently being ignored.
+	  setlinkrole        Sets the required role ID to add/remove links (admin only).
+	  setrules           Set the server's rules (admin only).
+	  addxprole          Adds a new role to the xp promotion/demotion system (adm...
+	  sethackrole        Sets the required role ID to add/remove hacks (admin only).
+	  setmadlibschannel  Sets the required role ID to stop the music player (admi...
+	  setxp              Sets an absolute value for the member's xp (admin only).
+	  xprole             Lists the required role to give xp, gamble, or feed the ...
+	  broadcast          Broadcasts a message to all connected servers.  Can only...
+	  removexprole       Removes a role from the xp promotion/demotion system (ad...
+	  setxprole          Sets the required role ID to give xp, gamble, or feed th...
+	  stoprole           Lists the required role to stop the bot from playing music.
+	  setstoprole        Sets the required role ID to stop the music player (admi...
+	  lock               Toggles whether the bot only responds to admins (admin o...
+	  addadmin           Adds a new role to the xp promotion/demotion system (adm...
+	  setdefaultrole     Sets the default role or position for auto-role assignment.
+	  removeadmin        Removes a role from the admin list (admin only).
+	Ascii:
+	  ascii              Beautify some text (font list at http://artii.herokuapp....
 	Bot:
-	  source             Link the github source.
-	  avatar             Sets the bot's avatar (owner-only).
-	  setbotparts        Set the bot's parts - can be a url, formatted text, or n...
 	  nickname           Set the bot's nickname (admin-only).
+	  hostinfo           List info about the bot's host environment.
+	  avatar             Sets the bot's avatar (owner only).
+	  ping               Feeling lonely?
 	  playgame           Sets the playing status of the bot (owner-only).
+	  source             Link the github source.
+	  setbotparts        Set the bot's parts - can be a url, formatted text, or n...
 	  servers            Lists the number of servers I'm connected to!
+	BotAdmin:
+	  listen             Removes a member from the bot's "ignore" list (bot-admin...
+	  unmute             Allows a muted member to send messages in chat (bot-admi...
+	  ignored            Lists the users currently being ignored.
+	  ignore             Adds a member to the bot's "ignore" list (bot-admin only).
+	  ban                Bans the selected member (bot-admin only).
+	  kick               Kicks the selected member (bot-admin only).
+	  setuserparts       Set another user's parts list (bot-admin only).
+	  mute               Prevents a member from sending messages in chat (bot-adm...
+	Calc:
+	  calc               Do some math.
+	Cats:
+	  randomcat          Meow.
 	Channel:
+	  islocked           Says whether the bot only responds to admins.
 	  rules              Display the server's rules.
 	  clean              Cleans the passed number of messages from the given chan...
 	  rolecall           Lists the number of users in a current role.
-	  islocked           Says whether the bot only responds to admins.
-	  ismuted            Says whether a member is muted in chat.
 	  listadmin          Lists admin roles and id's.
+	  ismuted            Says whether a member is muted in chat.
 	Comic:
-	  randilbert         Randomly picks and displays a Dilbert comic.
-	  randcyanide        Randomly picks and displays a Cyanide & Happiness comic.
-	  gmg                Displays the Garfield Minus Garfield comic for the passe...
 	  randxkcd           Displays a random XKCD comic.
-	  randpeanuts        Randomly picks and displays a Peanuts comic.
+	  randcalvin         Randomly picks and displays a Calvin & Hobbes comic.
 	  randgarfield       Randomly picks and displays a Garfield comic.
 	  peanuts            Displays the Peanuts comic for the passed date (MM-DD-YY...
-	  xkcd               Displays the XKCD comic for the passed date (MM-DD-YYYY)...
+	  randpeanuts        Randomly picks and displays a Peanuts comic.
+	  cyanide            Displays the Cyanide & Happiness comic for the passed da...
 	  calvin             Displays the Calvin & Hobbes comic for the passed date (...
 	  randgmg            Randomly picks and displays a Garfield Minus Garfield co...
-	  randcalvin         Randomly picks and displays a Calvin & Hobbes comic.
-	  cyanide            Displays the Cyanide & Happiness comic for the passed da...
-	  garfield           Displays the Garfield comic for the passed date (MM-DD-Y...
+	  gmg                Displays the Garfield Minus Garfield comic for the passe...
+	  randcyanide        Randomly picks and displays a Cyanide & Happiness comic.
+	  randilbert         Randomly picks and displays a Dilbert comic.
 	  dilbert            Displays the Dilbert comic for the passed date (MM-DD-YY...
+	  garfield           Displays the Garfield comic for the passed date (MM-DD-Y...
+	  xkcd               Displays the XKCD comic for the passed date (MM-DD-YYYY)...
 	DrBeer:
 	  drbeer             Put yourself in your place.
+	Eat:
+	  eat                Eat like a boss.
+	EightBall:
+	  eightball          Get some answers.
 	Example:
-	  joined             Says when a member joined.
 	  choose             Chooses between multiple choices.
-	  roll               Rolls a dice in NdN format.
 	  add                Adds two numbers together.
+	  roll               Rolls a dice in NdN format.
+	  joined             Says when a member joined.
+	Face:
+	  shrug              Shrug it off.
+	  lenny              Give me some Lenny.
+	  lastlenny          Who Lenny'ed last?
+	  lastshrug          Who shrugged last?
 	Feed:
+	  killrole           Lists the required role to kill/resurrect the bot.
+	  setkillrole        Sets the required role ID to add/remove hacks (admin only).
 	  feed               Feed the bot some xp!
+	  resurrect          Restore life to the bot.  What magic is this?
 	  iskill             Check the ded of the bot.
 	  hunger             How hungry is the bot?
-	  killrole           Lists the required role to kill/resurrect the bot.
 	  kill               Kill the bot... you heartless soul.
-	  resurrect          Restore life to the bot.  What magic is this?
-	  setkillrole        Sets the required role ID to add/remove hacks (admin only).
 	Humor:
 	  fart               PrincessZoey :P
 	Invite:
 	  invite             Outputs a url you can use to invite me to your server.
 	Lists:
-	  online             Lists the number of users online.
-	  addlink            Add a link to the link list.
-	  hack               Retrieve a hack from the hack list.
-	  hackrole           Lists the required role to add hacks.
-	  lastonline         Lists the last time a user was online if known.
-	  partstemp          Gives a copy & paste style template for setting a parts ...
-	  linkinfo           Displays info about a link from the link list.
-	  links              List all links in the link list.
-	  hacks              List all hacks in the hack list.
-	  hackinfo           Displays info about a hack from the hack list.
-	  parts              Retrieve a member's parts list.
-	  setparts           Set your own parts - can be a url, formatted text, or no...
-	  removehack         Remove a hack from the hack list.
-	  addhack            Add a hack to the hack list.
-	  linkrole           Lists the required role to add links.
 	  removelink         Remove a link from the link list.
+	  removehack         Remove a hack from the hack list.
+	  linkrole           Lists the required role to add links.
+	  hack               Retrieve a hack from the hack list.
+	  lastonline         Lists the last time a user was online if known.
+	  online             Lists the number of users online.
+	  setparts           Set your own parts - can be a url, formatted text, or no...
+	  addhack            Add a hack to the hack list.
+	  hacks              List all hacks in the hack list.
+	  addlink            Add a link to the link list.
+	  hackrole           Lists the required role to add hacks.
+	  links              List all links in the link list.
+	  parts              Retrieve a member's parts list.
 	  link               Retrieve a link from the link list.
+	  linkinfo           Displays info about a link from the link list.
+	  hackinfo           Displays info about a hack from the hack list.
+	  partstemp          Gives a copy & paste style template for setting a parts ...
 	MadLibs:
-	  madlibs            Let's play MadLibs!  Start with $madlibs, select works w...
+	  madlibs            Let's play MadLibs!
 	Music:
+	  playlist           Shows current songs in the playlist.
+	  playing            Shows info about currently playing.
+	  vote_stats         
+	  removesong         Removes a song in the playlist by the index.
 	  play               Plays a song.
-	  pause              Pauses the currently played song.
-	  skip               Vote to skip a song. The song requester can automaticall...
+	  join               Joins a voice channel.
+	  keep               Vote to keep a song.
+	  volume             Sets the volume of the currently playing song.
 	  resume             Resumes the currently played song.
+	  skip               Vote to skip a song. The song requester can automaticall...
+	  unvote             Remove your song vote.
+	  pause              Pauses the currently played song.
 	  stop               Stops playing audio and leaves the voice channel.
 	  summon             Summons the bot to join your voice channel.
-	  playing            Shows info about currently playing.
-	  volume             Sets the volume of the currently playing song.
-	  join               Joins a voice channel.
+	Profile:
+	  profileinfo        Displays info about a profile from the passed user's pro...
+	  profile            Retrieve a profile from the passed user's profile list.
+	  addprofile         Add a profile to your profile list.
+	  removeprofile      Remove a profile from your profile list.
+	  profiles           List all profiles in the passed user's profile list.
 	Reddit:
-	  meirl              Me in real life.
-	  techsupport        Tech support irl.
-	  thinkdeep          Spout out some intellectual brilliance.
-	  dankmemes          Only the dankest.
-	  brainfart          Spout out some uh... intellectual brilliance...
-	  answer             Spout out some interstellar answering... ?
 	  earthporn          Earth is good.
-	  nocontext          Spout out some intersexual brilliance.
-	  software           I uh... I wrote it myself.
-	  abandoned          Get something abandoned to look at.
-	  starterpack        Starterpacks.
-	  wallpaper          Get something pretty to look at.
+	  meirl              Me in real life.
 	  question           Spout out some interstellar questioning... ?
+	  randomdog          Bark if you know whassup.
+	  thinkdeep          Spout out some intellectual brilliance.
+	  starterpack        Starterpacks.
+	  software           I uh... I wrote it myself.
+	  wallpaper          Get something pretty to look at.
+	  cablefail          Might as well be a noose...
+	  brainfart          Spout out some uh... intellectual brilliance...
+	  dragon             From the past - when great winged beasts soared the skies.
+	  aww                Whenever you're down - uppify.
+	  answer             Spout out some interstellar answering... ?
+	  nocontext          Spout out some intersexual brilliance.
+	  techsupport        Tech support irl.
+	  dankmemes          Only the dankest.
+	  abandoned          Get something abandoned to look at.
+	Remind:
+	  reminders          List up to 10 pending reminders.
+	  clearmind          Clear all reminders.
+	  remindme           Set a reminder.
+	Search:
+	  duck               Duck Duck... GOOSE.
+	  google             Get some searching done.
+	  bing               Get some uh... more searching done.
+	  searchsite         Search corpnewt.com forums.
 	Server:
 	  info               Displays the server info if any.
 	  setinfo            Sets the server info (admin only).
 	Settings:
-	  prune              Iterate through all members on all connected servers and...
-	  prunesettings      Compares all connected servers' settings to the default ...
-	  owner              Sets the bot owner - once set, can only be changed by th...
 	  getstat            Gets the value for a specific stat for the listed member...
-	  prunelocalsettings Compares the current server's settings to the default li...
-	  setsstat           Sets a server stat (admin only).
 	  getsstat           Gets a server stat (admin only).
 	  flush              Flush the bot settings to disk (admin only).
+	  setsstat           Sets a server stat (admin only).
+	  prune              Iterate through all members on all connected servers and...
+	  prunesettings      Compares all connected servers' settings to the default ...
 	  disown             Revokes ownership of the bot.
+	  setowner           Sets the bot owner - once set, can only be changed by th...
+	  owner              Lists the bot's current owner.
+		  claim              Claims the bot - once set, can only be changed by the cu...
+	  ownerlock          Locks/unlocks the bot to only respond to the owner.
+	  prunelocalsettings Compares the current server's settings to the default li...
 	Setup:
 	  setup              Runs first-time setup (server owner only).
+	Time:
+	  time               Get UTC time +- an offset.
+	  offset             See a member's UTC offset.
+	  setoffset          Set your UTC offset.
 	Uptime:
 	  uptime             Lists the bot's uptime.
 	UrbanDict:
 	  define             Gives the definition of the word passed.
 	  randefine          Gives a random word and its definition.
 	Xp:
-	  topxp              List the top 10 xp-holders - or all members, if there ar...
-	  xp                 Gift xp to other members.
-	  setxp              Sets an absolute value for the member's xp (admin only).
 	  defaultrole        Lists the default role that new users are assigned.
-	  gamble             Gamble your xp reserves for a chance at winning xp!
-	  bottomxp           List the bottom 10 xp-holders - or all members, if there...
 	  stats              List the xp and xp reserve of a listed member.
-	  recheckroles       Re-iterate through all members and assign the proper rol...
 	  listxproles        Lists all roles, id's, and xp requirements for the xp pr...
-	  rank               Say the highest rank of a listed member.
-	  recheckrole        Re-iterate through all members and assign the proper rol...
 	  xpinfo             Gives a quick rundown of the xp system.
+	  leaderboard        List the top xp-holders (max of 50).
+	  rank               Say the highest rank of a listed member.
+	  bottomxp           List the bottom xp-holders (max of 50).
+	  recheckroles       Re-iterate through all members and assign the proper rol...
+	  recheckrole        Re-iterate through all members and assign the proper rol...
+	  xp                 Gift xp to other members.
+	  gamble             Gamble your xp reserves for a chance at winning xp!
 	​No Category:
 	  help               Shows this message.
 
