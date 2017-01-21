@@ -1,6 +1,25 @@
 # CorpBot.py
 A *slightly* less clumsy python bot for discord
 
+# Installation
+Run `git pull https://github.com/corpnewt/CorpBot.py.git` or download as ZIP. CD to the directory.
+Then, run the correct file (`Install.bat` for Windows, `sudo bash Install.sh` for MacOS and Linux).
+Make sure you scroll through all of the output, as there might be hidden errors.
+
+Linux note: You may need to run `sudo apt install python3 pip3 && sudo pip3 install --upgrade pillow`
+to make sure Pillow, Python3, and PIP3 are installed correctly.
+
+# Running the Bot
+Create a .txt file and paste your token with no extra lines in it. Save it as token.txt in the same
+place where CorpBot's source is.
+Run the correct file (`StartBot.bat` for Windows, `bash Start.sh` for MacOS and Linux).
+
+MacOS note: If you get an error about certificate verification failed, you need to update your Python 
+key stores, and download from Python.org. In Python 3.6, Apple decided to bundle its own OpenSSL version,
+leading to a certificate store that does not have all the root certificates. You can update this by running
+`Install Certificates.command`, located in CorpBot's source directory.
+
+# Features
 A sample of his `$help` command:
 
 -
