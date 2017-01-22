@@ -17,7 +17,7 @@ Run the correct file (`StartBot.bat` for Windows, `bash Start.sh` for MacOS and 
 MacOS note: If you get an error about certificate verification failed, you need to update your Python 
 key stores, and download from Python.org. In Python 3.6, Apple decided to bundle its own OpenSSL version,
 leading to a certificate store that does not have all the root certificates. You can update this by running
-`Install Certificates.command`, located in CorpBot's source directory.
+`UpdateCertificates.command`, located in CorpBot's source directory.
 
 # Features
 A sample of his `$help` command:
