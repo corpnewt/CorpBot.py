@@ -7,6 +7,7 @@ from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import CheckRoles
 
 # This is the xp module.  It's likely to be retarded.
 
@@ -20,11 +21,12 @@ class Xp:
 		
 	async def addXP(self):
 		while not self.bot.is_closed:
-			await asyncio.sleep(3600) # runs only every 1 hour (3600 seconds)
+			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
 			print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
 			for server in self.bot.servers:
 				# Iterate through the servers and add them
-				xpAmount   = self.settings.getServerStat(server, "HourlyXP")
+				xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
+				xpAmount   = float(xpAmount/6)
 				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
 				for user in server.members:
 					bumpXP = False
@@ -35,7 +37,13 @@ class Xp:
 							bumpXP = True
 							
 					if bumpXP:
-						self.settings.incrementStat(user, server, "XPReserve", int(xpAmount))
+						# User is online
+						xpLeftover = float(self.settings.getUserStat(user, server, "XPLeftover"))
+						gainedXp = xpLeftover+xpAmount
+						gainedXpInt = int(gainedXp) # Strips the decimal point off
+						xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
+						self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
+						self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
 	
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
@@ -178,12 +186,12 @@ class Xp:
 								leftover -= 1
 							else:
 								self.settings.incrementStat(cMember, server, "XP", eachXP)
-							await self.checkroles(cMember, channel)
+							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
 					else:
 						for i in range(0, xpAmount):
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							self.settings.incrementStat(cMember, server, "XP", 1)
-							await self.checkroles(cMember, channel)
+							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
 
 					# Decrement if needed
 					if decrement:
@@ -209,7 +217,7 @@ class Xp:
 				await self.bot.send_message(channel, msg)
 				self.settings.incrementStat(member, server, "XP", xpAmount)
 				# Now we check for promotions
-				await self.checkroles(member, channel)
+				await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 		else:
 			await self.bot.send_message(channel, msg)
 			
@@ -333,7 +341,7 @@ class Xp:
 				self.settings.incrementStat(author, server, "XP", int(payout))
 				msg = '*{}* bet *{}* and ***WON*** *{} xp!*'.format(DisplayName.name(author), bet, int(payout))
 				# Now we check for promotions
-				await self.checkroles(author, channel)
+				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
 			else:
 				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
@@ -357,7 +365,7 @@ class Xp:
 		changeCount = 0
 		for member in server.members:
 			# Now we check for promotions
-			if await self.checkroles(member, channel, True):
+			if await CheckRoles.checkroles(member, channel, self.settings, self.bot, True):
 				changeCount += 1
 		
 		if changeCount == 1:
@@ -384,72 +392,11 @@ class Xp:
 			user = author
 
 		# Now we check for promotions
-		if await self.checkroles(user, channel):
+		if await CheckRoles.checkroles(user, channel, self.settings, self.bot):
 			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was updated.'.format(DisplayName.name(user)))
 		else:
 			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was not updated.'.format(DisplayName.name(user)))
 
-
-			
-	async def checkroles(self, user, channel, suppress : bool = False):
-		# This method checks whether we need to promote, demote, or whatever
-		# then performs the said action, and outputs.
-		
-		server = channel.server
-		
-		# Get our preliminary vars
-		msg         = None
-		xpPromote   = self.settings.getServerStat(server,     "XPPromote")
-		xpDemote    = self.settings.getServerStat(server,     "XPDemote")
-		userXP      = int(self.settings.getUserStat(user, server, "XP"))
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
-			suppressed = True
-		else:
-			suppressed = False
-
-		changed = False
-		
-		if xpPromote.lower() == "yes":
-			# This is, by far, the more functional way
-			promoArray = self.settings.getServerStat(server, "PromotionArray")
-			for role in promoArray:
-				# Iterate through the roles, and add which we have xp for
-				if int(role['XP']) <= userXP:
-					# We *can* have this role, let's see if we already do
-					currentRole = None
-					for aRole in server.roles:
-						# Get the role that corresponds to the id
-						if aRole.id == role['ID']:
-							# We found it
-							currentRole = aRole
-					# Now see if we have it, and add it if we don't
-					if not currentRole in user.roles:
-						await self.bot.add_roles(user, currentRole)
-						msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), currentRole.name)
-						changed = True
-				else:
-					if xpDemote.lower() == "yes":
-						# Let's see if we have this role, and remove it.  Demote time!
-						currentRole = None
-						for aRole in server.roles:
-							# Get the role that corresponds to the id
-							if aRole.id == role['ID']:
-								# We found it
-								currentRole = aRole
-						# Now see if we have it, and take it away!
-						if currentRole in user.roles:
-							await self.bot.remove_roles(user, currentRole)
-							msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), currentRole.name)
-							changed = True
-		# Check if we have a message to display - and display it
-		if msg and (not suppress):
-			# Check for suppress
-			if suppressed:
-				msg = Nullify.clean(msg)
-			await self.bot.send_message(channel, msg)
-		return changed
 
 
 	@commands.command(pass_context=True)

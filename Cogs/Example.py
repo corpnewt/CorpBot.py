@@ -97,6 +97,7 @@ class VoiceState:
 		self.bot = bot
 		self.play_next_song = asyncio.Event()
 		self.playlist = []
+		self.repeat = False
 		self.votes = []
 		self.audio_player = self.bot.loop.create_task(self.audio_player_task())
 		self.start_time = datetime.datetime.now()
@@ -151,6 +152,8 @@ class VoiceState:
 			self.current.player.start()
 			await self.play_next_song.wait()
 			self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
+			if self.repeat:
+				self.playlist.append(self.playlist[0])
 			del self.playlist[0]
 
 
@@ -339,6 +342,35 @@ class Music:
 		await self.bot.say('Enqueued - *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
 	
+	@commands.command(pass_context=True, no_pm=True)
+	async def repeat(self, ctx):
+		"""Toggles whether or not to repeat the playlist."""
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
+			return
+
+		state = self.get_voice_state(ctx.message.server)
+		if state.repeat:
+			state.repeat = False
+			await self.bot.say('Repeat is now **off**.')
+		else:
+			state.repeat = True
+			await self.bot.say('Repeat is now **on**.')
+
+
+	@commands.command(pass_context=True, no_pm=True)
+	async def willrepeat(self, ctx):
+		"""Displays whether or not repeat is active."""
+		# Check user credentials
+		state = self.get_voice_state(ctx.message.server)
+		if state.repeat:
+			await self.bot.say('Repeat is currently **on**.')
+		else:
+			await self.bot.say('Repeat is currently **off**.')
+
+
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def volume(self, ctx, value : int):
@@ -463,6 +495,7 @@ class Music:
 			state.audio_player.cancel()
 			del self.voice_states[server.id]
 			state.playlist = []
+			state.repeat = False
 			await state.voice.disconnect()
 		except:
 			pass
@@ -683,7 +716,8 @@ class Music:
 		minutes = (total_seconds % 3600) // 60
 		seconds = total_seconds % 60
 		playlist_string  += '\n**Total Time: **[{:02d}h:{:02d}m:{:02d}s]'.format(round(hours), round(minutes), round(seconds))
-
+		if state.repeat:
+			playlist_string += '\nRepeat is **on**'
 
 		await self.bot.say(playlist_string)
 
