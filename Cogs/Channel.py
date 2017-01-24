@@ -86,9 +86,9 @@ class Channel:
 
 		if isMute.lower() == "yes":
 			if checkRead:
-				msg = '{} is *Muted* - *{}* remain.'.format(DisplayName.name(member), checkRead)	
+				msg = '*{}* is *Muted* - *{}* remain.'.format(DisplayName.name(member), checkRead)	
 			else:
-				msg = '{} is *Muted*.'.format(DisplayName.name(member))	
+				msg = '*{}* is *Muted*.'.format(DisplayName.name(member))	
 		else:
 			msg = '{} is *Unmuted*.'.format(DisplayName.name(member))
 			
