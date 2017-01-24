@@ -37,6 +37,19 @@ class Feed:
 			ignore = True
 			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
 				ignore = False
+				
+		# Check if admin and override
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(message.server, "AdminArray")
+			for role in message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		if isAdmin:
+			ignore = False
+			delete = False
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 		

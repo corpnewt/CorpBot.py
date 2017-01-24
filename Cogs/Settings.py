@@ -254,6 +254,9 @@ class Settings:
 						if not "XP" in y:
 							y["XP"] = int(self.getServerStat(server, "DefaultXP"))
 							needsUpdate = True
+						if not "XPLeftover" in y:
+							y["XPLeftover"] = 0
+							needsUpdate = True
 						if not "XPReserve" in y:
 							y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
 							needsUpdate = True

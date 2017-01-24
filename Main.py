@@ -38,6 +38,7 @@ from Cogs import Search
 from Cogs import Eat
 from Cogs import Profile
 from Cogs import Ascii
+from Cogs import Promote
 
 # Let's load our prefix file
 prefix = '$'
@@ -63,7 +64,7 @@ settings = Settings.Settings(bot, jsonFile)
 cogList.append(settings)
 
 # Examples - there are 2 parts here, Example, and Music
-example = Example.Example(bot)
+example = Example.Example(bot, settings)
 music = Example.Music(bot, settings)
 cogList.append(example)
 cogList.append(music)
@@ -179,6 +180,10 @@ cogList.append(askey)
 # Profile
 prof = Profile.Profile(bot, settings)
 cogList.append(prof)
+
+# Promote/Demote
+prom = Promote.Promote(bot, settings)
+cogList.append(prom)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

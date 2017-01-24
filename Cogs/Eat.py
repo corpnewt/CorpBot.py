@@ -43,9 +43,10 @@ class Eat:
 			elif memberCheck.id == ctx.message.author.id:
 				# We're eating... ourselves?
 				memberList = [  'you clamp down on your own forearm - not surprisingly, it hurts.',
-								'you place a finger into your mouth, but *just cant\'t* force yourself to bite down.',
+								'you place a finger into your mouth, but *just can\'t* force yourself to bite down.',
 								'you happily munch away, but can now only wave with your left hand.',
-								'wait - you\'re not a sandwich!']
+								'wait - you\'re not a sandwich!',
+								'you might not be the smartest...']
 			else:
 				memName = DisplayName.name(memberCheck)
 				memberList = [ 'you unhinge your jaw and consume *{}* in one bite.'.format(memName),
@@ -62,6 +63,8 @@ class Eat:
 		# Assume we're eating something else
 		itemList = [ 	'you take a big chunk out of *{}*. *Delicious.*'.format(member),
 						'your teeth sink into *{}* - it tastes satisfying.'.format(member),
+						'you rip hungrily into *{}*, tearing it to bits!'.format(member),
+						'you just can\'t bring yourself to eat *{}* - so you just hold it for awhile...'.format(member),
 						'you attempt to bite into *{}*, but you\'re clumsier than you remember - and fail...'.format(member),]
 
 		randnum = random.randint(0, len(itemList)-1)
