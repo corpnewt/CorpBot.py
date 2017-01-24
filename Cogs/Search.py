@@ -1,14 +1,15 @@
 import asyncio
 import discord
+import urllib
+import requests
+import json
+import os
 from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import TinyURL
-import urllib
-import requests
-import json
-import os
+from   pyquery import PyQuery as pq
 
 class Search:
 
@@ -110,19 +111,26 @@ class Search:
 		await self.bot.say(result_string)
 
 
+	@commands.command(pass_context=True)
+	async def convert(self, ctx, amount : int, frm = None, to = None):
+		"""convert currencies"""
+		convert_url = "https://www.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
+		r = requests.get(convert_url)
+		doc = pq(r.text)
+		await self.bot.say("{} {} is {}".format(amount,str(frm).upper(),str(doc('#currency_converter_result span').text())))
+
 	async def find_category(self, categories, category_to_search):
 		"""recurse through the categories and sub categories to find the correct category"""
 		result_category = None
 		
 		for category in categories:
-                        
-                        if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
-                                return category
+			if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
+					return category
 
-                        if len(category["children"]) > 0:
-                                result_category = await self.find_category(category["children"], category_to_search)
-                                if result_category != None:
-                                        return result_category
+			if len(category["children"]) > 0:
+					result_category = await self.find_category(category["children"], category_to_search)
+					if result_category != None:
+							return result_category
 		
 		return result_category
 

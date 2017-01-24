@@ -57,6 +57,11 @@ function main () {
     echo
     update "pyparsing"
     echo
+
+    echo Updating PyQuery...
+    echo
+    update "pyquery"
+    echo
     
     echo Done.
     sleep 5
