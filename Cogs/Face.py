@@ -26,15 +26,17 @@ class Face:
 
 		# Log the user
 		self.settings.setServerStat(ctx.message.server, "LastLenny", ctx.message.author.id)
-		# Remove original message
-		await self.bot.delete_message(ctx.message)
+
 		msg = "( ͡° ͜ʖ ͡°)"
 		if message:
 			msg += "\n{}".format(message)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
+		# Send new message first, then delete original
 		await self.bot.send_message(ctx.message.channel, msg)
+		# Remove original message
+		await self.bot.delete_message(ctx.message)
 
 	@commands.command(pass_context=True)
 	async def lastlenny(self, ctx):
@@ -63,15 +65,17 @@ class Face:
 
 		# Log the user
 		self.settings.setServerStat(ctx.message.server, "LastShrug", ctx.message.author.id)
-		# Remove original message
-		await self.bot.delete_message(ctx.message)
+
 		msg = "¯\_(ツ)_/¯"
 		if message:
 			msg += "\n{}".format(message)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
+		# Send new message first, then delete original
 		await self.bot.send_message(ctx.message.channel, msg)
+		# Remove original message
+		await self.bot.delete_message(ctx.message)
 
 	
 	@commands.command(pass_context=True)
