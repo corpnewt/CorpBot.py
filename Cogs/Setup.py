@@ -172,7 +172,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Auto-role delay time will remian *{} minutes*.'.format(threshold))
+					await self.bot.send_message(author, 'Auto-role delay time will remain *{} minutes*.'.format(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -253,7 +253,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default xp reserve will remian *{}*.'.format(defXP))
+					await self.bot.send_message(author, 'Default xp reserve will remain *{}*.'.format(defXP))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -282,7 +282,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default xp reserve will remian *{}*.'.format(defXPR))
+					await self.bot.send_message(author, 'Default xp reserve will remain *{}*.'.format(defXPR))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -311,7 +311,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Hourly xp reserve will remian *{}*.'.format(hourXP))
+					await self.bot.send_message(author, 'Hourly xp reserve will remain *{}*.'.format(hourXP))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -367,7 +367,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Minimum xp role will remian **{}**.'.format(reqXP))
+					await self.bot.send_message(author, 'Minimum xp role will remain **{}**.'.format(reqXP))
 				elif talk.content == "everyone":
 					self.settings.setServerStat(server, "RequiredXPRole", None)
 					await self.bot.send_message(author, 'Minimum xp role set to **Everyone**.')
@@ -488,7 +488,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Anti-spam picture cooldown will remian *{}*.'.format(threshold))
+					await self.bot.send_message(author, 'Anti-spam picture cooldown will remain *{}*.'.format(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -550,7 +550,7 @@ class Setup:
 				return
 			else:
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default volume will remian *{}*.'.format(int(dVol*100)))
+					await self.bot.send_message(author, 'Default volume will remain *{}*.'.format(int(dVol*100)))
 				else:
 					try:
 						talkInt = int(talk.content)
