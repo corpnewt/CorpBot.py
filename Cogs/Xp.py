@@ -760,6 +760,15 @@ class Xp:
 
 		serverName = server.name
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
+		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
+		xpPerMessage = int(self.setting.getServerStat(server, "XPPerMessage"))
+		xpRPerMessage = int(self.setting.getServerStat(server, "XPRPerMessage"))
+		if not xpPerMessage:
+			xpPerMessage = 0
+		if not xpRPerMessage:
+			xpRPerMessage = 0
+		if not hourlyXPReal:
+			hourlyXPReal = 0
 		if not hourlyXP:
 			hourlyXP = 0
 		onlyOnline = self.settings.getServerStat(server, "RequireOnline")
@@ -778,8 +787,23 @@ class Xp:
 
 		msg = "__***{}'s*** **XP System**__\n\n__What's What:__\n\n".format(serverName)
 		msg = "{}**XP:** This is the xp you have *earned.*\nIt comes from other users gifting you xp, or if you're lucky enough to `{}gamble` and win.\n".format(msg, ctx.prefix)
+		
 		if xpStr:
 			msg = "{}{}".format(msg, xpStr)
+		
+		hourStr = None
+		if hourlyXPReal > 0:
+			hourStr = "Currently, you receive *{} xp* each hour".format(hourlyXPReal)
+			if onlyOnline.lower() == "yes":
+				hourStr = "{} (but *only* if your status is *Online*).".format(hourStr)
+			else:
+				hourStr = "{}.".format(hourStr)
+		if hourStr:
+			msg = "{}{}.\n".format(msg, hourStr)
+			
+		if xpPerMessage > 0:
+			msg = "{}Currently, you receive *{} xp* per message.\n".format(msg, xpPerMessage)
+			
 		msg = "{}This can only be taken away by an *admin*.\n\n".format(msg)
 		msg = "{}**XP Reserve:** This is the xp you can *gift*, *gamble*, or use to *feed* me.\n".format(msg)
 
@@ -792,9 +816,12 @@ class Xp:
 				hourStr = "{}.".format(hourStr)
 		
 		if hourStr:
-			msg = "{}{}".format(msg, hourStr)
+			msg = "{}{}\n".format(msg, hourStr)
+		
+		if xpRPerMessage > 0:
+			msg = "{}Currently, you receive *{} xp reserve* per message.\n".format(msg, xpRPerMessage)
 
-		msg = "{}\n\n__How Do I Use It?:__\n\nYou can gift other users xp by using the `{}xp [user] [amount]` command.\n".format(msg, ctx.prefix)
+		msg = "{}\n__How Do I Use It?:__\n\nYou can gift other users xp by using the `{}xp [user] [amount]` command.\n".format(msg, ctx.prefix)
 		msg = "{}This pulls from your *xp reserve*, and adds to their *xp*.\n".format(msg)
 		msg = "{}It does not change the *xp* you have *earned*.\n\n".format(msg)
 
