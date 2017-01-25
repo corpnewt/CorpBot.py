@@ -16,6 +16,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     xpPromote   = settings.getServerStat(server,     "XPPromote")
     xpDemote    = settings.getServerStat(server,     "XPDemote")
     userXP      = int(settings.getUserStat(user, server, "XP"))
+    suppProm    = settings.getServerStat(server, "SuppressPromotions")
+    suppDom     = settings.getServerStat(server, "SuppressDemotions")
 
     # Check if we're suppressing @here and @everyone mentions
     if settings.getServerStat(server, "SuppressMentions").lower() == "yes":
@@ -41,7 +43,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                 if addRole:
                     if not addRole in user.roles:
                         addRoles.append(addRole)
-                        msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), addRole.name)
+                        if not suppProm.lower() == "yes":
+                            msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), addRole.name)
                         changed = True
 
     # Allow independent promotion/demotion
@@ -54,7 +57,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                 if remRole:
                     if remRole in user.roles:
                         remRoles.append(remRole)
-                        msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
+                        if not suppDem.lower() == "yes":
+                            msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
                         changed = True
     
 
