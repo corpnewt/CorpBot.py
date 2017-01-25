@@ -27,7 +27,11 @@ class Xp:
 				# Iterate through the servers and add them
 				xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
 				xpAmount   = float(xpAmount/6)
+				xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
+				xpRAmount  = float(xpRAmount/6)
+				
 				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
+				
 				for user in server.members:
 					bumpXP = False
 					if onlyOnline.lower() == "no":
@@ -37,14 +41,25 @@ class Xp:
 							bumpXP = True
 							
 					if bumpXP:
-						# User is online
+						# User is online add hourly xp reserve
 						xpLeftover = float(self.settings.getUserStat(user, server, "XPLeftover"))
 						gainedXp = xpLeftover+xpAmount
 						gainedXpInt = int(gainedXp) # Strips the decimal point off
 						xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
 						self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
 						self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
-	
+
+						# User is online add hourly xp
+						xpRLeftover = float(self.settings.getUserStat(user, server, "XPRealLeftover"))
+						gainedXpR = xpRLeftover+xpRAmount
+						gainedXpRInt = int(gainedXpR) # Strips the decimal point off
+						xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
+						self.settings.setUserStat(user, server, "XPLeftover", xpRLeftover)
+						self.settings.incrementStat(user, server, "XPReserve", gainedXpRInt)
+						
+						# Check for promotion/demotion
+						await CheckRoles.checkroles(user, server.default_channel, self.settings, self.bot)
+						
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
