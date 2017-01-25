@@ -39,6 +39,7 @@ from Cogs import Eat
 from Cogs import Profile
 from Cogs import Ascii
 from Cogs import Promote
+from Cogs import MessageXp
 
 # Let's load our prefix file
 prefix = '$'
@@ -184,6 +185,10 @@ cogList.append(prof)
 # Promote/Demote
 prom = Promote.Promote(bot, settings)
 cogList.append(prom)
+
+# MessageXp
+messageXp = MessageXp.MessageXp(bot, settings)
+cogList.append(messageXp)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
