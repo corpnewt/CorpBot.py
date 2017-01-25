@@ -212,7 +212,7 @@ class Setup:
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 
 		msg = '**__XP Management System__**\n\nI can help auto-manage roles by promoting/demoting based on xp.\n\nWould you like to go through that setup? (y/n)'
-		msg = '{}\n\n__Current settings:__\n\nDefault xp on join: *{}*\nDefault xp reserve on join: *{}*\nHourly xp: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nXP per message: *{}*\nXP reserve per message: *{}\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nUsers can be demoted based on xp: *{}*'.format(msg, defXP, defXPR, hourXPReal, hourXP, reqOnline, messageXP, messageXPR, reqXP, adminUnlimited, xpProm, xpDem)
+		msg = '{}\n\n__Current settings:__\n\nDefault xp on join: *{}*\nDefault xp reserve on join: *{}*\nHourly xp: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nXP per message: *{}*\nXP reserve per message: *{}*\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nUsers can be demoted based on xp: *{}*'.format(msg, defXP, defXPR, hourXPReal, hourXP, reqOnline, messageXP, messageXPR, reqXP, adminUnlimited, xpProm, xpDem)
 		await self.bot.send_message(author, msg)
 
 		gotIt = False
@@ -414,8 +414,8 @@ class Setup:
 		# XP Reserve Per Message
 		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
 		if messageXP == None:
-			messageXP = 3
-		msg = 'How much xp (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
+			messageXP = 0
+		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
 		await self.bot.send_message(author, msg)
 		gotIt = False
 		while not gotIt:
