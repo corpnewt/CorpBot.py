@@ -23,7 +23,7 @@ class MessageXp:
 		
 		if xpRAmount > 0:
 			# Bump xp
-			self.settings.incrementStat(message.author, server, "XPReserve", xpAmount)
+			self.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
 		
 		if xpAmount > 0:
 			# Bump xp
