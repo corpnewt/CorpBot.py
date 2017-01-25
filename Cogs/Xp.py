@@ -30,6 +30,10 @@ class Xp:
 				xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
 				xpRAmount  = float(xpRAmount/6)
 				
+				if xpAmount == 0 and xpRAmount == 0:
+					# Nothing to apply
+					continue
+				
 				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
 				
 				for user in server.members:
@@ -55,7 +59,7 @@ class Xp:
 						gainedXpRInt = int(gainedXpR) # Strips the decimal point off
 						xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
 						self.settings.setUserStat(user, server, "XPLeftover", xpRLeftover)
-						self.settings.incrementStat(user, server, "XPReserve", gainedXpRInt)
+						self.settings.incrementStat(user, server, "XP", gainedXpRInt)
 						
 						# Check for promotion/demotion
 						await CheckRoles.checkroles(user, server.default_channel, self.settings, self.bot)
