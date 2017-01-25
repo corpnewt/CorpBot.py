@@ -522,6 +522,31 @@ class Setup:
 					# Skipping
 					await self.bot.send_message(author, 'XP promote shall remain *{}*'.format(xpProm))
 				gotIt = True
+				
+		##########################################################################################################################
+		# Suppress Promote Message?
+		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
+		msg = 'Would you like me to avoid sending a message when someone is promoted? (y/n)\n\nCurrent is *{}*.'.format(suppProm)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower().startswith('y'):
+					self.settings.setServerStat(server, "SuppressPromotions", "Yes")
+					await self.bot.send_message(author, 'I will avoid sending a promotion message.')
+				elif talk.content.lower().startswith('n'):
+					self.settings.setServerStat(server, "SuppressPromotions", "No")
+					await self.bot.send_message(author, 'I will send a promotion message.')
+				else:
+					# Skipping
+					await self.bot.send_message(author, 'Promotion message suppression shall remain *{}*'.format(suppProm))
+				gotIt = True
 
 		##########################################################################################################################
 		# Auto Demote
@@ -546,6 +571,31 @@ class Setup:
 				else:
 					# Skipping
 					await self.bot.send_message(author, 'XP demote shall remain *{}*'.format(xpDem))
+				gotIt = True
+				
+		##########################################################################################################################
+		# Suppress Demote Message?
+		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
+		msg = 'Would you like me to avoid sending a message when someone is demoted? (y/n)\n\nCurrent is *{}*.'.format(suppDem)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower().startswith('y'):
+					self.settings.setServerStat(server, "SuppressDemotions", "Yes")
+					await self.bot.send_message(author, 'I will avoid sending a demotion message.')
+				elif talk.content.lower().startswith('n'):
+					self.settings.setServerStat(server, "SuppressDemotions", "No")
+					await self.bot.send_message(author, 'I will send a demotion message.')
+				else:
+					# Skipping
+					await self.bot.send_message(author, 'Demotion message suppression shall remain *{}*'.format(suppDem))
 				gotIt = True
 
 		##########################################################################################################################
