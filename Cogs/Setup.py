@@ -62,11 +62,12 @@ class Setup:
 	def check(self, msg):
 		if not msg.channel.is_private:
 			return False
-		if msg.content.lower().startswith('y'):
+		msgStr = msg.content.lower()
+		if msgStr.startswith('y'):
 			return True
-		if msg.content.lower().startswith('n'):
+		if msgStr.startswith('n'):
 			return True
-		if msg.content.lower() == 'skip':
+		if msgStr == 'skip':
 			return True
 		return False
 
@@ -118,9 +119,9 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					await self.autoRoleName(ctx)
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "DefaultRole", None)
 					await self.bot.send_message(author, 'Auto-role *disabled.*')
 					await self.xpSystem(ctx)
@@ -171,7 +172,7 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Auto-role delay time will remain *{} minutes*.'.format(threshold))
 				else:
 					try:
@@ -220,10 +221,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					# await self.autoRoleName(ctx)
 					await self.setupXP(ctx)
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					await self.picThresh(ctx)
 				else:
 					# Skipping
@@ -252,7 +253,7 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Default xp will remain *{}*.'.format(defXP))
 				else:
 					try:
@@ -281,7 +282,7 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Default xp reserve will remain *{}*.'.format(defXPR))
 				else:
 					try:
@@ -310,7 +311,7 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Hourly xp reserve will remain *{}*.'.format(hourXP))
 				else:
 					try:
@@ -337,10 +338,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "RequireOnline", "Yes")
 					await self.bot.send_message(author, 'Require Online set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "RequireOnline", "No")
 					await self.bot.send_message(author, 'Require Online set to *No.*')
 				else:
@@ -366,9 +367,9 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Minimum xp role will remain **{}**.'.format(reqXP))
-				elif talk.content == "everyone":
+				elif talk.content.lower() == "everyone":
 					self.settings.setServerStat(server, "RequiredXPRole", None)
 					await self.bot.send_message(author, 'Minimum xp role set to **Everyone**.')
 				else:
@@ -396,10 +397,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "AdminUnlimited", "Yes")
 					await self.bot.send_message(author, 'Unlimited xp reserve for admins set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "AdminUnlimited", "No")
 					await self.bot.send_message(author, 'Unlimited xp reserve for admins set to *No.*')
 				else:
@@ -421,10 +422,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "XPPromote", "Yes")
 					await self.bot.send_message(author, 'XP promote set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "XPPromote", "No")
 					await self.bot.send_message(author, 'XP promote set to *No.*')
 				else:
@@ -446,10 +447,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "XPDemote", "Yes")
 					await self.bot.send_message(author, 'XP demote set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "XPDemote", "No")
 					await self.bot.send_message(author, 'XP demote set to *No.*')
 				else:
@@ -487,7 +488,7 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Anti-spam picture cooldown will remain *{}*.'.format(threshold))
 				else:
 					try:
@@ -518,10 +519,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "HungerLock", "Yes")
 					await self.bot.send_message(author, 'Hunger lock set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "HungerLock", "No")
 					await self.bot.send_message(author, 'Hunger lock set to *No.*')
 				else:
@@ -549,7 +550,7 @@ class Setup:
 				await self.bot.send_message(author, msg)
 				return
 			else:
-				if talk.content == "skip":
+				if talk.content.lower() == "skip":
 					await self.bot.send_message(author, 'Default volume will remain *{}*.'.format(int(dVol*100)))
 				else:
 					try:
@@ -586,10 +587,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "SuppressMentions", "Yes")
 					await self.bot.send_message(author, 'I *will* suppress @​everyone and @​here mentions.')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "SuppressMentions", "No")
 					await self.bot.send_message(author, 'I *will not* suppress @​everyone and @​here mentions.')
 				else:
