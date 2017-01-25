@@ -799,7 +799,7 @@ class Xp:
 			else:
 				hourStr = "{}.".format(hourStr)
 		if hourStr:
-			msg = "{}{}.\n".format(msg, hourStr)
+			msg = "{}{}\n".format(msg, hourStr)
 			
 		if xpPerMessage > 0:
 			msg = "{}Currently, you receive *{} xp* per message.\n".format(msg, xpPerMessage)
