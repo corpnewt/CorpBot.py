@@ -62,11 +62,11 @@ class Setup:
 	def check(self, msg):
 		if not msg.channel.is_private:
 			return False
-		if msg.content.startswith('y'):
+		if msg.content.lower().startswith('y'):
 			return True
-		if msg.content.startswith('n'):
+		if msg.content.lower().startswith('n'):
 			return True
-		if msg.content == 'skip':
+		if msg.content.lower() == 'skip':
 			return True
 		return False
 
@@ -191,15 +191,15 @@ class Setup:
 		server  = ctx.message.server
 
 		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if not defXP:
+		if defXP == None:
 			defXP = 0
 		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if not defXPR:
+		if defXPR = None:
 			defXPR = 10
 		hourXP = self.settings.getServerStat(server, "HourlyXP")
 		reqOnline = self.settings.getServerStat(server, "RequireOnline")
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if not reqXP:
+		if reqXP == None:
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
@@ -239,7 +239,7 @@ class Setup:
 		##########################################################################################################################
 		# Default XP
 		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if not defXP:
+		if defXP == None:
 			defXP = 0
 		msg = 'How much xp should each user get when they join?\n\nCurrent is *{}*.'.format(defXP)
 		await self.bot.send_message(author, msg)
@@ -253,22 +253,22 @@ class Setup:
 			else:
 				# We got something
 				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default xp reserve will remain *{}*.'.format(defXP))
+					await self.bot.send_message(author, 'Default xp will remain *{}*.'.format(defXP))
 				else:
 					try:
 						talkInt = int(talk.content)
-						await self.bot.send_message(author, 'Default xp reserve is now *{}!*'.format(talkInt))
+						await self.bot.send_message(author, 'Default xp is now *{}!*'.format(talkInt))
 						self.settings.setServerStat(server, "DefaultXP", talkInt)
 					except ValueError:
 						# await self.autoRoleName(ctx)
-						await self.bot.send_message(author, 'Default xp reserve needs to be a whole number - try again.')
+						await self.bot.send_message(author, 'Default xp needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		
 		##########################################################################################################################
 		# Default XP Reserve
 		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if not defXPR:
+		if defXPR == None:
 			defXPR = 10
 		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get when they join?\n\nCurrent is *{}*.'.format(defXPR)
 		await self.bot.send_message(author, msg)
@@ -297,7 +297,7 @@ class Setup:
 		##########################################################################################################################
 		# Hourly XP
 		hourXP = self.settings.getServerStat(server, "HourlyXP")
-		if not hourXP:
+		if hourXP == None:
 			hourXP = 3
 		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per hour?\n\nCurrent is *{}*.'.format(hourXP)
 		await self.bot.send_message(author, msg)
@@ -351,7 +351,7 @@ class Setup:
 		##########################################################################################################################
 		# Required Role for XP
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if not reqXP:
+		if reqXP == None:
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
@@ -537,7 +537,7 @@ class Setup:
 		server  = ctx.message.server
 
 		dVol = float(self.settings.getServerStat(server, "DefaultVolume"))
-		if not dVol:
+		if dVol == None:
 			dVol = 0.6
 		msg = 'What would you like the default volume of the music player to be? (values can be 1-100)\n\nCurrent is *{}*.'.format(int(dVol*100))
 		await self.bot.send_message(author, msg)
