@@ -194,7 +194,7 @@ class Setup:
 		if defXP == None:
 			defXP = 0
 		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if defXPR = None:
+		if defXPR == None:
 			defXPR = 10
 		hourXP = self.settings.getServerStat(server, "HourlyXP")
 		reqOnline = self.settings.getServerStat(server, "RequireOnline")
