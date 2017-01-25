@@ -761,8 +761,8 @@ class Xp:
 		serverName = server.name
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
-		xpPerMessage = int(self.setting.getServerStat(server, "XPPerMessage"))
-		xpRPerMessage = int(self.setting.getServerStat(server, "XPRPerMessage"))
+		xpPerMessage = int(self.settings.getServerStat(server, "XPPerMessage"))
+		xpRPerMessage = int(self.settings.getServerStat(server, "XPRPerMessage"))
 		if not xpPerMessage:
 			xpPerMessage = 0
 		if not xpRPerMessage:
