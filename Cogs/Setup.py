@@ -385,7 +385,7 @@ class Setup:
 		# XP Per Message
 		messageXP = self.settings.getServerStat(server, "XPPerMessage")
 		if messageXP == None:
-			messageXP = 3
+			messageXP = 0
 		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
 		await self.bot.send_message(author, msg)
 		gotIt = False
@@ -413,8 +413,8 @@ class Setup:
 		##########################################################################################################################
 		# XP Reserve Per Message
 		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
-		if messageXP == None:
-			messageXP = 0
+		if messageXPR == None:
+			messageXPR = 0
 		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
 		await self.bot.send_message(author, msg)
 		gotIt = False
@@ -427,7 +427,7 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower() == "skip":
-					await self.bot.send_message(author, 'Xp reserve per message will remain *{}*.'.format(messageXP))
+					await self.bot.send_message(author, 'Xp reserve per message will remain *{}*.'.format(messageXPR))
 				else:
 					try:
 						talkInt = int(talk.content)
