@@ -43,6 +43,9 @@ class Settings:
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
+				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
+				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
+				"XPRPerMessage"			: 0,		# How much xp reserve per message (typically 0)
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
