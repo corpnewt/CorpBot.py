@@ -386,7 +386,7 @@ class Setup:
 		messageXP = self.settings.getServerStat(server, "XPPerMessage")
 		if messageXP == None:
 			messageXP = 0
-		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
+		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXP)
 		await self.bot.send_message(author, msg)
 		gotIt = False
 		while not gotIt:
@@ -415,7 +415,7 @@ class Setup:
 		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
 		if messageXPR == None:
 			messageXPR = 0
-		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(hourXP)
+		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXPR)
 		await self.bot.send_message(author, msg)
 		gotIt = False
 		while not gotIt:
@@ -474,7 +474,7 @@ class Setup:
 				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Admin Unlimited
 		adminUnlimited = self.settings.getServerStat(server, "AdminUnlimited")
 		msg = 'Would you like to give server admins unlimited xp reserve? (y/n)\n\nCurrent is *{}*.'.format(adminUnlimited)
 		await self.bot.send_message(author, msg)
@@ -499,7 +499,7 @@ class Setup:
 				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Auto Promote
 		xpProm = self.settings.getServerStat(server, "XPPromote")
 		msg = 'Would you like me to auto-promote users based on xp? (y/n) - You\'ll be able to set which roles can be promoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpProm)
 		await self.bot.send_message(author, msg)
@@ -524,7 +524,7 @@ class Setup:
 				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Auto Demote
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 		msg = 'Would you like me to auto-demote users based on xp? (y/n) - You\'ll be able to set which roles can be demoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpDem)
 		await self.bot.send_message(author, msg)
