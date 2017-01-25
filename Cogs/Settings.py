@@ -260,6 +260,9 @@ class Settings:
 						if not "XPLeftover" in y:
 							y["XPLeftover"] = 0
 							needsUpdate = True
+						if not "XPRealLeftover" in y:
+							y["XPRealLeftover"] = 0
+							needsUpdate = True
 						if not "XPReserve" in y:
 							y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
 							needsUpdate = True
