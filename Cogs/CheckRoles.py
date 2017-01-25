@@ -17,7 +17,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     xpDemote    = settings.getServerStat(server,     "XPDemote")
     userXP      = int(settings.getUserStat(user, server, "XP"))
     suppProm    = settings.getServerStat(server, "SuppressPromotions")
-    suppDom     = settings.getServerStat(server, "SuppressDemotions")
+    suppDem     = settings.getServerStat(server, "SuppressDemotions")
 
     # Check if we're suppressing @here and @everyone mentions
     if settings.getServerStat(server, "SuppressMentions").lower() == "yes":
