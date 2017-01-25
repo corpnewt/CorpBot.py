@@ -56,7 +56,7 @@ class Xp:
 							gainedXpR = xpRLeftover+xpRAmount
 							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
 							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
-							self.settings.setUserStat(user, server, "XPLeftover", xpRLeftover)
+							self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
 							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
 
 							# Check for promotion/demotion
