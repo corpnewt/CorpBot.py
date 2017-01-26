@@ -1,5 +1,6 @@
 import asyncio
 import discord
+from   operator    import itemgetter
 from   discord.ext import commands
 from   Cogs        import Nullify
 
@@ -35,7 +36,96 @@ class ServerStats:
         if suppress:
             msg = Nullify.clean(msg)
         await self.bot.send_message(ctx.message.channel, msg)
-    
+
+    @commands.command(pass_context=True)
+    async def topservers(self, ctx, number : int = 10):
+        """Lists the top servers I'm connected to ordered by population - default is 10, max is 50."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 50:
+            number = 50
+        if number < 1:
+            await self.bot.send_message(ctx.message.channel, 'Oookay - look!  No servers!  Just like you wanted!')
+            return
+        serverList = []
+        for server in self.bot.servers:
+            memberCount = 0
+            for member in server.members:
+                memberCount += 1
+            serverList.append({ 'Name' : server.name, 'Users' : memberCount })
+
+        # sort the servers by population
+        serverList = sorted(serverList, key=lambda x:int(x['Users']), reverse=True)
+
+        if number > len(serverList):
+            number = len(serverList)
+
+        i = 1
+        msg = ''
+        for server in serverList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}* members\n'.format(i, server['Name'], server['Users'])
+            i += 1
+
+        if number < len(serverList):
+            msg = '__**Top {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
+        else:
+            msg = '__**Top {} Servers:**__\n\n'.format(number)+msg
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await self.bot.send_message(ctx.message.channel, msg)
+
+    @commands.command(pass_context=True)
+    async def bottomservers(self, ctx, number : int = 10):
+        """Lists the bottom servers I'm connected to ordered by population - default is 10, max is 50."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 50:
+            number = 50
+        if number < 1:
+            await self.bot.send_message(ctx.message.channel, 'Oookay - look!  No servers!  Just like you wanted!')
+            return
+        serverList = []
+        for server in self.bot.servers:
+            memberCount = 0
+            for member in server.members:
+                memberCount += 1
+            serverList.append({ 'Name' : server.name, 'Users' : memberCount })
+
+        # sort the servers by population
+        serverList = sorted(serverList, key=lambda x:int(x['Users']))
+
+        if number > len(serverList):
+            number = len(serverList)
+
+        i = 1
+        msg = ''
+        for server in serverList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}* members\n'.format(i, server['Name'], server['Users'])
+            i += 1
+
+        if number < len(serverList):
+            msg = '__**Bottom {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
+        else:
+            msg = '__**Bottom {} Servers:**__\n\n'.format(number)+msg
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await self.bot.send_message(ctx.message.channel, msg)
+
+
     @commands.command(pass_context=True)
     async def users(self, ctx):
         """Lists the total number of users on all servers I'm connected to."""
