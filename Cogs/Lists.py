@@ -7,6 +7,7 @@ from   Cogs import Settings
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import FuzzySearch
 
 # This is the lists module.
 
@@ -178,6 +179,14 @@ class Lists:
 				return
 				
 		msg = 'Link "*{}*" not found!'.format(name)
+		
+		# No link - let's fuzzy search
+		potentialList = FuzzySearch.search(name, linkList, 'Name')
+		if len(potentialList):
+			msg+='\n\nDid you maybe mean one of the following?\n'
+			for pot in potentialList:
+				msg+='`{}`\n'.format(pot['Name'])
+		
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
