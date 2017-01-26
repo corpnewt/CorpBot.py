@@ -276,7 +276,7 @@ class Welcome:
 
         if channel == None:
             self.settings.setServerStat(ctx.message.server, "WelcomeChannel", "")
-            msg = 'Welcome and goodbye messages will be displayed in the default channel.'
+            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(ctx.message.server.default_channel.name)
             await self.bot.send_message(ctx.message.channel, msg)
             return
 
