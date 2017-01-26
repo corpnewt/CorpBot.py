@@ -1,8 +1,10 @@
 import asyncio
 import discord
+from   datetime    import datetime
 from   operator    import itemgetter
 from   discord.ext import commands
 from   Cogs        import Nullify
+from   Cogs        import DisplayName
 
 class ServerStats:
 
@@ -75,7 +77,7 @@ class ServerStats:
         if number < len(serverList):
             msg = '__**Top {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
         else:
-            msg = '__**Top {} Servers:**__\n\n'.format(number)+msg
+            msg = '__**Top {} Servers:**__\n\n'.format(len(serverList))+msg
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
@@ -97,10 +99,7 @@ class ServerStats:
             return
         serverList = []
         for server in self.bot.servers:
-            memberCount = 0
-            for member in server.members:
-                memberCount += 1
-            serverList.append({ 'Name' : server.name, 'Users' : memberCount })
+            serverList.append({ 'Name' : server.name, 'Users' : len(server.members) })
 
         # sort the servers by population
         serverList = sorted(serverList, key=lambda x:int(x['Users']))
@@ -119,7 +118,7 @@ class ServerStats:
         if number < len(serverList):
             msg = '__**Bottom {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
         else:
-            msg = '__**Bottom {} Servers:**__\n\n'.format(number)+msg
+            msg = '__**Bottom {} Servers:**__\n\n'.format(len(serverList))+msg
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
@@ -133,8 +132,86 @@ class ServerStats:
         serverCount = 0
         for server in self.bot.servers:
             serverCount += 1
-            for member in server.members:
-                userCount += 1
+            userCount += len(server.members)
         await self.bot.send_message(ctx.message.channel, 'There are *{} users* on the *{} servers* I am currently a part of!'.format(userCount, serverCount))
 
     
+    @commands.command(pass_context=True)
+    async def firstjoins(self, ctx, number : int = 10):
+        """Lists the most recent users to join - default is 10, max is 25."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 25:
+            number = 25
+        if number < 1:
+            await self.bot.send_message(ctx.message.channel, 'Oookay - look!  No users!  Just like you wanted!')
+            return
+
+        joinedList = []
+        for member in ctx.message.server.members:
+            joinedList.append({ 'ID' : member.id, 'Joined' : member.joined_at })
+        
+        # sort the users by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+
+        i = 1
+        msg = ''
+        for member in joinedList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.server)), member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            i += 1
+        
+        if number < len(joinedList):
+            msg = '__**First {} of {} Members to Join:**__\n\n'.format(number, len(joinedList))+msg
+        else:
+            msg = '__**First {} Members to Join:**__\n\n'.format(len(joinedList))+msg
+
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await self.bot.send_message(ctx.message.channel, msg)
+
+    @commands.command(pass_context=True)
+    async def recentjoins(self, ctx, number : int = 10):
+        """Lists the most recent users to join - default is 10, max is 25."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 25:
+            number = 25
+        if number < 1:
+            await self.bot.send_message(ctx.message.channel, 'Oookay - look!  No users!  Just like you wanted!')
+            return
+
+        joinedList = []
+        for member in ctx.message.server.members:
+            joinedList.append({ 'ID' : member.id, 'Joined' : member.joined_at })
+        
+        # sort the users by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'], reverse=True)
+
+        i = 1
+        msg = ''
+        for member in joinedList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.server)), member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            i += 1
+        
+        if number < len(joinedList):
+            msg = '__**Last {} of {} Members to Join:**__\n\n'.format(number, len(joinedList))+msg
+        else:
+            msg = '__**Last {} Members to Join:**__\n\n'.format(len(joinedList))+msg
+
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await self.bot.send_message(ctx.message.channel, msg)
