@@ -240,6 +240,6 @@ class ServerStats:
         if messages == None:
             messages = 0
         if messages == 1:
-            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{:,} message!*.'.format(messages))
+            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{:,} message!*'.format(messages))
         else:
-            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{:,} messages!*.'.format(messages))
+            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{:,} messages!*'.format(messages))
