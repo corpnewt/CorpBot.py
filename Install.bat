@@ -80,6 +80,11 @@ echo.
 call :install "pyquery"
 echo.
 
+echo Installing Levenshtein...
+echo.
+call :install "python-levenshtein"
+echo.
+
 echo Done.
 timeout 5 > nul
 exit /b
