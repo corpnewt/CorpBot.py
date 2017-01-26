@@ -114,6 +114,18 @@ class Welcome:
             await self.bot.send_message(ctx.message.channel, 'Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
             return
         await self._welcome(member, ctx.message.server, ctx.message.channel)
+        # Print the welcome channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.server, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.server.channels:
+                if channel.id == welcomeChannel:
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.name)
+        else:
+            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(ctx.message.server.default_channel.name)
+        await self.bot.send_message(ctx.message.channel, msg)
 
 
     @commands.command(pass_context=True)
@@ -186,6 +198,19 @@ class Welcome:
             await self.bot.send_message(ctx.message.channel, 'Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
             return
         await self._goodbye(member, ctx.message.server, ctx.message.channel)
+        
+        # Print the goodbye channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.server, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.server.channels:
+                if channel.id == welcomeChannel:
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.name)
+        else:
+            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(ctx.message.server.default_channel.name)
+        await self.bot.send_message(ctx.message.channel, msg)
 
 
     async def _welcome(self, member, server, channel = None):
