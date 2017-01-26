@@ -183,7 +183,7 @@ class Lists:
 		# No link - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```'
+			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
 				msg+='{}\n'.format(pot['Name'])
 			msg+='```'
@@ -500,7 +500,7 @@ class Lists:
 		# No hack - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```'
+			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
 				msg+='{}\n'.format(pot['Name'])
 			msg+='```'
