@@ -40,6 +40,7 @@ from Cogs import Profile
 from Cogs import Ascii
 from Cogs import Promote
 from Cogs import MessageXp
+from Cogs import Welcome
 
 # Let's load our prefix file
 prefix = '$'
@@ -190,6 +191,10 @@ cogList.append(prom)
 messageXp = MessageXp.MessageXp(bot, settings)
 cogList.append(messageXp)
 
+# Welcome
+welcome = Welcome.Welcome(bot, settings)
+cogList.append(welcome)
+
 # Help - Must be last
 #help = Help.Help(bot, cogList)
 #cogList.append(help)
@@ -252,6 +257,12 @@ async def on_voice_state_update(before, after):
 async def on_member_remove(member):
 	server = member.server
 	settings.removeUser(member, server)
+	for cog in cogList:
+		try:
+			check = await cog.onleave(member, server)
+		except AttributeError:
+			# Onto the next
+			continue
 
 @bot.event
 async def on_server_join(server):

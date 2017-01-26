@@ -75,6 +75,11 @@ echo.
 call :install "pyparsing"
 echo.
 
+echo Installing PyQuery...
+echo.
+call :install "pyquery"
+echo.
+
 echo Done.
 timeout 5 > nul
 exit /b

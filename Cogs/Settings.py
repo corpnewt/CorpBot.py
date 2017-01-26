@@ -50,8 +50,8 @@ class Settings:
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
 				"XPDemote" 				: "No",		# Can xp lower your rank?
-				"SuppressPromotions"		: "No",			# Do we suppress the promotion message?
-				"SuppressDemotions"		: "No",			# Do we suppress the demotion message?
+				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
+				"SuppressDemotions"		: "No",		# Do we suppress the demotion message?
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastShrug"				: "",		# Who shrugged last?
@@ -60,6 +60,8 @@ class Settings:
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
+				"Welcome"				: "Welcome *[[user]]* to *[[server]]!*",
+				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
 				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
