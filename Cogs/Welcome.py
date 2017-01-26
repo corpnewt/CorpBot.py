@@ -15,9 +15,9 @@ class Welcome:
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
-        self.regexUserName = re.compile(r"\[\[[user]+\]\]")
-        self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]")
-        self.regexServer   = re.compile(r"\[\[[server]+\]\]")
+        self.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
+        self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
+        self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
 
     async def onjoin(self, member, server):
         # Welcome
@@ -50,7 +50,8 @@ class Welcome:
             return
         
         self.settings.setServerStat(ctx.message.server, "Welcome", message)
-        await self.bot.send_message(ctx.message.channel, 'Welcome message updated!')
+        await self.bot.send_message(ctx.message.channel, 'Welcome message updated!\n\nHere\'s a preview:')
+        await self._welcome(ctx.message.author, ctx.message.server, ctx.message.channel)
 
     @commands.command(pass_context=True)
     async def testwelcome(self, ctx, *, member = None):
@@ -120,7 +121,8 @@ class Welcome:
             return
         
         self.settings.setServerStat(ctx.message.server, "Goodbye", message)
-        await self.bot.send_message(ctx.message.channel, 'Goodbye message updated!')
+        await self.bot.send_message(ctx.message.channel, 'Goodbye message updated!\n\nHere\'s a preview:')
+        await self._goodbye(ctx.message.author, ctx.message.server, ctx.message.channel)
 
 
     @commands.command(pass_context=True)
