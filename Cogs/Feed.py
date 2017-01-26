@@ -215,8 +215,8 @@ class Feed:
 			if hunger <= -150:
 				# Kill the bot here
 				self.settings.setServerStat(server, "Killed", "Yes")
-				self.settings.setServerStat(server, "KilledBy", DisplayName.name(author))
-				msg = '{}\n\nI am kill...\n\n{} did it...'.format(msg, DisplayName.name(author))			
+				self.settings.setServerStat(server, "KilledBy", author.id)
+				msg = '{}\n\nI am kill...\n\n*{}* did it...'.format(msg, DisplayName.name(author))			
 			elif hunger <= -100:
 				msg = '{}\n\nYou *are* going to kill me...  Stop *now* if you have a heart!'.format(msg)
 			elif hunger <= -75:
@@ -263,11 +263,12 @@ class Feed:
 		iskill = self.settings.getServerStat(server, "Killed")
 		if iskill.lower() == 'yes':
 			killedby = self.settings.getServerStat(server, "KilledBy")
-			await self.bot.send_message(channel, 'I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
+			killedby = DisplayName.memberForName(killedby, server)
+			await self.bot.send_message(channel, 'I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 			return
 		
 		self.settings.setServerStat(server, "Killed", "Yes")
-		self.settings.setServerStat(server, "KilledBy", DisplayName.name(author))
+		self.settings.setServerStat(server, "KilledBy", author.id)
 		await self.bot.send_message(channel, 'I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
 		
 	@commands.command(pass_context=True)
@@ -304,7 +305,8 @@ class Feed:
 		self.settings.setServerStat(server, "Killed", "No")
 		self.settings.setServerStat(server, "Hunger", "0")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
-		await self.bot.send_message(channel, 'Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(killedBy))
+		killedBy = DisplayName.memberForName(killedBy, server)
+		await self.bot.send_message(channel, 'Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
 		
 	@commands.command(pass_context=True)
 	async def iskill(self, ctx):
@@ -316,9 +318,10 @@ class Feed:
 		
 		isKill = self.settings.getServerStat(server, "Killed")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
+		killedBy = DisplayName.memberForName(killedBy, server)
 		msg = 'I have no idea what you\'re talking about... Should I be worried?'
 		if isKill.lower() == "yes":
-			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(killedBy)
+			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(DisplayName.name(killedBy))
 		else:
 			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
 			

@@ -52,6 +52,7 @@ class Settings:
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
 				"SuppressDemotions"		: "No",		# Do we suppress the demotion message?
+				"TotalMessages"			: 0,		# The total number of messages the bot has witnessed
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastShrug"				: "",		# Who shrugged last?

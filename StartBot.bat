@@ -14,5 +14,8 @@ goto start
 
 :start
 "%pyPath%" "%botFile%"
-if /i "%autoRestart%"=="Yes" goto start
+if /i "%autoRestart%"=="Yes" (
+    timeout 10
+    goto start
+)
 pause

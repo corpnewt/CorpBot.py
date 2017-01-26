@@ -12,6 +12,19 @@ class ServerStats:
         self.bot = bot
         self.settings = settings
 
+    async def message(self, message):
+        # Check the message and see if we should allow it - always yes.
+        # This module doesn't need to cancel messages.
+
+        server = message.server
+        messages = int(self.settings.getServerStat(server, "TotalMessages"))
+        if messages == None:
+            messages = 0
+        messages += 1
+        self.settings.setServerStat(server, "TotalMessages", messages)
+            
+        return { 'Ignore' : False, 'Delete' : False}
+
     @commands.command(pass_context=True)
     async def listservers(self, ctx, number : int = 10):
         """Lists the servers I'm connected to - default is 10, max is 50."""
@@ -215,3 +228,14 @@ class ServerStats:
         if suppress:
             msg = Nullify.clean(msg)
         await self.bot.send_message(ctx.message.channel, msg)
+
+    @commands.command(pass_context=True)
+    async def messages(self, ctx):
+        """Lists the number of messages I've seen on this sever so far. (only applies after this module's inception, and if I'm online)"""
+        messages = int(self.settings.getServerStat(ctx.message.server, "TotalMessages"))
+        if messages == None:
+            messages = 0
+        if messages == 1:
+            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{} message!*.'.format(messages))
+        else:
+            await self.bot.send_message(ctx.message.channel, 'So far, I\'ve witnessed *{} messages!*.'.format(messages))
