@@ -31,12 +31,6 @@ class Welcome:
     async def setwelcome(self, ctx, *, message = None):
         """Sets the welcome message for your server (bot-admin only). [[user]] = user name, [[atuser]] = user mention, [[server]] = server name"""
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
-            suppress = True
-        else:
-            suppress = False
-
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
             checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
@@ -77,6 +71,11 @@ class Welcome:
                     if aRole['ID'] == role.id:
                         isAdmin = True
 
+        # Only allow admins to change server stats
+        if not isAdmin:
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            return
+
         if member == None:
             member = ctx.message.author
         if type(member) is str:
@@ -101,12 +100,6 @@ class Welcome:
     @commands.command(pass_context=True)
     async def setgoodbye(self, ctx, *, message = None):
         """Sets the goodbye message for your server (bot-admin only). [[user]] = user name, [[atuser]] = user mention, [[server]] = server name"""
-
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
-            suppress = True
-        else:
-            suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
@@ -148,6 +141,11 @@ class Welcome:
                     # Get the role that corresponds to the id
                     if aRole['ID'] == role.id:
                         isAdmin = True
+
+        # Only allow admins to change server stats
+        if not isAdmin:
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            return
 
         if member == None:
             member = ctx.message.author

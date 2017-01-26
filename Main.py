@@ -41,6 +41,7 @@ from Cogs import Ascii
 from Cogs import Promote
 from Cogs import MessageXp
 from Cogs import Welcome
+from Cogs import ServerStats
 
 # Let's load our prefix file
 prefix = '$'
@@ -195,6 +196,10 @@ cogList.append(messageXp)
 welcome = Welcome.Welcome(bot, settings)
 cogList.append(welcome)
 
+# Server Stats
+serverstats = ServerStats.ServerStats(bot, settings)
+cogList.append(serverstats)
+
 # Help - Must be last
 #help = Help.Help(bot, cogList)
 #cogList.append(help)
@@ -287,8 +292,6 @@ async def on_member_join(member):
 	server = member.server
 	# Initialize the user
 	settings.checkUser(member, server)
-	fmt = 'Welcome *{}* to *{}*!'.format(member.name, server.name)
-	await bot.send_message(server, fmt.format(member, server))
 
 	rules = settings.getServerStat(server, "Rules")
 	
