@@ -63,6 +63,7 @@ class Settings:
 				"Rules" 				: "Be nice to each other.",
 				"Welcome"				: "Welcome *[[user]]* to *[[server]]!*",
 				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
+				"WelcomeChannel"		: "",		# ID or blank for default channel
 				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
