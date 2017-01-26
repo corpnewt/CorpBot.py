@@ -235,6 +235,7 @@ class ServerStats:
     async def messages(self, ctx):
         """Lists the number of messages I've seen on this sever so far. (only applies after this module's inception, and if I'm online)"""
         messages = int(self.settings.getServerStat(ctx.message.server, "TotalMessages"))
+        messages -= 1
         if messages == None:
             messages = 0
         if messages == 1:
