@@ -16,12 +16,14 @@ class ServerStats:
         # Check the message and see if we should allow it - always yes.
         # This module doesn't need to cancel messages.
 
-        server = message.server
-        messages = int(self.settings.getServerStat(server, "TotalMessages"))
-        if messages == None:
-            messages = 0
-        messages += 1
-        self.settings.setServerStat(server, "TotalMessages", messages)
+        # Don't count your own, Pooter
+        if not message.author.id == self.bot.user.id:
+            server = message.server
+            messages = int(self.settings.getServerStat(server, "TotalMessages"))
+            if messages == None:
+                messages = 0
+            messages += 1
+            self.settings.setServerStat(server, "TotalMessages", messages)
             
         return { 'Ignore' : False, 'Delete' : False}
 
