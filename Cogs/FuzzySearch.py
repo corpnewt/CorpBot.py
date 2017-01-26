@@ -1,7 +1,7 @@
 import difflib
 from   operator    import itemgetter
 
-def search(searchTerm, list, numMatches : int = 3, keyName : str = None):
+def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
 	"""Searches the provided list for the searchTerm - using a keyName if provided for dicts."""
 	if len(list) < 1:
 		return None
@@ -12,7 +12,7 @@ def search(searchTerm, list, numMatches : int = 3, keyName : str = None):
 			testName = item[keyName]
 		else:
 			testName = item
-		matchRatio = difflib.SequenceMatcher(None, searchTerm, testName).ratio()
+		matchRatio = difflib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
 		searchList.append({ 'Name' : testName, 'Ratio' : matchRatio })
 	# sort the servers by population
 	searchList = sorted(searchList, key=lambda x:int(x['Ratio']), reverse=True)
