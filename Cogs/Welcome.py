@@ -21,11 +21,29 @@ class Welcome:
 
     async def onjoin(self, member, server):
         # Welcome
-        await self._welcome(member, server)
+        welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in server.channels:
+                if channel.id == welcomeChannel:
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            await self._welcome(member, server, welcomeChannel)
+        else:
+            await self._welcome(member, server)
 
     async def onleave(self, member, server):
         # Goodbye
-        await self._goodbye(member, server)
+        welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in server.channels:
+                if channel.id == welcomeChannel:
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            await self._goodbye(member, server, welcomeChannel)
+        else:
+            await self._goodbye(member, server)
 
     @commands.command(pass_context=True)
     async def setwelcome(self, ctx, *, message = None):
@@ -48,7 +66,7 @@ class Welcome:
             self.settings.setServerStat(ctx.message.server, "Welcome", None)
             await self.bot.send_message(ctx.message.channel, 'Welcome message removed!')
             return
-        
+
         self.settings.setServerStat(ctx.message.server, "Welcome", message)
         await self.bot.send_message(ctx.message.channel, 'Welcome message updated!\n\nHere\'s a preview:')
         await self._welcome(ctx.message.author, ctx.message.server, ctx.message.channel)
@@ -119,7 +137,7 @@ class Welcome:
             self.settings.setServerStat(ctx.message.server, "Goodbye", None)
             await self.bot.send_message(ctx.message.channel, 'Goodbye message removed!')
             return
-        
+
         self.settings.setServerStat(ctx.message.server, "Goodbye", message)
         await self.bot.send_message(ctx.message.channel, 'Goodbye message updated!\n\nHere\'s a preview:')
         await self._goodbye(ctx.message.author, ctx.message.server, ctx.message.channel)
@@ -212,3 +230,47 @@ class Welcome:
             await self.bot.send_message(channel, message)
         else:
             await self.bot.send_message(server.default_channel, message)
+
+    @commands.command(pass_context=True)
+    async def setwelcomechannel(self, ctx, *, channel : discord.Channel = None):
+        """Sets the channel for the welcome and goodbye messages (bot-admin only)."""
+
+        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+        if not isAdmin:
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+            for role in ctx.message.author.roles:
+                for aRole in checkAdmin:
+                    # Get the role that corresponds to the id
+                    if aRole['ID'] == role.id:
+                        isAdmin = True
+
+        # Only allow admins to change server stats
+        if not isAdmin:
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            return
+
+        if channel == None:
+            self.settings.setServerStat(ctx.message.server, "WelcomeChannel", "")
+            msg = 'Welcome and goodbye messages will be displayed in the default channel.'
+            await self.bot.send_message(ctx.message.channel, msg)
+            return
+
+        if type(channel) is str:
+            try:
+                role = discord.utils.get(message.server.channels, name=role)
+            except:
+                print("That channel does not exist")
+                return
+
+        # If we made it this far - then we can add it
+        self.settings.setServerStat(ctx.message.server, "WelcomeChannel", channel.id)
+
+        msg = 'Welcome and goodbye messages will be displayed in **{}**.'.format(channel.name)
+        await self.bot.send_message(ctx.message.channel, msg)
+
+
+    @setwelcomechannel.error
+    async def setwelcomechannel_error(self, ctx, error):
+        # do stuff
+        msg = 'setwelcomechannel Error: {}'.format(ctx)
+        await self.bot.say(msg)
