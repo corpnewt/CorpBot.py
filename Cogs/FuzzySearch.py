@@ -19,4 +19,5 @@ def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
 	if numMatches > len(searchList):
 		# Less than three - let's just give what we've got
 		numMatches = len(searchList)
+	print(searchList)
 	return searchList[:numMatches]
