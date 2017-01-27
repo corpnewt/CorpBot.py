@@ -1,5 +1,4 @@
 import difflib
-import Levenshtein
 from   operator    import itemgetter
 
 def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
@@ -13,8 +12,8 @@ def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
 			testName = item[keyName]
 		else:
 			testName = item
-		# matchRatio = difflib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
-		matchRatio = Levenshtein.ratio(searchTerm.lower(), testName.lower())
+		matchRatio = difflib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
+		# matchRatio = Levenshtein.ratio(searchTerm.lower(), testName.lower())
 		searchList.append({ 'Name' : testName, 'Ratio' : matchRatio })
 	# sort the servers by population
 	searchList = sorted(searchList, key=lambda x:x['Ratio'], reverse=True)
