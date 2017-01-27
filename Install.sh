@@ -63,10 +63,10 @@ function main () {
     update "pyquery"
     echo
     
-    echo Updating Levenshtein...
-    echo
-    update "python-levenshtein"
-    echo
+    # echo Updating Levenshtein...
+    # echo
+    # update "python-levenshtein"
+    # echo
     
     echo Done.
     sleep 5
