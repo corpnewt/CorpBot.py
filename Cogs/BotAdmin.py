@@ -65,6 +65,13 @@ class BotAdmin:
 		if suppress:
 			msg = Nullify.clean(msg)
 		await self.bot.send_message(channel, msg)
+		
+	@setuserparts.error
+	async def setuserparts_error(self, ctx, error):
+		# do stuff
+		msg = 'setuserparts Error: {}'.format(ctx)
+		await self.bot.say(msg)
+
 
 	@commands.command(pass_context=True)
 	async def mute(self, ctx, *, member = None, cooldown = None):

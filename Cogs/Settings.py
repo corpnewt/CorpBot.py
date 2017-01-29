@@ -42,6 +42,9 @@ class Settings:
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
+				"StrikeOut"				: 3,		# Number of strikes needed for consequence
+				"KickList"				: [],		# List of id's that have been kicked
+				"BanList"				: [],		# List of id's that have been banned
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
@@ -63,7 +66,6 @@ class Settings:
 				"Rules" 				: "Be nice to each other.",
 				"Welcome"				: "Welcome *[[user]]* to *[[server]]!*",
 				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
-				"WelcomeChannel"		: "",		# ID or blank for default channel
 				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
@@ -298,6 +300,12 @@ class Settings:
 							needsUpdate = True
 						if not "Reminders" in y:
 							y["Reminders"] = []
+							needsUpdate = True
+						if not "Strikes" in y:
+							y["Strikes"] = []
+							needsUpdate = True
+						if not "StrikeLevel" in y:
+							y["StrikeLevel"] = 0
 							needsUpdate = True
 						if not "Profiles" in y:
 							y["Profiles"] = []

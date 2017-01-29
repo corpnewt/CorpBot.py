@@ -42,6 +42,7 @@ from Cogs import Promote
 from Cogs import MessageXp
 from Cogs import Welcome
 from Cogs import ServerStats
+from Cogs import Strike
 
 # Let's load our prefix file
 prefix = '$'
@@ -199,6 +200,10 @@ cogList.append(welcome)
 # Server Stats
 serverstats = ServerStats.ServerStats(bot, settings)
 cogList.append(serverstats)
+
+# Strike
+strike = Strike.Strike(bot, settings)
+cogList.append(strike)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
