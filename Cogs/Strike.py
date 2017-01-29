@@ -56,7 +56,7 @@ class Strike:
 
 	async def checkStrike(self, member, strike):
 		# Start our countdown
-		countDown = int(strike['End'])-int(time.time())
+		countDown = int(strike['Time'])-int(time.time())
 		if countDown > 0:
 			# We have a positive countdown - let's wait
 			await asyncio.sleep(countDown)
@@ -110,6 +110,7 @@ class Strike:
 			strike['Time'] = -1
 		else:
 			strike['Time'] = currentTime+(86400*days)
+			self.bot.loop.create_task(self.checkStrike(member, strike))
 		strike['Message'] = message
 		strikes = self.settings.getUserStat(member, ctx.message.server, "Strikes")
 		strikeout = int(self.settings.getServerStat(ctx.message.server, "StrikeOut"))
@@ -637,3 +638,47 @@ class Strike:
 		else:
 			msg = '*{}* is **not** in the ban list.'.format(DisplayName.name(member))
 		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def strikelimit(self, ctx):
+		"""Lists the number of strikes before advancing to the next consequence."""
+		strikeout = int(self.settings.getServerStat(ctx.message.server, "StrikeOut"))
+		msg = '*{}* strikes are required to strike out.'.format(strikeout)
+		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def setstrikelimit(self, ctx, limit = None):
+		"""Sets the number of strikes before advancing to the next consequence (bot-admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		if not limit:
+			await self.bot.send_message(ctx.message.channel, 'Strike limit must be *at least* one.')
+			return
+
+		try:
+			limit = int(limit)
+		except Exception:
+			await self.bot.send_message(ctx.message.channel, 'Strike limit must be an integer.')
+			return
+		
+		self.settings.setServerStat(ctx.message.server, "StrikeOut", limit)
+		msg = '*{}* strikes are now required to strike out.'.format(limit)
+		await self.bot.send_message(ctx.message.channel, msg)
+
+		
+	@setstrikelimit.error
+	async def setstrikelimit_error(self, ctx, error):
+		# do stuff
+		msg = 'setstrikelimit Error: {}'.format(ctx)
+		await self.bot.say(msg)
