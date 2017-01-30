@@ -136,9 +136,12 @@ class Settings:
 					# We have our role
 					foundRole = True
 			if not foundRole:
-				await self.bot.add_roles(member, defRole)
-				fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
-				await self.bot.send_message(member, fmt)
+				try:
+					await self.bot.add_roles(member, defRole)
+					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
+					await self.bot.send_message(member, fmt)
+				except Exception:
+					continue
 
 	async def backup(self):
 		# Wait initial time - then start loop
