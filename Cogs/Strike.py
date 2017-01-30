@@ -31,14 +31,14 @@ class Strike:
 		# Check id against the kick and ban list and react accordingly
 		kickList = self.settings.getServerStat(server, "KickList")
 		if member.id in kickList:
-			# The user has been kicked before - set their strikeLevel to 1
-			self.settings.setUserStat(member, server, "StrikeLevel", 1)
+			# The user has been kicked before - set their strikeLevel to 2
+			self.settings.setUserStat(member, server, "StrikeLevel", 2)
 
 		banList = self.settings.getServerStat(server, "BanList")
 		if member.id in banList:
-			# The user has been kicked before - set their strikeLevel to 1
+			# The user has been kicked before - set their strikeLevel to 3
 			# Also mute them
-			self.settings.setUserStat(member, server, "StrikeLevel", 2)
+			self.settings.setUserStat(member, server, "StrikeLevel", 3)
 			self.settings.setUserStat(member, server, "Muted", "Yes")
 			self.settings.setUserStat(member, server, "Cooldown", None)
 
@@ -112,6 +112,7 @@ class Strike:
 			strike['Time'] = currentTime+(86400*days)
 			self.bot.loop.create_task(self.checkStrike(member, strike))
 		strike['Message'] = message
+		strike['GivenBy'] = ctx.message.author.id
 		strikes = self.settings.getUserStat(member, ctx.message.server, "Strikes")
 		strikeout = int(self.settings.getServerStat(ctx.message.server, "StrikeOut"))
 		strikeLevel = int(self.settings.getUserStat(member, ctx.message.server, "StrikeLevel"))
@@ -135,19 +136,48 @@ class Strike:
 			if strikeLevel == 0:
 				cooldownFinal = currentTime+86400
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
-				self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
-				self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
+				if message:
+					mutemessage = 'You have been muted in *{}*.\nThe Reason:\n{}'.format(ctx.message.server.name, message)
+				else:
+					mutemessage = 'You have been muted in *{}*.'.format(ctx.message.server.name)
+				# Check if already muted
+				alreadyMuted = self.settings.getUserStat(member, ctx.message.server, "Muted")
+				if alreadyMuted.lower() == "yes":
+					# Find out for how long
+					muteTime = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
+					if not muteTime == None:
+						if muteTime < cooldownFinal:
+							self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
+							timeRemains = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+							if message:
+								mutemessage = 'Your muted time in *{}* has been extended to *{}*.\nThe Reason:\n{}'.format(ctx.message.server.name, timeRemains, message)
+							else:
+								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(ctx.message.server.name, timeRemains)
+				else:
+					self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
+					self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
+				await self.bot.send_message(member, mutemessage)
 			elif strikeLevel == 1:
 				kickList = self.settings.getServerStat(ctx.message.server, "KickList")
 				if not member.id in kickList:
 					kickList.append(member.id)
 					self.settings.setServerStat(ctx.message.server, "KickList", kickList)
+				if message:
+					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(ctx.message.server.name, message)
+				else:
+					kickmessage = 'You have been kicked from *{}*.'.format(ctx.message.server.name)
+				await self.bot.send_message(member, kickmessage)
 				await self.bot.kick(member)
 			else:
 				banList = self.settings.getServerStat(ctx.message.server, "BanList")
 				if not member.id in banList:
 					banList.append(member.id)
 					self.settings.setServerStat(ctx.message.server, "BanList", banList)
+				if message:
+					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(ctx.message.server.name, message)
+				else:
+					banmessage = 'You have been banned from *{}*.'.format(ctx.message.server.name)
+				await self.bot.send_message(member, banmessage)
 				await self.bot.ban(member)
 			self.settings.incrementStat(member, ctx.message.server, "StrikeLevel", 1)
 			self.settings.setUserStat(member, ctx.message.server, "Strikes", [])
@@ -174,6 +204,7 @@ class Strike:
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You are not a bot-admin.  You can only see your own strikes.')
 			member = ctx.message.author
 
 		if member == None:
@@ -230,9 +261,11 @@ class Strike:
 			# no strikes
 			messages = "None."
 			cooldowns = "None."
+			givenBy = "None."
 		else:
 			messages    = ''
 			cooldowns   = ''
+			givenBy = ''
 
 		for i in range(0, len(strikes)):
 			if strikes[i]['Message']:
@@ -245,10 +278,13 @@ class Strike:
 			else:
 				timeRemains = ReadableTime.getReadableTimeBetween(currentTime, timeLeft)
 				cooldowns += '{}. {}\n'.format(i+1, timeRemains)
+			given = strikes[i]['GivenBy']
+			givenBy += '{}. {}\n'.format(i+1, DisplayName.name(DisplayName.memberForID(given, ctx.message.server)))
 		
 		# Add messages and cooldowns
 		stat_embed.add_field(name="Messages", value=messages, inline=True)
 		stat_embed.add_field(name="Time Left", value=cooldowns, inline=True)
+		stat_embed.add_field(name="Given By", value=givenBy, inline=True)
 
 		# Strikes remaining
 		stat_embed.add_field(name="Strikes Remaining", value=strikeout-len(strikes), inline=True)
