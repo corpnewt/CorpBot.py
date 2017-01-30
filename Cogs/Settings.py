@@ -910,6 +910,8 @@ class Settings:
 		channelWord = "channels"
 		serverWord = "servers"
 		usersWord = "users"
+		# Set to hold our servers to delete
+		serverSet = set()
 
 		for botServer in self.serverDict["Servers"]:
 			# Let's check through each server first - then members
@@ -918,6 +920,9 @@ class Settings:
 				# Check ID in case of name change
 				if botServer["ID"] == serve.id:
 					foundServer = True
+					# Create some blank sets to hold orphaned users/channels
+					userSet    = set()
+					channelSet = set()
 					# Now we check users...
 					for botMember in botServer["Members"]:
 						foundMember = False
@@ -926,9 +931,15 @@ class Settings:
 								foundMember = True
 							
 						if not foundMember:
+							# Add to set
+							userSet.add(botMember)
 							# We didn't find this member - remove them
-							self.removeUserID(botMember['ID'], serve)
+							# self.removeUserID(botMember['ID'], serve)
 							removedUsers +=1
+					# Remove users that are in userSet
+					if len(userSet):
+						# There's something to remove
+						botServer["Members"] = [v for i, v in enumerate(botServer["Members"]) if i not in userSet]
 
 					for botChannel in botServer["ChannelMOTD"]:
 						foundChannel = False
@@ -937,14 +948,28 @@ class Settings:
 								foundChannel = True
 						
 						if not foundChannel:
+							# Add to set
+							channelSet.add(botChannel)
 							# We didn't find this channel - remove
-							self.removeChannelID(botChannel['ID'], serve)
+							# self.removeChannelID(botChannel['ID'], serve)
 							removedChannels += 1
+							
+					# Remove users that are in userSet
+					if len(channelSet):
+						# There's something to remove
+						botServer["ChannelMOTD"] = [v for i, v in enumerate(botServer["ChannelMOTD"]) if i not in channelSet]
 						
 			if not foundServer:
+				# Add to set
+				serverSet.add(botServer)
 				# We didn't find this server - remove it
-				self.removeServerID(botServer['ID'])
+				# self.removeServerID(botServer['ID'])
 				removedServers += 1
+				
+		# Remove servers in serverSet
+		if len(serverSet):
+			# There's something to remove
+			self.serverDict["Servers"] = [v for i, v in enumerate(self.serverDict["Servers"]) if i not in serverSet]
 
 		if removedServers is 1:
 			serverWord = "server"
