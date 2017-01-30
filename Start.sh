@@ -7,6 +7,7 @@ shopt -s extglob
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+gitupdate="Yes"
 
 function main () {
     echo \#\#\# Starting CorpBot \#\#\#
@@ -28,6 +29,7 @@ function runBot () {
 }
 
 function update () {
+    echo "Updating..."
     git pull
 }
 
