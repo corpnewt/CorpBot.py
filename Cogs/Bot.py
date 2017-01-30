@@ -4,6 +4,7 @@ import os
 import psutil
 import platform
 import time
+import sys
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -11,6 +12,7 @@ from   Cogs import DisplayName
 from   Cogs import ReadableTime
 from   Cogs import GetImage
 from   Cogs import Nullify
+from   Cogs import ProgressBar
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -65,7 +67,9 @@ class Bot:
 		cpuUsage    = psutil.cpu_percent(interval=1)
 		memStats    = psutil.virtual_memory()
 		memPerc     = memStats.percent
+		memUsed     = memStats.used
 		memTotal    = memStats.total
+		memUsedGB   = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
 		memTotalGB  = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
 		currentOS   = platform.platform()
 		system      = platform.system()
@@ -76,12 +80,19 @@ class Bot:
 		botName     = DisplayName.name(botMember)
 		currentTime = int(time.time())
 		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+		pythonMajor = sys.version_info.major
+		pythonMinor = sys.version_info.minor
+		pythonMicro = sys.version_info.micro
+		pythonRelease = sys.version_info.releaselevel
 
-		msg = '***{}\'s*** **Home:**\n\n'.format(botName)
-		msg += '*{}*\n'.format(currentOS)
-		msg += '*{}% of {} ({} thread[s])*\n'.format(cpuUsage, processor, cpuThred)
-		msg += '*{}% of {}GB RAM*\n'.format(memPerc, memTotalGB)
-		msg += '*{} uptime*'.format(timeString)
+		msg = '***{}\'s*** **Home:**\n'.format(botName)
+		msg += '```{}\n'.format(currentOS)
+		msg += 'Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
+		msg += '{}% of {} ({} thread[s])\n'.format(cpuUsage, processor, cpuThred)
+		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
+		msg += '{} ({}%) of {}GB RAM used\n'.format(memUsedGB, memPerc, memTotalGB)
+		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n"
+		msg += '{} uptime```'.format(timeString)
 
 		await self.bot.send_message(ctx.message.channel, msg)
 

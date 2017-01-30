@@ -106,7 +106,7 @@ class Admin:
 
 	@commands.command(pass_context=True)
 	async def setmadlibschannel(self, ctx, *, channel : discord.Channel = None):
-		"""Sets the required role ID to stop the music player (admin only)."""
+		"""Sets the channel for MadLibs (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats

@@ -6,6 +6,7 @@ from   shutil      import copyfile
 import time
 import json
 import os
+import copy
 from   Cogs        import DisplayName
 
 
@@ -42,11 +43,20 @@ class Settings:
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
+				"StrikeOut"				: 3,		# Number of strikes needed for consequence
+				"KickList"				: [],		# List of id's that have been kicked
+				"BanList"				: [],		# List of id's that have been banned
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
+				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
+				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
+				"XPRPerMessage"			: 0,		# How much xp reserve per message (typically 0)
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
 				"XPDemote" 				: "No",		# Can xp lower your rank?
+				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
+				"SuppressDemotions"		: "No",		# Do we suppress the demotion message?
+				"TotalMessages"			: 0,		# The total number of messages the bot has witnessed
 				"Killed" 				: "No",		# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastShrug"				: "",		# Who shrugged last?
@@ -55,6 +65,8 @@ class Settings:
 				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
 				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
 				"Rules" 				: "Be nice to each other.",
+				"Welcome"				: "Welcome *[[user]]* to *[[server]]!*",
+				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
 				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
@@ -181,7 +193,13 @@ class Settings:
 				for key in self.defaultServer:
 					if not key in x:
 						#print("Adding: {} -> {}".format(key, server.name))
-						x[key] = self.defaultServer[key]
+						if type(self.defaultServer[key]) == dict:
+							x[key] = {}
+						elif type(self.defaultServer[key]) == list:
+							# We have lists/dicts - copy them
+							x[key] = copy.deepcopy(self.defaultServer[key])
+						else:
+							x[key] = self.defaultServer[key]
 
 		if not found:
 			# We didn't locate our server
@@ -190,6 +208,13 @@ class Settings:
 			newServer = { "Name" : server.name, "ID" : server.id }
 			for key in self.defaultServer:
 				newServer[key] = self.defaultServer[key]
+				if type(self.defaultServer[key]) == dict:
+					newServer[key] = {}
+				elif type(self.defaultServer[key]) == list:
+					# We have lists/dicts - copy them
+					newServer[key] = copy.deepcopy(self.defaultServer[key])
+				else:
+					newServer[key] = self.defaultServer[key]
 			
 			self.serverDict["Servers"].append(newServer)
 			#self.flushSettings()
@@ -257,6 +282,9 @@ class Settings:
 						if not "XPLeftover" in y:
 							y["XPLeftover"] = 0
 							needsUpdate = True
+						if not "XPRealLeftover" in y:
+							y["XPRealLeftover"] = 0
+							needsUpdate = True
 						if not "XPReserve" in y:
 							y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
 							needsUpdate = True
@@ -286,6 +314,12 @@ class Settings:
 							needsUpdate = True
 						if not "Reminders" in y:
 							y["Reminders"] = []
+							needsUpdate = True
+						if not "Strikes" in y:
+							y["Strikes"] = []
+							needsUpdate = True
+						if not "StrikeLevel" in y:
+							y["StrikeLevel"] = 0
 							needsUpdate = True
 						if not "Profiles" in y:
 							y["Profiles"] = []

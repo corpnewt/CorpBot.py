@@ -39,6 +39,10 @@ from Cogs import Eat
 from Cogs import Profile
 from Cogs import Ascii
 from Cogs import Promote
+from Cogs import MessageXp
+from Cogs import Welcome
+from Cogs import ServerStats
+from Cogs import Strike
 
 # Let's load our prefix file
 prefix = '$'
@@ -185,6 +189,22 @@ cogList.append(prof)
 prom = Promote.Promote(bot, settings)
 cogList.append(prom)
 
+# MessageXp
+messageXp = MessageXp.MessageXp(bot, settings)
+cogList.append(messageXp)
+
+# Welcome
+welcome = Welcome.Welcome(bot, settings)
+cogList.append(welcome)
+
+# Server Stats
+serverstats = ServerStats.ServerStats(bot, settings)
+cogList.append(serverstats)
+
+# Strike
+strike = Strike.Strike(bot, settings)
+cogList.append(strike)
+
 # Help - Must be last
 #help = Help.Help(bot, cogList)
 #cogList.append(help)
@@ -247,13 +267,19 @@ async def on_voice_state_update(before, after):
 async def on_member_remove(member):
 	server = member.server
 	settings.removeUser(member, server)
+	for cog in cogList:
+		try:
+			check = await cog.onleave(member, server)
+		except AttributeError:
+			# Onto the next
+			continue
 
 @bot.event
 async def on_server_join(server):
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
-	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `$help` either in chat or in PM. (PM is probably better though - I can get *kinda* spammy)'
+	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `$help` either in chat or in PM.'
 	await bot.send_message(server, msg)
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `$setup` in the main chat.  Thanks!'
 	await bot.send_message(owner, msg)
@@ -271,26 +297,15 @@ async def on_member_join(member):
 	server = member.server
 	# Initialize the user
 	settings.checkUser(member, server)
-	fmt = 'Welcome *{}* to *{}*!'.format(member.name, server.name)
-	await bot.send_message(server, fmt.format(member, server))
-	# Scan through roles - find "Entry Level" and set them to that
 
-	defaultRole = settings.getServerStat(server, "DefaultRole")
-	rules       = settings.getServerStat(server, "Rules")
+	rules = settings.getServerStat(server, "Rules")
 	
-	if defaultRole:
-		# Check for join functions
-		for cog in cogList:
-			try:
-				check = await cog.onjoin(member, server)
-			except AttributeError:
-				# Onto the next
-				continue
-
-		'''newRole = discord.utils.get(server.roles, id=str(defaultRole))
-		await bot.add_roles(member, newRole)
-		fmt = 'You\'ve been auto-assigned the role **{}**!'.format(newRole.name)
-		await bot.send_message(server, fmt)'''
+	for cog in cogList:
+		try:
+			check = await cog.onjoin(member, server)
+		except AttributeError:
+			# Onto the next
+			continue
 
 	help = 'Type `$help` for a list of available user commands.'
 

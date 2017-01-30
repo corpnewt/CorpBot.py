@@ -75,6 +75,16 @@ echo.
 call :install "pyparsing"
 echo.
 
+echo Installing PyQuery...
+echo.
+call :install "pyquery"
+echo.
+
+REM echo Installing Levenshtein...
+REM echo.
+REM call :install "python-levenshtein"
+REM echo.
+
 echo Done.
 timeout 5 > nul
 exit /b

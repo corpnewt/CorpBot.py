@@ -62,11 +62,12 @@ class Setup:
 	def check(self, msg):
 		if not msg.channel.is_private:
 			return False
-		if msg.content.startswith('y'):
+		msgStr = msg.content.lower()
+		if msgStr.startswith('y'):
 			return True
-		if msg.content.startswith('n'):
+		if msgStr.startswith('n'):
 			return True
-		if msg.content == 'skip':
+		if msgStr == 'skip':
 			return True
 		return False
 
@@ -118,9 +119,9 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					await self.autoRoleName(ctx)
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "DefaultRole", None)
 					await self.bot.send_message(author, 'Auto-role *disabled.*')
 					await self.xpSystem(ctx)
@@ -171,8 +172,8 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Auto-role delay time will remian *{} minutes*.'.format(threshold))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Auto-role delay time will remain *{} minutes*.'.format(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -191,15 +192,20 @@ class Setup:
 		server  = ctx.message.server
 
 		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if not defXP:
+		if defXP == None:
 			defXP = 0
 		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if not defXPR:
+		if defXPR == None:
 			defXPR = 10
 		hourXP = self.settings.getServerStat(server, "HourlyXP")
+		hourXPReal = self.settings.getServerStat(server, "HourlyXPReal")
+		messageXP  = self.settings.getServerStat(server, "XPPerMessage")
+		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
 		reqOnline = self.settings.getServerStat(server, "RequireOnline")
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if not reqXP:
+		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
+		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
+		if reqXP == None:
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
@@ -208,7 +214,7 @@ class Setup:
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 
 		msg = '**__XP Management System__**\n\nI can help auto-manage roles by promoting/demoting based on xp.\n\nWould you like to go through that setup? (y/n)'
-		msg = '{}\n\n__Current settings:__\n\nDefault xp on join: *{}*\nDefault xp reserve on join: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nUsers can be demoted based on xp: *{}*'.format(msg, defXP, defXPR, hourXP, reqOnline, reqXP, adminUnlimited, xpProm, xpDem)
+		msg = '{}\n\n__Current settings:__\n\nDefault xp on join: *{}*\nDefault xp reserve on join: *{}*\nHourly xp: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nXP per message: *{}*\nXP reserve per message: *{}*\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nPromotion message suppression: *{}*\nUsers can be demoted based on xp: *{}*\nDemotion message suppression: *{}*'.format(msg, defXP, defXPR, hourXPReal, hourXP, reqOnline, messageXP, messageXPR, reqXP, adminUnlimited, xpProm, suppProm, xpDem, suppDem)
 		await self.bot.send_message(author, msg)
 
 		gotIt = False
@@ -220,10 +226,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					# await self.autoRoleName(ctx)
 					await self.setupXP(ctx)
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					await self.picThresh(ctx)
 				else:
 					# Skipping
@@ -239,7 +245,7 @@ class Setup:
 		##########################################################################################################################
 		# Default XP
 		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if not defXP:
+		if defXP == None:
 			defXP = 0
 		msg = 'How much xp should each user get when they join?\n\nCurrent is *{}*.'.format(defXP)
 		await self.bot.send_message(author, msg)
@@ -252,23 +258,23 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default xp reserve will remian *{}*.'.format(defXP))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Default xp will remain *{}*.'.format(defXP))
 				else:
 					try:
 						talkInt = int(talk.content)
-						await self.bot.send_message(author, 'Default xp reserve is now *{}!*'.format(talkInt))
+						await self.bot.send_message(author, 'Default xp is now *{}!*'.format(talkInt))
 						self.settings.setServerStat(server, "DefaultXP", talkInt)
 					except ValueError:
 						# await self.autoRoleName(ctx)
-						await self.bot.send_message(author, 'Default xp reserve needs to be a whole number - try again.')
+						await self.bot.send_message(author, 'Default xp needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		
 		##########################################################################################################################
 		# Default XP Reserve
 		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if not defXPR:
+		if defXPR == None:
 			defXPR = 10
 		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get when they join?\n\nCurrent is *{}*.'.format(defXPR)
 		await self.bot.send_message(author, msg)
@@ -281,8 +287,8 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default xp reserve will remian *{}*.'.format(defXPR))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Default xp reserve will remain *{}*.'.format(defXPR))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -293,11 +299,40 @@ class Setup:
 						await self.bot.send_message(author, 'Default xp reserve needs to be a whole number - try again.')
 						continue
 				gotIt = True
-		
+				
 		##########################################################################################################################
 		# Hourly XP
+		hourXPReal = self.settings.getServerStat(server, "HourlyXPReal")
+		if hourXPReal == None:
+			hourXPReal = 0
+		msg = 'How much xp (xp that determines the user\'s role) should each user get per hour?\n\nCurrent is *{}*.'.format(hourXPReal)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Hourly xp will remain *{}*.'.format(hourXPReal))
+				else:
+					try:
+						talkInt = int(talk.content)
+						await self.bot.send_message(author, 'Hourly xp is now *{}!*'.format(talkInt))
+						self.settings.setServerStat(server, "HourlyXPReal", talkInt)
+					except ValueError:
+						# await self.autoRoleName(ctx)
+						await self.bot.send_message(author, 'Hourly xp needs to be a whole number - try again.')
+						continue
+				gotIt = True
+		
+		##########################################################################################################################
+		# Hourly XP Reserve
 		hourXP = self.settings.getServerStat(server, "HourlyXP")
-		if not hourXP:
+		if hourXP == None:
 			hourXP = 3
 		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per hour?\n\nCurrent is *{}*.'.format(hourXP)
 		await self.bot.send_message(author, msg)
@@ -310,8 +345,8 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Hourly xp reserve will remian *{}*.'.format(hourXP))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Hourly xp reserve will remain *{}*.'.format(hourXP))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -337,21 +372,79 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "RequireOnline", "Yes")
 					await self.bot.send_message(author, 'Require Online set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "RequireOnline", "No")
 					await self.bot.send_message(author, 'Require Online set to *No.*')
 				else:
 					# Skipping
 					await self.bot.send_message(author, 'Require Online shall remain *{}*'.format(reqOnline))
 				gotIt = True
+				
+		##########################################################################################################################
+		# XP Per Message
+		messageXP = self.settings.getServerStat(server, "XPPerMessage")
+		if messageXP == None:
+			messageXP = 0
+		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXP)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Xp per message will remain *{}*.'.format(messageXP))
+				else:
+					try:
+						talkInt = int(talk.content)
+						await self.bot.send_message(author, 'Xp per message is now *{}!*'.format(talkInt))
+						self.settings.setServerStat(server, "XPPerMessage", talkInt)
+					except ValueError:
+						# await self.autoRoleName(ctx)
+						await self.bot.send_message(author, 'Xp per message needs to be a whole number - try again.')
+						continue
+				gotIt = True
+				
+		##########################################################################################################################
+		# XP Reserve Per Message
+		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
+		if messageXPR == None:
+			messageXPR = 0
+		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXPR)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.checkRole, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Xp reserve per message will remain *{}*.'.format(messageXPR))
+				else:
+					try:
+						talkInt = int(talk.content)
+						await self.bot.send_message(author, 'Xp reserve per message is now *{}!*'.format(talkInt))
+						self.settings.setServerStat(server, "XPRPerMessage", talkInt)
+					except ValueError:
+						# await self.autoRoleName(ctx)
+						await self.bot.send_message(author, 'Xp reserve per message needs to be a whole number - try again.')
+						continue
+				gotIt = True
 		
 		##########################################################################################################################
 		# Required Role for XP
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if not reqXP:
+		if reqXP == None:
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
@@ -366,9 +459,9 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Minimum xp role will remian **{}**.'.format(reqXP))
-				elif talk.content == "everyone":
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Minimum xp role will remain **{}**.'.format(reqXP))
+				elif talk.content.lower() == "everyone":
 					self.settings.setServerStat(server, "RequiredXPRole", None)
 					await self.bot.send_message(author, 'Minimum xp role set to **Everyone**.')
 				else:
@@ -383,7 +476,7 @@ class Setup:
 				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Admin Unlimited
 		adminUnlimited = self.settings.getServerStat(server, "AdminUnlimited")
 		msg = 'Would you like to give server admins unlimited xp reserve? (y/n)\n\nCurrent is *{}*.'.format(adminUnlimited)
 		await self.bot.send_message(author, msg)
@@ -396,10 +489,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "AdminUnlimited", "Yes")
 					await self.bot.send_message(author, 'Unlimited xp reserve for admins set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "AdminUnlimited", "No")
 					await self.bot.send_message(author, 'Unlimited xp reserve for admins set to *No.*')
 				else:
@@ -408,7 +501,7 @@ class Setup:
 				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Auto Promote
 		xpProm = self.settings.getServerStat(server, "XPPromote")
 		msg = 'Would you like me to auto-promote users based on xp? (y/n) - You\'ll be able to set which roles can be promoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpProm)
 		await self.bot.send_message(author, msg)
@@ -421,19 +514,44 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "XPPromote", "Yes")
 					await self.bot.send_message(author, 'XP promote set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "XPPromote", "No")
 					await self.bot.send_message(author, 'XP promote set to *No.*')
 				else:
 					# Skipping
 					await self.bot.send_message(author, 'XP promote shall remain *{}*'.format(xpProm))
 				gotIt = True
+				
+		##########################################################################################################################
+		# Suppress Promote Message?
+		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
+		msg = 'Would you like me to avoid sending a message when someone is promoted? (y/n)\n\nCurrent is *{}*.'.format(suppProm)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower().startswith('y'):
+					self.settings.setServerStat(server, "SuppressPromotions", "Yes")
+					await self.bot.send_message(author, 'I will avoid sending a promotion message.')
+				elif talk.content.lower().startswith('n'):
+					self.settings.setServerStat(server, "SuppressPromotions", "No")
+					await self.bot.send_message(author, 'I will send a promotion message.')
+				else:
+					# Skipping
+					await self.bot.send_message(author, 'Promotion message suppression shall remain *{}*'.format(suppProm))
+				gotIt = True
 
 		##########################################################################################################################
-		# Required Role for XP
+		# Auto Demote
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 		msg = 'Would you like me to auto-demote users based on xp? (y/n) - You\'ll be able to set which roles can be demoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpDem)
 		await self.bot.send_message(author, msg)
@@ -446,15 +564,40 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "XPDemote", "Yes")
 					await self.bot.send_message(author, 'XP demote set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "XPDemote", "No")
 					await self.bot.send_message(author, 'XP demote set to *No.*')
 				else:
 					# Skipping
 					await self.bot.send_message(author, 'XP demote shall remain *{}*'.format(xpDem))
+				gotIt = True
+				
+		##########################################################################################################################
+		# Suppress Demote Message?
+		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
+		msg = 'Would you like me to avoid sending a message when someone is demoted? (y/n)\n\nCurrent is *{}*.'.format(suppDem)
+		await self.bot.send_message(author, msg)
+		gotIt = False
+		while not gotIt:
+			talk = await self.bot.wait_for_message(check=self.check, author=author, timeout=60)
+			if not talk:
+				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+				await self.bot.send_message(author, msg)
+				return
+			else:
+				# We got something
+				if talk.content.lower().startswith('y'):
+					self.settings.setServerStat(server, "SuppressDemotions", "Yes")
+					await self.bot.send_message(author, 'I will avoid sending a demotion message.')
+				elif talk.content.lower().startswith('n'):
+					self.settings.setServerStat(server, "SuppressDemotions", "No")
+					await self.bot.send_message(author, 'I will send a demotion message.')
+				else:
+					# Skipping
+					await self.bot.send_message(author, 'Demotion message suppression shall remain *{}*'.format(suppDem))
 				gotIt = True
 
 		##########################################################################################################################
@@ -487,8 +630,8 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Anti-spam picture cooldown will remian *{}*.'.format(threshold))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Anti-spam picture cooldown will remain *{}*.'.format(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -518,10 +661,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "HungerLock", "Yes")
 					await self.bot.send_message(author, 'Hunger lock set to *Yes.*')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "HungerLock", "No")
 					await self.bot.send_message(author, 'Hunger lock set to *No.*')
 				else:
@@ -537,7 +680,7 @@ class Setup:
 		server  = ctx.message.server
 
 		dVol = float(self.settings.getServerStat(server, "DefaultVolume"))
-		if not dVol:
+		if dVol == None:
 			dVol = 0.6
 		msg = 'What would you like the default volume of the music player to be? (values can be 1-100)\n\nCurrent is *{}*.'.format(int(dVol*100))
 		await self.bot.send_message(author, msg)
@@ -549,8 +692,8 @@ class Setup:
 				await self.bot.send_message(author, msg)
 				return
 			else:
-				if talk.content == "skip":
-					await self.bot.send_message(author, 'Default volume will remian *{}*.'.format(int(dVol*100)))
+				if talk.content.lower() == "skip":
+					await self.bot.send_message(author, 'Default volume will remain *{}*.'.format(int(dVol*100)))
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -586,10 +729,10 @@ class Setup:
 				return
 			else:
 				# We got something
-				if talk.content.startswith('y'):
+				if talk.content.lower().startswith('y'):
 					self.settings.setServerStat(server, "SuppressMentions", "Yes")
 					await self.bot.send_message(author, 'I *will* suppress @​everyone and @​here mentions.')
-				elif talk.content.startswith('n'):
+				elif talk.content.lower().startswith('n'):
 					self.settings.setServerStat(server, "SuppressMentions", "No")
 					await self.bot.send_message(author, 'I *will not* suppress @​everyone and @​here mentions.')
 				else:
