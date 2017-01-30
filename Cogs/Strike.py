@@ -228,8 +228,10 @@ class Strike:
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You are not a bot-admin.  You can only see your own strikes.')
-			member = ctx.message.author
+			if member:
+				if not member.id == ctx.message.author.id:
+					await self.bot.send_message(ctx.message.channel, 'You are not a bot-admin.  You can only see your own strikes.')
+					member = ctx.message.author
 
 		if member == None:
 			member = ctx.message.author
