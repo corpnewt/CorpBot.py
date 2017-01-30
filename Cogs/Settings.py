@@ -141,7 +141,7 @@ class Settings:
 					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
 					await self.bot.send_message(member, fmt)
 				except Exception:
-					continue
+					pass
 
 	async def backup(self):
 		# Wait initial time - then start loop
