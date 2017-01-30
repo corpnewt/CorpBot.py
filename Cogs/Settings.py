@@ -6,6 +6,7 @@ from   shutil      import copyfile
 import time
 import json
 import os
+import copy
 from   Cogs        import DisplayName
 
 
@@ -192,7 +193,13 @@ class Settings:
 				for key in self.defaultServer:
 					if not key in x:
 						#print("Adding: {} -> {}".format(key, server.name))
-						x[key] = self.defaultServer[key]
+						if type(self.defaultServer[key]) == dict:
+							x[key] = {}
+						elif type(self.defaultServer[key]) == list:
+							# We have lists/dicts - copy them
+							x[key] = copy.deepcopy(self.defaultServer[key])
+						else:
+							x[key] = self.defaultServer[key]
 
 		if not found:
 			# We didn't locate our server
@@ -201,6 +208,13 @@ class Settings:
 			newServer = { "Name" : server.name, "ID" : server.id }
 			for key in self.defaultServer:
 				newServer[key] = self.defaultServer[key]
+				if type(self.defaultServer[key]) == dict:
+					newServer[key] = {}
+				elif type(self.defaultServer[key]) == list:
+					# We have lists/dicts - copy them
+					newServer[key] = copy.deepcopy(self.defaultServer[key])
+				else:
+					newServer[key] = self.defaultServer[key]
 			
 			self.serverDict["Servers"].append(newServer)
 			#self.flushSettings()
