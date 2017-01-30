@@ -98,7 +98,7 @@ class Strike:
 		
 		# Check if the bot is getting the strike
 		if member.id == self.bot.user.id:
-			await self.bot.send_message(ctx.message.channel, 'I can\'t do that, *{}*.'.format(DisplayName.name(ctx.message.author))
+			await self.bot.send_message(ctx.message.channel, 'I can\'t do that, *{}*.'.format(DisplayName.name(ctx.message.author)))
 			return
 		
 		# Check if we're striking another admin/bot-admin
