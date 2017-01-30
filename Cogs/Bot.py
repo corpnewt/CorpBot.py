@@ -214,6 +214,43 @@ class Bot:
 			if wasConverted:
 				os.remove(filename)
 		await self.bot.edit_message(status, 'Avatar set!')
+
+
+	@commands.command(pass_context=True)
+	async def reboot(self, ctx):
+		"""Shuts down the bot - allows for reboot if using the start script (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		# Only allow owner to change server stats
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can change my avatar.'
+				await self.bot.send_message(channel, msg)
+				return
+		
+		self.settings.flushSettings()
+		msg = 'Flushed settings to disk.\nRebooting...'
+		await self.bot.send_message(ctx.message.channel, msg)
+		# Logout, stop the event loop, close the loop, quit
+		await self.bot.logout()
+		await self.bot.loop.stop()
+		await self.bot.loop.close()
+		await exit(0)
 			
 
 	@commands.command(pass_context=True)
