@@ -226,12 +226,6 @@ class Strike:
 					# Get the role that corresponds to the id
 					if aRole['ID'] == role.id:
 						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			if member:
-				if not member.id == ctx.message.author.id:
-					await self.bot.send_message(ctx.message.channel, 'You are not a bot-admin.  You can only see your own strikes.')
-					member = ctx.message.author
 
 		if member == None:
 			member = ctx.message.author
@@ -252,6 +246,13 @@ class Strike:
 					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
+			
+		# Only allow admins to check others' strikes
+		if not isAdmin:
+			if member:
+				if not member.id == ctx.message.author.id:
+					await self.bot.send_message(ctx.message.channel, 'You are not a bot-admin.  You can only see your own strikes.')
+					member = ctx.message.author
 
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
