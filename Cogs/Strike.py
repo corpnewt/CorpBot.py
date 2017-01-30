@@ -89,6 +89,25 @@ class Strike:
 			msg = 'Usage: `{}strike [member] [strike timeout (in days) - 0 = forever] [message (optional)]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
+		
+		# Check if we're striking ourselves
+		if member.id == ctx.message.author.id:
+			# We're giving ourselves a strike?
+			await self.bot.send_message(ctx.message.channel, 'You can\'t give yourself a strike, silly.')
+			return
+		
+		# Check if we're striking another admin/bot-admin
+		isAdmin = member.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in member.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		if isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You can\'t give other admins/bot-admins strikes, bub.')
+			return
 
 		# Check if days is an int - otherwise assume it's part of the message
 		try:
