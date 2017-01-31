@@ -136,9 +136,12 @@ class Settings:
 					# We have our role
 					foundRole = True
 			if not foundRole:
-				await self.bot.add_roles(member, defRole)
-				fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
-				await self.bot.send_message(member, fmt)
+				try:
+					await self.bot.add_roles(member, defRole)
+					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
+					await self.bot.send_message(member, fmt)
+				except Exception:
+					pass
 
 	async def backup(self):
 		# Wait initial time - then start loop
@@ -910,6 +913,8 @@ class Settings:
 		channelWord = "channels"
 		serverWord = "servers"
 		usersWord = "users"
+		# Set (array) to hold our servers to delete
+		serverSet = []
 
 		for botServer in self.serverDict["Servers"]:
 			# Let's check through each server first - then members
@@ -918,6 +923,9 @@ class Settings:
 				# Check ID in case of name change
 				if botServer["ID"] == serve.id:
 					foundServer = True
+					# Create some blank sets (actually arrays) to hold orphaned users/channels
+					userSet    = []
+					channelSet = []
 					# Now we check users...
 					for botMember in botServer["Members"]:
 						foundMember = False
@@ -926,9 +934,16 @@ class Settings:
 								foundMember = True
 							
 						if not foundMember:
+							# Add to set
+							userSet.append(botMember)
 							# We didn't find this member - remove them
-							self.removeUserID(botMember['ID'], serve)
+							# self.removeUserID(botMember['ID'], serve)
 							removedUsers +=1
+					# Remove users that are in userSet
+					if len(userSet):
+						# There's something to remove
+						for key in userSet:
+							botServer["Members"].remove(key)
 
 					for botChannel in botServer["ChannelMOTD"]:
 						foundChannel = False
@@ -937,14 +952,30 @@ class Settings:
 								foundChannel = True
 						
 						if not foundChannel:
+							# Add to set
+							channelSet.append(botChannel)
 							# We didn't find this channel - remove
-							self.removeChannelID(botChannel['ID'], serve)
+							# self.removeChannelID(botChannel['ID'], serve)
 							removedChannels += 1
+							
+					# Remove users that are in userSet
+					if len(channelSet):
+						# There's something to remove
+						for key in channelSet:
+							botServer["ChannelMOTD"].remove(key)
 						
 			if not foundServer:
+				# Add to set
+				serverSet.append(botServer)
 				# We didn't find this server - remove it
-				self.removeServerID(botServer['ID'])
+				# self.removeServerID(botServer['ID'])
 				removedServers += 1
+				
+		# Remove servers in serverSet
+		if len(serverSet):
+			# There's something to remove
+			for key in serverSet:
+				self.serverDict["Servers"].remove(key)
 
 		if removedServers is 1:
 			serverWord = "server"

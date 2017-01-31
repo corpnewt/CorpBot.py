@@ -7,6 +7,8 @@ shopt -s extglob
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+gitupdate="Yes"
+
 function main () {
     echo \#\#\# Starting CorpBot \#\#\#
     cd "$DIR"
@@ -20,7 +22,15 @@ function runBot () {
     echo "$(timestamp): CorpBot died."
     echo "Restarting in 10 seconds..."
     sleep 10
+    if [[ "$gitupdate" == "Yes" ]]; then
+        update
+    fi
     runBot
+}
+
+function update () {
+    echo "Updating..."
+    git pull
 }
 
 # Define a timestamp function
