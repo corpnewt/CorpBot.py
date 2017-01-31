@@ -734,6 +734,70 @@ class Settings:
 		self.flushSettings()
 		msg = 'Flushed settings to disk.'
 		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def filetomongo(self, ctx):
+		"""Imports Settings.json file to MongoDB."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		msg = 'Importing Settings to MongoDB Database...'
+		await self.bot.send_message(ctx.message.channel, msg)
+
+		# Let's load our settings file
+		file = self.file
+		servers = {}
+		if os.path.exists(file):
+			servers = json.load(open(file))["Servers"]
+		else:
+			msg = 'Settings File doesn\'t exist aborting the mission, mayday mayday...'
+			await self.bot.send_message(ctx.message.channel, msg)
+		
+
+		serversDb = self.mongoDB.servers
+		membersDb = self.mongoDB.members
+		statsDb = self.mongoDB.server_stats
+
+		msg = 'Clearing out current Database...'
+		await self.bot.send_message(ctx.message.channel, msg)
+
+		serversDb.remove({})
+		membersDb.remove({})
+		statsDb.remove({})
+		
+		msg = 'Inserting Data...'
+		await self.bot.send_message(ctx.message.channel, msg)
+		for server in servers:
+			newServer = { "Name": server["Name"], "DiscordId": server["ID"] }
+			serversDb.insert_one(newServer)
+			for key, value in server.items():
+				# Import Server Stats
+				if key != "Members" and key != "ID":
+					statsDb.update_one({ 
+						"StatName": key,
+						"ServerId": server["ID"]
+					},# Query
+					{
+						'$set': {
+							"StatValue": value
+						}# Values to update
+					}, upsert=True)
+				# Import Server Members
+				if key == "Members":
+					server_members = value
+					for member in server_members:
+						member["DiscordId"] = member["ID"]
+						member["ServerId"] = server["ID"]
+						del member["ID"]
+						membersDb.insert_one(member)
+		
+		msg = 'Import Complete!'
+		await self.bot.send_message(ctx.message.channel, msg)
+
+
 				
 
 	# Flush loop - run every 10 minutes
