@@ -63,6 +63,10 @@ function main () {
     update "pyquery"
     echo
     
+    echo Updating PyMongo...
+    echo
+    update "pymongo"
+    echo    
     # echo Updating Levenshtein...
     # echo
     # update "python-levenshtein"
