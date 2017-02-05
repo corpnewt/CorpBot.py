@@ -279,9 +279,9 @@ async def on_server_join(server):
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
-	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `$help` either in chat or in PM.'
+	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
 	await bot.send_message(server, msg)
-	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `$setup` in the main chat.  Thanks!'
+	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
 	await bot.send_message(owner, msg)
 
 @bot.event
@@ -307,7 +307,7 @@ async def on_member_join(member):
 			# Onto the next
 			continue
 
-	help = 'Type `$help` for a list of available user commands.'
+	help = 'Type `{}help` for a list of available user commands.'.format(prefix)
 
 	# PM User
 	fmt = "*{}* Rules:\n{}\n\n{}".format(server.name, rules, help)
