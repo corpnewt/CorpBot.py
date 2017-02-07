@@ -43,6 +43,7 @@ from Cogs import MessageXp
 from Cogs import Welcome
 from Cogs import ServerStats
 from Cogs import Strike
+from Cogs import Debugging
 
 # Let's load our prefix file
 prefix = '$'
@@ -51,6 +52,10 @@ if os.path.exists('prefix.txt'):
 		prefix = f.read()
 	if not prefix:
 		prefix = '$'
+# Set up debugging
+debug = False
+if os.path.exists('debug.txt'):
+	debug = True
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
@@ -204,6 +209,10 @@ cogList.append(serverstats)
 # Strike
 strike = Strike.Strike(bot, settings)
 cogList.append(strike)
+
+# Debugging
+debugging = Debugging.Debugging(bot, settings)
+cogList.append(debugging)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
@@ -411,6 +420,15 @@ async def on_message(message):
 	if not ignore:
 		# We're processing commands here
 		await bot.process_commands(message)
+
+@bot.event
+async def on_command(command, ctx):
+	for cog in cogList:
+		try:
+			await cog.oncommand(command, ctx)
+		except AttributeError:
+			# Onto the next
+			continue
 		
 @bot.event
 async def on_message_edit(before, message):
