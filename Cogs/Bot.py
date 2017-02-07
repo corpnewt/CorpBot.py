@@ -239,7 +239,7 @@ class Bot:
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can change my avatar.'
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can reboot me.'
 				await self.bot.send_message(channel, msg)
 				return
 		
