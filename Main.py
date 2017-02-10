@@ -44,6 +44,7 @@ from Cogs import Welcome
 from Cogs import ServerStats
 from Cogs import Strike
 from Cogs import Debugging
+from Cogs import CardsAgainstHumanity
 
 # Let's load our prefix file
 prefix = '$'
@@ -60,6 +61,7 @@ if os.path.exists('debug.txt'):
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
+deckFile = "deck.json"
 corpSiteAuth = "corpSiteAuth.txt"
 # Open our token
 with open('token.txt', 'r') as f:
@@ -213,6 +215,11 @@ cogList.append(strike)
 # Debugging
 debugging = Debugging.Debugging(bot, settings)
 cogList.append(debugging)
+
+# CardsAgainstHumanity
+if os.path.exists(deckFile):
+	cah = CardsAgainstHumanity.CardsAgainstHumanity(bot)
+	cogList.append(cah)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

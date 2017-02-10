@@ -17,6 +17,9 @@ ffmpeg.exe
 # Settings
 Settings*
 
+# Deck
+deck.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
