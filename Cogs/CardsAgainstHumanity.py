@@ -159,7 +159,7 @@ class CardsAgainstHumanity:
         if not game:
             return
         msg = ''
-        stat_embed.set_author(name='{} - Hand'.format(DisplayName.name(user))
+        stat_embed.set_author(name='{} - Hand'.format(DisplayName.name(user)))
         i = 0
         for member in game['Members']:
             if member['ID'] == user.id:
