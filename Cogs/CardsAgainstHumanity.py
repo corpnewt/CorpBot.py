@@ -493,8 +493,8 @@ class CardsAgainstHumanity:
     @commands.command(pass_context=True)
     async def leavecah(self, ctx):        
         """Leaves the current game you're in."""
-        if not await self.checkPM(ctx.message):
-            return
+        #if not await self.checkPM(ctx.message):
+            #return
         game = self.userGame(ctx.message.author)
         removeCheck = self.removeMember(ctx.message.author)
         if removeCheck:
@@ -502,7 +502,7 @@ class CardsAgainstHumanity:
             msg = 'You were removed from game id: *{}*.'.format(removeCheck['ID'])
         else:
             msg = 'You are not in a game.'
-        await self.bot.send_message(ctx.message.author, msg)
+        await self.bot.send_message(ctx.message.channel, msg)
         # Respond to the rest of the group
         msg = '*{}* left the game - re-organizing...'.format(DisplayName.name(ctx.message.author))
         for member in game['Members']:
@@ -512,7 +512,7 @@ class CardsAgainstHumanity:
 
     @commands.command(pass_context=True)
     async def joincah(self, ctx, *, id = None):
-        """Join a Cards Against Humanity game.  If no id is passed, joins a random game."""
+        """Join a Cards Against Humanity game.  If no id or user is passed, joins a random game."""
         #if not await self.checkPM(ctx.message):
             #return
         # Check if the user is already in game
@@ -525,6 +525,29 @@ class CardsAgainstHumanity:
         if len(self.games):
             if id:
                 game = self.gameForID(id)
+                if game == None:
+                    # That id doesn't exist - or is possibly a user
+                    # If user, has to be joined from server chat
+                    if not ctx.message.server:
+                        msg = "I couldn't find a game attached to that id.  If you are trying to join a user - run the `{}joincah [user]` command in a channel on a server you share with that user.".format(ctx.prefix)
+                        await self.bot.send_message(ctx.message.channel, msg)
+                        return
+                    else:
+                        # We have a server - let's try for a user
+                        member = DisplayName.memberForName(game, ctx.message.server)
+                        if not member:
+                            # Couldn't find user!
+                            msg = "I couldn't find a game attached to that id.  If you are trying to join a user - run the `{}joincah [user]` command in a channel on a server you share with that user.".format(ctx.prefix)
+                            await self.bot.send_message(ctx.message.channel, msg)
+                            return
+                        # Have a user - check if they're in a game
+                        game = self.userGame(member)
+                        if not game:
+                            # That user is NOT in a game!
+                            msg = "That user doesn't appear to be playing."
+                            await self.bot.send_message(ctx.message.channel, msg)
+                            return
+                                
             else:
                 game = random.choice(self.games)
         else:
