@@ -57,7 +57,7 @@ class CardsAgainstHumanity:
         for game in self.games:
             gameTime = game['Time']
             currentTime = int(time.time())
-            timeRemain  = gameTime - currentTime
+            timeRemain  = currentTime - gameTime
             if timeRemain > self.maxDeadTime:
                 # Game is dead - quit it and alert members
                 for member in game['Members']:
@@ -465,14 +465,14 @@ class CardsAgainstHumanity:
     @commands.command(pass_context=True)
     async def newcah(self, ctx):
         """Starts a new Cards Against Humanity game."""
-        if not await self.checkPM(ctx.message):
-            return
+        #if not await self.checkPM(ctx.message):
+            #return
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if userGame:
             # Already in a game
             msg = "You're already in a game (id: *{}*)\nType `{}leavecah` to leave that game.".format(userGame['ID'], ctx.prefix)
-            await self.bot.send_message(ctx.message.author, msg)
+            await self.bot.send_message(ctx.message.channel, msg)
             return
 
         # Not in a game - create a new one
@@ -484,7 +484,7 @@ class CardsAgainstHumanity:
         self.games.append(newGame)
 
         msg = "You've created game id: *{}!*".format(gameID, ctx.prefix, gameID)
-        await self.bot.send_message(ctx.message.author, msg)
+        await self.bot.send_message(ctx.message.channel, msg)
         await self.drawCards(ctx.message.author)
         await self.bot.send_message(ctx.message.author, "Your hand is:")
         await self.showHand(ctx.message.author)
@@ -513,14 +513,14 @@ class CardsAgainstHumanity:
     @commands.command(pass_context=True)
     async def joincah(self, ctx, *, id = None):
         """Join a Cards Against Humanity game.  If no id is passed, joins a random game."""
-        if not await self.checkPM(ctx.message):
-            return
+        #if not await self.checkPM(ctx.message):
+            #return
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if userGame:
             # Already in a game
             msg = "You're already in a game (id: *{}*)\nType `{}leavecah` to leave that game.".format(userGame['ID'], ctx.prefix)
-            await self.bot.send_message(ctx.message.author, msg)
+            await self.bot.send_message(ctx.message.channel, msg)
             return
         if len(self.games):
             if id:
@@ -539,7 +539,7 @@ class CardsAgainstHumanity:
         await self.drawCards(ctx.message.author)
         if len(game['Members'])==1:
             msg = "You've joined game id: *{}!*\n\nThere is *{} user* in this game.".format(game['ID'], len(game['Members']))
-            await self.bot.send_message(ctx.message.author, msg)
+            await self.bot.send_message(ctx.message.channel, msg)
             # Just created the game
             msg = "You've created game id: *{}!*".format(gameID, ctx.prefix, gameID)
             await self.bot.send_message(ctx.message.author, msg)
@@ -549,12 +549,12 @@ class CardsAgainstHumanity:
             await self.nextPlay(ctx, game)
         elif len(game['Members'])==2:
             msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
-            await self.bot.send_message(ctx.message.author, msg)
+            await self.bot.send_message(ctx.message.channel, msg)
             # We just got a 2nd member - let's advance
             await self.nextPlay(ctx, game)
         else:
             msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
-            await self.bot.send_message(ctx.message.author, msg)
+            await self.bot.send_message(ctx.message.channel, msg)
             totalUsers = len(game['Members'])-1
             submitted  = len(game['Submitted'])
             if submitted < totalUsers:
