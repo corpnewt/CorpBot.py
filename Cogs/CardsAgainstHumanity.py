@@ -47,7 +47,7 @@ class CardsAgainstHumanity:
         json = html.unescape(json)
         #json = json.encode('utf-8', 'replace')
         json = json.replace('_','[blank]')
-        json = json.replace('<br>','\\n')
+        json = json.replace('<br>','\n')
         return json
 
 
@@ -283,7 +283,28 @@ class CardsAgainstHumanity:
                 await self.bot.send_message(member['User'], msg)
                 await self.showHand(member['User'])
 
-
+    @commands.command(pass_context=True)
+    async def cahsay(self, ctx, *, message = None):
+        """Broadcasts a message to the other players in your game."""
+        if not await self.checkPM(ctx.message):
+            return
+        userGame = self.userGame(ctx.message.author)
+        if not userGame:
+            msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
+            await self.bot.send_message(ctx.message.author, msg)
+            return
+        if message == None:
+            msg = "Ooookay, you say *nothing...*"
+            await self.bot.send_message(ctx.message.author, msg)
+            return
+        msg = '*{}* says: {}'.format(ctx.message.author.name, message)
+        for member in userGame['Members']:
+            # Tell them all!!
+            if not member['User'] == ctx.message.author:
+                # Don't tell yourself
+                await self.bot.send_message(member['User'], msg)
+            
+                
     @commands.command(pass_context=True)
     async def lay(self, ctx, *, card = None):
         """Lays a card or cards from your hand.  If multiple cards are needed, separate them by a comma (1,2,3)."""
@@ -317,7 +338,6 @@ class CardsAgainstHumanity:
         if numberCards > 1:
             cardSpeak = "cards"
             try:
-                card = card.replace(' ', '')
                 card = card.split(',')
             except Exception:
                 card = []
