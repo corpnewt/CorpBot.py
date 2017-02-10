@@ -719,6 +719,8 @@ class CardsAgainstHumanity:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await self.bot.send_message(ctx.message.author, msg)
             return
+        stat_embed = discord.Embed(color=discord.Color.teal())
+        stat_embed.set_author(name='Current Score')
         users = sorted(userGame['Members'], key=lambda card:int(card['Points']), reverse=True)
         msg = ''
         i = 0
@@ -734,4 +736,5 @@ class CardsAgainstHumanity:
                 msg += '{}. *{}* - {} point\n'.format(i, DisplayName.name(user['User']), user['Points'])
             else:
                 msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
-        await self.bot.send_message(ctx.message.author, msg)
+        stat_embed.add_field(name="Players", value=msg, inline=True)
+        await self.bot.send_message(user, embed=stat_embed)
