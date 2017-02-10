@@ -155,6 +155,7 @@ class CardsAgainstHumanity:
         
     async def showHand(self, user):
         # Shows the user's hand in an embed
+        stat_embed = discord.Embed(color=discord.Color.teal())
         game = self.userGame(user)
         if not game:
             return
@@ -172,6 +173,7 @@ class CardsAgainstHumanity:
                               
     async def showOptions(self, ctx, user):
         # Shows the judgement options
+        stat_embed = discord.Embed(color=discord.Color.teal())
         game = self.userGame(user)
         if not game:
             return
