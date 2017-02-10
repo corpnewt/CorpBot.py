@@ -729,7 +729,7 @@ class CardsAgainstHumanity:
             if i > 10:
                 break
             if user['Points'] == 1:
-                stat_embed.add_field(name=i, value='*{}* - {} point'.format(DisplayName.name(user['User']), user['Points']), inline=False)
+                stat_embed.add_field(name='{}. *{}*'.format(i, DisplayName.name(user['User'])), value='{} point'.format(user['Points']), inline=False)
             else:
-                stat_embed.add_field(name=i, value='*{}* - {} points'.format(DisplayName.name(user['User']), user['Points']), inline=False)
+                stat_embed.add_field(name='{}. *{}*'.format(i, DisplayName.name(user['User'])), value='{} points'.format(user['Points']), inline=False)
         await self.bot.send_message(ctx.message.author, embed=stat_embed)
