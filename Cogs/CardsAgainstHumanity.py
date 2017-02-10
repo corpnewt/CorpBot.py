@@ -725,9 +725,9 @@ class CardsAgainstHumanity:
         msg = ''
         i = 0
         if len(users) > 10:
-            msg = '1-10 of {} Users:\n\n'.format(len(users))
+            statname = '10 of {} Players'.format(len(users))
         else:
-            msg = '1-{} Users:\n\n'.format(len(users))
+            statname = 'Players'
         for user in users:
             i += 1
             if i > 10:
@@ -736,5 +736,5 @@ class CardsAgainstHumanity:
                 msg += '{}. *{}* - {} point\n'.format(i, DisplayName.name(user['User']), user['Points'])
             else:
                 msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
-        stat_embed.add_field(name="Players", value=msg, inline=True)
+        stat_embed.add_field(name=statname, value=msg, inline=True)
         await self.bot.send_message(ctx.message.author, embed=stat_embed)
