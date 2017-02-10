@@ -216,7 +216,7 @@ class CardsAgainstHumanity:
         await self.bot.send_message(user, msg)
 
 
-    async def showOptions(self, ctx, user):
+    async def showOptions(self, ctx, user, isJudge = True):
         # Shows the judgement options
         game = self.userGame(user)
         msg = '**{}**\n\n'.format(game['BlackCard']['Text'])
@@ -224,7 +224,8 @@ class CardsAgainstHumanity:
         for sub in game['Submitted']:
             i+=1
             msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
-        msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
+        if isJudge:
+            msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
         await self.bot.send_message(user, msg)
 
     async def nextPlay(self, ctx, game):
@@ -418,7 +419,9 @@ class CardsAgainstHumanity:
                 if index == userGame['Judge']:
                     # Send judgement here
                     await self.bot.send_message(member['User'], '**JUDGEMENT TIME!**')
-                await self.showOptions(ctx, member['User'])
+                    await self.showOptions(ctx, member['User'])
+                else:
+                    await self.showOptions(ctx, member['User'], False)
 
 
     @commands.command(pass_context=True)
