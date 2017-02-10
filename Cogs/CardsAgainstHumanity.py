@@ -719,7 +719,6 @@ class CardsAgainstHumanity:
         stat_embed = discord.Embed(color=discord.Color.teal())
         stat_embed.set_author(name='Current Score')
         users = sorted(userGame['Members'], key=lambda card:int(card['Points']), reverse=True)
-        msg = ''
         i = 0
         if len(users) > 10:
             statname = '10 of {} Players'.format(len(users))
@@ -730,8 +729,7 @@ class CardsAgainstHumanity:
             if i > 10:
                 break
             if user['Points'] == 1:
-                msg += '{}. *{}* - {} point\n'.format(i, DisplayName.name(user['User']), user['Points'])
+                stat_embed.add_field(name=i, value='*{}* - {} point'.format(i, DisplayName.name(user['User']), user['Points']), inline=False)
             else:
-                msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
-        stat_embed.add_field(name=statname, value=msg, inline=True)
+                stat_embed.add_field(name=i, value='*{}* - {} points'.format(i, DisplayName.name(user['User']), user['Points']), inline=False)
         await self.bot.send_message(ctx.message.author, embed=stat_embed)
