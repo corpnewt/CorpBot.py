@@ -534,7 +534,7 @@ class CardsAgainstHumanity:
                         return
                     else:
                         # We have a server - let's try for a user
-                        member = DisplayName.memberForName(game, ctx.message.server)
+                        member = DisplayName.memberForName(id, ctx.message.server)
                         if not member:
                             # Couldn't find user!
                             msg = "I couldn't find a game attached to that id.  If you are trying to join a user - run the `{}joincah [user]` command in a channel on a server you share with that user.".format(ctx.prefix)
