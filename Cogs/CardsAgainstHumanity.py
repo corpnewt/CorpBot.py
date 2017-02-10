@@ -169,8 +169,7 @@ class CardsAgainstHumanity:
                 # Got our user
                 for card in member['Hand']:
                     i += 1
-                    msg += '{}. {}\n'.format(i, card['Text'])
-        stat_embed.add_field(name="Cards", value=msg, inline=True)
+                    stat_embed.add_field(name='{}.'.format(i), value=card['Text'], inline=False)
         await self.bot.send_message(user, embed=stat_embed)
                               
     async def showOptions(self, ctx, user):
