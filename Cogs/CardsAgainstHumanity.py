@@ -143,7 +143,10 @@ class CardsAgainstHumanity:
         judge = DisplayName.name(game['Members'][game['Judge']]['User'])
         stat_embed.add_field(name="Judge", value=judge, inline=True)
         # Get the Black Card
-        blackCard = game['BlackCard']['Text']
+        try:
+            blackCard = game['BlackCard']['Text']
+        except Exception:
+            blackCard = 'None.'
         stat_embed.add_field(name="Black Card", value=blackCard, inline=True)
         await self.bot.send_message(user, embed=stat_embed)
         
