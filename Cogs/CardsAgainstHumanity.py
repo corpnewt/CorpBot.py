@@ -737,4 +737,4 @@ class CardsAgainstHumanity:
             else:
                 msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
         stat_embed.add_field(name="Players", value=msg, inline=True)
-        await self.bot.send_message(user, embed=stat_embed)
+        await self.bot.send_message(ctx.message.author, embed=stat_embed)
