@@ -284,7 +284,7 @@ class CardsAgainstHumanity:
                 await self.showHand(member['User'])
 
     @commands.command(pass_context=True)
-    async def cahsay(self, ctx, *, message = None):
+    async def say(self, ctx, *, message = None):
         """Broadcasts a message to the other players in your game."""
         if not await self.checkPM(ctx.message):
             return
@@ -303,6 +303,7 @@ class CardsAgainstHumanity:
             if not member['User'] == ctx.message.author:
                 # Don't tell yourself
                 await self.bot.send_message(member['User'], msg)
+        await self.bot.send_message(ctx.message.author, 'Message sent!')
             
                 
     @commands.command(pass_context=True)
