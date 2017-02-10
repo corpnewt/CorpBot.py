@@ -161,7 +161,6 @@ class CardsAgainstHumanity:
         game = self.userGame(user)
         if not game:
             return
-        msg = ''
         stat_embed.set_author(name='{} - Hand'.format(DisplayName.name(user)))
         i = 0
         for member in game['Members']:
@@ -169,7 +168,7 @@ class CardsAgainstHumanity:
                 # Got our user
                 for card in member['Hand']:
                     i += 1
-                    stat_embed.add_field(name='{}.'.format(i), value=card['Text'], inline=False)
+                    stat_embed.add_field(name='', value='{}. {}'.format(card['Text']), inline=False)
         await self.bot.send_message(user, embed=stat_embed)
                               
     async def showOptions(self, ctx, user):
@@ -189,11 +188,10 @@ class CardsAgainstHumanity:
         # Add black card
         stat_embed.add_field(name="Black Card", value='**{}**'.format(game['BlackCard']['Text']), inline=True)
         i = 0
-        msg = ''
         for sub in game['Submitted']:
             i+=1
-            msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
-        stat_embed.add_field(name="Cards Submitted", value=msg, inline=True)
+            stat_embed.add_field(name='', value='{}. {}'.format(i, ' - '.join(sub['Cards'])), inline=False)
+        #stat_embed.add_field(name="Cards Submitted", value=msg, inline=True)
         await self.bot.send_message(user, embed=stat_embed)
         
     async def drawCard(self, game):
