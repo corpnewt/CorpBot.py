@@ -140,16 +140,58 @@ class CardsAgainstHumanity:
         # add the game id
         stat_embed.set_author(name='Cards Against Humanity - id: {}'.format(game['ID']))
         # Get the judge's name
-        judge = DisplayName.name(game['Members'][game['Judge']]['User'])
+        if game['Members'][game['Judge']]['User'] == user:
+            judge = '**YOU**'
+        else:
+            judge = DisplayName.name(game['Members'][game['Judge']]['User'])
         stat_embed.add_field(name="Judge", value=judge, inline=True)
         # Get the Black Card
         try:
-            blackCard = game['BlackCard']['Text']
+            blackCard = '**{}**'.format(game['BlackCard']['Text'])
         except Exception:
             blackCard = 'None.'
         stat_embed.add_field(name="Black Card", value=blackCard, inline=True)
         await self.bot.send_message(user, embed=stat_embed)
         
+    async def showHand(self, user):
+        # Shows the user's hand in an embed
+        game = self.userGame(user)
+        if not game:
+            return
+        msg = ''
+        stat_embed.set_author(name='{} - Hand'.format(DisplayName.name(user))
+        i = 0
+        for member in game['Members']:
+            if member['ID'] == user.id:
+                # Got our user
+                for card in member['Hand']:
+                    i += 1
+                    msg += '{}. {}\n'.format(i, card['Text'])
+        stat_embed.add_field(name="Cards", value=msg, inline=True)
+        await self.bot.send_message(user, embed=stat_embed)
+                              
+    async def showOptions(self, ctx, user):
+        # Shows the judgement options
+        game = self.userGame(user)
+        if not game:
+            return
+        # Add title
+        stat_embed.set_author(name='JUDGEMENT TIME!')
+        if game['Members'][game['Judge']]['User'] == user:
+            judge = '**YOU**'
+        else:
+            judge = DisplayName.name(game['Members'][game['Judge']]['User'])
+        # Add Judge
+        stat_embed.add_field(name="Judge", value=judge, inline=True)
+        # Add black card
+        stat_embed.add_field(name="Black Card", value='**{}**'.format(game['BlackCard']['Text']), inline=True)
+        i = 0
+        msg = ''
+        for sub in game['Submitted']:
+            i+=1
+            msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
+        stat_embed.add_field(name="Cards Submitted", value=msg, inline=True)
+        await self.bot.send_message(user, embed=stat_embed)
         
     async def drawCard(self, game):
         # Draws a random unused card and shuffles the deck if needed
@@ -214,7 +256,7 @@ class CardsAgainstHumanity:
                 game['BlackCard'] = { 'Text': text, 'Pick': self.deck['blackCards'][index]['pick'] }
                 return game['BlackCard']
 
-    async def showHand(self, user):
+    async def showHands(self, user):
         # Shows the user's hand
         game = self.userGame(user)
         msg = ''
@@ -227,7 +269,7 @@ class CardsAgainstHumanity:
         await self.bot.send_message(user, msg)
 
 
-    async def showOptions(self, ctx, user, isJudge = True):
+    async def showOption(self, ctx, user, isJudge = True):
         # Shows the judgement options
         game = self.userGame(user)
         msg = '**{}**\n\n'.format(game['BlackCard']['Text'])
