@@ -8,6 +8,7 @@ import json
 import time
 import html
 import codecs
+from   random import shuffle
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
@@ -396,6 +397,9 @@ class CardsAgainstHumanity:
             # Valid card
             newSubmission = { 'By': ctx.message.author, 'Cards': [ user['Hand'].pop(card-1)['Text'] ] }
         userGame['Submitted'].append(newSubmission)
+        
+        # Shuffle cards
+        shuffle(userGame['Submitted'])
 
         user['Laid'] = True
         
@@ -414,7 +418,7 @@ class CardsAgainstHumanity:
                 if index == userGame['Judge']:
                     # Send judgement here
                     await self.bot.send_message(member['User'], '**JUDGEMENT TIME!**')
-                    await self.showOptions(ctx, member['User'])
+                await self.showOptions(ctx, member['User'])
 
 
     @commands.command(pass_context=True)
