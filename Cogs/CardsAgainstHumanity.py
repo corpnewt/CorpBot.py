@@ -160,15 +160,6 @@ class CardsAgainstHumanity:
         for member in game['Members']:
             for card in member['Hand']:
                 game['Discard'].append(card['Index'])
-                
-    def all_different(l):
-        seen = set()
-        for i in l:
-            if i in seen:
-                return False
-            seen.add(i)
-        return True
-
 
     async def drawCards(self, user, cards = 10):
         # fills the user's hand up to number of cards
@@ -351,14 +342,16 @@ class CardsAgainstHumanity:
             cardSpeak = "cards"
             try:
                 card = card.split(',')
-                if not self.all_different(card):
-                    msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
-                    await self.bot.send_message(ctx.message.author, msg)
-                    await self.showHand(ctx.message.author)
-                    return
             except Exception:
                 card = []
             if not len(card) == numberCards:
+                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                await self.bot.send_message(ctx.message.author, msg)
+                await self.showHand(ctx.message.author)
+                return
+            # Got something
+            # Check for duplicates
+            if not len(card) == len(set(card)):
                 msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
                 await self.showHand(ctx.message.author)
