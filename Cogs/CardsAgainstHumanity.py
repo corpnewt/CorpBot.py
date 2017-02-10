@@ -159,6 +159,14 @@ class CardsAgainstHumanity:
         for member in game['Members']:
             for card in member['Hand']:
                 game['Discard'].append(card['Index'])
+                
+    def all_different(l):
+        seen = set()
+        for i in l:
+            if i in seen:
+                return False
+            seen.add(i)
+        return True
 
 
     async def drawCards(self, user, cards = 10):
@@ -293,6 +301,7 @@ class CardsAgainstHumanity:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await self.bot.send_message(ctx.message.author, msg)
             return
+        userGame['Time'] = currentTime = int(time.time())
         if message == None:
             msg = "Ooookay, you say *nothing...*"
             await self.bot.send_message(ctx.message.author, msg)
@@ -340,10 +349,15 @@ class CardsAgainstHumanity:
             cardSpeak = "cards"
             try:
                 card = card.split(',')
+                if not self.all_different(card):
+                    msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                    await self.bot.send_message(ctx.message.author, msg)
+                    await self.showHand(ctx.message.author)
+                    return
             except Exception:
                 card = []
             if not len(card) == numberCards:
-                msg = 'You need to pick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
                 await self.showHand(ctx.message.author)
                 return
@@ -352,7 +366,7 @@ class CardsAgainstHumanity:
                 try:
                     c = int(c)
                 except Exception:
-                    msg = 'You need to pick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                    msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                     await self.bot.send_message(ctx.message.author, msg)
                     await self.showHand(ctx.message.author)
                     return
