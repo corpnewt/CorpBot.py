@@ -130,7 +130,24 @@ class CardsAgainstHumanity:
             self.games.remove(game)
 
     ################################################
-
+    
+    async def showPlay(self, user):
+        # Creates an embed and displays the current game stats
+        stat_embed = discord.Embed(color=discord.Color.teal())
+        game = self.userGame(user)
+        if not game:
+            return
+        # add the game id
+        stat_embed.set_author(name='Cards Against Humanity - id: {}'.format(game['ID']))
+        # Get the judge's name
+        judge = DisplayName.name(game['Members'][game['Judge']]['User'])
+        stat_embed.add_field(name="Judge", value=judge, inline=True)
+        # Get the Black Card
+        blackCard = game['BlackCard']['Text']
+        stat_embed.add_field(name="Black Card", value=blackCard, inline=True)
+        await self.bot.send_message(user, embed=stat_embed)
+        
+        
     async def drawCard(self, game):
         # Draws a random unused card and shuffles the deck if needed
         totalDiscard = len(game['Discard'])
@@ -284,6 +301,18 @@ class CardsAgainstHumanity:
                 await self.bot.send_message(member['User'], msg)
                 await self.showHand(member['User'])
 
+    @commands.command(pass_context=True)
+    async def game(self, ctx, *, message = None):
+        """Displays the game's current status."""
+        if not await self.checkPM(ctx.message):
+            return
+        userGame = self.userGame(ctx.message.author)
+        if not userGame:
+            msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
+            await self.bot.send_message(ctx.message.author, msg)
+            return
+        await self.showPlay(ctx.message.author)
+                
     @commands.command(pass_context=True)
     async def say(self, ctx, *, message = None):
         """Broadcasts a message to the other players in your game."""
