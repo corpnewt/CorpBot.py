@@ -166,13 +166,14 @@ class CardsAgainstHumanity:
                 msg += 'All cards have been submitted!'
                 await self.showOptions(ctx, user)
                 return
-
-        if blackNum == 1:
-            # Singular
-            msg += '\n\nPick a card with `{}lay [card number]`'.format(ctx.prefix)
-        elif blackNum > 1:
-            # Plural
-            msg += '\n\nPick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, ctx.prefix)
+        if not judge == '**YOU** are':
+            # Judge doesn't need to lay a card
+            if blackNum == 1:
+                # Singular
+                msg += '\n\nPick a card with `{}lay [card number]`'.format(ctx.prefix)
+            elif blackNum > 1:
+                # Plural
+                msg += '\n\nPick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, ctx.prefix)
         
         stat_embed.set_author(name='Current Play')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
