@@ -606,7 +606,8 @@ class CardsAgainstHumanity:
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False }
         newGame['Members'].append(member)
         self.games.append(newGame)
-
+        # Tell the user they created a new game and list its ID
+        await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
         await self.drawCards(ctx.message.author)
         await self.showHand(ctx, ctx.message.author)
         await self.nextPlay(ctx, newGame)
@@ -676,6 +677,8 @@ class CardsAgainstHumanity:
             gameID = self.randomID()
             game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [] }
             self.games.append(game)
+            # Tell the user they created a new game and list its ID
+            await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
 
         # Tell everyone else you joined
         for member in game['Members']:
@@ -725,7 +728,7 @@ class CardsAgainstHumanity:
             if i > 10:
                 break
             if user['Points'] == 1:
-                msg += '{}. *{}* - 1 point'.format(i, DisplayName.name(user['User']))
+                msg += '{}. *{}* - 1 point\n'.format(i, DisplayName.name(user['User']))
             else:
-                msg += '{}. *{}* - {} points'.format(i, DisplayName.name(user['User']), user['Points'])
+                msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
         await self.bot.send_message(ctx.message.author, msg)
