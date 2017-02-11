@@ -24,6 +24,7 @@ class CardsAgainstHumanity:
         self.checkTime = 300 # 5 minutes between dead time checks
         self.winAfter = 10 # 10 wins for the game
         self.charset = "1234567890"
+        self.minMembers = 2
         if file == None:
             file = "deck.json"
         # Let's load our deck file
@@ -133,66 +134,104 @@ class CardsAgainstHumanity:
 
     ################################################
     
-    async def showPlay(self, user):
+    async def showPlay(self, ctx, user):
         # Creates an embed and displays the current game stats
-        stat_embed = discord.Embed(color=discord.Color.teal())
+        stat_embed = discord.Embed(color=discord.Color.blue())
         game = self.userGame(user)
         if not game:
             return
-        # add the game id
-        stat_embed.set_author(name='Cards Against Humanity - id: {}'.format(game['ID']))
         # Get the judge's name
         if game['Members'][game['Judge']]['User'] == user:
-            judge = '**YOU**'
+            judge = '**YOU** are'
         else:
-            judge = DisplayName.name(game['Members'][game['Judge']]['User'])
-        stat_embed.add_field(name="Judge", value=judge, inline=True)
+            judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
+        
         # Get the Black Card
         try:
-            blackCard = '**{}**'.format(game['BlackCard']['Text'])
+            blackCard = game['BlackCard']['Text']
+            blackNum  = game['BlackCard']['Pick']
         except Exception:
             blackCard = 'None.'
-        stat_embed.add_field(name="Black Card", value=blackCard, inline=True)
-        await self.bot.send_message(user, embed=stat_embed)
+            blackNum  = 0
+
+        msg = '{} the judge.\n\n'.format(judge)
+        msg += '__Current Card:__\n\n**{}**\n\n'.format(blackCard)
         
-    async def showHand(self, user):
+        totalUsers = len(game['Members'])-1
+        submitted  = len(game['Submitted'])
+        if len(game['Members']) >= self.minMembers:
+            if submitted < totalUsers:
+                msg += '{}/{} cards submitted...'.format(submitted, totalUsers)
+            else:
+                msg += 'All cards have been submitted!'
+                await self.showOptions(ctx, user)
+                return
+
+        if blackNum == 1:
+            # Singular
+            msg += '\n\nPick a card with `{}lay [card number]`'.format(ctx.prefix)
+        elif blackNum > 1:
+            # Plural
+            msg += '\n\nPick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, ctx.prefix)
+        
+        stat_embed.set_author(name='Current Play')
+        stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
+        await self.bot.send_message(user, embed=stat_embed)
+        await self.bot.send_message(user, msg)
+        
+    async def showHand(self, ctx, user):
         # Shows the user's hand in an embed
-        stat_embed = discord.Embed(color=discord.Color.teal())
+        stat_embed = discord.Embed(color=discord.Color.green())
         game = self.userGame(user)
         if not game:
             return
-        stat_embed.set_author(name='{} - Hand'.format(DisplayName.name(user)))
+        stat_embed.set_author(name='Your Hand')
+        stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
+        await self.bot.send_message(user, embed=stat_embed)
         i = 0
+        msg = ''
         for member in game['Members']:
             if member['ID'] == user.id:
                 # Got our user
                 for card in member['Hand']:
                     i += 1
-                    stat_embed.add_field(name=i, value='{}'.format(card['Text']), inline=False)
-        await self.bot.send_message(user, embed=stat_embed)
+                    msg += '{}. {}\n'.format(i, card['Text'])
+
+        try:
+            blackCard = '**{}**'.format(game['BlackCard']['Text'])
+        except Exception:
+            blackCard = '**None.**'
+        
+        await self.bot.send_message(user, msg)
                               
     async def showOptions(self, ctx, user):
         # Shows the judgement options
-        stat_embed = discord.Embed(color=discord.Color.teal())
+        stat_embed = discord.Embed(color=discord.Color.orange())
         game = self.userGame(user)
         if not game:
             return
         # Add title
-        stat_embed.set_author(name='JUDGEMENT TIME!')
+        stat_embed.set_author(name='JUDGEMENT TIME!!')
+        stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
+        await self.bot.send_message(user, embed=stat_embed)
+
         if game['Members'][game['Judge']]['User'] == user:
-            judge = '**YOU**'
+            judge = '**YOU** are'
         else:
-            judge = DisplayName.name(game['Members'][game['Judge']]['User'])
-        # Add Judge
-        stat_embed.add_field(name="Judge", value=judge, inline=True)
-        # Add black card
-        stat_embed.add_field(name="Black Card", value='**{}**'.format(game['BlackCard']['Text']), inline=True)
+            judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
+        blackCard = game['BlackCard']['Text']
+
+        msg = '{} judging.\n\n'.format(judge)
+        msg += '__Current Card:__\n\n**{}**\n\n'.format(blackCard)
+        msg += '__Submitted Cards:__\n\n'
+
         i = 0
         for sub in game['Submitted']:
             i+=1
-            stat_embed.add_field(name=i, value='{}'.format(' - '.join(sub['Cards'])), inline=False)
-        #stat_embed.add_field(name="Cards Submitted", value=msg, inline=True)
-        await self.bot.send_message(user, embed=stat_embed)
+            msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
+        if judge == '**YOU** are':
+            msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
+        await self.bot.send_message(user, msg)
         
     async def drawCard(self, game):
         # Draws a random unused card and shuffles the deck if needed
@@ -269,36 +308,28 @@ class CardsAgainstHumanity:
                     msg += '{}. {}\n'.format(i, card['Text'])
         await self.bot.send_message(user, msg)
 
-
-    async def showOption(self, ctx, user, isJudge = True):
-        # Shows the judgement options
-        game = self.userGame(user)
-        msg = '**{}**\n\n'.format(game['BlackCard']['Text'])
-        i = 0
-        for sub in game['Submitted']:
-            i+=1
-            msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
-        if isJudge:
-            msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
-        await self.bot.send_message(user, msg)
-
     async def nextPlay(self, ctx, game):
         # Advances the game
-        if len(game['Members']) < 2:
+        if len(game['Members']) < self.minMembers:
+            stat_embed = discord.Embed(color=discord.Color.red())
+            stat_embed.set_author(name='Not enough players to continue! ({}/{})'.format(len(game['Members']), self.minMembers))
+            stat_embed.set_footer(text='Have other users join with: {}joincah {}'.format(ctx.prefix, game['ID']))
             for member in game['Members']:
-                await self.bot.send_message(member['User'], '**Not enough players to continue!**\n\nTo get other users into this game, have them PM me and type `{}joincah {}`'.format(ctx.prefix, game['ID']))
+                await self.bot.send_message(member['User'], embed=stat_embed)
             return
 
         # Find if we have a winner
-        msg = ''
+        winner = False
+        stat_embed = discord.Embed(color=discord.Color.lighter_grey())
         for member in game['Members']:
             if member['Points'] >= self.winAfter:
                 # We have a winner!
-                msg = "__***{}*** **is the WINNER!!__**".format(DisplayName.name(member['User']))
+                winner = True
+                stat_embed.set_author(name='{} is the WINNER!!'.format(DisplayName.name(member['User'])))
                 break
-        if not msg == '':
+        if winner:
             for member in game['Members']:
-                await self.bot.send_message(member['User'], msg)
+                await self.bot.send_message(member['User'], embed=stat_embed)
                 # Reset all users
                 member['Hand']  = []
                 member['Points'] = 0
@@ -316,36 +347,14 @@ class CardsAgainstHumanity:
         # Draw the next black card
         bCard = await self.drawBCard(game)
 
-        # Find the judge
-        for member in game['Members']:
-            await self.drawCards(member['User'])
-            index = game['Members'].index(member)
-            if index == game['Judge']:
-                thejudge = game['Members'][index]['User']
-
-        # PM the new judge - that they're the judge
-        # PM everyone else their name - and that they need to pick their cards
         for member in game['Members']:
             member['Laid'] = False
+            await self.drawCards(member['User'])
+            await self.showPlay(ctx, member['User'])
             index = game['Members'].index(member)
-            if index == game['Judge']:
-                msg = '**YOU** are the judge this round!\n\nWaiting for *{}/{}* cards...\n\n'.format(len(game['Members'])-1, len(game['Members'])-1)
-                msg += 'Your black card is:\n\n**{}**\n\n'.format(bCard['Text'])
-                await self.bot.send_message(member['User'], msg)
-            else:
-                if bCard['Pick'] == 1:
-                    pickText = 'card'
-                else:
-                    pickText = 'cards'
-                msg = '*{}* is the judge this round!\n\n'.format(DisplayName.name(thejudge))
-                msg += 'Waiting for *{}/{}* cards...'.format(len(game['Members'])-1, len(game['Members'])-1)
-                msg += 'The black card is:\n\n**{}**\n\n'.format(bCard['Text'])
-                if bCard['Pick'] == 1:
-                    msg += 'Pick a card with `{}lay [card number]`.\n\nYour hand is:'.format(ctx.prefix)
-                else:
-                    msg += 'Pick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(bCard['Pick'], ctx.prefix)
-                await self.bot.send_message(member['User'], msg)
-                await self.showHand(member['User'])
+            if not index == game['Judge']:
+                await self.showHand(ctx, member['User'])
+
 
     @commands.command(pass_context=True)
     async def game(self, ctx, *, message = None):
@@ -357,8 +366,9 @@ class CardsAgainstHumanity:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await self.bot.send_message(ctx.message.author, msg)
             return
-        await self.showPlay(ctx.message.author)
-                
+        await self.showPlay(ctx, ctx.message.author)
+
+
     @commands.command(pass_context=True)
     async def say(self, ctx, *, message = None):
         """Broadcasts a message to the other players in your game."""
@@ -411,6 +421,14 @@ class CardsAgainstHumanity:
         card = card.strip()
         card = card.replace(" ", "")
         # Not the judge
+        if len(userGame['Members']) < self.minMembers:
+            stat_embed = discord.Embed(color=discord.Color.red())
+            stat_embed.set_author(name='Not enough players to continue! ({}/{})'.format(len(userGame['Members']), self.minMembers))
+            stat_embed.set_footer(text='Have other users join with: {}joincah {}'.format(ctx.prefix, userGame['ID']))
+            for member in userGame['Members']:
+                await self.bot.send_message(member['User'], embed=stat_embed)
+            return
+
         numberCards = userGame['BlackCard']['Pick']
         cards = []
         if numberCards > 1:
@@ -422,14 +440,14 @@ class CardsAgainstHumanity:
             if not len(card) == numberCards:
                 msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
-                await self.showHand(ctx.message.author)
+                await self.showHand(ctx, ctx.message.author)
                 return
             # Got something
             # Check for duplicates
             if not len(card) == len(set(card)):
                 msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
-                await self.showHand(ctx.message.author)
+                await self.showHand(ctx, ctx.message.author)
                 return
             # Works
             for c in card:
@@ -438,13 +456,13 @@ class CardsAgainstHumanity:
                 except Exception:
                     msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
                     await self.bot.send_message(ctx.message.author, msg)
-                    await self.showHand(ctx.message.author)
+                    await self.showHand(ctx, ctx.message.author)
                     return
 
                 if c-1 < 0 or c-1 > len(user['Hand'])-1:
                     msg = 'Card numbers must be between 1 and {}.\n\nYour hand is:'.format(len(user['Hand']))
                     await self.bot.send_message(ctx.message.author, msg)
-                    await self.showHand(ctx.message.author)
+                    await self.showHand(ctx, ctx.message.author)
                     return
                 cards.append(user['Hand'][c-1]['Text'])
             # Remove from user's hand
@@ -461,7 +479,7 @@ class CardsAgainstHumanity:
             except Exception:
                 msg = 'You need to pick a valid card with `{}lay [card number]`\n\nYour hand is:'.format(ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
-                await self.showHand(ctx.message.author)
+                await self.showHand(ctx, ctx.message.author)
                 return
             # Valid card
             newSubmission = { 'By': ctx.message.author, 'Cards': [ user['Hand'].pop(card-1)['Text'] ] }
@@ -481,15 +499,9 @@ class CardsAgainstHumanity:
                 msg = 'Waiting for *{}/{}* cards...'.format(totalUsers-submitted, totalUsers)
                 await self.bot.send_message(member['User'], msg)
             else:
-                msg = 'All cards submitted!  Waiting on judgement!'
+                msg = 'All cards have been submitted!'
                 await self.bot.send_message(member['User'], msg)
-                index = userGame['Members'].index(member)
-                if index == userGame['Judge']:
-                    # Send judgement here
-                    await self.bot.send_message(member['User'], '**JUDGEMENT TIME!**')
-                    await self.showOptions(ctx, member['User'])
-                else:
-                    await self.showOptions(ctx, member['User'], False)
+                await self.showOptions(ctx, member['User'])
 
 
     @commands.command(pass_context=True)
@@ -521,9 +533,9 @@ class CardsAgainstHumanity:
         submitted  = len(userGame['Submitted'])
         if submitted < totalUsers:
             if totalUsers - submitted == 1:
-                msg = "Still waiting on *1* card..."
+                msg = "Still waiting on 1 card..."
             else:
-                msg = "Still waiting on *{}* cards...".format(totalUsers-submitted)
+                msg = "Still waiting on {} cards...".format(totalUsers-submitted)
             await self.bot.send_message(ctx.message.author, msg)
             return
         try:
@@ -537,22 +549,22 @@ class CardsAgainstHumanity:
         # Pick is good!
         winner = userGame['Submitted'][card]
         for member in userGame['Members']:
+            stat_embed = discord.Embed(color=discord.Color.gold())
+            stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(userGame['ID']))
             index = userGame['Members'].index(member)
             if index == userGame['Judge']:
-                msg = '**YOU** picked *{}\'s* card!'.format(DisplayName.name(winner['By']))
-                await self.bot.send_message(member['User'], msg)
+                stat_embed.set_author(name='You picked {}\'s card!'.format(DisplayName.name(winner['By'])))
             elif member['User'] == winner['By']:
-                msg = '**YOU** won!'
-                await self.bot.send_message(member['User'], msg)
+                stat_embed.set_author(name='YOU WON!!'.format(DisplayName.name(winner['By'])))
                 member['Points'] += 1
                 member['Won'].append(userGame['BlackCard']['Text'])
             else:
-                msg = '*{}* won!'.format(DisplayName.name(winner['By']))
-                await self.bot.send_message(member['User'], msg)
+                stat_embed.set_author(name='{} won!'.format(DisplayName.name(winner['By'])))
             if len(winner['Cards']) == 1:
                 msg = 'The **Winning** card was:\n\n{}'.format('{}'.format(' - '.join(winner['Cards'])))
             else:
                 msg = 'The **Winning** cards were:\n\n{}'.format('{}'.format(' - '.join(winner['Cards'])))
+            await self.bot.send_message(member['User'], embed=stat_embed)
             await self.bot.send_message(member['User'], msg)
         await self.nextPlay(ctx, userGame)
 
@@ -569,7 +581,7 @@ class CardsAgainstHumanity:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await self.bot.send_message(ctx.message.author, msg)
             return
-        await self.showHand(ctx.message.author)
+        await self.showHand(ctx, ctx.message.author)
         userGame['Time'] = currentTime = int(time.time())
 
     @commands.command(pass_context=True)
@@ -593,11 +605,8 @@ class CardsAgainstHumanity:
         newGame['Members'].append(member)
         self.games.append(newGame)
 
-        msg = "You've created game id: *{}!*".format(gameID, ctx.prefix, gameID)
-        await self.bot.send_message(ctx.message.channel, msg)
         await self.drawCards(ctx.message.author)
-        await self.bot.send_message(ctx.message.author, "Your hand is:")
-        await self.showHand(ctx.message.author)
+        await self.showHand(ctx, ctx.message.author)
         await self.nextPlay(ctx, newGame)
     
     @commands.command(pass_context=True)
@@ -665,43 +674,25 @@ class CardsAgainstHumanity:
             gameID = self.randomID()
             game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [] }
             self.games.append(game)
+
+        # Tell everyone else you joined
+        for member in game['Members']:
+            await self.bot.send_message(member['User'], '*{}* joined the game!'.format(DisplayName.name(ctx.message.author)))
             
         # We got a user!
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False }
         game['Members'].append(member)
         await self.drawCards(ctx.message.author)
         if len(game['Members'])==1:
-            msg = "You've joined game id: *{}!*\n\nThere is *{} user* in this game.".format(game['ID'], len(game['Members']))
-            await self.bot.send_message(ctx.message.channel, msg)
             # Just created the game
-            msg = "You've created game id: *{}!*".format(gameID, ctx.prefix, gameID)
-            await self.bot.send_message(ctx.message.author, msg)
             await self.drawCards(ctx.message.author)
-            await self.bot.send_message(ctx.message.author, "Your hand is:")
-            await self.showHand(ctx.message.author)
-            await self.nextPlay(ctx, game)
-        elif len(game['Members'])==2:
-            msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
-            await self.bot.send_message(ctx.message.channel, msg)
-            # We just got a 2nd member - let's advance
+            await self.showHand(ctx, ctx.message.author)
             await self.nextPlay(ctx, game)
         else:
             msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
             await self.bot.send_message(ctx.message.channel, msg)
-            totalUsers = len(game['Members'])-1
-            submitted  = len(game['Submitted'])
-            if submitted < totalUsers:
-                msg = '*{}* joined the game!\n\nWaiting for *{}/{}* cards...'.format(DisplayName.name(ctx.message.author), totalUsers-submitted, totalUsers)
-                for member in game['Members']:
-                    if member['User']==ctx.message.author:
-                        if game['BlackCard']['Pick'] == 1:
-                            msg += ' The black card is:\n\nPick a card with `{}lay [card number]`.\n\n**{}**\n\nYour hand is'.format(ctx.prefix, game['BlackCard']['Text'])
-                        else:
-                            msg += ' The black card is:\n\nPick **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`.\n\n**{}**\n\nYour hand is'.format(game['BlackCard']['Pick'], ctx.prefix, game['BlackCard']['Text'])
-                        await self.bot.send_message(member['User'], msg)
-                        await self.showHand(ctx.message.author)
-                    else:
-                        await self.bot.send_message(member['User'], msg)
+            await self.nextPlay(ctx, game)
+
         game['Time'] = currentTime = int(time.time())
 
     @commands.command(pass_context=True)
@@ -716,20 +707,23 @@ class CardsAgainstHumanity:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await self.bot.send_message(ctx.message.author, msg)
             return
-        stat_embed = discord.Embed(color=discord.Color.teal())
+        stat_embed = discord.Embed(color=discord.Color.purple())
         stat_embed.set_author(name='Current Score')
+        stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(userGame['ID']))
+        await self.bot.send_message(ctx.message.author, embed=stat_embed)
         users = sorted(userGame['Members'], key=lambda card:int(card['Points']), reverse=True)
+        msg = ''
         i = 0
         if len(users) > 10:
-            statname = '10 of {} Players'.format(len(users))
+            msg += '__10 of {} Players:__\n\n'.format(len(users))
         else:
-            statname = 'Players'
+            msg += '__Players:__\n\n'
         for user in users:
             i += 1
             if i > 10:
                 break
             if user['Points'] == 1:
-                stat_embed.add_field(name='{}. *{}*'.format(i, DisplayName.name(user['User'])), value='{} point'.format(user['Points']), inline=False)
+                msg += '{}. *{}* - 1 point'.format(i, DisplayName.name(user['User']))
             else:
-                stat_embed.add_field(name='{}. *{}*'.format(i, DisplayName.name(user['User'])), value='{} points'.format(user['Points']), inline=False)
-        await self.bot.send_message(ctx.message.author, embed=stat_embed)
+                msg += '{}. *{}* - {} points'.format(i, DisplayName.name(user['User']), user['Points'])
+        await self.bot.send_message(ctx.message.author, msg)
