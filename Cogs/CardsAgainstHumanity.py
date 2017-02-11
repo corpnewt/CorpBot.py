@@ -50,6 +50,7 @@ class CardsAgainstHumanity:
         #json = json.encode('utf-8', 'replace')
         json = json.replace('_','[blank]')
         json = json.replace('<br>','\n')
+        json = json.replace('<br/>','\n')
         json = json.replace('<i>', '*')
         json = json.replace('</i>', '*')
         return json
