@@ -24,7 +24,7 @@ class CardsAgainstHumanity:
         self.checkTime = 300 # 5 minutes between dead time checks
         self.winAfter = 10 # 10 wins for the game
         self.charset = "1234567890"
-        self.minMembers = 2
+        self.minMembers = 3
         if file == None:
             file = "deck.json"
         # Let's load our deck file
