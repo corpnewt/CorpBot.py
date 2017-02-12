@@ -793,7 +793,7 @@ class CardsAgainstHumanity:
         newGame = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event() }
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': False, 'Creator': True, 'Task': None }
         newGame['Members'].append(member)
-        task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
+        task = self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame))
         newGame['Task'] = task
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
