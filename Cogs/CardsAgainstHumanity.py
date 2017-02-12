@@ -26,8 +26,8 @@ class CardsAgainstHumanity:
         self.maxDeadTime = 3600 # Allow an hour of dead time before killing a game
         self.checkTime = 300 # 5 minutes between dead time checks
         self.winAfter = 10 # 10 wins for the game
-        self.botWaitMin = 0 # Minimum number of seconds before the bot makes a decision (default 5)
-        self.botWaitMax = 5 # Max number of seconds before a bot makes a decision (default 30)
+        self.botWaitMin = 5 # Minimum number of seconds before the bot makes a decision (default 5)
+        self.botWaitMax = 30 # Max number of seconds before a bot makes a decision (default 30)
         self.charset = "1234567890"
         self.botName = 'Rando Cardrissian'
         self.minMembers = 3
