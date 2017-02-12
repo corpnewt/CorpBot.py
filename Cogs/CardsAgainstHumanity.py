@@ -169,6 +169,9 @@ class CardsAgainstHumanity:
             if not member['IsBot']:
                 return True
         # If we got here - only bots, or empty game
+        # Kill the game loop
+        task = game['Task']
+        task.cancel()
         self.games.remove(game)
         return False
 
@@ -790,7 +793,8 @@ class CardsAgainstHumanity:
         newGame = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event() }
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': False, 'Creator': True, 'Task': None }
         newGame['Members'].append(member)
-        self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame))
+        task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
+        newGame['Task'] = task
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
         await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
@@ -860,7 +864,8 @@ class CardsAgainstHumanity:
             # No games - create a new one
             gameID = self.randomID()
             game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event() }
-            self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
+            task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
+            game['Task'] = task
             self.games.append(game)
             # Tell the user they created a new game and list its ID
             await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
