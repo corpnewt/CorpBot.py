@@ -920,7 +920,8 @@ class CardsAgainstHumanity:
         else:
             # No games - create a new one
             gameID = self.randomID()
-            game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False }
+            currentTime = int(time.time())
+            game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False }
             task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
             game['Task'] = task
             task = self.bot.loop.create_task(self.checkCards(ctx, game))
@@ -950,8 +951,8 @@ class CardsAgainstHumanity:
             await self.bot.send_message(ctx.message.channel, msg)
             # await self.nextPlay(ctx, game)
             # Start the game loop
-            event = game['NextHand']
-            self.bot.loop.call_soon_threadsafe(event.set)
+        event = game['NextHand']
+        self.bot.loop.call_soon_threadsafe(event.set)
 
         game['Time'] = currentTime = int(time.time())
 
