@@ -31,6 +31,7 @@ class CardsAgainstHumanity:
         self.charset = "1234567890"
         self.botName = 'Rando Cardrissian'
         self.minMembers = 3
+        self.loopsleep = 0.01
         if file == None:
             file = "deck.json"
         # Let's load our deck file
@@ -229,8 +230,7 @@ class CardsAgainstHumanity:
             # Judge is a bot - and all cards are in!
             await self.typing(game)
             # Pick a winner
-            winner = random.randint(0, totalUsers-1)
-            
+            winner = random.randint(0, totalUsers-2)
             await self.winningCard(ctx, game, winner)
 
 
@@ -249,12 +249,12 @@ class CardsAgainstHumanity:
                 await self.bot.send_message(member['User'], msg)
                 await self.showOptions(ctx, member['User'])
 
-        # Check if a bot is the judge
-        judge = game['Members'][game['Judge']]
-        if not judge['IsBot']:
-            return
-        task = self.bot.loop.create_task(self.botPickWin(ctx, game))
-        judge['Task'] = task
+                # Check if a bot is the judge
+                judge = game['Members'][game['Judge']]
+                if not judge['IsBot']:
+                    continue
+                task = self.bot.loop.create_task(self.botPickWin(ctx, game))
+                judge['Task'] = task
         
 
     async def winningCard(self, ctx, game, card):
@@ -289,9 +289,9 @@ class CardsAgainstHumanity:
 
             # await self.nextPlay(ctx, game)
             
-            # Start the game loop
-            event = game['NextHand']
-            self.bot.loop.call_soon_threadsafe(event.set)
+        # Start the game loop
+        event = game['NextHand']
+        self.bot.loop.call_soon_threadsafe(event.set)
         game['Time'] = currentTime = int(time.time())
 
     async def gameCheckLoop(self, ctx, game):
@@ -305,6 +305,20 @@ class CardsAgainstHumanity:
             await self.nextPlay(ctx, game)
             # Wait until our next clear
             await task.wait()
+
+    async def messagePlayers(self, ctx, message, game, judge = False):
+        # Messages all the users on in a game
+        for member in game['Members']:
+            if member['IsBot']:
+                continue
+            # Not bots
+            if member is game['Members'][game['Judge']]:
+                # Is the judge
+                if judge:
+                    await self.bot.send_message(member['User'], message)
+            else:
+                # Not the judge
+                await self.bot.send_message(member['User'], message)
 
     ################################################
     
@@ -514,6 +528,7 @@ class CardsAgainstHumanity:
                 if not member['Task'] == None:
                     task = member['Task']
                     task.cancel()
+                    asyncio.sleep(1)
                     member['Task'] = None
             if member['Points'] >= self.winAfter:
                 # We have a winner!
@@ -875,7 +890,7 @@ class CardsAgainstHumanity:
         for member in game['Members']:
             if member['IsBot']:
                 continue
-            await self.bot.send_message(member['User'], '*{}* joined the game!'.format(DisplayName.name(ctx.message.author)))
+            await self.bot.send_message(member['User'], '*{}* joined the game! Reorganizing...'.format(DisplayName.name(ctx.message.author)))
             
         # We got a user!
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': False, 'Creator': isCreator, 'Task': None }
@@ -890,6 +905,9 @@ class CardsAgainstHumanity:
             msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
             await self.bot.send_message(ctx.message.channel, msg)
             # await self.nextPlay(ctx, game)
+            # Start the game loop
+            event = game['NextHand']
+            self.bot.loop.call_soon_threadsafe(event.set)
 
         game['Time'] = currentTime = int(time.time())
 
@@ -928,7 +946,7 @@ class CardsAgainstHumanity:
         lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': True, 'Creator': False, 'Task': None }
         userGame['Members'].append(lobot)
         await self.drawCards(lobot['ID'])
-        msg = '*{} ({})* joined the game!'.format(self.botName, botID)
+        msg = '*{} ({})* joined the game! Reorganizing...'.format(self.botName, botID)
         for member in userGame['Members']:
             if member['IsBot']:
                 continue
@@ -997,6 +1015,7 @@ class CardsAgainstHumanity:
             await self.drawCards(lobot['ID'])
             msg += '*{} ({})* joined the game!\n'.format(self.botName, botID)
             # await self.nextPlay(ctx, userGame)
+        msg += 'Reorganizing...'
         
         for member in userGame['Members']:
             if member['IsBot']:
