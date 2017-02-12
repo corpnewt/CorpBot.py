@@ -31,7 +31,7 @@ class CardsAgainstHumanity:
         self.charset = "1234567890"
         self.botName = 'Rando Cardrissian'
         self.minMembers = 3
-        self.loopsleep = 0.01
+        self.loopsleep = 0.05
         if file == None:
             file = "deck.json"
         # Let's load our deck file
@@ -194,6 +194,7 @@ class CardsAgainstHumanity:
                     continue
                 # Show that we're typing
                 await self.bot.send_typing(member['User'])
+                await asyncio.sleep(self.loopsleep)
             await asyncio.sleep(typeTime)
         else:
             for member in game['Members']:
@@ -201,6 +202,7 @@ class CardsAgainstHumanity:
                     continue
                 # Show that we're typing
                 await self.bot.send_typing(member['User'])
+                await asyncio.sleep(self.loopsleep)
             await asyncio.sleep(waitTime)
 
     async def botPick(self, ctx, bot, game):
@@ -250,6 +252,7 @@ class CardsAgainstHumanity:
             if submitted < totalUsers:
                 msg = '{}/{} cards submitted...'.format(submitted, totalUsers)
                 await self.bot.send_message(member['User'], msg)
+                await asyncio.sleep(self.loopsleep)
 
 
     async def checkCards(self, ctx, game):
@@ -276,6 +279,7 @@ class CardsAgainstHumanity:
                     # if 
                     await self.bot.send_message(member['User'], msg)
                     await self.showOptions(ctx, member['User'])
+                    await asyncio.sleep(self.loopsleep)
 
                 # Check if a bot is the judge
                 judge = game['Members'][game['Judge']]
@@ -321,6 +325,7 @@ class CardsAgainstHumanity:
                 msg = 'The **Winning** cards were:\n\n{}'.format('{}'.format(' - '.join(winner['Cards'])))
             await self.bot.send_message(member['User'], embed=stat_embed)
             await self.bot.send_message(member['User'], msg)
+            await asyncio.sleep(self.loopsleep)
 
             # await self.nextPlay(ctx, game)
             
@@ -577,6 +582,7 @@ class CardsAgainstHumanity:
                 member['Points'] = 0
                 member['Won']   = []
                 member['Laid']  = False
+                await asyncio.sleep(self.loopsleep)
 
         game['Judging'] = False
         # Clear submitted cards
@@ -607,6 +613,7 @@ class CardsAgainstHumanity:
             index = game['Members'].index(member)
             if not index == game['Judge']:
                 await self.showHand(ctx, member['User'])
+            await asyncio.sleep(self.loopsleep)
 
         # Have the bots lay their cards
         for member in game['Members']:
@@ -697,10 +704,7 @@ class CardsAgainstHumanity:
             stat_embed = discord.Embed(color=discord.Color.red())
             stat_embed.set_author(name='Not enough players to continue! ({}/{})'.format(len(userGame['Members']), self.minMembers))
             stat_embed.set_footer(text='Have other users join with: {}joincah {}'.format(ctx.prefix, userGame['ID']))
-            for member in userGame['Members']:
-                if member['IsBot']:
-                    continue
-                await self.bot.send_message(member['User'], embed=stat_embed)
+            await self.bot.send_message(ctx.message.author, embed=stat_embed)
             return
 
         numberCards = userGame['BlackCard']['Pick']
@@ -712,14 +716,14 @@ class CardsAgainstHumanity:
             except Exception:
                 card = []
             if not len(card) == numberCards:
-                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
                 await self.showHand(ctx, ctx.message.author)
                 return
             # Got something
             # Check for duplicates
             if not len(card) == len(set(card)):
-                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await self.bot.send_message(ctx.message.author, msg)
                 await self.showHand(ctx, ctx.message.author)
                 return
@@ -728,13 +732,13 @@ class CardsAgainstHumanity:
                 try:
                     c = int(c)
                 except Exception:
-                    msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`\n\nYour hand is:'.format(numberCards, ctx.prefix)
+                    msg = 'You need to pick **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                     await self.bot.send_message(ctx.message.author, msg)
                     await self.showHand(ctx, ctx.message.author)
                     return
 
-                if c-1 < 0 or c-1 > len(user['Hand'])-1:
-                    msg = 'Card numbers must be between 1 and {}.\n\nYour hand is:'.format(len(user['Hand']))
+                if c < 1 or c > len(user['Hand']):
+                    msg = 'Card numbers must be between 1 and {}.'.format(len(user['Hand']))
                     await self.bot.send_message(ctx.message.author, msg)
                     await self.showHand(ctx, ctx.message.author)
                     return
@@ -751,7 +755,12 @@ class CardsAgainstHumanity:
             try:
                 card = int(card)
             except Exception:
-                msg = 'You need to pick a valid card with `{}lay [card number]`\n\nYour hand is:'.format(ctx.prefix)
+                msg = 'You need to pick a valid card with `{}lay [card number]`'.format(ctx.prefix)
+                await self.bot.send_message(ctx.message.author, msg)
+                await self.showHand(ctx, ctx.message.author)
+                return
+            if card < 1 or card > len(user['Hand']):
+                msg = 'Card numbers must be between 1 and {}.'.format(len(user['Hand']))
                 await self.bot.send_message(ctx.message.author, msg)
                 await self.showHand(ctx, ctx.message.author)
                 return
