@@ -154,15 +154,15 @@ class CardsAgainstHumanity:
                     removed = member
                     outcome = True
                     if not member['IsBot']:
-                        msg = 'You were removed from game id: *{}*.'.format(game['ID'])
+                        msg = '**You were removed from game id:** ***{}.***'.format(game['ID'])
                         await self.bot.send_message(member['User'], msg)
         if not outcome:
             return outcome
         # We removed someone - let's tell the world
         if removed['IsBot']:
-            msg = '*{} ({})* left the game - reorganizing...'.format(self.botName, removed['ID'])
+            msg = '***{} ({})*** **left the game - reorganizing...**'.format(self.botName, removed['ID'])
         else:
-            msg = '*{}* left the game - reorganizing...'.format(DisplayName.name(removed['User']))
+            msg = '***{}*** **left the game - reorganizing...**'.format(DisplayName.name(removed['User']))
         for member in game['Members']:
             if member['IsBot']:
                 continue
@@ -941,14 +941,14 @@ class CardsAgainstHumanity:
             game['CardTask'] = task
             self.games.append(game)
             # Tell the user they created a new game and list its ID
-            await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
+            await self.bot.send_message(ctx.message.channel, '**You created game id:** ***{}***'.format(gameID))
             isCreator = True
 
         # Tell everyone else you joined
         for member in game['Members']:
             if member['IsBot']:
                 continue
-            await self.bot.send_message(member['User'], '*{}* joined the game! Reorganizing...'.format(DisplayName.name(ctx.message.author)))
+            await self.bot.send_message(member['User'], '***{}*** **joined the game! Reorganizing...**'.format(DisplayName.name(ctx.message.author)))
             
         # We got a user!
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': False, 'Creator': isCreator, 'Task': None }
@@ -960,7 +960,7 @@ class CardsAgainstHumanity:
             # await self.showHand(ctx, ctx.message.author)
             # await self.nextPlay(ctx, game)
         else:
-            msg = "You've joined game id: *{}!*\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
+            msg = "**You've joined game id:** ***{}!***\n\nThere are *{} users* in this game.".format(game['ID'], len(game['Members']))
             await self.bot.send_message(ctx.message.channel, msg)
             # await self.nextPlay(ctx, game)
             # Start the game loop
@@ -1004,7 +1004,7 @@ class CardsAgainstHumanity:
         lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': True, 'Creator': False, 'Task': None }
         userGame['Members'].append(lobot)
         await self.drawCards(lobot['ID'])
-        msg = '*{} ({})* joined the game! Reorganizing...'.format(self.botName, botID)
+        msg = '***{} ({})*** **joined the game! Reorganizing...**'.format(self.botName, botID)
         for member in userGame['Members']:
             if member['IsBot']:
                 continue
@@ -1061,9 +1061,9 @@ class CardsAgainstHumanity:
             number = self.maxBots - botCount
         
         if number == 1:
-            msg = 'Adding {} bot:\n\n'.format(number)
+            msg = '**Adding {} bot:**\n\n'.format(number)
         else:
-            msg = 'Adding {} bots:\n\n'.format(number)
+            msg = '**Adding {} bots:**\n\n'.format(number)
 
         for i in range(0, number):
             # We can get another bot!
@@ -1071,9 +1071,9 @@ class CardsAgainstHumanity:
             lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': True, 'Creator': False, 'Task': None }
             userGame['Members'].append(lobot)
             await self.drawCards(lobot['ID'])
-            msg += '*{} ({})* joined the game!\n'.format(self.botName, botID)
+            msg += '***{} ({})*** **joined the game!**\n'.format(self.botName, botID)
             # await self.nextPlay(ctx, userGame)
-        msg += 'Reorganizing...'
+        msg += '\n**Reorganizing...**'
         
         for member in userGame['Members']:
             if member['IsBot']:
@@ -1105,7 +1105,7 @@ class CardsAgainstHumanity:
             if member['User'] == ctx.message.author:
                 if not member['Creator']:
                     # You didn't make this game
-                    msg = 'Only the player that created the game can add bots.'
+                    msg = 'Only the player that created the game can remove bots.'
                     await self.bot.send_message(ctx.message.author, msg)
                     return
         # We are the creator - let's check the number of bots
