@@ -26,8 +26,8 @@ class CardsAgainstHumanity:
         self.maxDeadTime = 3600 # Allow an hour of dead time before killing a game
         self.checkTime = 300 # 5 minutes between dead time checks
         self.winAfter = 10 # 10 wins for the game
-        self.botWaitMin = 5 # Minimum number of seconds before the bot makes a decision
-        self.botWaitMax = 30 # Max number of seconds before a bot makes a decision
+        self.botWaitMin = 0 # Minimum number of seconds before the bot makes a decision (default 5)
+        self.botWaitMax = 5 # Max number of seconds before a bot makes a decision (default 30)
         self.charset = "1234567890"
         self.botName = 'Rando Cardrissian'
         self.minMembers = 3
@@ -73,6 +73,11 @@ class CardsAgainstHumanity:
                             continue
                         msg = "Game id: *{}* has been closed due to inactivity.".format(game['ID'])
                         await self.bot.send_message(member['User'], msg)
+                    # Close loops
+                    task = game['Task']
+                    task.cancel()
+                    task = game['CardTask']
+                    task.cancel()
                     self.games.remove(game)
 
     async def checkPM(self, message):
@@ -173,6 +178,8 @@ class CardsAgainstHumanity:
         # Kill the game loop
         task = game['Task']
         task.cancel()
+        task = game['CardTask']
+        task.cancel()
         self.games.remove(game)
         return False
 
@@ -213,7 +220,7 @@ class CardsAgainstHumanity:
         await self.typing(game)
 
         # Make sure we haven't laid any cards
-        if bot['Laid'] == False:
+        if bot['Laid'] == False and game['Judging'] == False:
             newSubmission = { 'By': bot, 'Cards': cards }
             game['Submitted'].append(newSubmission)
             # Shuffle cards
@@ -230,11 +237,11 @@ class CardsAgainstHumanity:
             # Judge is a bot - and all cards are in!
             await self.typing(game)
             # Pick a winner
-            winner = random.randint(0, totalUsers-2)
+            winner = random.randint(0, totalUsers-1)
             await self.winningCard(ctx, game, winner)
 
 
-    async def checkSubmissions(self, ctx, game):
+    async def checkSubmissions(self, ctx, game):        
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
         for member in game['Members']:
@@ -243,18 +250,46 @@ class CardsAgainstHumanity:
             if submitted < totalUsers:
                 msg = '{}/{} cards submitted...'.format(submitted, totalUsers)
                 await self.bot.send_message(member['User'], msg)
-            else:
-                msg = 'All cards have been submitted!'
-                # if 
-                await self.bot.send_message(member['User'], msg)
-                await self.showOptions(ctx, member['User'])
+
+
+    async def checkCards(self, ctx, game):
+        while not self.bot.is_closed:
+            # wait for 1 second
+            await asyncio.sleep(1)
+            # Check for all cards
+            if len(game['Members']) < self.minMembers:
+                # Not enough members
+                continue
+            # Enough members - let's check if we're judging
+            if game['Judging']:
+                continue
+            # Enough members, and not judging - let's check cards
+            totalUsers = len(game['Members'])-1
+            submitted  = len(game['Submitted'])
+            if submitted >= totalUsers:
+                game['Judging'] = True
+                # We have enough cards
+                for member in game['Members']:
+                    if member['IsBot']:
+                        continue
+                    msg = 'All cards have been submitted!'
+                    # if 
+                    await self.bot.send_message(member['User'], msg)
+                    await self.showOptions(ctx, member['User'])
 
                 # Check if a bot is the judge
                 judge = game['Members'][game['Judge']]
                 if not judge['IsBot']:
                     continue
+                # task = asyncio.ensure_future(self.botPick(ctx, member, game))
+                oldTask = judge['Task']
+                if not oldTask == None:
+                    # We have a prior task
+                    while not oldTask.cancelled():
+                        asyncio.sleep(1)
                 task = self.bot.loop.create_task(self.botPickWin(ctx, game))
                 judge['Task'] = task
+
         
 
     async def winningCard(self, ctx, game, card):
@@ -299,8 +334,6 @@ class CardsAgainstHumanity:
         while True:
             # Clear the pending task
             task.clear()
-            # Wait for a second before continuing
-            await asyncio.sleep(1)
             # Queue up the next hand
             await self.nextPlay(ctx, game)
             # Wait until our next clear
@@ -545,6 +578,7 @@ class CardsAgainstHumanity:
                 member['Won']   = []
                 member['Laid']  = False
 
+        game['Judging'] = False
         # Clear submitted cards
         game['Submitted'] = []
         # We have enough members
@@ -581,7 +615,13 @@ class CardsAgainstHumanity:
             if member['ID'] == game['Members'][game['Judge']]['ID']:
                 continue
             # Not a human player, and not the judge
-            task = self.bot.loop.create_task(self.botPick(ctx, member, game))
+            oldTask = member['Task']
+            if not oldTask == None:
+                # We havea prior task
+                while not oldTask.cancelled():
+                    asyncio.sleep(1)
+            task = self.bot.loop.create_task(self.botPick(ctx, member, game))\
+            # task = asyncio.ensure_future(self.botPick(ctx, member, game))
             member['Task'] = task
             # await self.botPick(ctx, member, game)
 
@@ -805,11 +845,13 @@ class CardsAgainstHumanity:
         # Not in a game - create a new one
         gameID = self.randomID()
         currentTime = int(time.time())
-        newGame = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event() }
+        newGame = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False }
         member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'IsBot': False, 'Creator': True, 'Task': None }
         newGame['Members'].append(member)
         task = self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame))
         newGame['Task'] = task
+        task = self.bot.loop.create_task(self.checkCards(ctx, newGame))
+        newGame['CardTask'] = task
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
         await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
@@ -878,9 +920,11 @@ class CardsAgainstHumanity:
         else:
             # No games - create a new one
             gameID = self.randomID()
-            game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event() }
+            game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': 0, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False }
             task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
             game['Task'] = task
+            task = self.bot.loop.create_task(self.checkCards(ctx, game))
+            game['CardTask'] = task
             self.games.append(game)
             # Tell the user they created a new game and list its ID
             await self.bot.send_message(ctx.message.channel, 'You created game id: *{}*'.format(gameID))
