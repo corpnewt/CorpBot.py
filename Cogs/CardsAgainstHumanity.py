@@ -571,7 +571,11 @@ class CardsAgainstHumanity:
             if member['Points'] >= self.winAfter:
                 # We have a winner!
                 winner = True
-                stat_embed.set_author(name='{} is the WINNER!!'.format(DisplayName.name(member['User'])))
+                if member['IsBot']:
+                    stat_embed.set_author(name='{} ({}) is the WINNER!!'.format(self.botName, member['ID']))
+                else:
+                    stat_embed.set_author(name='{} is the WINNER!!'.format(DisplayName.name(member['User'])))
+                stat_embed.set_footer(text='Congratulations!'.format(game['ID']))
                 break
         if winner:
             for member in game['Members']:
