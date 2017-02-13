@@ -309,22 +309,24 @@ class CardsAgainstHumanity:
         for member in game['Members']:
             if member['IsBot'] == True:
                 continue
+            msg = ''
+            # Check if we have a user
+            if user:
+                blackNum  = game['BlackCard']['Pick']
+                if blackNum == 1:
+                    card = 'card'
+                else:
+                    card = 'cards'
+                if user['IsBot']:
+                    msg = '*{} ({})* submitted their {}!\n'.format(self.botName, user['ID'], card)
+                else:
+                    if not member == user:
+                        # Don't say this to the submitting user
+                        msg = '*{}* submitted their {}!\n'.format(DisplayName.name(user['User']), card)
             if submitted < totalUsers:
-                msg = ''
-                # Check if we have a user
-                if user:
-                    blackNum  = game['BlackCard']['Pick']
-                    if blackNum == 1:
-                        card = 'card'
-                    else:
-                        card = 'cards'
-                    if user['IsBot']:
-                        msg = '*{} ({})* submitted their {}!\n'.format(self.botName, user['ID'], card)
-                    else:
-                        if not member == user:
-                            # Don't say this to the submitting user
-                            msg = '*{}* submitted their {}!\n'.format(DisplayName.name(user['User']), card)
                 msg += '{}/{} cards submitted...'.format(submitted, totalUsers)
+            if len(msg):
+                # We have something to say
                 await self.bot.send_message(member['User'], msg)
                 await asyncio.sleep(self.loopsleep)
 
