@@ -181,6 +181,7 @@ class CardsAgainstHumanity:
                         for newCreator in game['Members']:
                             if not newCreator['IsBot']:
                                 newCreator['Creator'] = True
+                                await self.bot.send_message(newCreator['User'], 'The creator of this game left.  **YOU** are now the creator.')
                                 break
                     
                     # Remove submissions
