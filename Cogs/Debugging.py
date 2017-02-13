@@ -80,3 +80,37 @@ class Debugging:
 		self.debug = debug
 		
 		await self.bot.send_message(ctx.message.channel, msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def cleardebug(self, ctx):
+		"""Deletes the debug.txt file (owner only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.settings.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I cannot adjust debugging until I have an owner.'
+			await self.bot.send_message(channel, msg)
+			return
+		if not author.id == owner:
+			# Not the owner
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
+			await self.bot.send_message(channel, msg)
+			return
+		
+		if not os.path.exists('debug.txt'):
+			msg = 'No *debug.txt* found.'
+			await self.bot.send_message(channel, msg)
+			return
+		# Exists - remove it
+		os.remove('debug.txt')
+		msg = '*debug.txt* removed!'
+		await self.bot.send_message(channel, msg)
