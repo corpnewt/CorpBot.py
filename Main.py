@@ -275,6 +275,8 @@ async def on_voice_state_update(before, after):
 	try:
 		state.audio_player.cancel()
 		del music.voice_states[server.id]
+		state.playlist = []
+		state.repeat = False
 		await state.voice.disconnect()
 	except:
 		pass
