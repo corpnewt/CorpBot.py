@@ -321,7 +321,7 @@ class CardsAgainstHumanity:
                     if user['IsBot']:
                         msg = '*{} ({})* submitted their {}!\n'.format(self.botName, user['ID'], card)
                     else:
-                        msg = '*{}* submitted their {}!\n'.format(DisplayName.name(user['User'], card)
+                        msg = '*{}* submitted their {}!\n'.format(DisplayName.name(user['User'], card))
                 msg += '{}/{} cards submitted...'.format(submitted, totalUsers)
                 await self.bot.send_message(member['User'], msg)
                 await asyncio.sleep(self.loopsleep)
