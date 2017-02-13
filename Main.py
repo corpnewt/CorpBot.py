@@ -213,7 +213,7 @@ strike = Strike.Strike(bot, settings)
 cogList.append(strike)
 
 # Debugging
-debugging = Debugging.Debugging(bot, settings)
+debugging = Debugging.Debugging(bot, settings, debug)
 cogList.append(debugging)
 
 # CardsAgainstHumanity
