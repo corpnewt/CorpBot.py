@@ -318,11 +318,11 @@ class CardsAgainstHumanity:
                 else:
                     card = 'cards'
                 if user['IsBot']:
-                    msg = '*{} ({})* submitted their {}!\n'.format(self.botName, user['ID'], card)
+                    msg = '*{} ({})* submitted their {}! '.format(self.botName, user['ID'], card)
                 else:
                     if not member == user:
                         # Don't say this to the submitting user
-                        msg = '*{}* submitted their {}!\n'.format(DisplayName.name(user['User']), card)
+                        msg = '*{}* submitted their {}! '.format(DisplayName.name(user['User']), card)
             if submitted < totalUsers:
                 msg += '{}/{} cards submitted...'.format(submitted, totalUsers)
             if len(msg):
