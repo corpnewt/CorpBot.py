@@ -54,11 +54,12 @@ class Debugging:
 			return
 
 		if debug == None:
-			# Swap
-			if self.debug == False:
-				debug = True
+			# Output debug status
+			if self.debug:
+				await self.bot.send_message(ctx.message.channel, 'Debugging is enabled.')
 			else:
-				debug = False
+				await self.bot.send_message(ctx.message.channel, 'Debugging is disabled.')
+			return
 		elif debug.lower() == "yes" or debug.lower() == "on":
 			debug = True
 		elif debug.lower() == "no" or debug.lower() == "off":
