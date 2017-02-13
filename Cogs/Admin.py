@@ -639,7 +639,7 @@ class Admin:
 			if role == "everyone":
 				role = "@everyone"
 			roleName = role
-			role = DisplayName.roleForName(roleName, server)
+			role = DisplayName.roleForName(roleName, ctx.message.server)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
 				# Check for suppress
