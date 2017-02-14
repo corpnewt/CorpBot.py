@@ -247,9 +247,9 @@ class Bot:
 		msg = 'Flushed settings to disk.\nRebooting...'
 		await self.bot.send_message(ctx.message.channel, msg)
 		# Logout, stop the event loop, close the loop, quit
-		await self.bot.logout()
 		for task in asyncio.Task.all_tasks():
 			task.cancel()
+		await self.bot.logout()
 		self.bot.loop.stop()
 		self.bot.loop.close()
 		await exit(0)

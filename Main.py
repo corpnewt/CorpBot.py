@@ -438,6 +438,15 @@ async def on_command(command, ctx):
 		except AttributeError:
 			# Onto the next
 			continue
+
+@bot.event
+async def on_command_completion(command, ctx):
+	for cog in cogList:
+		try:
+			await cog.oncommandcompletion(command, ctx)
+		except AttributeError:
+			# Onto the next
+			continue
 		
 @bot.event
 async def on_message_edit(before, message):
@@ -496,5 +505,7 @@ for cog in cogList:
 	bot.add_cog(cog)
 
 print("{} Cog(s) Loaded.".format(i))
-	
+
+# await bot.connect()
+# bot.login(token)
 bot.run(token)

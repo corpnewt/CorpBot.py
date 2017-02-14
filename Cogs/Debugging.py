@@ -29,6 +29,20 @@ class Debugging:
 				with open("debug.txt", "w") as myfile:
 					myfile.write(msg)
 
+	async def oncommandcompletion(self, command, ctx):
+		if self.debug:
+			# We're Debugging
+			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+			msg = '{}{}:\n"{}"\nCompleted at {}\nBy {}\nOn {}'.format(ctx.prefix, command, ctx.message.content, timeStamp, ctx.message.author.name, ctx.message.server.name)
+			if os.path.exists('debug.txt'):
+				# Exists - let's append
+				msg = "\n\n" + msg
+				with open("debug.txt", "a") as myfile:
+					myfile.write(msg)
+			else:
+				with open("debug.txt", "w") as myfile:
+					myfile.write(msg)
+
 	@commands.command(pass_context=True)
 	async def setdebug(self, ctx, *, debug = None):
 		"""Turns on/off debugging (owner only - always off by default)."""
@@ -114,3 +128,37 @@ class Debugging:
 		os.remove('debug.txt')
 		msg = '*debug.txt* removed!'
 		await self.bot.send_message(channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def heartbeat(self, ctx):
+		"""Write to the console and attempt to send a message (owner only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.settings.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I cannot adjust debugging until I have an owner.'
+			await self.bot.send_message(channel, msg)
+			return
+		if not author.id == owner:
+			# Not the owner
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
+			await self.bot.send_message(channel, msg)
+			return
+
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		print('Heartbeat tested at {}.'.format(timeStamp))
+		# Message send
+		message = await self.bot.send_message(ctx.message.channel, 'Heartbeat tested at {}.'.format(timeStamp))
+		if message:
+			print('Message:\n{}'.format(message))
+		else:
+			print('No message returned.')
