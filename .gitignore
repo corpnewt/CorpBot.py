@@ -7,6 +7,9 @@ corpSiteAuth.txt
 # Prefix file
 prefix.txt
 
+# Debug file
+debug.txt
+
 # FFMpeg.exe
 ffmpeg.exe
 

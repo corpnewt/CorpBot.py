@@ -249,6 +249,7 @@ class Bot:
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			task.cancel()
+		
 		await self.bot.logout()
 		self.bot.loop.stop()
 		self.bot.loop.close()
