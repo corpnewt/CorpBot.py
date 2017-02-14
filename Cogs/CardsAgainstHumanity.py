@@ -82,13 +82,18 @@ class CardsAgainstHumanity:
                         if downTime >= self.userTimeout:
                             # You gettin kicked, son.
                             await self.removeMember(member['User'])
+                            self.checkGame(game)
                             continue
                         # Check if downTime is in warning time
                         if downTime >= (self.userTimeout - self.utWarn):
                             # Check if we're at warning phase
                             if self.userTimeout - downTime >= (self.utWarn - self.utCheck):
+                                kickTime = self.userTimeout - downTime
+                                if kickTime % self.utCheck:
+                                    # Kick time isn't exact time - round out to the next loop
+                                    kickTime = kickTime-(kickTime % self.utCheck)+self.utCheck
                                 # Warning time!
-                                timeString = ReadableTime.getReadableTimeBetween(0, self.userTimeout - downTime)
+                                timeString = ReadableTime.getReadableTimeBetween(0, kickTime)
                                 msg = '**WARNING** - You will be kicked from the game if you do not make a move in *{}!*'.format(timeString)
                                 await self.bot.send_message(member['User'], msg)
                 else:
