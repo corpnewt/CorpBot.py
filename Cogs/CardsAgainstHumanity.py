@@ -1402,12 +1402,12 @@ class CardsAgainstHumanity:
         else:
             msg += '__Players:__\n\n'
         for user in users:
-            i += 1
-            if i > 10:
-                break
             if len(userGame['Members']) >= self.minMembers:
                 if user == userGame['Members'][userGame['Judge']]:
                     continue
+            i += 1
+            if i > 10:
+                break
 
             if user['Laid']:
                 if user['User']:
