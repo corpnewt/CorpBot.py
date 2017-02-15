@@ -7,8 +7,9 @@ from Cogs import Nullify
 class ChatterBot:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
+		self.settings = settings
 		self.chatBot = ChatBot('Pooter', trainer='chatterbot.trainers.ChatterBotCorpusTrainer')
 		self.chatBot.train('chatterbot.corpus.english')
 
@@ -16,13 +17,13 @@ class ChatterBot:
 	async def chat(self, ctx, *, message = None):
 		"""Chats with the bot."""
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		if message == None:
 			return
-		msg = self.chatBot.get_response(str(message))
+		msg = str(self.chatBot.get_response(str(message)))
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
