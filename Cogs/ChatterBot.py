@@ -92,6 +92,7 @@ class ChatterBot:
 			return
 		if not self.canChat(server):
 			return
+		await self.bot.send_typing(channel)
 		msg = str(self.chatBot.get_response(str(message)))
 		# Check for suppress
 		if suppress:
