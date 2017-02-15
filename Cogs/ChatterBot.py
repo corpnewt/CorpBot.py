@@ -2,6 +2,7 @@ import asyncio
 import discord
 from chatterbot import ChatBot
 from discord.ext import commands
+from Cogs import Nullify
 
 class ChatterBot:
 
@@ -14,8 +15,15 @@ class ChatterBot:
 	@commands.command(pass_context=True)
 	async def chat(self, ctx, *, message = None):
 		"""Chats with the bot."""
-		if message == None:
-			msg = 'You uh... you say nothing.'
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
 		else:
-			msg = self.chatBot.get_response(str(message))
+			suppress = False
+		if message == None:
+			return
+		msg = self.chatBot.get_response(str(message))
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
