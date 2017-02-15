@@ -41,6 +41,8 @@ class Settings:
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"MadLibsChannel"        : "",       # ID or blank for any channel
+				"ChatChannel"			: "", 		# ID or blank for no channel
+				"LastChat"				: 0,		# UTC Timestamp of last chat message
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
 				"StrikeOut"				: 3,		# Number of strikes needed for consequence
