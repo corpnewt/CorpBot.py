@@ -62,6 +62,11 @@ function main () {
     echo
     update "pyquery"
     echo
+
+    echo Updating Chatterbot...
+    echo
+    update "chatterbot"
+    echo
     
     # echo Updating Levenshtein...
     # echo

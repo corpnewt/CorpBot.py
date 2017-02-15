@@ -80,6 +80,11 @@ echo.
 call :install "pyquery"
 echo.
 
+echo Installing Chatterbot...
+echo.
+call :install "chatterbot"
+echo.
+
 REM echo Installing Levenshtein...
 REM echo.
 REM call :install "python-levenshtein"
