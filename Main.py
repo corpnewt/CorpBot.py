@@ -66,7 +66,7 @@ deckFile = "deck.json"
 corpSiteAuth = "corpSiteAuth.txt"
 # Open our token
 with open('token.txt', 'r') as f:
-	token = f.read()
+	token = f.read().strip()
 
 # Create our cog classes
 cogList = []

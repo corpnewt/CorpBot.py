@@ -19,6 +19,7 @@ database.db
 # Hidden stuff
 .git
 .vscode
+.idea
 
 # Settings
 Settings*
