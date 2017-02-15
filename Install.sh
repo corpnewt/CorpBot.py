@@ -22,6 +22,11 @@ function main () {
         sudo apt-get install ffmpeg
         echo
     fi
+
+    echo Updating Chatterbot...
+    echo
+    update "chatterbot"
+    echo
     
     echo Updating Discord...
     echo
@@ -61,11 +66,6 @@ function main () {
     echo Updating PyQuery...
     echo
     update "pyquery"
-    echo
-
-    echo Updating Chatterbot...
-    echo
-    update "chatterbot"
     echo
     
     # echo Updating Levenshtein...

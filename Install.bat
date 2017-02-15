@@ -40,6 +40,12 @@ echo   ###                ###
 echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
+
+echo Installing Chatterbot...
+echo.
+call :install "chatterbot"
+echo.
+
 echo Installing Discord...
 echo.
 call :install "discord.py[voice]"
@@ -78,11 +84,6 @@ echo.
 echo Installing PyQuery...
 echo.
 call :install "pyquery"
-echo.
-
-echo Installing Chatterbot...
-echo.
-call :install "chatterbot"
 echo.
 
 REM echo Installing Levenshtein...
