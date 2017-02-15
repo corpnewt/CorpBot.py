@@ -185,7 +185,7 @@ class Lists:
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'])
 			msg+='```'
 		
 		# Check for suppress
@@ -502,7 +502,7 @@ class Lists:
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'])
 			msg+='```'
 		
 		# Check for suppress

@@ -75,6 +75,17 @@ class CardsAgainstHumanity:
                     for member in game['Members']:
                         if member['IsBot']:
                             continue
+                        if game['Judging']:
+                            if not member == game['Members'][game['Judge']]:
+                                # Not the judge - don't hold against the user
+                                member['Time'] = int(time.time())
+                                continue
+                        else:
+                            # Not judging
+                            if member == game['Members'][game['Judge']]:
+                                # The judge - don't hold that against them
+                                member['Time'] = int(time.time())
+                                continue
                         currentTime = int(time.time())
                         userTime = member['Time']
                         downTime = currentTime - userTime
@@ -221,6 +232,7 @@ class CardsAgainstHumanity:
                             index = game['Members'].index(judge)
                             game['Judge'] = index
                     else:
+                        judge = None
                         # Just remove the member
                         game['Members'].remove(member)
                         
@@ -253,22 +265,25 @@ class CardsAgainstHumanity:
         if not outcome:
             return outcome
         # We removed someone - let's tell the world
-        if removed['IsBot']:
-            msg = '***{} ({})*** **left the game - reorganizing...**'.format(self.botName, removed['ID'])
-        else:
-            msg = '***{}*** **left the game - reorganizing...**'.format(DisplayName.name(removed['User']))
-        # Check if the judge changed
-        if judgeChanged:
-            # Judge changed
-            newJudge = game['Members'][game['Judge']] 
-            if newJudge['IsBot']:
-                msg += '\n\n***{} ({})*** **is now judging!**'.format(self.botName, newJudge['ID'])
-                # Schedule judging task
-            else:
-                msg += '\n\n***{}*** **is now judging!**'.format(DisplayName.name(newJudge['User']))
         for member in game['Members']:
             if member['IsBot']:
                 continue
+            if removed['IsBot']:
+                msg = '***{} ({})*** **left the game - reorganizing...**'.format(self.botName, removed['ID'])
+            else:
+                msg = '***{}*** **left the game - reorganizing...**'.format(DisplayName.name(removed['User']))
+            # Check if the judge changed
+            if judgeChanged:
+                # Judge changed
+                newJudge = game['Members'][game['Judge']] 
+                if newJudge['IsBot']:
+                    msg += '\n\n***{} ({})*** **is now judging!**'.format(self.botName, newJudge['ID'])
+                    # Schedule judging task
+                else:
+                    if newJudge == member:
+                        msg += '\n\n***YOU*** **are now judging!**'
+                    else:
+                        msg += '\n\n***{}*** **is now judging!**'.format(DisplayName.name(newJudge['User']))
             await self.bot.send_message(member['User'], msg)
         return game
             
@@ -356,9 +371,26 @@ class CardsAgainstHumanity:
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
         for member in game['Members']:
+            msg = ''
+            # Is the game running?
+            if len(game['Members']) < self.minMembers:
+                if member['IsBot']:
+                    # Clear pending tasks and set to None
+                    if not member['Task'] == None:
+                        task = member['Task']
+                        if not task.done():
+                            # Task isn't finished - we're on a new hand, cancel it
+                            task.cancel()
+                        member['Task'] = None
+                    continue
+                # not enough members - send the embed
+                stat_embed = discord.Embed(color=discord.Color.red())
+                stat_embed.set_author(name='Not enough players to continue! ({}/{})'.format(len(game['Members']), self.minMembers))
+                stat_embed.set_footer(text='Have other users join with: {}joincah {}'.format(ctx.prefix, game['ID']))
+                await self.bot.send_message(member['User'], embed=stat_embed)
+                continue
             if member['IsBot'] == True:
                 continue
-            msg = ''
             # Check if we have a user
             if user:
                 blackNum  = game['BlackCard']['Pick']
