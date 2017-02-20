@@ -223,8 +223,8 @@ if os.path.exists(deckFile):
 	cogList.append(cah)
 
 # Cleverbot
-# chatterbot = ChatterBot.ChatterBot(bot, settings, prefix)
-# cogList.append(chatterbot)
+chatterbot = ChatterBot.ChatterBot(bot, settings, prefix)
+cogList.append(chatterbot)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

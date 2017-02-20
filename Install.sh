@@ -67,6 +67,11 @@ function main () {
     echo
     update "pyquery"
     echo
+
+    echo Updating Flask...
+    echo
+    update "Flask"
+    echo
     
     # echo Updating Levenshtein...
     # echo

@@ -1,7 +1,8 @@
 import asyncio
 import discord
 import time
-from chatterbot import ChatBot
+import requests
+import urllib
 from discord.ext import commands
 from Cogs import Nullify
 
@@ -13,8 +14,6 @@ class ChatterBot:
 		self.settings = settings
 		self.prefix = prefix
 		self.waitTime = 4 # Wait time in seconds
-		self.chatBot = ChatBot('Pooter', trainer='chatterbot.trainers.ChatterBotCorpusTrainer')
-		self.chatBot.train('chatterbot.corpus.english')
 
 	def canChat(self, server):
 		# Check if we can display images
@@ -93,7 +92,12 @@ class ChatterBot:
 		if not self.canChat(server):
 			return
 		await self.bot.send_typing(channel)
-		msg = str(self.chatBot.get_response(str(message)))
+		message = message.replace('/', '')
+		quotes = urllib.parse.quote(message)
+		url = "http://127.0.0.1:5000/chat/"+quotes
+		msg = requests.get(url).text
+		if not msg:
+			return
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)

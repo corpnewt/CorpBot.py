@@ -86,6 +86,11 @@ echo.
 call :install "pyquery"
 echo.
 
+echo Installing Flask...
+echo.
+call :install "Flask"
+echo.
+
 REM echo Installing Levenshtein...
 REM echo.
 REM call :install "python-levenshtein"
