@@ -43,6 +43,9 @@ from Cogs import MessageXp
 from Cogs import Welcome
 from Cogs import ServerStats
 from Cogs import Strike
+from Cogs import Debugging
+from Cogs import CardsAgainstHumanity
+from Cogs import ChatterBot
 
 # Let's load our prefix file
 prefix = '$'
@@ -51,14 +54,19 @@ if os.path.exists('prefix.txt'):
 		prefix = f.read()
 	if not prefix:
 		prefix = '$'
+# Set up debugging
+debug = False
+if os.path.exists('debug.txt'):
+	debug = True
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
+deckFile = "deck.json"
 corpSiteAuth = "corpSiteAuth.txt"
 # Open our token
 with open('token.txt', 'r') as f:
-	token = f.read()
+	token = f.read().strip()
 
 # Create our cog classes
 cogList = []
@@ -205,6 +213,19 @@ cogList.append(serverstats)
 strike = Strike.Strike(bot, settings)
 cogList.append(strike)
 
+# Debugging
+debugging = Debugging.Debugging(bot, settings, debug)
+cogList.append(debugging)
+
+# CardsAgainstHumanity
+if os.path.exists(deckFile):
+	cah = CardsAgainstHumanity.CardsAgainstHumanity(bot)
+	cogList.append(cah)
+
+# Cleverbot
+chatterbot = ChatterBot.ChatterBot(bot, settings, prefix)
+cogList.append(chatterbot)
+
 # Help - Must be last
 #help = Help.Help(bot, cogList)
 #cogList.append(help)
@@ -259,6 +280,8 @@ async def on_voice_state_update(before, after):
 	try:
 		state.audio_player.cancel()
 		del music.voice_states[server.id]
+		state.playlist = []
+		state.repeat = False
 		await state.voice.disconnect()
 	except:
 		pass
@@ -279,9 +302,9 @@ async def on_server_join(server):
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
-	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `$help` either in chat or in PM.'
+	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
 	await bot.send_message(server, msg)
-	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `$setup` in the main chat.  Thanks!'
+	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
 	await bot.send_message(owner, msg)
 
 @bot.event
@@ -307,7 +330,7 @@ async def on_member_join(member):
 			# Onto the next
 			continue
 
-	help = 'Type `$help` for a list of available user commands.'
+	help = 'Type `{}help` for a list of available user commands.'.format(prefix)
 
 	# PM User
 	fmt = "*{}* Rules:\n{}\n\n{}".format(server.name, rules, help)
@@ -411,6 +434,24 @@ async def on_message(message):
 	if not ignore:
 		# We're processing commands here
 		await bot.process_commands(message)
+
+@bot.event
+async def on_command(command, ctx):
+	for cog in cogList:
+		try:
+			await cog.oncommand(command, ctx)
+		except AttributeError:
+			# Onto the next
+			continue
+
+@bot.event
+async def on_command_completion(command, ctx):
+	for cog in cogList:
+		try:
+			await cog.oncommandcompletion(command, ctx)
+		except AttributeError:
+			# Onto the next
+			continue
 		
 @bot.event
 async def on_message_edit(before, message):
@@ -469,5 +510,7 @@ for cog in cogList:
 	bot.add_cog(cog)
 
 print("{} Cog(s) Loaded.".format(i))
-	
+
+# await bot.connect()
+# bot.login(token)
 bot.run(token)

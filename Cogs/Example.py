@@ -343,8 +343,8 @@ class Music:
 
 	
 	@commands.command(pass_context=True, no_pm=True)
-	async def repeat(self, ctx):
-		"""Toggles whether or not to repeat the playlist."""
+	async def repeat(self, ctx, *, repeat = None):
+		"""Checks or sets whether to repeat or not."""
 		# Check user credentials
 		userInVoice = await self._user_in_voice(ctx)
 		if userInVoice == False:
@@ -352,12 +352,37 @@ class Music:
 			return
 
 		state = self.get_voice_state(ctx.message.server)
-		if state.repeat:
-			state.repeat = False
-			await self.bot.say('Repeat is now **off**.')
+
+		if repeat == None:
+			# Just checking
+			if state.repeat:
+				await self.bot.say('Repeat is currently **on**.')
+			else:
+				await self.bot.say('Repeat is currently **off**.')
+			return
+		elif repeat.lower() == "on" or repeat.lower() == "yes" or repeat.lower() == "true":
+			# Trying to enable repeat
+			if state.repeat:
+				await self.bot.say('Repeat will remain **on**.')
+			else:
+				state.repeat = True
+				await self.bot.say('Repeat is now **on**.')
+			return
+		elif repeat.lower() == "off" or repeat.lower() == "no" or repeat.lower() == "false":
+			# Trying to disable repeat
+			if not state.repeat:
+				await self.bot.say('Repeat will remain **off**.')
+			else:
+				state.repeat = False
+				await self.bot.say('Repeat is now **off**.')
+			return
 		else:
-			state.repeat = True
-			await self.bot.say('Repeat is now **on**.')
+			# No working variable - let's just output repeat status
+			if state.repeat:
+				await self.bot.say('Repeat is currently **on**.')
+			else:
+				await self.bot.say('Repeat is currently **off**.')
+			return
 
 
 	@commands.command(pass_context=True, no_pm=True)

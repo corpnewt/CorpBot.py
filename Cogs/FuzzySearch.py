@@ -14,7 +14,7 @@ def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
 			testName = item
 		matchRatio = difflib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
 		# matchRatio = Levenshtein.ratio(searchTerm.lower(), testName.lower())
-		searchList.append({ 'Name' : testName, 'Ratio' : matchRatio })
+		searchList.append({ 'Item' : item, 'Ratio' : matchRatio })
 	# sort the servers by population
 	searchList = sorted(searchList, key=lambda x:x['Ratio'], reverse=True)
 	if numMatches > len(searchList):

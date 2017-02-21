@@ -461,7 +461,12 @@ class Xp:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						roleText = '{}You need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+					else:
+						roleText = '{}You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
 				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
 
