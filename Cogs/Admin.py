@@ -839,7 +839,7 @@ class Admin:
 		
 	@commands.command(pass_context=True)
 	async def addadmin(self, ctx, *, role : str = None):
-		"""Adds a new role to the xp promotion/demotion system (admin only)."""
+		"""Adds a new role to the admin list (admin only)."""
 
 		usage = 'Usage: `{}addadmin [role]`'.format(ctx.prefix)
 
