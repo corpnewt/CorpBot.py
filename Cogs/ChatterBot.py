@@ -20,6 +20,8 @@ class ChatterBot:
 		self.waitTime = 4 # Wait time in seconds
 		self.botDir = 'standard'
 		self.botList = []
+		self.ownerName = "CorpNewt"
+		self.ownerGender = "man"
 		self.timeout = 3
 		self.chatBot = Kernel()
 
@@ -28,6 +30,13 @@ class ChatterBot:
 		files = listdir(self.botDir)
 		for file in files:
 			self.chatBot.learn(self.botDir + '/' + file)
+		# Learned by this point - let's set our owner's name/gender
+		# Start the convo
+		self.chatBot.respond('Hello')
+		# Bot asks for our Name
+		self.chatBot.respond('My name is {}'.format(self.ownerName))
+		# Bot asks for our gender
+		self.chatBot.respond('I am a {}'.format(self.ownerGender))
 
 	def canChat(self, server):
 		# Check if we can display images
