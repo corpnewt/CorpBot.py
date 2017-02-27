@@ -19,6 +19,7 @@ class ChatterBot:
 		self.botID = 'b0a6a41a5e345c23' # Lisa
 		self.botName = 'Lisa'
 		self.botList = []
+		self.timeout = 3
 
 	async def onready(self):
 		# We're ready - let's load the bots
@@ -159,7 +160,10 @@ class ChatterBot:
 		# Get the available bots
 
 		url = "http://pandorabots.com/botmaster/en/mostactive"
-		r = requests.request('POST', url)
+		try:
+			r = requests.request('POST', url, timeout=self.timeout)
+		except Exception:
+			return
 
 		doc = pq(r.text)
 
@@ -222,15 +226,17 @@ class ChatterBot:
 		}
 
 		url = "http://pandorabots.com/pandora/talk?botid=b0a6a41a5e345c23"
-		r = requests.request('POST', url, params=options)
+		try:
+			r = requests.request('POST', url, params=options, timeout=self.timeout)
+		except Exception:
+			await self.bot.send_message(channel, "I'm sorry - I can't talk right now.")
+			return
+		try:
+			r2 = requests.request('POST', url, params=payload, timeout=self.timeout)
+		except Exception:
+			await self.bot.send_message(channel, "I'm sorry - I can't talk right now.")
+			return
 
-		if not r:
-			await self.bot.send_message(channel, "I'm sorry - I can't talk right now.")
-			return
-		r2 = requests.request('POST', url, params=payload)
-		if not r2:
-			await self.bot.send_message(channel, "I'm sorry - I can't talk right now.")
-			return
 		doc = pq(r2.text)
 
 		r2.close()
