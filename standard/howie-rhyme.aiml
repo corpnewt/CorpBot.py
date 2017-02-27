@@ -1,0 +1,58 @@
+<!--
+This file includes support for "what rhymes with" questions,
+with the help of Brian Langenberger's Rhyming Dictionary
+at http://rhyme.sourceforge.net/
+-->
+
+<aiml version="1.0.1">
+
+<category>
+<pattern>WHAT RHYMES WITH *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>GIVE ME A RHYME FOR *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT IS A RHYME FOR *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT WORDS RHYME WITH *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>GIVE ME A WORD THAT RHYMES WITH *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>TELL ME A WORD THAT RHYMES WITH *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>TELL ME WHAT RHYMES WITH *</pattern>
+<template>
+<system>scripts/rhyme.py "<star/>"</system>
+</template>
+</category>
+
+</aiml>

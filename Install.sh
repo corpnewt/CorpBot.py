@@ -23,10 +23,10 @@ function main () {
         echo
     fi
 
-    echo Updating Chatterbot...
-    echo
-    update "chatterbot"
-    echo
+    #echo Updating Chatterbot...
+    #echo
+    #update "chatterbot"
+    #echo
     
     echo Updating Discord...
     echo
@@ -68,10 +68,15 @@ function main () {
     update "pyquery"
     echo
 
-    echo Updating Flask...
+    echo Updating PyAIML3
     echo
-    update "Flask"
+    update "git+https://github.com/weddige/pyaiml3"
     echo
+
+    #echo Updating Flask...
+    #echo
+    #update "Flask"
+    #echo
     
     # echo Updating Levenshtein...
     # echo

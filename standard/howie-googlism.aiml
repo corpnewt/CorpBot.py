@@ -1,0 +1,122 @@
+<!--
+This file includes support for "who/what/where/when is" questions,
+through www.googlism.com.
+-->
+
+<aiml version="1.0.1">
+
+<category>
+<pattern>WHO IS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT IS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHERE IS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHEN IS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+
+<category>
+<pattern>WHO WAS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT WAS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHERE WAS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHEN WAS *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+
+<category>
+<pattern>WHO ARE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT ARE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHERE ARE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHEN ARE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHO WERE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHAT WERE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHERE WERE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+<category>
+<pattern>WHEN WERE *</pattern>
+<template>
+<system>scripts/googlism.py "<input/>"</system>
+</template>
+</category>
+
+</aiml>
