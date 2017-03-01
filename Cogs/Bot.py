@@ -92,6 +92,7 @@ class Bot:
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
 		msg += '{} ({}%) of {}GB RAM used\n'.format(memUsedGB, memPerc, memTotalGB)
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n"
+		msg += 'Hostname: {}\n'.format(platform.node())
 		msg += '{} uptime```'.format(timeString)
 
 		await self.bot.send_message(ctx.message.channel, msg)
