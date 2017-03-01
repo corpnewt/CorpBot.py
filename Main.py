@@ -46,6 +46,7 @@ from Cogs import Strike
 from Cogs import Debugging
 from Cogs import CardsAgainstHumanity
 from Cogs import ChatterBot
+from Cogs import Star
 
 # Let's load our prefix file
 prefix = '$'
@@ -225,6 +226,9 @@ if os.path.exists(deckFile):
 # Cleverbot
 chatterbot = ChatterBot.ChatterBot(bot, settings, prefix)
 cogList.append(chatterbot)
+
+star = Star.Star(bot)
+cogList.append(star)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
