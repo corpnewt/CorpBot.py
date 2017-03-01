@@ -420,11 +420,11 @@ class Music:
 
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
+			player = state.player
 			if value == None:
 				# No value - output current volume
 				await self.bot.say('Current volume is {:.0%}'.format(player.volume))
 				return
-			player = state.player
 			if value < 0:
 				value = 0
 			if value > 100:
