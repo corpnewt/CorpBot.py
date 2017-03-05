@@ -327,7 +327,11 @@ class Lists:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					msg = 'You need to be a/an **{}** to add links.'.format(arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to add links.'.format(arole.name)
+					else:
+						msg = 'You need to be a **{}** to add links.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			# Check for suppress
@@ -645,7 +649,11 @@ class Lists:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					msg = 'You need to be a/an **{}** to add hacks.'.format(arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to add hacks.'.format(arole.name)
+					else:
+						msg = 'You need to be a **{}** to add hacks.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			# Check for suppress

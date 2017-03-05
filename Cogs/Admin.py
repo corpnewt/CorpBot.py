@@ -605,7 +605,11 @@ class Admin:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					msg = 'You need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(arole.name)
+					else:
+						msg = 'You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			# Check for suppress
@@ -684,7 +688,12 @@ class Admin:
 			for arole in ctx.message.server.roles:
 				if arole.id == role:
 					found = True
-					msg = 'You need to be a/an **{}** to use stop.'.format(arole.name)
+					vowels = "aeiou"
+					if arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to use `$stop`.'.format(arole.name)
+					else:
+						msg = 'You need to be a **{}** to use `$stop`.'.format(arole.name)
+					
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			# Check for suppress
@@ -839,7 +848,7 @@ class Admin:
 		
 	@commands.command(pass_context=True)
 	async def addadmin(self, ctx, *, role : str = None):
-		"""Adds a new role to the xp promotion/demotion system (admin only)."""
+		"""Adds a new role to the admin list (admin only)."""
 
 		usage = 'Usage: `{}addadmin [role]`'.format(ctx.prefix)
 

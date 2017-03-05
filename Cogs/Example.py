@@ -398,7 +398,7 @@ class Music:
 
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def volume(self, ctx, value : int):
+	async def volume(self, ctx, value = None):
 		"""Sets the volume of the currently playing song."""
 
 		# Check user credentials
@@ -407,12 +407,24 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
+		
+		if not value == None:
+			# We have a value, let's make sure it's valid
+			try:
+				value = int(value)
+			except Exception:
+				await self.bot.say('Volume must be an integer.')
+				return
 
 		state = self.get_voice_state(ctx.message.server)
 		if state.is_playing():
 			player = state.player
+			if value == None:
+				# No value - output current volume
+				await self.bot.say('Current volume is {:.0%}'.format(player.volume))
+				return
 			if value < 0:
 				value = 0
 			if value > 100:
@@ -420,6 +432,10 @@ class Music:
 			player.volume = value / 100
 			self.settings.setServerStat(ctx.message.server, "Volume", player.volume)
 			await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
+		else:
+			# Not playing anything
+			await self.bot.say('Not playing anything right now...')
+			return
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def pause(self, ctx):
@@ -431,7 +447,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		state = self.get_voice_state(ctx.message.server)
@@ -451,7 +467,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		state = self.get_voice_state(ctx.message.server)
@@ -504,7 +520,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		server = ctx.message.server
@@ -535,7 +551,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		state = self.get_voice_state(ctx.message.server)
@@ -614,7 +630,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		state = self.get_voice_state(ctx.message.server)
@@ -757,7 +773,7 @@ class Music:
 			await self.bot.say('You\'ll have to join the same voice channel as me to use that.')
 			return
 		elif userInVoice == None:
-			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing someting.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			await self.bot.say('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
 			return
 
 		channel = ctx.message.channel

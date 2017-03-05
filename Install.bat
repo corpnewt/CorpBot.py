@@ -41,10 +41,10 @@ echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
 
-echo Installing Chatterbot...
-echo.
-call :install "chatterbot"
-echo.
+REM echo Installing Chatterbot...
+REM echo.
+REM call :install "chatterbot"
+REM echo.
 
 echo Installing Discord...
 echo.
@@ -86,10 +86,16 @@ echo.
 call :install "pyquery"
 echo.
 
-echo Installing Flask...
+echo Installing PyAIML3...
 echo.
-call :install "Flask"
+call :install "git+https://github.com/weddige/pyaiml3"
 echo.
+
+
+REM echo Installing Flask...
+REM echo.
+REM call :install "Flask"
+REM echo.
 
 REM echo Installing Levenshtein...
 REM echo.

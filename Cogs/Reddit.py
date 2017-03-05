@@ -95,6 +95,13 @@ class Reddit:
 		msg = self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
 		await self.bot.send_message(ctx.message.channel, msg)
 		
+		
+	@commands.command(pass_context=True)
+	async def withcontext(self, ctx):
+		"""Spout out some contextual brilliance."""
+		msg = self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
+		await self.bot.send_message(ctx.message.channel, msg)
+		
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):

@@ -3,8 +3,12 @@ import discord
 import time
 import requests
 import urllib
+from aiml import Kernel
+from os import listdir
 from discord.ext import commands
 from Cogs import Nullify
+from pyquery import PyQuery as pq
+from Cogs import FuzzySearch
 
 class ChatterBot:
 
@@ -14,6 +18,25 @@ class ChatterBot:
 		self.settings = settings
 		self.prefix = prefix
 		self.waitTime = 4 # Wait time in seconds
+		self.botDir = 'standard'
+		self.botList = []
+		self.ownerName = "CorpNewt"
+		self.ownerGender = "man"
+		self.timeout = 3
+		self.chatBot = Kernel()
+
+	async def onready(self):
+		# We're ready - let's load the bots
+		files = listdir(self.botDir)
+		for file in files:
+			self.chatBot.learn(self.botDir + '/' + file)
+		# Learned by this point - let's set our owner's name/gender
+		# Start the convo
+		self.chatBot.respond('Hello')
+		# Bot asks for our Name
+		self.chatBot.respond('My name is {}'.format(self.ownerName))
+		# Bot asks for our gender
+		self.chatBot.respond('I am a {}'.format(self.ownerGender))
 
 	def canChat(self, server):
 		# Check if we can display images
@@ -47,6 +70,7 @@ class ChatterBot:
 					msg = msg[len(pre):]
 				await self._chat(message.channel, message.server, msg)
 		return { 'Ignore' : ignore, 'Delete' : delete}
+
 
 	@commands.command(pass_context=True)
 	async def setchatchannel(self, ctx, *, channel : discord.Channel = None):
@@ -92,10 +116,9 @@ class ChatterBot:
 		if not self.canChat(server):
 			return
 		await self.bot.send_typing(channel)
-		message = message.replace('/', '')
-		quotes = urllib.parse.quote(message)
-		url = "http://127.0.0.1:5000/chat/"+quotes
-		msg = requests.get(url).text
+
+		msg = self.chatBot.respond(message)
+
 		if not msg:
 			return
 		# Check for suppress
