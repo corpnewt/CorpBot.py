@@ -249,12 +249,20 @@ class Bot:
 		await self.bot.send_message(ctx.message.channel, msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
-			task.cancel()
-		
-		await self.bot.logout()
-		self.bot.loop.stop()
-		self.bot.loop.close()
-		await exit(0)
+			try:
+				task.cancel()
+			except Exception:
+				continue
+		try:
+			await self.bot.logout()
+			self.bot.loop.stop()
+			self.bot.loop.close()
+		except Exception:
+			pass
+		try:
+			await exit(0)
+		except Exception:
+			pass
 			
 
 	@commands.command(pass_context=True)
