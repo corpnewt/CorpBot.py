@@ -29,11 +29,20 @@ class Monitor:
 			self.settings.flushSettings()
 			# Logout, stop the event loop, close the loop, quit
 			for task in asyncio.Task.all_tasks():
-				task.cancel()
-			await self.bot.logout()
-			self.bot.loop.stop()
-			self.bot.loop.close()
-			await exit(0)
+				try:
+					task.cancel()
+				except Exception:
+					continue
+			try:
+				await self.bot.logout()
+				self.bot.loop.stop()
+				self.bot.loop.close()
+			except Exception:
+				pass
+			try:
+				await exit(0)
+			except Exception:
+				pass
 	
 		# Once we're here - we add our new command
 		# Save the command to a list with the message
