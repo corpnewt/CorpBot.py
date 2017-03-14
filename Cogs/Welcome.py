@@ -230,8 +230,6 @@ class Welcome:
         if suppress:
             message = Nullify.clean(message)
 
-        print("{}:{}".format(channel, server))
-
         if channel:
             await channel.send(message)
         else:
