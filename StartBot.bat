@@ -8,7 +8,7 @@ echo.
 
 set "botFile=Main.py"
 set "pyPath=python"
-set "autoRestart=Yes"
+set "autoRestart=No"
 
 goto start
 

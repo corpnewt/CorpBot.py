@@ -5,6 +5,7 @@ import os
 from   discord.ext import commands
 from   discord import errors
 from   Cogs import ReadableTime
+from   Cogs import DisplayName
 
 # Import the cogs
 
@@ -81,7 +82,7 @@ cogList.append(settings)
 example = Example.Example(bot, settings)
 music = Example.Music(bot, settings)
 cogList.append(example)
-cogList.append(music)
+# cogList.append(music) # Uncomment this when voice is available.
 
 # Xp
 xp = Xp.Xp(bot, settings)
@@ -123,7 +124,7 @@ cogList.append(botCog)
 humor = Humor.Humor(bot)
 cogList.append(humor)
 
-# Humor
+# Uptime
 uptime = Uptime.Uptime(bot)
 cogList.append(uptime)
 
@@ -228,6 +229,7 @@ if os.path.exists(deckFile):
 chatterbot = ChatterBot.ChatterBot(bot, settings, prefix)
 cogList.append(chatterbot)
 
+# Star
 star = Star.Star(bot)
 cogList.append(star)
 
@@ -255,30 +257,25 @@ async def on_ready():
 	
 
 @bot.event
-async def on_voice_state_update(before, after):
-	# Let's get all the users in our voice channel, if we're in one
-
-	if not bot.is_voice_connected(before.server):
+async def on_voice_state_update(user, beforeState, afterState):
+	# Get our member on the same server as the user
+	botMember = DisplayName.memberForID(bot.user.id, user.guild)
+	botVoice = botMember.voice
+	if not botVoice:
+		# We're not in a voice channel - don't care
 		return
+	voiceChannel = botVoice.channel
 
-	voiceChannel = bot.voice_client_in(before.server)
-	if not voiceChannel:
-		return
-	voiceChannel = voiceChannel.channel
-
-	if not before.voice_channel:
+	if not beforeState.channel is voiceChannel:
 		# Not pertaining to our channel
 		return
 
-	# Get all the members connected
-	voiceList = voiceChannel.voice_members
-
-	if len(voiceList) > 1:
-		# We are not alone - hang out still
+	if len(beforeState.channel.members) > 1:
+		# More than one user
 		return
 
 	# if we made it here - then we're alone - disconnect
-	server = before.server
+	server = before.guild
 	state = music.get_voice_state(server)
 
 	settings.setServerStat(server, "Volume", None)
@@ -297,7 +294,7 @@ async def on_voice_state_update(before, after):
 
 @bot.event
 async def on_member_remove(member):
-	server = member.server
+	server = member.guild
 	settings.removeUser(member, server)
 	for cog in cogList:
 		try:
@@ -312,9 +309,9 @@ async def on_server_join(server):
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
-	await bot.send_message(server, msg)
+	await server.send(msg)
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
-	await bot.send_message(owner, msg)
+	await owner.send(msg)
 
 @bot.event
 async def on_server_remove(server):
@@ -322,11 +319,11 @@ async def on_server_remove(server):
 
 @bot.event
 async def on_channel_delete(channel):
-	settings.removeChannelID(channel.id, channel.server)
+	settings.removeChannelID(channel.id, channel.guild)
 
 @bot.event
 async def on_member_join(member):
-	server = member.server
+	server = member.guild
 	# Initialize the user
 	settings.checkUser(member, server)
 
@@ -343,11 +340,11 @@ async def on_member_join(member):
 
 	# PM User
 	fmt = "*{}* Rules:\n{}\n\n{}".format(server.name, rules, help)
-	await bot.send_message(member, fmt)
+	await member.send(fmt)
 
 @bot.event
 async def on_member_update(before, after):
-	server = after.server
+	server = after.guild
 
 	# Check if the member went offline and log the time
 	if str(after.status).lower() == "offline":
@@ -377,7 +374,7 @@ async def on_member_update(before, after):
 				msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
 			else:
 				msg = motd
-			await bot.edit_channel(channel, topic=msg)
+			await channel.edit(topic=msg)
 	
 	# Check for cogs that accept updates
 	pm = None
@@ -391,7 +388,7 @@ async def on_member_update(before, after):
 
 @bot.event
 async def on_message(message):
-	if not message.server:
+	if not message.guild:
 		# This wasn't said in a server, process commands, then return
 		await bot.process_commands(message)
 		return
@@ -435,29 +432,29 @@ async def on_message(message):
 
 	if respond:
 		# We have something to say
-		await bot.send_message(message.channel, respond)
+		await message.channel.send(respond)
 	if delete:
 		# We need to delete the message - top priority
-		await bot.delete_message(message)
+		await message.delete()
 
 	if not ignore:
 		# We're processing commands here
 		await bot.process_commands(message)
 
 @bot.event
-async def on_command(command, ctx):
+async def on_command(ctx):
 	for cog in cogList:
 		try:
-			await cog.oncommand(command, ctx)
+			await cog.oncommand(ctx.command, ctx)
 		except AttributeError:
 			# Onto the next
 			continue
 
 @bot.event
-async def on_command_completion(command, ctx):
+async def on_command_completion(ctx):
 	for cog in cogList:
 		try:
-			await cog.oncommandcompletion(command, ctx)
+			await cog.oncommandcompletion(ctx.command, ctx)
 		except AttributeError:
 			# Onto the next
 			continue
@@ -465,7 +462,7 @@ async def on_command_completion(command, ctx):
 @bot.event
 async def on_message_edit(before, message):
 	# Run through the on_message commands, but on edits.
-	if not message.server:
+	if not message.guild:
 		# This wasn't said in a server, return
 		return
 
@@ -502,10 +499,10 @@ async def on_message_edit(before, message):
 
 	if respond:
 		# We have something to say
-		await bot.send_message(message.channel, respond)
+		await message.channel.send(respond)
 	if delete:
 		# We need to delete the message - top priority
-		await bot.delete_message(message)
+		await message.delete()
 	
 	
 
