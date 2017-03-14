@@ -47,7 +47,7 @@ from Cogs import Debugging
 from Cogs import CardsAgainstHumanity
 from Cogs import ChatterBot
 from Cogs import Star
-from Cogs import Monitor
+# from Cogs import Monitor
 
 # Let's load our prefix file
 prefix = '$'
@@ -232,8 +232,8 @@ star = Star.Star(bot)
 cogList.append(star)
 
 # Monitoring
-monitor = Monitor.Monitor(bot, settings)
-cogList.append(monitor)
+# monitor = Monitor.Monitor(bot, settings)
+# cogList.append(monitor)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
