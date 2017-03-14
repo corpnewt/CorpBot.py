@@ -126,11 +126,9 @@ class ChatterBot:
 			return
 		await self.bot.send_typing(channel)
 		
-		# try:
-		message = message.strip()
-		'''except Exception:
-			await self.bot.send_message(channel, "I couldn't understand that.")
-			return'''
+		# Sanitize input string
+		PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-./?@<>!" 
+		message = "".join(c for c in message if c in PERMITTED_CHARS)
 
 		msg = self.chatBot.respond(message)
 
