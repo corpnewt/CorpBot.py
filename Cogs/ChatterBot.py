@@ -127,7 +127,7 @@ class ChatterBot:
 		await self.bot.send_typing(channel)
 		
 		# Sanitize input string
-		PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ _-./?@<>!" 
+		PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ `~!@#$%^&*()_+-=[{}]\|/?.>,<;:'\"" 
 		message = "".join(c for c in message if c in PERMITTED_CHARS)
 
 		msg = self.chatBot.respond(message)
