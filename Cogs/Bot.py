@@ -40,7 +40,7 @@ class Bot:
 	async def ping(self, ctx):
 		"""Feeling lonely?"""
 		msg = '*{}*, PONG!'.format(ctx.message.author.mention)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 		
 	@commands.command(pass_context=True)
@@ -50,12 +50,12 @@ class Bot:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 		
 		# Let's get the bot's member in the current server
 		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
-		botMember = ctx.message.server.get_member_named(botName)
+		botMember = ctx.message.guild.get_member_named(botName)
 		await self.bot.change_nickname(botMember, name)
 
 	@commands.command(pass_context=True)
@@ -76,7 +76,7 @@ class Bot:
 		release     = platform.release()
 		version     = platform.version()
 		processor   = platform.processor()
-		botMember   = DisplayName.memberForID(self.bot.user.id, ctx.message.server)
+		botMember   = DisplayName.memberForID(self.bot.user.id, ctx.message.guild)
 		botName     = DisplayName.name(botMember)
 		currentTime = int(time.time())
 		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
@@ -92,10 +92,9 @@ class Bot:
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
 		msg += '{} ({}%) of {}GB RAM used\n'.format(memUsedGB, memPerc, memTotalGB)
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n"
-		msg += 'Hostname: {}\n'.format(platform.node())
 		msg += '{} uptime```'.format(timeString)
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -104,7 +103,7 @@ class Bot:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
 		serverDict = self.settings.serverDict
@@ -117,21 +116,23 @@ class Bot:
 		if owner == None:
 			# No owner set
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change my avatar.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 		if filename is None:
-			await self.bot.edit_profile(avatar=None)
+			await self.bot.user.edit(avatar=None)
+			await ctx.channel.send('Avatar removed!')
+			# await self.bot.edit_profile(avatar=None)
 			return
 
 		# Check if we created a temp folder for this image
 		isTemp = False
 
-		status = await self.bot.send_message(channel, 'Checking if url (and downloading if valid)...')
+		status = await channel.send('Checking if url (and downloading if valid)...')
 
 		# File name is *something* - let's first check it as a url, then a file
 		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
@@ -145,7 +146,7 @@ class Bot:
 
 		if not os.path.isfile(filename):
 			if not os.path.isfile('./{}'.format(filename)):
-				await self.bot.edit_message(status, '*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
+				await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
 				# File doesn't exist
 				return
 			else:
@@ -158,14 +159,14 @@ class Bot:
 
 		if not ext:
 			# File isn't a valid image
-			await self.bot.edit_message(status, '*{}* isn\'t a valid image format.'.format(filename))
+			await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
 			return
 
 		wasConverted = False
 		# Is an image PIL understands
 		if not ext.lower == "png":
 			# Not a PNG - let's convert
-			await self.bot.edit_message(status, 'Converting to png...')
+			await status.edit(content='Converting to png...')
 			filename = '{}.png'.format(filename)
 			img.save(filename)
 			wasConverted = True
@@ -180,14 +181,14 @@ class Bot:
 			# Tall
 			dh = int((h-w)/2)
 		# Run the crop
-		await self.bot.edit_message(status, 'Cropping (if needed)...')
+		await status.edit(content='Cropping (if needed)...')
 		img.crop((dw, dh, w-dw, h-dh)).save(filename)
 
 		# Should be a square png here - let's check size
 		# Let's make sure it's less than the passed limit
 
 		imageSize = os.stat(filename)
-		await self.bot.edit_message(status, 'Resizing (if needed)...')
+		await status.edit(content='Resizing (if needed)...')
 		while int(imageSize.st_size) > sizeLimit:
 			# Image is too big - resize
 			myimage = Image.open(filename)
@@ -203,18 +204,19 @@ class Bot:
 		ext = img.format
 		img.close()
 
-		await self.bot.edit_message(status, 'Uploading and applying avatar...')
+		await status.edit(content='Uploading and applying avatar...')
 		with open(filename, 'rb') as f:
 			newAvatar = f.read()
-			await self.bot.edit_profile(avatar=newAvatar)
+			await self.bot.user.edit(avatar=newAvatar)
+			# await self.bot.edit_profile(avatar=newAvatar)
 		# Cleanup - try removing with shutil.rmtree, then with os.remove()
-		await self.bot.edit_message(status, 'Cleaning up...')
+		await status.edit(content='Cleaning up...')
 		if isTemp:
 			GetImage.remove(filename)
 		else:
 			if wasConverted:
 				os.remove(filename)
-		await self.bot.edit_message(status, 'Avatar set!')
+		await status.edit(content='Avatar set!')
 
 
 	@commands.command(pass_context=True)
@@ -223,7 +225,7 @@ class Bot:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
 		serverDict = self.settings.serverDict
@@ -236,33 +238,25 @@ class Bot:
 		if owner == None:
 			# No owner set
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can reboot me.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 		
 		self.settings.flushSettings()
 		msg = 'Flushed settings to disk.\nRebooting...'
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
-			try:
-				task.cancel()
-			except Exception:
-				continue
-		try:
-			await self.bot.logout()
-			self.bot.loop.stop()
-			self.bot.loop.close()
-		except Exception:
-			pass
-		try:
-			await exit(0)
-		except Exception:
-			pass
+			task.cancel()
+		
+		await self.bot.logout()
+		self.bot.loop.stop()
+		self.bot.loop.close()
+		await exit(0)
 			
 
 	@commands.command(pass_context=True)
@@ -271,16 +265,16 @@ class Bot:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		total = 0
-		for server in self.bot.servers:
+		for server in self.bot.guilds:
 			total += 1
 		if total == 1:
 			msg = 'I am a part of *1* server!'
 		else:
 			msg = 'I am a part of *{}* servers!'.format(total)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -289,10 +283,10 @@ class Bot:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -308,22 +302,22 @@ class Bot:
 		if owner == None:
 			# No owner set
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can set my playing status.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		if game == None:
 			self.settings.serverDict['Game'] = None
 			msg = 'Removing my playing status...'
-			status = await self.bot.send_message(channel, msg)
+			status = await channel.send(msg)
 
 			await self.bot.change_presence(game=None)
 			
-			await self.bot.edit_message(status, 'Playing status removed!')
+			await status.edit(content='Playing status removed!')
 			self.settings.flushSettings()
 			return
 
@@ -332,13 +326,13 @@ class Bot:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		status = await self.bot.send_message(channel, msg)
+		status = await channel.send(msg)
 
 		await self.bot.change_presence(game=discord.Game(name=game))
 		# Check for suppress
 		if suppress:
 			game = Nullify.clean(game)
-		await self.bot.edit_message(status, 'Playing status set to *{}!*'.format(game))
+		await status.edit(content='Playing status set to *{}!*'.format(game))
 		self.settings.flushSettings()
 
 	@commands.command(pass_context=True)
@@ -348,23 +342,23 @@ class Bot:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		if not parts:
 			parts = ""
 			
 		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def source(self, ctx):
 		"""Link the github source."""
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

@@ -21,7 +21,7 @@ class Humor:
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
 		randnum = random.randint(0, len(fartList)-1)
 		msg = '{}'.format(fartList[randnum])
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def memetemps(self, ctx):
@@ -47,7 +47,7 @@ class Humor:
 
 		if template_id == None or text_zero == None or text_one == None:
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		templates = self.getTemps()
@@ -77,7 +77,7 @@ class Humor:
 		result = result_json["data"]["url"]
 		if msg:
 			result = '{}\n{}'.format(msg, result)
-		await self.bot.send_message(ctx.message.channel, result)
+		await ctx.channel.send(result)
 
 
 	def getTemps(self):

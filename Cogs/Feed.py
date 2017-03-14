@@ -25,9 +25,9 @@ class Feed:
 		# Check the message and see if we should allow it.
 		ignore = False
 		delete = False
-		hunger = int(self.settings.getServerStat(message.server, "Hunger"))
-		hungerLock = self.settings.getServerStat(message.server, "HungerLock")
-		isKill = self.settings.getServerStat(message.server, "Killed")
+		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
+		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
+		isKill = self.settings.getServerStat(message.guild, "Killed")
 		if isKill.lower() == "yes":
 			ignore = True
 			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
@@ -41,7 +41,7 @@ class Feed:
 		# Check if admin and override
 		isAdmin = message.author.permissions_in(message.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.server, "AdminArray")
+			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
 			for role in message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
@@ -54,10 +54,11 @@ class Feed:
 		return { 'Ignore' : ignore, 'Delete' : delete}
 		
 	async def getHungry(self):
-		while not self.bot.is_closed:
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed():
 			# Add The Hunger
 			await asyncio.sleep(900) # runs every 15 minutes
-			for server in self.bot.servers:
+			for server in self.bot.guilds:
 				# Iterate through the servers and add them
 				isKill = self.settings.getServerStat(server, "Killed")
 				
@@ -77,7 +78,7 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		hunger = int(self.settings.getServerStat(server, "Hunger"))
 		isKill = self.settings.getServerStat(server, "Killed")
@@ -115,7 +116,7 @@ class Feed:
 		if isKill.lower() == "yes" and hunger > -150:
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, self.prefix)
 			
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def feed(self, ctx, food : int = None):
@@ -125,14 +126,14 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if food == None:
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		if not type(food) == int:
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		isAdmin    = author.permissions_in(channel).administrator
@@ -183,7 +184,7 @@ class Feed:
 		if isKill.lower() == "yes":
 			# Bot's dead...
 			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		if approve:
@@ -232,7 +233,7 @@ class Feed:
 			elif hunger == 0:
 				msg = '{}\n\nIf you keep feeding me, I *may* get fat...'.format(msg)
 		
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def kill(self, ctx):
@@ -240,7 +241,7 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
@@ -248,7 +249,7 @@ class Feed:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -257,19 +258,19 @@ class Feed:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 
 		iskill = self.settings.getServerStat(server, "Killed")
 		if iskill.lower() == 'yes':
 			killedby = self.settings.getServerStat(server, "KilledBy")
 			killedby = DisplayName.memberForName(killedby, server)
-			await self.bot.send_message(channel, 'I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
+			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 			return
 		
 		self.settings.setServerStat(server, "Killed", "Yes")
 		self.settings.setServerStat(server, "KilledBy", author.id)
-		await self.bot.send_message(channel, 'I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
+		await channel.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
 		
 	@commands.command(pass_context=True)
 	async def resurrect(self, ctx):
@@ -277,7 +278,7 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
@@ -285,7 +286,7 @@ class Feed:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -294,19 +295,19 @@ class Feed:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 
 		iskill = self.settings.getServerStat(server, "Killed")
 		if iskill.lower() == 'no':
-			await self.bot.send_message(channel, 'Trying to bring back the *already-alive* - well aren\'t you special!')
+			await channel.send('Trying to bring back the *already-alive* - well aren\'t you special!')
 			return
 		
 		self.settings.setServerStat(server, "Killed", "No")
 		self.settings.setServerStat(server, "Hunger", "0")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
 		killedBy = DisplayName.memberForName(killedBy, server)
-		await self.bot.send_message(channel, 'Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
+		await channel.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
 		
 	@commands.command(pass_context=True)
 	async def iskill(self, ctx):
@@ -314,7 +315,7 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		isKill = self.settings.getServerStat(server, "Killed")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
@@ -325,7 +326,7 @@ class Feed:
 		else:
 			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
 			
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
@@ -334,10 +335,10 @@ class Feed:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -345,13 +346,13 @@ class Feed:
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if role == None:
 			self.settings.setServerStat(server, "RequiredKillRole", "")
 			msg = 'Kill/resurrect now *admin-only*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		if type(role) is str:
@@ -368,32 +369,32 @@ class Feed:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@setkillrole.error
-	async def killrole_error(ctx, error):
+	async def killrole_error(self, ctx, error):
 		# do stuff
 		msg = 'setkillrole Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		await error.channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def killrole(self, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.server, "RequiredKillRole")
+		role = self.settings.getServerStat(ctx.message.guild, "RequiredKillRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can kill/ressurect the bot.'.format(ctx)
-			await self.bot.say(msg)
+			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.server.roles:
+			for arole in ctx.message.guild.roles:
 				if arole.id == role:
 					found = True
 					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
@@ -402,4 +403,4 @@ class Feed:
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)

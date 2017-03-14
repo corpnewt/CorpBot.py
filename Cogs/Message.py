@@ -14,6 +14,6 @@ async def say(bot, msg, target, characters : int = 2000):
         return False
     
     for message in textList:
-        await bot.send_message(target, message)
+        await target.send(message)
     
     return True

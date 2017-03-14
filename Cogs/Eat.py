@@ -26,11 +26,11 @@ class Eat:
 			randnum = random.randint(0, len(nothingList)-1)
 			msg = '*{}*, {}'.format(authorName, nothingList[randnum])
 			msg = Nullify.clean(msg)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 		
 		# Check if we're eating a member
-		memberCheck = DisplayName.memberForName(member, ctx.message.server)
+		memberCheck = DisplayName.memberForName(member, ctx.message.guild)
 		if memberCheck:
 			# We're eating a member - let's do a bot-check
 			if memberCheck.id == self.bot.user.id:
@@ -57,7 +57,7 @@ class Eat:
 			randnum = random.randint(0, len(memberList)-1)
 			msg = '*{}*, {}'.format(authorName, memberList[randnum])
 			msg = Nullify.clean(msg)				
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		# Assume we're eating something else
@@ -70,5 +70,5 @@ class Eat:
 		randnum = random.randint(0, len(itemList)-1)
 		msg = '*{}*, {}'.format(authorName, itemList[randnum])
 		msg = Nullify.clean(msg)			
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		return				

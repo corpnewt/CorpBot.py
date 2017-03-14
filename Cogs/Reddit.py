@@ -68,7 +68,7 @@ class Reddit:
 		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
 		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
 		if not GetImage.canDisplay( lastTime, threshold ):
-			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+			# await channel.send('Too many images at once - please wait a few seconds.')
 			return False
 		
 		# If we made it here - set the LastPicture method
@@ -79,48 +79,48 @@ class Reddit:
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
 		msg = self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def brainfart(self, ctx):
 		"""Spout out some uh... intellectual brilliance..."""
 		msg = self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def nocontext(self, ctx):
 		"""Spout out some intersexual brilliance."""
 		msg = self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def withcontext(self, ctx):
 		"""Spout out some contextual brilliance."""
 		msg = self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):
 		"""Spout out some interstellar questioning... ?"""
 		infoDict = self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
-		self.settings.setServerStat(ctx.message.server, "LastAnswer", infoDict["url"])
+		self.settings.setServerStat(ctx.message.guild, "LastAnswer", infoDict["url"])
 		msg = '{}'.format(infoDict["title"])
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def answer(self, ctx):
 		"""Spout out some interstellar answering... ?"""
-		answer = self.settings.getServerStat(ctx.message.server, "LastAnswer")
+		answer = self.settings.getServerStat(ctx.message.guild, "LastAnswer")
 		if answer == "":
 			msg = 'You need to ask a `{}question` first!'.format(ctx.prefix)
 		else:
 			msg = '{}'.format(answer)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -129,7 +129,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -146,7 +146,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -163,7 +163,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -180,7 +180,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -197,7 +197,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -214,7 +214,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -231,7 +231,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -248,7 +248,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -265,7 +265,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -282,7 +282,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -299,7 +299,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -316,7 +316,7 @@ class Reddit:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return

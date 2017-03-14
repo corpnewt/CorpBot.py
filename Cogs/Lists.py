@@ -24,14 +24,14 @@ class Lists:
 		"""Add a link to the link list."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredLinkRole")
@@ -39,7 +39,7 @@ class Lists:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -48,13 +48,13 @@ class Lists:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 				
 		# Passed role requirements!
 		if not (name or link):
 			msg = 'Usage: `{}addlink "[link name]" [url]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
@@ -80,7 +80,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -89,10 +89,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -103,7 +103,7 @@ class Lists:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -112,18 +112,18 @@ class Lists:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		
 		if name == None:
 			msg = 'Usage: `{}removelink "[link name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
 			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -134,14 +134,14 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		msg = '*{}* not found in link list!'.format(name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -150,23 +150,23 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not name:
 			msg = 'Usage: `{}link "[link name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
 			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -175,7 +175,7 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 				
 		msg = 'Link "*{}*" not found!'.format(name)
@@ -191,7 +191,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)		
+		await channel.send(msg)		
 
 	@commands.command(pass_context=True)
 	async def linkinfo(self, ctx, *, name : str = None):
@@ -199,23 +199,23 @@ class Lists:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not name:
 			msg = 'Usage: `{}linkinfo "[link name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Links")
 		if not linkList or linkList == []:
 			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -253,14 +253,14 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 				
 		msg = 'Link "*{}*" not found!'.format(name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def links(self, ctx):
@@ -268,10 +268,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -285,13 +285,13 @@ class Lists:
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		linkList = self.settings.getServerStat(server, "Links")
 		if linkList == None or linkList == []:
 			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		# Sort by link name
@@ -304,7 +304,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await self.bot.send_message(channel, linkText[:-2])
+		await channel.send(linkText[:-2])
 
 
 	@commands.command(pass_context=True)
@@ -312,19 +312,19 @@ class Lists:
 		"""Lists the required role to add links."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.server, "RequiredLinkRole")
+		role = self.settings.getServerStat(ctx.message.guild, "RequiredLinkRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can add links.'.format(ctx)
-			await self.bot.say(msg)
+			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.server.roles:
+			for arole in ctx.message.guild.roles:
 				if arole.id == role:
 					found = True
 					vowels = "aeiou"
@@ -337,7 +337,7 @@ class Lists:
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -346,10 +346,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -360,7 +360,7 @@ class Lists:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -369,13 +369,13 @@ class Lists:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+				await ctx.channel.send('You do not have sufficient privileges to access this command.')
 				return
 				
 		# Passed role requirements!
 		if not (name or hack):
 			msg = 'Usage: `{}addhack "[hack name]" [hack]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		hackList = self.settings.getServerStat(server, "Hacks")
@@ -401,7 +401,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 		
 		
@@ -411,10 +411,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -425,7 +425,7 @@ class Lists:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
@@ -434,18 +434,18 @@ class Lists:
 				if role.id == requiredRole:
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		
 		if name == None:
 			msg = 'Usage: `{}removehack "[hack name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
 			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -456,14 +456,14 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 
 		msg = '*{}* not found in hack list!'.format(name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -472,23 +472,23 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not name:
 			msg = 'Usage: `{}hack "[hack name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
 			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -497,7 +497,7 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 		msg = 'Hack "*{}*" not found!'.format(name)
 		
@@ -512,7 +512,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def hackinfo(self, ctx, *, name : str = None):
@@ -520,23 +520,23 @@ class Lists:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not name:
 			msg = 'Usage: `{}hackinfo "[hack name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
 			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -574,13 +574,13 @@ class Lists:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 		msg = 'Hack "*{}*" not found!'.format(name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)	
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -589,10 +589,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -606,13 +606,13 @@ class Lists:
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
 		if not linkList or linkList == []:
 			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Sort by link name
@@ -626,7 +626,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await self.bot.send_message(channel, linkText[:-2])
+		await channel.send(linkText[:-2])
 
 
 	@commands.command(pass_context=True)
@@ -634,19 +634,19 @@ class Lists:
 		"""Lists the required role to add hacks."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.server, "RequiredHackRole")
+		role = self.settings.getServerStat(ctx.message.guild, "RequiredHackRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can add hacks.'.format(ctx)
-			await self.bot.say(msg)
+			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.server.roles:
+			for arole in ctx.message.guild.roles:
 				if arole.id == role:
 					found = True
 					vowels = "aeiou"
@@ -659,7 +659,7 @@ class Lists:
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -668,10 +668,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -681,33 +681,33 @@ class Lists:
 			
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 
 		parts = self.settings.getUserStat(member, server, "Parts")
 		
 		if not parts or parts == "":
 			msg = '*{}* has not added their parts yet!  They can add them with the `{}setparts [parts text]` command!'.format(DisplayName.name(member), ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		msg = '***{}\'s*** **Parts:**\n{}'.format(DisplayName.name(member), parts)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@parts.error
 	async def parts_error(self, ctx, error):
 		# do stuff
 		msg = 'parts Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		await error.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -716,10 +716,10 @@ class Lists:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -732,19 +732,19 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
 		msg = '\{}setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'.format(ctx.prefix)	
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def online(self, ctx):
 		"""Lists the number of users online."""
-		server = ctx.message.server
+		server = ctx.message.guild
 		members = 0
 		membersOnline = 0
 		for member in server.members:
@@ -752,7 +752,7 @@ class Lists:
 			if str(member.status).lower() == "online":
 				membersOnline += 1
 		msg = 'There are *{}* out of *{}* users online.'.format(membersOnline, members)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -760,29 +760,29 @@ class Lists:
 		"""Lists the last time a user was online if known."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
 		if not member:
 			msg = 'Usage: `{}lastonline "[member]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 		name = DisplayName.name(member)
 
@@ -801,10 +801,10 @@ class Lists:
 			else:
 				msg = 'I don\'t know when *{}* was last online.  Sorry.'.format(name)
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 	@lastonline.error
 	async def lastonline_error(self, ctx, error):
 		# do stuff
 		msg = 'lastonline Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		await error.channel.send(msg)

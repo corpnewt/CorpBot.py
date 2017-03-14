@@ -18,7 +18,7 @@ class Ascii:
 		"""Beautify some text (font list at http://artii.herokuapp.com/fonts_list)."""
 
 		if text == None:
-			await self.bot.send_message(ctx.message.channel, 'Usage: `{}ascii [font (optional)] [text]`\n(font list at http://artii.herokuapp.com/fonts_list)'.format(ctx.prefix))
+			await ctx.channel.send('Usage: `{}ascii [font (optional)] [text]`\n(font list at http://artii.herokuapp.com/fonts_list)'.format(ctx.prefix))
 			return
 
 		# Get list of fonts
@@ -42,4 +42,4 @@ class Ascii:
 			url += '&font={}'.format(font)
 		get_request = self.bot.loop.run_in_executor(None, requests.get, url)
 		response = await get_request
-		await self.bot.say("```Markup\n{}```".format(response.text))
+		await ctx.channel.send("```Markup\n{}```".format(response.text))

@@ -20,4 +20,4 @@ class Uptime:
 		currentTime = int(time.time())
 		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
 		msg = 'I\'ve been up for *{}*.'.format(timeString)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

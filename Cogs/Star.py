@@ -15,4 +15,4 @@ class Star:
 	@commands.command(pass_context=True, no_pm=True)
 	async def randstar(self, ctx, *, text : str = None):
 		r = requests.get('https://sydneyerickson.me/starapi/rand.php')
-		await self.bot.say(r.content.decode("utf-8").replace(" ", "%20"))
+		await ctx.channel.send(r.content.decode("utf-8").replace(" ", "%20"))

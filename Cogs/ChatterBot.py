@@ -3,6 +3,7 @@ import discord
 import time
 import requests
 import urllib
+import os
 from aiml import Kernel
 from os import listdir
 from discord.ext import commands
@@ -19,6 +20,7 @@ class ChatterBot:
 		self.prefix = prefix
 		self.waitTime = 4 # Wait time in seconds
 		self.botDir = 'standard'
+		self.botBrain = 'standard.brn'
 		self.botList = []
 		self.ownerName = "CorpNewt"
 		self.ownerGender = "man"
@@ -27,9 +29,16 @@ class ChatterBot:
 
 	async def onready(self):
 		# We're ready - let's load the bots
-		files = listdir(self.botDir)
-		for file in files:
-			self.chatBot.learn(self.botDir + '/' + file)
+		if not os.path.exists(self.botBrain):
+			# No brain, let's learn and create one
+			files = listdir(self.botDir)
+			for file in files:
+				self.chatBot.learn(self.botDir + '/' + file)
+			# Save brain
+			self.chatBot.saveBrain("standard.brn")
+		else:
+			# Already have a brain - load it
+			self.chatBot.bootstrap(brainFile="standard.brn")
 		# Learned by this point - let's set our owner's name/gender
 		# Start the convo
 		self.chatBot.respond('Hello')
@@ -57,7 +66,7 @@ class ChatterBot:
 		ignore = False
 		delete = False
 		msg = message.content
-		chatChannel = self.settings.getServerStat(message.server, "ChatChannel")
+		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
 		if chatChannel and not message.author == self.bot.user and not msg.startswith(self.prefix):
 			# We have a channel
 			if message.channel.id == chatChannel:
@@ -68,41 +77,41 @@ class ChatterBot:
 				msg = message.content
 				if msg.lower().startswith(pre):
 					msg = msg[len(pre):]
-				await self._chat(message.channel, message.server, msg)
+				await self._chat(message.channel, message.guild, msg)
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
 
 	@commands.command(pass_context=True)
-	async def setchatchannel(self, ctx, *, channel : discord.Channel = None):
+	async def setchatchannel(self, ctx, *, channel : discord.TextChannel = None):
 		"""Sets the channel for bot chatter."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if channel == None:
-			self.settings.setServerStat(ctx.message.server, "ChatChannel", "")
+			self.settings.setServerStat(ctx.message.guild, "ChatChannel", "")
 			msg = 'Chat channel removed - must use the `{}chat [message]` command to chat.'.format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.message.channel.send(msg)
 			return
 
 		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.server, "ChatChannel", channel.id)
+		self.settings.setServerStat(ctx.message.guild, "ChatChannel", channel.id)
 		msg = 'Chat channel set to **{}**.'.format(channel.name)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.message.channel.send(msg)
 
 	@setchatchannel.error
-	async def setchatchannel_error(self, ctx, error):
+	async def setchatchannel_error(self, error, ctx):
 		# do stuff
-		msg = 'setchatchannel Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		msg = 'setchatchannel Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def chat(self, ctx, *, message = None):
 		"""Chats with the bot."""
-		await self._chat(ctx.message.channel, ctx.message.server, message)
+		await self._chat(ctx.message.channel, ctx.message.guild, message)
 
 
 	async def _chat(self, channel, server, message):
@@ -115,7 +124,7 @@ class ChatterBot:
 			return
 		if not self.canChat(server):
 			return
-		await self.bot.send_typing(channel)
+		await channel.trigger_typing()
 
 		msg = self.chatBot.respond(message)
 
@@ -124,4 +133,4 @@ class ChatterBot:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)

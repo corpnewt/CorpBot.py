@@ -98,7 +98,7 @@ class Settings:
 
 	async def onready(self):
 		# Check all verifications - and start timers if needed
-		for server in self.bot.servers:
+		for server in self.bot.guilds:
 			# Get default role
 			defRole = self.getServerStat(server, "DefaultRole")
 			defRole = DisplayName.roleForID(defRole, server)
@@ -141,14 +141,14 @@ class Settings:
 				try:
 					await self.bot.add_roles(member, defRole)
 					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
-					await self.bot.send_message(member, fmt)
+					await member.send(fmt)
 				except Exception:
 					pass
 
 	async def backup(self):
 		# Wait initial time - then start loop
 		await asyncio.sleep(self.backupWait)
-		while not self.bot.is_closed:
+		while not self.bot.is_closed():
 			# Initial backup - then wait
 			if not os.path.exists(self.backupDir):
 				# Create it
@@ -249,7 +249,7 @@ class Settings:
 
 
 	def removeChannel(self, channel):
-		motdArray = self.settings.getServerStat(channel.server, "ChannelMOTD")
+		motdArray = self.settings.getServerStat(channel.guild, "ChannelMOTD")
 		for a in motdArray:
 			# Get the channel that corresponds to the id
 			if a['ID'] == channel.id:
@@ -494,7 +494,7 @@ class Settings:
 	async def ownerlock(self, ctx):
 		"""Locks/unlocks the bot to only respond to the owner."""
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -505,12 +505,12 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			msg = 'I cannot be locked until I have an owner.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			# We have an owner - and the owner is talking to us
 			# Let's try and get the OwnerLock setting and toggle it
@@ -527,7 +527,7 @@ class Settings:
 				self.serverDict['OwnerLock'] = "No"
 				msg = 'Owner lock **Disabled**.'
 				await self.bot.change_presence(game=None)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			#self.flushSettings()
 
 
@@ -535,7 +535,7 @@ class Settings:
 	async def owner(self, ctx):
 		"""Lists the bot's current owner."""
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -548,21 +548,21 @@ class Settings:
 			member = DisplayName.memberForID(owner, server)
 			if not member:
 				# Not on this server
-				msg = 'My owner (id: *{}*) does not appear to be a part of this server.'.format(owner)
+				msg = 'My owner, *<@!{}>* (id: *{}*), does not appear to be a part of this server.'.format(owner, owner)
 			else:
 				# Gotem!
 				msg = 'I am owned by *{}*.'.format(DisplayName.name(member))
 		else:
 			# No owner
 			msg = 'I have not been claimed, *yet*.'
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	
 	@commands.command(pass_context=True)
 	async def claim(self, ctx):
 		"""Claims the bot - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 		member = author
 
@@ -578,19 +578,19 @@ class Settings:
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			self.serverDict['Owner'] = member.id
 			#self.flushSettings()
 		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 	
 
 	@commands.command(pass_context=True)
 	async def setowner(self, ctx, *, member : str = None):
 		"""Sets the bot owner - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		if member == None:
@@ -601,7 +601,7 @@ class Settings:
 			member = memberCheck
 		else:
 			msg = 'I couldn\'t find *{}*.'.format(member)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		try:
@@ -616,25 +616,25 @@ class Settings:
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			self.serverDict['Owner'] = member.id
 			#self.flushSettings()
 
 		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	@owner.error
-	async def owner_error(ctx, error):
-		msg = 'owner Error: {}'.format(ctx)
-		await self.bot.say(msg)
+	async def owner_error(self, error, ctx):
+		msg = 'owner Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def disown(self, ctx):
 		"""Revokes ownership of the bot."""
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -645,18 +645,18 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			msg = 'I have already been disowned...'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can disown me.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			self.serverDict['Owner'] = None
 			#self.flushSettings()
 
 		msg = 'I have been disowned by *{}!*'.format(DisplayName.name(author))
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -664,7 +664,7 @@ class Settings:
 		"""Gets the value for a specific stat for the listed member (case-sensitive)."""
 		
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
 		if member == None:
@@ -672,7 +672,7 @@ class Settings:
 
 		if str == None:
 			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		if type(member) is str:
@@ -684,24 +684,24 @@ class Settings:
 
 		if member is None:
 			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		try:
 			newStat = self.getUserStat(member, server, stat)
 		except KeyError:
 			msg = '"{}" is not a valid stat for *{}*'.format(stat, DisplayName.name(member))
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 	# Catch errors for stat
 	@getstat.error
-	async def getstat_error(ctx, error):
-		msg = 'getstat Error: {}'.format(ctx)
-		await self.bot.say(msg)
+	async def getstat_error(self, error, ctx):
+		msg = 'getstat Error: {}'.format(error)
+		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
@@ -709,24 +709,24 @@ class Settings:
 		"""Sets a server stat (admin only)."""
 		
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
 		isAdmin = author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if stat == None or value == None:
 			msg = 'Usage: `{}setsstat Stat Value`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		self.setServerStat(server, stat, value)
 
 		msg = '**{}** set to *{}!*'.format(stat, value)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -734,24 +734,24 @@ class Settings:
 		"""Gets a server stat (admin only)."""
 		
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if stat == None:
 			msg = 'Usage: `{}getsstat [stat]`'.format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		value = self.getServerStat(server, stat)
 
 		msg = '**{}** is currently *{}!*'.format(stat, value)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def flush(self, ctx):
@@ -759,12 +759,12 @@ class Settings:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 		# Flush settings
 		self.flushSettings()
 		msg = 'Flushed settings to disk.'
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 				
 
 	# Flush loop - run every 10 minutes
@@ -772,7 +772,7 @@ class Settings:
 		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
 		if not file:
 			file = self.file
-		while not self.bot.is_closed:
+		while not self.bot.is_closed():
 			await asyncio.sleep(self.settingsDump)
 			self.flushSettings()
 				
@@ -790,7 +790,7 @@ class Settings:
 		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -801,12 +801,12 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		removedSettings = 0
@@ -830,7 +830,7 @@ class Settings:
 			settingsWord = "setting"
 		
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		# Flush settings
 		self.flushSettings()
 
@@ -840,7 +840,7 @@ class Settings:
 		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -851,12 +851,12 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		removedSettings = 0
@@ -879,7 +879,7 @@ class Settings:
 			settingsWord = "setting"
 		
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		# Flush settings
 		self.flushSettings()
 
@@ -889,7 +889,7 @@ class Settings:
 		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
 		
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		try:
@@ -900,12 +900,12 @@ class Settings:
 		if owner == None:
 			# No previous owner, let's set them
 			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		else:
 			if not author.id == owner:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 		
 		# Set up vars
@@ -921,7 +921,7 @@ class Settings:
 		for botServer in self.serverDict["Servers"]:
 			# Let's check through each server first - then members
 			foundServer = False
-			for serve in self.bot.servers:
+			for serve in self.bot.guilds:
 				# Check ID in case of name change
 				if botServer["ID"] == serve.id:
 					foundServer = True
@@ -987,4 +987,4 @@ class Settings:
 			usersWord = "user"
 		
 		msg = 'Pruned *{} {}*, *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedChannels, channelWord, removedServers, serverWord)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

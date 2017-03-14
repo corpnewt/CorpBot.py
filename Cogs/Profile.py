@@ -23,14 +23,14 @@ class Profile:
 		"""Add a profile to your profile list."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredXPRole")
@@ -38,22 +38,22 @@ class Profile:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 				
 		# Passed role requirements!
 		if not (name or link):
 			msg = 'Usage: `{}addprofile "[profile name]" [link]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getUserStat(author, server, "Profiles")
@@ -80,7 +80,7 @@ class Profile:
 				msg = Nullify.clean(msg)
 		
 		self.settings.setUserStat(author, server, "Profiles", linkList)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -89,10 +89,10 @@ class Profile:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -103,27 +103,27 @@ class Profile:
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
-				await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		
 		if name == None:
 			msg = 'Usage: `{}removeprofile "[profile name]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		linkList = self.settings.getUserStat(author, server, "Profiles")
 		if not linkList or linkList == []:
 			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(author), ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		for alink in linkList:
@@ -134,14 +134,14 @@ class Profile:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		msg = '*{}* not found in *{}\'s* profile list!'.format(name, DisplayName.name(author))
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -150,17 +150,17 @@ class Profile:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not member:
 			msg = 'Usage: `{}profile [member] [profile name]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# name is likely to be empty unless quotes are used
@@ -179,7 +179,7 @@ class Profile:
 					nameStr    = ' '.join(parts[0:i+1])
 					# Profile = end of name -> end of parts joined by space
 					profileStr = ' '.join(parts[i+1:])
-					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
+					memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
 					if memFromName:
 						# We got a member - let's check for a profile
 						linkList = self.settings.getUserStat(memFromName, server, "Profiles")
@@ -193,7 +193,7 @@ class Profile:
 								# Check for suppress
 								if suppress:
 									msg = Nullify.clean(msg)
-								await self.bot.send_message(channel, msg)
+								await channel.send(msg)
 								return
 		# Check if there is no member specified
 		linkList = self.settings.getUserStat(author, server, "Profiles")
@@ -207,12 +207,12 @@ class Profile:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 
 		# If we got this far - we didn't find them or somehow they added a name
 		msg = 'Sorry, I couldn\'t find that user/profile.'
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 			
 
 	@commands.command(pass_context=True)
@@ -221,17 +221,17 @@ class Profile:
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 		
 		if not member:
 			msg = 'Usage: `{}profileinfo [member] [profile name]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		profile = None
@@ -252,7 +252,7 @@ class Profile:
 					nameStr    = ' '.join(parts[0:i+1])
 					# Profile = end of name -> end of parts joined by space
 					profileStr = ' '.join(parts[i+1:])
-					memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
+					memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
 					if memFromName:
 						# We got a member - let's check for a profile
 						linkList = self.settings.getUserStat(memFromName, server, "Profiles")
@@ -279,7 +279,7 @@ class Profile:
 		if not profile:
 			# At this point - we've exhausted our search
 			msg = 'Sorry, I couldn\'t find that user/profile.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		# We have a profile
@@ -301,7 +301,7 @@ class Profile:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await self.bot.send_message(channel, msg)
+		await channel.send(msg)
 		return
 
 
@@ -311,10 +311,10 @@ class Profile:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -329,7 +329,7 @@ class Profile:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			else:
 				member = newMember
@@ -339,7 +339,7 @@ class Profile:
 		linkList = self.settings.getUserStat(member, server, "Profiles")
 		if linkList == None or linkList == []:
 			msg = '*{}* hasn\'t added any profiles yet!  They can do so with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(member), ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		# Sort by link name
@@ -353,4 +353,4 @@ class Profile:
 			linkText = Nullify.clean(linkText)
 
 		# Speak the link list while cutting off the end ", "
-		await self.bot.send_message(channel, linkText[:-2])
+		await channel.send(linkText[:-2])

@@ -78,7 +78,7 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	
 async def upload(path, bot, channel):
 	with open (path, 'rb') as f:
-		await bot.send_file(channel, path)
+		await channel.send(file=path)
 
 def addExt(path):
 	img = Image.open(path)
@@ -92,13 +92,13 @@ def remove(path):
 
 async def get(url, bot, channel, title : str = 'Unknown', ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download passed image, and upload it to passed channel."""
-	message = await bot.send_message(channel, 'Downloading...')
+	message = await channel.send('Downloading...')
 	file = download(url)
 	if not file:
-		await bot.edit_message(message, 'Oh *shoot* - I couldn\'t get that image...')
+		await message.edit(content='Oh *shoot* - I couldn\'t get that image...')
 		return
 
-	message = await bot.edit_message(message, 'Uploading...')
-	await upload(file, bot, channel)
-	await bot.edit_message(message, title)
+	await message.edit(content='Uploading...')
+	await channel.send(file=file)
+	await message.edit(content=title)
 	remove(file)

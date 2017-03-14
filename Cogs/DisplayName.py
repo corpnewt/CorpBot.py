@@ -19,9 +19,9 @@ def name(member : discord.Member):
         return name
     return None
 
-def memberForID(id, server):
+def memberForID(checkid, server):
     for member in server.members:
-        if member.id == id:
+        if str(member.id) == str(checkid):
             return member
     return None
 
@@ -43,7 +43,7 @@ def memberForName(name, server):
 
 def roleForID(id, server):
     for role in server.roles:
-        if role.id == id:
+        if str(role.id) == str(id):
             return role
     return None
 

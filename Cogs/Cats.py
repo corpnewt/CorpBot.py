@@ -44,7 +44,7 @@ class Cats:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return

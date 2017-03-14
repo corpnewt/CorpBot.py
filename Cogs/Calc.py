@@ -126,7 +126,7 @@ class Calc:
 
         if formula == None:
             msg = 'Usage: `{}calc [formula]`'.format(ctx.prefix)
-            await self.bot.send_message(ctx.message.channel, msg)
+            await ctx.channel.send(msg)
             return
 
         try:
@@ -143,9 +143,9 @@ class Calc:
             msg += "term    :: factor [ multop factor ]*\n"
             msg += "expr    :: term [ addop term ]*```"
             msg = Nullify.clean(msg)
-            await self.bot.send_message(ctx.message.channel, msg)
+            await ctx.channel.send(msg)
             return
 
         msg = '{} = {}'.format(formula, answer)
         # Say message
-        await self.bot.send_message(ctx.message.channel, msg)
+        await ctx.channel.send(msg)

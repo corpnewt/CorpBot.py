@@ -17,9 +17,9 @@ class Time:
 		"""Set your UTC offset."""
 
 		if offset == None:
-			self.settings.setUserStat(ctx.message.author, ctx.message.server, "UTCOffset", None)
+			self.settings.setUserStat(ctx.message.author, ctx.message.guild, "UTCOffset", None)
 			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		offset = offset.replace('+', '')
@@ -32,19 +32,19 @@ class Time:
 				hours = int(offset)
 				minutes = 0
 			except Exception:
-				await self.bot.say('Offset has to be in +-H:M!')
+				await ctx.channel.send('Offset has to be in +-H:M!')
 				return
 		off = "{}:{}".format(hours, minutes)
-		self.settings.setUserStat(ctx.message.author, ctx.message.server, "UTCOffset", off)
+		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "UTCOffset", off)
 		msg = '*{}*, your UTC offset has been set to *{}!*'.format(DisplayName.name(ctx.message.author), off)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def offset(self, ctx, *, member = None):
 		"""See a member's UTC offset."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -55,20 +55,20 @@ class Time:
 		if type(member) == str:
 			# Try to get a user first
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'Couldn\'t find user *{}*.'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 
 		# We got one
-		offset = self.settings.getUserStat(member, ctx.message.server, "UTCOffset")
+		offset = self.settings.getUserStat(member, ctx.message.guild, "UTCOffset")
 		if offset == None:
 			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		# Split time string by : and get hour/minute values
@@ -79,7 +79,7 @@ class Time:
 				hours = int(offset)
 				minutes = 0
 			except Exception:
-				await self.bot.say('Offset has to be in +-H:M!')
+				await ctx.channel.send('Offset has to be in +-H:M!')
 				return
 		
 		msg = 'UTC'
@@ -92,7 +92,7 @@ class Time:
 			msg += '{}'.format(offset)
 
 		msg = '*{}\'s* offset is *{}*'.format(DisplayName.name(member), msg)
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 
 
 
@@ -104,15 +104,15 @@ class Time:
 			member = ctx.message.author
 		else:
 			# Try to get a user first
-			member = DisplayName.memberForName(offset, ctx.message.server)
+			member = DisplayName.memberForName(offset, ctx.message.guild)
 
 		if member:
 			# We got one
-			offset = self.settings.getUserStat(member, ctx.message.server, "UTCOffset")
+			offset = self.settings.getUserStat(member, ctx.message.guild, "UTCOffset")
 		
 		if offset == None:
 			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.\nThe current UTC time is *{}*.'.format(DisplayName.name(member), ctx.prefix, datetime.datetime.utcnow().strftime("%I:%M %p"))
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		offset = offset.replace('+', '')
@@ -125,7 +125,7 @@ class Time:
 				hours = int(offset)
 				minutes = 0
 			except Exception:
-				await self.bot.say('Offset has to be in +-H:M!')
+				await ctx.channel.send('Offset has to be in +-H:M!')
 				return
 
 		msg = 'UTC'
@@ -151,4 +151,4 @@ class Time:
 		else:
 			msg = '{} is currently *{}*'.format(msg, newTime.strftime("%I:%M %p"))
 		# Say message
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

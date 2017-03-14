@@ -19,7 +19,7 @@ class DrBeer:
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
 			for role in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
@@ -30,7 +30,7 @@ class DrBeer:
 			return
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		beerList = ["Hey, yall. Quit ya horsin' around now. Can't you see I'm busy tryin'a shoot'n all them summersquash?",
@@ -42,6 +42,6 @@ class DrBeer:
 		randnum = random.randint(0, len(beerList)-1)
 		msg = '{}'.format(beerList[randnum])
 		# Remove original message
-		await self.bot.delete_message(ctx.message)
+		await ctx.message.delete()
 		# Say new message
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

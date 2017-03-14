@@ -9,7 +9,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
     
-    server = channel.server
+    server = channel.guild
     
     # Get our preliminary vars
     msg         = None
@@ -64,14 +64,14 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
 
     # Add and remove roles as needed
     if len(addRoles):
-        await bot.add_roles(user, *addRoles)
+        await user.add_roles(*addRoles)
     if len(remRoles):
-        await bot.remove_roles(user, *remRoles)
+        await user.remove_roles(*remRoles)
 
     # Check if we have a message to display - and display it
     if msg and (not suppress):
         # Check for suppress
         if suppressed:
             msg = Nullify.clean(msg)
-        await bot.send_message(channel, msg)
+        await channel.send(msg)
     return changed

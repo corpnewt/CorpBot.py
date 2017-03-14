@@ -16,7 +16,7 @@ class EightBall:
 
 		if question == None:
 			msg = 'You need to ask me a question first.'
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		answerList = [	"It is certain",
@@ -42,4 +42,4 @@ class EightBall:
 		randnum = random.randint(0, len(answerList)-1)
 		msg = '{}'.format(answerList[randnum])
 		# Say message
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)

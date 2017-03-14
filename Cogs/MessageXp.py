@@ -17,12 +17,12 @@ class MessageXp:
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 
-		server = message.server
+		server = message.guild
 		xpAmount   = int(self.settings.getServerStat(server, "XPPerMessage"))
 		xpRAmount  = int(self.settings.getServerStat(server, "XPRPerMessage"))
 		
 		if xpRAmount > 0:
-			# Bump xp
+			# Bump xp reserve
 			self.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
 		
 		if xpAmount > 0:

@@ -22,11 +22,11 @@ class Fliptime:
 		# Check for admin status
 		isAdmin = message.author.permissions_in(message.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.server, "AdminArray")
+			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
 			for role in message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
+					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
 
 		# Check if the message contains the flip chars
@@ -44,10 +44,10 @@ class Fliptime:
 			# Table flip - add time
 			currentTime = int(time.time())
 			cooldownFinal = currentTime+60
-			alreadyMuted = self.settings.getUserStat(message.author, message.server, "Muted")
+			alreadyMuted = self.settings.getUserStat(message.author, message.guild, "Muted")
 			if not isAdmin:
 				# Check if we're muted already
-				previousCooldown = self.settings.getUserStat(message.author, message.server, "Cooldown")
+				previousCooldown = self.settings.getUserStat(message.author, message.guild, "Cooldown")
 				if not previousCooldown:
 					if alreadyMuted.lower() == "yes":
 						# We're perma-muted - ignore
@@ -63,9 +63,9 @@ class Fliptime:
 					# Not cooling down - start it
 					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
-				self.settings.setUserStat(message.author, message.server, "Cooldown", cooldownFinal)
-				self.settings.setUserStat(message.author, message.server, "Muted", "Yes")
-				await self.bot.send_message(message.channel, res)
+				self.settings.setUserStat(message.author, message.guild, "Cooldown", cooldownFinal)
+				self.settings.setUserStat(message.author, message.guild, "Muted", "Yes")
+				await message.channel.send(res)
 				return { 'Ignore' : True, 'Delete' : True }		
 
 		return { 'Ignore' : False, 'Delete' : False}

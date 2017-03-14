@@ -22,21 +22,21 @@ class Channel:
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
 		
-		isLocked = self.settings.getServerStat(ctx.message.server, "AdminLock")
+		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
 		if isLocked.lower() == "yes":
 			msg = 'Admin lock is *On*.'
 		else:
 			msg = 'Admin lock is *Off*.'
 			
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def rules(self, ctx):
 		"""Display the server's rules."""
-		rules = self.settings.getServerStat(ctx.message.server, "Rules")
-		msg = "*{}* Rules:\n{}".format(ctx.message.server.name, rules)
-		await self.bot.send_message(ctx.message.channel, msg)
+		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
+		msg = "*{}* Rules:\n{}".format(ctx.message.guild.name, rules)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -44,30 +44,30 @@ class Channel:
 		"""Says whether a member is muted in chat."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 			
 		if member == None:
 			msg = 'Usage: `{}ismuted [member]`'.format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 				
-		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
+		isMute = self.settings.getUserStat(member, ctx.message.guild, "Muted")
 
-		checkTime = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
+		checkTime = self.settings.getUserStat(member, ctx.message.guild, "Cooldown")
 		if checkTime:
 			checkTime = int(checkTime)
 		currentTime = int(time.time())
@@ -78,9 +78,9 @@ class Channel:
 			# We have passed the check time
 			ignore = False
 			delete = False
-			self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
-			self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
-			isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
+			self.settings.setUserStat(member, ctx.message.guild, "Cooldown", None)
+			self.settings.setUserStat(member, ctx.message.guild, "Muted", "No")
+			isMute = self.settings.getUserStat(member, ctx.message.guild, "Muted")
 		elif checkTime:
 			checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
 
@@ -92,13 +92,13 @@ class Channel:
 		else:
 			msg = '{} is *Unmuted*.'.format(DisplayName.name(member))
 			
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.channel.send(msg)
 		
 	@ismuted.error
-	async def ismuted_error(self, ctx, error):
+	async def ismuted_error(self, error, ctx):
 		# do stuff
-		msg = 'ismuted Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		msg = 'ismuted Error: {}'.format(error)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
@@ -106,12 +106,12 @@ class Channel:
 		"""Lists admin roles and id's."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
-		promoArray = self.settings.getServerStat(ctx.message.server, "AdminArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")
 		
 		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
 		
@@ -119,14 +119,14 @@ class Channel:
 
 		if not len(promoSorted):
 			roleText = "There are no admin roles set yet.  Use `{}addadmin [role]` to add some.".format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, roleText)
+			await ctx.channel.send(roleText)
 			return
 		
 		roleText = "Current Admin Roles:\n"
 
 		for arole in promoSorted:
 			found = False
-			for role in ctx.message.server.roles:
+			for role in ctx.message.guild.roles:
 				if role.id == arole["ID"]:
 					# Found the role ID
 					found = True
@@ -138,36 +138,36 @@ class Channel:
 		if suppress:
 			roleText = Nullify.clean(roleText)
 
-		await self.bot.send_message(ctx.message.channel, roleText)
+		await ctx.channel.send(roleText)
 
 	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, role = None):
 		"""Lists the number of users in a current role."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		if role == None:
 			msg = 'Usage: `{}rolecall [role]`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		if type(role) is str:
 			roleName = role
-			role = DisplayName.roleForName(roleName, ctx.message.server)
+			role = DisplayName.roleForName(roleName, ctx.message.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.channel.send(msg)
 				return
 		
 		# Create blank embed
@@ -197,22 +197,22 @@ class Channel:
 		
 		role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)
 			
-		# await self.bot.send_message(channel, msg)
-		await self.bot.send_message(channel, embed=role_embed)
+		# await channel.send(msg)
+		await channel.send(embed=role_embed)
 
 
 	@rolecall.error
 	async def rolecall_error(self, ctx, error):
 		# do stuff
 		msg = 'rolecall Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		await error.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def clean(self, ctx, messages : int = 100, *, chan : discord.Channel = None):
+	async def clean(self, ctx, messages : int = 100, *, chan : discord.TextChannel = None):
 		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Check for admin status
@@ -226,7 +226,7 @@ class Channel:
 						isAdmin = True
 
 		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if not chan:

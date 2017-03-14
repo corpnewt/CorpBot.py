@@ -22,14 +22,14 @@ class UrbanDict:
 		"""Gives the definition of the word passed."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
 		if not word:
 			msg = 'Usage: `{}define [word]`'.format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.channel.send(msg)
 			return
 		rword = word.replace(" ", "+")
 		url = "http://api.urbandictionary.com/v0/define?term={}".format(rword)
@@ -43,7 +43,7 @@ class UrbanDict:
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
 		
-		# await self.bot.send_message(ctx.message.channel, msg)
+		# await ctx.channel.send(msg)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -62,5 +62,5 @@ class UrbanDict:
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
 		
-		# await self.bot.send_message(ctx.message.channel, msg)
+		# await ctx.channel.send(msg)
 		await Message.say(self.bot, msg, ctx.message.channel)

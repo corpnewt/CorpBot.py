@@ -111,7 +111,7 @@ class Comic:
 		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
 		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
 		if not GetImage.canDisplay( lastTime, threshold ):
-			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+			# await channel.send('Too many images at once - please wait a few seconds.')
 			return False
 		
 		# If we made it here - set the LastPicture method
@@ -131,7 +131,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -163,7 +163,7 @@ class Comic:
 		
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		# Got a comic link
@@ -180,7 +180,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -191,7 +191,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}dilbert "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		# Can't be after this date
@@ -201,7 +201,7 @@ class Comic:
 		
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		# Build our url and check if it's valid
@@ -210,7 +210,7 @@ class Comic:
 		
 		if not imageHTML:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		# Got a comic link
@@ -229,7 +229,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -261,7 +261,7 @@ class Comic:
 			
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		# Got a comic link
@@ -279,7 +279,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -294,7 +294,7 @@ class Comic:
 				date = int(date)
 			except:
 				msg = 'Usage: `{}xkcd "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			# Must be a comic number
 			archiveURL = "http://xkcd.com/archive/"
@@ -302,7 +302,7 @@ class Comic:
 			newest = int(ComicHelper.getNewestXKCD(archiveHTML))
 			if int(date) > int(newest) or int(date) < 1:
 				msg = "Comic out of range. Must be between 1 and {}".format(newest)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			comicURL = "/" + str(date) + "/"
 		else:
@@ -313,7 +313,7 @@ class Comic:
 
 			if not self.isDateBetween(date, firstDate, todayDate):
 				msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				return
 			# Get date in a dict (Month, Day, Year)
 			dateDict = self.dateDict(date)
@@ -326,7 +326,7 @@ class Comic:
 		
 		if not comicURL:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		comicNumber = comicURL.replace('/', '').strip()
@@ -351,7 +351,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -389,7 +389,7 @@ class Comic:
 			
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		imageDisplayName = "Cyanide & Happiness " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
@@ -404,7 +404,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -415,7 +415,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}cyanide "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Can't be after this date.
@@ -425,7 +425,7 @@ class Comic:
 
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		dateDict = self.dateDict(date)	
@@ -445,7 +445,7 @@ class Comic:
 		
 		if not gotComic:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		imageDisplayName = "Cyanide & Happiness " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
@@ -463,7 +463,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -495,7 +495,7 @@ class Comic:
 			
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		imageDisplayName = "Calvin & Hobbes " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
@@ -510,7 +510,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -521,7 +521,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}calvin "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Can't be after this date.
@@ -531,7 +531,7 @@ class Comic:
 
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		dateDict = self.dateDict(date)
@@ -543,7 +543,7 @@ class Comic:
 		
 		if not imageHTML:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		imageDisplayName = "Calvin & Hobbes " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
@@ -561,7 +561,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -594,7 +594,7 @@ class Comic:
 
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
@@ -609,7 +609,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -620,7 +620,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}gmg "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Can't be after this date.
@@ -630,7 +630,7 @@ class Comic:
 
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		dateDict = self.dateDict(date)
@@ -644,14 +644,14 @@ class Comic:
 		# Comment out to test
 		'''if imageHTML == None:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return'''
 		
 		imageURL  = ComicHelper.getGMGImageURL(imageHTML)
 
 		if not imageURL:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
@@ -669,7 +669,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -702,7 +702,7 @@ class Comic:
 
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
@@ -715,7 +715,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -726,7 +726,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}garfield "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Can't be after this date.
@@ -736,7 +736,7 @@ class Comic:
 
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		dateDict = self.dateDict(date)
@@ -750,14 +750,14 @@ class Comic:
 		# Comment out to test
 		'''if imageHTML == None:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return'''
 		
 		imageURL  = ComicHelper.getGImageURL(imageHTML)
 
 		if not imageURL:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
@@ -775,7 +775,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -808,7 +808,7 @@ class Comic:
 
 		if tries >= 10:
 			msg = 'Failed to find working link.'
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
@@ -821,7 +821,7 @@ class Comic:
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		
 		if not self.canDisplay(server):
 			return
@@ -832,7 +832,7 @@ class Comic:
 			
 		if not self.dateIsValid(date):
 			msg = 'Usage: `{}peanuts "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		# Can't be after this date.
@@ -842,7 +842,7 @@ class Comic:
 
 		if not self.isDateBetween(date, firstDate, todayDate):
 			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		dateDict = self.dateDict(date)
@@ -856,14 +856,14 @@ class Comic:
 		# Comment out to test
 		'''if imageHTML == None:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return'''
 		
 		imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
 
 		if not imageURL:
 			msg = 'No comic found for *{}*'.format(date)
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']

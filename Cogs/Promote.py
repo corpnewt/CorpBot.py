@@ -23,13 +23,13 @@ class Promote:
         """Auto-adds the required xp to promote the passed user to the next role (admin only)."""
 
         author  = ctx.message.author
-        server  = ctx.message.server
+        server  = ctx.message.guild
         channel = ctx.message.channel
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
         if not isAdmin:
-            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
@@ -41,18 +41,18 @@ class Promote:
         usage = 'Usage: `{}promote [member]`'.format(ctx.prefix)
 
         if member == None:
-            await self.bot.send_message(ctx.message.channel, usage)
+            await ctx.channel.send(usage)
             return
 
         if type(member) is str:
             memberName = member
-            member = DisplayName.memberForName(memberName, ctx.message.server)
+            member = DisplayName.memberForName(memberName, ctx.message.guild)
             if not member:
                 msg = 'I couldn\'t find *{}*...'.format(memberName)
                 # Check for suppress
                 if suppress:
                     msg = Nullify.clean(msg)
-                await self.bot.send_message(ctx.message.channel, msg)
+                await ctx.channel.send(msg)
                 return
 
         # Get user's xp
@@ -84,20 +84,20 @@ class Promote:
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
-        await self.bot.send_message(channel, msg)
+        await channel.send(msg)
 
     @commands.command(pass_context=True)
     async def promoteto(self, ctx, *, member = None, role = None):
         """Auto-adds the required xp to promote the passed user to the passed role (admin only)."""
 
         author  = ctx.message.author
-        server  = ctx.message.server
+        server  = ctx.message.guild
         channel = ctx.message.channel
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
         if not isAdmin:
-            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
@@ -109,7 +109,7 @@ class Promote:
         usage = 'Usage: `{}promoteto [member] [role]`'.format(ctx.prefix)
 
         if member == None:
-            await self.bot.send_message(ctx.message.channel, usage)
+            await ctx.channel.send(usage)
             return
 
         if role == None:
@@ -126,10 +126,10 @@ class Promote:
                     nameStr = ' '.join(parts[0:i+1])
                     # Role = end of name -> end of parts joined by space
                     roleStr = ' '.join(parts[i+1:])
-                    memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
+                    memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
                     if memFromName:
                         # We got a member - let's check for a role
-                        roleFromName = DisplayName.roleForName(roleStr, ctx.message.server)
+                        roleFromName = DisplayName.roleForName(roleStr, ctx.message.guild)
                             
                         if not roleFromName == None:
                             # We got a member and a role - break
@@ -141,11 +141,11 @@ class Promote:
                     # Check for suppress
                     if suppress:
                         msg = Nullify.clean(msg)
-                    await self.bot.send_message(ctx.message.channel, msg)
+                    await ctx.channel.send(msg)
                     return
                 if roleFromName == None:
                     # We couldn't find one or the other
-                    await self.bot.send_message(ctx.message.channel, usage)
+                    await ctx.channel.send(usage)
                     return
 
                 member = memFromName
@@ -164,7 +164,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
         
         if currentRole == nextRole:
@@ -176,7 +176,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
         elif currentRole > nextRole:
             # We are a higher role than the target
@@ -184,7 +184,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
 
         if nextRole >= len(promoArray):
@@ -209,20 +209,20 @@ class Promote:
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
-        await self.bot.send_message(channel, msg)
+        await channel.send(msg)
 
     @commands.command(pass_context=True)
     async def demote(self, ctx, *, member = None):
         """Auto-removes the required xp to demote the passed user to the previous role (admin only)."""
 
         author  = ctx.message.author
-        server  = ctx.message.server
+        server  = ctx.message.guild
         channel = ctx.message.channel
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
         if not isAdmin:
-            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
@@ -234,18 +234,18 @@ class Promote:
         usage = 'Usage: `{}demote [member]`'.format(ctx.prefix)
 
         if member == None:
-            await self.bot.send_message(ctx.message.channel, usage)
+            await ctx.channel.send(usage)
             return
 
         if type(member) is str:
             memberName = member
-            member = DisplayName.memberForName(memberName, ctx.message.server)
+            member = DisplayName.memberForName(memberName, ctx.message.guild)
             if not member:
                 msg = 'I couldn\'t find *{}*...'.format(memberName)
                 # Check for suppress
                 if suppress:
                     msg = Nullify.clean(msg)
-                await self.bot.send_message(ctx.message.channel, msg)
+                await ctx.channel.send(msg)
                 return
 
         # Get user's xp
@@ -277,7 +277,7 @@ class Promote:
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
-        await self.bot.send_message(channel, msg)
+        await channel.send(msg)
 
 
     @commands.command(pass_context=True)
@@ -285,13 +285,13 @@ class Promote:
         """Auto-removes the required xp to demote the passed user to the passed role (admin only)."""
 
         author  = ctx.message.author
-        server  = ctx.message.server
+        server  = ctx.message.guild
         channel = ctx.message.channel
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
         if not isAdmin:
-            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
@@ -303,7 +303,7 @@ class Promote:
         usage = 'Usage: `{}demoteto [member] [role]`'.format(ctx.prefix)
 
         if member == None:
-            await self.bot.send_message(ctx.message.channel, usage)
+            await ctx.channel.send(usage)
             return
 
         if role == None:
@@ -320,10 +320,10 @@ class Promote:
                     nameStr = ' '.join(parts[0:i+1])
                     # Role = end of name -> end of parts joined by space
                     roleStr = ' '.join(parts[i+1:])
-                    memFromName = DisplayName.memberForName(nameStr, ctx.message.server)
+                    memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
                     if memFromName:
                         # We got a member - let's check for a role
-                        roleFromName = DisplayName.roleForName(roleStr, ctx.message.server)
+                        roleFromName = DisplayName.roleForName(roleStr, ctx.message.guild)
                             
                         if not roleFromName == None:
                             # We got a member and a role - break
@@ -335,11 +335,11 @@ class Promote:
                     # Check for suppress
                     if suppress:
                         msg = Nullify.clean(msg)
-                    await self.bot.send_message(ctx.message.channel, msg)
+                    await ctx.channel.send(msg)
                     return
                 if roleFromName == None:
                     # We couldn't find one or the other
-                    await self.bot.send_message(ctx.message.channel, usage)
+                    await ctx.channel.send(usage)
                     return
 
                 member = memFromName
@@ -358,7 +358,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
 
         if currentRole == nextRole:
@@ -370,7 +370,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
         elif currentRole < nextRole:
             # We are a higher role than the target
@@ -378,7 +378,7 @@ class Promote:
             # Check for suppress
             if suppress:
                 msg = Nullify.clean(msg)
-            await self.bot.send_message(channel, msg)
+            await channel.send(msg)
             return
 
         newRole  = DisplayName.roleForID(promoArray[nextRole]['ID'], server)
@@ -401,7 +401,7 @@ class Promote:
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
-        await self.bot.send_message(channel, msg)
+        await channel.send(msg)
 
 
     def getCurrentRoleIndex(self, member, server):
@@ -428,7 +428,7 @@ class Promote:
         index = 0
         found = False
         for arole in promoSorted:
-            if arole['ID'] == role.id:
+            if str(arole['ID']) == str(role.id):
                 # Found it - break
                 found = True
                 break

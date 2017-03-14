@@ -20,10 +20,12 @@ class Xp:
 		self.bot.loop.create_task(self.addXP())
 		
 	async def addXP(self):
-		while not self.bot.is_closed:
+		await self.bot.wait_until_ready()
+		print('XP Loop started.')
+		while not self.bot.is_closed():
 			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
 			print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
-			for server in self.bot.servers:
+			for server in self.bot.guilds:
 				# Iterate through the servers and add them
 				xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
 				xpAmount   = float(xpAmount/6)
@@ -70,7 +72,7 @@ class Xp:
 		"""Gift xp to other members."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -84,7 +86,7 @@ class Xp:
 		isRole = False
 
 		if member == None:
-			await self.bot.send_message(ctx.message.channel, usage)
+			await ctx.message.channel.send(usage)
 			return
 
 		# Check for formatting issues
@@ -99,7 +101,7 @@ class Xp:
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
-					await self.bot.send_message(ctx.message.channel, msg)
+					await ctx.message.channel.send(msg)
 					return
 				if roleCheck["Role"]:
 					isRole = True
@@ -109,24 +111,24 @@ class Xp:
 					# Role is invalid - check for member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
 					if not nameCheck:
-						await self.bot.send_message(ctx.message.channel, usage)
+						await ctx.message.channel.send(usage)
 						return
 					if not nameCheck["Member"]:
 						msg = 'I couldn\'t find *{}* on the server.'.format(member)
 						# Check for suppress
 						if suppress:
 							msg = Nullify.clean(msg)
-						await self.bot.send_message(ctx.message.channel, msg)
+						await ctx.message.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
 					xpAmount = nameCheck["Int"]
 
 		if xpAmount == None:
 			# Still no xp
-			await self.bot.send_message(ctx.message.channel, usage)
+			await ctx.message.channel.send(usage)
 			return
 		if not type(xpAmount) is int:
-			await self.bot.send_message(ctx.message.channel, usage)
+			await ctx.message.channel.send(usage)
 			return
 
 		# Get our user/server stats
@@ -220,10 +222,10 @@ class Xp:
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
-					await self.bot.send_message(channel, msg)
+					await channel.send(msg)
 				else:
 					msg = 'There are no eligible members in *{}!*'.format(member.name)
-					await self.bot.send_message(channel, msg)
+					await channel.send(msg)
 
 			else:
 				# Decrement if needed
@@ -234,36 +236,36 @@ class Xp:
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(channel, msg)
+				await channel.send(msg)
 				self.settings.incrementStat(member, server, "XP", xpAmount)
 				# Now we check for promotions
 				await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 		else:
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			
 	@xp.error
-	async def xp_error(self, ctx, error):
-		msg = 'xp Error: {}'.format(ctx)
-		await self.bot.say(msg)
+	async def xp_error(self, error, ctx):
+		msg = 'xp Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def defaultrole(self, ctx):
 		"""Lists the default role that new users are assigned."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.server, "DefaultRole")
+		role = self.settings.getServerStat(ctx.message.guild, "DefaultRole")
 		if role == None or role == "":
 			msg = 'New users are not assigned a role on joining this server.'
-			await self.bot.say(msg)
+			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.server.roles:
+			for arole in ctx.message.guild.roles:
 				if arole.id == role:
 					found = True
 					msg = 'New users will be assigned to **{}**.'.format(arole.name)
@@ -272,25 +274,25 @@ class Xp:
 						msg = Nullify.clean(msg)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			await self.bot.send_message(ctx.message.channel, msg)
+			await ctx.message.channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def gamble(self, ctx, bet : int = None):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
 		msg = 'Usage: `{}gamble [xp reserve bet] (must be multiple of 10)`'.format(ctx.prefix)
 		
 		if not (bet or type(bet) == int):
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 			
 		if not type(bet) == int:
-			await self.bot.send_message(channel, msg)
+			await channel.send(msg)
 			return
 
 		isAdmin    = author.permissions_in(channel).administrator
@@ -365,21 +367,21 @@ class Xp:
 			else:
 				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.message.channel.send(msg)
 			
 	@commands.command(pass_context=True)
 	async def recheckroles(self, ctx):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		isAdmin = author.permissions_in(channel).administrator
 
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		changeCount = 0
@@ -389,23 +391,23 @@ class Xp:
 				changeCount += 1
 		
 		if changeCount == 1:
-			await self.bot.send_message(channel, 'Done checking roles.\n\n*1 user* updated.')
+			await channel.send('Done checking roles.\n\n*1 user* updated.')
 		else:
-			await self.bot.send_message(channel, 'Done checking roles.\n\n*{} users* updated.'.format(changeCount))
+			await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
 	@commands.command(pass_context=True)
 	async def recheckrole(self, ctx, *, user : discord.Member = None):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		isAdmin = author.permissions_in(channel).administrator
 
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if not user:
@@ -413,9 +415,9 @@ class Xp:
 
 		# Now we check for promotions
 		if await CheckRoles.checkroles(user, channel, self.settings, self.bot):
-			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was updated.'.format(DisplayName.name(user)))
+			await channel.send('Done checking roles.\n\n*{}* was updated.'.format(DisplayName.name(user)))
 		else:
-			await self.bot.send_message(channel, 'Done checking roles.\n\n*{}* was not updated.'.format(DisplayName.name(user)))
+			await channel.send('Done checking roles.\n\n*{}* was not updated.'.format(DisplayName.name(user)))
 
 
 
@@ -423,7 +425,7 @@ class Xp:
 	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 		
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -452,13 +454,13 @@ class Xp:
 				roleText = '{}**{}** : *{} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
 
 		# Get the required role for using the xp system
-		role = self.settings.getServerStat(ctx.message.server, "RequiredXPRole")
+		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
 		if role == None or role == "":
 			roleText = '{}\n**Everyone** can give xp, gamble, and feed the bot.'.format(roleText)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.server.roles:
+			for arole in ctx.message.guild.roles:
 				if arole.id == role:
 					found = True
 					vowels = "aeiou"
@@ -474,7 +476,7 @@ class Xp:
 		if suppress:
 			roleText = Nullify.clean(roleText)
 
-		await self.bot.send_message(channel, roleText)
+		await channel.send(roleText)
 		
 		
 	@commands.command(pass_context=True)
@@ -482,7 +484,7 @@ class Xp:
 		"""Say the highest rank of a listed member."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -492,19 +494,19 @@ class Xp:
 			
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.message.channel.send(msg)
 				return
 			
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
 			
-		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
@@ -543,20 +545,20 @@ class Xp:
 			# Add Rank
 			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
 			
-		# await self.bot.send_message(ctx.message.channel, msg)
-		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
+		# await ctx.message.channel.send(msg)
+		await ctx.message.channel.send(embed=stat_embed)
 		
 	@rank.error
-	async def rank_error(self, ctx, error):
-		msg = 'rank Error: {}'.format(ctx)
-		await self.bot.say(msg)
+	async def rank_error(self, error, ctx):
+		msg = 'rank Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
 	async def leaderboard(self, ctx, total : int = 10):
 		"""List the top xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
 
@@ -573,16 +575,16 @@ class Xp:
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
 			startIndex = len(promoSorted)-1
-			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.server.name)
+			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.guild.name)
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex-i
 			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.server)
-			#if ctx.message.server.get_member_named(cMemName):
+			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.guild)
+			#if ctx.message.guild.get_member_named(cMemName):
 				# Member exists
-				#cMember = ctx.message.server.get_member_named(cMemName)
+				#cMember = ctx.message.guild.get_member_named(cMemName)
 			#else:
 				#cMember = None
 			if cMember:
@@ -592,14 +594,14 @@ class Xp:
 
 			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.message.channel.send(msg)
 
 		
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
 	async def bottomxp(self, ctx, total : int = 10):
 		"""List the bottom xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.server, "Members")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 
@@ -615,16 +617,16 @@ class Xp:
 		
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
-			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.server.name)
+			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.guild.name)
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex+i
 			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.server)
-			#if ctx.message.server.get_member_named(cMemName):
+			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.guild)
+			#if ctx.message.guild.get_member_named(cMemName):
 				# Member exists
-				#cMember = ctx.message.server.get_member_named(cMemName)
+				#cMember = ctx.message.guild.get_member_named(cMemName)
 			#else:
 				#cMember = None
 			if cMember:
@@ -633,7 +635,7 @@ class Xp:
 				cMemberDisplay = promoSorted[index]['Name']
 			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.message.channel.send(msg)
 		
 		
 	# List the xp and xp reserve of a user
@@ -642,7 +644,7 @@ class Xp:
 		"""List the xp and xp reserve of a listed member."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
 		else:
 			suppress = False
@@ -652,21 +654,21 @@ class Xp:
 			
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.server)
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
+				await ctx.message.channel.send(msg)
 				return
 
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
 					    
 		# Get user's xp
-		newStat = int(self.settings.getUserStat(member, ctx.message.server, "XP"))
-		newState = int(self.settings.getUserStat(member, ctx.message.server, "XPReserve"))
+		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))
+		newState = int(self.settings.getUserStat(member, ctx.message.guild, "XPReserve"))
 		
 		# Add XP and XP Reserve
 		stat_embed.add_field(name="XP", value=newStat, inline=True)
@@ -698,7 +700,7 @@ class Xp:
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
 		# Get user's current role
-		promoArray = self.settings.getServerStat(ctx.message.server, "PromotionArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
@@ -740,13 +742,13 @@ class Xp:
 			# Add Next Rank
 			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
 			
-		#await self.bot.send_message(ctx.message.channel, msg)
-		await self.bot.send_message(ctx.message.channel, embed=stat_embed)
+		#await ctx.message.channel.send(msg)
+		await ctx.message.channel.send(embed=stat_embed)
 		
 	@stats.error
-	async def stats_error(self, ctx, error):
-		msg = 'stats Error: {}'.format(ctx)
-		await self.bot.say(msg)
+	async def stats_error(self, error, ctx):
+		msg = 'stats Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 
 	# List the xp and xp reserve of a user
@@ -754,7 +756,7 @@ class Xp:
 	async def xpinfo(self, ctx):
 		"""Gives a quick rundown of the xp system."""
 
-		server  = ctx.message.server
+		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -865,4 +867,4 @@ class Xp:
 		if suppress:
 			msg = Nullify.clean(msg)
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await ctx.message.channel.send(msg)

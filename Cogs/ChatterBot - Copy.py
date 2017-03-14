@@ -147,7 +147,7 @@ class ChatterBot:
 	async def setchatchannel_error(self, ctx, error):
 		# do stuff
 		msg = 'setchatchannel Error: {}'.format(ctx)
-		await self.bot.say(msg)
+		await error.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
