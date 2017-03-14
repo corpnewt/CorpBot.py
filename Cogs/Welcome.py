@@ -24,7 +24,7 @@ class Welcome:
         welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
         if welcomeChannel:
             for channel in server.channels:
-                if str(channel.id) == str(welcomeChannel):
+                if channel.id == welcomeChannel:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
@@ -37,7 +37,7 @@ class Welcome:
         welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
         if welcomeChannel:
             for channel in server.channels:
-                if str(channel.id) == str(welcomeChannel):
+                if channel.id == welcomeChannel:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
@@ -51,81 +51,81 @@ class Welcome:
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
             for role in ctx.message.author.roles:
                 for aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    if aRole['ID'] == role.id:
                         isAdmin = True
         # Only allow admins to change server stats
         if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
             return
 
         if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Welcome", None)
-            await ctx.channel.send('Welcome message removed!')
+            self.settings.setServerStat(ctx.message.server, "Welcome", None)
+            await self.bot.send_message(ctx.message.channel, 'Welcome message removed!')
             return
 
-        self.settings.setServerStat(ctx.message.guild, "Welcome", message)
-        await ctx.channel.send('Welcome message updated!\n\nHere\'s a preview:')
-        await self._welcome(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        self.settings.setServerStat(ctx.message.server, "Welcome", message)
+        await self.bot.send_message(ctx.message.channel, 'Welcome message updated!\n\nHere\'s a preview:')
+        await self._welcome(ctx.message.author, ctx.message.server, ctx.message.channel)
 
     @commands.command(pass_context=True)
     async def testwelcome(self, ctx, *, member = None):
         """Prints the current welcome message (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
             for role in ctx.message.author.roles:
                 for aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    if aRole['ID'] == role.id:
                         isAdmin = True
 
         # Only allow admins to change server stats
         if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
             return
 
         if member == None:
             member = ctx.message.author
         if type(member) is str:
             memberName = member
-            member = DisplayName.memberForName(memberName, ctx.message.guild)
+            member = DisplayName.memberForName(memberName, ctx.message.server)
             if not member:
                 msg = 'I couldn\'t find *{}*...'.format(memberName)
                 # Check for suppress
                 if suppress:
                     msg = Nullify.clean(msg)
-                await ctx.channel.send(msg)
+                await self.bot.send_message(ctx.message.channel, msg)
                 return
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Welcome")
+        message = self.settings.getServerStat(ctx.message.server, "Welcome")
         if message == None:
-            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
+            await self.bot.send_message(ctx.message.channel, 'Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
             return
-        await self._welcome(member, ctx.message.guild, ctx.message.channel)
+        await self._welcome(member, ctx.message.server, ctx.message.channel)
         # Print the welcome channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        welcomeChannel = self.settings.getServerStat(ctx.message.server, "WelcomeChannel")
         if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+            for channel in ctx.message.server.channels:
+                if channel.id == welcomeChannel:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
             msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.name)
         else:
-            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
-        await ctx.channel.send(msg)
+            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(ctx.message.server.default_channel.name)
+        await self.bot.send_message(ctx.message.channel, msg)
 
 
     @commands.command(pass_context=True)
@@ -134,25 +134,25 @@ class Welcome:
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
             for role in ctx.message.author.roles:
                 for aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    if aRole['ID'] == role.id:
                         isAdmin = True
         # Only allow admins to change server stats
         if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
             return
 
         if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Goodbye", None)
-            await ctx.channel.send('Goodbye message removed!')
+            self.settings.setServerStat(ctx.message.server, "Goodbye", None)
+            await self.bot.send_message(ctx.message.channel, 'Goodbye message removed!')
             return
 
-        self.settings.setServerStat(ctx.message.guild, "Goodbye", message)
-        await ctx.channel.send('Goodbye message updated!\n\nHere\'s a preview:')
-        await self._goodbye(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        self.settings.setServerStat(ctx.message.server, "Goodbye", message)
+        await self.bot.send_message(ctx.message.channel, 'Goodbye message updated!\n\nHere\'s a preview:')
+        await self._goodbye(ctx.message.author, ctx.message.server, ctx.message.channel)
 
 
     @commands.command(pass_context=True)
@@ -160,57 +160,57 @@ class Welcome:
         """Prints the current goodbye message (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
             for role in ctx.message.author.roles:
                 for aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    if aRole['ID'] == role.id:
                         isAdmin = True
 
         # Only allow admins to change server stats
         if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
             return
 
         if member == None:
             member = ctx.message.author
         if type(member) is str:
             memberName = member
-            member = DisplayName.memberForName(memberName, ctx.message.guild)
+            member = DisplayName.memberForName(memberName, ctx.message.server)
             if not member:
                 msg = 'I couldn\'t find *{}*...'.format(memberName)
                 # Check for suppress
                 if suppress:
                     msg = Nullify.clean(msg)
-                await ctx.channel.send(msg)
+                await self.bot.send_message(ctx.message.channel, msg)
                 return
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
+        message = self.settings.getServerStat(ctx.message.server, "Goodbye")
         if message == None:
-            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
+            await self.bot.send_message(ctx.message.channel, 'Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
             return
-        await self._goodbye(member, ctx.message.guild, ctx.message.channel)
+        await self._goodbye(member, ctx.message.server, ctx.message.channel)
         
         # Print the goodbye channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        welcomeChannel = self.settings.getServerStat(ctx.message.server, "WelcomeChannel")
         if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+            for channel in ctx.message.server.channels:
+                if channel.id == welcomeChannel:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
             msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.name)
         else:
-            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
-        await ctx.channel.send(msg)
+            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(ctx.message.server.default_channel.name)
+        await self.bot.send_message(ctx.message.channel, msg)
 
 
     async def _welcome(self, member, server, channel = None):
@@ -229,11 +229,10 @@ class Welcome:
 
         if suppress:
             message = Nullify.clean(message)
-
         if channel:
-            await channel.send(message)
+            await self.bot.send_message(channel, message)
         else:
-            await server.default_channel.send(message)
+            await self.bot.send_message(server.default_channel, message)
 
 
     async def _goodbye(self, member, server, channel = None):
@@ -253,50 +252,50 @@ class Welcome:
         if suppress:
             message = Nullify.clean(message)
         if channel:
-            await channel.send(message)
+            await self.bot.send_message(channel, message)
         else:
-            await server.default_channel.send(message)
+            await self.bot.send_message(server.default_channel, message)
 
     @commands.command(pass_context=True)
-    async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
+    async def setwelcomechannel(self, ctx, *, channel : discord.Channel = None):
         """Sets the channel for the welcome and goodbye messages (bot-admin only)."""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
             for role in ctx.message.author.roles:
                 for aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    if aRole['ID'] == role.id:
                         isAdmin = True
 
         # Only allow admins to change server stats
         if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
             return
 
         if channel == None:
-            self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
-            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
-            await ctx.channel.send(msg)
+            self.settings.setServerStat(ctx.message.server, "WelcomeChannel", "")
+            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(ctx.message.server.default_channel.name)
+            await self.bot.send_message(ctx.message.channel, msg)
             return
 
         if type(channel) is str:
             try:
-                role = discord.utils.get(message.guild.channels, name=role)
+                role = discord.utils.get(message.server.channels, name=role)
             except:
                 print("That channel does not exist")
                 return
 
         # If we made it this far - then we can add it
-        self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", channel.id)
+        self.settings.setServerStat(ctx.message.server, "WelcomeChannel", channel.id)
 
         msg = 'Welcome and goodbye messages will be displayed in **{}**.'.format(channel.name)
-        await ctx.channel.send(msg)
+        await self.bot.send_message(ctx.message.channel, msg)
 
 
     @setwelcomechannel.error
     async def setwelcomechannel_error(self, ctx, error):
         # do stuff
         msg = 'setwelcomechannel Error: {}'.format(ctx)
-        await error.channel.send(msg)
+        await self.bot.say(msg)
