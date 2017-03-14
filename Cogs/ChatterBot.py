@@ -126,11 +126,11 @@ class ChatterBot:
 			return
 		await self.bot.send_typing(channel)
 		
-		try:
-			message = message.splitlines().join().strip()
-		except Exception:
+		# try:
+		message = message.splitlines().join().strip()
+		'''except Exception:
 			await self.bot.send_message(channel, "I couldn't understand that.")
-			return
+			return'''
 
 		msg = self.chatBot.respond(message)
 
