@@ -20,6 +20,7 @@ class Xp:
 		self.bot.loop.create_task(self.addXP())
 		
 	async def addXP(self):
+		await self.bot.wait_until_ready()
 		while not self.bot.is_closed:
 			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
 			print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))

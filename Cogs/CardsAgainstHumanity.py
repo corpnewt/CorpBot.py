@@ -64,6 +64,7 @@ class CardsAgainstHumanity:
 
 
     async def checkUserTimeout(self):
+        await self.bot.wait_until_ready()
         while not self.bot.is_closed:
             # Wait first - then check
             await asyncio.sleep(self.utCheck)
@@ -114,6 +115,7 @@ class CardsAgainstHumanity:
 
 
     async def checkDead(self):
+        await self.bot.wait_until_ready()
         while not self.bot.is_closed:
             # Wait first - then check
             await asyncio.sleep(self.checkTime)

@@ -64,9 +64,15 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
 
     # Add and remove roles as needed
     if len(addRoles):
-        await bot.add_roles(user, *addRoles)
+        try:
+            await bot.add_roles(user, *addRoles)
+        except Exception:
+            pass
     if len(remRoles):
-        await bot.remove_roles(user, *remRoles)
+        try:
+            await bot.remove_roles(user, *remRoles)
+        except Exception:
+            pass
 
     # Check if we have a message to display - and display it
     if msg and (not suppress):

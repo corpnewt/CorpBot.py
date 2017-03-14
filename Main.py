@@ -377,7 +377,10 @@ async def on_member_update(before, after):
 				msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
 			else:
 				msg = motd
-			await bot.edit_channel(channel, topic=msg)
+			try:
+				await bot.edit_channel(channel, topic=msg)
+			except Exception:
+				continue
 	
 	# Check for cogs that accept updates
 	pm = None
