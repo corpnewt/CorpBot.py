@@ -19,6 +19,7 @@ class ChatterBot:
 		self.prefix = prefix
 		self.waitTime = 4 # Wait time in seconds
 		self.botDir = 'standard'
+		self.botBrain = 'standard.brn'
 		self.botList = []
 		self.ownerName = "CorpNewt"
 		self.ownerGender = "man"
@@ -27,9 +28,16 @@ class ChatterBot:
 
 	async def onready(self):
 		# We're ready - let's load the bots
-		files = listdir(self.botDir)
-		for file in files:
-			self.chatBot.learn(self.botDir + '/' + file)
+		if not os.path.exists(self.botBrain):
+			# No brain, let's learn and create one
+			files = listdir(self.botDir)
+			for file in files:
+				self.chatBot.learn(self.botDir + '/' + file)
+			# Save brain
+			self.chatBot.saveBrain("standard.brn")
+		else:
+			# Already have a brain - load it
+			self.chatBot.bootstrap(brainFile="standard.brn")
 		# Learned by this point - let's set our owner's name/gender
 		# Start the convo
 		self.chatBot.respond('Hello')
