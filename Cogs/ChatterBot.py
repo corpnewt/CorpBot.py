@@ -129,7 +129,9 @@ class ChatterBot:
 		# Sanitize input string
 		PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ `~!@#$%^&*()_+-=[{}]\|/?.>,<;:'\"" 
 		message = "".join(c for c in message if c in PERMITTED_CHARS)
-
+		if message == None:
+			return
+		
 		msg = self.chatBot.respond(message)
 
 		if not msg:
