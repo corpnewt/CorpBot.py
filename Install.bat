@@ -86,9 +86,9 @@ echo.
 call :install "pyquery"
 echo.
 
-echo Installing PyAIML3...
+echo Installing PyAIML...
 echo.
-call :install "git+https://github.com/weddige/pyaiml3"
+call :install "git+https://github.com/paulovn/python-aiml"
 echo.
 
 

@@ -4,7 +4,7 @@ import time
 import requests
 import urllib
 import os
-from aiml import Kernel
+import aiml
 from os import listdir
 from discord.ext import commands
 from Cogs import Nullify
@@ -25,7 +25,7 @@ class ChatterBot:
 		self.ownerName = "CorpNewt"
 		self.ownerGender = "man"
 		self.timeout = 3
-		self.chatBot = Kernel()
+		self.chatBot = aiml.Kernel()
 
 	async def onready(self):
 		# We're ready - let's load the bots

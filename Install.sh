@@ -68,9 +68,9 @@ function main () {
     update "pyquery"
     echo
 
-    echo Updating PyAIML3
+    echo Updating PyAIML
     echo
-    update "git+https://github.com/weddige/pyaiml3"
+    update "git+https://github.com/paulovn/python-aiml"
     echo
 
     #echo Updating Flask...
