@@ -233,6 +233,6 @@ class Channel:
 			chan = channel
 
 		# Remove original message
-		await self.bot.delete_message(ctx.message)
+		await ctx.message.delete()
 		# Remove the rest
-		await self.bot.purge_from(chan, limit=messages)
+		await chan.purge(limit=messages)
