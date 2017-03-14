@@ -3,6 +3,7 @@ import discord
 import time
 import requests
 import urllib
+import os
 from aiml import Kernel
 from os import listdir
 from discord.ext import commands
