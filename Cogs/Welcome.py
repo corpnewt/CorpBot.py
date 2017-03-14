@@ -229,10 +229,13 @@ class Welcome:
 
         if suppress:
             message = Nullify.clean(message)
+
+        print("{}:{}".format(channel, server))
+
         if channel:
             await channel.send(message)
         else:
-            await server.send(message)
+            await server.default_channel.send(message)
 
 
     async def _goodbye(self, member, server, channel = None):
@@ -254,7 +257,7 @@ class Welcome:
         if channel:
             await channel.send(message)
         else:
-            await server.send(message)
+            await server.default_channel.send(message)
 
     @commands.command(pass_context=True)
     async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
