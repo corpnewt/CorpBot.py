@@ -332,15 +332,12 @@ class Settings:
 						if not "UTCOffset" in y:
 							y["UTCOffset"] = None
 							needsUpdate = True
+						if not "LastCommand" in y:
+							y["LastCommand"] = 0
 						if not "VerificationTime" in y:
 							currentTime = int(time.time())
 							waitTime = int(self.getServerStat(server, "VerificationTime"))
 							y["VerificationTime"] = currentTime + (waitTime * 60)
-						# Check for empty values that need numbers
-						if not y["XP"]:
-							y["XP"] = 0
-						if not y["XPReserve"]:
-							y["XPReserve"] = 0
 				if not found:
 					needsUpdate = True
 					# We didn't locate our user - add them
