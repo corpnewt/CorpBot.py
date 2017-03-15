@@ -14,7 +14,7 @@ class RateLimit:
 		self.settings = settings
 		self.commandCooldown = 5 # 5 seconds between commands
 		
-	def canRun( firstTime, threshold ):
+	def canRun( self, firstTime, threshold ):
 		# Check if enough time has passed since the last command to run another
 		currentTime = int(time.time())
 		if currentTime > (int(firstTime) + int(threshold)):
