@@ -48,6 +48,7 @@ from Cogs import CardsAgainstHumanity
 from Cogs import ChatterBot
 from Cogs import Star
 # from Cogs import Monitor
+from Cogs import RateLimit
 
 # Let's load our prefix file
 prefix = '$'
@@ -234,6 +235,10 @@ cogList.append(star)
 # Monitoring
 # monitor = Monitor.Monitor(bot, settings)
 # cogList.append(monitor)
+
+# Rate Limiting
+rateLim = RateLimit.RateLimit(bot, settings)
+cogList.append(rateLim)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
