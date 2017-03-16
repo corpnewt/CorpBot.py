@@ -48,7 +48,7 @@ class Xp:
 							if xpLeftover == None:
 								xpLeftover = 0
 							else:
-								xpLeftover = float(XPLeftover)
+								xpLeftover = float(xpLeftover)
 							gainedXp = xpLeftover+xpAmount
 							gainedXpInt = int(gainedXp) # Strips the decimal point off
 							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
