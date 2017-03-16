@@ -218,7 +218,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def reboot(self, ctx):
+	async def reboot(self, ctx, force = None):
 		"""Shuts down the bot - allows for reboot if using the start script (owner only)."""
 
 		channel = ctx.message.channel
@@ -243,10 +243,15 @@ class Bot:
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can reboot me.'
 				await self.bot.send_message(channel, msg)
 				return
-		
+
 		self.settings.flushSettings()
-		msg = 'Flushed settings to disk.\nRebooting...'
-		await self.bot.send_message(ctx.message.channel, msg)
+		
+		quiet = False
+		if force and force.lower() == 'force':
+			quiet = True
+		if not quiet:
+			msg = 'Flushed settings to disk.\nRebooting...'
+			await self.bot.send_message(ctx.message.channel, msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
