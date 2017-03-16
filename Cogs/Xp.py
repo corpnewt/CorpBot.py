@@ -44,7 +44,11 @@ class Xp:
 					if bumpXP:
 						if xpAmount > 0:
 							# User is online add hourly xp reserve
-							xpLeftover = float(self.settings.getUserStat(user, server, "XPLeftover"))
+							xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
+							if xpLeftover == None:
+								xpLeftover = 0
+							else:
+								xpLeftover = float(XPLeftover)
 							gainedXp = xpLeftover+xpAmount
 							gainedXpInt = int(gainedXp) # Strips the decimal point off
 							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
@@ -53,7 +57,11 @@ class Xp:
 						
 						if xpRAmount > 0:
 							# User is online add hourly xp
-							xpRLeftover = float(self.settings.getUserStat(user, server, "XPRealLeftover"))
+							xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
+							if xpRLeftover == None:
+								xpRLeftover = 0
+							else:
+								xpRLeftover = float(xpRLeftover)
 							gainedXpR = xpRLeftover+xpRAmount
 							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
 							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
