@@ -1160,5 +1160,9 @@ class Admin:
 						msg = motd
 							
 					# print(msg)
-							
-					await self.bot.edit_channel(channel, topic=msg)
+					try:		
+						await self.bot.edit_channel(channel, topic=msg)
+					except Exception:
+						# If someone has the wrong perms - we just move on
+						continue
+						
