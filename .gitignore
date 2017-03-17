@@ -16,6 +16,9 @@ ffmpeg.exe
 # Chatterbot database
 database.db
 
+# Server List
+ServerList*
+
 # Hidden stuff
 .git
 .vscode

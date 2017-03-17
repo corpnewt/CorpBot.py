@@ -101,9 +101,9 @@ class Server:
 			msg += str(len(server.members)) + "\n\n"
 
 		# Trim the last 2 newlines
-		msg = msg[:-2]
+		msg = msg[:-2].encode("utf-8")
 		
-		with open(serverFile, "w") as myfile:
+		with open(serverFile, "wb") as myfile:
 			myfile.write(msg)
 
 		message = await self.bot.edit_message(message, 'Uploading *{}*...'.format(serverFile))
