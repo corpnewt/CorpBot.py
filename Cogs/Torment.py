@@ -102,7 +102,7 @@ class Torment:
 		await self.bot.send_message(ctx.message.author, 'Tormenting cancelled.')
 		
 		
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command(pass_context=True)
 	async def torment(self, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice (owner only)."""
 
