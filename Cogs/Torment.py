@@ -14,8 +14,95 @@ class Torment:
 		self.bot = bot
 		self.waitBetween = 1 # number of seconds to wait before sending another message
 		self.settings = settings
+		self.torment = False
+		
+	@commands.command(pass_context=True, hidden=True)
+	async def tormentdelay(self, ctx, delay : int = None):
+		"""Sets the delay in seconds between messages (owner only)."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
 
-	@commands.command(pass_context=True)
+		# Only allow owner to change server stats
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+				await self.bot.send_message(channel, msg)
+				return
+		
+		if delay == None:
+			if self.waitBetween == 1:
+				await self.bot.send_message(ctx.message.author, 'Current torment delay is *1 second.*')
+			else:
+				await self.bot.send_message(ctx.message.author, 'Current torment delay is *{} seconds.*'.format(self.waitBetween))
+			return
+		
+		try:
+			delay = int(delay)
+		except Exception:
+			await self.bot.send_message(ctx.message.author, 'Delay must be an int.')
+			return
+		
+		if delay < 1:
+			await self.bot.send_message(ctx.message.author, 'Delay must be at least 1 second.')
+			return
+		
+		self.waitBetween = delay
+		if self.waitBetween == 1:
+			await self.bot.send_message(ctx.message.author, 'Current torment delay is now *1 second.*')
+		else:
+			await self.bot.send_message(ctx.message.author, 'Current torment delay is now *{} seconds.*'.format(self.waitBetween))
+		
+	
+	@commands.command(pass_context=True, hidden=True)
+	async def canceltorment(self, ctx):
+		"""Cancels tormenting if it's in progress - must be false when next torment attempt starts to work (owner only)."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		# Only allow owner to change server stats
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+				await self.bot.send_message(channel, msg)
+				return
+			
+		if not self.torment:
+			await self.bot.send_message(ctx.message.author, 'Not currently tormenting.')
+			return
+		# Cancel it!
+		self.torment = False
+		await self.bot.send_message(ctx.message.author, 'Tormenting cancelled.')
+		
+		
+	@commands.command(pass_context=True, hidden=True)
 	async def torment(self, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice (owner only)."""
 
@@ -72,6 +159,9 @@ class Torment:
 						return
 					member   = nameCheck["Member"]
 					times = nameCheck["Int"]
+					
+		# Set the torment flag
+		self.torment = True
 
 		if times == None:
 			# Still no times - roll back to default
@@ -89,6 +179,8 @@ class Torment:
 			return
 		
 		for i in range(0, times):
+			if not self.torment:
+				break
 			# Do this over time
 			await self.bot.send_message(ctx.message.channel, '*{}*'.format(member.mention))
 			await asyncio.sleep(self.waitBetween)
