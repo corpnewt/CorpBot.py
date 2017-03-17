@@ -31,11 +31,27 @@ class Humor:
 		result_json = json.loads(r.text)
 		templates = result_json["data"]["memes"]
 
+		templates_string_list = []
+		
 		templates_string = "**Meme Templates**\n"
 		for template in templates:
+			length_test = templates_string + "* [`{}` - `{}`]\n".format(template["id"], template["name"])
+			if len(length_test) > 2000:
+				# We're past our character limit - add it to the list and reset the
+				# templates_string
+				templates_string_list.append(templates_string)
+				templates_string = ''
+				continue
+			# Not over the limit - add it to the string
 			templates_string += "* [`{}` - `{}`]\n".format(template["id"], template["name"])
-		
-		await Message.say(self.bot, templates_string, ctx.message.author)
+		# Add the templates_string to the list here if it contains anything
+		if len(templates_string):
+			templates_string_list.append(templates_string)
+		# Iterate over all the template strings and display them
+		for string in templates_string_list:
+			await self.bot.send_message(ctx.message.author, string)
+			
+		# await Message.say(self.bot, templates_string, ctx.message.author)
 
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
