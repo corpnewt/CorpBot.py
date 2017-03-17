@@ -121,7 +121,7 @@ botCog = Bot.Bot(bot, settings)
 cogList.append(botCog)
 
 # Humor
-humor = Humor.Humor(bot)
+humor = Humor.Humor(bot, settings)
 cogList.append(humor)
 
 # Humor
