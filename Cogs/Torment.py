@@ -179,7 +179,7 @@ class Torment:
 			return
 		
 		for i in range(0, times):
-			if not self.torment:
+			if not self.toTorment:
 				break
 			# Do this over time
 			await self.bot.send_message(ctx.message.channel, '*{}*'.format(member.mention))
