@@ -49,6 +49,7 @@ from Cogs import ChatterBot
 from Cogs import Star
 # from Cogs import Monitor
 from Cogs import RateLimit
+from Cogs import Torment
 
 # Let's load our prefix file
 prefix = '$'
@@ -239,6 +240,10 @@ cogList.append(star)
 # Rate Limiting
 rateLim = RateLimit.RateLimit(bot, settings)
 cogList.append(rateLim)
+
+# Torment
+torment = Torment.Torment(bot, settings)
+cogList.append(torment)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
