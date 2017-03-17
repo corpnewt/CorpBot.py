@@ -14,8 +14,9 @@ from Cogs import GetImage
 
 class Humor:
 
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
+		self.settings = settings
 		
 	@commands.command(pass_context=True)
 	async def fart(self, ctx):
