@@ -79,6 +79,14 @@ class Torment:
 			
 		if times > 100:
 			times = 100
+			
+		if times == 0:
+			await self.bot.send_message(ctx.message.channel, 'Oooooh - I bet they feel *sooooo* tormented...')
+			return
+		
+		if times < 0:
+			await self.bot.send_message(ctx.message.channel, 'I just uh... *un-tormented* them.  Yeah.')
+			return
 		
 		for i in range(0, times):
 			# Do this over time
