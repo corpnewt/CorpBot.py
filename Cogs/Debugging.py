@@ -23,10 +23,12 @@ class Debugging:
 			if os.path.exists('debug.txt'):
 				# Exists - let's append
 				msg = "\n\n" + msg
-				with open("debug.txt", "a") as myfile:
+				msg = msg.encode("utf-8")
+				with open("debug.txt", "ab") as myfile:
 					myfile.write(msg)
 			else:
-				with open("debug.txt", "w") as myfile:
+				msg = msg.encode("utf-8")
+				with open("debug.txt", "wb") as myfile:
 					myfile.write(msg)
 
 	async def oncommandcompletion(self, command, ctx):
