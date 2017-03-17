@@ -2,6 +2,8 @@ import asyncio
 import discord
 import requests
 import string
+import os
+from   datetime import datetime
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
@@ -64,3 +66,95 @@ class Server:
 			msg = Nullify.clean(msg)
 
 		await self.bot.send_message(ctx.message.channel, msg)
+
+	@commands.command(pass_context=True)
+	async def dumpservers(self, ctx):
+		"""Dumps a timpestamped list of servers into the same directory as the bot (owner only)."""
+		
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.settings.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I cannot dump the server list until I have an owner.'
+			await self.bot.send_message(channel, msg)
+			return
+		if not author.id == owner:
+			# Not the owner
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can dump the server list.'
+			await self.bot.send_message(channel, msg)
+			return
+
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		serverFile = 'ServerList-{}.txt'.format(timeStamp)
+		message = await self.bot.send_message(ctx.message.channel, 'Saving server list to *{}*...'.format(serverFile))
+		msg = ''
+		for server in self.bot.servers:
+			msg += server.name + "\n"
+			msg += server.id + "\n"
+			msg += str(len(server.members)) + "\n\n"
+
+		# Trim the last 2 newlines
+		msg = msg[:-2]
+		
+		with open(serverFile, "w") as myfile:
+			myfile.write(msg)
+
+		message = await self.bot.edit_message(message, 'Uploading *{}*...'.format(serverFile))
+		await self.bot.send_file(ctx.message.channel, serverFile)
+		message = await self.bot.edit_message(message, 'Uploaded *{}!*'.format(serverFile))
+		os.remove(serverFile)
+
+
+	@commands.command(pass_context=True)
+	async def leaveserver(self, ctx, *, targetServer = None):
+		"""Leaves a server - can take a name or id (owner only)."""
+		
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		try:
+			owner = self.settings.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I cannot leave servers until I have an owner.'
+			await self.bot.send_message(channel, msg)
+			return
+		if not author.id == owner:
+			# Not the owner
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can have me leave servers.'
+			await self.bot.send_message(channel, msg)
+			return
+
+		if targetServer == None:
+			# No server passed
+			msg = 'Usage: `{}leaveserver [id/name]`'.format(ctx.prefix)
+			await self.bot.send_message(channel, msg)
+			return
+
+		# Check id first, then name
+		for aServer in self.bot.servers:
+			if str(aServer.id) == str(targetServer):
+				# Found it by id
+				await self.bot.send_message(aServer, 'Thanks for having me - but it\'s my time to go...')
+				await self.bot.leave_server(aServer)
+				return
+		# Didn't find it - try by name
+		for aServer in self.bot.servers:
+			if aServer.name.lower() == targetServer.lower():
+				# Found it by name
+				await self.bot.send_message(aServer, 'Thanks for having me - but it\'s my time to go...')
+				await self.bot.leave_server(aServer)
+				return
+
+		await self.bot.send_message(ctx.message.channel, 'I couldn\'t find that server.')
