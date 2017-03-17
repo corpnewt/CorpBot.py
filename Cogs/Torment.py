@@ -76,6 +76,9 @@ class Torment:
 		if times == None:
 			# Still no times - roll back to default
 			times = 25
+			
+		if times > 100:
+			times = 100
 		
 		for i in range(0, times):
 			# Do this over time
