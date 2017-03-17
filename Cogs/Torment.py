@@ -14,7 +14,7 @@ class Torment:
 		self.bot = bot
 		self.waitBetween = 1 # number of seconds to wait before sending another message
 		self.settings = settings
-		self.torment = False
+		self.toTorment = False
 		
 	@commands.command(pass_context=True, hidden=True)
 	async def tormentdelay(self, ctx, delay : int = None):
@@ -94,15 +94,15 @@ class Torment:
 				await self.bot.send_message(channel, msg)
 				return
 			
-		if not self.torment:
+		if not self.toTorment:
 			await self.bot.send_message(ctx.message.author, 'Not currently tormenting.')
 			return
 		# Cancel it!
-		self.torment = False
+		self.toTorment = False
 		await self.bot.send_message(ctx.message.author, 'Tormenting cancelled.')
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command(pass_context=True, hidden=True)
 	async def torment(self, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice (owner only)."""
 
@@ -161,7 +161,7 @@ class Torment:
 					times = nameCheck["Int"]
 					
 		# Set the torment flag
-		self.torment = True
+		self.toTorment = True
 
 		if times == None:
 			# Still no times - roll back to default
