@@ -7,12 +7,13 @@ from   Cogs import DisplayName
 
 # This is the Torment module. It spams the target with pings for awhile
 
-class RateLimit:
+class Torment:
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.waitBetween = 1 # number of seconds to wait before sending another message
+		self.settings = settings
 
 	@commands.command(pass_context=True)
 	async def torment(self, ctx, *, member = None, times : int = None):
