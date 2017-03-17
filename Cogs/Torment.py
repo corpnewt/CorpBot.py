@@ -268,6 +268,7 @@ class Torment:
 			# Do this over time
 			for channel in ctx.message.server.channels:
 				# Get user's permissions
+				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
 					# Only ping where they can read
 					await self.bot.send_message(channel, '*{}*'.format(member.mention))
 			for j in range(0, self.waitBetween):
