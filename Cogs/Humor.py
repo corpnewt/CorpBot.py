@@ -4,9 +4,11 @@ import random
 import urllib
 import requests
 import json
+import time
 from   discord.ext import commands
 from Cogs import Message
 from Cogs import FuzzySearch
+from Cogs import GetImage
 
 # This module is for random funny things I guess...
 
@@ -22,6 +24,18 @@ class Humor:
 		randnum = random.randint(0, len(fartList)-1)
 		msg = '{}'.format(fartList[randnum])
 		await self.bot.send_message(ctx.message.channel, msg)
+		
+	def canDisplay(self, server):
+		# Check if we can display images
+		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
+		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
+		if not GetImage.canDisplay( lastTime, threshold ):
+			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+			return False
+		
+		# If we made it here - set the LastPicture method
+		self.settings.setServerStat(server, "LastPicture", int(time.time()))
+		return True
 
 	@commands.command(pass_context=True)
 	async def memetemps(self, ctx):
@@ -56,6 +70,9 @@ class Humor:
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
 		"""Generate Meme"""
+		
+		if not self.canDisplay(ctx.message.server):
+			return
 
 		if text_one == None:
 			# Set as space if not included
@@ -92,8 +109,10 @@ class Humor:
 		result_json = json.loads(r.text)
 		result = result_json["data"]["url"]
 		if msg:
-			result = '{}\n{}'.format(msg, result)
-		await self.bot.send_message(ctx.message.channel, result)
+			# result = '{}\n{}'.format(msg, result)
+			await self.bot.send_message(ctx.message.channel, msg)
+		# Download Image - set title as a space so it disappears on upload
+		await GetImage.get(result, self.bot, ctx.message.channel, " ")
 
 
 	def getTemps(self):
