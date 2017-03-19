@@ -34,13 +34,9 @@ class Torment:
 
 		if owner == None:
 			# No owner set
-			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-				await self.bot.send_message(channel, msg)
 				return
 		
 		if delay == None:
@@ -57,7 +53,7 @@ class Torment:
 			return
 		
 		if delay < 1:
-			await self.bot.send_message(ctx.message.author, 'Delay must be at least 1 second.')
+			await self.bot.send_message(ctx.message.author, 'Delay must be at least *1 second*.')
 			return
 		
 		self.waitBetween = delay
@@ -85,13 +81,9 @@ class Torment:
 
 		if owner == None:
 			# No owner set
-			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-				await self.bot.send_message(channel, msg)
 				return
 			
 		if not self.toTorment:
@@ -120,13 +112,9 @@ class Torment:
 
 		if owner == None:
 			# No owner set
-			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-				await self.bot.send_message(channel, msg)
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
@@ -206,13 +194,9 @@ class Torment:
 
 		if owner == None:
 			# No owner set
-			msg = 'I have not been claimed, *yet*.'
-			await self.bot.send_message(channel, msg)
 			return
 		else:
 			if not author.id == owner:
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-				await self.bot.send_message(channel, msg)
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)

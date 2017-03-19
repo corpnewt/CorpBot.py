@@ -46,9 +46,14 @@ REM echo.
 REM call :install "chatterbot"
 REM echo.
 
-echo Installing Discord...
+REM echo Installing Discord...
+REM echo.
+REM call :install "discord.py[voice]"
+REM echo.
+
+echo Installing Discord [Development Version]...
 echo.
-call :install "discord.py[voice]"
+call :install "https://github.com/Rapptz/discord.py/archive/master.zip#egg=discord.py[voice]"
 echo.
 
 echo Installing Pillow...

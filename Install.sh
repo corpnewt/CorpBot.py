@@ -28,9 +28,14 @@ function main () {
     #update "chatterbot"
     #echo
     
-    echo Updating Discord...
+    #echo Updating Discord...
+    #echo
+    #update "discord.py[voice]"
+    #echo
+
+    echo Updating Discord [Development Version]...
     echo
-    update "discord.py[voice]"
+    update "https://github.com/Rapptz/discord.py/archive/master.zip#egg=discord.py[voice]"
     echo
 
     echo Updating Pillow...
