@@ -345,6 +345,7 @@ class Torment:
 		
 		for i in range(0, times):
 			# Do this over time
+			for channel in server.channels:
 				# Get user's permissions
 				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
 					# Only ping where they can read
