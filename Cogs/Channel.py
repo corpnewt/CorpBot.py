@@ -300,33 +300,11 @@ class Channel:
 		if messages > 1000:
 			messages = 1000
 
-		totalMessage = messages
-
-		while totalMessage > 0:
-			# Remove them 100 at a time
-			if totalMessage > 100:
-				tempNum = 100
-			else:
-				tempNum = totalMessage
-			# Create an empty list
-			messageList = []
-			async for message in self.bot.logs_from(channel, limit=tempNum):
-				messageList.append(message)
-				counter += 1
-
-			if not len(messageList):
-				# Out of messages
-				totalMessage = 0
-				break
-			if len(messageList) == 1:
-				# Removed one
-				await self.bot.delete_message(messageList[0])
-			if len(messageList) > 1:
-				# Removed more than one
-				await self.bot.delete_messages(messageList)
-			# Subtract removed from total
-			totalMessage -= len(messageList)
-			await asyncio.sleep(0.05)
+		# I tried bulk deleting - but it doesn't work on messages over 14 days
+		# old - so we're doing them individually I guess.
+		async for message in self.bot.logs_from(channel, limit=tempNum):
+			await self.bot.delete_message(message)
+			counter += 1
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
