@@ -295,16 +295,29 @@ class Channel:
 		# Remove original message
 		await self.bot.delete_message(ctx.message)
 
-		# Use logs_from instead of purge
-		counter = 0
 		if messages > 1000:
 			messages = 1000
 
+		# Use logs_from instead of purge
+		counter = 0
+
 		# I tried bulk deleting - but it doesn't work on messages over 14 days
 		# old - so we're doing them individually I guess.
-		async for message in self.bot.logs_from(channel, limit=tempNum):
-			await self.bot.delete_message(message)
-			counter += 1
+		totalMess = messages
+		while totalMess > 0:
+			gotMessage = False
+			if totalMess > 100:
+				tempNum = 100
+			else:
+				tempNum = totalMess
+			async for message in self.bot.logs_from(channel, limit=tempNum):
+				await self.bot.delete_message(message)
+				gotMessage = True
+				counter += 1
+				totalMess -= 1
+			if not gotMessage:
+				# No more messages - exit
+				break
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
