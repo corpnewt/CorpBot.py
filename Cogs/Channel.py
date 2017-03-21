@@ -334,9 +334,9 @@ class Channel:
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
-			await self.bot.send_message(ctx.message.author, '*1* message removed from *{}* in *{}!*'.format(channel.name, server.name))
+			await self.bot.send_message(ctx.message.author, '*1* message removed from *{}* in *#{}!*'.format(channel.name, server.name))
 		else:
-			await self.bot.send_message(ctx.message.author, '*{}* messages removed from *{}* in *{}!*'.format(counter, channel.name, server.name))
+			await self.bot.send_message(ctx.message.author, '*{}* messages removed from *{}* in *#{}!*'.format(counter, channel.name, server.name))
 
 		# Remove the rest
 		# await self.bot.purge_from(chan, limit=messages)
