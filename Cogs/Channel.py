@@ -269,7 +269,7 @@ class Channel:
 
 	@commands.command(pass_context=True)
 	async def clean(self, ctx, messages : int = 100, *, chan : discord.Channel = None):
-		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
+		"""Cleans the passed number of messages from the given channel - 100 by default, 1000 max (admin only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.server
@@ -297,15 +297,42 @@ class Channel:
 
 		# Use logs_from instead of purge
 		counter = 0
-		async for message in self.bot.logs_from(channel, limit=messages):
-			await self.bot.delete_message(message)
-			counter += 1
+		if messages > 1000:
+			messages = 1000
+
+		totalMessage = messages
+
+		while totalMessage > 0:
+			# Remove them 100 at a time
+			if totalMessage > 100:
+				tempNum = 100
+			else:
+				tempNum = totalMessage
+			# Create an empty list
+			messageList = []
+			async for message in self.bot.logs_from(channel, limit=tempNum):
+				messageList.append(message)
+				counter += 1
+
+			if not len(messageList):
+				# Out of messages
+				totalMessage = 0
+				break
+			if len(messageList) == 1:
+				# Removed one
+				await self.bot.delete_message(messageList[0])
+			if len(messageList) > 1:
+				# Removed more than one
+				await self.bot.delete_messages(messageList)
+			# Subtract removed from total
+			totalMessage -= len(messageList)
+			await asyncio.sleep(0.05)
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
-			await self.bot.send_message(ctx.message.author, '*1* message removed from *{}!*'.format(channel.name))
+			await self.bot.send_message(ctx.message.author, '*1* message removed from *{}* in *{}!*'.format(channel.name, server.name))
 		else:
-			await self.bot.send_message(ctx.message.author, '*{}* messages removed from *{}!*'.format(counter, channel.name))
+			await self.bot.send_message(ctx.message.author, '*{}* messages removed from *{}* in *{}!*'.format(counter, channel.name, server.name))
 
 		# Remove the rest
 		# await self.bot.purge_from(chan, limit=messages)
