@@ -19,6 +19,7 @@ class Channel:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.cleanChannels = []
 		
 	@commands.command(pass_context=True)
 	async def islocked(self, ctx):
@@ -292,6 +293,10 @@ class Channel:
 		if not chan:
 			chan = channel
 
+		if chan in self.cleanChannels:
+			# Don't clean messages from a channel that's being cleaned
+			return
+
 		# Remove original message
 		await self.bot.delete_message(ctx.message)
 
@@ -301,6 +306,8 @@ class Channel:
 		# Use logs_from instead of purge
 		counter = 0
 
+		# Add channel to list
+		self.cleanChannels.append(ctx.message.channel)
 		# I tried bulk deleting - but it doesn't work on messages over 14 days
 		# old - so we're doing them individually I guess.
 		totalMess = messages
@@ -310,14 +317,20 @@ class Channel:
 				tempNum = 100
 			else:
 				tempNum = totalMess
-			async for message in self.bot.logs_from(channel, limit=tempNum):
-				await self.bot.delete_message(message)
-				gotMessage = True
-				counter += 1
-				totalMess -= 1
+			try:
+				async for message in self.bot.logs_from(channel, limit=tempNum):
+					await self.bot.delete_message(message)
+					gotMessage = True
+					counter += 1
+					totalMess -= 1
+			except Exception:
+				pass
 			if not gotMessage:
 				# No more messages - exit
 				break
+
+		# Remove channel from list
+		self.cleanChannels.remove(ctx.message.channel)
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
