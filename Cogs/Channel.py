@@ -1,7 +1,9 @@
 import asyncio
 import discord
 import time
+import os
 from   discord.ext import commands
+from   datetime import datetime
 from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import ReadableTime
@@ -208,6 +210,64 @@ class Channel:
 		await self.bot.say(msg)
 
 	@commands.command(pass_context=True)
+	async def log(self, ctx, messages : int = 25, *, chan : discord.Channel = None):
+		"""Logs the passed number of messages from the given channel - 25 by default (admin only)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+
+		# Check for admin status
+		isAdmin = author.permissions_in(channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(server, "AdminArray")
+			for role in author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+
+		if not isAdmin:
+			await self.bot.send_message(channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		logFile = 'Logs-{}.txt'.format(timeStamp)
+
+		if not chan:
+			chan = channel
+
+		# Remove original message
+		await self.bot.delete_message(ctx.message)
+
+		mess = await self.bot.send_message(ctx.message.author, 'Saving logs to *{}*...'.format(logFile))
+
+		# Use logs_from instead of purge
+		counter = 0
+		msg = ''
+		async for message in self.bot.logs_from(channel, limit=messages):
+			counter += 1
+			msg += message.content + "\n"
+			msg += '----Sent-By: ' + message.author.name + '#' + message.author.discriminator + "\n"
+			msg += '---------At: ' + message.timestamp.strftime("%Y-%m-%d %H.%M") + "\n"
+			if message.edited_timestamp:
+				msg += '--Edited-At: ' + message.edited_timestamp.strftime("%Y-%m-%d %H.%M") + "\n"
+			msg += '\n'
+
+		msg = msg[:-2].encode("utf-8")
+
+		with open(logFile, "wb") as myfile:
+			myfile.write(msg)
+
+		
+		message = await self.bot.edit_message(mess, 'Uploading *{}*...'.format(logFile))
+		await self.bot.send_file(ctx.message.author, logFile)
+		message = await self.bot.edit_message(mess, 'Uploaded *{}!*'.format(logFile))
+		os.remove(logFile)
+
+		
+
+	@commands.command(pass_context=True)
 	async def clean(self, ctx, messages : int = 100, *, chan : discord.Channel = None):
 		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
 
@@ -234,5 +294,18 @@ class Channel:
 
 		# Remove original message
 		await self.bot.delete_message(ctx.message)
+
+		# Use logs_from instead of purge
+		counter = 0
+		async for message in self.bot.logs_from(channel, limit=messages):
+			await self.bot.delete_message(message)
+			counter += 1
+
+		# Send the cleaner a pm letting them know we're done
+		if counter == 1:
+			await self.bot.send_message(ctx.message.author, '*1* message removed from *{}!*'.format(channel.name))
+		else:
+			await self.bot.send_message(ctx.message.author, '*{}* messages removed from *{}!*'.format(counter, channel.name))
+
 		# Remove the rest
-		await self.bot.purge_from(chan, limit=messages)
+		# await self.bot.purge_from(chan, limit=messages)
