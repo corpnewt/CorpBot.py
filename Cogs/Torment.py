@@ -172,7 +172,10 @@ class Torment:
 
 		for i in range(0, times):
 			# Do this over time
-			await self.bot.send_message(channel, '*{}*'.format(member.mention))
+			try:
+				await self.bot.send_message(channel, '*{}*'.format(member.mention))
+			except Exception:
+				pass
 			for j in range(0, self.waitBetween):
 				# Wait for 1 second, then check if we should cancel - then wait some more
 				await asyncio.sleep(1)
@@ -258,8 +261,11 @@ class Torment:
 		
 		for i in range(0, times):
 			# Do this over time
-			tmessage = await self.bot.send_message(ctx.message.channel, '*{}*'.format(member.mention))
-			await self.bot.delete_message(tmessage)
+			try:
+				tmessage = await self.bot.send_message(ctx.message.channel, '*{}*'.format(member.mention))
+				await self.bot.delete_message(tmessage)
+			except Exception:
+				pass
 			for j in range(0, self.waitBetween):
 				# Wait for 1 second, then check if we should cancel - then wait some more
 				await asyncio.sleep(1)
@@ -349,7 +355,10 @@ class Torment:
 				# Get user's permissions
 				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
 					# Only ping where they can read
-					await self.bot.send_message(channel, '*{}*'.format(member.mention))
+					try:
+						await self.bot.send_message(channel, '*{}*'.format(member.mention))
+					except Exception:
+						pass
 			for j in range(0, self.waitBetween):
 				# Wait for 1 second, then check if we should cancel - then wait some more
 				await asyncio.sleep(1)
@@ -439,8 +448,11 @@ class Torment:
 				# Get user's permissions
 				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
 					# Only ping where they can read
-					tmessage = await self.bot.send_message(channel, '*{}*'.format(member.mention))
-					await self.bot.delete_message(tmessage)
+					try:
+						tmessage = await self.bot.send_message(channel, '*{}*'.format(member.mention))
+						await self.bot.delete_message(tmessage)
+					except Exception:
+						pass
 			for j in range(0, self.waitBetween):
 				# Wait for 1 second, then check if we should cancel - then wait some more
 				await asyncio.sleep(1)
