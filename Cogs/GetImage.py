@@ -61,19 +61,26 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	imageSize = os.stat(imagePath)
 	
 	while int(imageSize.st_size) > sizeLimit:
-		# Image is too big - resize
-		myimage = Image.open(imagePath)
-		xsize, ysize = myimage.size
-		ratio = sizeLimit/int(imageSize.st_size)
-		xsize *= ratio
-		ysize *= ratio
-		myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
-		myimage.save(imagePath)
-		imageSize = os.stat(imagePath)
-		
-	img = Image.open(imagePath)
-	ext = img.format
-	img.close()
+		try:
+			# Image is too big - resize
+			myimage = Image.open(imagePath)
+			xsize, ysize = myimage.size
+			ratio = sizeLimit/int(imageSize.st_size)
+			xsize *= ratio
+			ysize *= ratio
+			myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
+			myimage.save(imagePath)
+			imageSize = os.stat(imagePath)
+		except Exception:
+			# Image too big and can't be opened
+			return None
+	try:
+		# Try to get the extension
+		img = Image.open(imagePath)
+		ext = img.format
+		img.close()
+	except Exception:
+		pass
 	
 	if ext:
 		os.rename(imagePath, '{}.{}'.format(imagePath, ext))
