@@ -85,7 +85,7 @@ class Bot:
 		pythonMinor   = sys.version_info.minor
 		pythonMicro   = sys.version_info.micro
 		pythonRelease = sys.version_info.releaselevel
-		process       = subprocess.Popen(['git', 'rev-parse', 'HEAD'], shell=False, stdout=subprocess.PIPE)
+		process       = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], shell=False, stdout=subprocess.PIPE)
 		git_head_hash = process.communicate()[0].strip()
 
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
