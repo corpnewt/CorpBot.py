@@ -1,9 +1,10 @@
 # CorpBot.py
 A *slightly* less clumsy python bot for discord
 
+(Worth noting - youtube-dl on Ubuntu 16.04 at least had a preference for libav over ffmpeg.  That can be installed with `sudo apt-get install libav-tools`)
+
 A sample of his `$help` command:
 
--
 
 	A bot that does stuff.... probably
 
