@@ -13,6 +13,11 @@ debug.txt
 # FFMpeg.exe
 ffmpeg.exe
 
+# FFMpeg extras
+*.dll
+ffplay.exe
+ffprobe.exe
+
 # Chatterbot database
 database.db
 
