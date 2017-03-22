@@ -101,10 +101,13 @@ class Reddit:
 	def getInfo(self, url):
 		# Let's try using reddit's json info to get our images
 		r = requests.get(url, headers = {'User-agent': self.ua})
+		numPosts = len(r.json()['data']['children'])
+		if numPosts < 0:
+			numPosts = 0
 		gotLink = False
 		returnDict = None
 		for i in range(0, 10):
-			randnum = random.randint(0, self.posts)
+			randnum = random.randint(0, numPosts-1)
 			#try:
 			theJSON = r.json()["data"]["children"][randnum]["data"]
 			theURL = None
