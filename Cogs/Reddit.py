@@ -108,7 +108,7 @@ class Reddit:
 			#try:
 			theJSON = r.json()["data"]["children"][randnum]["data"]
 			theURL = None
-			if theJSON.has_key('preview'):
+			if 'preview' in theJSON:
 				print("Has preview")
 				# We've got images right in the json
 				theURL = theJSON['preview']['images'][0]['source']['url']
