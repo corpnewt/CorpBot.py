@@ -187,7 +187,7 @@ class Reddit:
 		
 		
 	@commands.command(pass_context=True)
-	async def battlestations(self, ctx):
+	async def battlestation(self, ctx):
 		"""Let's look at some pretty stuff."""
 		
 		channel = ctx.message.channel
@@ -203,8 +203,6 @@ class Reddit:
 		if not infoDict:
 			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
 			return
-		
-		await self.bot.send_message(ctx.message.channel, infoDict['url'])
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
