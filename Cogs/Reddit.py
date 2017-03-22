@@ -208,7 +208,7 @@ class Reddit:
 			return
 			
 		# Check for nsfw - and for now, only allow admins/botadmins to post those
-		if infoDict['over_18'].lower() == 'true':
+		if infoDict['over_18']:
 			# NSFW - check admin
 			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 			if not isAdmin:
