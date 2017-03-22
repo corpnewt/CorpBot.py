@@ -109,7 +109,7 @@ class Reddit:
 				theURL = theJSON['preview']['images'][0]['source']['url']
 				returnDict = { 'title': theJSON['title'], 'url': theURL }
 				break
-			except IndexError:
+			except Exception:
 				continue
 		return returnDict
 			
