@@ -187,6 +187,73 @@ class Reddit:
 		
 		
 	@commands.command(pass_context=True)
+	async def redditimage(self, ctx, subreddit = None):
+		"""Try to grab an image from an image-based subreddit."""
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		if not subreddit:
+			await self.bot.send_message(ctx.message.channel, "You need to pass a subreddit name.")
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		
+		
+	
+	@commands.command(pass_context=True)
+	async def macsetup(self, ctx):
+		"""Feast your eyes upon these setups."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/macsetups/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+	
+	
+	@commands.command(pass_context=True)
+	async def carmod(self, ctx):
+		"""Marvels of modern engineering."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/Shitty_Car_Mods/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+	
+	
+	@commands.command(pass_context=True)
 	async def battlestation(self, ctx):
 		"""Let's look at some pretty stuff."""
 		
@@ -205,10 +272,31 @@ class Reddit:
 			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		
+		
+	@commands.command(pass_context=True)
+	async def shittybattlestation(self, ctx):
+		"""Let's look at some shitty stuff."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/shittybattlestations/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
-	async def dankmemes(self, ctx):
+	async def dankmeme(self, ctx):
 		"""Only the dankest."""
 		
 		channel = ctx.message.channel
@@ -219,7 +307,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -236,7 +328,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -253,7 +349,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -270,7 +370,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 		
@@ -287,7 +391,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -304,7 +412,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -321,7 +433,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -338,7 +454,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 		
@@ -355,7 +475,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -372,7 +496,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -389,7 +517,11 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
@@ -406,6 +538,10 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getTitle('https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=100', False, True)
+		infoDict = self.getInfo('https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
