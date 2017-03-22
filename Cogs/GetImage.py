@@ -52,6 +52,11 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 			if chunk:
 				f.write(chunk)
 	
+	# Check if the file exists
+	if not os.path.exists(imagePath):
+		remove(dirpath)
+		return None
+	
 	# Let's make sure it's less than the passed limit
 	imageSize = os.stat(imagePath)
 	
