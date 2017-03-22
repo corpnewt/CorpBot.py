@@ -80,7 +80,8 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 		ext = img.format
 		img.close()
 	except Exception:
-		pass
+		# Not something we understand - error out
+		return None
 	
 	if ext:
 		os.rename(imagePath, '{}.{}'.format(imagePath, ext))
