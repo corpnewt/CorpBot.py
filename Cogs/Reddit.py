@@ -3,6 +3,8 @@ import discord
 import random
 import requests
 import time
+import mimetypes
+import urllib2
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
@@ -27,6 +29,45 @@ class MLStripper(HTMLParser):
 		self.fed.append(d)
 	def get_data(self):
 		return ''.join(self.fed)
+	
+class HeadRequest(self, urllib2.Request):
+	def get_method(self):
+		return 'HEAD'
+	
+class CheckURL:
+	def get_contenttype(self, image_url):
+		try:
+			response= urllib2.urlopen(HeadRequest(image_url))
+			maintype= response.headers['Content-Type'].split(';')[0].lower()
+			return maintype
+		except urllib2.HTTPError as e:
+			print(e)
+		return None
+
+	def get_mimetype(self, image_url):
+		(mimetype, encoding) =  mimetypes.guess_type(image_url)
+		return mimetype
+
+	def get_extension_from_type(self, type_string):
+		if type(type_string) == str or type(type_string) == unicode:
+			temp = type_string.split('/')
+			if len(temp) >= 2:
+				return temp[1]
+			elif len(temp) >= 1:
+				return temp[0]
+			else:
+				return None
+
+	def get_type(self, image_url):
+		valid_types = ('image/png', 'image/jpeg', 'image/gif', 'image/jpg')
+		content_type = get_contenttype(image_url)
+		if content_type in valid_types:
+			return get_extension_from_type(content_type)
+		mimetypes = get_mimetype(image_url)
+		if mimetypes in valid_types:
+			return get_extension_from_type(mimetypes)
+		return None
+	
 
 class Reddit:
 
@@ -127,6 +168,7 @@ class Reddit:
 						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
 					else:
 						# Not an imgur album - let's try for a single image
+						print(CheckURL.get_type(imageURL))
 						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
 				if not theURL:
