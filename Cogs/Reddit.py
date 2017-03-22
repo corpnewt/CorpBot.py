@@ -106,7 +106,7 @@ class Reddit:
 			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
-				theURL = theJSON['preview']['images'][0]['source']['url'].split('?')[0]
+				theURL = theJSON['preview']['images'][0]['source']['url']
 				returnDict = { 'title': theJSON['title'], 'url': theURL }
 				break
 			except IndexError:
