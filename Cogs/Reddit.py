@@ -204,6 +204,8 @@ class Reddit:
 			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
 			return
 		
+		print(infoDict['url'])
+		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
 
