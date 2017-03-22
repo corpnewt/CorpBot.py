@@ -3,17 +3,29 @@ import discord
 import random
 import requests
 import time
+from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import GetImage
+from   Cogs import Message
 
 try:
-    from urllib.parse import urlparse
+	from urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse
+	from urlparse import urlparse
 
 # This module grabs Reddit posts and selects one at random
+
+class MLStripper(HTMLParser):
+	def __init__(self):
+		super().__init__()
+		self.reset()
+		self.fed = []
+	def handle_data(self, d):
+		self.fed.append(d)
+	def get_data(self):
+		return ''.join(self.fed)
 
 class Reddit:
 
@@ -25,6 +37,13 @@ class Reddit:
 			posts = 100
 		self.posts = posts
 		self.ua = 'CorpNewt DeepThoughtBot'
+		
+	def strip_tags(self, html):
+		parser = HTMLParser()
+		html = parser.unescape(html)
+		s = MLStripper()
+		s.feed(html)
+		return s.get_data()
 
 	def getTitle(self, url, answer : bool = False, image : bool = False):
 		# Load url - with self.posts number of posts
@@ -62,6 +81,22 @@ class Reddit:
 		if answer or image:
 			# We need the image or the answer
 			return {'title' : theJSON['title'], 'url' : theJSON["url"]}
+		
+	def getText(self, url):
+		# Load url - with self.posts number of posts
+		r = requests.get(url, headers = {'User-agent': self.ua})
+		# If we need an image - make sure we have a valid one
+		gotLink = False
+		randnum = random.randint(0,self.posts)
+		returnDict = None
+		for i in range(0, 10):
+			try:
+				theJSON = r.json()["data"]["children"][randnum]["data"]
+				returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']) }
+				break
+			except IndexError:
+				continue
+		return returnDict
 			
 	def canDisplay(self, server):
 		# Check if we can display images
@@ -74,7 +109,20 @@ class Reddit:
 		# If we made it here - set the LastPicture method
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
+	
+	@commands.command(pass_context=True)
+	async def nosleep(self, ctx):
+		"""I hope you're not tired..."""
+		msg = self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
+		if not msg:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		mess = '__**{}**__\n\n'.format(msg['title'])
+		mess += msg['content']
+		await Message.say(self.bot, mess, ctx.message.author)
+		#await self.bot.send_message(ctx.message.channel, msg)
 
+		
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
