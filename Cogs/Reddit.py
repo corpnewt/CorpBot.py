@@ -109,13 +109,15 @@ class Reddit:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
 				theURL = None
 				if theJSON.has_key('preview'):
+					print("Has preview")
 					# We've got images right in the json
-					print("Preview: " + theURL)
 					theURL = theJSON['preview']['images'][0]['source']['url']
+					print("Preview: " + theURL)
 				else:
 					# No images - let's check the url
 					imageURL = theJSON['url']
 					if 'imgur.com/a/' in imageURL.lower():
+						print("Is Imgur Album")
 						# It's an imgur album
 						response = requests.get(imageURL)
 						dom = pq(response.text)
@@ -125,11 +127,13 @@ class Reddit:
 						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
 						print("Imgur Album: " + theURL)
 					else:
+						print("Not Imgur Album")
 						# Not an imgur album - let's try for a single image
-						if GetImage.get_ext(imageURL) in self.extList:
+						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
 							print("By Extension: " + theURL)
 						else:
+							print(imageURL)
 							# Nothing found - continue
 							continue
 				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
