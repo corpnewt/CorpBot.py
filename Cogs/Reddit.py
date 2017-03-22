@@ -51,7 +51,7 @@ class Reddit:
 	
 	def getImageHEAD(self, url):
 		response = requests.head(url)
-		print(response['content-type'])
+		return response
 
 	def getTitle(self, url, answer : bool = False, image : bool = False):
 		# Load url - with self.posts number of posts
