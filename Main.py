@@ -408,6 +408,10 @@ async def on_message(message):
 		# This wasn't said in a server, process commands, then return
 		await bot.process_commands(message)
 		return
+	
+	if message.author.bot:
+		# We don't need other bots controlling things we do.
+		return
 
 	try:
 		message.author.roles
