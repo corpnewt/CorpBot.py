@@ -4,7 +4,7 @@ import random
 import requests
 import time
 import mimetypes
-import urllib2
+import urllib
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
@@ -30,17 +30,17 @@ class MLStripper(HTMLParser):
 	def get_data(self):
 		return ''.join(self.fed)
 	
-class HeadRequest(self, urllib2.Request):
+class HeadRequest(self, urllib.request):
 	def get_method(self):
 		return 'HEAD'
 	
 class CheckURL:
 	def get_contenttype(self, image_url):
 		try:
-			response= urllib2.urlopen(HeadRequest(image_url))
+			response= urllib.urlopen(HeadRequest(image_url))
 			maintype= response.headers['Content-Type'].split(';')[0].lower()
 			return maintype
-		except urllib2.HTTPError as e:
+		except urllib.HTTPError as e:
 			print(e)
 		return None
 
