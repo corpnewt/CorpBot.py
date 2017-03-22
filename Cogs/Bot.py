@@ -5,6 +5,7 @@ import psutil
 import platform
 import time
 import sys
+import subprocess
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -63,30 +64,33 @@ class Bot:
 		"""List info about the bot's host environment."""
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
-		cpuThred    = os.cpu_count()
-		cpuUsage    = psutil.cpu_percent(interval=1)
-		memStats    = psutil.virtual_memory()
-		memPerc     = memStats.percent
-		memUsed     = memStats.used
-		memTotal    = memStats.total
-		memUsedGB   = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
-		memTotalGB  = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
-		currentOS   = platform.platform()
-		system      = platform.system()
-		release     = platform.release()
-		version     = platform.version()
-		processor   = platform.processor()
-		botMember   = DisplayName.memberForID(self.bot.user.id, ctx.message.server)
-		botName     = DisplayName.name(botMember)
-		currentTime = int(time.time())
-		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
-		pythonMajor = sys.version_info.major
-		pythonMinor = sys.version_info.minor
-		pythonMicro = sys.version_info.micro
+		cpuThred      = os.cpu_count()
+		cpuUsage      = psutil.cpu_percent(interval=1)
+		memStats      = psutil.virtual_memory()
+		memPerc       = memStats.percent
+		memUsed       = memStats.used
+		memTotal      = memStats.total
+		memUsedGB     = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
+		memTotalGB    = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
+		currentOS     = platform.platform()
+		system        = platform.system()
+		release       = platform.release()
+		version       = platform.version()
+		processor     = platform.processor()
+		botMember     = DisplayName.memberForID(self.bot.user.id, ctx.message.server)
+		botName       = DisplayName.name(botMember)
+		currentTime   = int(time.time())
+		timeString    = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+		pythonMajor   = sys.version_info.major
+		pythonMinor   = sys.version_info.minor
+		pythonMicro   = sys.version_info.micro
 		pythonRelease = sys.version_info.releaselevel
+		process       = subprocess.Popen(['git', 'rev-parse', 'HEAD'], shell=False, stdout=subprocess.PIPE)
+		git_head_hash = process.communicate()[0].strip()
 
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
-		msg += '```{}\n'.format(currentOS)
+		msg += '```Commit Hash: {}\n'.format(git_head_hash)
+		msg += '{}\n'.format(currentOS)
 		msg += 'Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
 		msg += '{}% of {} ({} thread[s])\n'.format(cpuUsage, processor, cpuThred)
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
