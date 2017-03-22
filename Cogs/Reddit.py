@@ -41,6 +41,7 @@ class Reddit:
 		self.posts = posts
 		self.ua = 'CorpNewt DeepThoughtBot'
 		self.extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
+		self.headList = ["image/jpeg", "image/png", "image/gif", "image/jpg"]
 		
 	def strip_tags(self, html):
 		parser = HTMLParser()
@@ -133,9 +134,12 @@ class Reddit:
 						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
 					else:
 						# Not an imgur album - let's try for a single image
-						print(self.getImageHEAD(imageURL))
 						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
+						elif self.getImageHEAD(imageURL) in self.headList:
+							# Check header as a last resort
+							theURL = imageURL
+							
 				if not theURL:
 					continue
 				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
