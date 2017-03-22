@@ -9,6 +9,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import Message
+from   pyquery import PyQuery as pq
 
 try:
 	from urllib.parse import urlparse
@@ -37,6 +38,7 @@ class Reddit:
 			posts = 100
 		self.posts = posts
 		self.ua = 'CorpNewt DeepThoughtBot'
+		self.extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
 		
 	def strip_tags(self, html):
 		parser = HTMLParser()
@@ -52,7 +54,6 @@ class Reddit:
 		gotLink = False
 		while not gotLink:
 			if image:
-				extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
 				gotImage = False
 				while not gotImage:
 					randnum = random.randint(0,self.posts)
@@ -63,7 +64,7 @@ class Reddit:
 						# Failed - set to none
 						theJSON = { "url" : "" }
 
-					if GetImage.get_ext(theJSON["url"]) in extList:
+					if GetImage.get_ext(theJSON["url"]) in self.extList:
 						gotImage = True
 						gotLink  = True
 			else:
@@ -106,7 +107,28 @@ class Reddit:
 			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
-				theURL = theJSON['preview']['images'][0]['source']['url']
+				theURL = None
+				if theJSON.has_key('preview'):
+					# We've got images right in the json
+					theURL = theJSON['preview']['images'][0]['source']['url']
+				else:
+					# No images - let's check the url
+					imageURL = theJSON['url']
+					if 'imgur.com/a/' in imageURL.lower():
+						# It's an imgur album
+						response = requests.get(imageURL)
+						dom = pq(response.text)
+						# Get the first image
+						image = dom('.image-list-link')[0]
+						image = pq(image).attr('href').split('/')[2]
+						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
+					else:
+						# Not an imgur album - let's try for a single image
+						if GetImage.get_ext(imageURL) in self.extList:
+							theURL = imageURL
+						else:
+							# Nothing found - continue
+							continue
 				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
 				break
 			except Exception:
