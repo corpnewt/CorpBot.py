@@ -48,6 +48,10 @@ class Reddit:
 		s = MLStripper()
 		s.feed(html)
 		return s.get_data()
+	
+	def getImageHEAD(self, url):
+		response = requests.head(url)
+		print(response['content-type'])
 
 	def getTitle(self, url, answer : bool = False, image : bool = False):
 		# Load url - with self.posts number of posts
@@ -129,7 +133,7 @@ class Reddit:
 						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
 					else:
 						# Not an imgur album - let's try for a single image
-						print(CheckURL.get_type(imageURL))
+						print(self.getImageHEAD(imageURL))
 						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
 				if not theURL:
