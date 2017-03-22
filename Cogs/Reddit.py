@@ -105,7 +105,7 @@ class Reddit:
 		returnDict = None
 		for i in range(0, 10):
 			randnum = random.randint(0, self.posts)
-			try:
+			#try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
 				theURL = None
 				if theJSON.has_key('preview'):
@@ -132,14 +132,12 @@ class Reddit:
 						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
 							print("By Extension: " + theURL)
-						else:
-							print(imageURL)
-							# Nothing found - continue
-							continue
+				if not theURL:
+					continue
 				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
 				break
-			except Exception:
-				continue
+			#except Exception:
+				#continue
 		return returnDict
 			
 	def canDisplay(self, server):
