@@ -108,39 +108,33 @@ class Reddit:
 		returnDict = None
 		for i in range(0, 10):
 			randnum = random.randint(0, numPosts-1)
-			#try:
-			theJSON = r.json()["data"]["children"][randnum]["data"]
-			theURL = None
-			if 'preview' in theJSON:
-				print("Has preview")
-				# We've got images right in the json
-				theURL = theJSON['preview']['images'][0]['source']['url']
-				print("Preview: " + theURL)
-			else:
-				# No images - let's check the url
-				imageURL = theJSON['url']
-				if 'imgur.com/a/' in imageURL.lower():
-					print("Is Imgur Album")
-					# It's an imgur album
-					response = requests.get(imageURL)
-					dom = pq(response.text)
-					# Get the first image
-					image = dom('.image-list-link')[0]
-					image = pq(image).attr('href').split('/')[2]
-					theURL = 'http://i.imgur.com/{}.jpg'.format(image)
-					print("Imgur Album: " + theURL)
+			try:
+				theJSON = r.json()["data"]["children"][randnum]["data"]
+				theURL = None
+				if 'preview' in theJSON:
+					# We've got images right in the json
+					theURL = theJSON['preview']['images'][0]['source']['url']
 				else:
-					print("Not Imgur Album")
-					# Not an imgur album - let's try for a single image
-					if GetImage.get_ext(imageURL).lower() in self.extList:
-						theURL = imageURL
-						print("By Extension: " + theURL)
-			if not theURL:
+					# No images - let's check the url
+					imageURL = theJSON['url']
+					if 'imgur.com/a/' in imageURL.lower():
+						# It's an imgur album
+						response = requests.get(imageURL)
+						dom = pq(response.text)
+						# Get the first image
+						image = dom('.image-list-link')[0]
+						image = pq(image).attr('href').split('/')[2]
+						theURL = 'http://i.imgur.com/{}.jpg'.format(image)
+					else:
+						# Not an imgur album - let's try for a single image
+						if GetImage.get_ext(imageURL).lower() in self.extList:
+							theURL = imageURL
+				if not theURL:
+					continue
+				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
+				break
+			except Exception:
 				continue
-			returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
-			break
-			#except Exception:
-				#continue
 		return returnDict
 			
 	def canDisplay(self, server):
