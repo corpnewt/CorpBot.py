@@ -107,7 +107,7 @@ class Reddit:
 			try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
 				theURL = theJSON['preview']['images'][0]['source']['url']
-				returnDict = { 'title': theJSON['title'], 'url': theURL }
+				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
 				break
 			except Exception:
 				continue
@@ -186,7 +186,7 @@ class Reddit:
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 		
-	'''@commands.command(pass_context=True)
+	@commands.command(pass_context=True)
 	async def redditimage(self, ctx, subreddit = None):
 		"""Try to grab an image from an image-based subreddit."""
 		channel = ctx.message.channel
@@ -206,8 +206,24 @@ class Reddit:
 		if not infoDict:
 			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
 			return
+			
+		# Check for nsfw - and for now, only allow admins/botadmins to post those
+		if infoDict['over_18'].lower() == 'true':
+			# NSFW - check admin
+			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+			if not isAdmin:
+				checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+				for role in ctx.message.author.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if aRole['ID'] == role.id:
+							isAdmin = True
+			# Only allow admins to change server stats
+			if not isAdmin:
+				await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access nsfw subreddits.')
+				return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)'''
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 		
 		
 	
