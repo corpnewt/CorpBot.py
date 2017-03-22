@@ -186,7 +186,7 @@ class Reddit:
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 		
-	@commands.command(pass_context=True)
+	'''@commands.command(pass_context=True)
 	async def redditimage(self, ctx, subreddit = None):
 		"""Try to grab an image from an image-based subreddit."""
 		channel = ctx.message.channel
@@ -207,7 +207,7 @@ class Reddit:
 			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)'''
 		
 		
 	
