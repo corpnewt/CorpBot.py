@@ -89,7 +89,7 @@ class Bot:
 		git_head_hash = process.communicate()[0].strip()
 
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
-		msg += '```Commit Hash: {}\n'.format(git_head_hash)
+		msg += '```Commit Hash: {}\n'.format(git_head_hash.decode("utf-8"))
 		msg += '{}\n'.format(currentOS)
 		msg += 'Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
 		msg += '{}% of {} ({} thread[s])\n'.format(cpuUsage, processor, cpuThred)
