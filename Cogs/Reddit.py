@@ -107,8 +107,11 @@ class Reddit:
 	
 	def getInfo(self, url):
 		# Let's try using reddit's json info to get our images
-		r = requests.get(url, headers = {'User-agent': self.ua})
-		numPosts = len(r.json()['data']['children'])
+		try:
+			r = requests.get(url, headers = {'User-agent': self.ua})
+			numPosts = len(r.json()['data']['children'])
+		except Exception:
+			numPosts = 0
 		if numPosts <= 0:
 			# No links
 			return None
