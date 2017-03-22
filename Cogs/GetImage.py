@@ -73,6 +73,7 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 			imageSize = os.stat(imagePath)
 		except Exception:
 			# Image too big and can't be opened
+			remove(dirpath)
 			return None
 	try:
 		# Try to get the extension
@@ -81,6 +82,7 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 		img.close()
 	except Exception:
 		# Not something we understand - error out
+		remove(dirpath)
 		return None
 	
 	if ext:
