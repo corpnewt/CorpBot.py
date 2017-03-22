@@ -96,6 +96,11 @@ echo.
 call :install "git+https://github.com/paulovn/python-aiml"
 echo.
 
+echo Installing PySpeedTest...
+echo.
+call :install "pyspeedtest"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.

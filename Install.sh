@@ -78,6 +78,11 @@ function main () {
     update "git+https://github.com/paulovn/python-aiml"
     echo
 
+    echo Updating PySpeedTest
+    echo
+    update "pyspeedtest"
+    echo
+
     #echo Updating Flask...
     #echo
     #update "Flask"

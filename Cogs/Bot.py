@@ -6,6 +6,7 @@ import platform
 import time
 import sys
 import subprocess
+import pyspeedtest
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -100,6 +101,43 @@ class Bot:
 		msg += '{} uptime```'.format(timeString)
 
 		await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def speedtest(self, ctx):
+		"""Run a network speed test (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+
+		# Only allow owner to change server stats
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await self.bot.send_message(channel, msg)
+			return
+		else:
+			if not author.id == owner:
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can run a speed test.'
+				await self.bot.send_message(channel, msg)
+				return
+
+		message = await self.bot.send_message(channel, 'Running speed test...')
+		st = pyspeedtest.SpeedTest()
+		msg = '**Speed Test Results:**\n'
+		msg += '```\n'
+		msg += '    Ping: {}\n'.format(round(st.ping(), 2))
+		msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
+		msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
+		await self.bot.edit_message(message, msg)
 
 
 	@commands.command(pass_context=True)
