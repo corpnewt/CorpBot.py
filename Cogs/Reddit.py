@@ -85,14 +85,29 @@ class Reddit:
 	def getText(self, url):
 		# Load url - with self.posts number of posts
 		r = requests.get(url, headers = {'User-agent': self.ua})
-		# If we need an image - make sure we have a valid one
 		gotLink = False
-		randnum = random.randint(0,self.posts)
 		returnDict = None
 		for i in range(0, 10):
+			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
 				returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']) }
+				break
+			except IndexError:
+				continue
+		return returnDict
+	
+	def getInfo(self, url):
+		# Let's try using reddit's json info to get our images
+		r = requests.get(url, headers = {'User-agent': self.ua})
+		gotLink = False
+		returnDict = None
+		for i in range(0, 10):
+			randnum = random.randint(0,self.posts)
+			try:
+				theJSON = r.json()["data"]["children"][randnum]["data"]
+				theURL = theJSON['preview']['images'][0]['source']['url'].split('?')[0]
+				returnDict = { 'title': theJSON['title'], 'url': theURL }
 				break
 			except IndexError:
 				continue
@@ -169,6 +184,27 @@ class Reddit:
 		else:
 			msg = '{}'.format(answer)
 		await self.bot.send_message(ctx.message.channel, msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def battlestations(self, ctx):
+		"""Let's look at some pretty stuff."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.server
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/battlestations/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
