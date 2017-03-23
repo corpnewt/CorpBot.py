@@ -160,6 +160,7 @@ class VoiceState:
 	async def create_youtube_entry(self, ctx, song: str):
 
 		opts = {
+			'cachedir': False',
 			'default_search': 'auto',
 			'quiet': True,
 		}
@@ -321,6 +322,7 @@ class Music:
 		#await state.songs.put(entry)
 
 		opts = {
+			'cachedir': False,
 			'format': 'webm[abr>0]/bestaudio/best',
 			'default_search': 'auto',
 			'quiet': True,
