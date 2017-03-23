@@ -63,6 +63,9 @@ class Bot:
 	@commands.command(pass_context=True)
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
+
+		message = await self.bot.send_message(ctx.message.channel, 'Gathering info...')
+
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
 		cpuThred      = os.cpu_count()
@@ -89,18 +92,26 @@ class Bot:
 		process       = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], shell=False, stdout=subprocess.PIPE)
 		git_head_hash = process.communicate()[0].strip()
 
+		threadString = 'thread'
+		if not cpuThred == 1:
+			threadString += 's'
+
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
-		msg += '```Commit Hash: {}\n'.format(git_head_hash.decode("utf-8"))
-		msg += '{}\n'.format(currentOS)
-		msg += 'Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
-		msg += '{}% of {} ({} thread[s])\n'.format(cpuUsage, processor, cpuThred)
-		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
-		msg += '{} ({}%) of {}GB RAM used\n'.format(memUsedGB, memPerc, memTotalGB)
-		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n"
-		msg += 'Hostname: {}\n'.format(platform.node())
+		msg += '```\n'
+		msg += 'OS       : {}\n'.format(currentOS)
+		msg += 'Hostname : {}\n'.format(platform.node())
+		msg += 'Language : Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
+		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
+		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
+		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
+		#msg += '{}% of {} {}\n\n'.format(cpuUsage, cpuThred, threadString)
+		#msg += '{}% of {} ({} {})\n\n'.format(cpuUsage, processor, cpuThred, threadString)
+		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
+		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
+		#msg += '{} ({}%) of {}GB used\n\n'.format(memUsedGB, memPerc, memTotalGB)
 		msg += '{} uptime```'.format(timeString)
 
-		await self.bot.send_message(ctx.message.channel, msg)
+		await self.bot.edit_message(message, msg)
 
 
 	@commands.command(pass_context=True)
