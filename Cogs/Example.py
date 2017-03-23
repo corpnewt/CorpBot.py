@@ -160,7 +160,7 @@ class VoiceState:
 	async def create_youtube_entry(self, ctx, song: str):
 
 		opts = {
-			'cachedir': False',
+			'cachedir': False,
 			'default_search': 'auto',
 			'quiet': True,
 		}
