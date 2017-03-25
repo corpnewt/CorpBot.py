@@ -6,6 +6,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import downloader
 import youtube_dl
 import functools
 
@@ -71,7 +72,7 @@ class Example:
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 
-		await self.bot.say('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
+		await self.bot.say('*{}* joined *{} UTC*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
 	def __init__(self, message, player, ctx):
@@ -161,6 +162,7 @@ class VoiceState:
 
 		opts = {
 			'cachedir': False,
+			'format': 'ogg[abr>0]/bestaudio/best',
 			'default_search': 'auto',
 			'quiet': True,
 		}
@@ -176,6 +178,8 @@ class VoiceState:
 				volume = 0.6
 
 		try:
+			# Here we should download the song, then start the stream
+			#player = await self.voice.create_ffmpeg_player(song, )
 			player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
 		except Exception as e:
 			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
@@ -195,6 +199,7 @@ class Music:
 		self.bot = bot
 		self.voice_states = {}
 		self.settings = settings
+		self.downloader = downloader.Downloader()
 
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
@@ -322,15 +327,34 @@ class Music:
 		#await state.songs.put(entry)
 
 		opts = {
-			'cachedir': False,
 			'format': 'webm[abr>0]/bestaudio/best',
 			'default_search': 'auto',
-			'quiet': True,
+			'quiet': True
 		}
+
+		song = song.strip('<>')
 
 		ydl = youtube_dl.YoutubeDL(opts)
 		func = functools.partial(ydl.extract_info, song, download=False)
-		info = await self.bot.loop.run_in_executor(None, func)
+		#info = await self.bot.loop.run_in_executor(None, func)
+		info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+
+		if info.get('url', '').startswith('ytsearch'):
+			info = await self.downloader.extract_info(
+				self.bot.loop,
+				song,
+				download=False,
+				process=True,    # ASYNC LAMBDAS WHEN
+				retry_on_error=True
+			)
+			if not info:
+				return
+			if not all(info.get('entries', [])):
+				# empty list, no data
+				return
+			song = info['entries'][0]['webpage_url']
+			info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+
 
 		if "entries" in info:
 			info = info['entries'][0]
