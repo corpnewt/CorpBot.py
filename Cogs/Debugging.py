@@ -66,7 +66,7 @@ class Debugging:
 		server = before.server
 		if not str(before.status).lower() == str(after.status).lower():
 			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg, logLevel)
+			await self._logEvent(server, msg, 2)
 		if not before.game == after.game:
 			# Something changed
 			msg = '*{}#{}* changed playing status: ```\n'.format(before.name, before.discriminator)
