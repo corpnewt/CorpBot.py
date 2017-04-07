@@ -109,7 +109,8 @@ class Debugging:
 				# Type changed
 				msg += 'Type:\n   {}\n   --->\n   {}'.format(before.game.type, after.game.type)
 			msg += '```'
-			await self._logEvent(server, msg, logLevel)
+			if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
+				await self._logEvent(server, msg, logLevel)
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
@@ -206,7 +207,11 @@ class Debugging:
 					logText = 'Normal'
 				elif logLevel == 2:
 					logText = 'Verbose'
-				msg = '*{}* logging is *enabled* in *{}*.\nLogging: {}'.format(logText, channel.name, ', '.join(logVars))
+				if len(logVars):
+					logText = ', '.join(logVars)
+				else:
+					logText = '*Nothing*'
+				msg = 'Logging is *enabled* in *{}*.\nCurrnetly logging: {}'.format(logText, channel.name, logText)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 		await self.bot.send_message(ctx.message.channel, 'Logging is currently *disabled*.')
