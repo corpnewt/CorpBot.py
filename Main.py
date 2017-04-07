@@ -360,7 +360,7 @@ async def on_member_update(before, after):
 	# Check for cogs that accept updates
 	for cog in cogList:
 		try:
-			await cog.status(before, after)
+			await cog.member_update(before, after)
 		except AttributeError:
 			# Onto the next
 			continue
