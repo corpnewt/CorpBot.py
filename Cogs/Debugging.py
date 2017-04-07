@@ -102,6 +102,7 @@ class Debugging:
 		msg = '*{}#{}* sent: ```\n{}```'.format(message.author.name, message.author.discriminator, message.content)
 		logLevel = 2
 		await self._logEvent(message.server, msg, logLevel)
+		return { 'Ignore' : False, 'Delete' : False}
 		
 	async def message_edit(self, before, after):
 		# A message was edited
@@ -110,6 +111,7 @@ class Debugging:
 		await self._logEvent(before.server, msg, logLevel)
 		msg = 'To: ```\n{}```'.format(after.content)
 		await self._logEvent(before.server, msg, logLevel)
+		return { 'Ignore' : False, 'Delete' : False}
 		
 	async def message_delete(self, message):
 		# A message was deleted
