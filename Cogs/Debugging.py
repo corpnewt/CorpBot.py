@@ -112,7 +112,7 @@ class Debugging:
 		
 	async def message_delete(self, message):
 		# A message was deleted
-		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}```\nIn *#{}*'.format(message.author.name, message.channel.name, message.author.discriminator, message.content)
+		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}```'.format(message.author.name, message.channel.name, message.author.discriminator, message.content)
 		logLevel = 1
 		await self._logEvent(message.server, msg, logLevel)
 	
