@@ -21,7 +21,7 @@ class Admin:
 		self.bot = bot
 		self.settings = settings
 		
-	async def message_edit(self, message):
+	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed
 		await self.message(message)
 		
