@@ -237,7 +237,7 @@ class Debugging:
 			return
 		
 		serverOptions = self.settings.getServerStat(server, "LogVars")
-		options.replace(" ", "")
+		options = "".join(options.split())
 		optionList = options.split(',')
 		addedOptions = []
 		for option in optionList:
@@ -283,7 +283,7 @@ class Debugging:
 			return
 		
 		serverOptions = self.settings.getServerStat(server, "LogVars")
-		options.replace(" ", "")
+		options = "".join(options.split())
 		optionList = options.split(',')
 		addedOptions = []
 		for option in optionList:
