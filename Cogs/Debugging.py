@@ -60,7 +60,7 @@ class Debugging:
 		logLevel = 0
 		await self._logEvent(server, msg, logLevel)
 		
-	async def status(self, before, after):
+	async def member_update(self, before, after):
 		# A member changed something about their user-profile
 		logLevel = 1
 		print('{} ---> {}'.format(before.status.lower(), after.status.lower()))
