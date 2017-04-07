@@ -455,7 +455,6 @@ async def on_message_delete(message):
 		except AttributeError:
 			# Onto the next
 			continue
-		try:
 			
 		
 @bot.event
