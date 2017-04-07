@@ -136,6 +136,42 @@ class Debugging:
 	
 	
 	@commands.command(pass_context=True)
+	async def logging(self, ctx):
+		"""Outputs whether or not we're logging is enabled (bot-admin only)."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+		
+		logChannel = self.settings.getServerStat(ctx.message.server, "LogChannel")
+		if logChannel:
+			channel = self.bot.get_channel(logChannel)
+				if channel:
+					logLevel = self.settings.getServerStat(ctx.message.server, "LogLevel")
+					logText = 'Quiet'
+					if logLevel == 1:
+						logText = 'Normal'
+					elif logLevel == 2:
+						logText = 'Verbose'
+					msg = '*{}* logging is *enabled* in *{}*.'.format(logText, channel.name)
+					await self.bot.send_message(ctx.message.channel, msg)
+					return
+		await self.bot.send_message(ctx.message.channel, 'Logging is currently *disabled*.')
+		
+	
+	@commands.command(pass_context=True)
 	async def loglevel(self, ctx, *, log = None):
 		"""Sets the server's logging level (0 = quiet, 1 = normal, 2 = verbose [bot-admin only])."""
 
