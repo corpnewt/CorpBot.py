@@ -62,6 +62,7 @@ class Debugging:
 		
 	async def status(self, before, after):
 		# A member changed something about their user-profile
+		print('Status changed.')
 		if not str(before.status.lower()) == str(after.status.lower()):
 			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, before.status.lower(), after.status.lower())
 			logLevel = 1
@@ -99,7 +100,7 @@ class Debugging:
 		
 	async def message(self, message):
 		# A message was sent
-		msg = '*{}#{}* sent: ```\n{}```'.format(message.author.name, message.author.discriminator, message.content)
+		msg = '*{}#{}* sent: ```\n{}```\nIn *#{}*'.format(message.author.name, message.author.discriminator, message.content, message.channel.name)
 		logLevel = 2
 		await self._logEvent(message.server, msg, logLevel)
 		return { 'Ignore' : False, 'Delete' : False}
@@ -109,13 +110,13 @@ class Debugging:
 		msg = '*{}#{}* edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.content)
 		logLevel = 1
 		await self._logEvent(before.server, msg, logLevel)
-		msg = 'To: ```\n{}```'.format(after.content)
+		msg = 'To: ```\n{}```\nIn *#{}*'.format(after.content, before.channel.name)
 		await self._logEvent(before.server, msg, logLevel)
 		return { 'Ignore' : False, 'Delete' : False}
 		
 	async def message_delete(self, message):
 		# A message was deleted
-		msg = '*{}#{}* deleted: ```\n{}```'.format(message.author.name, message.author.discriminator, message.content)
+		msg = '*{}#{}* deleted: ```\n{}```\nIn *#{}*'.format(message.author.name, message.author.discriminator, message.content, message.channel.name)
 		logLevel = 1
 		await self._logEvent(message.server, msg, logLevel)
 	
