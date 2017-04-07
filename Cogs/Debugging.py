@@ -125,9 +125,9 @@ class Debugging:
 		
 	async def message(self, message):
 		if message.author.bot:
-			return
+			return { 'Ignore' : False, 'Delete' : False}
 		if not self.shouldLog('message.send', message.server):
-			return
+			return { 'Ignore' : False, 'Delete' : False}
 		# A message was sent
 		msg = '*{}#{}*, in *#{}*, sent: ```\n{}```'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
 		logLevel = 2
@@ -136,9 +136,9 @@ class Debugging:
 		
 	async def message_edit(self, before, after):
 		if before.author.bot:
-			return
+			return { 'Ignore' : False, 'Delete' : False}
 		if not self.shouldLog('message.edit', before.server):
-			return
+			return { 'Ignore' : False, 'Delete' : False}
 		# A message was edited
 		msg = '*{}#{}*, in *#{}*, edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
 		logLevel = 1
