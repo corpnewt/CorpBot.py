@@ -22,7 +22,7 @@ class Channel:
 		self.cleanChannels = []
 		
 		
-	async def status(self, before, after):
+	async def member_update(self, before, after):
 		server = after.server
 
 		# Check if the member went offline and log the time
