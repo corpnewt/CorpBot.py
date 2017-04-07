@@ -15,14 +15,17 @@ class Debugging:
 		self.bot = bot
 		self.settings = settings
 		self.debug = debug
-		self.logvars = [ 'user', 'user.join', 'user.leave', 'user.status', 'user.game',
+		self.logvars = [ 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
-				'user.nick', 'user.name', 'message', 'message.send', 'message.delete',
+				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit' ]
 		self.quiet = [ 'user.join', 'user.leave' ]
 		self.normal = [ 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 			       'message.edit', 'message.delete' ]
-		self.verbose = [ 'user', 'message' ]
+		self.verbose = [ 'user.join', 'user.leave', 'user.status',
+				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
+				'user.nick', 'user.name', 'message.send', 'message.delete',
+				'message.edit' ]
 		
 
 	async def oncommand(self, command, ctx):
@@ -205,7 +208,7 @@ class Debugging:
 					logText = ', '.join(logVars)
 				else:
 					logText = '*Nothing*'
-				msg = 'Logging is *enabled* in *{}*.\nCurrnetly logging: {}'.format(channel.name, logText)
+				msg = 'Logging is *enabled* in *{}*.\nCurrently logging: {}'.format(channel.name, logText)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 		await self.bot.send_message(ctx.message.channel, 'Logging is currently *disabled*.')
@@ -241,9 +244,10 @@ class Debugging:
 		optionList = options.split(',')
 		addedOptions = []
 		for option in optionList:
-			if option.lower() in self.logvars and not option.lower() in serverOptions:
-				# Only add if valid and not already added
-				addedOptions.append(option.lower())
+			for varoption in self.logvars:
+				if varoption.startswith(option.lower()) and not varoption in serverOptions:
+					# Only add if valid and not already added
+					addedOptions.append(varoption)
 		if not len(addedOptions):
 			await self.bot.send_message(ctx.message.channel, 'No valid or disabled options were passed.')
 			return
