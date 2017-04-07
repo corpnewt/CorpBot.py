@@ -215,7 +215,7 @@ class Debugging:
 			await self.bot.send_message(ctx.message.channel, 'Logging with *normal* preset.')
 		elif preset.lower() == 'verbose' or preset == '2':
 			currentVars = []
-			for var in self.verbose
+			for var in self.verbose:
 				currentVars.append(var)
 			await self.bot.send_message(ctx.message.channel, 'Logging with *verbose* preset.')
 		else:
