@@ -63,7 +63,7 @@ class Debugging:
 		check = ''
 		for item in checks:
 			if len(check):
-				check += '.' += item
+				check += '.' + item
 			else:
 				check = item
 			if check.lower() in serverLogVars:
