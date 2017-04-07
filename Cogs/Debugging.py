@@ -64,7 +64,7 @@ class Debugging:
 		# A member changed something about their user-profile
 		logLevel = 1
 		if not str(before.status.lower()) == str(after.status.lower()):
-			print('{} ---> {}'.format(before.status.lower(), after.status.lower())
+			print('{} ---> {}'.format(before.status.lower(), after.status.lower()))
 			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, before.status.lower(), after.status.lower())
 			await self._logEvent(server, msg, logLevel)
 		if not before.game == after.game:
