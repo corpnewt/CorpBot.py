@@ -55,7 +55,7 @@ class Remind:
 			self.settings.setUserStat(member, member.server, "Reminders", reminders)
 					
 
-	async def status(self, member_before, member):
+	async def member_update(self, member_before, member):
 		# Check the user's status - and if they have any reminders
 		# If so - pm them - if not, ignore
 		if not str(member.status).lower() == "offline":
