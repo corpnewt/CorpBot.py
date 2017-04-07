@@ -21,6 +21,11 @@ class MadLibs:
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
 
+	async def onready(self):
+		# Clear all pending madlibs
+		for server in self.bot.servers:
+			self.settings.setServerStat(server, "PlayingMadLibs", None)
+			
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
