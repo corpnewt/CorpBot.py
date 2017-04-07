@@ -357,7 +357,7 @@ async def on_member_join(member):
 
 @bot.event
 async def on_member_update(before, after):
-	print("{} ---> {}".format(before.status.lower(), after.status.lower()))
+	print("{} ---> {}".format(str(before.status).lower(), str(after.status).lower()))
 	# Check for cogs that accept updates
 	for cog in cogList:
 		try:
