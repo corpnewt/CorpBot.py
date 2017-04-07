@@ -21,6 +21,44 @@ class Channel:
 		self.settings = settings
 		self.cleanChannels = []
 		
+		
+	async def status(self, before, after):
+		server = after.server
+
+		# Check if the member went offline and log the time
+		if str(after.status).lower() == "offline":
+			currentTime = int(time.time())
+			self.settings.setUserStat(after, server, "LastOnline", currentTime)
+
+		settings.checkServer(server)
+		try:
+			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
+		except KeyError:
+			channelMOTDList = []
+
+		if len(channelMOTDList) > 0:
+			members = 0
+			membersOnline = 0
+			for member in server.members:
+				members += 1
+				if str(member.status).lower() == "online":
+					membersOnline += 1
+
+		for id in channelMOTDList:
+			channel = self.bot.get_channel(id['ID'])
+			if channel:
+				motd = id['MOTD'] # A markdown message of the day
+				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
+				if listOnline.lower() == "yes":
+					msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+				else:
+					msg = motd
+				try:
+					await self.bot.edit_channel(channel, topic=msg)
+				except Exception:
+					continue
+					
+		
 	@commands.command(pass_context=True)
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
