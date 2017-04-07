@@ -104,7 +104,7 @@ class MadLibs:
 
 			# Setup the check
 			def check(msg):	
-				return msg.content.startswith("{}{}".format(ctx.prefix, self.prefix))
+				return msg.content.startswith("{}{}".format(ctx.prefix.lower(), self.prefix.lower()))
 
 			# Wait for a response
 			talk = await self.bot.wait_for_message(channel=channel, check=check, timeout=60)
@@ -117,7 +117,7 @@ class MadLibs:
 				return
 
 			# Check if the message is to leave
-			if talk.content.startswith(self.leavePrefix):
+			if talk.content.startswith('{}{}'.format(ctx.prefix.lower(), self.leavePrefix.lower())):
 				if talk.author is author:
 					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await self.bot.send_message(channel, msg)
@@ -132,9 +132,9 @@ class MadLibs:
 			# We got a relevant message
 			word = talk.content
 			# Let's remove the $ml prefix (with or without space)
-			if word.startswith('{}{} '.format(ctx.prefix, self.prefix)):
+			if word.startswith('{}{} '.format(ctx.prefix.lower(), self.prefix.lower())):
 				word = word[4:]
-			if word.startswith('{}{}'.format(ctx.prefix, self.prefix)):
+			if word.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
 				word = word[3:]
 			
 			# Check capitalization
