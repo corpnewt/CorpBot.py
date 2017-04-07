@@ -207,16 +207,19 @@ class Debugging:
 			currentVars = []
 			for var in self.quiet:
 				currentVars.append(var)
+			self.settings.setServerStat(server, "LogVars", currentVars)
 			await self.bot.send_message(ctx.message.channel, 'Logging with *quiet* preset.')
 		elif preset.lower() == 'normal' or preset == '1':
 			currentVars = []
 			for var in self.normal:
 				currentVars.append(var)
+			self.settings.setServerStat(server, "LogVars", currentVars)
 			await self.bot.send_message(ctx.message.channel, 'Logging with *normal* preset.')
 		elif preset.lower() == 'verbose' or preset == '2':
 			currentVars = []
 			for var in self.verbose:
 				currentVars.append(var)
+			self.settings.setServerStat(server, "LogVars", currentVars)
 			await self.bot.send_message(ctx.message.channel, 'Logging with *verbose* preset.')
 		else:
 			await self.bot.send_message(ctx.message.channel, 'Usage: `{}logpreset [quiet/normal/verbose]`'.format(ctx.prefix))
