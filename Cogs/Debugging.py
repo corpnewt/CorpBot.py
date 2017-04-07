@@ -287,10 +287,11 @@ class Debugging:
 		optionList = options.split(',')
 		addedOptions = []
 		for option in optionList:
-			if option.lower() in self.logvars and option.lower() in serverOptions:
-				# Only remove if valid and in list
-				addedOptions.append(option.lower())
-				serverOptions.remove(option.lower())
+			for varoption in self.logvars:
+				if varoption.startswith(option.lower()) and varoption in serverOptions:
+					# Only remove if valid and in list
+					addedOptions.append(option.lower())
+					serverOptions.remove(option.lower())
 		if not len(addedOptions):
 			await self.bot.send_message(ctx.message.channel, 'No valid or enabled options were passed.  Nothing to disable.')
 			return
