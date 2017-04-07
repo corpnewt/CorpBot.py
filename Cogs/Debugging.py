@@ -62,6 +62,7 @@ class Debugging:
 		checks = logVar.split('.')
 		check = ''
 		for item in checks:
+			print('{}'.format(check))
 			if len(check):
 				check += '.' + item
 			else:
