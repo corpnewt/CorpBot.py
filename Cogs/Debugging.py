@@ -66,7 +66,6 @@ class Debugging:
 				check += '.' + item
 			else:
 				check = item
-			print('{}'.format(check))
 			if check.lower() in serverLogVars:
 				return True
 		return False
