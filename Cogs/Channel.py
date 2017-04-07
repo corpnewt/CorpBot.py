@@ -30,7 +30,7 @@ class Channel:
 			currentTime = int(time.time())
 			self.settings.setUserStat(after, server, "LastOnline", currentTime)
 
-		settings.checkServer(server)
+		self.settings.checkServer(server)
 		try:
 			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
 		except KeyError:
