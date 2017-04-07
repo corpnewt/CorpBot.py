@@ -61,7 +61,7 @@ class Debugging:
 		serverLogVars = self.settings.getServerStat(server, "LogVars")
 		checks = logVar.split('.')
 		check = ''
-		for item in checks
+		for item in checks:
 			if len(check):
 				check += '.' += item
 			else:
