@@ -62,10 +62,10 @@ class Debugging:
 		
 	async def status(self, before, after):
 		# A member changed something about their user-profile
-		print('Status changed.')
+		logLevel = 1
 		if not str(before.status.lower()) == str(after.status.lower()):
+			print('{} ---> {}'.format(before.status.lower(), after.status.lower())
 			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, before.status.lower(), after.status.lower())
-			logLevel = 1
 			await self._logEvent(server, msg, logLevel)
 		if not before.game == after.game:
 			# Something changed
@@ -80,22 +80,18 @@ class Debugging:
 				# Type changed
 				msg += 'Type:\n   {}\n   --->\n   {}'.format(before.game.type, after.game.type)
 			msg += '```'
-			logLevel = 1
 			await self._logEvent(server, msg, logLevel)
 		if not before.avatar_url == after.avatar_url:
 			# Avatar changed
 			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
-			logLevel = 1
 			await self._logEvent(server, msg, logLevel)
 		if not before.nick == after.nick:
 			# Nickname changed
 			msg = '*{}#{}* changed nickname: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.nick, after.nick)
-			logLevel = 1
 			await self._logEvent(server, msg, logLevel)
 		if not before.name == after.name:
 			# Name changed
 			msg = '*{}#{}* changed name: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.name, after.name)
-			logLevel = 1
 			await self._logEvent(server, msg, logLevel)
 		
 	async def message(self, message):
