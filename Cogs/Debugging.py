@@ -180,6 +180,49 @@ class Debugging:
 	
 	
 	@commands.command(pass_context=True)
+	async def logpreset(self, ctx, *, preset = None):
+		"""Can select one of 3 available presets - quiet, normal, verbose (bot-admin only)."""
+		author  = ctx.message.author
+		server  = ctx.message.server
+		channel = ctx.message.channel
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+		
+		if preset == None:
+			await self.bot.send_message(ctx.message.channel, 'Usage: `{}logpreset [quiet/normal/verbose]`'.format(ctx.prefix))
+			return
+		currentVars = self.settings.getServerStat(server, "LogVars")
+		if preset.lower() == 'quiet' or preset == '0':
+			currentVars = []
+			for var in self.quiet:
+				currentVars.append(var)
+			await self.bot.send_message(ctx.message.channel, 'Logging with *quiet* preset.')
+		elif preset.lower() == 'normal' or preset == '1':
+			currentVars = []
+			for var in self.normal:
+				currentVars.append(var)
+			await self.bot.send_message(ctx.message.channel, 'Logging with *normal* preset.')
+		elif preset.lower() == 'verbose' or preset == '2'
+			currentVars = []
+			for var in self.verbose
+				currentVars.append(var)
+			await self.bot.send_message(ctx.message.channel, 'Logging with *verbose* preset.')
+		else:
+			await self.bot.send_message(ctx.message.channel, 'Usage: `{}logpreset [quiet/normal/verbose]`'.format(ctx.prefix))
+		
+	
+	@commands.command(pass_context=True)
 	async def logging(self, ctx):
 		"""Outputs whether or not we're logging is enabled (bot-admin only)."""
 		author  = ctx.message.author
