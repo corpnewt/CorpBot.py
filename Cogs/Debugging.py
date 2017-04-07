@@ -282,7 +282,8 @@ class Debugging:
 			return
 		
 		if options == None:
-			msg = 'Usage: `{}logenable option1, option2, option3...`\nAvailable options:\n{}'.format(ctx.prefix, ', '.join(self.logvars))
+			msg = 'Cleared all logging options.'
+			self.settings.setServerStat(server, "LogVars", [])
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 		
