@@ -62,11 +62,11 @@ class Debugging:
 		checks = logVar.split('.')
 		check = ''
 		for item in checks:
-			print('{}'.format(check))
 			if len(check):
 				check += '.' + item
 			else:
 				check = item
+			print('{}'.format(check))
 			if check.lower() in serverLogVars:
 				return True
 		return False
