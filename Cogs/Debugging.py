@@ -63,6 +63,7 @@ class Debugging:
 	async def member_update(self, before, after):
 		# A member changed something about their user-profile
 		logLevel = 1
+		server = before.server
 		if not str(before.status).lower() == str(after.status).lower():
 			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, before.status.lower(), after.status.lower())
 			await self._logEvent(server, msg, logLevel)
