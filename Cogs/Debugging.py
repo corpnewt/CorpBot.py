@@ -96,23 +96,23 @@ class Debugging:
 		
 	async def message(self, message):
 		# A message was sent
-		msg = '*{}#{}* sent: ```\n{}```\nIn *#{}*'.format(message.author.name, message.author.discriminator, message.content, message.channel.name)
+		msg = '*{}#{}*, in *#{}*, sent: ```\n{}```'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
 		logLevel = 2
 		await self._logEvent(message.server, msg, logLevel)
 		return { 'Ignore' : False, 'Delete' : False}
 		
 	async def message_edit(self, before, after):
 		# A message was edited
-		msg = '*{}#{}* edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.content)
+		msg = '*{}#{}*, in *#{}*, edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
 		logLevel = 1
 		await self._logEvent(before.server, msg, logLevel)
-		msg = 'To: ```\n{}```\nIn *#{}*'.format(after.content, before.channel.name)
+		msg = 'To: ```\n{}```'.format(after.content)
 		await self._logEvent(before.server, msg, logLevel)
 		return { 'Ignore' : False, 'Delete' : False}
 		
 	async def message_delete(self, message):
 		# A message was deleted
-		msg = '*{}#{}* deleted: ```\n{}```\nIn *#{}*'.format(message.author.name, message.author.discriminator, message.content, message.channel.name)
+		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}```\nIn *#{}*'.format(message.author.name, message.channel.name, message.author.discriminator, message.content)
 		logLevel = 1
 		await self._logEvent(message.server, msg, logLevel)
 	
