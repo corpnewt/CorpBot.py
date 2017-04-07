@@ -200,12 +200,13 @@ class Debugging:
 			channel = self.bot.get_channel(logChannel)
 			if channel:
 				logLevel = self.settings.getServerStat(ctx.message.server, "LogLevel")
+				logVars = self.settings.getServerStat(ctx.message.server, "LogVars")
 				logText = 'Quiet'
 				if logLevel == 1:
 					logText = 'Normal'
 				elif logLevel == 2:
 					logText = 'Verbose'
-				msg = '*{}* logging is *enabled* in *{}*.'.format(logText, channel.name)
+				msg = '*{}* logging is *enabled* in *{}*.\nLogging: {}'.format(logText, channel.name, ', '.join(logVars))
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
 		await self.bot.send_message(ctx.message.channel, 'Logging is currently *disabled*.')
