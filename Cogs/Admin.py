@@ -21,6 +21,10 @@ class Admin:
 		self.bot = bot
 		self.settings = settings
 		
+	async def message_edit(self, message):
+		# Pipe the edit into our message func to respond if needed
+		await self.message(message)
+		
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
