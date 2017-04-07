@@ -65,7 +65,7 @@ class Debugging:
 		logLevel = 1
 		server = before.server
 		if not str(before.status).lower() == str(after.status).lower():
-			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, before.status.lower(), after.status.lower())
+			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, logLevel)
 		if not before.game == after.game:
 			# Something changed
@@ -83,15 +83,15 @@ class Debugging:
 			await self._logEvent(server, msg, logLevel)
 		if not before.avatar_url == after.avatar_url:
 			# Avatar changed
-			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
+			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
 			await self._logEvent(server, msg, logLevel)
 		if not before.nick == after.nick:
 			# Nickname changed
-			msg = '*{}#{}* changed nickname: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.nick, after.nick)
+			msg = '*{}#{}* changed nickname: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.nick, after.nick)
 			await self._logEvent(server, msg, logLevel)
 		if not before.name == after.name:
 			# Name changed
-			msg = '*{}#{}* changed name: ```\n{}\n   --->\n{}'.format(before.name, before.discriminator, before.name, after.name)
+			msg = '*{}#{}* changed name: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.name, after.name)
 			await self._logEvent(server, msg, logLevel)
 		
 	async def message(self, message):
