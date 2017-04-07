@@ -357,46 +357,10 @@ async def on_member_join(member):
 
 @bot.event
 async def on_member_update(before, after):
-	server = after.server
-
-	# Check if the member went offline and log the time
-	if str(after.status).lower() == "offline":
-		currentTime = int(time.time())
-		settings.setUserStat(after, server, "LastOnline", currentTime)
-			
-	settings.checkServer(server)
-	try:
-		channelMOTDList = settings.getServerStat(server, "ChannelMOTD")
-	except KeyError:
-		channelMOTDList = []
-		
-	if len(channelMOTDList) > 0:
-		members = 0
-		membersOnline = 0
-		for member in server.members:
-			members += 1
-			if str(member.status).lower() == "online":
-				membersOnline += 1
-			
-	for id in channelMOTDList:
-		channel = bot.get_channel(id['ID'])
-		if channel:
-			motd = id['MOTD'] # A markdown message of the day
-			listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
-			if listOnline.lower() == "yes":
-				msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
-			else:
-				msg = motd
-			try:
-				await bot.edit_channel(channel, topic=msg)
-			except Exception:
-				continue
-	
 	# Check for cogs that accept updates
-	pm = None
 	for cog in cogList:
 		try:
-			await cog.status(after)
+			await cog.status(before, after)
 		except AttributeError:
 			# Onto the next
 			continue
@@ -419,11 +383,6 @@ async def on_message(message):
 		# Not a User
 		await bot.process_commands(message)
 		return
-
-	# Admin Override - always allow admin commands
-	#if message.author.permissions_in(message.channel).administrator:
-		#await bot.process_commands(message)
-		#return
 	
 	# Check if we need to ignore or delete the message
 	# or respond or replace
@@ -478,6 +437,26 @@ async def on_command_completion(command, ctx):
 		except AttributeError:
 			# Onto the next
 			continue
+			
+@bot.event
+async def on_message_delete(message):
+	# Run through the on_message commands, but on deletes.
+	if not message.server:
+		# This wasn't in a server, return
+		return
+	try:
+		message.author.roles
+	except AttributeError:
+		# Not a User
+		return
+	for cog in cogList:
+		try:
+			check = await cog.message_delete(message)
+		except AttributeError:
+			# Onto the next
+			continue
+		try:
+			
 		
 @bot.event
 async def on_message_edit(before, message):
@@ -498,7 +477,7 @@ async def on_message_edit(before, message):
 	respond = None
 	for cog in cogList:
 		try:
-			check = await cog.message(message)
+			check = await cog.message_edit(before, message)
 		except AttributeError:
 			# Onto the next
 			continue
