@@ -23,7 +23,7 @@ class Admin:
 		
 	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed
-		await self.message(message)
+		return await self.message(message)
 		
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
