@@ -101,7 +101,7 @@ class Debugging:
 			await self._logEvent(server, msg, 2)
 		if not before.game == after.game:
 			# Something changed
-			msg = '*{}#{}* changed playing status: ```\n'.format(before.name, before.discriminator)
+			msg = ''
 			if not before.game.name == after.game.name and self.shouldLog('user.game.name', server):
 				# Name change
 				msg += 'Name:\n   {}\n   --->\n   {}'.format(before.game.name, after.game.name)
@@ -111,9 +111,12 @@ class Debugging:
 			if not before.game.type == after.game.type and self.shouldLog('user.game.type', server):
 				# Type changed
 				msg += 'Type:\n   {}\n   --->\n   {}'.format(before.game.type, after.game.type)
-			msg += '```'
-			if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-				await self._logEvent(server, msg, logLevel)
+			if len(msg):
+				# We saw something tangible change
+				msg = '*{}#{}* changed playing status: ```\n{}'.format(before.name, before.discriminator, msg)
+				msg += '```'
+				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
+					await self._logEvent(server, msg, logLevel)
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
@@ -142,6 +145,9 @@ class Debugging:
 		if before.author.bot:
 			return { 'Ignore' : False, 'Delete' : False}
 		if not self.shouldLog('message.edit', before.server):
+			return { 'Ignore' : False, 'Delete' : False}
+		if before.content == after.content:
+			# Edit was likely a preview happening
 			return { 'Ignore' : False, 'Delete' : False}
 		# A message was edited
 		msg = '*{}#{}*, in *#{}*, edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
