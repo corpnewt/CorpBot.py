@@ -150,6 +150,12 @@ class BotAdmin:
 					cooldown = endTime
 				member   = memFromName
 
+		# Check if we're muting ourself
+		if member is ctx.message.author:
+			msg = 'It would be easier for me if you just *stayed quiet all by yourself...*'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+
 		# Check if member is admin or bot admin
 		isAdmin = member.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
