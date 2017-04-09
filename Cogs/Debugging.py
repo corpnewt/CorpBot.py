@@ -104,17 +104,16 @@ class Debugging:
 			msg = ''
 			if not before.game.name == after.game.name and self.shouldLog('user.game.name', server):
 				# Name change
-				msg += 'Name:\n   {}\n   --->\n   {}'.format(before.game.name, after.game.name)
+				msg += 'Name:\n   {}\n   --->\n   {}\n'.format(before.game.name, after.game.name)
 			if not before.game.url == after.game.url and self.shouldLog('user.game.url', server):
 				# URL changed
-				msg += 'URL:\n   {}\n   --->\n   {}'.format(before.game.url, after.game.url)
+				msg += 'URL:\n   {}\n   --->\n   {}\n'.format(before.game.url, after.game.url)
 			if not before.game.type == after.game.type and self.shouldLog('user.game.type', server):
 				# Type changed
-				msg += 'Type:\n   {}\n   --->\n   {}'.format(before.game.type, after.game.type)
+				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(before.game.type, after.game.type)
 			if len(msg):
 				# We saw something tangible change
-				msg = '*{}#{}* changed playing status: ```\n{}'.format(before.name, before.discriminator, msg)
-				msg += '```'
+				msg = '*{}#{}* changed playing status: ```\n{}```'.format(before.name, before.discriminator, msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
 					await self._logEvent(server, msg, logLevel)
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
