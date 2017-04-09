@@ -223,11 +223,14 @@ class Channel:
 
 		# We have a role
 		memberCount = 0
+		memberOnline = 0
 		for member in server.members:
 			roles = member.roles
 			if role in roles:
 				# We found it
 				memberCount += 1
+				if str(member.status).lower() == 'online':
+					memberOnline+= 1
 
 		'''if memberCount == 1:
 			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
@@ -236,7 +239,7 @@ class Channel:
 			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
 			role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)'''
 		
-		role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)
+		role_embed.add_field(name="Members", value='{} out of {} online.'.format(memberOnline, memberCount), inline=True)
 			
 		# await self.bot.send_message(channel, msg)
 		await self.bot.send_message(channel, embed=role_embed)
