@@ -105,33 +105,33 @@ class Channel:
 					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
+
+		mutedIn = 0
+		channelList = []
+		for channel in ctx.message.server.channels:
+			if not channel.type is discord.ChannelType.text:
+				continue
+			overs = channel.overwrites_for(member)
+			if overs.send_messages == False:
+				# We haven't been muted here yet
+				overs.send_messages = False
+				await self.bot.edit_channel_permissions(channel, member, overs)
+				perms = member.permissions_in(channel)
+				if perms.read_messages:
+					mutedIn +=1
+					channelList.append(channel.name)
 				
-		isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
-
-		checkTime = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
-		if checkTime:
-			checkTime = int(checkTime)
-		currentTime = int(time.time())
-		checkRead = None
-
-		# Check if they've outlasted their time
-		if checkTime and (currentTime >= checkTime):
-			# We have passed the check time
-			ignore = False
-			delete = False
-			self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
-			self.settings.setUserStat(member, ctx.message.server, "Muted", "No")
-			isMute = self.settings.getUserStat(member, ctx.message.server, "Muted")
-		elif checkTime:
-			checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-
-		if isMute.lower() == "yes":
-			if checkRead:
-				msg = '*{}* is *Muted* - *{}* remain.'.format(DisplayName.name(member), checkRead)	
+		if len(channelList):
+			# Get time remaining if needed
+			cd = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
+			if not cd == None:
+				ct = int(time.time())
+				checkRead = ReadableTime.getReadableTimeBetween(ct, cd)
+				msg = '*{}* is **muted** in *{}*\n*{}* remain'.format(DisplayName.name(member), ', '.join(channelList), checkRead)
 			else:
-				msg = '*{}* is *Muted*.'.format(DisplayName.name(member))	
+				msg = '*{}* is **muted** in *{}*.'.format(DisplayName.name(member), ', '.join(channelList))	
 		else:
-			msg = '{} is *Unmuted*.'.format(DisplayName.name(member))
+			msg = '{} is **unmuted**.'.format(DisplayName.name(member))
 			
 		await self.bot.send_message(ctx.message.channel, msg)
 		

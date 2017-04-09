@@ -50,6 +50,7 @@ from Cogs import Star
 # from Cogs import Monitor
 from Cogs import RateLimit
 from Cogs import Torment
+from Cogs import Mute
 
 # Let's load our prefix file
 prefix = '$'
@@ -79,6 +80,10 @@ cogList = []
 settings = Settings.Settings(bot, jsonFile)
 cogList.append(settings)
 
+# Mute
+mute = Mute.Mute(bot, settings)
+cogList.append(mute)
+
 # Examples - there are 2 parts here, Example, and Music
 example = Example.Example(bot, settings)
 music = Example.Music(bot, settings)
@@ -94,7 +99,7 @@ admin = Admin.Admin(bot, settings)
 cogList.append(admin)
 
 # BotAdmin
-botadmin = BotAdmin.BotAdmin(bot, settings)
+botadmin = BotAdmin.BotAdmin(bot, settings, mute)
 cogList.append(botadmin)
 
 # Channel
@@ -125,7 +130,7 @@ cogList.append(botCog)
 humor = Humor.Humor(bot, settings)
 cogList.append(humor)
 
-# Humor
+# Uptime
 uptime = Uptime.Uptime(bot)
 cogList.append(uptime)
 
@@ -214,7 +219,7 @@ serverstats = ServerStats.ServerStats(bot, settings)
 cogList.append(serverstats)
 
 # Strike
-strike = Strike.Strike(bot, settings)
+strike = Strike.Strike(bot, settings, mute)
 cogList.append(strike)
 
 # Debugging

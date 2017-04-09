@@ -14,9 +14,10 @@ from   Cogs import Nullify
 class BotAdmin:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, muter):
 		self.bot = bot
 		self.settings = settings
+		self.muter= muter
 
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
@@ -95,6 +96,11 @@ class BotAdmin:
 		if not isAdmin:
 			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
 			return
+			
+		if member == None:
+			msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
 
 		if cooldown == None:
 			# Either a cooldown wasn't set - or it's the last section
@@ -144,23 +150,21 @@ class BotAdmin:
 					cooldown = endTime
 				member   = memFromName
 
-			
-		if member == None:
-			msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
-			await self.bot.send_message(ctx.message.channel, msg)
+		# Check if member is admin or bot admin
+		isAdmin = member.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in member.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You can\'t mute other admins or bot-admins.')
 			return
 
-		if type(member) is str:
-			try:
-				member = discord.utils.get(message.server.members, name=member)
-			except:
-				msg = 'Couldn\'t find user *{}*.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await self.bot.send_message(ctx.message.channel, msg)
-				return
-
+		
 		# Set cooldown - or clear it
 		if type(cooldown) is int or type(cooldown) is float:
 			if cooldown < 0:
@@ -172,7 +176,8 @@ class BotAdmin:
 		else:
 			cooldownFinal = None
 
-		pm = 'You have been **Muted** by *{}*.'.format(DisplayName.name(ctx.message.author))
+		# Do the actual muting
+		await self.muter.mute(member, ctx.message.server, cooldownFinal)
 
 		if cooldown:
 			mins = "minutes"
@@ -182,8 +187,6 @@ class BotAdmin:
 		else:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
 			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), ctx.message.server.name)
-		self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
-		self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
 
 		await self.bot.send_message(ctx.message.channel, msg)
 		await self.bot.send_message(member, pm)
@@ -233,6 +236,8 @@ class BotAdmin:
 					msg = Nullify.clean(msg)
 				await self.bot.send_message(ctx.message.channel, msg)
 				return
+
+		await self.muter.unmute(member, ctx.message.server)
 
 		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), ctx.message.server.name)
 		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))

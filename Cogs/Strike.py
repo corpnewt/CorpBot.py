@@ -23,9 +23,10 @@ from   Cogs import Nullify
 class Strike:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, mute):
 		self.bot = bot
 		self.settings = settings
+		self.mute = mute
 
 	async def onjoin(self, member, server):
 		# Check id against the kick and ban list and react accordingly
@@ -180,6 +181,8 @@ class Strike:
 				else:
 					self.settings.setUserStat(member, ctx.message.server, "Muted", "Yes")
 					self.settings.setUserStat(member, ctx.message.server, "Cooldown", cooldownFinal)
+					await self.mute.mute(member, ctx.message.server, cooldownFinal)
+					
 				await self.bot.send_message(member, mutemessage)
 			elif strikeLevel == 1:
 				kickList = self.settings.getServerStat(ctx.message.server, "KickList")
