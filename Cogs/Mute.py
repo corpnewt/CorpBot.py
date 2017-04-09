@@ -58,15 +58,17 @@ class Mute:
         for channel in server.channels:
             if not channel.type is discord.ChannelType.text:
                 continue
-            overs = channel.overwrites_for(member)
-            if not overs.send_messages == False:
-                # We haven't been muted here yet
-                overs.send_messages = False
-                overs.add_reactions = False
-                try:
-                    await self.bot.edit_channel_permissions(channel, member, overs)
-                except Exception:
-                    continue
+            perms = member.permissions_in(channel)
+            if perms.read_messages:
+                overs = channel.overwrites_for(member)
+                if not overs.send_messages == False:
+                    # We haven't been muted here yet
+                    overs.send_messages = False
+                    overs.add_reactions = False
+                    try:
+                        await self.bot.edit_channel_permissions(channel, member, overs)
+                    except Exception:
+                        continue
         
         self.settings.setUserStat(member, server, "Muted", "Yes")
         self.settings.setUserStat(member, server, "Cooldown", cooldown)
@@ -81,24 +83,26 @@ class Mute:
         for channel in server.channels:
                 if not channel.type is discord.ChannelType.text:
                     continue
-                overs = channel.overwrites_for(member)
-                otherPerms = False
-                for perm in overs:
-                    if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
-                        otherPerms = True
-                if overs.send_messages == False:
-                    # We haven't been muted here yet
-                    if otherPerms:
-                        # We have other overwrites - preserve those
-                        overs.send_messages = None
-                        overs.add_reactions = None
-                        try:
-                            await self.bot.edit_channel_permissions(channel, member, overs)
-                        except Exception:
-                            continue
-                    else:
-                        # No other overwrites - delete custom perms
-                        try:
-                            await self.bot.delete_channel_permissions(channel, member)
-                        except Exception:
-                            continue
+                perms = member.permissions_in(channel)
+                if perms.read_messages:
+                    overs = channel.overwrites_for(member)
+                    otherPerms = False
+                    for perm in overs:
+                        if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
+                            otherPerms = True
+                    if overs.send_messages == False:
+                        # We haven't been muted here yet
+                        if otherPerms:
+                            # We have other overwrites - preserve those
+                            overs.send_messages = None
+                            overs.add_reactions = None
+                            try:
+                                await self.bot.edit_channel_permissions(channel, member, overs)
+                            except Exception:
+                                continue
+                        else:
+                            # No other overwrites - delete custom perms
+                            try:
+                                await self.bot.delete_channel_permissions(channel, member)
+                            except Exception:
+                                continue
