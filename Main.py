@@ -159,7 +159,7 @@ server = Server.Server(bot, settings)
 cogList.append(server)
 
 # Flip
-fliptime = Fliptime.Fliptime(bot, settings)
+fliptime = Fliptime.Fliptime(bot, settings, mute)
 cogList.append(fliptime)
 
 # Remind
