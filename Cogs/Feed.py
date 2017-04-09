@@ -180,12 +180,6 @@ class Feed:
 			approve = True
 			decrement = False
 			
-		if isKill.lower() == "yes":
-			# Bot's dead...
-			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
-			await self.bot.send_message(channel, msg)
-			return
-			
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
 			# Apply food - then check health
@@ -195,6 +189,12 @@ class Feed:
 			takeReserve = -1*food
 			if decrement:
 				self.settings.incrementStat(author, server, "XPReserve", takeReserve)
+
+			if isKill.lower() == "yes":
+				# Bot's dead...
+				msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
+				await self.bot.send_message(channel, msg)
+				return
 			
 			# Bet more, less chance of winning, but more winnings!
 			chanceToWin = 50
