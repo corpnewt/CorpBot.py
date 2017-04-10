@@ -155,6 +155,12 @@ class BotAdmin:
 			msg = 'It would be easier for me if you just *stayed quiet all by yourself...*'
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
+		
+		# Check if we're muting the bot
+		if member.id == self.bot.user.id:
+			msg = 'How about we don\'t, and *pretend* we did...'
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
 
 		# Check if member is admin or bot admin
 		isAdmin = member.permissions_in(ctx.message.channel).administrator
@@ -251,7 +257,10 @@ class BotAdmin:
 		self.settings.setUserStat(member, ctx.message.server, "Cooldown", None)
 
 		await self.bot.send_message(ctx.message.channel, msg)
-		await self.bot.send_message(member, pm)
+		try:
+			await self.bot.send_message(member, pm)
+		except Exception:
+			pass
 		
 	@unmute.error
 	async def unmute_error(self, ctx, error):
@@ -451,6 +460,11 @@ class BotAdmin:
 			await self.bot.send_message(ctx.message.channel, 'Stop kicking yourself.  Stop kicking yourself.')
 			return
 		
+		# Check if we're kicking the bot
+		if member.id == self.bot.user.id:
+			await self.bot.send_message(ctx.message.channel, 'Oh - you probably meant to kick *yourself* instead, right?')
+			return
+		
 		# Check if the targeted user is admin
 		isTAdmin = member.permissions_in(ctx.message.channel).administrator
 		if not isTAdmin:
@@ -512,6 +526,11 @@ class BotAdmin:
 		
 		if member.id == ctx.message.author.id:
 			await self.bot.send_message(ctx.message.channel, 'Ahh - the ol\' self-ban.  Good try.')
+			return
+		
+		# Check if we're banning the bot
+		if member.id == self.bot.user.id:
+			await self.bot.send_message(ctx.message.channel, 'Oh - you probably meant to ban *yourself* instead, right?')
 			return
 		
 		# Check if the targeted user is admin
