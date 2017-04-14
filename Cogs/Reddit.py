@@ -176,7 +176,21 @@ class Reddit:
 		await Message.say(self.bot, mess, ctx.message.author)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
+	
+	@commands.command(pass_context=True)
+	async def lpt(self, ctx):
+		"""Become a pro - AT LIFE."""
+		msg = self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
+		await self.bot.send_message(ctx.message.channel, msg)
 		
+		
+	@commands.command(pass_context=True)
+	async def shittylpt(self, ctx):
+		"""Your advise is bad, and you should feel bad."""
+		msg = self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
