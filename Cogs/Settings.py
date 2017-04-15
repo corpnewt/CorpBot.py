@@ -16,7 +16,7 @@ from   Cogs        import DisplayName
 class Settings:
 	"""The Doorway To The Server Settings"""
 	# Let's initialize with a file location
-	def __init__(self, bot, file : str = None):
+	def __init__(self, bot, prefix = "$", file : str = None):
 		if file == None:
 			# We weren't given a file, default to ./Settings.json
 			file = "Settings.json"
@@ -29,6 +29,7 @@ class Settings:
 		self.settingsDump = 300 # runs every 5 minutes
 		self.bot = bot
 		self.serverDict = {}
+		self.prefix = prefix
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position

@@ -60,7 +60,7 @@ class Server:
 			serverPrefix = None
 
 		if not serverPrefix:
-			serverPrefix = ctx.prefix
+			serverPrefix = self.settings.prefix
 
 		msg = 'Prefix is: {}'.format(serverPrefix)
 		await self.bot.send_message(ctx.message.channel, msg)

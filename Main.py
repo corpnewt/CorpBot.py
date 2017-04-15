@@ -99,7 +99,7 @@ with open('token.txt', 'r') as f:
 cogList = []
 
 # Settings
-settings = Settings.Settings(bot, jsonFile)
+settings = Settings.Settings(bot, prefix, jsonFile)
 cogList.append(settings)
 
 # Mute
