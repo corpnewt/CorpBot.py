@@ -55,7 +55,7 @@ class Server:
 		"""Output's the server's prefix - custom or otherwise."""
 
 		try:
-			serverPrefix = settings.getServerStat(message.server, "Prefix")
+			serverPrefix = settings.getServerStat(ctx.message.server, "Prefix")
 		except Exception:
 			serverPrefix = None
 
