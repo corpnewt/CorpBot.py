@@ -19,6 +19,54 @@ class Server:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
+	async def setprefix(self, ctx, *, prefix : str = None):
+		"""Sets the bot's prefix (admin only)."""
+		# Check for admin status
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
+			return
+
+		# We're admin
+		if not prefix:
+			self.settings.setServerStat(ctx.message.server, "Prefix", None)
+			msg = 'Custom server prefix *removed*.'
+		else:
+			if prefix == '@everyone' or prefix == '@here':
+				await self.bot.send_message(ctx.message.channel, "Yeah, that'd get annoying *reaaaal* fast.  Try another prefix.")
+				return
+
+			self.settings.setServerStat(ctx.message.server, "Prefix", prefix)
+			msg = 'Custom server prefix is now: {}'.format(prefix)
+
+		await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def prefix(self, ctx):
+		"""Output's the server's prefix - custom or otherwise."""
+
+		try:
+			serverPrefix = settings.getServerStat(message.server, "Prefix")
+		except Exception:
+			serverPrefix = None
+
+		if not serverPrefix:
+			serverPrefix = ctx.prefix
+
+		msg = 'Prefix is: {}'.format(serverPrefix)
+		await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
 	async def setinfo(self, ctx, *, word : str = None):
 		"""Sets the server info (admin only)."""
 

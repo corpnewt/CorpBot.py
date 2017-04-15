@@ -63,8 +63,24 @@ if os.path.exists('prefix.txt'):
 debug = False
 if os.path.exists('debug.txt'):
 	debug = True
+
+
+async def get_prefix(bot, message):
+	# Check commands against some things and do stuff or whatever...
+	try:
+		serverPrefix = settings.getServerStat(message.server, "Prefix")
+	except Exception:
+		serverPrefix = None
+
+	if not serverPrefix:
+		# No custom prefix - use the default
+		serverPrefix = prefix
+
+	# Allow mentions too
+	return (serverPrefix, str(bot.user.mention)+" ")
+
 # This should be the main soul of the bot - everything should load from here
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
+bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
 deckFile = "deck.json"
@@ -369,7 +385,7 @@ async def on_member_update(before, after):
 		except AttributeError:
 			# Onto the next
 			continue
-		
+
 
 @bot.event
 async def on_message(message):
