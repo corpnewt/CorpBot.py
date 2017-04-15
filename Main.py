@@ -76,8 +76,14 @@ async def get_prefix(bot, message):
 		# No custom prefix - use the default
 		serverPrefix = prefix
 
+	try:
+		botMember = discord.utils.get(message.server.members, id=bot.user.id)
+	except Exception:
+		# Couldn't get a member - just get the user
+		botMember = bot.user
+
 	# Allow mentions too
-	return (serverPrefix, str(bot.user.mention)+" ")
+	return (serverPrefix, str(botMember.mention)+" ")
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
