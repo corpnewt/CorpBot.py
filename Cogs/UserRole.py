@@ -261,6 +261,37 @@ class UserRole:
 			suppress = True
 		else:
 			suppress = False
+		
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(server, "UserRoles")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+
+		if role == None:
+			# Remove us from all roles
+			remRole = []
+			for arole in promoArray:
+				roleTest = DisplayName.roleForID(arole['ID'], server)
+				if not roleTest:
+					# Not a real role - skip
+					continue
+				if roleTest in ctx.message.author.roles:
+					# We have this in our roles - remove it
+					remRole.append(roleTest)
+			if len(remRole):
+				try:
+					await self.bot.remove_roles(ctx.message.author, *remRole)
+				except Exception:
+					pass
+			# Give a quick status
+			msg = '*{}* has been moved out of all roles in the list!'.format(DisplayName.name(ctx.message.author))
+			if suppress:
+				msg = Nullify.clean(msg)
+			await self.bot.send_message(channel, msg)
+			return
 
 		# Check if role is real
 		roleCheck = DisplayName.roleForName(role, server)
@@ -275,20 +306,6 @@ class UserRole:
 		
 		# Got a role - set it
 		role = roleCheck
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
-			suppress = True
-		else:
-			suppress = False
-		
-		# Get the array
-		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
-		except Exception:
-			promoArray = []
-		if promoArray == None:
-			promoArray = []
 
 		addRole = []
 		remRole = []
