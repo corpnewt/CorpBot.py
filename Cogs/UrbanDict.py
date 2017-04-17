@@ -2,6 +2,7 @@ import asyncio
 import discord
 import requests
 import string
+from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
@@ -31,8 +32,7 @@ class UrbanDict:
 			msg = 'Usage: `{}define [word]`'.format(ctx.prefix)
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
-		rword = word.replace(" ", "+")
-		url = "http://api.urbandictionary.com/v0/define?term={}".format(rword)
+		url = "http://api.urbandictionary.com/v0/define?term={}".format(quote(word))
 		msg = 'I couldn\'t find a definition for "{}"...'.format(word) 
 		r = requests.get(url, headers = {'User-agent': self.ua})
 		theJSON = r.json()["list"]
