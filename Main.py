@@ -51,6 +51,7 @@ from Cogs import Star
 from Cogs import RateLimit
 from Cogs import Torment
 from Cogs import Mute
+from Cogs import UserRole
 
 # Let's load our prefix file
 prefix = '$'
@@ -271,6 +272,10 @@ cogList.append(rateLim)
 # Torment
 torment = Torment.Torment(bot, settings)
 cogList.append(torment)
+
+# UserRole
+userRole = UserRole.UserRole(bot, settings)
+cogList.append(userRole)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)

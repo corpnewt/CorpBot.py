@@ -61,16 +61,21 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                             msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
                         changed = True
     
-
+    
     # Add and remove roles as needed
-    if len(addRoles):
-        try:
-            await bot.add_roles(user, *addRoles)
-        except Exception:
-            pass
     if len(remRoles):
         try:
             await bot.remove_roles(user, *remRoles)
+        except Exception:
+            pass
+
+    # Pause if we're adding *and* removing
+    if len(remRoles) and len(addRoles):
+        await asyncio.sleep(0.2)
+
+    if len(addRoles):
+        try:
+            await bot.add_roles(user, *addRoles)
         except Exception:
             pass
 

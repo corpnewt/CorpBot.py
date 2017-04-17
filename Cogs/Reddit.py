@@ -173,7 +173,7 @@ class Reddit:
 			return
 		mess = '__**{}**__\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.say(self.bot, mess, ctx.message.author)
+		await Message.say(self.bot, mess, ctx.message.author, ctx.message.author)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
 	
