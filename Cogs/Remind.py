@@ -101,6 +101,11 @@ class Remind:
 
 		# Get the time from now to end time
 		timeFromNow = end-currentTime
+		
+		if timeFromNow < 1:
+			# Less than a second - set it to 1 second
+			end = currentTime+1
+			timeFromNow = 1
 
 		# Get our readable time
 		readableTime = ReadableTime.getReadableTimeBetween(int(currentTime), int(end))
@@ -172,11 +177,48 @@ class Remind:
 
 
 	@commands.command(pass_context=True)
-	async def clearmind(self, ctx):
-		"""Clear all reminders."""
+	async def clearmind(self, ctx, *, index = None):
+		"""Clear the reminder index passed - or all if none passed."""
 		member = ctx.message.author
-
-		self.settings.setUserStat(member, member.server, "Reminders", [])
-
-		msg = 'Alright *{}*, your calendar has been cleared of reminders!'.format(DisplayName.name(ctx.message.author))
+		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+			
+		reminders = self.settings.getUserStat(member, member.server, "Reminders")
+		if not len(reminders):
+			# No reminders
+			msg = "Oooh, look at you, *so much to be reminded about*... Just kidding.  You don't have any reminders to clear."
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+		
+		if index == None:
+			self.settings.setUserStat(member, member.server, "Reminders", [])
+			msg = 'Alright *{}*, your calendar has been cleared of reminders!'.format(DisplayName.name(ctx.message.author))
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+		
+		# We have something for our index
+		try:
+			index = int(index)
+		except Exception:
+			msg = 'Usage: `{}clearmind [index]`'.format(ctx.prefix)
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+		
+		# We have an int
+		if index < 1 or index > len(reminders):
+			# Out of bounds!
+			msg = "You'll have to pick an index between 1 and {}.".format(len(reminders))
+			await self.bot.send_message(ctx.message.channel, msg)
+			return
+		
+		# We made it!  Valid index and all sorts of stuff
+		removed = reminders.pop(index-1)
+		msg = "I will no longer remind you: {}".format(removed["Message"])
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await self.bot.send_message(ctx.message.channel, msg)
