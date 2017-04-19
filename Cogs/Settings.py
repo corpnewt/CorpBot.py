@@ -83,7 +83,6 @@ class Settings:
 				"Links" 				: [],		# List of links
 				"Members" 				: [],		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
-				"LogLevel"			: 0,		# 0 = minimal, 1 = normal, 2 = verbose
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"			: [],		# List of options to log
 				"ChannelMOTD" 			: []}		# List of channel messages of the day
