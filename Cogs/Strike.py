@@ -42,7 +42,6 @@ class Strike:
 			self.settings.setUserStat(member, server, "StrikeLevel", 3)
 			#self.settings.setUserStat(member, server, "Muted", "Yes")
 			#self.settings.setUserStat(member, server, "Cooldown", None)
-			self.mute.mute(member, server, None)
 			await self.mute.mute(member, server)
 
 	async def onready(self):
