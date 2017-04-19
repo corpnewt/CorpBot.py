@@ -157,4 +157,4 @@ class Mute:
         for entry in muteList:
             if entry['ID'] == member.id:
                 # Found them - remove from the mutelist
-                muteList.pop(entry)
+                muteList.remove(entry)
