@@ -356,49 +356,6 @@ class Debugging:
 			await self.bot.send_message(ctx.message.channel, '*1* logging option disabled.')
 		else:
 			await self.bot.send_message(ctx.message.channel, '*{}* logging options disabled.'.format(len(addedOptions)))			
-		
-	
-	@commands.command(pass_context=True)
-	async def loglevel(self, ctx, *, log = None):
-		"""Sets the server's logging level (0 = quiet, 1 = normal, 2 = verbose [bot-admin only])."""
-
-		author  = ctx.message.author
-		server  = ctx.message.server
-		channel = ctx.message.channel
-		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.server, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await self.bot.send_message(ctx.message.channel, 'You do not have sufficient privileges to access this command.')
-			return
-
-		logLevel  = self.settings.getServerStat(server, "LogLevel")
-
-		if log == None:
-			# Output log level
-			if logLevel == 2:
-				await self.bot.send_message(ctx.message.channel, 'Log level is *verbose*.')
-			elif logLevel == 1:
-				await self.bot.send_message(ctx.message.channel, 'Log level is *normal*.')
-			else:
-				await self.bot.send_message(ctx.message.channel, 'Log level is *quiet*.')
-			return
-		elif log.lower() == "0" or log.lower() == "quiet":
-			self.settings.setServerStat(server, "LogLevel", 0)
-			await self.bot.send_message(ctx.message.channel, 'Log level set to *quiet*.')
-		elif log.lower() == "1" or log.lower() == "normal":
-			self.settings.setServerStat(server, "LogLevel", 1)
-			await self.bot.send_message(ctx.message.channel, 'Log level set to *normal*.')
-		elif log.lower() == "2" or log.lower() == "verbose":
-			self.settings.setServerStat(server, "LogLevel", 2)
-			await self.bot.send_message(ctx.message.channel, 'Log level set to *verbose*.')
 			
 			
 	@commands.command(pass_context=True)
