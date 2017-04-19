@@ -81,6 +81,38 @@ class Channel:
 		
 		
 	@commands.command(pass_context=True)
+	async def listmuted(self, ctx):
+		"""Lists the names of those that are muted."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		muteList = self.settings.getServerStat(ctx.message.server, "MuteList")
+		activeMutes = []
+		for entry in muteList:
+			member = DisplayName.memberForID(entry['ID'], ctx.message.server)
+			if member:
+				# Found one!
+				activeMutes.append(DisplayName.name(member))
+
+		if not len(activeMutes):
+			await self.bot.send_message(ctx.message.channel, "No one is currently muted.")
+			return
+
+		# We have at least one member muted
+		msg = 'Currently muted:\n\n'
+		msg += ', '.join(activeMutes)
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
 	async def ismuted(self, ctx, *, member = None):
 		"""Says whether a member is muted in chat."""
 

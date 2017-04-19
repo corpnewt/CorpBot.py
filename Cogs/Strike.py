@@ -40,8 +40,8 @@ class Strike:
 			# The user has been kicked before - set their strikeLevel to 3
 			# Also mute them
 			self.settings.setUserStat(member, server, "StrikeLevel", 3)
-			#self.settings.setUserStat(member, server, "Muted", "Yes")
-			#self.settings.setUserStat(member, server, "Cooldown", None)
+			self.settings.setUserStat(member, server, "Muted", "Yes")
+			self.settings.setUserStat(member, server, "Cooldown", None)
 			await self.mute.mute(member, server)
 
 	async def onready(self):

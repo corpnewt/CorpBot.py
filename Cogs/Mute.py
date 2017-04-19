@@ -52,20 +52,10 @@ class Mute:
             # Time to wait yet - sleep
             await asyncio.sleep(timeleft)
 
-        muteList = self.settings.getServerStat(server, "MuteList")
-        isMute = 'no'
-        cd = None
-        muteEntry = None
-        for entry in muteList:
-            if entry['ID'] == member.id:
-                # Found our member
-                muteEntry = entry
-                isMute = 'yes'
-                cd = entry['Cooldown']
         # We've waited it out - unmute if needed
         # But check if the mute time has changed
-        #cd = self.settings.getUserStat(member, server, "Cooldown")
-        #isMute = self.settings.getUserStat(member, server, "Muted")
+        cd = self.settings.getUserStat(member, server, "Cooldown")
+        isMute = self.settings.getUserStat(member, server, "Muted")
         
         if cd == None:
             if isMute.lower() == 'yes':
@@ -79,9 +69,8 @@ class Mute:
                 return
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
-        #isMute = self.settings.getUserStat(member, server, "Muted")
-        #if isMute.lower() == "yes":
-        if muteEntry in muteList:
+        isMute = self.settings.getUserStat(member, server, "Muted")
+        if isMute.lower() == "yes":
             await self.unmute(member, server)
             pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(server.name)
             await self.bot.send_message(member, pm)
@@ -104,8 +93,8 @@ class Mute:
                     except Exception:
                         continue
         
-        #self.settings.setUserStat(member, server, "Muted", "Yes")
-        #self.settings.setUserStat(member, server, "Cooldown", cooldown)
+        self.settings.setUserStat(member, server, "Muted", "Yes")
+        self.settings.setUserStat(member, server, "Cooldown", cooldown)
 
         muteList = self.settings.getServerStat(server, "MuteList")
         

@@ -161,10 +161,10 @@ class VoiceState:
 	async def create_youtube_entry(self, ctx, song: str):
 
 		opts = {
-			'cachedir': False,
-			'format': 'ogg[abr>0]/bestaudio/best',
+			'buffer-size': '20000000',
+			'f': 'bestaudio',
 			'default_search': 'auto',
-			'quiet': True,
+			'quiet': True
 		}
 		volume = self.settings.getServerStat(ctx.message.server, "Volume")
 		defVolume = self.settings.getServerStat(ctx.message.server, "DefaultVolume")
@@ -327,7 +327,8 @@ class Music:
 		#await state.songs.put(entry)
 
 		opts = {
-			'format': 'webm[abr>0]/bestaudio/best',
+			'buffer-size': '20000000',
+			'f': 'bestaudio',
 			'default_search': 'auto',
 			'quiet': True
 		}
