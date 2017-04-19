@@ -124,7 +124,7 @@ class Channel:
 		if len(channelList):
 			# Get time remaining if needed
 			#cd = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
-			muteList = self.setttings.getServerStat(ctx.message.server, "MuteList")
+			muteList = self.settings.getServerStat(ctx.message.server, "MuteList")
 			cd = None
 			for entry in muteList:
 				if entry['ID'] == member.id:
