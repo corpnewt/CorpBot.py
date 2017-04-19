@@ -17,7 +17,7 @@ class Mute:
         for entry in muteList:
             if entry['ID'] == member.id:
                 # Found them - mute them
-                await self.mute(member, server, entry['Cooldown']):
+                await self.mute(member, server, entry['Cooldown'])
 
     '''async def onready(self):
         # Check all reminders - and start timers
