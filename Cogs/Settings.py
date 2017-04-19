@@ -85,6 +85,7 @@ class Settings:
 				"AdminArray"	 		: [],		# List of admin roles
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"			: [],		# List of options to log
+				"MuteList"			: [],		# List of muted members
 				"ChannelMOTD" 			: []}		# List of channel messages of the day
 
 		# Let's load our settings file
