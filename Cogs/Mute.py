@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+from Cogs import DisplayName
 
 class Mute:
 
@@ -10,7 +11,7 @@ class Mute:
         self.settings = settings
 
 
-    async def onready(self):
+    '''async def onready(self):
         # Check all reminders - and start timers
         for server in self.bot.servers:
             for member in server.members:
@@ -18,6 +19,19 @@ class Mute:
                 if isMute.lower() == "yes":
                     # We're muted
                     cooldown = self.settings.getUserStat(member, server, "Cooldown")
+                    if cooldown == None:
+                        continue
+                    self.bot.loop.create_task(self.checkMute(member, server, cooldown))'''
+    
+    async def onread(self):
+        # Check all mutes and start timers
+        for server in self.bot.servers:
+            muteList = self.settings.getServerStat(server, "MuteList")
+            for entry in muteList:
+                member = DisplayName.memberForID(entry['ID'], server)
+                if member:
+                    # We have a user! Check for a cooldown
+                    cooldown = entry['Cooldown']
                     if cooldown == None:
                         continue
                     self.bot.loop.create_task(self.checkMute(member, server, cooldown))
@@ -30,10 +44,21 @@ class Mute:
             # Time to wait yet - sleep
             await asyncio.sleep(timeleft)
 
+        muteList = self.settings.getServerStat(server, "MuteList")
+        isMute = 'no'
+        cd = None
+        muteEntry = None
+        for entry in muteList:
+            if entry['ID'] == member.id:
+                # Found our member
+                muteEntry = entry
+                isMute = 'yes'
+                cd = entry['Cooldown']
         # We've waited it out - unmute if needed
         # But check if the mute time has changed
-        cd = self.settings.getUserStat(member, server, "Cooldown")
-        isMute = self.settings.getUserStat(member, server, "Muted")
+        #cd = self.settings.getUserStat(member, server, "Cooldown")
+        #isMute = self.settings.getUserStat(member, server, "Muted")
+        
         if cd == None:
             if isMute.lower() == 'yes':
                 # We're now muted permanently
@@ -46,8 +71,9 @@ class Mute:
                 return
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
-        isMute = self.settings.getUserStat(member, server, "Muted")
-        if isMute.lower() == "yes":
+        #isMute = self.settings.getUserStat(member, server, "Muted")
+        #if isMute.lower() == "yes":
+        if muteEntry in muteList:
             await self.unmute(member, server)
             pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(server.name)
             await self.bot.send_message(member, pm)
@@ -70,9 +96,22 @@ class Mute:
                     except Exception:
                         continue
         
-        self.settings.setUserStat(member, server, "Muted", "Yes")
-        self.settings.setUserStat(member, server, "Cooldown", cooldown)
+        #self.settings.setUserStat(member, server, "Muted", "Yes")
+        #self.settings.setUserStat(member, server, "Cooldown", cooldown)
 
+        muteList = self.settings.getServerStat(server, "MuteList")
+        
+        # check if we're already muted
+        found = False
+        for entry in muteList:
+            if entry['ID'] == member.id:
+                # Set the cooldown
+                found = True
+                entry['Cooldown'] = cooldown
+                break
+        if not found:
+            muteList.append({ 'ID': member.id, 'Cooldown': cooldown })
+        
         if not cooldown == None:
             # We have a cooldown - set a timer
             self.bot.loop.create_task(self.checkMute(member, server, cooldown))
@@ -106,3 +145,8 @@ class Mute:
                                 await self.bot.delete_channel_permissions(channel, member)
                             except Exception:
                                 continue
+        muteList = self.settings.getServerStat(server, "MuteList")
+        for entry in muteList:
+            if entry['ID'] == member.id:
+                # Found them - remove from the mutelist
+                muteList.pop(entry)
