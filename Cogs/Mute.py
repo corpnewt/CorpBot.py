@@ -9,7 +9,15 @@ class Mute:
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
-
+        
+        
+    async def onjoin(self, member, server):
+        # Check if the new member was muted when they left
+        muteList = self.settings.getServerStat(server, "MuteList")
+        for entry in muteList:
+            if entry['ID'] == member.id:
+                # Found them - mute them
+                await self.mute(member, server, entry['Cooldown']):
 
     '''async def onready(self):
         # Check all reminders - and start timers
@@ -23,7 +31,7 @@ class Mute:
                         continue
                     self.bot.loop.create_task(self.checkMute(member, server, cooldown))'''
     
-    async def onread(self):
+    async def onready(self):
         # Check all mutes and start timers
         for server in self.bot.servers:
             muteList = self.settings.getServerStat(server, "MuteList")
