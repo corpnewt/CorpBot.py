@@ -76,16 +76,17 @@ class Example:
 		await self.bot.say('*{}* joined *{} UTC*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
-	def __init__(self, message, player, title, ctx):
+	def __init__(self, message, player, title, duration, ctx):
 		self.requester = message.author
 		self.channel = message.channel
 		self.player = player
 		self.title = title
+		self.duration = duration
 		self.ctx = ctx
 
 	def __str__(self):
 		fmt = '*{}* requested by *{}*'.format(self.title, DisplayName.name(self.requester))
-		seconds = self.player.duration
+		seconds = self.duration
 		if seconds:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
@@ -135,7 +136,7 @@ class VoiceState:
 				continue
 
 			self.start_time = datetime.datetime.now()
-			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['song'])
+			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['song'], self.playlist[0]['duration'])
 
 			#Check if youtube-dl found the song
 			if self.current == False:
@@ -160,7 +161,7 @@ class VoiceState:
 			del self.playlist[0]
 
 
-	async def create_youtube_entry(self, ctx, song: str, title: str):
+	async def create_youtube_entry(self, ctx, song: str, title: str, duration):
 
 		opts = {
 			'buffersize': '20000000',
@@ -191,7 +192,7 @@ class VoiceState:
 			return False
 		else:
 			player.volume = volume
-			entry = VoiceEntry(ctx.message, player, title, ctx)
+			entry = VoiceEntry(ctx.message, player, title, duration, ctx)
 			return entry;
 
 class Music:
