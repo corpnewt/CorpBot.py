@@ -18,6 +18,9 @@ ffmpeg.exe
 ffplay.exe
 ffprobe.exe
 
+# Youtube-dl extras
+youtube-dl*
+
 # Chatterbot database
 database.db
 

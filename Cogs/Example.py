@@ -2,6 +2,7 @@ import asyncio
 import discord
 import random
 import datetime
+import subprocess
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
@@ -161,7 +162,7 @@ class VoiceState:
 	async def create_youtube_entry(self, ctx, song: str):
 
 		opts = {
-			'buffer-size': '20000000',
+			'buffersize': '20000000',
 			'f': 'bestaudio',
 			'default_search': 'auto',
 			'quiet': True
@@ -179,8 +180,10 @@ class VoiceState:
 
 		try:
 			# Here we should download the song, then start the stream
-			#player = await self.voice.create_ffmpeg_player(song, )
-			player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
+			audioProc = subprocess.Popen(['youtube-dl', '-o', '-', '-q', '-f', 'bestaudio', '--buffer-size', '20000000', song], stdout=subprocess.PIPE)
+			player = self.voice.create_ffmpeg_player(audioProc.stdout, pipe=True, after=self.toggle_next)
+			# player = await self.voice.create_ffmpeg_player(song, )
+			# player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
 		except Exception as e:
 			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
 			await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
@@ -327,7 +330,7 @@ class Music:
 		#await state.songs.put(entry)
 
 		opts = {
-			'buffer-size': '20000000',
+			'buffersize': '20000000',
 			'f': 'bestaudio',
 			'default_search': 'auto',
 			'quiet': True
