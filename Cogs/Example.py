@@ -182,8 +182,10 @@ class VoiceState:
 
 		try:
 			# Here we should download the song, then start the stream
-			audioProc = subprocess.Popen(['youtube-dl', '-o', '-', '-q', '-f', 'bestaudio', '--buffer-size', '20000000', song], stdout=subprocess.PIPE)
-			player = self.voice.create_ffmpeg_player(audioProc.stdout, pipe=True, after=self.toggle_next)
+			audioProc = subprocess.Popen( "youtube-dl -f worstaudio --buffer-size 900000 -o - \"" + song + "\" | ffmpeg -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE)
+			player = self.voice.create_stream_player( audioProc.stdout, after=self.toggle_next )
+			# audioProc = subprocess.Popen(['youtube-dl', '-o', '-', '-q', '-f', 'bestaudio', '--buffer-size', '20000000', song], stdout=subprocess.PIPE)
+			# player = self.voice.create_ffmpeg_player(audioProc.stdout, pipe=True, after=self.toggle_next)
 			# player = await self.voice.create_ffmpeg_player(song, )
 			# player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
 		except Exception as e:
