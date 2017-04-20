@@ -135,7 +135,7 @@ class VoiceState:
 				continue
 
 			self.start_time = datetime.datetime.now()
-			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['title'])
+			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['song'])
 
 			#Check if youtube-dl found the song
 			if self.current == False:
