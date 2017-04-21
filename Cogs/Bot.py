@@ -450,9 +450,7 @@ class Bot:
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
 					value = root + "/" + items
-					num_lines = sum(1 for line in open(items, encoding='utf-8'))
-					#temp += self.file_len(value)
-					temp += num_lines
+					temp += self.file_len(value)
 			code_count.append(temp)
 			pass
 		
@@ -465,12 +463,12 @@ class Bot:
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	# Helper function to count lines in a file
-	'''def file_len(self, fname):
+	def file_len(self, fname):
 		i = 0
-		with open(fname) as f:
+		with open(fname, encoding='utf-8') as f:
 			for i, l in enumerate(f):
 				pass
-		return i + 2'''
+		return i + 2
 
 	# Helper function to get extensions
 	def get_extensions(self, path, excl):
