@@ -450,12 +450,7 @@ class Bot:
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
 					value = root + "/" + items
-					try:
-						temp += sum(+1 for line in open(value, 'rb'))
-					except e as Exception:
-						msg = '{}'.format(e)
-						await self.bot.send_message(ctx.message.channel, msg)
-						return
+					temp += sum(+1 for line in open(value, 'rb'))
 					#temp += self.file_len(value)
 			code_count.append(temp)
 			pass
@@ -467,6 +462,12 @@ class Bot:
 			#print(extensions[idx] + ": " + str(code_count[idx]))
 			pass
 		await self.bot.send_message(ctx.message.channel, msg)
+		
+	@cloc.error
+	async def cloc_error(self, ctx, error):
+		# do stuff
+		msg = 'cloc Error: {}'.format(ctx)
+		await self.bot.say(msg)
 		
 	# Helper function to count lines in a file
 	def file_len(self, fname):
