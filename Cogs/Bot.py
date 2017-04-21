@@ -452,7 +452,7 @@ class Bot:
 					value = root + "/" + items
 					temp += sum(+1 for line in open(value, 'rb'))
 					#temp += self.file_len(value)
-			await self.bot.send_message(ctx.message.channel, 'Temp is: {}'.format(temp))
+			await self.bot.send_message(ctx.message.channel, '"{}" - {} - {}'.format(value, extension, temp))
 			code_count.append(temp)
 			pass
 		
