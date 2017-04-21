@@ -442,7 +442,7 @@ class Bot:
 		exclude = ['exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
 		
 		# Get the extensions - exclude our exclusion list
-		extensions = get_extensions(path, exclude)
+		extensions = self.get_extensions(path, exclude)
 		
 		for run in extensions:
 			extension = "*."+run
