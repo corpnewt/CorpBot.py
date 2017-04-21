@@ -439,7 +439,7 @@ class Bot:
 		# Set up some lists
 		extensions = []
 		code_count = []
-		exclude = ['exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
+		exclude = ['brn','md','exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
 		
 		# Get the extensions - exclude our exclusion list
 		extensions = self.get_extensions(path, exclude)
