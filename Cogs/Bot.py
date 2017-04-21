@@ -440,18 +440,19 @@ class Bot:
 		extensions = []
 		code_count = []
 		exclude = ['brn','md','exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
+		include = ['py']
 		
 		# Get the extensions - exclude our exclusion list
-		extensions = self.get_extensions(path, exclude)
+		extensions = self.get_extensions(path, include)
 		
 		for run in extensions:
 			extension = "*."+run
 			temp = 0
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
+					if items.lower().startswith('frag')
 					value = root + "/" + items
 					temp += sum(+1 for line in open(value, 'rb'))
-					#temp += self.file_len(value)
 			await self.bot.send_message(ctx.message.channel, '"{}" - {} - {}'.format(value, extension, temp))
 			code_count.append(temp)
 			pass
@@ -469,19 +470,6 @@ class Bot:
 		# do stuff
 		msg = 'cloc Error: {}'.format(ctx)
 		await self.bot.say(msg)
-		
-	# Helper function to count lines in a file
-	def file_len(self, fname):
-		i = 0
-		count=0
-		with open (fname,'rb') as f:
-			for line in f:
-				i+=1
-				pass
-		'''with open(fname, encoding='utf-8') as f:
-			for i, l in enumerate(f):
-				pass'''
-		return i + 2
 
 	# Helper function to get extensions
 	def get_extensions(self, path, excl):
@@ -490,9 +478,8 @@ class Bot:
 			for items in fnmatch.filter(files, "*"):
 				temp_extensions = items.rfind(".")
 				ext = items[temp_extensions+1:]
-
 				if ext not in extensions:
-					if ext not in excl:
+					if ext in excl:
 						extensions.append(ext)
 						pass
 		return extensions
