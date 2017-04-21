@@ -450,7 +450,7 @@ class Bot:
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
 					value = root + "/" + items
-					num_lines = sum(1 for line in open(items))
+					num_lines = sum(1 for line in open(items, encoding='utf-8'))
 					#temp += self.file_len(value)
 					temp += num_lines
 			code_count.append(temp)
