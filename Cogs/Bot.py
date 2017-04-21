@@ -5,6 +5,7 @@ import psutil
 import platform
 import time
 import sys
+import fnmatch
 import subprocess
 import pyspeedtest
 from   PIL         import Image
@@ -426,3 +427,59 @@ class Bot:
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await self.bot.send_message(ctx.message.channel, msg)
+		
+	@commands.command(pass_context=True)
+	async def cloc(self, ctx):
+		"""Outputs the total count of lines of code in the currently installed repo."""
+		# Script pulled and edited from https://github.com/kyco/python-count-lines-of-code/blob/python3/cloc.py
+		
+		# Get our current working directory - should be the bot's home
+		path = os.getcwd()
+		
+		# Set up some lists
+		extensions = []
+		code_count = []
+		exclude = ['exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
+		
+		# Get the extensions - exclude our exclusion list
+		extensions = get_extensions(path, exclude)
+		
+		for run in extensions:
+			extension = "*."+run
+			temp = 0
+			for root, dir, files in os.walk(path):
+					for items in fnmatch.filter(files, extension):
+						value = root + "/" + items
+						temp += self.file_len(value)
+			code_count.append(temp)
+			pass
+		
+		# Set up our output
+		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n\n'
+		for idx, val in enumerate(code_count):
+			msg += extensions[idx] + ": " + str(code_count[idx]) + '\n'
+			#print(extensions[idx] + ": " + str(code_count[idx]))
+			pass
+		await self.bot.send_message(ctx.message.channel, msg)
+		
+	# Helper function to count lines in a file
+	def file_len(self, fname):
+		i = 0
+		with open(fname) as f:
+			for i, l in enumerate(f):
+				pass
+		return i + 2
+
+	# Helper function to get extensions
+	def get_extensions(self, path, excl):
+		extensions = []
+		for root, dir, files in os.walk(path):
+				for items in fnmatch.filter(files, "*"):
+					temp_extensions = items.rfind(".")
+					ext = items[temp_extensions+1:]
+
+					if ext not in extensions:
+						if ext not in excl:
+							extensions.append(ext)
+							pass
+		return extensions
