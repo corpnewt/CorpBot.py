@@ -450,7 +450,13 @@ class Bot:
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
 					value = root + "/" + items
-					temp += self.file_len(value)
+					try:
+						temp += sum(+1 for line in open(value, 'rb'))
+					except e as Exception:
+						msg = '{}'.format(e)
+						await self.bot.send_message(ctx.message.channel, msg)
+						return
+					#temp += self.file_len(value)
 			code_count.append(temp)
 			pass
 		
