@@ -465,21 +465,26 @@ class Bot:
 	# Helper function to count lines in a file
 	def file_len(self, fname):
 		i = 0
-		with open(fname, encoding='utf-8') as f:
-			for i, l in enumerate(f):
+		count=0
+		with open (fname,'rb') as f:
+			for line in f:
+				i+=1
 				pass
+		'''with open(fname, encoding='utf-8') as f:
+			for i, l in enumerate(f):
+				pass'''
 		return i + 2
 
 	# Helper function to get extensions
 	def get_extensions(self, path, excl):
 		extensions = []
 		for root, dir, files in os.walk(path):
-				for items in fnmatch.filter(files, "*"):
-					temp_extensions = items.rfind(".")
-					ext = items[temp_extensions+1:]
+			for items in fnmatch.filter(files, "*"):
+				temp_extensions = items.rfind(".")
+				ext = items[temp_extensions+1:]
 
-					if ext not in extensions:
-						if ext not in excl:
-							extensions.append(ext)
-							pass
+				if ext not in extensions:
+					if ext not in excl:
+						extensions.append(ext)
+						pass
 		return extensions
