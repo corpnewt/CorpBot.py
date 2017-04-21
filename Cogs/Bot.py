@@ -450,7 +450,6 @@ class Bot:
 			temp = 0
 			for root, dir, files in os.walk(path):
 				for items in fnmatch.filter(files, extension):
-					if items.lower().startswith('frag')
 					value = root + "/" + items
 					temp += sum(+1 for line in open(value, 'rb'))
 			await self.bot.send_message(ctx.message.channel, '"{}" - {} - {}'.format(value, extension, temp))
