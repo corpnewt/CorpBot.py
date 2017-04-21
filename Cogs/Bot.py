@@ -439,10 +439,9 @@ class Bot:
 		# Set up some lists
 		extensions = []
 		code_count = []
-		exclude = ['brn','md','exe','json','sample','exclude','description','png','jpg','config','HEAD','packed-refs','idx','master','pack','txt','index','gitignore','COMMIT_EDITMSG','python3']
-		include = ['py']
+		include = ['py','bat','sh']
 		
-		# Get the extensions - exclude our exclusion list
+		# Get the extensions - include our include list
 		extensions = self.get_extensions(path, include)
 		
 		for run in extensions:
@@ -452,16 +451,20 @@ class Bot:
 				for items in fnmatch.filter(files, extension):
 					value = root + "/" + items
 					temp += sum(+1 for line in open(value, 'rb'))
-			await self.bot.send_message(ctx.message.channel, '"{}" - {} - {}'.format(value, extension, temp))
 			code_count.append(temp)
 			pass
 		
 		# Set up our output
-		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n\n'
+		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n```\n'
 		for idx, val in enumerate(code_count):
-			msg += extensions[idx] + ": " + str(code_count[idx]) + '\n'
-			#print(extensions[idx] + ": " + str(code_count[idx]))
+			lineWord = 'lines'
+			if code_count[idx] == 1:
+				lineWord = 'line'
+			msg += str(code_count[idx]) + " " + lineWord + " of " + extensions[idx] + "\n"
+			# msg += extensions[idx] + ": " + str(code_count[idx]) + ' ' + lineWord + '\n'
+			# print(extensions[idx] + ": " + str(code_count[idx]))
 			pass
+		msg += '```'
 		await self.bot.send_message(ctx.message.channel, msg)
 		
 	@cloc.error
