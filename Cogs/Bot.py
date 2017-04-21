@@ -456,11 +456,19 @@ class Bot:
 		
 		# Set up our output
 		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n```\n'
+		padTo = 0
+		for idx, val in enumerate(code_count):
+			# Find out which has the longest
+			tempLen = len(str('{:,}'.format(code_count[idx])))
+			if tempLen > padTo:
+				padTo = tempLen
 		for idx, val in enumerate(code_count):
 			lineWord = 'lines'
 			if code_count[idx] == 1:
 				lineWord = 'line'
-			msg += str(code_count[idx]) + " " + lineWord + " of " + extensions[idx] + "\n"
+			# Setup a right-justified string padded with spaces
+			numString = str('{:,}'.format(code_count[idx])).rjust(padTo, ' ')
+			msg += numString + " " + lineWord + " of " + extensions[idx] + "\n"
 			# msg += extensions[idx] + ": " + str(code_count[idx]) + ' ' + lineWord + '\n'
 			# print(extensions[idx] + ": " + str(code_count[idx]))
 			pass
