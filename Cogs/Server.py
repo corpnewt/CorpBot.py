@@ -195,14 +195,20 @@ class Server:
 		for aServer in self.bot.guilds:
 			if str(aServer.id) == str(targetServer):
 				# Found it by id
-				await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+				try:
+					await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+				except Exception:
+					pass
 				await aServer.leave()
 				return
 		# Didn't find it - try by name
 		for aServer in self.bot.guilds:
 			if aServer.name.lower() == targetServer.lower():
 				# Found it by name
-				await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+				try:
+					await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+				except Exception:
+					pass
 				await aServer.leave()
 				return
 
