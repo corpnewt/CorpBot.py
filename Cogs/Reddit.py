@@ -365,7 +365,7 @@ class Reddit:
 
 
 	@commands.command(pass_context=True)
-	async def dankmemes(self, ctx):
+	async def dankmeme(self, ctx):
 		"""Only the dankest."""
 		
 		channel = ctx.message.channel
