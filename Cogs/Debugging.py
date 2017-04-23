@@ -345,7 +345,7 @@ class Debugging:
 		
 		logChannel = self.settings.getServerStat(ctx.message.guild, "LogChannel")
 		if logChannel:
-			channel = self.bot.get_channel(logChannel)
+			channel = self.bot.get_channel(int(logChannel))
 			if channel:
 				logVars = self.settings.getServerStat(ctx.message.guild, "LogVars")
 				if len(logVars):
