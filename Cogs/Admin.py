@@ -119,7 +119,7 @@ class Admin:
 			return
 
 		if channel == None:
-			self.settings.setServerStat(ctx.messager, "MadLibsChannel", "")
+			self.settings.setServerStat(ctx.message.guild, "MadLibsChannel", "")
 			msg = 'MadLibs works in *any channel* now.'
 			await ctx.message.channel.send(msg)
 			return
