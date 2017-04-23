@@ -45,7 +45,7 @@ class Lists:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
@@ -109,7 +109,7 @@ class Lists:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
@@ -325,7 +325,7 @@ class Lists:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.message.guild.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
@@ -366,7 +366,7 @@ class Lists:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await ctx.channel.send('You do not have sufficient privileges to access this command.')
@@ -431,7 +431,7 @@ class Lists:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
@@ -647,7 +647,7 @@ class Lists:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.message.guild.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:

@@ -752,7 +752,7 @@ class Admin:
 		
 	
 	@setlinkrole.error
-	async def linkrole_error(self, error, ctx):
+	async def setlinkrole_error(self, error, ctx):
 		# do stuff
 		msg = 'setlinkrole Error: {}'.format(error)
 		await ctx.channel.send(msg)
