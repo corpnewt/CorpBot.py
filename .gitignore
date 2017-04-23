@@ -13,8 +13,19 @@ debug.txt
 # FFMpeg.exe
 ffmpeg.exe
 
+# FFMpeg extras
+*.dll
+ffplay.exe
+ffprobe.exe
+
+# Youtube-dl extras
+youtube-dl*
+
 # Chatterbot database
 database.db
+
+# Server List
+ServerList*
 
 # Hidden stuff
 .git
