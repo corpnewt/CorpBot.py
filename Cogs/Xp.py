@@ -21,7 +21,6 @@ class Xp:
 		
 	async def addXP(self):
 		await self.bot.wait_until_ready()
-		print('XP Loop started.')
 		while not self.bot.is_closed():
 			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
 			print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
@@ -45,7 +44,11 @@ class Xp:
 					if bumpXP:
 						if xpAmount > 0:
 							# User is online add hourly xp reserve
-							xpLeftover = float(self.settings.getUserStat(user, server, "XPLeftover"))
+							xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
+							if xpLeftover == None:
+								xpLeftover = 0
+							else:
+								xpLeftover = float(xpLeftover)
 							gainedXp = xpLeftover+xpAmount
 							gainedXpInt = int(gainedXp) # Strips the decimal point off
 							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
@@ -54,7 +57,11 @@ class Xp:
 						
 						if xpRAmount > 0:
 							# User is online add hourly xp
-							xpRLeftover = float(self.settings.getUserStat(user, server, "XPRealLeftover"))
+							xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
+							if xpRLeftover == None:
+								xpRLeftover = 0
+							else:
+								xpRLeftover = float(xpRLeftover)
 							gainedXpR = xpRLeftover+xpRAmount
 							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
 							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
@@ -144,7 +151,7 @@ class Xp:
 		if requiredXP:
 			foundRole = False
 			for checkRole in author.roles:
-				if checkRole.id == requiredXP:
+				if str(checkRole.id) == str(requiredXP):
 					foundRole = True
 			if not foundRole:
 				approve = False
@@ -190,7 +197,7 @@ class Xp:
 						# Add to our list
 						for smem in sMemberList:
 							# Find our server entry
-							if smem["ID"] == amem.id:
+							if str(smem["ID"]) == str(amem.id):
 								# Add it.
 								memberList.append(smem)
 				memSorted = sorted(memberList, key=lambda x:int(x['XP']))
@@ -266,7 +273,7 @@ class Xp:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.message.guild.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					msg = 'New users will be assigned to **{}**.'.format(arole.name)
 					# Check for suppress
@@ -326,7 +333,7 @@ class Xp:
 		if requiredXP:
 			foundRole = False
 			for checkRole in author.roles:
-				if checkRole.id == requiredXP:
+				if str(checkRole.id) == str(requiredXP):
 					foundRole = True
 			if not foundRole:
 				approve = False
@@ -446,7 +453,7 @@ class Xp:
 			# Get current role name based on id
 			foundRole = False
 			for role in server.roles:
-				if role.id == arole['ID']:
+				if str(role.id) == str(arole['ID']):
 					# We found it
 					foundRole = True
 					roleText = '{}**{}** : *{} XP*\n'.format(roleText, role.name, arole['XP'])
@@ -461,7 +468,7 @@ class Xp:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.message.guild.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
@@ -532,7 +539,7 @@ class Xp:
 			currentRole = None
 			for aRole in member.roles:
 				# Get the role that corresponds to the id
-				if aRole.id == role['ID']:
+				if str(aRole.id) == str(role['ID']):
 					# We found it
 					highestRole = aRole.name
 
@@ -717,7 +724,7 @@ class Xp:
 			currentRole = None
 			for aRole in member.roles:
 				# Get the role that corresponds to the id
-				if aRole.id == role['ID']:
+				if str(aRole.id) == str(role['ID']):
 					# We found it
 					highestRole = aRole.name
 					if len(promoSorted) > (promoSorted.index(role)+1):
@@ -851,7 +858,7 @@ class Xp:
 			# Role is set - let's get its name
 			found = False
 			for arole in server.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:

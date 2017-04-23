@@ -5,10 +5,9 @@ import os
 from   discord.ext import commands
 from   discord import errors
 from   Cogs import ReadableTime
-from   Cogs import DisplayName
 
 # Import the cogs
-
+from Cogs import DisplayName
 from Cogs import Settings
 from Cogs import Xp
 from Cogs import Admin
@@ -48,7 +47,11 @@ from Cogs import Debugging
 from Cogs import CardsAgainstHumanity
 from Cogs import ChatterBot
 from Cogs import Star
-from Cogs import Monitor
+# from Cogs import Monitor
+from Cogs import RateLimit
+from Cogs import Torment
+from Cogs import Mute
+from Cogs import UserRole
 
 # Let's load our prefix file
 prefix = '$'
@@ -61,8 +64,30 @@ if os.path.exists('prefix.txt'):
 debug = False
 if os.path.exists('debug.txt'):
 	debug = True
+
+
+async def get_prefix(bot, message):
+	# Check commands against some things and do stuff or whatever...
+	try:
+		serverPrefix = settings.getServerStat(message.guild, "Prefix")
+	except Exception:
+		serverPrefix = None
+
+	if not serverPrefix:
+		# No custom prefix - use the default
+		serverPrefix = prefix
+
+	try:
+		botMember = discord.utils.get(message.guild.members, id=bot.user.id)
+	except Exception:
+		# Couldn't get a member - just get the user
+		botMember = bot.user
+
+	# Allow mentions too
+	return (serverPrefix, str(botMember.mention)+" ")
+
 # This should be the main soul of the bot - everything should load from here
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), pm_help=None, description='A bot that does stuff.... probably')
+bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
 # Initialize some things
 jsonFile = "Settings.json"
 deckFile = "deck.json"
@@ -75,14 +100,18 @@ with open('token.txt', 'r') as f:
 cogList = []
 
 # Settings
-settings = Settings.Settings(bot, jsonFile)
+settings = Settings.Settings(bot, prefix, jsonFile)
 cogList.append(settings)
+
+# Mute
+mute = Mute.Mute(bot, settings)
+cogList.append(mute)
 
 # Examples - there are 2 parts here, Example, and Music
 example = Example.Example(bot, settings)
 music = Example.Music(bot, settings)
 cogList.append(example)
-# cogList.append(music) # Uncomment this when voice is available.
+cogList.append(music) # Uncomment this when voice is available.
 
 # Xp
 xp = Xp.Xp(bot, settings)
@@ -93,7 +122,7 @@ admin = Admin.Admin(bot, settings)
 cogList.append(admin)
 
 # BotAdmin
-botadmin = BotAdmin.BotAdmin(bot, settings)
+botadmin = BotAdmin.BotAdmin(bot, settings, mute)
 cogList.append(botadmin)
 
 # Channel
@@ -121,7 +150,7 @@ botCog = Bot.Bot(bot, settings)
 cogList.append(botCog)
 
 # Humor
-humor = Humor.Humor(bot)
+humor = Humor.Humor(bot, settings)
 cogList.append(humor)
 
 # Uptime
@@ -153,7 +182,7 @@ server = Server.Server(bot, settings)
 cogList.append(server)
 
 # Flip
-fliptime = Fliptime.Fliptime(bot, settings)
+fliptime = Fliptime.Fliptime(bot, settings, mute)
 cogList.append(fliptime)
 
 # Remind
@@ -213,7 +242,7 @@ serverstats = ServerStats.ServerStats(bot, settings)
 cogList.append(serverstats)
 
 # Strike
-strike = Strike.Strike(bot, settings)
+strike = Strike.Strike(bot, settings, mute)
 cogList.append(strike)
 
 # Debugging
@@ -234,8 +263,20 @@ star = Star.Star(bot)
 cogList.append(star)
 
 # Monitoring
-monitor = Monitor.Monitor(bot, settings)
-cogList.append(monitor)
+# monitor = Monitor.Monitor(bot, settings)
+# cogList.append(monitor)
+
+# Rate Limiting
+rateLim = RateLimit.RateLimit(bot, settings)
+cogList.append(rateLim)
+
+# Torment
+torment = Torment.Torment(bot, settings)
+cogList.append(torment)
+
+# UserRole
+userRole = UserRole.UserRole(bot, settings)
+cogList.append(userRole)
 
 # Help - Must be last
 #help = Help.Help(bot, cogList)
@@ -275,13 +316,13 @@ async def on_voice_state_update(user, beforeState, afterState):
 		return
 
 	# if we made it here - then we're alone - disconnect
-	server = before.guild
+	server = beforeState.channel.guild
 	state = music.get_voice_state(server)
 
 	settings.setServerStat(server, "Volume", None)
 
 	if state.is_playing():
-		player = state.player
+		player = state.voice
 		player.stop()
 	try:
 		state.audio_player.cancel()
@@ -309,7 +350,7 @@ async def on_server_join(server):
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
-	await server.send(msg)
+	await server.default_channel.send(msg)
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
 	await owner.send(msg)
 
@@ -343,44 +384,11 @@ async def on_member_join(member):
 	await member.send(fmt)
 
 @bot.event
-async def on_member_update(before, after):
-	server = after.guild
-
-	# Check if the member went offline and log the time
-	if str(after.status).lower() == "offline":
-		currentTime = int(time.time())
-		settings.setUserStat(after, server, "LastOnline", currentTime)
-			
-	settings.checkServer(server)
-	try:
-		channelMOTDList = settings.getServerStat(server, "ChannelMOTD")
-	except KeyError:
-		channelMOTDList = []
-		
-	if len(channelMOTDList) > 0:
-		members = 0
-		membersOnline = 0
-		for member in server.members:
-			members += 1
-			if str(member.status).lower() == "online":
-				membersOnline += 1
-			
-	for id in channelMOTDList:
-		channel = bot.get_channel(id['ID'])
-		if channel:
-			motd = id['MOTD'] # A markdown message of the day
-			listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
-			if listOnline.lower() == "yes":
-				msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
-			else:
-				msg = motd
-			await channel.edit(topic=msg)
-	
+async def on_member_update(before, after):	
 	# Check for cogs that accept updates
-	pm = None
 	for cog in cogList:
 		try:
-			await cog.status(after)
+			await cog.member_update(before, after)
 		except AttributeError:
 			# Onto the next
 			continue
@@ -393,17 +401,16 @@ async def on_message(message):
 		await bot.process_commands(message)
 		return
 
+	if message.author.bot:
+		# We don't need other bots controlling things we do.
+		return
+
 	try:
 		message.author.roles
 	except AttributeError:
 		# Not a User
 		await bot.process_commands(message)
 		return
-
-	# Admin Override - always allow admin commands
-	#if message.author.permissions_in(message.channel).administrator:
-		#await bot.process_commands(message)
-		#return
 	
 	# Check if we need to ignore or delete the message
 	# or respond or replace
@@ -442,22 +449,41 @@ async def on_message(message):
 		await bot.process_commands(message)
 
 @bot.event
-async def on_command(ctx):
+async def on_command(command):
 	for cog in cogList:
 		try:
-			await cog.oncommand(ctx.command, ctx)
+			await cog.oncommand(command)
 		except AttributeError:
 			# Onto the next
 			continue
 
 @bot.event
-async def on_command_completion(ctx):
+async def on_command_completion(command):
 	for cog in cogList:
 		try:
-			await cog.oncommandcompletion(ctx.command, ctx)
+			await cog.oncommandcompletion(command)
 		except AttributeError:
 			# Onto the next
 			continue
+
+@bot.event
+async def on_message_delete(message):
+	# Run through the on_message commands, but on deletes.
+	if not message.guild:
+		# This wasn't in a server, return
+		return
+	try:
+		message.author.roles
+	except AttributeError:
+		# Not a User
+		return
+	for cog in cogList:
+		try:
+			check = await cog.message_delete(message)
+		except AttributeError:
+			# Onto the next
+			continue
+
 		
 @bot.event
 async def on_message_edit(before, message):
@@ -478,7 +504,7 @@ async def on_message_edit(before, message):
 	respond = None
 	for cog in cogList:
 		try:
-			check = await cog.message(message)
+			check = await cog.message_edit(before, message)
 		except AttributeError:
 			# Onto the next
 			continue

@@ -20,6 +20,10 @@ class Admin:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+
+	async def message_edit(self, before_message, message):
+		# Pipe the edit into our message func to respond if needed
+		return await self.message(message)
 		
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -1160,5 +1164,8 @@ class Admin:
 						msg = motd
 							
 					# print(msg)
-							
-					await channel.edit(topic=msg)
+					try:		
+						await channel.edit(topic=msg)
+					except Exception:
+						# If someone has the wrong perms - we just move on
+						continue

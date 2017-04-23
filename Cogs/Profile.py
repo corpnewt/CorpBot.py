@@ -32,7 +32,7 @@ class Profile:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		# Check for role requirements
+		'''# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredXPRole")
 		if requiredRole == "":
 			#admin only
@@ -48,7 +48,7 @@ class Profile:
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+				return'''
 				
 		# Passed role requirements!
 		if not (name or link):

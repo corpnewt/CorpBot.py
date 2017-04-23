@@ -23,9 +23,10 @@ from   Cogs import Nullify
 class Strike:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, mute):
 		self.bot = bot
 		self.settings = settings
+		self.mute = mute
 
 	async def onjoin(self, member, server):
 		# Check id against the kick and ban list and react accordingly
@@ -41,6 +42,7 @@ class Strike:
 			self.settings.setUserStat(member, server, "StrikeLevel", 3)
 			self.settings.setUserStat(member, server, "Muted", "Yes")
 			self.settings.setUserStat(member, server, "Cooldown", None)
+			await self.mute.mute(member, server)
 
 	async def onready(self):
 		# Check all strikes - and start timers
@@ -180,7 +182,9 @@ class Strike:
 				else:
 					self.settings.setUserStat(member, ctx.message.guild, "Muted", "Yes")
 					self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
-				await self.bot.send_message(member, mutemessage)
+					await self.mute.mute(member, ctx.message.guild, cooldownFinal)
+
+				await member.send(mutemessage)
 			elif strikeLevel == 1:
 				kickList = self.settings.getServerStat(ctx.message.guild, "KickList")
 				if not str(member.id) in kickList:
@@ -190,8 +194,8 @@ class Strike:
 					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, message)
 				else:
 					kickmessage = 'You have been kicked from *{}*.'.format(ctx.message.guild.name)
-				await self.bot.send_message(member, kickmessage)
-				await self.bot.kick(member)
+				await member.send(kickmessage)
+				await ctx.guild.kick(member)
 			else:
 				banList = self.settings.getServerStat(ctx.message.guild, "BanList")
 				if not str(member.id) in banList:
@@ -201,8 +205,8 @@ class Strike:
 					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, message)
 				else:
 					banmessage = 'You have been banned from *{}*.'.format(ctx.message.guild.name)
-				await self.bot.send_message(member, banmessage)
-				await self.bot.ban(member)
+				await member.send(banmessage)
+				await ctx.guild.ban(member)
 			self.settings.incrementStat(member, ctx.message.guild, "StrikeLevel", 1)
 			self.settings.setUserStat(member, ctx.message.guild, "Strikes", [])
 			

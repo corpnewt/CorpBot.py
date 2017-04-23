@@ -2,10 +2,12 @@ import asyncio
 import discord
 import random
 import datetime
+import subprocess
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import downloader
 import youtube_dl
 import functools
 
@@ -74,15 +76,17 @@ class Example:
 		await ctx.channel.send('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
-	def __init__(self, message, player, ctx):
+	def __init__(self, message, player, title, duration, ctx):
 		self.requester = message.author
 		self.channel = message.channel
 		self.player = player
+		self.title = title
+		self.duration = duration
 		self.ctx = ctx
 
 	def __str__(self):
-		fmt = '*{}* requested by *{}*'.format(self.player.title, DisplayName.name(self.requester))
-		seconds = self.player.duration
+		fmt = '*{}* requested by *{}*'.format(self.title, DisplayName.name(self.requester))
+		seconds = self.duration
 		if seconds:
 			hours = seconds // 3600
 			minutes = (seconds % 3600) // 60
@@ -109,8 +113,8 @@ class VoiceState:
 		if self.voice is None or self.current is None:
 			return False
 
-		player = self.current.player
-		return not player.is_done()
+		player = self.voice
+		return not player.is_paused() and player.is_playing()
 
 	@property
 	def player(self):
@@ -118,21 +122,27 @@ class VoiceState:
 
 	def skip(self):
 		self.votes = []
-		if self.is_playing():
-			self.player.stop()
+		if self.voice.is_playing():
+			self.voice.stop()
 
-	def toggle_next(self):
+	def toggle_next(self, error):
+		if error:
+			print("Error and shit... Should probably handle this one day.")
 		self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
 	async def audio_player_task(self):
 		while True:
+
 			self.play_next_song.clear()
+
 			if len(self.playlist) <= 0:
 				await asyncio.sleep(1)
 				continue
 
+
 			self.start_time = datetime.datetime.now()
-			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"])
+			self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['song'], self.playlist[0]['duration'])
+
 
 			#Check if youtube-dl found the song
 			if self.current == False:
@@ -149,7 +159,6 @@ class VoiceState:
 			self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
 			await self.current.channel.send('Now playing *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"], round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
 
-			self.current.player.start()
 			await self.play_next_song.wait()
 			self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
 			if self.repeat:
@@ -157,11 +166,13 @@ class VoiceState:
 			del self.playlist[0]
 
 
-	async def create_youtube_entry(self, ctx, song: str):
+	async def create_youtube_entry(self, ctx, song: str, title: str, duration):
 
 		opts = {
+			'buffersize': '20000000',
+			'f': 'bestaudio',
 			'default_search': 'auto',
-			'quiet': True,
+			'quiet': True
 		}
 		volume = self.settings.getServerStat(ctx.message.guild, "Volume")
 		defVolume = self.settings.getServerStat(ctx.message.guild, "DefaultVolume")
@@ -175,15 +186,25 @@ class VoiceState:
 				volume = 0.6
 
 		try:
-			player = await self.voice.create_ytdl_player(song, ytdl_options=opts, after=self.toggle_next)
+			
+			# Create a rewrite player because why not...
+			# audioProc = subprocess.Popen( [ "youtube-dl", "-q", "-o", "-", song ], stdout=subprocess.PIPE )
+			# audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\"", shell=True, stdout=subprocess.PIPE )
+			# ffsource = discord.FFmpegPCMAudio(audioProc.stdout, pipe=True)
+			audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\" | ffmpeg -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
+			rawAudio = discord.PCMAudio(audioProc.stdout)
+			volumeSource = discord.PCMVolumeTransformer(rawAudio)
+			self.voice.play(volumeSource, after=self.toggle_next)
+
 		except Exception as e:
-			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-			await ctx.channel.send(fmt.format(type(e).__name__, e))
+			fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'.format(type(e).__name__, e)
+			await ctx.channel.send(fmt)
 			return False
 		else:
-			player.volume = volume
-			entry = VoiceEntry(ctx.message, player, ctx)
-			return entry;
+			#self.voice.volume = volume
+			self.voice.source.volume = volume
+			entry = VoiceEntry(ctx.message, self.voice, title, duration, ctx)
+			return entry
 
 class Music:
 	"""Voice related commands.
@@ -192,9 +213,9 @@ class Music:
 	"""
 	def __init__(self, bot, settings):
 		self.bot = bot
-		self.bot.wait_until_ready()
 		self.voice_states = {}
 		self.settings = settings
+		self.downloader = downloader.Downloader()
 
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
@@ -205,16 +226,7 @@ class Music:
 		return state
 
 	async def create_voice_client(self, channel):
-		# Have bot join a channel
-		# Get member on the passed channel's server
-		botMember = DisplayName.memberForID(self.bot.user.id, channel.guild)
-		# Move the bot to the channel
-		await botMember.edit(voice_channel=channel)
-		# Set our voice
-		voice = botMember.voice
-		return
-		print(self.bot.voice_clients)
-		# voice = await self.bot.join_voice_channel(channel)
+		voice = await channel.connect()
 		state = self.get_voice_state(channel.guild)
 		state.voice = voice
 
@@ -229,11 +241,16 @@ class Music:
 
 	async def _user_in_voice(self, ctx):
 		# Check if we're in a voice channel
-		voiceChannel = self.bot.voice_client_in(ctx.message.guild)
+		# voiceChannel = self.bot.voice_client_in(ctx.message.guild)
+		voiceChannel = None
+		for client in self.bot.voice_clients:
+			if client.guild == ctx.guild:
+				# Found it?
+				voiceChannel = client.channel
+
 		if not voiceChannel:
 			# We're not in a voice channel
 			return None
-		voiceChannel = voiceChannel.channel
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -284,16 +301,16 @@ class Music:
 		state = self.get_voice_state(ctx.message.guild)
 
 		if state.is_playing():
-			await ctx.channel.send('I\`m already playing on a channel, Join me there instead! :D')
+			await ctx.channel.send('I\`m already playing in a channel, Join me there instead! :D')
 			return
 
-		summoned_channel = ctx.message.author.voice_channel
+		summoned_channel = ctx.message.author.voice.channel
 		if summoned_channel is None:
 			await ctx.channel.send('You are not in a voice channel.')
 			return False
 
 		if state.voice is None:
-			state.voice = await self.bot.join_voice_channel(summoned_channel)
+			state.voice = await summoned_channel.connect() # self.bot.join_voice_channel(summoned_channel)
 		else:
 			await state.voice.move_to(summoned_channel)
 
@@ -331,14 +348,32 @@ class Music:
 		#await state.songs.put(entry)
 
 		opts = {
-			'format': 'webm[abr>0]/bestaudio/best',
+			'buffersize': '20000000',
+			'f': 'bestaudio',
 			'default_search': 'auto',
-			'quiet': True,
+			'quiet': True
 		}
 
-		ydl = youtube_dl.YoutubeDL(opts)
-		func = functools.partial(ydl.extract_info, song, download=False)
-		info = await self.bot.loop.run_in_executor(None, func)
+		song = song.strip('<>')
+
+		#info = await self.bot.loop.run_in_executor(None, func)
+		info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+
+		if info.get('url', '').startswith('ytsearch'):
+			info = await self.downloader.extract_info(
+				self.bot.loop,
+				song,
+				download=False,
+				process=True,    # ASYNC LAMBDAS WHEN
+				retry_on_error=True
+			)
+			if not info:
+				return
+			if not all(info.get('entries', [])):
+				# empty list, no data
+				return
+			song = info['entries'][0]['webpage_url']
+			info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
 		if "entries" in info:
 			info = info['entries'][0]
@@ -430,18 +465,18 @@ class Music:
 
 		state = self.get_voice_state(ctx.message.guild)
 		if state.is_playing():
-			player = state.player
+			player = state.voice
 			if value == None:
 				# No value - output current volume
-				await ctx.channel.send('Current volume is {:.0%}'.format(player.volume))
+				await ctx.channel.send('Current volume is {:.0%}'.format(player.source.volume))
 				return
 			if value < 0:
 				value = 0
 			if value > 100:
 				value = 100
-			player.volume = value / 100
-			self.settings.setServerStat(ctx.message.guild, "Volume", player.volume)
-			await ctx.channel.send('Set the volume to {:.0%}'.format(player.volume))
+			player.source.volume = value / 100
+			self.settings.setServerStat(ctx.message.guild, "Volume", player.source.volume)
+			await ctx.channel.send('Set the volume to {:.0%}'.format(player.source.volume))
 		else:
 			# Not playing anything
 			await ctx.channel.send('Not playing anything right now...')
@@ -461,8 +496,8 @@ class Music:
 			return
 
 		state = self.get_voice_state(ctx.message.guild)
-		if state.is_playing():
-			player = state.player
+		if state.voice.is_playing():
+			player = state.voice
 			player.pause()
 			state.total_playing_time += (datetime.datetime.now() - state.start_time)
 			state.is_paused = True
@@ -481,8 +516,8 @@ class Music:
 			return
 
 		state = self.get_voice_state(ctx.message.guild)
-		if state.is_playing():
-			player = state.player
+		if state.voice.is_paused():
+			player = state.voice
 			player.resume()
 			state.start_time = datetime.datetime.now()
 			state.is_paused = False
@@ -539,7 +574,7 @@ class Music:
 		self.settings.setServerStat(ctx.message.guild, "Volume", None)
 
 		if state.is_playing():
-			player = state.player
+			player = state.voice
 			player.stop()
 
 		try:
@@ -565,7 +600,7 @@ class Music:
 			return
 
 		state = self.get_voice_state(ctx.message.guild)
-		if not state.is_playing():
+		if not state.voice.is_playing():
 			await ctx.channel.send('Not playing anything right now...')
 			return
 
@@ -716,7 +751,7 @@ class Music:
 		"""Shows info about currently playing."""
 
 		state = self.get_voice_state(ctx.message.guild)
-		if not state.is_playing():
+		if not state.voice.is_playing():
 			await ctx.channel.send('Not playing anything.')
 		else:
 			diff_time = state.total_playing_time  + (datetime.datetime.now() - state.start_time)
@@ -729,9 +764,11 @@ class Music:
 			minutes = (seconds % 3600) // 60
 			seconds = seconds % 60
 
-			percent = diff_time.total_seconds() / state.current.player.duration * 100
+			#percent = diff_time.total_seconds() / state.current.player.duration * 100
+			dSeconds = state.playlist[0]["duration"]
+			percent = diff_time.total_seconds() / dSeconds * 100
 
-			await ctx.channel.send('Now playing - {} [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.current,round(hours), round(minutes), round(seconds), round(percent, 2)))
+			await ctx.channel.send('Now playing - *{}* [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.playlist[0]["song"],round(hours), round(minutes), round(seconds), round(percent, 2)))
 
 
 	@commands.command(pass_context=True, no_pm=True)

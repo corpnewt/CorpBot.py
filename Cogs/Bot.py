@@ -5,6 +5,9 @@ import psutil
 import platform
 import time
 import sys
+import fnmatch
+import subprocess
+import pyspeedtest
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -56,45 +59,97 @@ class Bot:
 		# Let's get the bot's member in the current server
 		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
 		botMember = ctx.message.guild.get_member_named(botName)
-		await self.bot.change_nickname(botMember, name)
+		await botMember.edit(nick=name)
 
 	@commands.command(pass_context=True)
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
+
+		message = await ctx.channel.send('Gathering info...')
+
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
-		cpuThred    = os.cpu_count()
-		cpuUsage    = psutil.cpu_percent(interval=1)
-		memStats    = psutil.virtual_memory()
-		memPerc     = memStats.percent
-		memUsed     = memStats.used
-		memTotal    = memStats.total
-		memUsedGB   = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
-		memTotalGB  = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
-		currentOS   = platform.platform()
-		system      = platform.system()
-		release     = platform.release()
-		version     = platform.version()
-		processor   = platform.processor()
-		botMember   = DisplayName.memberForID(self.bot.user.id, ctx.message.guild)
-		botName     = DisplayName.name(botMember)
-		currentTime = int(time.time())
-		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
-		pythonMajor = sys.version_info.major
-		pythonMinor = sys.version_info.minor
-		pythonMicro = sys.version_info.micro
+		cpuThred      = os.cpu_count()
+		cpuUsage      = psutil.cpu_percent(interval=1)
+		memStats      = psutil.virtual_memory()
+		memPerc       = memStats.percent
+		memUsed       = memStats.used
+		memTotal      = memStats.total
+		memUsedGB     = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
+		memTotalGB    = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
+		currentOS     = platform.platform()
+		system        = platform.system()
+		release       = platform.release()
+		version       = platform.version()
+		processor     = platform.processor()
+		botMember     = DisplayName.memberForID(self.bot.user.id, ctx.message.guild)
+		botName       = DisplayName.name(botMember)
+		currentTime   = int(time.time())
+		timeString    = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+		pythonMajor   = sys.version_info.major
+		pythonMinor   = sys.version_info.minor
+		pythonMicro   = sys.version_info.micro
 		pythonRelease = sys.version_info.releaselevel
+		process       = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], shell=False, stdout=subprocess.PIPE)
+		git_head_hash = process.communicate()[0].strip()
+
+		threadString = 'thread'
+		if not cpuThred == 1:
+			threadString += 's'
 
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
-		msg += '```{}\n'.format(currentOS)
-		msg += 'Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
-		msg += '{}% of {} ({} thread[s])\n'.format(cpuUsage, processor, cpuThred)
-		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n"
-		msg += '{} ({}%) of {}GB RAM used\n'.format(memUsedGB, memPerc, memTotalGB)
-		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n"
+		msg += '```\n'
+		msg += 'OS       : {}\n'.format(currentOS)
+		msg += 'Hostname : {}\n'.format(platform.node())
+		msg += 'Language : Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
+		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
+		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
+		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
+		#msg += '{}% of {} {}\n\n'.format(cpuUsage, cpuThred, threadString)
+		#msg += '{}% of {} ({} {})\n\n'.format(cpuUsage, processor, cpuThred, threadString)
+		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
+		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
+		#msg += '{} ({}%) of {}GB used\n\n'.format(memUsedGB, memPerc, memTotalGB)
 		msg += '{} uptime```'.format(timeString)
 
-		await ctx.channel.send(msg)
+		await message.edit(content=msg)
+
+
+	@commands.command(pass_context=True)
+	async def speedtest(self, ctx):
+		"""Run a network speed test (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner to change server stats
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await channel.send(msg)
+			return
+		else:
+			if not str(author.id) == str(owner):
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can run a speed test.'
+				await channel.send(msg)
+				return
+
+		message = await channel.send('Running speed test...')
+		st = pyspeedtest.SpeedTest()
+		msg = '**Speed Test Results:**\n'
+		msg += '```\n'
+		msg += '    Ping: {}\n'.format(round(st.ping(), 2))
+		msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
+		msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
+		await message.edit(content=msg)
 
 
 	@commands.command(pass_context=True)
@@ -220,7 +275,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def reboot(self, ctx):
+	async def reboot(self, ctx, force = None):
 		"""Shuts down the bot - allows for reboot if using the start script (owner only)."""
 
 		channel = ctx.message.channel
@@ -247,16 +302,29 @@ class Bot:
 				return
 		
 		self.settings.flushSettings()
-		msg = 'Flushed settings to disk.\nRebooting...'
-		await ctx.channel.send(msg)
+
+		quiet = False
+		if force and force.lower() == 'force':
+			quiet = True
+		if not quiet:
+			msg = 'Flushed settings to disk.\nRebooting...'
+			await ctx.channel.send(msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
-			task.cancel()
-		
-		await self.bot.logout()
-		self.bot.loop.stop()
-		self.bot.loop.close()
-		await exit(0)
+			try:
+				task.cancel()
+			except Exception:
+				continue
+		try:
+			await self.bot.logout()
+			self.bot.loop.stop()
+			self.bot.loop.close()
+		except Exception:
+			pass
+		try:
+			await exit(0)
+		except Exception:
+			pass
 			
 
 	@commands.command(pass_context=True)
@@ -362,3 +430,69 @@ class Bot:
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def cloc(self, ctx):
+		"""Outputs the total count of lines of code in the currently installed repo."""
+		# Script pulled and edited from https://github.com/kyco/python-count-lines-of-code/blob/python3/cloc.py
+		
+		# Get our current working directory - should be the bot's home
+		path = os.getcwd()
+		
+		# Set up some lists
+		extensions = []
+		code_count = []
+		include = ['py','bat','sh']
+		
+		# Get the extensions - include our include list
+		extensions = self.get_extensions(path, include)
+		
+		for run in extensions:
+			extension = "*."+run
+			temp = 0
+			for root, dir, files in os.walk(path):
+				for items in fnmatch.filter(files, extension):
+					value = root + "/" + items
+					temp += sum(+1 for line in open(value, 'rb'))
+			code_count.append(temp)
+			pass
+		
+		# Set up our output
+		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n```\n'
+		padTo = 0
+		for idx, val in enumerate(code_count):
+			# Find out which has the longest
+			tempLen = len(str('{:,}'.format(code_count[idx])))
+			if tempLen > padTo:
+				padTo = tempLen
+		for idx, val in enumerate(code_count):
+			lineWord = 'lines'
+			if code_count[idx] == 1:
+				lineWord = 'line'
+			# Setup a right-justified string padded with spaces
+			numString = str('{:,}'.format(code_count[idx])).rjust(padTo, ' ')
+			msg += numString + " " + lineWord + " of " + extensions[idx] + "\n"
+			# msg += extensions[idx] + ": " + str(code_count[idx]) + ' ' + lineWord + '\n'
+			# print(extensions[idx] + ": " + str(code_count[idx]))
+			pass
+		msg += '```'
+		await ctx.channel.send(msg)
+		
+	@cloc.error
+	async def cloc_error(self, ctx, error):
+		# do stuff
+		msg = 'cloc Error: {}'.format(ctx)
+		await error.channel.send(msg)
+
+	# Helper function to get extensions
+	def get_extensions(self, path, excl):
+		extensions = []
+		for root, dir, files in os.walk(path):
+			for items in fnmatch.filter(files, "*"):
+				temp_extensions = items.rfind(".")
+				ext = items[temp_extensions+1:]
+				if ext not in extensions:
+					if ext in excl:
+						extensions.append(ext)
+						pass
+		return extensions

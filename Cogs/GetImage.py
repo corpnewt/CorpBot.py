@@ -51,24 +51,39 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 		for chunk in rImage.iter_content(chunk_size=1024):
 			if chunk:
 				f.write(chunk)
+
+	# Check if the file exists
+	if not os.path.exists(imagePath):
+		remove(dirpath)
+		return None
 	
 	# Let's make sure it's less than the passed limit
 	imageSize = os.stat(imagePath)
 	
 	while int(imageSize.st_size) > sizeLimit:
-		# Image is too big - resize
-		myimage = Image.open(imagePath)
-		xsize, ysize = myimage.size
-		ratio = sizeLimit/int(imageSize.st_size)
-		xsize *= ratio
-		ysize *= ratio
-		myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
-		myimage.save(imagePath)
-		imageSize = os.stat(imagePath)
-		
-	img = Image.open(imagePath)
-	ext = img.format
-	img.close()
+		try:
+			# Image is too big - resize
+			myimage = Image.open(imagePath)
+			xsize, ysize = myimage.size
+			ratio = sizeLimit/int(imageSize.st_size)
+			xsize *= ratio
+			ysize *= ratio
+			myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
+			myimage.save(imagePath)
+			imageSize = os.stat(imagePath)
+		except Exception:
+			# Image too big and can't be opened
+			remove(dirpath)
+			return None
+	try:
+		# Try to get the extension
+		img = Image.open(imagePath)
+		ext = img.format
+		img.close()
+	except Exception:
+		# Not something we understand - error out
+		remove(dirpath)
+		return None
 	
 	if ext:
 		os.rename(imagePath, '{}.{}'.format(imagePath, ext))
@@ -78,7 +93,7 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	
 async def upload(path, bot, channel):
 	with open (path, 'rb') as f:
-		await channel.send(file=path)
+		await channel.send(file=discord.File(f))
 
 def addExt(path):
 	img = Image.open(path)
@@ -93,12 +108,12 @@ def remove(path):
 async def get(url, bot, channel, title : str = 'Unknown', ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download passed image, and upload it to passed channel."""
 	message = await channel.send('Downloading...')
-	file = download(url)
-	if not file:
+	afile = download(url)
+	if not afile:
 		await message.edit(content='Oh *shoot* - I couldn\'t get that image...')
 		return
 
 	await message.edit(content='Uploading...')
-	await channel.send(file=file)
+	await upload(afile, bot, channel)
 	await message.edit(content=title)
-	remove(file)
+	remove(afile)

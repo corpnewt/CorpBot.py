@@ -14,9 +14,10 @@ from   Cogs import Nullify
 class BotAdmin:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, muter):
 		self.bot = bot
 		self.settings = settings
+		self.muter = muter
 
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
@@ -96,6 +97,11 @@ class BotAdmin:
 			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
+		if member == None:
+			msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
+
 		if cooldown == None:
 			# Either a cooldown wasn't set - or it's the last section
 			if type(member) is str:
@@ -144,22 +150,31 @@ class BotAdmin:
 					cooldown = endTime
 				member   = memFromName
 
-			
-		if member == None:
-			msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
+		# Check if we're muting ourself
+		if member is ctx.message.author:
+			msg = 'It would be easier for me if you just *stayed quiet all by yourself...*'
+			await ctx.channel.send(msg)
+			return
+		
+		# Check if we're muting the bot
+		if member.id == self.bot.user.id:
+			msg = 'How about we don\'t, and *pretend* we did...'
 			await ctx.channel.send(msg)
 			return
 
-		if type(member) is str:
-			try:
-				member = discord.utils.get(message.guild.members, name=member)
-			except:
-				msg = 'Couldn\'t find user *{}*.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
-				return
+		# Check if member is admin or bot admin
+		isAdmin = member.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in member.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if isAdmin:
+			await ctx.channel.send('You can\'t mute other admins or bot-admins.')
+			return
 
 		# Set cooldown - or clear it
 		if type(cooldown) is int or type(cooldown) is float:
@@ -172,7 +187,8 @@ class BotAdmin:
 		else:
 			cooldownFinal = None
 
-		pm = 'You have been **Muted** by *{}*.'.format(DisplayName.name(ctx.message.author))
+		# Do the actual muting
+		await self.muter.mute(member, ctx.message.guild, cooldownFinal)
 
 		if cooldown:
 			mins = "minutes"
@@ -182,8 +198,6 @@ class BotAdmin:
 		else:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
 			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), ctx.message.guild.name)
-		self.settings.setUserStat(member, ctx.message.guild, "Muted", "Yes")
-		self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
 
 		await ctx.channel.send(msg)
 		await member.send(pm)
@@ -234,14 +248,17 @@ class BotAdmin:
 				await ctx.channel.send(msg)
 				return
 
+		await self.muter.unmute(member, ctx.message.guild)
+
 		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), ctx.message.guild.name)
 		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
-		self.settings.setUserStat(member, ctx.message.guild, "Muted", "No")
-		self.settings.setUserStat(member, ctx.message.guild, "Cooldown", None)
 
 		await ctx.channel.send(msg)
-		await member.send(pm)
-		
+		try:
+			await member.send(pm)
+		except Exception:
+			pass
+
 	@unmute.error
 	async def unmute_error(self, error, ctx):
 		# do stuff
@@ -439,6 +456,11 @@ class BotAdmin:
 		if member.id == ctx.message.author.id:
 			await ctx.channel.send('Stop kicking yourself.  Stop kicking yourself.')
 			return
+
+		# Check if we're kicking the bot
+		if member.id == self.bot.user.id:
+			await ctx.channel.send('Oh - you probably meant to kick *yourself* instead, right?')
+			return
 		
 		# Check if the targeted user is admin
 		isTAdmin = member.permissions_in(ctx.message.channel).administrator
@@ -501,6 +523,11 @@ class BotAdmin:
 		
 		if member.id == ctx.message.author.id:
 			await ctx.channel.send('Ahh - the ol\' self-ban.  Good try.')
+			return
+
+		# Check if we're banning the bot
+		if member.id == self.bot.user.id:
+			await ctx.channel.send('Oh - you probably meant to ban *yourself* instead, right?')
 			return
 		
 		# Check if the targeted user is admin

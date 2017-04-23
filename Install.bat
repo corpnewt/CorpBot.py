@@ -46,9 +46,14 @@ REM echo.
 REM call :install "chatterbot"
 REM echo.
 
-echo Installing Discord...
+REM echo Installing Discord...
+REM echo.
+REM call :install "discord.py[voice]"
+REM echo.
+
+echo Installing Discord [Development Version]...
 echo.
-call :install "discord.py[voice]"
+call :install "https://github.com/Rapptz/discord.py/archive/rewrite.zip#egg=discord.py[voice]"
 echo.
 
 echo Installing Pillow...
@@ -86,9 +91,14 @@ echo.
 call :install "pyquery"
 echo.
 
-echo Installing PyAIML3...
+echo Installing PyAIML...
 echo.
-call :install "git+https://github.com/weddige/pyaiml3"
+call :install "git+https://github.com/paulovn/python-aiml"
+echo.
+
+echo Installing PySpeedTest...
+echo.
+call :install "pyspeedtest"
 echo.
 
 

@@ -34,6 +34,9 @@ class Welcome:
 
     async def onleave(self, member, server):
         # Goodbye
+        if not server in self.bot.guilds:
+            # We're not on this server - and can't say anything there
+            return
         welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
         if welcomeChannel:
             for channel in server.channels:

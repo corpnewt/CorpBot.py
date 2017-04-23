@@ -181,12 +181,6 @@ class Feed:
 			approve = True
 			decrement = False
 			
-		if isKill.lower() == "yes":
-			# Bot's dead...
-			msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
-			await channel.send(msg)
-			return
-			
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
 			# Apply food - then check health
@@ -196,6 +190,12 @@ class Feed:
 			takeReserve = -1*food
 			if decrement:
 				self.settings.incrementStat(author, server, "XPReserve", takeReserve)
+
+			if isKill.lower() == "yes":
+				# Bot's dead...
+				msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
+				await channel.send(msg)
+				return
 			
 			# Bet more, less chance of winning, but more winnings!
 			chanceToWin = 50
@@ -264,7 +264,7 @@ class Feed:
 		iskill = self.settings.getServerStat(server, "Killed")
 		if iskill.lower() == 'yes':
 			killedby = self.settings.getServerStat(server, "KilledBy")
-			killedby = DisplayName.memberForName(killedby, server)
+			killedby = DisplayName.memberForID(killedby, server)
 			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 			return
 		
@@ -306,7 +306,7 @@ class Feed:
 		self.settings.setServerStat(server, "Killed", "No")
 		self.settings.setServerStat(server, "Hunger", "0")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
-		killedBy = DisplayName.memberForName(killedBy, server)
+		killedBy = DisplayName.memberForID(killedBy, server)
 		await channel.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
 		
 	@commands.command(pass_context=True)
@@ -319,7 +319,7 @@ class Feed:
 		
 		isKill = self.settings.getServerStat(server, "Killed")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
-		killedBy = DisplayName.memberForName(killedBy, server)
+		killedBy = DisplayName.memberForID(killedBy, server)
 		msg = 'I have no idea what you\'re talking about... Should I be worried?'
 		if isKill.lower() == "yes":
 			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(DisplayName.name(killedBy))

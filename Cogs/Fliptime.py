@@ -5,15 +5,21 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
 from   Cogs import DisplayName
+from   Cogs import Mute
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
 class Fliptime:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, mute):
 		self.bot = bot
 		self.settings = settings
+		self.mute = mute
+
+	async def message_edit(self, before_message, message):
+		# Pipe the edit into our message func to respond if needed
+		return await self.message(message)
 
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -63,8 +69,9 @@ class Fliptime:
 					# Not cooling down - start it
 					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
-				self.settings.setUserStat(message.author, message.guild, "Cooldown", cooldownFinal)
-				self.settings.setUserStat(message.author, message.guild, "Muted", "Yes")
+				# Do the actual muting
+				await self.mute.mute(message.author, message.guild, cooldownFinal)
+
 				await message.channel.send(res)
 				return { 'Ignore' : True, 'Delete' : True }		
 

@@ -143,7 +143,11 @@ class Search:
 		convert_url = "https://www.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
 		r = requests.get(convert_url)
 		doc = pq(r.text)
-		await ctx.channel.send("{} {} is {}".format(amount,str(frm).upper(),str(doc('#currency_converter_result span').text())))
+		result = str(doc('#currency_converter_result span').text())
+		if result:
+			await ctx.channel.send("{} {} is {}".format(amount,str(frm).upper(),result))
+		else:
+			await ctx.channel.send("Whoops!  I couldn't make that conversion.")
 
 	async def find_category(self, categories, category_to_search):
 		"""recurse through the categories and sub categories to find the correct category"""

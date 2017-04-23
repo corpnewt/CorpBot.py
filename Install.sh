@@ -28,9 +28,14 @@ function main () {
     #update "chatterbot"
     #echo
     
-    echo Updating Discord...
+    #echo Updating Discord...
+    #echo
+    #update "discord.py[voice]"
+    #echo
+
+    echo Updating Discord [Development Version]...
     echo
-    update "discord.py[voice]"
+    update "https://github.com/Rapptz/discord.py/archive/rewrite.zip#egg=discord.py[voice]"
     echo
 
     echo Updating Pillow...
@@ -68,9 +73,14 @@ function main () {
     update "pyquery"
     echo
 
-    echo Updating PyAIML3
+    echo Updating PyAIML
     echo
-    update "git+https://github.com/weddige/pyaiml3"
+    update "git+https://github.com/paulovn/python-aiml"
+    echo
+
+    echo Updating PySpeedTest
+    echo
+    update "pyspeedtest"
     echo
 
     #echo Updating Flask...

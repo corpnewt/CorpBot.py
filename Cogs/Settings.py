@@ -16,7 +16,7 @@ from   Cogs        import DisplayName
 class Settings:
 	"""The Doorway To The Server Settings"""
 	# Let's initialize with a file location
-	def __init__(self, bot, file : str = None):
+	def __init__(self, bot, prefix = "$", file : str = None):
 		if file == None:
 			# We weren't given a file, default to ./Settings.json
 			file = "Settings.json"
@@ -29,6 +29,7 @@ class Settings:
 		self.settingsDump = 300 # runs every 5 minutes
 		self.bot = bot
 		self.serverDict = {}
+		self.prefix = prefix
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
@@ -82,6 +83,9 @@ class Settings:
 				"Links" 				: [],		# List of links
 				"Members" 				: [],		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
+				"LogChannel"			: "",		# ID or blank for no logging
+				"LogVars"			: [],		# List of options to log
+				"MuteList"			: [],		# List of muted members
 				"ChannelMOTD" 			: []}		# List of channel messages of the day
 
 		# Let's load our settings file
@@ -191,7 +195,7 @@ class Settings:
 			self.serverDict["Servers"] = []
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server
 				found = True
 				# Verify all the default keys have values
@@ -229,7 +233,7 @@ class Settings:
 		# Check for our server name
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
@@ -240,7 +244,7 @@ class Settings:
 		# Check for our server ID
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == id:
+			if str(x["ID"]) == str(id):
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
@@ -252,7 +256,7 @@ class Settings:
 		motdArray = self.settings.getServerStat(channel.guild, "ChannelMOTD")
 		for a in motdArray:
 			# Get the channel that corresponds to the id
-			if a['ID'] == channel.id:
+			if str(a['ID']) == str(channel.id):
 				# We found it - throw an error message and return
 				motdArray.remove(a)
 				self.setServerStat(server, "ChannelMOTD", motdArray)
@@ -261,7 +265,7 @@ class Settings:
 	def removeChannelID(self, id, server):
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				for y in x["ChannelMOTD"]:
 					if y["ID"] == id:
 						found = True
@@ -275,10 +279,10 @@ class Settings:
 		# Check for our username
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == user.id:
+					if str(y["ID"]) == str(user.id):
 						found = True
 						needsUpdate = False
 						if not "XP" in y:
@@ -332,15 +336,12 @@ class Settings:
 						if not "UTCOffset" in y:
 							y["UTCOffset"] = None
 							needsUpdate = True
+						if not "LastCommand" in y:
+							y["LastCommand"] = 0
 						if not "VerificationTime" in y:
 							currentTime = int(time.time())
 							waitTime = int(self.getServerStat(server, "VerificationTime"))
 							y["VerificationTime"] = currentTime + (waitTime * 60)
-						# Check for empty values that need numbers
-						if not y["XP"]:
-							y["XP"] = 0
-						if not y["XPReserve"]:
-							y["XPReserve"] = 0
 				if not found:
 					needsUpdate = True
 					# We didn't locate our user - add them
@@ -370,10 +371,10 @@ class Settings:
 		# Check for our username
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == user.id:
+					if str(y["ID"]) == str(user.id):
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
@@ -388,10 +389,10 @@ class Settings:
 		# Check for our username
 		found = False
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == id:
+					if str(y["ID"]) == str(id):
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
@@ -405,10 +406,10 @@ class Settings:
 		self.checkUser(user, server)
 		# Check for our username
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == user.id:
+					if str(y["ID"]) == str(user.id):
 						# Found our user - now check for the stat
 						if stat in y:
 							# Stat exists - return it
@@ -426,10 +427,10 @@ class Settings:
 		self.checkUser(user, server)
 		# Check for our username
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == user.id:
+					if str(y["ID"]) == str(user.id):
 						# Found our user - let's set the stat
 						y[stat] = value
 						#self.flushSettings()
@@ -442,10 +443,10 @@ class Settings:
 		self.checkUser(user, server)
 		# Check for our username
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server, now to iterate users
 				for y in x["Members"]:
-					if y["ID"] == user.id:
+					if str(y["ID"]) == str(user.id):
 						# Found our user - check for stat
 						if stat in y:
 							# Found
@@ -469,7 +470,7 @@ class Settings:
 		self.checkServer(server)
 		# Check for our server
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# Found the server, check for the stat
 				if stat in x:
 					return x[stat]
@@ -485,10 +486,36 @@ class Settings:
 		self.checkServer(server)
 		# Check for our server
 		for x in self.serverDict["Servers"]:
-			if x["ID"] == server.id:
+			if str(x["ID"]) == str(server.id):
 				# We found our server - set the stat
 				x[stat] = value
 				#self.flushSettings()
+
+	@commands.command(pass_context=True)
+	async def dumpsettings(self, ctx):
+		"""Sends the Settings.json file to the owner."""
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		try:
+			owner = self.serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No previous owner, let's set them
+			msg = 'I can\'t do that until I have an owner.'
+			await channel.send(msg)
+			return
+		if not str(author.id) == str(owner):
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can dump the settings.'
+			await channel.send(msg)
+			return
+		
+		message = await ctx.message.author.send('Uploading *Settings.json*...')
+		await ctx.message.author.send(file=discord.File('Settings.json'))
+		await message.edit(content='Uploaded *Settings.json!*')
 
 	@commands.command(pass_context=True)
 	async def ownerlock(self, ctx):
@@ -508,7 +535,7 @@ class Settings:
 			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
 				await channel.send(msg)
 				return
@@ -548,7 +575,7 @@ class Settings:
 			member = DisplayName.memberForID(owner, server)
 			if not member:
 				# Not on this server
-				msg = 'My owner, *<@!{}>* (id: *{}*), does not appear to be a part of this server.'.format(owner, owner)
+				msg = 'My owner, *<@{}>* (id: *{}*), does not appear to be a part of this server.'.format(owner, owner)
 			else:
 				# Gotem!
 				msg = 'I am owned by *{}*.'.format(DisplayName.name(member))
@@ -576,7 +603,7 @@ class Settings:
 			self.serverDict['Owner'] = member.id
 			#self.flushSettings()
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
 				await channel.send(msg)
 				return
@@ -614,7 +641,7 @@ class Settings:
 			self.serverDict['Owner'] = member.id
 			#self.flushSettings()
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
 				await channel.send(msg)
 				return
@@ -648,7 +675,7 @@ class Settings:
 			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can disown me.'
 				await channel.send(msg)
 				return
@@ -804,7 +831,7 @@ class Settings:
 			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
 				await channel.send(msg)
 				return
@@ -813,7 +840,7 @@ class Settings:
 		settingsWord = "settings"
 
 		for serv in self.serverDict["Servers"]:
-			if serv["ID"] == server.id:
+			if str(serv["ID"]) == str(server.id):
 				# Found it - let's check settings
 				removeKeys = []
 				for key in serv:
@@ -854,7 +881,7 @@ class Settings:
 			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
 				await channel.send(msg)
 				return
@@ -903,7 +930,7 @@ class Settings:
 			await channel.send(msg)
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
 				await channel.send(msg)
 				return
@@ -923,7 +950,7 @@ class Settings:
 			foundServer = False
 			for serve in self.bot.guilds:
 				# Check ID in case of name change
-				if botServer["ID"] == serve.id:
+				if str(botServer["ID"]) == str(serve.id):
 					foundServer = True
 					# Create some blank sets (actually arrays) to hold orphaned users/channels
 					userSet    = []
@@ -932,7 +959,7 @@ class Settings:
 					for botMember in botServer["Members"]:
 						foundMember = False
 						for member in serve.members:
-							if botMember["ID"] == member.id:
+							if str(botMember["ID"]) == str(member.id):
 								foundMember = True
 							
 						if not foundMember:
@@ -950,7 +977,7 @@ class Settings:
 					for botChannel in botServer["ChannelMOTD"]:
 						foundChannel = False
 						for chan in serve.channels:
-							if botChannel['ID'] == chan.id:
+							if str(botChannel['ID']) == str(chan.id):
 								foundChannel = True
 						
 						if not foundChannel:

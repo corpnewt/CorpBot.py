@@ -144,9 +144,9 @@ class MadLibs:
 			# We got a relevant message
 			word = talk.content
 			# Let's remove the $ml prefix (with or without space)
-			if word.startswith('{}{} '.format(ctx.prefix, self.prefix)):
+			if word.startswith('{}{} '.format(ctx.prefix.lower(), self.prefix.lower())):
 				word = word[len(ctx.prefix)+len(self.prefix)+1:]
-			if word.startswith('{}{}'.format(ctx.prefix, self.prefix)):
+			if word.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
 				word = word[len(ctx.prefix)+len(self.prefix):]
 			
 			# Check capitalization

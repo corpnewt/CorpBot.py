@@ -1,7 +1,9 @@
 import asyncio
 import discord
 import time
+import os
 from   discord.ext import commands
+from   datetime import datetime
 from   operator import itemgetter
 from   Cogs import Settings
 from   Cogs import ReadableTime
@@ -17,7 +19,45 @@ class Channel:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+
+
+	async def member_update(self, before, after):
+		server = after.guild
+
+		# Check if the member went offline and log the time
+		if str(after.status).lower() == "offline":
+			currentTime = int(time.time())
+			self.settings.setUserStat(after, server, "LastOnline", currentTime)
+
+		self.settings.checkServer(server)
+		try:
+			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
+		except KeyError:
+			channelMOTDList = []
+
+		if len(channelMOTDList) > 0:
+			members = 0
+			membersOnline = 0
+			for member in server.members:
+				members += 1
+				if str(member.status).lower() == "online":
+					membersOnline += 1
+
+		for id in channelMOTDList:
+			channel = self.bot.get_channel(id['ID'])
+			if channel:
+				motd = id['MOTD'] # A markdown message of the day
+				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
+				if listOnline.lower() == "yes":
+					msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+				else:
+					msg = motd
+				try:
+					await channel.edit(topic=msg)
+				except Exception:
+					continue
 		
+
 	@commands.command(pass_context=True)
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
@@ -36,6 +76,38 @@ class Channel:
 		"""Display the server's rules."""
 		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
 		msg = "*{}* Rules:\n{}".format(ctx.message.guild.name, rules)
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def listmuted(self, ctx):
+		"""Lists the names of those that are muted."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		muteList = self.settings.getServerStat(ctx.guild, "MuteList")
+		activeMutes = []
+		for entry in muteList:
+			member = DisplayName.memberForID(entry['ID'], ctx.guild)
+			if member:
+				# Found one!
+				activeMutes.append(DisplayName.name(member))
+
+		if not len(activeMutes):
+			await ctx.channel.send("No one is currently muted.")
+			return
+
+		# We have at least one member muted
+		msg = 'Currently muted:\n\n'
+		msg += ', '.join(activeMutes)
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
 		
 		
@@ -65,32 +137,38 @@ class Channel:
 				await ctx.channel.send(msg)
 				return
 				
-		isMute = self.settings.getUserStat(member, ctx.message.guild, "Muted")
-
-		checkTime = self.settings.getUserStat(member, ctx.message.guild, "Cooldown")
-		if checkTime:
-			checkTime = int(checkTime)
-		currentTime = int(time.time())
-		checkRead = None
-
-		# Check if they've outlasted their time
-		if checkTime and (currentTime >= checkTime):
-			# We have passed the check time
-			ignore = False
-			delete = False
-			self.settings.setUserStat(member, ctx.message.guild, "Cooldown", None)
-			self.settings.setUserStat(member, ctx.message.guild, "Muted", "No")
-			isMute = self.settings.getUserStat(member, ctx.message.guild, "Muted")
-		elif checkTime:
-			checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-
-		if isMute.lower() == "yes":
-			if checkRead:
-				msg = '*{}* is *Muted* - *{}* remain.'.format(DisplayName.name(member), checkRead)	
+		mutedIn = 0
+		channelList = []
+		for channel in ctx.guild.channels:
+			if not type(channel) is discord.ChannelType.text:
+				continue
+			overs = channel.overwrites_for(member)
+			if overs.send_messages == False:
+				# We haven't been muted here yet
+				overs.send_messages = False
+				perms = member.permissions_in(channel)
+				if perms.read_messages:
+					mutedIn +=1
+					channelList.append(channel.name)
+				
+		if len(channelList):
+			# Get time remaining if needed
+			#cd = self.settings.getUserStat(member, ctx.message.server, "Cooldown")
+			muteList = self.settings.getServerStat(ctx.guild, "MuteList")
+			cd = None
+			for entry in muteList:
+				if str(entry['ID']) == str(member.id):
+					# Found them!
+					cd = entry['Cooldown']
+					
+			if not cd == None:
+				ct = int(time.time())
+				checkRead = ReadableTime.getReadableTimeBetween(ct, cd)
+				msg = '*{}* is **muted** in *{}*\n*{}* remain'.format(DisplayName.name(member), ', '.join(channelList), checkRead)
 			else:
-				msg = '*{}* is *Muted*.'.format(DisplayName.name(member))	
+				msg = '*{}* is **muted** in *{}*.'.format(DisplayName.name(member), ', '.join(channelList))	
 		else:
-			msg = '{} is *Unmuted*.'.format(DisplayName.name(member))
+			msg = '{} is **unmuted**.'.format(DisplayName.name(member))
 			
 		await ctx.channel.send(msg)
 		
@@ -127,7 +205,7 @@ class Channel:
 		for arole in promoSorted:
 			found = False
 			for role in ctx.message.guild.roles:
-				if role.id == arole["ID"]:
+				if str(role.id) == str(arole["ID"]):
 					# Found the role ID
 					found = True
 					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
@@ -182,11 +260,14 @@ class Channel:
 
 		# We have a role
 		memberCount = 0
+		memberOnline = 0
 		for member in server.members:
 			roles = member.roles
 			if role in roles:
 				# We found it
 				memberCount += 1
+				if str(member.status).lower() == 'online':
+					memberOnline += 1
 
 		'''if memberCount == 1:
 			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
@@ -195,7 +276,7 @@ class Channel:
 			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
 			role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)'''
 		
-		role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)
+		role_embed.add_field(name="Members", value='{} of {} online.'.format(memberOnline, memberCount), inline=True)
 			
 		# await channel.send(msg)
 		await channel.send(embed=role_embed)
@@ -207,9 +288,10 @@ class Channel:
 		msg = 'rolecall Error: {}'.format(ctx)
 		await error.channel.send(msg)
 
+
 	@commands.command(pass_context=True)
-	async def clean(self, ctx, messages : int = 100, *, chan : discord.TextChannel = None):
-		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
+	async def log(self, ctx, messages : int = 25, *, chan : discord.TextChannel = None):
+		"""Logs the passed number of messages from the given channel - 25 by default (admin only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
@@ -222,17 +304,43 @@ class Channel:
 			for role in author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
+					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
 
 		if not isAdmin:
 			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		logFile = 'Logs-{}.txt'.format(timeStamp)
+
 		if not chan:
 			chan = channel
 
 		# Remove original message
 		await ctx.message.delete()
-		# Remove the rest
-		await chan.purge(limit=messages)
+
+		mess = await ctx.message.author.send('Saving logs to *{}*...'.format(logFile))
+
+		# Use logs_from instead of purge
+		counter = 0
+		msg = ''
+		async for message in channel.history(limit=messages):
+			counter += 1
+			msg += message.content + "\n"
+			msg += '----Sent-By: ' + message.author.name + '#' + message.author.discriminator + "\n"
+			msg += '---------At: ' + message.created_at.strftime("%Y-%m-%d %H.%M") + "\n"
+			if message.edited_at:
+				msg += '--Edited-At: ' + message.edited_at.strftime("%Y-%m-%d %H.%M") + "\n"
+			msg += '\n'
+
+		msg = msg[:-2].encode("utf-8")
+
+		with open(logFile, "wb") as myfile:
+			myfile.write(msg)
+
+		
+		await mess.edit(content='Uploading *{}*...'.format(logFile))
+		await ctx.message.author.send(file=logFile)
+		await mess.edit(content='Uploaded *{}!*'.format(logFile))
+		os.remove(logFile)

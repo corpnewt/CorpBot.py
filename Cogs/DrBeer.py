@@ -23,7 +23,7 @@ class DrBeer:
 			for role in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
+					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins
 		if not isAdmin:
