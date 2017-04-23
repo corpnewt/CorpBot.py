@@ -299,6 +299,8 @@ async def on_ready():
 
 @bot.event
 async def on_voice_state_update(user, beforeState, afterState):
+	if not user.guild:
+		return
 	# Get our member on the same server as the user
 	botMember = DisplayName.memberForID(bot.user.id, user.guild)
 	botVoice = botMember.voice
