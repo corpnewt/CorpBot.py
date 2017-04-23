@@ -172,7 +172,7 @@ class Debugging:
 		logChanID = self.settings.getServerStat(server, "LogChannel")
 		if not logChanID:
 			return
-		logChan = self.bot.get_channel(logChanID)
+		logChan = self.bot.get_channel(int(logChanID))
 		if not logChan:
 			return
 		# At this point - we log the message
