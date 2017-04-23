@@ -143,7 +143,7 @@ class Settings:
 					foundRole = True
 			if not foundRole:
 				try:
-					await self.bot.add_roles(member, defRole)
+					await member.add_roles(defRole)
 					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
 					await member.send(fmt)
 				except Exception:
