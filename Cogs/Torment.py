@@ -353,7 +353,7 @@ class Torment:
 			# Do this over time
 			for channel in server.channels:
 				# Get user's permissions
-				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
+				if channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
 						await channel.send('*{}*'.format(member.mention))
@@ -446,7 +446,7 @@ class Torment:
 			# Do this over time
 			for channel in server.channels:
 				# Get user's permissions
-				if channel.permissions_for(member).read_messages and channel.type is discord.ChannelType.text:
+				if channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
 						tmessage = await channel.send('*{}*'.format(member.mention))
