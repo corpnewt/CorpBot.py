@@ -1,5 +1,8 @@
 # Token file
-token.txt
+token*.txt
+
+# Brain file
+*.brn
 
 # Auth file
 corpSiteAuth.txt

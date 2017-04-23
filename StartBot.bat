@@ -9,7 +9,7 @@ echo.
 set "botFile=Main.py"
 set "pyPath=python"
 set "autoRestart=Yes"
-set "update=No"
+set "update=Yes"
 
 set "thisDir=%~dp0"
 
@@ -19,7 +19,7 @@ goto start
 pushd "%thisDir%"
 echo Updating...
 echo.
-git pull
+git pull origin rewrite
 echo.
 popd
 goto :EOF

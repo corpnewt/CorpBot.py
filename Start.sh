@@ -35,7 +35,7 @@ function runBot () {
 function update () {
     echo "Updating..."
     echo
-    git pull
+    git pull origin rewrite
 }
 
 # Define a timestamp function

@@ -345,7 +345,7 @@ async def on_member_remove(member):
 			continue
 
 @bot.event
-async def on_server_join(server):
+async def on_guild_join(server):
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
@@ -355,7 +355,7 @@ async def on_server_join(server):
 	await owner.send(msg)
 
 @bot.event
-async def on_server_remove(server):
+async def on_guild_remove(server):
 	settings.removeServer(server)
 
 @bot.event

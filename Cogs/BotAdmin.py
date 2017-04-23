@@ -233,7 +233,7 @@ class BotAdmin:
 			return
 			
 		if member == None:
-			msg = 'Usage: `{}mute [member]`'.format(ctx.prefix)
+			msg = 'Usage: `{}unmute [member]`'.format(ctx.prefix)
 			await ctx.channel.send(msg)
 			return
 
