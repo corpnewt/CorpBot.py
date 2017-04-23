@@ -270,7 +270,7 @@ class Music:
 		
 		# Here, user is not admin - make sure they're in the voice channel
 		# Check if the user in question is in a voice channel
-		if ctx.message.author in voiceChannel.voice_members:
+		if ctx.message.author in voiceChannel.members:
 			return True
 		# If we're here - we're not admin, and not in the same channel, deny
 		return False
