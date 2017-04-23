@@ -36,7 +36,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 		
 		if delay == None:
@@ -83,7 +83,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 			
 		if not self.toTorment:
@@ -115,7 +115,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
@@ -204,7 +204,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
@@ -294,7 +294,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
@@ -387,7 +387,7 @@ class Torment:
 			# No owner set
 			return
 		else:
-			if not author.id == owner:
+			if not str(author.id) == str(owner):
 				return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
