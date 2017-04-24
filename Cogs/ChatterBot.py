@@ -103,7 +103,7 @@ class ChatterBot:
 		if chatChannel and not message.author == self.bot.user and not msg.startswith(self.prefix):
 			# We have a channel
 			# Now we check if we're hungry/dead and respond accordingly
-			check = self.killcheck(message)
+			check = await self.killcheck(message)
 			if check['Ignore']:
 				# We're too hungry - or dead
 				return check
