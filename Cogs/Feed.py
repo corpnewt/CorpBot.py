@@ -45,7 +45,7 @@ class Feed:
 			for role in message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
+					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		if isAdmin:
 			ignore = False
@@ -169,7 +169,7 @@ class Feed:
 		if requiredXP:
 			foundRole = False
 			for checkRole in author.roles:
-				if checkRole.id == requiredXP:
+				if str(checkRole.id) == str(requiredXP):
 					foundRole = True
 			if not foundRole:
 				approve = False
@@ -255,7 +255,7 @@ class Feed:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
@@ -292,7 +292,7 @@ class Feed:
 			#role requirement
 			hasPerms = False
 			for role in author.roles:
-				if role.id == requiredRole:
+				if str(role.id) == str(requiredRole):
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
@@ -395,7 +395,7 @@ class Feed:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.message.guild.roles:
-				if arole.id == role:
+				if str(arole.id) == str(role):
 					found = True
 					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
 			if not found:
