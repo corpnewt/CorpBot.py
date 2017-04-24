@@ -48,7 +48,7 @@ class ChatterBot:
 		self.chatBot.respond('I am a {}'.format(self.ownerGender))
 
 	def canChat(self, server):
-		# Check if we can display images
+		# Check if we can chat
 		lastTime = int(self.settings.getServerStat(server, "LastChat"))
 		threshold = int(self.waitTime)
 		currentTime = int(time.time())
@@ -59,6 +59,39 @@ class ChatterBot:
 		# If we made it here - set the LastPicture method
 		self.settings.setServerStat(server, "LastChat", int(time.time()))
 		return True
+	
+	async def killcheck(self, message):
+		# Pulled from the Feed.py module - checks if we should ignore due to death
+		# or hunger.
+		ignore = False
+		delete = False
+		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
+		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
+		isKill = self.settings.getServerStat(message.guild, "Killed")
+		if isKill.lower() == "yes":
+			ignore = True
+			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
+				ignore = False
+				
+		if hunger >= 100 and hungerLock.lower() == "yes":
+			ignore = True
+			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
+				ignore = False
+				
+		# Check if admin and override
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
+			for role in message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if isAdmin:
+			ignore = False
+			delete = False
+		
+		return { 'Ignore' : ignore, 'Delete' : delete}
 
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -69,7 +102,12 @@ class ChatterBot:
 		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
 		if chatChannel and not message.author == self.bot.user and not msg.startswith(self.prefix):
 			# We have a channel
-			if message.channel.id == chatChannel:
+			# Now we check if we're hungry/dead and respond accordingly
+			check = self.killcheck(message)
+			if check['Ignore']:
+				# We're too hungry - or dead
+				return check
+			if str(message.channel.id) == str(chatChannel):
 				# We're in that channel!
 				#ignore = True
 				# Strip prefix
