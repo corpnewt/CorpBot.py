@@ -1075,7 +1075,10 @@ class Admin:
 				return
 		
 		for server in self.bot.guilds:
-			await server.send(message)
+			try:
+				await server.default_channel.send(message)
+			except Exception:
+				pass
 
 		
 	@commands.command(pass_context=True)
