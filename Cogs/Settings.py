@@ -421,6 +421,30 @@ class Settings:
 		return None
 	
 	
+	def getGlobalUserStat(self, user, stat):
+		# Loop through options, and get the most common
+		tempDict = {}
+		for server in self.bot.guilds:
+			for member in server.members:
+				if user.id == member.id:
+					# Found us
+					tempVal = self.getUserStat(member, server, stat)
+					if not tempVal == None or not tempVal == "":
+						# It's a real value
+						if tempVal in tempDict:
+							tempDict[tempVal] += 1
+						else:
+							tempDict[tempVal] = 1
+		decidedVal = None
+		highest = 0
+		for key in tempDict:
+			if tempDict[key] > highest:
+				highest = tempDict[key]
+				decidedVal = key
+		
+		return decidedVal
+	
+	
 	# Set the provided stat
 	def setUserStat(self, user, server, stat, value):
 		# Make sure our user and server exists in the list
