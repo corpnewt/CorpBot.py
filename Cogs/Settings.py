@@ -440,10 +440,12 @@ class Settings:
 	def setGlobalUserStat(self, user, stat, value):
 		# Changes the stat across all servers the user is a part
 		for server in self.bot.guilds:
-			if user in server.members:
-				print("Setting {} in {}".format(stat, server.id))
-				# Our user is here - update the stat
-				self.setUserStat(user, server, stat, value)
+			for member in server.members:
+				if user.id == member.id:
+					# Our user is here - update the stat
+					self.setUserStat(member, server, stat, value)
+					# Already found our user - no need to keep searching here
+					continue
 						
 					
 	# Increment a specified user stat by a provided amount
