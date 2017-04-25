@@ -407,11 +407,29 @@ class Bot:
 	async def setbotparts(self, ctx, *, parts : str = None):
 		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
 		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
+		else:
+			if not str(ctx.message.author.id) == str(owner):
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
+				await ctx.channel.send(msg)
+				return
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -420,8 +438,11 @@ class Bot:
 		if not parts:
 			parts = ""
 			
-		self.settings.setUserStat(self.bot.user, server, "Parts", parts)
+		self.settings.setGlobalUserStat(self.bot.user, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)

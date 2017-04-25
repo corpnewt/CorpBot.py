@@ -39,12 +39,12 @@ class BotAdmin:
 		if owner == None:
 			# No owner set
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
 		else:
 			if not str(ctx.message.author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
-				await channel.send(msg)
+				await ctx.channel.send(msg)
 				return
 			
 		if member == None:
