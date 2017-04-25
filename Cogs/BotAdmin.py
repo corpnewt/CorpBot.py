@@ -42,7 +42,7 @@ class BotAdmin:
 			await channel.send(msg)
 			return
 		else:
-			if not str(author.id) == str(owner):
+			if not str(ctx.message.author.id) == str(owner):
 				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
 				await channel.send(msg)
 				return
