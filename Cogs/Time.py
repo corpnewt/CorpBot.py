@@ -12,11 +12,10 @@ class Time:
 		self.bot = bot
 		self.settings = settings
 
-	@commands.command(pass_context=True)
-	async def printstat(self, ctx, *, stat : str = None):
-		"""Test for now - will be removed"""
-		stat = self.settings.getGlobalUserStat(ctx.message.author, stat)
-		await ctx.channel.send(stat)
+	async def onjoin(self, member, server):
+		# Resolve our status based on the most occurances of UTCOffset
+		newVal = self.settings.getGlobalUserStat(member, "UTCOffset")
+		self.settings.setUserStat(member, server, "UTCOffset", newVal)	
 		
 	@commands.command(pass_context=True)
 	async def setoffset(self, ctx, *, offset : str = None):
