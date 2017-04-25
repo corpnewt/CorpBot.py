@@ -435,6 +435,15 @@ class Settings:
 						y[stat] = value
 						#self.flushSettings()
 						
+						
+	# Set a provided global stat
+	def setGlobalUserStat(self, user, stat, value):
+		# Changes the stat across all servers the user is a part
+		for server in self.bot.guilds:
+			if user in server.members:
+				# Our user is here - update the stat
+				self.setUserStat(user, server, stat, value)
+						
 					
 	# Increment a specified user stat by a provided amount
 	# returns the stat post-increment, or None if error
