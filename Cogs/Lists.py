@@ -17,6 +17,12 @@ class Lists:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		
+		
+	async def onjoin(self, member, server):
+		# Resolve our status based on the most occurances of UTCOffset
+		newVal = self.settings.getGlobalUserStat(member, "Parts")
+		self.settings.setUserStat(member, server, "Parts", newVal)
 
 		
 	@commands.command(pass_context=True)
@@ -727,7 +733,7 @@ class Lists:
 		if not parts:
 			parts = ""
 			
-		self.settings.setUserStat(author, server, "Parts", parts)
+		self.settings.setGlobalUserStat(author, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(author), parts)
 		# Check for suppress
 		if suppress:
