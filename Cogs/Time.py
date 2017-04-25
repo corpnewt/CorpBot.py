@@ -17,7 +17,7 @@ class Time:
 		"""Set your UTC offset."""
 
 		if offset == None:
-			self.settings.setUserStat(ctx.message.author, "UTCOffset", None)
+			self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", None)
 			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
 			await ctx.channel.send(msg)
 			return
