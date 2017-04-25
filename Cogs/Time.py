@@ -13,6 +13,12 @@ class Time:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
+	async def printstat(self, ctx, *, stat : str = None):
+		"""Test for now - will be removed"""
+		stat = self.settings.getGlobalUserStat(ctx.message.author, stat)
+		await ctx.channel.send(stat)
+		
+	@commands.command(pass_context=True)
 	async def setoffset(self, ctx, *, offset : str = None):
 		"""Set your UTC offset."""
 
