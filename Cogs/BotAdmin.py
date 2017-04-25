@@ -60,7 +60,7 @@ class BotAdmin:
 		if not parts:
 			parts = ""
 			
-		self.settings.setUserStat(member, server, "Parts", parts)
+		self.settings.setGlobalUserStat(member, "Parts", parts)
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(member), parts)
 		# Check for suppress
 		if suppress:
