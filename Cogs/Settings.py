@@ -441,6 +441,7 @@ class Settings:
 		# Changes the stat across all servers the user is a part
 		for server in self.bot.guilds:
 			if user in server.members:
+				print("Setting {} in {}".format(stat, server.id))
 				# Our user is here - update the stat
 				self.setUserStat(user, server, stat, value)
 						
