@@ -21,7 +21,7 @@ class BotAdmin:
 
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
-		"""Set another user's parts list (bot-admin only)."""
+		"""Set another user's parts list (owner only)."""
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
@@ -29,18 +29,23 @@ class BotAdmin:
 		else:
 			suppress = False
 
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		serverDict = self.settings.serverDict
+
+		try:
+			owner = serverDict['Owner']
+		except KeyError:
+			owner = None
+
+		if owner == None:
+			# No owner set
+			msg = 'I have not been claimed, *yet*.'
+			await channel.send(msg)
 			return
+		else:
+			if not str(author.id) == str(owner):
+				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
+				await channel.send(msg)
+				return
 			
 		if member == None:
 			msg = 'Usage: `{}setuserparts [member] "[parts text]"`'.format(ctx.prefix)
