@@ -17,7 +17,7 @@ class Time:
 		"""Set your UTC offset."""
 
 		if offset == None:
-			self.settings.setUserStat(ctx.message.author, ctx.message.guild, "UTCOffset", None)
+			self.settings.setUserStat(ctx.message.author, "UTCOffset", None)
 			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
 			await ctx.channel.send(msg)
 			return
@@ -35,7 +35,7 @@ class Time:
 				await ctx.channel.send('Offset has to be in +-H:M!')
 				return
 		off = "{}:{}".format(hours, minutes)
-		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "UTCOffset", off)
+		self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", off)
 		msg = '*{}*, your UTC offset has been set to *{}!*'.format(DisplayName.name(ctx.message.author), off)
 		await ctx.channel.send(msg)
 
