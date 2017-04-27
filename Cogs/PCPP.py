@@ -96,25 +96,34 @@ def getMarkdown( url, style = None, escape = False):
 	
 	# Experimental crap because developing while not at home
 	table = dom('table.manual-zebra').children('tbody').children()
+	names = []
+	types = []
 	for i in range(0, len(table)):
 		child = table.eq(i)
 		try:
 			children = child.children()
 		except AttributeError:
 			continue
-		if len(children) > 2:
-			# We should have enough
-			type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-			name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-			print('"{}": "{}"'.format(type, name))
-		print(len(children))
-		#type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		#print('Type: "{}"\nName: "{}"'.format(type, name))
-	
-	names = []
-	types = []
-	for e in dom('td.component-type.tl'):
+		if len(children) < 3:
+			continue
+		# We should have enough
+		type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+		name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+		if not len(name):
+			# Didn't get a name
+			continue
+		# We got a name - awesome
+		names.append(name)
+		if not len(type):
+			if not len(types):
+				# Nothing yet - this is weird
+				types.append('-')
+			else:
+				types.append(types[len(types)-1])
+		else:
+			types.append(type)
+
+	'''for e in dom('td.component-type.tl'):
 		text = e.text_content().strip()
 		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		text = ' '.join(text.split())
@@ -129,7 +138,8 @@ def getMarkdown( url, style = None, escape = False):
 		text = e.text_content().strip()
 		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		text = ' '.join(text.split())
-		names.append(text)
+		names.append(text)'''
+	
 	if not len(types):
 		return None
 	if not len(types) == len(names):
