@@ -18,8 +18,8 @@ class Hw:
 
 	@commands.command(pass_context=True)
 	async def pcpp(self, ctx, url = None, style = None, escape = None):
-		"""Convert a pcpartpicker.com link into markdown parts."""
-		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic]`".format(ctx.prefix)
+		"""Convert a pcpartpicker.com link into markdown parts. Available styles: normal, md, mdblock, bold, and bolditalic."""
+		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
 
 		if not style:
 			style = 'normal'
