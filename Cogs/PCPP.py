@@ -99,7 +99,12 @@ def getMarkdown( url, style = None, escape = False):
 	for child in table.children('tbody'):
 		children = child.getchildren()
 		for achild in children:
-			print('"{}"'.format(achild))
+			# Here we can get our items
+			achildren = achild.getChildren()
+			try:
+				print('"{}": "{}"'.format(achildren[0], achildren[2]))
+			except:
+				continue
 		#type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
