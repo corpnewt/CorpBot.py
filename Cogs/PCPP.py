@@ -103,7 +103,7 @@ def getMarkdown( url, style = None, escape = False):
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
 		print(len(children))
 		achild = children[0]
-		print('"{}"'.format(achild.values()))
+		print('"{}"'.format(achild))
 		try:
 			print('"{}"'.format(children[0].text_content()))
 		except ValueError:
