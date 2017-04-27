@@ -102,6 +102,8 @@ def getMarkdown( url, style = None, escape = False):
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
 		print(len(children))
+		achild = children[0]
+		print('"{}"'.format(achild.values())
 		try:
 			print('"{}"'.format(children[0].text_content()))
 		except ValueError:
