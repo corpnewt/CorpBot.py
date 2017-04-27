@@ -98,7 +98,6 @@ def getMarkdown( url, style = None, escape = False):
 	table = dom('table.manual-zebra').children('tbody').children()
 	for i in range(0, len(table)):
 		child = table.eq(i)
-		print(child)
 		try:
 			children = child.children()
 		except AttributeError:
