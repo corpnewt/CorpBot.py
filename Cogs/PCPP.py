@@ -102,7 +102,7 @@ def getMarkdown( url, style = None, escape = False):
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
 		print(len(children))
-		print(type(children[0]))
+		print('"{}"'.format(children[0].text_content()))
 	
 	names = []
 	types = []
