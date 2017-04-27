@@ -22,33 +22,12 @@ function main () {
             echo "Installing required packages: libffi-dev python-dev ffmpeg"
             as_root apt-get install libffi-dev python-dev python3-pip ffmpeg
             ;;
-        "fedora")
-            echo "Fedora detected"
-            echo "Fedora support is UNTESTED! You have been warned."
-            echo "Installing required packages from official repos: libffi-devel python3-pip"
-            as_root dnf install libffi-devel python3-pip
-            
-            # Get FFMpeg for Fedora from RPMfusion repos
-            getrpmfusion
-            
-            echo "Checking for and Installing RPMfusion nonfree..."
-            as_root dnf install ffmpeg
-            ;;
-        "rhel"|"centos")
-            echo "RHEL/CentOS detected"
-            echo "RHEL/CentOS support is UNTESTED! You have been warned."
-            echo "Installing required packages from official repos: libffi-devel python3-pip"
-            as_root dnf install libffi-devel python3-pip
-            ;;
         *)
             echo "No compatible distro found!"
             echo
-            if [[ "$ignorepkg" != 1 ]]; then
                 echo "Please install libffi, python-pip and ffmpeg for your distro and rerun as"
-                echo "ignorepkg=1 $0"
-                
+                echo "ignorepkg=1 $0"                
                 return 1
-            fi
             ;;
         esac
     fi
@@ -143,11 +122,12 @@ function as_root()
 
 function getrpmfusion()
 {
-    if dnf list installed rpmfusion-nonfree; then
+    echo "Checking for and installing RPMfusion nonfree..."
+    if dnf list installed rpmfusion-nonfree-release; then
         echo "RPMfusion nonfree found!"
     else
         echo "RPMfusion nonfree not found."
-        if dnf list installed rpmfusion-free; then
+        if dnf list installed rpmfusion-free-release; then
             echo "RPMfusion free found!"
         else
             echo "RPMfusion free not found."
