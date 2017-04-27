@@ -99,7 +99,7 @@ def getMarkdown( url, style = None, escape = False):
 	for child in table.children('tbody'):
 		type = child.eq(0).text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		name = child.eq(2).text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		print('Type: "{}"\nName: "{}"'.format(type, name)
+		print('Type: "{}"\nName: "{}"'.format(type, name))
 	
 	names = []
 	types = []
