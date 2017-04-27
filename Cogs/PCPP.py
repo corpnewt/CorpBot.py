@@ -125,29 +125,12 @@ def getMarkdown( url, style = None, escape = False):
 				types.append(types[len(types)-1])
 		else:
 			types.append(type)
-
-	'''for e in dom('td.component-type.tl'):
-		text = e.text_content().strip()
-		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		text = ' '.join(text.split())
-		if text == "":
-			if not len(types):
-				# Nothing yet - this is weird
-				text = '-'
-			else:
-				text = types[len(types)-1]
-		types.append(text)
-	for e in dom('td.component-name.tl'):
-		text = e.text_content().strip()
-		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		text = ' '.join(text.split())
-		names.append(text)'''
 	
 	if not len(types):
 		return None
 	if not len(types) == len(names):
 		# Only way this would happen that I've seen so far, is with custom entries
-		return 'custom'
+		return None
 	partout = ''
 	if style.lower() == 'md':
 		partout = mdStyle(types, names, escape)
