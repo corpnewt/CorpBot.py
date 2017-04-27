@@ -97,7 +97,7 @@ def getMarkdown( url, style = None, escape = False):
 	# Experimental crap because developing while not at home
 	table = dom('table.manual-zebra').children('tbody')
 	for child in table.items():
-		c = child().children().eq(0)
+		c = child.children().eq(0)
 		print(c)
 		#type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
