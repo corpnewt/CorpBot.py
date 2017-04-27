@@ -42,9 +42,10 @@ class Hw:
 			msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 			await ctx.channel.send(msg)
 			return
-		if output.lower() == 'custom':
-			msg = 'Currently, custom entries are not supported, sorry for the inconvenience!'
+		if len(output) > 2000:
+			msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
+			msg += '/nMaybe see if you can prune up that list and try again?'
 			await ctx.channel.send(msg)
 			return
-
+			
 		await ctx.channel.send(output)
