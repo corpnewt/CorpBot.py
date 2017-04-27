@@ -14,26 +14,37 @@ function main () {
             echo "Arch Linux $(uname -m) detected"
             echo
             echo "Installing required packages: libffi python-pip ffmpeg"
-            sudo pacman -S libffi python-pip ffmpeg
+            as_root pacman -S --needed libffi python-pip ffmpeg
             ;;
         "ubuntu"|"debian"|"linuxmint")
             echo "Ubuntu or debian (*.deb based distro) detected"
             echo
             echo "Installing required packages: libffi-dev python-dev ffmpeg"
-            if which apt 2>/dev/null; then
-                echo "Using apt"
-                cmd=apt
-            else
-                echo "Using apt-get"
-                cmd=apt-get
-            fi
-            sudo $cmd install libffi-dev python-dev ffmpeg
+            as_root apt-get install libffi-dev python-dev ffmpeg
+            ;;
+        "fedora")
+            echo "Fedora detected"
+            echo "Fedora support is UNTESTED! You have been warned."
+            echo "Installing required packages from official repos: libffi-devel python3-pip"
+            as_root dnf install libffi-devel python3-pip
+            
+            # Get FFMpeg for Fedora from RPMfusion repos
+            getrpmfusion
+            
+            echo "Checking for and Installing RPMfusion nonfree..."
+            as_root dnf install ffmpeg
+            ;;
+        "rhel"|"centos")
+            echo "RHEL/CentOS detected"
+            echo "RHEL/CentOS support is UNTESTED! You have been warned."
+            echo "Installing required packages from official repos: libffi-devel python3-pip"
+            as_root dnf install libffi-devel python3-pip
             ;;
         *)
             echo "No compatible distro found!"
             echo
             if [[ "$ignorepkg" != 1 ]]; then
-                echo "Please install libbffi, python-pip and ffmpeg for your distro and rerun as"
+                echo "Please install libffi, python-pip and ffmpeg for your distro and rerun as"
                 echo "ignorepkg=1 $0"
                 
                 return 1
@@ -118,6 +129,36 @@ function main () {
 
 function update () {
     python3 -m pip install -U "$1"
+}
+
+# From Beyond Linux From Scratch: http://www.linuxfromscratch.org/blfs/view/stable/x/x7proto.html
+
+function as_root()
+{
+  if   [ $EUID = 0 ];        then $*
+  elif [ -x /usr/bin/sudo ]; then sudo $*
+  else                            su -c \\"$*\\"
+  fi
+}
+
+function getrpmfusion()
+{
+    if dnf list installed rpmfusion-nonfree; then
+        echo "RPMfusion nonfree found!"
+    else
+        echo "RPMfusion nonfree not found."
+        if dnf list installed rpmfusion-free; then
+            echo "RPMfusion free found!"
+        else
+            echo "RPMfusion free not found."
+            echo "Installing RPMfusion free..."
+            as_root dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+        fi
+        echo "Installing RPMfusion nonfree..."
+        as_root dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+        as_root dnf update
+        echo "Please verify GPG signatures: https://rpmfusion.org/keys"
+    fi
 }
 
 main
