@@ -106,11 +106,6 @@ def getMarkdown( url, style = None, escape = False):
 			else:
 				text = types[len(types)-1]
 		types.append(text)
-	# Remove custom entries for now
-	for e in types:
-		if e.lower().startswith('custom'):
-			types.remove(e)
-			
 	for e in dom('td.component-name.tl'):
 		text = e.text_content().strip()
 		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
@@ -119,8 +114,7 @@ def getMarkdown( url, style = None, escape = False):
 	if not len(types):
 		return None
 	if not len(types) == len(names):
-		#return None
-		return 'Types:\n{}\n\nNames:\n{}'.format(', '.join(types), ', '.join(names))
+		return None
 	partout = ''
 	if style.lower() == 'md':
 		partout = mdStyle(types, names, escape)
