@@ -20,7 +20,7 @@ function main () {
             echo "Ubuntu or debian (*.deb based distro) detected"
             echo
             echo "Installing required packages: libffi-dev python-dev ffmpeg"
-            as_root apt-get install libffi-dev python-dev ffmpeg
+            as_root apt-get install libffi-dev python-dev python3-pip ffmpeg
             ;;
         "fedora")
             echo "Fedora detected"
