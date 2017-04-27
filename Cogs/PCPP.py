@@ -93,6 +93,12 @@ def getMarkdown( url, style = None, escape = False):
 	except Exception:
 		return None
 	dom = pq(response.text)
+	
+	# Experimental crap because developing while not at home
+	table = dom('table.manual-zebra')
+	for child in table.children():
+		print(child.text_content())
+	
 	names = []
 	types = []
 	for e in dom('td.component-type.tl'):
