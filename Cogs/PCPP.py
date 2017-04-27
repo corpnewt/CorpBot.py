@@ -97,7 +97,7 @@ def getMarkdown( url, style = None, escape = False):
 	# Experimental crap because developing while not at home
 	table = dom('table.manual-zebra').children('tbody')
 	for i in range(0, len(table)):
-		child = table.children().eq(i)
+		child = table.eq(i)
 		print(child)
 		try:
 			children = child.children()
