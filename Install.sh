@@ -2,25 +2,44 @@
 
 function main () {
     echo \#\#\# Updating CorpBot \#\#\#
-
+    
+    
     # Check for some linux
-    unamestr="$( uname )"
-    if [[ "$unamestr" == "Linux" ]]; then
-        # Install linux dependencies
-        echo Installing libffi-dev \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install libffi-dev
-        echo
-
-        echo Installing python-dev \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install python-dev
-        echo
-
-        echo Installing ffmpeg \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install ffmpeg
-        echo
+    if [[ "$(uname)" == "Linux" ]]; then
+        # Check what Linux we're on
+        distro="$(egrep -i "^id=" /etc/os-release | cut -d"=" -f2)"  
+        
+        case $distro in
+        "arch"|"archarm")
+            echo "Arch Linux $(uname -m) detected"
+            echo
+            echo "Installing required packages: libffi python-pip ffmpeg"
+            sudo pacman -S libffi python-pip ffmpeg
+            ;;
+        "ubuntu"|"debian"|"linuxmint")
+            echo "Ubuntu or debian (*.deb based distro) detected"
+            echo
+            echo "Installing required packages: libffi-dev python-dev ffmpeg"
+            if which apt 2>/dev/null; then
+                echo "Using apt"
+                cmd=apt
+            else
+                echo "Using apt-get"
+                cmd=apt-get
+            fi
+            sudo $cmd install libffi-dev python-dev ffmpeg
+            ;;
+        *)
+            echo "No compatible distro found!"
+            echo
+            if [[ "$ignorepkg" != 1 ]]; then
+                echo "Please install libbffi, python-pip and ffmpeg for your distro and rerun as"
+                echo "ignorepkg=1 $0"
+                
+                return 1
+            fi
+            ;;
+        esac
     fi
 
     #echo Updating Chatterbot...
