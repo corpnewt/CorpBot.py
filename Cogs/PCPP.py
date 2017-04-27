@@ -101,11 +101,8 @@ def getMarkdown( url, style = None, escape = False):
 			children = child.children()
 		except AttributeError:
 			continue
-		if len(children) > 2:
-			# We should have enough to get our info
-			type = child.children().eq(0)
-			name = child.children().eq(2)
-			print("{}: {}".format(type, name))
+		print(children)
+		print(len(children))
 		#type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
