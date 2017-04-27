@@ -5,7 +5,7 @@ function main () {
     
     
     # Check for some linux
-    if [[ "$(uname)" == "Linux" ]]; then
+    if [[ "$(uname)" == "Linux"  && "$ignorepkg" != 1 ]]; then
         # Check what Linux we're on
         distro="$(egrep -i "^id=" /etc/os-release | cut -d"=" -f2)"  
         
@@ -25,9 +25,9 @@ function main () {
         *)
             echo "No compatible distro found!"
             echo
-                echo "Please install libffi, python-pip and ffmpeg for your distro and rerun as"
-                echo "ignorepkg=1 $0"                
-                return 1
+            echo "Please install libffi, python-pip and ffmpeg and rerun as"
+            echo "ignorepkg=1 $0"                
+            return 1
             ;;
         esac
     fi
@@ -118,27 +118,6 @@ function as_root()
   elif [ -x /usr/bin/sudo ]; then sudo $*
   else                            su -c \\"$*\\"
   fi
-}
-
-function getrpmfusion()
-{
-    echo "Checking for and installing RPMfusion nonfree..."
-    if dnf list installed rpmfusion-nonfree-release; then
-        echo "RPMfusion nonfree found!"
-    else
-        echo "RPMfusion nonfree not found."
-        if dnf list installed rpmfusion-free-release; then
-            echo "RPMfusion free found!"
-        else
-            echo "RPMfusion free not found."
-            echo "Installing RPMfusion free..."
-            as_root dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-        fi
-        echo "Installing RPMfusion nonfree..."
-        as_root dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-        as_root dnf update
-        echo "Please verify GPG signatures: https://rpmfusion.org/keys"
-    fi
 }
 
 main
