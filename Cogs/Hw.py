@@ -39,7 +39,8 @@ class Hw:
 		
 		output = PCPP.getMarkdown(url, style, escape)
 		if not output:
-			await ctx.channel.send('Something went wrong!  Make sure you use a valid pcpartpicker link.')
+			msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.\nCurrently, custom entries are not supported, so links containing custom entries will not work.'
+			await ctx.channel.send(msg)
 			return
 
 		await ctx.channel.send(output)
