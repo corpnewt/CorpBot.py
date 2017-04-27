@@ -106,6 +106,11 @@ def getMarkdown( url, style = None, escape = False):
 			else:
 				text = types[len(types)-1]
 		types.append(text)
+	# Remove custom entries for now
+	for e in types:
+		if e.lower() == 'custom':
+			types.remove(e)
+			
 	for e in dom('td.component-name.tl'):
 		text = e.text_content().strip()
 		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
