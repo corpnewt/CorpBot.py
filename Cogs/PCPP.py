@@ -100,7 +100,10 @@ def getMarkdown( url, style = None, escape = False):
 		children = child.getchildren()
 		for achild in children:
 			# Here we can get our items
-			achildren = achild.getChildren()
+			try:
+				achildren = achild.getChildren()
+			except:
+				continue
 			try:
 				print('"{}": "{}"'.format(achildren[0], achildren[2]))
 			except:
