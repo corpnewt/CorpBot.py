@@ -113,6 +113,9 @@ def getMarkdown( url, style = None, escape = False):
 			# Didn't get a name
 			continue
 		# We got a name - awesome
+		if name.lower().startswith('note:'):
+			# Not a part
+			continue
 		names.append(name)
 		if not len(type):
 			if not len(types):
