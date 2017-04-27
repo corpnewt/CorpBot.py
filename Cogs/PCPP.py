@@ -119,7 +119,8 @@ def getMarkdown( url, style = None, escape = False):
 	if not len(types):
 		return None
 	if not len(types) == len(names):
-		return None
+		#return None
+		return 'Types:\n{}\n\nNames:\n{}'.format(', '.join(types), ', '.join(names))
 	partout = ''
 	if style.lower() == 'md':
 		partout = mdStyle(types, names, escape)
