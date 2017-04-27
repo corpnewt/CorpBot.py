@@ -95,18 +95,9 @@ def getMarkdown( url, style = None, escape = False):
 	dom = pq(response.text)
 	
 	# Experimental crap because developing while not at home
-	table = dom('table.manual-zebra')
-	for child in table.children('tbody'):
-		children = child.getchildren()
-		for achild in children:
-			if '{}'.format(type(achild)) is 'lxml.html.HtmlComment':
-				continue
-			# Here we can get our items
-			achildren = achild.getChildren()
-			try:
-				print('"{}": "{}"'.format(achildren[0], achildren[2]))
-			except:
-				continue
+	table = dom('table.manual-zebra').children('tbody')
+	for child in table:
+		print("{}".format(child))
 		#type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
 		#print('Type: "{}"\nName: "{}"'.format(type, name))
