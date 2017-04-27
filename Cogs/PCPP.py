@@ -96,9 +96,21 @@ def getMarkdown( url, style = None, escape = False):
 	names = []
 	types = []
 	for e in dom('td.component-type.tl'):
-		types.append(e.text_content().strip())
+		text = e.text_content().strip()
+		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+		text = ' '.join(text.split())
+		if text == "":
+			if not len(types):
+				# Nothing yet - this is weird
+				text = '-'
+			else:
+				text = types[len(types)-1]
+		types.append(text)
 	for e in dom('td.component-name.tl'):
-		names.append(e.text_content().strip())
+		text = e.text_content().strip()
+		text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+		text = ' '.join(text.split())
+		names.append(text)
 	if not len(types):
 		return None
 	if not len(types) == len(names):
