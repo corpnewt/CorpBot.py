@@ -99,7 +99,7 @@ def getMarkdown( url, style = None, escape = False):
 	for child in table.children('tbody'):
 		children = child.getchildren()
 		for achild in children:
-			if type(achild) is lxml.html.HtmlComment:
+			if '{}'.format(type(achild)) is 'lxml.html.HtmlComment':
 				continue
 			# Here we can get our items
 			achildren = achild.getChildren()
