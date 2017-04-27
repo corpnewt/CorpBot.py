@@ -1,20 +1,26 @@
 import requests
 from   pyquery import PyQuery as pq
 
-def normalStyle(types, names):
+def normalStyle(types, names, escape = False):
 	padTo = 0
 	for t in types:
 		# Find out which has the longest
 		tempLen = len(t)
 		if tempLen > padTo:
 			padTo = tempLen
-	partdown = '```\n'
+	if escape:
+		partdown = '\`\`\`\n'
+	else:
+		partdown = '```\n'
 	for i in range(0, len(types)):
 		partdown += types[i].rjust(padTo, ' ') + ' : ' + names[i] + '\n'
-	partdown += '```'
+	if escape:
+		partdown += '\`\`\`'
+	else:
+		partdown += '```'
 	return partdown
 
-def mdStyle(types, names):
+def mdStyle(types, names, escape = False):
 	padTo = 0
 	for t in types:
 		# Find out which has the longest
@@ -22,14 +28,20 @@ def mdStyle(types, names):
 		tempLen = len(ty)
 		if tempLen > padTo:
 			padTo = tempLen
-	partdown = '```md\n'
+	if escape:
+		partdown = '\`\`\`md\n'
+	else:
+		partdown = '```md\n'
 	for i in range(0, len(types)):
 		t = "<" + types[i].replace(' ', '-') + ":"
 		partdown += t.ljust(padTo, ' ') + " " + names[i] + '>\n'
-	partdown += '```'
+	if escape:
+		partdown += '\`\`\`'
+	else:
+		partdown += '```'
 	return partdown
 
-def mdBlockStyle(types, names):
+def mdBlockStyle(types, names, escape = False):
 	padTo = 0
 	for t in types:
 		# Find out which has the longest
@@ -37,29 +49,41 @@ def mdBlockStyle(types, names):
 		tempLen = len(ty)
 		if tempLen > padTo:
 			padTo = tempLen
-	partdown = '```md\n'
+	if escape:
+		partdown = '\`\`\`md\n'
+	else:
+		partdown = '```md\n'
 	for i in range(0, len(types)):
 		ty = "[" + types[i]
 		t = "| " + ty.rjust(padTo, ' ') + "]["
 		partdown += t.rjust(padTo, ' ') + names[i] + ']\n'
-	partdown += '```'
+	if escape:
+		partdown += '\`\`\`'
+	else:
+		partdown += '```'
 	return partdown
 
-def boldStyle(types, names):
+def boldStyle(types, names, escape = False):
 	partdown = ''
 	for i in range(0, len(types)):
-		partdown += "**" + types[i] + ":** " + names[i] + '\n'
+		if escape:
+			partdown += "\*\*" + types[i] + ":\*\* " + names[i] + '\n'
+		else:
+			partdown += "**" + types[i] + ":** " + names[i] + '\n'
 	partdown = partdown[:-1]
 	return partdown
 
-def boldItalicStyle(types, names):
+def boldItalicStyle(types, names, escape = False):
 	partdown = ''
 	for i in range(0, len(types)):
-		partdown += "***" + types[i] + ":*** *" + names[i] + '*\n'
+		if escape:
+			partdown += "\*\*\*" + types[i] + ":\*\*\* \*" + names[i] + '\*\n'
+		else:
+			partdown += "***" + types[i] + ":*** *" + names[i] + '*\n'
 	partdown = partdown[:-1]
 	return partdown
 		
-def getMarkdown( url, style = None):
+def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
 	url = url.replace('/b/', '/list/')
 	if not style:
@@ -81,13 +105,13 @@ def getMarkdown( url, style = None):
 		return None
 	partout = ''
 	if style.lower() == 'md':
-		partout = mdStyle(types, names)
+		partout = mdStyle(types, names, escape)
 	elif style.lower() == 'mdblock':
-		partout = mdBlockStyle(types, names)
+		partout = mdBlockStyle(types, names, escape)
 	elif style.lower() == 'bold':
-		partout = boldStyle(types, names)
+		partout = boldStyle(types, names, escape)
 	elif style.lower() == 'bolditalic':
-		partout = boldItalicStyle(types, names)
+		partout = boldItalicStyle(types, names, escape)
 	else:
-		partout = normalStyle(types, names)
+		partout = normalStyle(types, names, escape)
 	return partout

@@ -17,7 +17,7 @@ class Hw:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
-	async def pcpp(self, ctx, url = None, style = None):
+	async def pcpp(self, ctx, url = None, style = None, escape = None):
 		"""Convert a pcpartpicker.com link into markdown parts."""
 		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic]`".format(ctx.prefix)
 
@@ -27,8 +27,17 @@ class Hw:
 		if not url:
 			await ctx.channel.send(usage)
 			return
+
+		if escape == None:
+			escape = 'no'
+		escape = escape.lower()
+
+		if escape == 'yes' or escape == 'true' or escape == 'on':
+			escape = True
+		else:
+			escape = False
 		
-		output = PCPP.getMarkdown(url, style)
+		output = PCPP.getMarkdown(url, style, escape)
 		if not output:
 			await ctx.channel.send('Something went wrong!  Make sure you use a valid pcpartpicker link.')
 			return
