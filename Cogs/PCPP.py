@@ -97,7 +97,11 @@ def getMarkdown( url, style = None, escape = False):
 	# Experimental crap because developing while not at home
 	table = dom('table.manual-zebra').children('tbody').children()
 	for child in table:
-		if len(child.children()) > 2:
+		try:
+			children = child.children()
+		except AttributeError:
+			continue
+		if len(children) > 2:
 			# We should have enough to get our info
 			type = child.children().eq(0)
 			name = child.children().eq(2)
