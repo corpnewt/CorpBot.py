@@ -421,10 +421,13 @@ class Settings:
 		return None
 	
 	
-	def getGlobalUserStat(self, user, stat):
+	def getGlobalUserStat(self, user, stat, ignore_server = None):
 		# Loop through options, and get the most common
 		tempDict = {}
 		for server in self.bot.guilds:
+			if ignore_server and ignore_server.id == server.id:
+				# We're ignoring this server
+				continue
 			for member in server.members:
 				if user.id == member.id:
 					# Found us

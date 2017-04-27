@@ -14,7 +14,7 @@ class Time:
 
 	async def onjoin(self, member, server):
 		# Resolve our status based on the most occurances of UTCOffset
-		newVal = self.settings.getGlobalUserStat(member, "UTCOffset")
+		newVal = self.settings.getGlobalUserStat(member, "UTCOffset", server)
 		self.settings.setUserStat(member, server, "UTCOffset", newVal)	
 		
 	@commands.command(pass_context=True)

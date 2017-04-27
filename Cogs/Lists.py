@@ -21,7 +21,7 @@ class Lists:
 		
 	async def onjoin(self, member, server):
 		# Resolve our status based on the most occurances of UTCOffset
-		newVal = self.settings.getGlobalUserStat(member, "Parts")
+		newVal = self.settings.getGlobalUserStat(member, "Parts", server)
 		self.settings.setUserStat(member, server, "Parts", newVal)
 
 		
