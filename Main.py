@@ -52,6 +52,7 @@ from Cogs import RateLimit
 from Cogs import Torment
 from Cogs import Mute
 from Cogs import UserRole
+from Cogs import Hw
 
 # Let's load our prefix file
 prefix = '$'
@@ -281,6 +282,10 @@ cogList.append(userRole)
 # Help - Must be last
 #help = Help.Help(bot, cogList)
 #cogList.append(help)
+
+# Hw - Parts like profiles
+hw = Hw.Hw(bot, settings)
+cogList.append(hw)
 
 
 # Main bot events
