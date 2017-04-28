@@ -200,6 +200,7 @@ class Hw:
 			await ctx.channel.send("Usage: `{}edithw [build name or index]`".format(ctx.prefix))
 			return
 
+		hwChannel = None
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
@@ -214,7 +215,7 @@ class Hw:
 					return
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
-		else:
+		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
@@ -297,6 +298,7 @@ class Hw:
 			await ctx.channel.send("Usage: `{}renhw [build name or index]`".format(ctx.prefix))
 			return
 
+		hwChannel = None
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
@@ -311,7 +313,7 @@ class Hw:
 					return
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
-		else:
+		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
@@ -510,6 +512,7 @@ class Hw:
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		hwChannel = None
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
@@ -524,7 +527,7 @@ class Hw:
 					return
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
-		else:
+		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
