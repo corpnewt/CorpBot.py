@@ -2,25 +2,34 @@
 
 function main () {
     echo \#\#\# Updating CorpBot \#\#\#
-
+    
+    
     # Check for some linux
-    unamestr="$( uname )"
-    if [[ "$unamestr" == "Linux" ]]; then
-        # Install linux dependencies
-        echo Installing libffi-dev \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install libffi-dev
-        echo
-
-        echo Installing python-dev \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install python-dev
-        echo
-
-        echo Installing ffmpeg \(run as sudo if this fails\)...
-        echo
-        sudo apt-get install ffmpeg
-        echo
+    if [[ "$(uname)" == "Linux"  && "$ignorepkg" != 1 ]]; then
+        # Check what Linux we're on
+        distro="$(egrep -i "^id=" /etc/os-release | cut -d"=" -f2)"  
+        
+        case $distro in
+        "arch"|"archarm")
+            echo "Arch Linux $(uname -m) detected"
+            echo
+            echo "Installing required packages: libffi python-pip ffmpeg"
+            as_root pacman -S --needed libffi python-pip ffmpeg
+            ;;
+        "ubuntu"|"debian"|"linuxmint")
+            echo "Ubuntu or debian (*.deb based distro) detected"
+            echo
+            echo "Installing required packages: libffi-dev python-dev ffmpeg"
+            as_root apt-get install libffi-dev python-dev python3-pip ffmpeg
+            ;;
+        *)
+            echo "No compatible distro found!"
+            echo
+            echo "Please install libffi, python-pip and ffmpeg and rerun as"
+            echo "ignorepkg=1 $0"                
+            return 1
+            ;;
+        esac
     fi
 
     #echo Updating Chatterbot...
@@ -99,6 +108,16 @@ function main () {
 
 function update () {
     python3 -m pip install -U "$1"
+}
+
+# From Beyond Linux From Scratch: http://www.linuxfromscratch.org/blfs/view/stable/x/x7proto.html
+
+function as_root()
+{
+  if   [ $EUID = 0 ];        then $*
+  elif [ -x /usr/bin/sudo ]; then sudo $*
+  else                            su -c \\"$*\\"
+  fi
 }
 
 main
