@@ -203,19 +203,17 @@ class Hw:
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-		else:
-			# Pm
-			hwChannel = None
-
-		if not (not hwChannel or hwChannel == ""):
-			# We need the channel id
-			if not str(hwChannel) == str(ctx.channel.id):
-				msg = 'This isn\'t the channel for that...'
-				for chan in ctx.guild.channels:
-					if str(chan.id) == str(hwChannel):
-						msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-				await ctx.channel.send(msg)
-				return
+			if not (not hwChannel or hwChannel == ""):
+				# We need the channel id
+				if not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel for that...'
+					for chan in ctx.guild.channels:
+						if str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+					await ctx.channel.send(msg)
+					return
+				else:
+					hwChannel = self.bot.get_channel(hwChannel)
 		else:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -265,7 +263,14 @@ class Hw:
 				if test == None:
 					return
 				elif test == True:
-					output = PCPP.getMarkdown(parts.content)
+					partList = parts.content.split()
+					if len(partList) == 1:
+						partList.append(None)
+					output = None
+					try:
+						output = PCPP.getMarkdown(partList[0], partList[1], False)
+					except:
+						pass
 					if not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
@@ -295,19 +300,17 @@ class Hw:
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-		else:
-			# Pm
-			hwChannel = None
-
-		if not (not hwChannel or hwChannel == ""):
-			# We need the channel id
-			if not str(hwChannel) == str(ctx.channel.id):
-				msg = 'This isn\'t the channel for that...'
-				for chan in ctx.guild.channels:
-					if str(chan.id) == str(hwChannel):
-						msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-				await ctx.channel.send(msg)
-				return
+			if not (not hwChannel or hwChannel == ""):
+				# We need the channel id
+				if not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel for that...'
+					for chan in ctx.guild.channels:
+						if str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+					await ctx.channel.send(msg)
+					return
+				else:
+					hwChannel = self.bot.get_channel(hwChannel)
 		else:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -565,7 +568,15 @@ class Hw:
 				if test == None:
 					return
 				elif test == True:
-					output = PCPP.getMarkdown(parts.content)
+					partList = parts.content.split()
+					if len(partList) == 1:
+						partList.append(None)
+					output = None
+					try:
+						output = PCPP.getMarkdown(partList[0], partList[1], False)
+					except:
+						pass
+					#output = PCPP.getMarkdown(parts.content)
 					if not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
