@@ -390,13 +390,6 @@ class Hw:
 
 		memFromName = None
 		buildParts  = None
-
-		memFromName = DisplayName.memberForName(user, ctx.guild)
-		if memFromName:
-			# Just passed a member - no search term
-			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
-			await ctx.channel.send(usage)
-			return
 		
 		for j in range(len(parts)):
 			# Reverse search direction
