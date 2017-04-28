@@ -28,6 +28,35 @@ class Hw:
 			return False
 
 	@commands.command(pass_context=True)
+	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
+		"""Sets the channel for hardware (admin only)."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if channel == None:
+			self.settings.setServerStat(ctx.message.guild, "HardwareChannel", "")
+			msg = 'Hardware works *only* in pm now.'
+			await ctx.channel.send(msg)
+			return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.guild, "HardwareChannel", channel.id)
+
+		msg = 'Hardware channel set to **{}**.'.format(channel.name)
+		await ctx.channel.send(msg)
+		
+	
+	@sethwchannel.error
+	async def sethwchannel_error(self, error, ctx):
+		# do stuff
+		msg = 'sethwchannel Error: {}'.format(error)
+		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
 	async def pcpp(self, ctx, url = None, style = None, escape = None):
 		"""Convert a pcpartpicker.com link into markdown parts. Available styles: normal, md, mdblock, bold, and bolditalic."""
 		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
@@ -256,6 +285,81 @@ class Hw:
 		await hwChannel.send(msg)
 
 
+	@commands.command(pass_context=True)
+	async def renhw(self, ctx, *, build = None):
+		"""Renames a build from your build list."""
+		if not build:
+			await ctx.channel.send("Usage: `{}renhw [build name or index]`".format(ctx.prefix))
+			return
+
+		if ctx.guild:
+			# Not a pm
+			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
+		else:
+			# Pm
+			hwChannel = None
+
+		if not (not hwChannel or hwChannel == ""):
+			# We need the channel id
+			if not str(hwChannel) == str(ctx.channel.id):
+				msg = 'This isn\'t the channel for that...'
+				for chan in ctx.guild.channels:
+					if str(chan.id) == str(hwChannel):
+						msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+				await ctx.channel.send(msg)
+				return
+		else:
+			# Nothing set - pm
+			hwChannel = ctx.author
+
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+
+		mainBuild = None
+
+		# Get build by name first - then by index
+		for b in buildList:
+			if b['Name'].lower() == build.lower():
+				# Found it
+				mainBuild = b
+
+		if not mainBuild:
+			try:
+				build = int(build)-1
+				mainBuild = buildList[build]
+			except:
+				pass
+
+		if not mainBuild:
+			msg = "I couldn't find that build or index."
+			await ctx.channel.send(msg)
+			return
+
+		# Here, we have a build
+		bname = mainBuild['Name']
+		if self.checkSuppress(ctx):
+			bname = Nullify.clean(bname)
+
+		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
+		while True:
+			buildName = await self.prompt(ctx, msg, hwChannel)
+			if not buildName:
+				return
+			buildExists = False
+			for build in buildList:
+				if build['Name'].lower() == buildName.content.lower():
+					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.format(DisplayName.name(ctx.author))
+					await hwChannel.send(mesg)
+					buildExists = True
+					break
+			if not buildExists:
+				mainBuild['Name'] = buildName.content
+				break
+		bname2 = buildName.content
+		if self.checkSuppress(ctx):
+			bname2 = Nullify.clean(bname2)
+		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
+		await hwChannel.send(msg)
+
 
 	@commands.command(pass_context=True)
 	async def hw(self, ctx, *, user = None, build = None):
@@ -418,6 +522,8 @@ class Hw:
 						msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
 				await ctx.channel.send(msg)
 				return
+			else:
+				hwChannel = self.bot.get_channel(hwChannel)
 		else:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -544,7 +650,7 @@ class Hw:
 			except Exception:
 				talk = None
 			if not talk:
-				msg = "*{}*, I'm out of time... type `{}newhw` to start again.".format(DisplayName.name(message.author), ctx.prefix)
+				msg = "*{}*, I'm out of time...".format(DisplayName.name(message.author))
 				await dest.send(msg)
 				return None
 			else:
@@ -572,7 +678,7 @@ class Hw:
 			except Exception:
 				talk = None
 			if not talk:
-				msg = "*{}*, I'm out of time... type `{}newhw` to start again.".format(DisplayName.name(ctx.author), ctx.prefix)
+				msg = "*{}*, I'm out of time...".format(DisplayName.name(ctx.author))
 				await dest.send(msg)
 				return None
 			else:
