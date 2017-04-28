@@ -398,8 +398,8 @@ class Hw:
 			buildParts  = None
 
 			# Name = 0 up to i joined by space
-			nameStr = ' '.join(parts[0:i+1])
-			buildStr = ' '.join(parts[i+1:])
+			buildStr = ' '.join(parts[0:i+1])
+			nameStr  = ' '.join(parts[i+1:])
 
 			print("Checking: {}".format(nameStr))
 			
