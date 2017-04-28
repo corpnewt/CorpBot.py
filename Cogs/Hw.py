@@ -488,7 +488,7 @@ class Hw:
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
-				if buildStr == "":
+				if buildStr == None:
 					# Full thing is a member's name - get their main rig
 					for build in buildList:
 						if build['Main']:
