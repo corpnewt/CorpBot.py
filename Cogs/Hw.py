@@ -134,7 +134,8 @@ class Hw:
 				
 		try:
 			build = int(build)-1
-			mainBuild = buildList[build]
+			if build >= 0 and build < len(buildList):
+				mainBuild = buildList[build]
 		except:
 			pass
 
@@ -180,14 +181,15 @@ class Hw:
 				return
 		try:
 			build = int(build)-1
-			b = buildList.pop(build)
-			if b['Main'] and len(buildList):
-				buildList[0]['Main'] = True
-			msg = "{} removed!".format(b['Name'])
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-			await ctx.channel.send(msg)
-			return
+			if build >= 0 and build < len(buildList):
+				b = buildList.pop(build)
+				if b['Main'] and len(buildList):
+					buildList[0]['Main'] = True
+				msg = "{} removed!".format(b['Name'])
+				if self.checkSuppress(ctx):
+					msg = Nullify.clean(msg)
+				await ctx.channel.send(msg)
+				return
 		except:
 			pass
 
@@ -235,7 +237,8 @@ class Hw:
 		if not mainBuild:
 			try:
 				build = int(build)-1
-				mainBuild = buildList[build]
+				if build >= 0 and build < len(buildList):
+					mainBuild = buildList[build]
 			except:
 				pass
 
@@ -335,7 +338,8 @@ class Hw:
 		if not mainBuild:
 			try:
 				build = int(build)-1
-				mainBuild = buildList[build]
+				if build >= 0 and build < len(buildList):
+					mainBuild = buildList[build]
 			except:
 				pass
 
@@ -429,7 +433,8 @@ class Hw:
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
-						buildParts = buildList[buildStr]
+						if build >= 0 and build < len(buildList):
+							buildParts = buildList[buildStr]
 					except Exception:
 						memFromName = None
 						buildParts  = None
@@ -447,8 +452,9 @@ class Hw:
 				# Okay - *this* time is the last - check for index
 				try:
 					user = int(user)-1
-					buildParts = buildList[user]
-					memFromName = ctx.author
+					if user >= 0 and user < len(buildList):
+						buildParts = buildList[user]
+						memFromName = ctx.author
 				except Exception:
 					pass
 		
