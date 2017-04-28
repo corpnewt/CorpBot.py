@@ -526,7 +526,8 @@ class Hw:
 		msg = msg[:-1]
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
-		await Message.say(self.bot, msg, ctx.channel, ctx.author)
+		# Limit output to 1 page - if more than that, send to pm
+		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
