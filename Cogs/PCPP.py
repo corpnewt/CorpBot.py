@@ -107,6 +107,7 @@ def getMarkdown( url, style = None, escape = False):
 		if newLink == None:
 			return None
 		url = "https://pcpartpicker.com/list/" + newLink
+		print(url)
 		
 	# url = url.replace('/b/', '/list/')
 	if not style:
