@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import re
 from   discord.ext import commands
 
 def name(member : discord.Member):
@@ -35,7 +36,8 @@ def memberForName(name, server):
         if member.name.lower() == name.lower():
             return member
     # No member yet - try ID
-    memID = ''.join(list(filter(str.isdigit, name)))
+    #memID = ''.join(list(filter(str.isdigit, name)))
+    memID = re.sub(r'\W+', '', name)
     newMem = memberForID(memID, server)
     if newMem:
         return newMem
