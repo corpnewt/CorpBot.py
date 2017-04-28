@@ -429,13 +429,20 @@ class Hw:
 				if len(foundStr):
 					# We're in business
 					foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
+					return
 				else:
-					foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
+					# foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
 					# Nothing found...
+					memFromName = None
+					buildStr    = None
+			if memFromName:
+				# We're in business
+				foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
 				if self.checkSuppress(ctx):
 					foundStr = Nullify.clean(foundStr)
 				await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
 				return
+			
 			# If we're here - then we didn't find a member - set it to the author, and run another quick search
 			buildStr  = user
 			
