@@ -146,7 +146,7 @@ class Hw:
 					b['Main'] = True
 				else:
 					b['Main'] = False
-			msg = "{} set as main!".format(b['Name'])
+			msg = "{} set as main!".format(mainBuild['Name'])
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
 			await ctx.channel.send(msg)
