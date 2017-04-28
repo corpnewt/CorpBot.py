@@ -108,7 +108,7 @@ class Hw:
 			await ctx.channel.send("Usage: `{}mainhw [build name or index]`".format(ctx.prefix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 
 		mainBuild = None
 
@@ -162,7 +162,7 @@ class Hw:
 			await ctx.channel.send("Usage: `{}delhw [build name or index]`".format(ctx.prefix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 
 		# Get build by name first - then by index
 		for b in buildList:
@@ -219,7 +219,7 @@ class Hw:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 
 		mainBuild = None
 
@@ -317,7 +317,7 @@ class Hw:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 
 		mainBuild = None
 
@@ -428,7 +428,7 @@ class Hw:
 
 		if not memFromName:
 			# One last shot - check if it's a build for us
-			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 			for build in buildList:
 				if build['Name'].lower() == user.lower():
 					memFromName = ctx.author
@@ -511,7 +511,7 @@ class Hw:
 	@commands.command(pass_context=True)
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot."""
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
 		hwChannel = None
