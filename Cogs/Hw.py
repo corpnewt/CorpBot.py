@@ -410,6 +410,7 @@ class Hw:
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
+				print("Got: {}\nFrom: {}".format(DisplayName.name(memFromName)), nameStr)
 				# Got a member - let's check the remainder length, and search!
 				if len(buildStr) < 3:
 					usage = "Search term must be at least 3 characters."
