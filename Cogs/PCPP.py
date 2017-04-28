@@ -1,6 +1,17 @@
 import requests
 from   pyquery import PyQuery as pq
 
+def find_last_between( source, start_sep, end_sep ):
+	result=[]
+	tmp=source.split(start_sep)
+	for par in tmp:
+		if end_sep in par:
+			result.append(par.split(end_sep)[0])
+	if len(result) == 0:
+		return None
+	else:
+		return result[len(result)-1] # Return last item
+
 def normalStyle(types, names, escape = False):
 	padTo = 0
 	for t in types:
@@ -85,7 +96,19 @@ def boldItalicStyle(types, names, escape = False):
 		
 def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
-	url = url.replace('/b/', '/list/')
+	if '/b/' in url.lower():
+		# We have a build
+		try:
+			response = requests.get(url)
+		except Exception:
+			return None
+		r = response.text
+		newLink = find_last_between(r, 'href="/list/', '">')
+		if newLink == None:
+			return None
+		url = "https://pcpartpicker.com/list/" + newLink
+		
+	# url = url.replace('/b/', '/list/')
 	if not style:
 		style = 'normal'
 	try:
