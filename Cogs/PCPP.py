@@ -103,7 +103,7 @@ def getMarkdown( url, style = None, escape = False):
 		except Exception:
 			return None
 		r = response.text
-		newLink = find_last_between(r, 'href="/list/', '">')
+		newLink = find_last_between(r, 'href=\"list/', '">View')
 		print("NewLink: {}".format(newLink))
 		if newLink == None:
 			return None
