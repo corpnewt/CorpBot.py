@@ -433,11 +433,17 @@ class Hw:
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
-						if build >= 0 and build < len(buildList):
+						if buildStr >= 0 and buildStr < len(buildList):
 							buildParts = buildList[buildStr]
 					except Exception:
 						memFromName = None
 						buildParts  = None
+					if buildParts:
+						# We're in business
+						break
+					else:
+						memFromName = None	
+					
 
 		if not memFromName:
 			# One last shot - check if it's a build for us
