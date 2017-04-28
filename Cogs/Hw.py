@@ -417,7 +417,7 @@ class Hw:
 					for line in bParts.splitlines():
 						if buildStr.lower() in line.lower():
 							foundCt += 1
-							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
+							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
 
 				if len(foundStr):
 					# We're in business
@@ -453,7 +453,7 @@ class Hw:
 			for line in bParts.splitlines():
 				if buildStr.lower() in line.lower():
 					foundCt += 1
-					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
+					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
 
 		if len(foundStr):
 			# We're in business
