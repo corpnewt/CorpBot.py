@@ -375,6 +375,88 @@ class Hw:
 			bname2 = Nullify.clean(bname2)
 		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
 		await hwChannel.send(msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def gethw(self, ctx, *, user = None, search = None):
+		"""Searches the user's hardware for a specific search term."""
+		if not user:
+			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
+			await ctx.channel.send(usage)
+			return
+	
+		# Let's check for username and search term
+		parts = user.split()
+
+		memFromName = None
+		buildParts  = None
+
+		memFromName = DisplayName.memberForName(user, ctx.guild)
+		if memFromName:
+			# Just passed a member - no search term
+			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
+			await ctx.channel.send(usage)
+			return
+		
+		for j in range(len(parts)):
+			# Reverse search direction
+			i = len(parts)-1-j
+			memFromName = None
+			buildParts  = None
+
+			# Name = 0 up to i joined by space
+			nameStr = ' '.join(parts[0:i+1])
+			buildStr = ' '.join(parts[i+1:])
+
+			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
+			if memFromName:
+				# Got a member - let's check the remainder length, and search!
+				if len(buildStr) < 3:
+					usage = "Search term must be at least 3 characters."
+					await ctx.channel.send(usage)
+					return
+				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+				foundStr = ''
+				foundCt  = 0
+				for build in buildList:
+					bParts = build['Hardware']
+					for line in bParts.splitlines():
+						if buildStr.lower() in line.lower():
+							foundCt += 1
+							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
+
+				if len(foundStr):
+					# We're in business
+					foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
+				else:
+					foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
+					# Nothing found...
+				if self.checkSuppress(ctx):
+					foundStr = Nullify.clean(foundStr)
+				await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
+				return
+			# If we're here - then we didn't find a member - set it to the author, and run another quick search
+			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+			foundStr = ''
+			foundCt  = 0
+			for build in buildList:
+				bParts = build['Hardware']
+				for line in bParts.splitlines():
+					if buildStr.lower() in line.lower():
+						foundCt += 1
+						foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
+
+			if len(foundStr):
+				# We're in business
+				foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr) + foundStr
+			else:
+				foundStr = 'Nothing found for "{}".'.format(buildStr)
+				# Nothing found...
+			if self.checkSuppress(ctx):
+				foundStr = Nullify.clean(foundStr)
+			await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
