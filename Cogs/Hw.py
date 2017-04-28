@@ -109,6 +109,7 @@ class Hw:
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
@@ -163,6 +164,7 @@ class Hw:
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		# Get build by name first - then by index
 		for b in buildList:
@@ -220,6 +222,7 @@ class Hw:
 			hwChannel = ctx.author
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
@@ -284,6 +287,7 @@ class Hw:
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
 					mainBuild['Hardware'] = output
+					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 					break
 			mainBuild['Hardware'] = parts.content
 			break
@@ -318,6 +322,7 @@ class Hw:
 			hwChannel = ctx.author
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
@@ -358,6 +363,8 @@ class Hw:
 					break
 			if not buildExists:
 				mainBuild['Name'] = buildName.content
+				# Flush settings to all servers
+				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				break
 		bname2 = buildName.content
 		if self.checkSuppress(ctx):
@@ -419,6 +426,7 @@ class Hw:
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
 					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
 						buildParts = buildList[buildStr]
@@ -429,6 +437,7 @@ class Hw:
 		if not memFromName:
 			# One last shot - check if it's a build for us
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 			for build in buildList:
 				if build['Name'].lower() == user.lower():
 					memFromName = ctx.author
