@@ -488,12 +488,20 @@ class Hw:
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
-				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				for build in buildList:
-					if build['Name'].lower() == buildStr.lower():
-						# Ha! Found it!
-						buildParts = build
-						break
+				if buildStr == "":
+					# Full thing is a member's name - get their main rig
+					for build in buildList:
+						if build['Main']:
+							# Ha! Found it!
+							buildParts = build
+							break
+				else:
+					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+					for build in buildList:
+						if build['Name'].lower() == buildStr.lower():
+							# Ha! Found it!
+							buildParts = build
+							break
 				if buildParts:
 					# We're in business
 					break
@@ -525,7 +533,7 @@ class Hw:
 						# We're in business
 						break
 					else:
-						memFromName = None	
+						memFromName = None
 					
 
 		if not memFromName:
