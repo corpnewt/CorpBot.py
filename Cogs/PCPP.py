@@ -104,9 +104,10 @@ def getMarkdown( url, style = None, escape = False):
 			return None
 		r = response.text
 		newLink = find_last_between(r, 'href="/list/', '">')
+		print("NewLink: {}".format(newLink))
 		if newLink == None:
 			return None
-		url = "https://pcpartpicker.com/list/" + newLink
+		url = "https://pcpartpicker.com/list/" + str(newLink)
 		print(url)
 		
 	# url = url.replace('/b/', '/list/')
