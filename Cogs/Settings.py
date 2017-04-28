@@ -43,6 +43,7 @@ class Settings:
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"ChatChannel"			: "", 		# ID or blank for no channel
+				"HardwareChannel"       : "",		# ID or blank for no channel
 				"LastChat"				: 0,		# UTC Timestamp of last chat message
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
@@ -338,6 +339,8 @@ class Settings:
 							needsUpdate = True
 						if not "LastCommand" in y:
 							y["LastCommand"] = 0
+						if not "Hardware" in y:
+							y["Hardware"] = []
 						if not "VerificationTime" in y:
 							currentTime = int(time.time())
 							waitTime = int(self.getServerStat(server, "VerificationTime"))
@@ -432,6 +435,9 @@ class Settings:
 				if user.id == member.id:
 					# Found us
 					tempVal = self.getUserStat(member, server, stat)
+					if type(tempVal) is dict or type(tempVal) is list:
+						# Un-hashable - return it
+						return tempVal
 					if not tempVal == None or not tempVal == "":
 						# It's a real value
 						if tempVal in tempDict:
