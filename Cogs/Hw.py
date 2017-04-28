@@ -478,39 +478,33 @@ class Hw:
 		memFromName = None
 		buildParts  = None
 
-		memFromName = DisplayName.memberForName(user, ctx.guild)
-		if not memFromName:
-			for j in range(len(parts)):
-				# Reverse search direction
-				i = len(parts)-1-j
-				memFromName = None
-				buildParts  = None
+		for j in range(len(parts)):
+			# Reverse search direction
+			i = len(parts)-1-j
 
-				# Name = 0 up to i joined by space
-				nameStr = ' '.join(parts[0:i])
-				buildStr = ' '.join(parts[i:])
+			# Name = 0 up to i joined by space
+			nameStr = ' '.join(parts[0:i])
+			buildStr = ' '.join(parts[i:])
 
-				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-				if memFromName:
-					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					for build in buildList:
-						if build['Name'].lower() == buildStr.lower():
-							# Ha! Found it!
-							buildParts = build
-							break
-					if buildParts:
-						# We're in business
+			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
+			if memFromName:
+				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				for build in buildList:
+					if build['Name'].lower() == buildStr.lower():
+						# Ha! Found it!
+						buildParts = build
 						break
-					else:
-						memFromName = None
+				if buildParts:
+					# We're in business
+					break
+				else:
+					memFromName = None
 
 		if not memFromName:
 			# Try again with indexes
 			for j in range(len(parts)):
 				# Reverse search direction
 				i = len(parts)-1-j
-				memFromName = None
-				buildParts  = None
 
 				# Name = 0 up to i joined by space
 				nameStr = ' '.join(parts[0:i])
