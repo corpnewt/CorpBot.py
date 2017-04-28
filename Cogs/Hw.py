@@ -437,9 +437,16 @@ class Hw:
 				await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
 				return
 			# If we're here - then we didn't find a member - set it to the author, and run another quick search
+			buildStr  = user
+			
+			if len(buildStr) < 3:
+				usage = "Search term must be at least 3 characters."
+				await ctx.channel.send(usage)
+				return
+			
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-			buildStr  = user
+			
 			foundStr = ''
 			foundCt  = 0
 			for build in buildList:
