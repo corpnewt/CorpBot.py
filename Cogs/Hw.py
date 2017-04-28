@@ -483,6 +483,7 @@ class Hw:
 			await ctx.channel.send(usage)
 			return
 		buildList = self.settings.getGlobalUserStat(member, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 		if not len(buildList):
 			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
 			await ctx.channel.send(msg)
@@ -509,21 +510,17 @@ class Hw:
 		if ctx.guild:
 			# Not a pm
 			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-		else:
-			# Pm
-			hwChannel = None
-
-		if not (not hwChannel or hwChannel == ""):
-			# We need the channel id
-			if not str(hwChannel) == str(ctx.channel.id):
-				msg = 'This isn\'t the channel for that...'
-				for chan in ctx.guild.channels:
-					if str(chan.id) == str(hwChannel):
-						msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-				await ctx.channel.send(msg)
-				return
-			else:
-				hwChannel = self.bot.get_channel(hwChannel)
+			if not (not hwChannel or hwChannel == ""):
+				# We need the channel id
+				if not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel for that...'
+					for chan in ctx.guild.channels:
+						if str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+					await ctx.channel.send(msg)
+					return
+				else:
+					hwChannel = self.bot.get_channel(hwChannel)
 		else:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -596,22 +593,34 @@ class Hw:
 		await hwChannel.send(msg)
 
 	# New HW helper methods
-	def channelCheck(self, msg):
-		if msg.channel == discord.TextChannel:
-			# Let's check our server stuff
-			hwChannel = self.settings.getServerStat(msg.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
-				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					return False
-			else:
-				# Nothing set - pm
-				if not type(msg.channel) == discord.DMChannel:
-					return False
+	def channelCheck(self, msg, dest = None):
+		if dest:
+			# We have a target channel
+			if type(dest) is discord.User or type(dest) is discord.Member:
+				dest = dest.dm_channel.id
+			elif type(dest) is discord.TextChannel:
+				dest = dest.id
+			elif type(dest) is discord.Guild:
+				dest = dest.default_channel.id
+			if not dest == msg.channel.id:
+				return False 
+		else:
+			# Just make sure it's in pm or the hw channel
+			if msg.channel == discord.TextChannel:
+				# Let's check our server stuff
+				hwChannel = self.settings.getServerStat(msg.guild, "HardwareChannel")
+				if not (not hwChannel or hwChannel == ""):
+					# We need the channel id
+					if not str(hwChannel) == str(ctx.channel.id):
+						return False
+				else:
+					# Nothing set - pm
+					if not type(msg.channel) == discord.DMChannel:
+						return False
 		return True
 
-	def confirmCheck(self, msg):
-		if not self.channelCheck(msg):
+	def confirmCheck(self, msg, dest = None):
+		if not self.channelCheck(msg, dest):
 			return False
 		msgStr = msg.content.lower()
 		if msgStr.startswith('y'):
@@ -644,7 +653,7 @@ class Hw:
 
 		while True:
 			def littleCheck(m):
-				return message.author.id == m.author.id and self.confirmCheck(m)
+				return message.author.id == m.author.id and self.confirmCheck(m, dest)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
 			except Exception:
@@ -672,7 +681,7 @@ class Hw:
 		await dest.send(message)
 		while True:
 			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.channelCheck(m)
+				return ctx.author.id == m.author.id and self.channelCheck(m, dest)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
 			except Exception:
