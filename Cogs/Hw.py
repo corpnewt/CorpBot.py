@@ -429,49 +429,48 @@ class Hw:
 				if len(foundStr):
 					# We're in business
 					foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
-					return
+					break
 				else:
 					# foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
 					# Nothing found...
 					memFromName = None
 					buildStr    = None
-			if memFromName:
-				# We're in business
-				foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
-				if self.checkSuppress(ctx):
-					foundStr = Nullify.clean(foundStr)
-				await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
-				return
-			
-			# If we're here - then we didn't find a member - set it to the author, and run another quick search
-			buildStr  = user
-			
-			if len(buildStr) < 3:
-				usage = "Search term must be at least 3 characters."
-				await ctx.channel.send(usage)
-				return
-			
-			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-			
-			foundStr = ''
-			foundCt  = 0
-			for build in buildList:
-				bParts = build['Hardware']
-				for line in bParts.splitlines():
-					if buildStr.lower() in line.lower():
-						foundCt += 1
-						foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
-
-			if len(foundStr):
-				# We're in business
-				foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr) + foundStr
-			else:
-				foundStr = 'Nothing found for "{}".'.format(buildStr)
-				# Nothing found...
+		if memFromName and len(foundStr):
+			# We're in business
 			if self.checkSuppress(ctx):
 				foundStr = Nullify.clean(foundStr)
 			await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
+			return
+
+		# If we're here - then we didn't find a member - set it to the author, and run another quick search
+		buildStr  = user
+
+		if len(buildStr) < 3:
+			usage = "Search term must be at least 3 characters."
+			await ctx.channel.send(usage)
+			return
+
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+
+		foundStr = ''
+		foundCt  = 0
+		for build in buildList:
+			bParts = build['Hardware']
+			for line in bParts.splitlines():
+				if buildStr.lower() in line.lower():
+					foundCt += 1
+					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line)
+
+		if len(foundStr):
+			# We're in business
+			foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr) + foundStr
+		else:
+			foundStr = 'Nothing found for "{}".'.format(buildStr)
+			# Nothing found...
+		if self.checkSuppress(ctx):
+			foundStr = Nullify.clean(foundStr)
+		await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
