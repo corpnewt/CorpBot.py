@@ -487,8 +487,8 @@ class Hw:
 				buildParts  = None
 
 				# Name = 0 up to i joined by space
-				nameStr = ' '.join(parts[0:i+1])
-				buildStr = ' '.join(parts[i+1:])
+				nameStr = ' '.join(parts[0:i])
+				buildStr = ' '.join(parts[i:])
 
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
@@ -513,8 +513,8 @@ class Hw:
 				buildParts  = None
 
 				# Name = 0 up to i joined by space
-				nameStr = ' '.join(parts[0:i+1])
-				buildStr = ' '.join(parts[i+1:])
+				nameStr = ' '.join(parts[0:i])
+				buildStr = ' '.join(parts[i:])
 
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
