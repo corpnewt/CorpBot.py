@@ -38,6 +38,7 @@ def memberForName(name, server):
     # No member yet - try ID
     #memID = ''.join(list(filter(str.isdigit, name)))
     memID = re.sub(r'\W+', '', name)
+    print("{} : {}".format(name, memID))
     newMem = memberForID(memID, server)
     if newMem:
         return newMem
