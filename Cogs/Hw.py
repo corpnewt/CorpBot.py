@@ -512,6 +512,8 @@ class Hw:
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", ctx.guild)
+		if buildList == None:
+			buildList = []
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
