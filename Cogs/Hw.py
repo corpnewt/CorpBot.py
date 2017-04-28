@@ -488,20 +488,12 @@ class Hw:
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
-				if buildStr == None:
-					# Full thing is a member's name - get their main rig
-					for build in buildList:
-						if build['Main']:
-							# Ha! Found it!
-							buildParts = build
-							break
-				else:
-					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					for build in buildList:
-						if build['Name'].lower() == buildStr.lower():
-							# Ha! Found it!
-							buildParts = build
-							break
+				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				for build in buildList:
+					if build['Name'].lower() == buildStr.lower():
+						# Ha! Found it!
+						buildParts = build
+						break
 				if buildParts:
 					# We're in business
 					break
@@ -533,8 +525,7 @@ class Hw:
 						# We're in business
 						break
 					else:
-						memFromName = None
-					
+						memFromName = None		
 
 		if not memFromName:
 			# One last shot - check if it's a build for us
@@ -554,6 +545,10 @@ class Hw:
 						memFromName = ctx.author
 				except Exception:
 					pass
+		
+		if not memFromName:
+			# Last check for a user passed as the only param
+			memFromName = DisplayName.memberForName(user, ctx.guild)
 		
 		if not memFromName:
 			# We couldn't find them :(
