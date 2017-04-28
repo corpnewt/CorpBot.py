@@ -439,6 +439,7 @@ class Hw:
 			# If we're here - then we didn't find a member - set it to the author, and run another quick search
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+			buildStr  = user
 			foundStr = ''
 			foundCt  = 0
 			for build in buildList:
