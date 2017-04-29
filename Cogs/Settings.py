@@ -44,7 +44,7 @@ class Settings:
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"ChatChannel"			: "", 		# ID or blank for no channel
 				"HardwareChannel"       : "",		# ID or blank for no channel
-				"DefaultChannel"	: "", 	: "",   # ID or blank for no channel
+				"DefaultChannel"	: "",		# ID or blank for no channel
 				"LastChat"				: 0,		# UTC Timestamp of last chat message
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
