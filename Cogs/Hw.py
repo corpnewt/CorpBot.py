@@ -27,6 +27,18 @@ class Hw:
 		else:
 			return False
 
+	async def onready(self):
+		# Clear any previous hw setting
+		try:
+			userList = self.settings.serverDict['GlobalMembers']
+		except:
+			userList = []
+		for user in userList:
+			if 'HWActive' in user and user['HWActive'] == True:
+				user['HWActive'] = False
+		self.settings.serverDict['GlobalMembers'] = userList
+
+
 	@commands.command(pass_context=True)
 	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets the channel for hardware (admin only)."""
@@ -229,6 +241,10 @@ class Hw:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
+		# Make sure we're not already in a parts transaction
+		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			return
+
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
@@ -255,6 +271,9 @@ class Hw:
 			await ctx.channel.send(msg)
 			return
 
+		# Set our HWActive flag
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+
 		# Here, we have a build
 		bname = mainBuild['Name']
 		bparts = mainBuild['Hardware']
@@ -270,12 +289,14 @@ class Hw:
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
+				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
 				test = await self.confirm(ctx, parts, hwChannel, msg)
 				if test == None:
+					self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 					return
 				elif test == True:
 					partList = parts.content.split()
@@ -289,11 +310,13 @@ class Hw:
 					if not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					if len(output) > 2000:
 						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
 						msg += '\nMaybe see if you can prune up that list a bit and try again?'
 						await hwChannel.send(msg)
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
@@ -303,6 +326,7 @@ class Hw:
 			mainBuild['Hardware'] = parts.content
 			break
 		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 
 
@@ -332,6 +356,10 @@ class Hw:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
+		# Make sure we're not already in a parts transaction
+		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			return
+
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
@@ -358,6 +386,9 @@ class Hw:
 			await ctx.channel.send(msg)
 			return
 
+		# Set our HWActive flag
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+
 		# Here, we have a build
 		bname = mainBuild['Name']
 		if self.checkSuppress(ctx):
@@ -367,6 +398,7 @@ class Hw:
 		while True:
 			buildName = await self.prompt(ctx, msg, hwChannel)
 			if not buildName:
+				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			buildExists = False
 			for build in buildList:
@@ -384,6 +416,7 @@ class Hw:
 		if self.checkSuppress(ctx):
 			bname2 = Nullify.clean(bname2)
 		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 		
 		
@@ -665,6 +698,13 @@ class Hw:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
+		# Make sure we're not already in a parts transaction
+		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			return
+
+		# Set our HWActive flag
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+
 		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
 		if len(buildList) == 1:
 			msg += 'You currently have *1 build* on file.\n\n'
@@ -679,6 +719,7 @@ class Hw:
 		while True:
 			buildName = await self.prompt(ctx, msg, hwChannel)
 			if not buildName:
+				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			buildExists = False
 			for build in buildList:
@@ -697,12 +738,14 @@ class Hw:
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
+				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
 				test = await self.confirm(ctx, parts, hwChannel, msg)
 				if test == None:
+					self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 					return
 				elif test == True:
 					partList = parts.content.split()
@@ -717,11 +760,13 @@ class Hw:
 					if not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					if len(output) > 2000:
 						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
 						msg += '\nMaybe see if you can prune up that list a bit and try again?'
 						await hwChannel.send(msg)
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
@@ -738,6 +783,7 @@ class Hw:
 		buildList.append(newBuild)
 		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 		msg = '*{}*, {} was created successfully!'.format(DisplayName.name(ctx.author), bname)
+		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 
 	# New HW helper methods

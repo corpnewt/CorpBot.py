@@ -23,6 +23,11 @@ class Server:
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
 	async def message(self, message):
+		if not type(message.channel) is discord.TextChannel:
+			return { "Ignore" : False, "Delete" : False }
+		# Make sure we're not already in a parts transaction
+		if self.settings.getGlobalUserStat(message.author, 'HWActive'):
+			return { "Ignore" : False, "Delete" : False }
 		# Check if we have a pcpartpicker link
 		matches = re.finditer(self.regex, message.content)
 
