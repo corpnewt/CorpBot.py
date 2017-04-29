@@ -102,6 +102,36 @@ class Admin:
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
+	
+	@commands.command(pass_context=True)
+	async def setdefaultchannel(self, ctx, *, channel: discord.TextChannel = None):
+		"""Sets a replacement default channel for bot messages (admin only)."""
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if channel == None:
+			self.settings.setServerStat(ctx.message.guild, "DefaultChannel", "")
+			msg = 'Default channel has been returned to **{}**.'.format(ctx.guild.default_channel.name)
+			await ctx.message.channel.send(msg)
+			return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.guild, "DefaultChannel", channel.id)
+
+		msg = 'Default channel set to **{}**.'.format(channel.name)
+		await ctx.message.channel.send(msg)
+		
+	
+	@setmadlibschannel.error
+	async def setmadlibschannel_error(self, error, ctx):
+		# do stuff
+		msg = 'setmadlibschannel Error: {}'.format(error)
+		await ctx.channel.send(msg)
+	
 
 	@commands.command(pass_context=True)
 	async def setmadlibschannel(self, ctx, *, channel: discord.TextChannel = None):
