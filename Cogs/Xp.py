@@ -68,9 +68,19 @@ class Xp:
 							self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
 							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
 
+							# Check our default channels
+							targetChan = server.default_channel
+							targetChanID = self.settings.getServerStat(ctx.message.guild, "DefaultChannel")
+							if len(targetChanID):
+								# We *should* have a channel
+								tChan = self.bot.get_channel(int(targetChanID))
+								if tChan:
+									# We *do* have one
+									targetChan = tChan
+							
 							# Check for promotion/demotion
 							try:
-								await CheckRoles.checkroles(user, server.default_channel, self.settings, self.bot)
+								await CheckRoles.checkroles(user, targetChan, self.settings, self.bot)
 							except Exception:
 								continue
 						
