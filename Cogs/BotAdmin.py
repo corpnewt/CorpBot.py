@@ -31,21 +31,16 @@ class BotAdmin:
 
 		serverDict = self.settings.serverDict
 
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(ctx.message.author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
-				await ctx.channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 			
 		if member == None:
 			msg = 'Usage: `{}setuserparts [member] "[parts text]"`'.format(ctx.prefix)
