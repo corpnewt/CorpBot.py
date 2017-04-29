@@ -104,6 +104,27 @@ class Admin:
 
 	
 	@commands.command(pass_context=True)
+	async def defaultchannel(self, ctx):
+		"""Lists the server's default channel, whether custom or not."""
+		# Returns the default channel for the server
+		targetChan = ctx.guild.default_channel
+		targetChanID = self.settings.getServerStat(ctx.guild, "DefaultChannel")
+		if len(str(targetChanID)):
+			# We *should* have a channel
+			tChan = self.bot.get_channel(int(targetChanID))
+			if tChan:
+				# We *do* have one
+				targetChan = tChan
+		if targetChan.id == ctx.guild.default_channel.id:
+			# We're using the server default
+			msg = "The default channel is the server's original default: **{}**".format(targetChan.name)
+		else:
+			# We have a custom channel
+			msg = "The default channel is set to **{}**.".format(targetChan.name)
+		await ctx.channel.send(msg)
+		
+	
+	@commands.command(pass_context=True)
 	async def setdefaultchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets a replacement default channel for bot messages (admin only)."""
 		
