@@ -47,6 +47,18 @@ class Welcome:
             await self._goodbye(member, server, welcomeChannel)
         else:
             await self._goodbye(member, server)
+            
+    async def _getDefault(self, server):
+        # Returns the default channel for the server
+        targetChan = server.default_channel
+        targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+        if len(targetChanID):
+            # We *should* have a channel
+            tChan = self.bot.get_channel(int(targetChanID))
+            if tChan:
+                # We *do* have one
+                targetChan = tChan
+        return targetChan
 
     @commands.command(pass_context=True)
     async def setwelcome(self, ctx, *, message = None):
@@ -127,7 +139,7 @@ class Welcome:
         if welcomeChannel:
             msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.name)
         else:
-            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
+            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
         await ctx.channel.send(msg)
 
 
@@ -212,7 +224,7 @@ class Welcome:
         if welcomeChannel:
             msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.name)
         else:
-            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
+            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
         await ctx.channel.send(msg)
 
 
@@ -236,7 +248,7 @@ class Welcome:
         if channel:
             await channel.send(message)
         else:
-            await server.default_channel.send(message)
+            await self._getDefault(ctx.guild).send(message)
 
 
     async def _goodbye(self, member, server, channel = None):
@@ -258,7 +270,7 @@ class Welcome:
         if channel:
             await channel.send(message)
         else:
-            await server.default_channel.send(message)
+            await self._getDefault(ctx.guild).send(message)
 
     @commands.command(pass_context=True)
     async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
@@ -280,7 +292,7 @@ class Welcome:
 
         if channel == None:
             self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
-            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(ctx.message.guild.default_channel.name)
+            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
             await ctx.channel.send(msg)
             return
 
