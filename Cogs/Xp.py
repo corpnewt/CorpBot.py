@@ -71,7 +71,7 @@ class Xp:
 							# Check our default channels
 							targetChan = server.default_channel
 							targetChanID = self.settings.getServerStat(ctx.message.guild, "DefaultChannel")
-							if len(targetChanID):
+							if len(str(targetChanID)):
 								# We *should* have a channel
 								tChan = self.bot.get_channel(int(targetChanID))
 								if tChan:
