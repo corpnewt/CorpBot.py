@@ -189,6 +189,7 @@ class Remind:
 			suppress = False
 			
 		reminders = self.settings.getUserStat(member, member.guild, "Reminders")
+		reminders = sorted(reminders, key=lambda x:int(x['End']))
 		if not len(reminders):
 			# No reminders
 			msg = "Oooh, look at you, *so much to be reminded about*... Just kidding.  You don't have any reminders to clear."
@@ -218,6 +219,7 @@ class Remind:
 		
 		# We made it!  Valid index and all sorts of stuff
 		removed = reminders.pop(index-1)
+		self.settings.setUserStat(member, member.guild, "Reminders", reminders)
 		msg = "I will no longer remind you: {}".format(removed["Message"])
 		# Check for suppress
 		if suppress:
