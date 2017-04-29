@@ -48,7 +48,7 @@ class Welcome:
         else:
             await self._goodbye(member, server)
             
-    async def _getDefault(self, server):
+    def _getDefault(self, server):
         # Returns the default channel for the server
         targetChan = server.default_channel
         targetChanID = self.settings.getServerStat(server, "DefaultChannel")
