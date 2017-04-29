@@ -12,10 +12,10 @@ class Time:
 		self.bot = bot
 		self.settings = settings
 
-	async def onjoin(self, member, server):
+	'''async def onjoin(self, member, server):
 		# Resolve our status based on the most occurances of UTCOffset
 		newVal = self.settings.getGlobalUserStat(member, "UTCOffset", server)
-		self.settings.setUserStat(member, server, "UTCOffset", newVal)	
+		self.settings.setUserStat(member, server, "UTCOffset", newVal)'''
 		
 	@commands.command(pass_context=True)
 	async def setoffset(self, ctx, *, offset : str = None):
