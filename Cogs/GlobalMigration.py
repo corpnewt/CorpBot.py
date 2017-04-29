@@ -16,6 +16,33 @@ class GlobalMigration:
 
 
 	@commands.command(pass_context=True, hidden=True)
+	async def clearlocal(self, ctx, setting = None):
+		"""Clears a local setting from a user."""
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if not setting:
+			msg = "You need a setting to clear."
+			await ctx.channel.send(msg)
+			return
+
+		for guild in self.bot.guilds:
+			for member in guild.members:
+				# Clear the setting
+				self.settings.setUserStat(member, guild, setting, None)
+		msg = "Local stat cleared!"
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True, hidden=True)
 	async def migrate(self, ctx, setting = None):
 		"""Migrates a local setting to global (owner only)."""
 		# Only allow owner
