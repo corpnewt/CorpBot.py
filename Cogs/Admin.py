@@ -1093,8 +1093,17 @@ class Admin:
 			return
 		
 		for server in self.bot.guilds:
+			# Get the default channel
+			targetChan = server.default_channel
+			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+			if len(str(targetChanID)):
+				# We *should* have a channel
+				tChan = self.bot.get_channel(int(targetChanID))
+				if tChan:
+					# We *do* have one
+					targetChan = tChan
 			try:
-				await server.default_channel.send(message)
+				await targetChan.send(message)
 			except Exception:
 				pass
 
