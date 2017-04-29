@@ -180,7 +180,7 @@ urban = UrbanDict.UrbanDict(bot, settings)
 cogList.append(urban)
 
 # Server Info
-server = Server.Server(bot, settings)
+server = Server.Server(bot, settings, prefix)
 cogList.append(server)
 
 # Flip

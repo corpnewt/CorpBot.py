@@ -96,9 +96,10 @@ def boldItalicStyle(types, names, escape = False):
 		
 def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
-	if url.lower() == "https://pcpartpicker.com/list/":
+	if url.lower().endswith("pcpartpicker.com/list/"):
 		# Not *just* the list... we want actual parts
 		return None
+	url = url.replace("#view=", "")
 	if '/b/' in url.lower():
 		# We have a build - let's try to convert to list
 		try:

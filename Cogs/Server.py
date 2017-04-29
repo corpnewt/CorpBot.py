@@ -16,11 +16,31 @@ from   Cogs import PCPP
 class Server:
 
 	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, prefix = "$"):
 		self.bot = bot
 		self.settings = settings
+		self.prefix = prefix
 		# Regex for extracting urls from strings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+
+
+	async def get_prefix(self, message):
+		# Check commands against some things and do stuff or whatever...
+		try:
+			serverPrefix = self.settings.getServerStat(message.guild, "Prefix")
+		except Exception:
+			serverPrefix = None
+		if not serverPrefix:
+			# No custom prefix - use the default
+			serverPrefix = self.prefix
+		try:
+			botMember = discord.utils.get(message.guild.members, id=self.bot.user.id)
+		except Exception:
+			# Couldn't get a member - just get the user
+			botMember = self.bot.user
+		# Allow mentions too
+		return (serverPrefix, str(botMember.mention)+" ")
+
 
 	async def message(self, message):
 		if not type(message.channel) is discord.TextChannel:
@@ -28,6 +48,13 @@ class Server:
 		# Make sure we're not already in a parts transaction
 		if self.settings.getGlobalUserStat(message.author, 'HWActive'):
 			return { "Ignore" : False, "Delete" : False }
+		
+		# Check if we're attempting to run the pcpp command
+		for pre in await self.get_prefix(message):
+			if message.content.lower().startswith(pre):
+				# Running a command - return
+				return { "Ignore" : False, "Delete" : False }
+
 		# Check if we have a pcpartpicker link
 		matches = re.finditer(self.regex, message.content)
 
