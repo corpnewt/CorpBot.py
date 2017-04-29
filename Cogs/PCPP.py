@@ -97,18 +97,21 @@ def boldItalicStyle(types, names, escape = False):
 def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
 	if '/b/' in url.lower():
-		# We have a build
+		# We have a build - let's try to convert to list
 		try:
 			response = requests.get(url)
 		except Exception:
 			return None
-		r = response.text
-		newLink = find_last_between(r, 'href=\"list/', '">View')
-		print("NewLink: {}".format(newLink))
+		dom = pq(response.text)
+		listLink = dom('span.header-actions')
+		newLink = None
+		for link in listLink.children():
+			for attrib_name in link.attrib:
+				if attrib_name == 'href':
+					newLink = link.attrib['href']
 		if newLink == None:
 			return None
-		url = "https://pcpartpicker.com/list/" + str(newLink)
-		print(url)
+		url = "https://pcpartpicker.com" + str(newLink)
 		
 	# url = url.replace('/b/', '/list/')
 	if not style:
