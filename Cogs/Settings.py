@@ -50,6 +50,7 @@ class Settings:
 				"StrikeOut"				: 3,		# Number of strikes needed for consequence
 				"KickList"				: [],		# List of id's that have been kicked
 				"BanList"				: [],		# List of id's that have been banned
+				"Prefix"				: None,		# Custom Prefix
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
@@ -575,19 +576,15 @@ class Settings:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I can\'t do that until I have an owner.'
-			await channel.send(msg)
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
-		if not str(author.id) == str(owner):
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can dump the settings.'
-			await channel.send(msg)
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
 			return
 		
 		message = await ctx.message.author.send('Uploading *Settings.json*...')
@@ -870,10 +867,15 @@ class Settings:
 	@commands.command(pass_context=True)
 	async def flush(self, ctx):
 		"""Flush the bot settings to disk (admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
 			return
 		# Flush settings
 		self.flushSettings()
@@ -907,21 +909,16 @@ class Settings:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		removedSettings = 0
 		settingsWord = "settings"
@@ -957,21 +954,16 @@ class Settings:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		removedSettings = 0
 		settingsWord = "settings"
@@ -1006,21 +998,16 @@ class Settings:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use prune.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 		
 		# Set up vars
 		removedUsers = 0
