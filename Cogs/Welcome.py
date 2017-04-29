@@ -52,7 +52,7 @@ class Welcome:
         # Returns the default channel for the server
         targetChan = server.default_channel
         targetChanID = self.settings.getServerStat(server, "DefaultChannel")
-        if len(targetChanID):
+        if len(str(targetChanID)):
             # We *should* have a channel
             tChan = self.bot.get_channel(int(targetChanID))
             if tChan:
