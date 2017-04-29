@@ -96,6 +96,9 @@ def boldItalicStyle(types, names, escape = False):
 		
 def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
+	if url.lower() == "https://pcpartpicker.com/list/":
+		# Not *just* the list... we want actual parts
+		return None
 	if '/b/' in url.lower():
 		# We have a build - let's try to convert to list
 		try:
@@ -168,6 +171,9 @@ def getMarkdown( url, style = None, escape = False):
 		partout = boldStyle(types, names, escape)
 	elif style.lower() == 'bolditalic':
 		partout = boldItalicStyle(types, names, escape)
-	else:
+	elif style.lower() == 'normal':
 		partout = normalStyle(types, names, escape)
+	else:
+		# No style present
+		return None
 	return partout

@@ -3,11 +3,13 @@ import discord
 import requests
 import string
 import os
+import re
 from   datetime import datetime
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
 from   Cogs import Nullify
+from   Cogs import PCPP
 
 # This module sets/gets some server info
 
@@ -17,6 +19,30 @@ class Server:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		# Regex for extracting urls from strings
+		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+
+	async def message(self, message):
+		# Check if we have a pcpartpicker link
+		matches = re.finditer(self.regex, message.content)
+
+		pcpplink = None
+		for match in matches:
+			if 'pcpartpicker.com' in match.group(0).lower():
+				pcpplink = match.group(0)
+		
+		if not pcpplink:
+			# Didn't find any
+			return { "Ignore" : False, "Delete" : False }
+		
+		autopcpp = self.settings.getServerStat(message.guild, "AutoPCPP")
+		if autopcpp == None:
+			return { "Ignore" : False, "Delete" : False }
+
+		ret = PCPP.getMarkdown(pcpplink, autopcpp)
+		return { "Ignore" : False, "Delete" : False, "Respond" : ret }
+
+		
 
 	@commands.command(pass_context=True)
 	async def setprefix(self, ctx, *, prefix : str = None):
@@ -64,6 +90,42 @@ class Server:
 
 		msg = 'Prefix is: {}'.format(serverPrefix)
 		await ctx.channel.send(msg)
+
+	
+	@commands.command(pass_context=True)
+	async def autopcpp(self, ctx, *, setting : str = None):
+		"""Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). Setting can be normal, md, mdblock, bold, bolditalic, or nothing."""
+		# Check for admin status
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if setting == None:
+			# Disabled
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", None)
+			msg = 'Auto pcpartpicker *disabled*.'
+		elif setting.lower() == "normal":
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", "normal")
+			msg = 'Auto pcpartpicker set to *Normal*.'
+		elif setting.lower() == "md":
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", "md")
+			msg = 'Auto pcpartpicker set to *Markdown*.'
+		elif setting.lower() == "mdblock":
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", "mdblock")
+			msg = 'Auto pcpartpicker set to *Markdown Block*.'
+		elif setting.lower() == "bold":
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", "bold")
+			msg = 'Auto pcpartpicker set to *Bold*.'
+		elif setting.lower() == "bolditalic":
+			self.settings.setServerStat(ctx.guild, "AutoPCPP", "bolditalic")
+			msg = 'Auto pcpartpicker set to *Bold Italics*.'
+		else:
+			msg = "That's not one of the options."
+		
+		await ctx.channel.send(msg)
+			
 
 
 	@commands.command(pass_context=True)

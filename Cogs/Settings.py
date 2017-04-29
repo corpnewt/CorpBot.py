@@ -44,7 +44,7 @@ class Settings:
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"ChatChannel"			: "", 		# ID or blank for no channel
 				"HardwareChannel"       : "",		# ID or blank for no channel
-				"DefaultChannel"	: "",		# ID or blank for no channel
+				"DefaultChannel"		: "",		# ID or blank for no channel
 				"LastChat"				: 0,		# UTC Timestamp of last chat message
 				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
@@ -52,6 +52,7 @@ class Settings:
 				"KickList"				: [],		# List of id's that have been kicked
 				"BanList"				: [],		# List of id's that have been banned
 				"Prefix"				: None,		# Custom Prefix
+				"AutoPCPP"				: None,		# Auto-format pcpartpicker links?
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)

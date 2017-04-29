@@ -449,15 +449,15 @@ async def on_message(message):
 		except KeyError:
 			pass
 
-	if respond:
-		# We have something to say
-		await message.channel.send(respond)
 	if delete:
 		# We need to delete the message - top priority
 		await message.delete()
 
 	if not ignore:
 		# We're processing commands here
+		if respond:
+			# We have something to say
+			await message.channel.send(respond)
 		await bot.process_commands(message)
 
 @bot.event
