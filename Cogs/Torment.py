@@ -25,19 +25,11 @@ class Torment:
 		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 		
 		if delay == None:
 			if self.waitBetween == 1:
@@ -72,19 +64,11 @@ class Torment:
 		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 			
 		if not self.toTorment:
 			await ctx.message.author.send('Not currently tormenting.')
@@ -104,19 +88,11 @@ class Torment:
 		message = ctx.message
 
 		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 
@@ -192,20 +168,12 @@ class Torment:
 		server  = ctx.message.guild
 		message = ctx.message
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 
@@ -282,20 +250,12 @@ class Torment:
 		server  = ctx.message.guild
 		message = ctx.message
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 
@@ -375,20 +335,12 @@ class Torment:
 		server  = ctx.message.guild
 		message = ctx.message
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			return
-		else:
-			if not str(author.id) == str(owner):
-				return
+		elif isOwner == False:
+			return
 				
 		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 

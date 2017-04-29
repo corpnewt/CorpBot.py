@@ -109,6 +109,8 @@ class Hw:
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
@@ -165,6 +167,8 @@ class Hw:
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		# Get build by name first - then by index
@@ -226,6 +230,8 @@ class Hw:
 			hwChannel = ctx.author
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
@@ -327,6 +333,8 @@ class Hw:
 			hwChannel = ctx.author
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
@@ -411,6 +419,8 @@ class Hw:
 					await ctx.channel.send(usage)
 					return
 				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				if buildList == None:
+					buildList = []
 				buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 				foundStr = ''
 				foundCt  = 0
@@ -446,6 +456,8 @@ class Hw:
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		foundStr = ''
@@ -491,6 +503,8 @@ class Hw:
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
 				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				if buildList == None:
+					buildList = []
 				for build in buildList:
 					if build['Name'].lower() == buildStr.lower():
 						# Ha! Found it!
@@ -515,6 +529,8 @@ class Hw:
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
 					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+					if buildList == None:
+						buildList = []
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
@@ -532,6 +548,8 @@ class Hw:
 		if not memFromName:
 			# One last shot - check if it's a build for us
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+			if buildList == None:
+				buildList = []
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 			for build in buildList:
 				if build['Name'].lower() == user.lower():
@@ -561,6 +579,8 @@ class Hw:
 		if buildParts == None:
 			# Check if that user has no builds
 			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+			if buildList == None:
+				buildList = []
 			if not len(buildList):
 				# No parts!
 				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
@@ -597,6 +617,8 @@ class Hw:
 			await ctx.channel.send(usage)
 			return
 		buildList = self.settings.getGlobalUserStat(member, "Hardware")
+		if buildList == None:
+			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 		if not len(buildList):
 			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)

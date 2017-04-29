@@ -496,20 +496,15 @@ class Debugging:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.settings.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I cannot adjust debugging until I have an owner.'
-			await channel.send(msg)
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
-		if not str(author.id) == str(owner):
-			# Not the owner
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-			await channel.send(msg)
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
 			return
 
 		if debug == None:
@@ -549,20 +544,15 @@ class Debugging:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.settings.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I cannot adjust debugging until I have an owner.'
-			await channel.send(msg)
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
-		if not str(author.id) == str(owner):
-			# Not the owner
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-			await channel.send(msg)
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
 			return
 		
 		if not os.path.exists('debug.txt'):
@@ -583,20 +573,15 @@ class Debugging:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.settings.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I cannot adjust debugging until I have an owner.'
-			await channel.send(msg)
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
-		if not str(author.id) == str(owner):
-			# Not the owner
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-			await channel.send(msg)
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
 			return
 
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")

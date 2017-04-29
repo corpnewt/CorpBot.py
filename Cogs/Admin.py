@@ -90,16 +90,11 @@ class Admin:
 			ownerLock = self.settings.serverDict['OwnerLock']
 		except KeyError:
 			ownerLock = "No"
-		try:
-			owner = self.settings.serverDict['Owner']
-		except KeyError:
-			owner = None
+		owner = self.settings.isOwner(message.author)
 		# Check if owner exists - and we're in OwnerLock
-		if owner and ownerLock.lower() == "yes":
-			# Check if the message author is the owner or not
-			if not str(message.author.id) == str(owner):
-				# Not the owner - ignore
-				ignore = True
+		if (not owner) and ownerLock.lower() == "yes":
+			# Not the owner - ignore
+			ignore = True
 				
 		if not isAdmin and res:
 			# We have a response - PM it
@@ -1056,23 +1051,16 @@ class Admin:
 			await channel.send(usage)
 			return
 
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can broadcast.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 		
 		for server in self.bot.guilds:
 			try:

@@ -19,10 +19,10 @@ class Lists:
 		self.settings = settings
 		
 		
-	async def onjoin(self, member, server):
+	'''async def onjoin(self, member, server):
 		# Resolve our status based on the most occurances of UTCOffset
 		newVal = self.settings.getGlobalUserStat(member, "Parts", server)
-		self.settings.setUserStat(member, server, "Parts", newVal)
+		self.settings.setUserStat(member, server, "Parts", newVal)'''
 
 		
 	@commands.command(pass_context=True)
@@ -696,7 +696,7 @@ class Lists:
 				await ctx.channel.send(msg)
 				return
 
-		parts = self.settings.getUserStat(member, server, "Parts")
+		parts = self.settings.getGlobalUserStat(member, "Parts")
 		
 		if not parts or parts == "":
 			msg = '*{}* has not added their parts yet!  They can add them with the `{}setparts [parts text]` command!'.format(DisplayName.name(member), ctx.prefix)

@@ -184,6 +184,33 @@ class Settings:
 			await asyncio.sleep(self.backupTime)
 
 
+	def isOwner(self, member):
+		# This method converts prior, string-only ownership to a list,
+		# then searches the list for the passed member
+		try:
+			ownerList = self.serverDict['Owner']
+		except KeyError:
+			self.serverDict['Owner'] = []
+			ownerList = self.serverDict['Owner']
+		if not len(ownerList):
+			return None
+		if not type(ownerList) is list:
+			# We have a string, convert
+			ownerList = [ int(ownerList) ]
+			self.serverDict['Owner'] = ownerList
+		# At this point - we should have a list
+		for owner in ownerList:
+			if not self.bot.get_user(owner):
+				# Invalid user - remove
+				self.serverDict['Owner'].remove(owner)
+				continue
+			if int(owner) == member.id:
+				# We're in the list
+				return True
+		# Not in the list.. :(
+		return False
+
+
 	def getServerDict(self):
 		# Returns the server dictionary
 		return self.serverDict
@@ -238,6 +265,7 @@ class Settings:
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
+		self.checkGlobalUsers()
 		#if found:
 			#self.flushSettings()
 
@@ -249,6 +277,7 @@ class Settings:
 				found = True
 				# We found our server - remove
 				self.serverDict["Servers"].remove(x)
+		self.checkGlobalUsers()
 		#if found:
 			#self.flushSettings()
 
@@ -381,9 +410,20 @@ class Settings:
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
+		self.checkGlobalUsers()
 		#if found:
 			#self.flushSettings()
 
+	def checkGlobalUsers(self):
+		try:
+			userList = self.serverDict['GlobalMembers']
+		except:
+			userList = []
+		for u in userList:
+			if not self.bot.get_user(u['ID']):
+				# Can't find... delete!
+				userList.remove(u)
+		self.serverDict['GlobalMembers'] = userList
 
 	# Let's make sure the user is in the specified server
 	def removeUserID(self, id, server):
@@ -399,6 +439,7 @@ class Settings:
 						found = True
 						# Found our user - remove
 						x["Members"].remove(y)
+		self.checkGlobalUsers()
 		#if found:
 			#self.flushSettings()
 
@@ -424,34 +465,21 @@ class Settings:
 		return None
 	
 	
-	def getGlobalUserStat(self, user, stat, ignore_server = None):
+	def getGlobalUserStat(self, user, stat):
 		# Loop through options, and get the most common
-		tempDict = {}
-		for server in self.bot.guilds:
-			if ignore_server and ignore_server.id == server.id:
-				# We're ignoring this server
-				continue
-			for member in server.members:
-				if user.id == member.id:
-					# Found us
-					tempVal = self.getUserStat(member, server, stat)
-					if type(tempVal) is dict or type(tempVal) is list:
-						# Un-hashable - return it
-						return tempVal
-					if not tempVal == None or not tempVal == "":
-						# It's a real value
-						if tempVal in tempDict:
-							tempDict[tempVal] += 1
-						else:
-							tempDict[tempVal] = 1
-		decidedVal = None
-		highest = 0
-		for key in tempDict:
-			if tempDict[key] > highest:
-				highest = tempDict[key]
-				decidedVal = key
-		
-		return decidedVal
+		try:
+			userList = self.serverDict['GlobalMembers']
+		except:
+			return None
+		for u in userList:
+			if u['ID'] == user.id:
+				# Got a match, check the stat
+				try:
+					uStat = u[stat]
+				except KeyError:
+					uStat = None
+				return uStat
+		return None
 	
 	
 	# Set the provided stat
@@ -471,14 +499,18 @@ class Settings:
 						
 	# Set a provided global stat
 	def setGlobalUserStat(self, user, stat, value):
-		# Changes the stat across all servers the user is a part
-		for server in self.bot.guilds:
-			for member in server.members:
-				if user.id == member.id:
-					# Our user is here - update the stat
-					self.setUserStat(member, server, stat, value)
-					# Already found our user - no need to keep searching here
-					continue
+		try:
+			userList = self.serverDict['GlobalMembers']
+		except:
+			userList = []
+		for u in userList:
+			if u['ID'] == user.id:
+				u[stat] = value
+				return
+		# Add the user
+		u = { "ID": user.id, stat: value }
+		userList.append(u)
+		self.serverDict['GlobalMembers'] = userList
 						
 					
 	# Increment a specified user stat by a provided amount
@@ -569,166 +601,176 @@ class Settings:
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I cannot be locked until I have an owner.'
-			await channel.send(msg)
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
 			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		# We have an owner - and the owner is talking to us
+		# Let's try and get the OwnerLock setting and toggle it
+		try:
+			ownerLock = self.serverDict['OwnerLock']
+		except KeyError:
+			ownerLock = "No"
+		# OwnerLock defaults to "No"
+		if ownerLock.lower() == "no":
+			self.serverDict['OwnerLock'] = "Yes"
+			msg = 'Owner lock **Enabled**.'
+			await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
 		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await channel.send(msg)
-				return
-			# We have an owner - and the owner is talking to us
-			# Let's try and get the OwnerLock setting and toggle it
-			try:
-				ownerLock = self.serverDict['OwnerLock']
-			except KeyError:
-				ownerLock = "No"
-			# OwnerLock defaults to "No"
-			if ownerLock.lower() == "no":
-				self.serverDict['OwnerLock'] = "Yes"
-				msg = 'Owner lock **Enabled**.'
-				await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
-			else:
-				self.serverDict['OwnerLock'] = "No"
-				msg = 'Owner lock **Disabled**.'
-				await self.bot.change_presence(game=None)
-			await channel.send(msg)
-			#self.flushSettings()
+			self.serverDict['OwnerLock'] = "No"
+			msg = 'Owner lock **Disabled**.'
+			await self.bot.change_presence(game=None)
+		await channel.send(msg)
+		#self.flushSettings()
 
 
 	@commands.command(pass_context=True)
-	async def owner(self, ctx):
-		"""Lists the bot's current owner."""
+	async def owners(self, ctx):
+		"""Lists the bot's current owners."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
+		# Check to force the owner list update
+		self.isOwner(ctx.author)
 
-		if owner:
-			# We got an owner
-			member = DisplayName.memberForID(owner, server)
-			if not member:
-				# Not on this server
-				msg = 'My owner, *<@{}>* (id: *{}*), does not appear to be a part of this server.'.format(owner, owner)
-			else:
-				# Gotem!
-				msg = 'I am owned by *{}*.'.format(DisplayName.name(member))
-		else:
-			# No owner
+		ownerList = self.serverDict['Owner']
+
+		if not len(ownerList):
+			# No owners.
 			msg = 'I have not been claimed, *yet*.'
+		else:
+			msg = 'I am owned by '
+			userList = []
+			for owner in ownerList:
+				# Get the owner's name
+				user = self.bot.get_user(int(owner))
+				if not user:
+					userString = "*Unknown User ({})*".format(owner)
+				else:
+					userString = "*{}*".format(user.name)
+				userList.append(userString)
+			msg += ', '.join(userList)
+
 		await channel.send(msg)
 
 	
 	@commands.command(pass_context=True)
 	async def claim(self, ctx):
-		"""Claims the bot - once set, can only be changed by the current owner."""
+		"""Claims the bot if disowned - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 		member = author
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			self.serverDict['Owner'] = member.id
-			#self.flushSettings()
+		owned = self.isOwner(ctx.author)
+		if owned:
+			# We're an owner
+			msg = "You're already one of my owners."
+		elif owned == False:
+			# We're not an owner
+			msg = "I've already been claimed."
 		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await channel.send(msg)
-				return
-			self.serverDict['Owner'] = member.id
-			#self.flushSettings()
-		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
+			# Claim it up
+			self.serverDict['Owner'].append(ctx.author.id)
+			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await channel.send(msg)
 	
-
 	@commands.command(pass_context=True)
-	async def setowner(self, ctx, *, member : str = None):
-		"""Sets the bot owner - once set, can only be changed by the current owner."""
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
+	async def addowner(self, ctx, *, member : str = None):
+		"""Adds an owner to the owner list.  Can only be done by a current owner."""
+		
+		owned = self.isOwner(ctx.author)
+		if owned == False:
+			msg = "Only an existing owner can add more owners."
+			await ctx.channel.send(msg)
+			return
+		
 		if member == None:
-			member = author
+			member = ctx.author
 
-		memberCheck = DisplayName.memberForName(member, server)
-		if memberCheck:
-			member = memberCheck
-		else:
-			msg = 'I couldn\'t find *{}*.'.format(member)
-			await channel.send(msg)
+		if type(member) is str:
+			memberCheck = DisplayName.memberForName(member, ctx.guild)
+			if memberCheck:
+				member = memberCheck
+			else:
+				msg = 'I couldn\'t find that user...'
+				await ctx.channel.send(msg)
+				return
+		
+		if member.bot:
+			msg = "I can't be owned by other bots.  I don't roll that way."
+			await ctx.channel.send(msg)
 			return
 
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			self.serverDict['Owner'] = member.id
-			#self.flushSettings()
+		if member.id in self.serverDict['Owner']:
+			# Already an owner
+			msg = "Don't get greedy now - *{}* is already an owner.".format(DisplayName.name(member))
 		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can change this setting.'
-				await channel.send(msg)
+			self.serverDict['Owner'].append(member.id)
+			msg = '*{}* has been added to my owner list!'.format(DisplayName.name(member))
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def remowner(self, ctx, *, member : str = None):
+		"""Removes an owner from the owner list.  Can only be done by a current owner."""
+		
+		owned = self.isOwner(ctx.author)
+		if owned == False:
+			msg = "Only an existing owner can remove owners."
+			await ctx.channel.send(msg)
+			return
+		
+		if member == None:
+			member = ctx.author
+
+		if type(member) is str:
+			memberCheck = DisplayName.memberForName(member, ctx.guild)
+			if memberCheck:
+				member = memberCheck
+			else:
+				msg = 'I couldn\'t find that user...'
+				await ctx.channel.send(msg)
 				return
-			self.serverDict['Owner'] = member.id
-			#self.flushSettings()
-
-		msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
-		await channel.send(msg)
-
-	@owner.error
-	async def owner_error(self, error, ctx):
-		msg = 'owner Error: {}'.format(error)
+		
+		if member.id in self.serverDict['Owner']:
+			# Already an owner
+			msg = "*{}* is no longer an owner.".format(DisplayName.name(member))
+			self.serverDict['Owner'].remove(member.id)
+		else:
+			msg = "*{}* can't be removed because they're not one of my owners.".format(DisplayName.name(member))
+		if not len(self.serverDict['Owner']):
+			# No more owners
+			msg += " I have been disowned!"
+		
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def disown(self, ctx):
-		"""Revokes ownership of the bot."""
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		try:
-			owner = self.serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No previous owner, let's set them
-			msg = 'I have already been disowned...'
-			await channel.send(msg)
+		"""Revokes all ownership of the bot."""
+		owned = self.isOwner(ctx.author)
+		if owned == False:
+			msg = "Only an existing owner can revoke ownership."
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can disown me.'
-				await channel.send(msg)
-				return
-			self.serverDict['Owner'] = None
-			#self.flushSettings()
+		elif owned == None:
+			# No owners
+			msg = 'I have already been disowned...'
+			await ctx.channel.send(msg)
+			return
 
-		msg = 'I have been disowned by *{}!*'.format(DisplayName.name(author))
-		await channel.send(msg)
+		self.serverDict['Owner'] = []
+		msg = 'I have been disowned!'
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)

@@ -56,24 +56,16 @@ class RateLimit:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		# Get current delay
 		try:

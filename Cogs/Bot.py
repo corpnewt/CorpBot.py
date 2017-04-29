@@ -123,24 +123,16 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can run a speed test.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		message = await channel.send('Running speed test...')
 		st = pyspeedtest.SpeedTest()
@@ -160,24 +152,17 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can change my avatar.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
 		if filename is None:
 			await self.bot.user.edit(avatar=None)
 			await ctx.channel.send('Avatar removed!')
@@ -282,24 +267,16 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can reboot me.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 		
 		self.settings.flushSettings()
 
@@ -359,24 +336,16 @@ class Bot:
 		else:
 			suppress = False
 
-		# Only allow owner to change server stats
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await channel.send(msg)
+			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can set my playing status.'
-				await channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		if game == None:
 			self.settings.serverDict['Game'] = None
@@ -413,23 +382,16 @@ class Bot:
 		else:
 			suppress = False
 
-		serverDict = self.settings.serverDict
-
-		try:
-			owner = serverDict['Owner']
-		except KeyError:
-			owner = None
-
-		if owner == None:
-			# No owner set
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		else:
-			if not str(ctx.message.author.id) == str(owner):
-				msg = 'You are not the *true* owner of me.  Only the rightful owner can set other user\'s parts.'
-				await ctx.channel.send(msg)
-				return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
 
 		channel = ctx.message.channel
 		author  = ctx.message.author

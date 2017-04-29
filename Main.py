@@ -53,6 +53,7 @@ from Cogs import Torment
 from Cogs import Mute
 from Cogs import UserRole
 from Cogs import Hw
+from Cogs import GlobalMigration
 
 # Let's load our prefix file
 prefix = '$'
@@ -286,6 +287,10 @@ cogList.append(userRole)
 # Hw - Parts like profiles
 hw = Hw.Hw(bot, settings)
 cogList.append(hw)
+
+# GM
+gm = GlobalMigration.GlobalMigration(bot, settings)
+cogList.append(gm)
 
 
 # Main bot events
