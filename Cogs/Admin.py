@@ -126,10 +126,10 @@ class Admin:
 		await ctx.message.channel.send(msg)
 		
 	
-	@setmadlibschannel.error
-	async def setmadlibschannel_error(self, error, ctx):
+	@setdefaultchannel.error
+	async def setdefaultchannel_error(self, error, ctx):
 		# do stuff
-		msg = 'setmadlibschannel Error: {}'.format(error)
+		msg = 'setdefaultchannel Error: {}'.format(error)
 		await ctx.channel.send(msg)
 	
 
