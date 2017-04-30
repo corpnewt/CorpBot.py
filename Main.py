@@ -54,6 +54,7 @@ from Cogs import Mute
 from Cogs import UserRole
 from Cogs import Hw
 from Cogs import GlobalMigration
+from Cogs import Tags
 
 # Let's load our prefix file
 prefix = '$'
@@ -291,6 +292,10 @@ cogList.append(hw)
 # GM
 gm = GlobalMigration.GlobalMigration(bot, settings)
 cogList.append(gm)
+
+# Tags
+tags = Tags.Tags(bot, settings)
+cogList.append(tags)
 
 
 # Main bot events

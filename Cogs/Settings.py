@@ -38,6 +38,7 @@ class Settings:
 				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
+				"RequiredTagRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
@@ -85,6 +86,7 @@ class Settings:
 				"LastComic"				: [],		# List of julian dates for last comic
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
+				"Tags"					: [],		# List of tags
 				"Members" 				: [],		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
 				"LogChannel"			: "",		# ID or blank for no logging
