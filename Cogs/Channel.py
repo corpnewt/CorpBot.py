@@ -44,7 +44,7 @@ class Channel:
 					membersOnline += 1
 
 		for id in channelMOTDList:
-			channel = self.bot.get_channel(id['ID'])
+			channel = self.bot.get_channel(int(id['ID']))
 			if channel:
 				motd = id['MOTD'] # A markdown message of the day
 				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
