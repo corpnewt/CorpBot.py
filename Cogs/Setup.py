@@ -221,7 +221,7 @@ class Setup:
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
 		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
 		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
-		if reqXP == None:
+		if reqXP == None or not len(str(reqXP)):
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
@@ -286,6 +286,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Default xp will remain *{}*.'.format(defXP))
+					self.settings.setServerStat(server, "DefaultXP", defXP)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -320,6 +321,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Default xp reserve will remain *{}*.'.format(defXPR))
+					self.settings.setServerStat(server, "DefaultXPReserve", defXPR)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -354,6 +356,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Hourly xp will remain *{}*.'.format(hourXPReal))
+					self.settings.setServerStat(server, "HourlyXPReal", hourXPReal)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -388,6 +391,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Hourly xp reserve will remain *{}*.'.format(hourXP))
+					self.settings.setServerStat(server, "HourlyXP", hourXP)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -452,6 +456,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Xp per message will remain *{}*.'.format(messageXP))
+					self.settings.setServerStat(server, "XPPerMessage", messageXP)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -486,6 +491,7 @@ class Setup:
 				# We got something
 				if talk.content.lower() == "skip":
 					await author.send('Xp reserve per message will remain *{}*.'.format(messageXPR))
+					self.settings.setServerStat(server, "XPRPerMessage", messageXPR)
 				else:
 					try:
 						talkInt = int(talk.content)
@@ -500,7 +506,7 @@ class Setup:
 		##########################################################################################################################
 		# Required Role for XP
 		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if reqXP == None:
+		if reqXP == None or not len(str(reqXP)):
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
