@@ -356,7 +356,25 @@ async def on_member_remove(member):
 	settings.removeUser(member, server)
 	for cog in cogList:
 		try:
-			check = await cog.onleave(member, server)
+			await cog.onleave(member, server)
+		except AttributeError:
+			# Onto the next
+			continue
+
+@bot.event
+async def on_member_ban(member):
+	for cog in cogList:
+		try:
+			await cog.onban(member)
+		except AttributeError:
+			# Onto the next
+			continue
+
+@bot.event
+async def on_member_unban(member, server):
+	for cog in cogList:
+		try:
+			await cog.onunban(member, server)
 		except AttributeError:
 			# Onto the next
 			continue
@@ -389,7 +407,7 @@ async def on_member_join(member):
 	
 	for cog in cogList:
 		try:
-			check = await cog.onjoin(member, server)
+			await cog.onjoin(member, server)
 		except AttributeError:
 			# Onto the next
 			continue
@@ -496,7 +514,7 @@ async def on_message_delete(message):
 		return
 	for cog in cogList:
 		try:
-			check = await cog.message_delete(message)
+			await cog.message_delete(message)
 		except AttributeError:
 			# Onto the next
 			continue

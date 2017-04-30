@@ -15,14 +15,14 @@ class Debugging:
 		self.bot = bot
 		self.settings = settings
 		self.debug = debug
-		self.logvars = [ 'user.join', 'user.leave', 'user.status',
+		self.logvars = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit' ]
-		self.quiet = [ 'user.join', 'user.leave' ]
-		self.normal = [ 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
+		self.quiet = [ 'user.ban', 'user.unban', 'user.join', 'user.leave' ]
+		self.normal = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 			       'message.edit', 'message.delete' ]
-		self.verbose = [ 'user.join', 'user.leave', 'user.status',
+		self.verbose = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit' ]
@@ -75,6 +75,20 @@ class Debugging:
 				return True
 		return False
 			
+	async def onban(self, member):
+		server = member.guild
+		if not self.shouldLog('user.ban', server):
+			return
+		# A member was banned
+		msg = '*{}#{}* was **banned** from *{}*.'.format(member.name, member.discriminator, server.name)
+		await self._logEvent(server, msg)
+
+	async def onunban(self, server, member):
+		if not self.shouldLog('user.unban', server):
+			return
+		# A member was banned
+		msg = '*{}#{}* was **unbanned** from *{}*.'.format(member.name, member.discriminator, server.name)
+		await self._logEvent(server, msg)
 			
 	async def onjoin(self, member, server):
 		if not self.shouldLog('user.join', server):
