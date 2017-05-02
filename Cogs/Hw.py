@@ -847,7 +847,7 @@ class Hw:
 
 		while True:
 			def littleCheck(m):
-				return message.author.id == m.author.id and self.confirmCheck(m, dest) and not m.content == None
+				return message.author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
 			except Exception:
@@ -875,7 +875,7 @@ class Hw:
 		await dest.send(message)
 		while True:
 			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.channelCheck(m, dest) and not m.content == None
+				return ctx.author.id == m.author.id and self.channelCheck(m, dest) and len(m.content)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
 			except Exception:
