@@ -854,14 +854,22 @@ class CardsAgainstHumanity:
             await ctx.message.author.send(msg)
             return
         userGame['Time'] = int(time.time())
+        user = None
         for member in userGame['Members']:
-            if str(member['User'].id) == str(ctx.author.id):
+            if member['User'] == ctx.author:
                 member['Time'] = int(time.time())
                 user = member
                 index = userGame['Members'].index(member)
                 if index == userGame['Judge']:
                     await ctx.message.author.send("You're the judge.  You don't get to lay cards this round.")
                     return
+                
+        if not user:
+            print("User not found.")
+            for member in userGame['Members']:
+                if member['User']:
+                    print("UserID: {}".format(member['User'].id))
+                    
         for submit in userGame['Submitted']:
             if submit['By']['User'] == ctx.message.author:
                 await ctx.message.author.send("You already made your submission this round.")
