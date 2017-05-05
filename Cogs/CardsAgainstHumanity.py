@@ -855,7 +855,7 @@ class CardsAgainstHumanity:
             return
         userGame['Time'] = int(time.time())
         for member in userGame['Members']:
-            if member['User'] == ctx.message.author:
+            if str(member['User'].id) == str(ctx.author.id):
                 member['Time'] = int(time.time())
                 user = member
                 index = userGame['Members'].index(member)
