@@ -819,6 +819,8 @@ class CardsAgainstHumanity:
         """Broadcasts a message to the other players in your game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         userGame = self.userGame(ctx.message.author)
         if not userGame:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
@@ -834,7 +836,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 continue
             # Tell them all!!
-            if not member['User'] == ctx.message.author:
+            if not member['User'] == author:
                 # Don't tell yourself
                 await member['User'].send(msg)
             else:
@@ -848,14 +850,16 @@ class CardsAgainstHumanity:
         """Lays a card or cards from your hand.  If multiple cards are needed, separate them by a comma (1,2,3)."""
         if not await self.checkPM(ctx.message):
             return
-        userGame = self.userGame(ctx.message.author)
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
+        userGame = self.userGame(author)
         if not userGame:
             msg = "You're not in a game - you can create one with `{}newcah` or join one with `{}joincah`.".format(ctx.prefix, ctx.prefix)
             await ctx.author.send(msg)
             return
         userGame['Time'] = int(time.time())
         for member in userGame['Members']:
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 member['Time'] = int(time.time())
                 user = member
                 index = userGame['Members'].index(member)
@@ -863,7 +867,7 @@ class CardsAgainstHumanity:
                     await ctx.author.send("You're the judge.  You don't get to lay cards this round.")
                     return
         for submit in userGame['Submitted']:
-            if submit['By']['User'] == ctx.message.author:
+            if submit['By']['User'] == author:
                 await ctx.author.send("You already made your submission this round.")
                 return
         if card == None:
@@ -890,14 +894,14 @@ class CardsAgainstHumanity:
             if not len(card) == numberCards:
                 msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await ctx.author.send(msg)
-                await self.showHand(ctx, ctx.message.author)
+                await self.showHand(ctx, author)
                 return
             # Got something
             # Check for duplicates
             if not len(card) == len(set(card)):
                 msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await ctx.author.send(msg)
-                await self.showHand(ctx, ctx.message.author)
+                await self.showHand(ctx, author)
                 return
             # Works
             for c in card:
@@ -906,13 +910,13 @@ class CardsAgainstHumanity:
                 except Exception:
                     msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                     await ctx.author.send(msg)
-                    await self.showHand(ctx, ctx.message.author)
+                    await self.showHand(ctx, author)
                     return
 
                 if c < 1 or c > len(user['Hand']):
                     msg = 'Card numbers must be between 1 and {}.'.format(len(user['Hand']))
                     await ctx.author.send(msg)
-                    await self.showHand(ctx, ctx.message.author)
+                    await self.showHand(ctx, author)
                     return
                 cards.append(user['Hand'][c-1]['Text'])
             # Remove from user's hand
@@ -929,12 +933,12 @@ class CardsAgainstHumanity:
             except Exception:
                 msg = 'You need to lay a valid card with `{}lay [card number]`'.format(ctx.prefix)
                 await ctx.author.send(msg)
-                await self.showHand(ctx, ctx.message.author)
+                await self.showHand(ctx, author)
                 return
             if card < 1 or card > len(user['Hand']):
                 msg = 'Card numbers must be between 1 and {}.'.format(len(user['Hand']))
                 await ctx.author.send(msg)
-                await self.showHand(ctx, ctx.message.author)
+                await self.showHand(ctx, author)
                 return
             # Valid card
             newSubmission = { 'By': user, 'Cards': [ user['Hand'].pop(card-1)['Text'] ] }
@@ -953,6 +957,8 @@ class CardsAgainstHumanity:
         """As the judge - pick the winning card(s)."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -963,7 +969,7 @@ class CardsAgainstHumanity:
         userGame['Time'] = int(time.time())
         isJudge = False
         for member in userGame['Members']:
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 member['Time'] = int(time.time())
                 user = member
                 index = userGame['Members'].index(member)
@@ -1016,6 +1022,8 @@ class CardsAgainstHumanity:
         """Starts a new Cards Against Humanity game."""
         #if not await self.checkPM(ctx.message):
             #return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if userGame:
@@ -1028,7 +1036,7 @@ class CardsAgainstHumanity:
         gameID = self.randomID()
         currentTime = int(time.time())
         newGame = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False, 'Timeout': True }
-        member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': False, 'Creator': True, 'Task': None, 'Time': currentTime }
+        member = { 'ID': author.id, 'User': author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': False, 'Creator': True, 'Task': None, 'Time': currentTime }
         newGame['Members'].append(member)
         newGame['Running'] = True
         task = self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame))
@@ -1064,6 +1072,8 @@ class CardsAgainstHumanity:
         """Join a Cards Against Humanity game.  If no id or user is passed, joins a random game."""
         #if not await self.checkPM(ctx.message):
             #return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         isCreator = False
@@ -1099,7 +1109,36 @@ class CardsAgainstHumanity:
                             return
                                 
             else:
-                game = random.choice(self.games)
+                # Let's order games by least number of people,
+                # then randomly end up in one of the lower ones
+                # Max number of people should be 10
+                orderedGames = sorted(memberList, key=lambda x:len(x['Members']))
+                lowestNumber = self.maxPlayers
+                for game in orderedGames:
+                    if len(game['Members']) < lowestNumber:
+                        lowestNumber = len(game['Members'])
+                
+                if lowestNumber >= self.maxPlayers:
+                    # We didn't find any games with fewer than 10 people
+                    # Create a new one
+                    # No games - create a new one
+                    gameID = self.randomID()
+                    currentTime = int(time.time())
+                    game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False, 'Timeout': True }
+                    game['Running'] = True
+                    task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
+                    task = self.bot.loop.create_task(self.checkCards(ctx, game))
+                    self.games.append(game)
+                    # Tell the user they created a new game and list its ID
+                    await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
+                    isCreator = True
+                else:
+                    # We found games with fewer than 10 members!
+                    gameList = []
+                    for game in orderedGames:
+                        if len(game['Members']) <= lowestNumber:
+                            gameList.append(game)
+                    game = random.choice(gameList)
         else:
             # No games - create a new one
             gameID = self.randomID()
@@ -1121,7 +1160,7 @@ class CardsAgainstHumanity:
             
         # We got a user!
         currentTime = int(time.time())
-        member = { 'ID': ctx.message.author.id, 'User': ctx.message.author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': False, 'Creator': isCreator, 'Task': None, 'Time': currentTime }
+        member = { 'ID': author.id, 'User': author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': False, 'Creator': isCreator, 'Task': None, 'Time': currentTime }
         game['Members'].append(member)
         await self.drawCards(ctx.message.author)
         if len(game['Members'])==1:
@@ -1154,6 +1193,8 @@ class CardsAgainstHumanity:
         """Adds a bot to the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1166,7 +1207,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 botCount += 1
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 if not member['Creator']:
                     # You didn't make this game
                     msg = 'Only the player that created the game can add bots.'
@@ -1211,6 +1252,8 @@ class CardsAgainstHumanity:
         """Adds bots to the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1223,7 +1266,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 botCount += 1
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 if not member['Creator']:
                     # You didn't make this game
                     msg = 'Only the player that created the game can add bots.'
@@ -1292,6 +1335,8 @@ class CardsAgainstHumanity:
         """Removes a bot from the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1304,7 +1349,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 botCount += 1
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 if not member['Creator']:
                     # You didn't make this game
                     msg = 'Only the player that created the game can remove bots.'
@@ -1473,6 +1518,8 @@ class CardsAgainstHumanity:
         """Removes a player from the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1485,7 +1532,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 botCount += 1
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 if not member['Creator']:
                     # You didn't make this game
                     msg = 'Only the player that created the game can remove players.'
@@ -1532,6 +1579,8 @@ class CardsAgainstHumanity:
         """Flushes the cards in your hand - can only be done once per game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1546,7 +1595,7 @@ class CardsAgainstHumanity:
         for member in userGame['Members']:
             if member['IsBot']:
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 member['Time'] = int(time.time())
                 # Found us!
                 if member['Refreshed']:
@@ -1568,6 +1617,8 @@ class CardsAgainstHumanity:
         """Sets whether or not to kick members if idle for 5 minutes or more.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
             return
+        # Get the user - for cross-server compatibility
+        author = self.bot.get_user(ctx.message.author.id)
         # Check if the user is already in game
         userGame = self.userGame(ctx.message.author)
         if not userGame:
@@ -1580,7 +1631,7 @@ class CardsAgainstHumanity:
             if member['IsBot']:
                 botCount += 1
                 continue
-            if member['User'] == ctx.message.author:
+            if member['User'] == author:
                 if not member['Creator']:
                     # You didn't make this game
                     msg = 'Only the player that created the game can remove bots.'
