@@ -254,7 +254,7 @@ cogList.append(debugging)
 
 # CardsAgainstHumanity
 if os.path.exists(deckFile):
-	cah = CardsAgainstHumanity.CardsAgainstHumanity(bot)
+	cah = CardsAgainstHumanity.CardsAgainstHumanity(bot, prefix)
 	cogList.append(cah)
 
 # Cleverbot

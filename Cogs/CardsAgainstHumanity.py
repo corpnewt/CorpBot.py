@@ -19,7 +19,8 @@ from   Cogs import Nullify
 class CardsAgainstHumanity:
 
     # Init with the bot reference, and a reference to the deck file
-    def __init__(self, bot, file = None):
+    def __init__(self, bot, prefix = "$", file = None):
+        self.prefix = prefix
         self.bot = bot
         self.games = []
         self.maxBots = 5 # Max number of bots that can be added to a game - don't count toward max players
@@ -564,10 +565,10 @@ class CardsAgainstHumanity:
             # Judge doesn't need to lay a card
             if blackNum == 1:
                 # Singular
-                msg += '\n\nLay a card with `{}lay [card number]`'.format(ctx.prefix)
+                msg += '\n\nLay a card with `{}lay [card number]`'.format(self.prefix)
             elif blackNum > 1:
                 # Plural
-                msg += '\n\nLay **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, ctx.prefix)
+                msg += '\n\nLay **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, self.prefix)
         
         stat_embed.set_author(name='Current Play')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
@@ -633,7 +634,7 @@ class CardsAgainstHumanity:
             i+=1
             msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
         if judge == '**YOU** are':
-            msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
+            msg += '\nPick a winner with `{}pick [submission number]`.'.format(self.prefix)
         await user.send(msg)
         
     async def drawCard(self, game):
@@ -892,14 +893,14 @@ class CardsAgainstHumanity:
             except Exception:
                 card = []
             if not len(card) == numberCards:
-                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
+                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return
             # Got something
             # Check for duplicates
             if not len(card) == len(set(card)):
-                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
+                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return
@@ -908,7 +909,7 @@ class CardsAgainstHumanity:
                 try:
                     c = int(c)
                 except Exception:
-                    msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
+                    msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
                     await ctx.author.send(msg)
                     await self.showHand(ctx, author)
                     return
@@ -931,7 +932,7 @@ class CardsAgainstHumanity:
             try:
                 card = int(card)
             except Exception:
-                msg = 'You need to lay a valid card with `{}lay [card number]`'.format(ctx.prefix)
+                msg = 'You need to lay a valid card with `{}lay [card number]`'.format(self.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return
@@ -976,7 +977,7 @@ class CardsAgainstHumanity:
                 if index == userGame['Judge']:
                     isJudge = True
         if not isJudge:
-            msg = "You're not the judge - I guess you'll have to wait your turn.".format(ctx.prefix, ctx.prefix)
+            msg = "You're not the judge - I guess you'll have to wait your turn."
             await ctx.author.send(msg)
             return
         # Am judge
@@ -1043,7 +1044,7 @@ class CardsAgainstHumanity:
         task = self.bot.loop.create_task(self.checkCards(ctx, newGame))
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
-        await ctx.channel.send('You created game id: *{}*'.format(gameID))
+        await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
         await self.drawCards(ctx.message.author)
         # await self.showHand(ctx, ctx.message.author)
         # await self.nextPlay(ctx, newGame)
@@ -1112,7 +1113,7 @@ class CardsAgainstHumanity:
                 # Let's order games by least number of people,
                 # then randomly end up in one of the lower ones
                 # Max number of people should be 10
-                orderedGames = sorted(memberList, key=lambda x:len(x['Members']))
+                orderedGames = sorted(self.games, key=lambda x:len(x['Members']))
                 lowestNumber = self.maxPlayers
                 for game in orderedGames:
                     if len(game['Members']) < lowestNumber:
