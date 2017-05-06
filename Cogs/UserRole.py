@@ -283,7 +283,7 @@ class UserRole:
 					remRole.append(roleTest)
 			if len(remRole):
 				try:
-					await self.bot.remove_roles(ctx.message.author, *remRole)
+					await ctx.author.remove_roles(*remRole)
 				except Exception:
 					pass
 			# Give a quick status
@@ -332,7 +332,7 @@ class UserRole:
 
 		if len(remRole):
 			try:
-				await self.bot.remove_roles(ctx.message.author, *remRole)
+				await ctx.author.remove_roles(*remRole)
 			except Exception:
 				pass
 		
@@ -342,7 +342,7 @@ class UserRole:
 
 		if len(addRole):
 			try:
-				await self.bot.add_roles(ctx.message.author, *addRole)
+				await ctx.author.add_roles(*addRole)
 			except Exception:
 				pass
 
