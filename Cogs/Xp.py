@@ -760,8 +760,9 @@ class Xp:
 			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
 			
 		if member.game:
-			# Playing a game!
-			stat_embed.add_field(name="Playing", value=str(member.game), inline=True)
+			if member.game.name:
+				# Playing a game!
+				stat_embed.add_field(name="Playing", value=str(member.game.name), inline=True)
 
 		#await ctx.message.channel.send(msg)
 		await ctx.message.channel.send(embed=stat_embed)
