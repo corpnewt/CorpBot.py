@@ -191,7 +191,7 @@ class VoiceState:
 			# audioProc = subprocess.Popen( [ "youtube-dl", "-q", "-o", "-", song ], stdout=subprocess.PIPE )
 			# audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\"", shell=True, stdout=subprocess.PIPE )
 			# ffsource = discord.FFmpegPCMAudio(audioProc.stdout, pipe=True)
-			audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\" | ffmpeg -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
+			audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\" | ffmpeg  -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
 			rawAudio = discord.PCMAudio(audioProc.stdout)
 			volumeSource = discord.PCMVolumeTransformer(rawAudio)
 			self.voice.play(volumeSource, after=self.toggle_next)
