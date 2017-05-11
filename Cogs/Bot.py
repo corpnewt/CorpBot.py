@@ -42,7 +42,11 @@ class Bot:
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
 		"""Feeling lonely?"""
-		msg = '*{}*, PONG!'.format(ctx.message.author.mention)
+		before_typing = time.monotonic()
+		await ctx.trigger_typing()
+		after_typing = time.monotonic()
+		ms = int((after_typing - before_typing) * 1000)
+		msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
 		await ctx.channel.send(msg)
 
 		
