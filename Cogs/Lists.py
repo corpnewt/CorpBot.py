@@ -670,7 +670,7 @@ class Lists:
 		
 	@commands.command(pass_context=True)
 	async def parts(self, ctx, *, member = None):
-		"""Retrieve a member's parts list."""
+		"""Retrieve a member's parts list. DEPRECATED - Use hw instead."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -699,11 +699,11 @@ class Lists:
 		parts = self.settings.getGlobalUserStat(member, "Parts")
 		
 		if not parts or parts == "":
-			msg = '*{}* has not added their parts yet!  They can add them with the `{}setparts [parts text]` command!'.format(DisplayName.name(member), ctx.prefix)
+			msg = '*{}* has not added their parts yet!  ~~They can add them with the `{}setparts [parts text]` command!~~ DEPRECATED - Use `{}newhw` instead.'.format(DisplayName.name(member), ctx.prefix, ctx.prefix)
 			await channel.send(msg)
 			return
 
-		msg = '***{}\'s*** **Parts:**\n{}'.format(DisplayName.name(member), parts)
+		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -718,7 +718,7 @@ class Lists:
 		
 	@commands.command(pass_context=True)
 	async def setparts(self, ctx, *, parts : str = None):
-		"""Set your own parts - can be a url, formatted text, or nothing to clear."""
+		"""Set your own parts - can be a url, formatted text, or nothing to clear. DEPRECATED - Use newhw instead."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -734,7 +734,7 @@ class Lists:
 			parts = ""
 			
 		self.settings.setGlobalUserStat(author, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.name(author), parts)
+		msg = '*{}\'s* parts have been set to (DEPRECATED - Use {}newhw instead):\n{}'.format(DisplayName.name(author), ctx.prefix, parts)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
