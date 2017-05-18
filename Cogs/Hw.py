@@ -640,7 +640,7 @@ class Hw:
 
 
 	@commands.command(pass_context=True)
-	async def hwraw(self, ctx, *, user = None, build = None):
+	async def rawhw(self, ctx, *, user = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
 		if not user:
 			user = ctx.author.name
