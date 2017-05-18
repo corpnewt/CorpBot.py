@@ -487,7 +487,7 @@ class Xp:
 						roleText = '{}You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
 					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
-				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that settings.'.format(roleText, role)
+				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that setting.'.format(roleText, role)
 
 		# Check for suppress
 		if suppress:
@@ -881,7 +881,7 @@ class Xp:
 					else:
 						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
 			if not found:
-				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that settings.\n\n'.format(msg, role)
+				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that setting.\n\n'.format(msg, role)
 
 		msg = "{}Hopefully that clears things up!".format(msg)
 

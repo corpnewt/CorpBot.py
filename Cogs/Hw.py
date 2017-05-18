@@ -637,6 +637,137 @@ class Hw:
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def hwraw(self, ctx, *, user = None, build = None):
+		"""Lists the raw markdown for either the user's default build - or the passed build."""
+		if not user:
+			user = ctx.author.name
+	
+		# Let's check for username and build name
+		parts = user.split()
+
+		memFromName = None
+		buildParts  = None
+
+		for j in range(len(parts)):
+			# Reverse search direction
+			i = len(parts)-1-j
+
+			# Name = 0 up to i joined by space
+			nameStr = ' '.join(parts[0:i])
+			buildStr = ' '.join(parts[i:])
+
+			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
+			if memFromName:
+				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+				if buildList == None:
+					buildList = []
+				for build in buildList:
+					if build['Name'].lower() == buildStr.lower():
+						# Ha! Found it!
+						buildParts = build
+						break
+				if buildParts:
+					# We're in business
+					break
+				else:
+					memFromName = None
+
+		if not memFromName:
+			# Try again with indexes
+			for j in range(len(parts)):
+				# Reverse search direction
+				i = len(parts)-1-j
+
+				# Name = 0 up to i joined by space
+				nameStr = ' '.join(parts[0:i])
+				buildStr = ' '.join(parts[i:])
+
+				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
+				if memFromName:
+					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+					if buildList == None:
+						buildList = []
+					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+					try:
+						buildStr = int(buildStr)-1
+						if buildStr >= 0 and buildStr < len(buildList):
+							buildParts = buildList[buildStr]
+					except Exception:
+						memFromName = None
+						buildParts  = None
+					if buildParts:
+						# We're in business
+						break
+					else:
+						memFromName = None		
+
+		if not memFromName:
+			# One last shot - check if it's a build for us
+			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+			if buildList == None:
+				buildList = []
+			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+			for build in buildList:
+				if build['Name'].lower() == user.lower():
+					memFromName = ctx.author
+					buildParts = build
+					break
+			if not memFromName:
+				# Okay - *this* time is the last - check for index
+				try:
+					user = int(user)-1
+					if user >= 0 and user < len(buildList):
+						buildParts = buildList[user]
+						memFromName = ctx.author
+				except Exception:
+					pass
+		
+		if not memFromName:
+			# Last check for a user passed as the only param
+			memFromName = DisplayName.memberForName(user, ctx.guild)
+		
+		if not memFromName:
+			# We couldn't find them :(
+			msg = "I couldn't find that user/build combo..."
+			await ctx.channel.send(msg)
+			return
+
+		if buildParts == None:
+			# Check if that user has no builds
+			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
+			if buildList == None:
+				buildList = []
+			if not len(buildList):
+				# No parts!
+				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
+				await ctx.channel.send(msg)
+				return
+			
+			# Must be the default build
+			for build in buildList:
+				if build['Main']:
+					buildParts = build
+					break
+
+			if not buildParts:
+				# Well... uh... no defaults
+				msg = "I couldn't find that user/build combo..."
+				await ctx.channel.send(msg)
+				return
+		
+		# At this point - we *should* have a user and a build
+		# Escape all \ with \\
+		p = buildParts['Hardware'].replace('\\', '\\\\')
+		p = p.replace('*', '\\*')
+		p = p.replace('`', '\\`')
+		p = p.replace('_', '\\_')
+		msg = "__**{}'s {} (Raw Markdown):**__\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
+		if self.checkSuppress(ctx):
+			msg = Nullify.clean(msg)
+		await ctx.channel.send(msg)
 			
 
 	@commands.command(pass_context=True)
