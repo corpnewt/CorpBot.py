@@ -55,8 +55,10 @@ class Remind:
 			reminders.remove(reminder)
 			self.settings.setUserStat(member, member.guild, "Reminders", reminders)
 					
-
-	async def status(self, member):
+	async def member_update(self, before, member):
+		# Not sure why I was using this "status" method before... seems to only show up here
+		# and not used in the Main.py - probably some serious brain-thought.
+		#### async def status(self, member): ####
 		# Check the user's status - and if they have any reminders
 		# If so - pm them - if not, ignore
 		if not str(member.status).lower() == "offline":
