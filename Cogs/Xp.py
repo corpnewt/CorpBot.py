@@ -458,17 +458,20 @@ class Xp:
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
-		roleText = "Current Roles:\n"
-		for arole in promoSorted:
-			# Get current role name based on id
-			foundRole = False
-			for role in server.roles:
-				if str(role.id) == str(arole['ID']):
-					# We found it
-					foundRole = True
-					roleText = '{}**{}** : *{} XP*\n'.format(roleText, role.name, arole['XP'])
-			if not foundRole:
-				roleText = '{}**{}** : *{} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
+		if not len(promoSorted):
+			roleText = "There are no roles in the xp role list.  You can add some with the `{}addxprole [role] [xpamount]` command!\n".format(ctx.prefix)
+		else:
+			roleText = "**__Current Roles:__**\n\n"
+			for arole in promoSorted:
+				# Get current role name based on id
+				foundRole = False
+				for role in server.roles:
+					if str(role.id) == str(arole['ID']):
+						# We found it
+						foundRole = True
+						roleText = '{}**{}** : *{} XP*\n'.format(roleText, role.name, arole['XP'])
+				if not foundRole:
+					roleText = '{}**{}** : *{} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
