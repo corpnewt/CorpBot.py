@@ -714,6 +714,59 @@ class Lists:
 		# do stuff
 		msg = 'parts Error: {}'.format(ctx)
 		await error.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def rawparts(self, ctx, *, member = None):
+		"""Retrieve the raw markdown for a member's parts list. DEPRECATED - Use rawhw instead."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		if member is None:
+			member = ctx.message.author
+			
+		if type(member) is str:
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.channel.send(msg)
+				return
+
+		parts = self.settings.getGlobalUserStat(member, "Parts")
+		
+		if not parts or parts == "":
+			msg = '*{}* has not added their parts yet!  ~~They can add them with the `{}setparts [parts text]` command!~~ DEPRECATED - Use `{}newhw` instead.'.format(DisplayName.name(member), ctx.prefix, ctx.prefix)
+			await channel.send(msg)
+			return
+
+		p = parts.replace('\\', '\\\\')
+		p = p.replace('*', '\\*')
+		p = p.replace('`', '\\`')
+		p = p.replace('_', '\\_')
+
+		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n{}'.format(DisplayName.name(member), ctx.prefix, p)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await channel.send(msg)
+
+	@parts.error
+	async def parts_error(self, ctx, error):
+		# do stuff
+		msg = 'parts Error: {}'.format(ctx)
+		await error.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
