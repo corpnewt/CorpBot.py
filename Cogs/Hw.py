@@ -285,7 +285,11 @@ class Hw:
 		await hwChannel.send(msg)
 		await hwChannel.send(bparts)
 
-		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
+		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
+		msg += 'For example: '
+		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
+		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
@@ -318,6 +322,17 @@ class Hw:
 						await hwChannel.send(msg)
 						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
+					# Make sure
+					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
+					if conf == None:
+						# Timed out
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						return
+					elif conf == False:
+						# Didn't get our answer
+						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						continue
+
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
 					mainBuild['Hardware'] = output
@@ -865,7 +880,11 @@ class Hw:
 		bname = buildName.content
 		if self.checkSuppress(ctx):
 			bname = Nullify.clean(bname)
-		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
+		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
+		msg += 'For example: '
+		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
+		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
@@ -899,6 +918,16 @@ class Hw:
 						await hwChannel.send(msg)
 						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
+					# Make sure
+					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
+					if conf == None:
+						# Timed out
+						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						return
+					elif conf == False:
+						# Didn't get our answer
+						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						continue
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
 					newBuild['Hardware'] = output
@@ -956,12 +985,39 @@ class Hw:
 			return True
 		return False
 
-	async def confirm(self, ctx, message, dest = None, m = None):
+	async def confirm(self, ctx, message, dest = None, m = None, author = None):
+		# Get author name
+		authorName = None
+		if author:
+			if type(author) is str:
+				authorName = author
+			else:
+				try:
+					authorName = DisplayName.name(author)
+				except Exception:
+					pass
+		else:
+			if message:
+				try:
+					author = message.author
+				except Exception:
+					pass
+			try:
+				authorName = DisplayName.name(message.author)
+			except Exception:
+				pass
+
 		if not dest:
 			dest = message.channel
 		if not m:
-			msg = '*{}*, I got:'.format(DisplayName.name(message.author))
-			msg2 = '{}'.format(message.content)
+			if authorName:
+				msg = '*{}*, I got:'.format(authorName)
+			else:
+				msg = "I got:"
+			if type(message) is str:
+				msg2 = message
+			else:
+				msg2 = '{}'.format(message.content)
 			msg3 = 'Is that correct? (y/n/stop)'
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
@@ -978,13 +1034,16 @@ class Hw:
 
 		while True:
 			def littleCheck(m):
-				return message.author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
+				return author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
 			except Exception:
 				talk = None
 			if not talk:
-				msg = "*{}*, I'm out of time...".format(DisplayName.name(message.author))
+				if authorName:
+					msg = "*{}*, I'm out of time...".format(authorName)
+				else:
+					msg = "I'm out of time..."
 				await dest.send(msg)
 				return None
 			else:
@@ -992,7 +1051,10 @@ class Hw:
 				if talk.content.lower().startswith('y'):
 					return True
 				elif talk.content.lower().startswith('stop'):
-					msg = "No problem, *{}!*  See you later!".format(DisplayName.name(message.author), ctx.prefix)
+					if authorName:
+						msg = "No problem, *{}!*  See you later!".format(authorName)
+					else:
+						msg = "No problem!  See you later!"
 					await dest.send(msg)
 					return None
 				else:
