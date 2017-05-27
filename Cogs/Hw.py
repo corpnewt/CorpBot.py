@@ -285,7 +285,7 @@ class Hw:
 		await hwChannel.send(msg)
 		await hwChannel.send(bparts)
 
-		msg = 'Alright, *{}*, what parts does "{}" have now?'.format(DisplayName.name(ctx.author), bname)
+		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
@@ -865,7 +865,7 @@ class Hw:
 		bname = buildName.content
 		if self.checkSuppress(ctx):
 			bname = Nullify.clean(bname)
-		msg = 'Alright, *{}*, what parts does "{}" have?'.format(DisplayName.name(ctx.author), bname)
+		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
 		while True:
 			parts = await self.prompt(ctx, msg, hwChannel)
 			if not parts:
