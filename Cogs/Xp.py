@@ -141,8 +141,11 @@ class Xp:
 					xpAmount = nameCheck["Int"]
 
 		if xpAmount == None:
-			# Still no xp
-			await ctx.message.channel.send(usage)
+			# Still no xp - let's run stats instead
+			if isRole:
+				await ctx.message.channel.send(usage)
+			else:
+				await ctx.invoke(self.stats, member=member)
 			return
 		if not type(xpAmount) is int:
 			await ctx.message.channel.send(usage)
@@ -261,7 +264,7 @@ class Xp:
 			await channel.send(msg)
 			
 	@xp.error
-	async def xp_error(self, error, ctx):
+	async def xp_error(self, ctx, error):
 		msg = 'xp Error: {}'.format(error)
 		await ctx.channel.send(msg)
 

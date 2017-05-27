@@ -127,8 +127,8 @@ class Remind:
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def reminders(self, ctx):
-		"""List up to 10 pending reminders."""
+	async def reminders(self, ctx, *, member = None):
+		"""List up to 10 pending reminders - pass a user to see their reminders."""
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
@@ -136,10 +136,26 @@ class Remind:
 		else:
 			suppress = False
 
-		member = ctx.message.author
-		myReminders = self.settings.getUserStat(member, member.guild, "Reminders")
-		msg = 'You don\'t currently have any reminders set.  You can add some with the `{}remindme "[message]" [time]` command.'.format(ctx.prefix)
+		if type(member) is str:
+			memberName = member
+			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(memberName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.message.channel.send(msg)
+				return
+
+		if not member:
+			member = ctx.message.author
 		
+		myReminders = self.settings.getUserStat(member, member.guild, "Reminders")
+		if member == ctx.message.author:
+			msg = 'You don\'t currently have any reminders set.  You can add some with the `{}remindme "[message]" [time]` command.'.format(ctx.prefix)
+		else:
+			msg = '*{}* doesn\'t currently have any reminders set.  They can add some with the `{}remindme "[message]" [time]` command.'.format(DisplayName.name(member), ctx.prefix)
+
 		if not len(myReminders):
 			# No reminders
 			await ctx.channel.send(msg)
