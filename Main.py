@@ -294,7 +294,7 @@ async def on_ready():
 		except AttributeError:
 			# Onto the next
 			continue
-	
+
 
 @bot.event
 async def on_voice_state_update(before, after):
@@ -373,7 +373,7 @@ async def on_member_join(member):
 	settings.checkUser(member, server)
 
 	rules = settings.getServerStat(server, "Rules")
-	
+
 	for cog in cogList:
 		try:
 			check = await cog.onjoin(member, server)
@@ -404,7 +404,7 @@ async def on_message(message):
 		# This wasn't said in a server, process commands, then return
 		await bot.process_commands(message)
 		return
-	
+
 	if message.author.bot:
 		# We don't need other bots controlling things we do.
 		return
@@ -415,7 +415,7 @@ async def on_message(message):
 		# Not a User
 		await bot.process_commands(message)
 		return
-	
+
 	# Check if we need to ignore or delete the message
 	# or respond or replace
 	ignore = delete = False
@@ -440,6 +440,9 @@ async def on_message(message):
 			respond = check['Respond']
 		except KeyError:
 			pass
+
+	if message.content == "k"
+		delete = True
 
 	if respond:
 		# We have something to say
@@ -469,7 +472,7 @@ async def on_command_completion(command, ctx):
 		except AttributeError:
 			# Onto the next
 			continue
-			
+
 @bot.event
 async def on_message_delete(message):
 	# Run through the on_message commands, but on deletes.
@@ -487,8 +490,8 @@ async def on_message_delete(message):
 		except AttributeError:
 			# Onto the next
 			continue
-			
-		
+
+
 @bot.event
 async def on_message_edit(before, message):
 	# Run through the on_message commands, but on edits.
@@ -501,7 +504,7 @@ async def on_message_edit(before, message):
 	except AttributeError:
 		# Not a User
 		return
-	
+
 	# Check if we need to ignore or delete the message
 	# or respond or replace
 	ignore = delete = False
@@ -533,10 +536,10 @@ async def on_message_edit(before, message):
 	if delete:
 		# We need to delete the message - top priority
 		await bot.delete_message(message)
-	
-	
 
-# Add our cogs 
+
+
+# Add our cogs
 # bot.add_cog(Music(bot))
 
 # Module and Class are named the same, must use Settings.Settings to call
