@@ -47,7 +47,8 @@ class Humor:
 		else:
 			# Get a random one
 			word = random.choice(matchList)
-			word = word.capitalize()
+			word = word.strip().capitalize()
+			subject = subject.strip().capitalize()
 			msg = "*Holy {} {}, Batman!*".format(word, subject)
 		
 		# Check for suppress
