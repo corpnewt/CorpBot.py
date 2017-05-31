@@ -39,6 +39,22 @@ class Bot:
 		else:
 			await self.bot.change_presence(game=None)
 
+	async def onserverjoin(self, server):
+		try:
+			serverList = self.settings.serverDict['BlockedServers']
+		except KeyError:
+			self.settings.serverDict['BlockedServers'] = []
+			serverList = self.settings.serverDict['BlockedServers']
+		for serv in serverList:
+			serverName = str(serv).lower()
+			try:
+				serverID = int(serv)
+			except Exception:
+				serverID = None
+			if serverName == server.name.lower() or serverID == server.id:
+				# Found it
+				await server.leave()
+
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
 		"""Feeling lonely?"""
@@ -417,6 +433,164 @@ class Bot:
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def block(self, ctx, *, server : str = None):
+		"""Blocks the bot from joining a server - takes either a name or an id (owner-only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		if server == None:
+			# No server provided
+			await ctx.send("Usage: `{}block [server name/id]`".format(ctx.prefix))
+			return
+		
+		try:
+			serverList = self.settings.serverDict['BlockedServers']
+		except KeyError:
+			self.settings.serverDict['BlockedServers'] = []
+			serverList = self.settings.serverDict['BlockedServers']
+
+		for serv in serverList:
+			if str(serv).lower() == server.lower():
+				# Found a match - already blocked.
+				await ctx.channel.send("That server is already blocked!")
+				return
+		
+		# Not blocked
+		self.settings.serverDict['BlockedServers'].append(server)
+		msg = "Server *{}* now blocked!".format(server)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def unblock(self, ctx, *, server : str = None):
+		"""Unblocks the bot from joining a server (owner-only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		if server == None:
+			# No server provided
+			await ctx.send("Usage: `{}unblock [server name/id]`".format(ctx.prefix))
+			return
+		
+		try:
+			serverList = self.settings.serverDict['BlockedServers']
+		except KeyError:
+			self.settings.serverDict['BlockedServers'] = []
+			serverList = self.settings.serverDict['BlockedServers']
+
+		for serv in serverList:
+			if str(serv).lower() == server.lower():
+				# Found a match - already blocked.
+				self.settings.serverDict['BlockedServers'].remove(serv)
+				msg = "*{}* unblocked!".format(serv)
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.channel.send(msg)
+				return
+		
+		# Not found
+		msg = "I couldn't find *{}* in my blocked list.".format(server)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def unblockall(self, ctx):
+		"""Unblocks all blocked servers (owner-only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		self.settings.serverDict['BlockedServers'] = []
+
+		await ctx.channel.send("*All* servers unblocked!")
+
+
+	@commands.command(pass_context=True)
+	async def blocked(self, ctx):
+		"""Lists all blocked servers (owner-only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		try:
+			serverList = self.settings.serverDict['BlockedServers']
+		except KeyError:
+			self.settings.serverDict['BlockedServers'] = []
+			serverList = self.settings.serverDict['BlockedServers']
+
+		if not len(serverList):
+			msg = "There are no blocked servers!"
+		else:
+			msg = "__Currently Blocked:__\n\n{}".format(', '.join(serverList))
+
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.channel.send(msg)
+			
+
 
 	@commands.command(pass_context=True)
 	async def cloc(self, ctx):

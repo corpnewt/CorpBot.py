@@ -381,13 +381,25 @@ async def on_member_unban(member, server):
 
 @bot.event
 async def on_guild_join(server):
+	for cog in cogList:
+		try:
+			await cog.onserverjoin(server)
+		except AttributeError:
+			# Onto the next
+			continue
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
-	await server.default_channel.send(msg)
+	try:
+		await server.default_channel.send(msg)
+	except Exception:
+		pass
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
-	await owner.send(msg)
+	try:
+		await owner.send(msg)
+	except Exception:
+		pass
 
 @bot.event
 async def on_guild_remove(server):

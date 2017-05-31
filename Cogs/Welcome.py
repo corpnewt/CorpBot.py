@@ -248,7 +248,10 @@ class Welcome:
         if channel:
             await channel.send(message)
         else:
-            await self._getDefault(server).send(message)
+            try:
+                await self._getDefault(server).send(message)
+            except Exception:
+                pass
 
 
     async def _goodbye(self, member, server, channel = None):
@@ -270,7 +273,10 @@ class Welcome:
         if channel:
             await channel.send(message)
         else:
-            await self._getDefault(server).send(message)
+            try:
+                await self._getDefault(server).send(message)
+            except Exception:
+                pass
 
     @commands.command(pass_context=True)
     async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
