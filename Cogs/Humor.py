@@ -9,14 +9,52 @@ from   discord.ext import commands
 from Cogs import Message
 from Cogs import FuzzySearch
 from Cogs import GetImage
+from Cogs import Nullify
 
 # This module is for random funny things I guess...
 
 class Humor:
 
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, listName = "Adjectives.txt"):
 		self.bot = bot
 		self.settings = settings
+		# Setup our adjective list
+		self.adj = []
+		if os.path.exists(listName):
+			with open(listName) as f:
+    				for line in f:
+					self.adj.append(line)
+					
+		
+	@commands.command(pass_context=True)
+	async def holy(self, ctx, *, subject : str = None):
+		"""Time to backup the Batman!"""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		matchList = []
+		for a in self.adj:
+			if a[:1].lower() == subject[:1].lower():
+				matchList.append(a)
+		
+		if not len(matchList):
+			# Nothing in there
+			msg = "*Whoah there!* That was *too* holy for Robin!"
+		else:
+			# Get a random one
+			word = random.choice(matchList)
+			word = word.capitalize()
+			msg = "*Holy {} {}, Batman!*".format(word, subject)
+		
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		
+		await ctx.channel.send(msg)
+			
 		
 	@commands.command(pass_context=True)
 	async def fart(self, ctx):
