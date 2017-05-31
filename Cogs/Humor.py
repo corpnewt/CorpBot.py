@@ -5,6 +5,7 @@ import urllib
 import requests
 import json
 import time
+import os
 from   discord.ext import commands
 from Cogs import Message
 from Cogs import FuzzySearch
