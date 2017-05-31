@@ -22,10 +22,10 @@ class Humor:
 		self.adj = []
 		if os.path.exists(listName):
 			with open(listName) as f:
-    				for line in f:
+				for line in f:
 					self.adj.append(line)
-					
-		
+
+
 	@commands.command(pass_context=True)
 	async def holy(self, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
