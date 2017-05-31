@@ -30,6 +30,11 @@ class Humor:
 	@commands.command(pass_context=True)
 	async def holy(self, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
+		
+		if subject == None:
+			await ctx.channel.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+			return
+		
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
