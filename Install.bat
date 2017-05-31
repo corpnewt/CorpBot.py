@@ -101,6 +101,11 @@ echo.
 call :install "pyspeedtest"
 echo.
 
+echo Installing Pytz...
+echo.
+call :install "pytz"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.
