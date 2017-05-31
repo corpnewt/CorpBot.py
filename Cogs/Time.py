@@ -19,7 +19,7 @@ class Time:
 
 	@commands.command(pass_context=True)
 	async def settz(self, ctx, *, tz : str = None):
-		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DSDT."""
+		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DST."""
 		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list of available TimeZones with `{}listtz`'.format(ctx.prefix, ctx.prefix)
 		if not tz:
 			self.settings.setGlobalUserStat(ctx.author, "TimeZone", None)
