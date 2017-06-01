@@ -188,13 +188,21 @@ class VoiceState:
 		try:
 			
 			# Create a rewrite player because why not...
+			# PS - Look at all these shitty attempts?!
+			#
 			# audioProc = subprocess.Popen( [ "youtube-dl", "-q", "-o", "-", song ], stdout=subprocess.PIPE )
-			# before_args = " -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+			# before_args = "-reconnect_streamed 1"
 			# audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\"", shell=True, stdout=subprocess.PIPE )
 			# ffsource = discord.FFmpegPCMAudio(audioProc.stdout, before_options=before_args, pipe=True)
-			audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\" | ffmpeg -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
+			# audioProc = subprocess.Popen( "youtube-dl -o - \"" + song + "\" | ffmpeg -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1 -reconnect_streamed 1", stdout=subprocess.PIPE, shell=True )
+			#
+			# VICTORY!
+			#
+			audioProc = subprocess.Popen( "ffmpeg -hide_banner -loglevel error -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 2 -i \"" + song + "\" -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
 			rawAudio = discord.PCMAudio(audioProc.stdout)
 			volumeSource = discord.PCMVolumeTransformer(rawAudio)
+			#
+			# ffsource = discord.FFmpegPCMAudio(song, before_options=before_args, pipe=True)
 			# volumeSource = discord.PCMVolumeTransformer(ffsource)
 			self.voice.play(volumeSource, after=self.toggle_next)
 
@@ -385,7 +393,8 @@ class Music:
 		minutes = (seconds % 3600) // 60
 		seconds = seconds % 60
 		
-		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
+		# state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
+		state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': info['formats'][len(info['formats'])-1]['url']})
 		await ctx.channel.send('Enqueued - *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
 	
@@ -753,7 +762,7 @@ class Music:
 		"""Shows info about currently playing."""
 
 		state = self.get_voice_state(ctx.message.guild)
-		if not state.voice.is_playing():
+		if state.voice == None or not state.voice.is_playing():
 			await ctx.channel.send('Not playing anything.')
 		else:
 			diff_time = state.total_playing_time  + (datetime.datetime.now() - state.start_time)
