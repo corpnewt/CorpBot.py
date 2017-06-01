@@ -47,8 +47,12 @@ class Humor:
 				matchList.append(a)
 		
 		if not len(matchList):
-			# Nothing in there
-			msg = "*Whoah there!* That was *too* holy for Robin!"
+			# Nothing in there - get random entry
+			# msg = "*Whoah there!* That was *too* holy for Robin!"
+			word = random.choice(self.adj)
+			word = word.strip().capitalize()
+			subject = subject.strip().capitalize()
+			msg = "*Holy {} {}, Batman!*".format(word, subject)
 		else:
 			# Get a random one
 			word = random.choice(matchList)
