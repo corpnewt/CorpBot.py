@@ -69,7 +69,7 @@ class RateLimit:
 
 		# Get current delay
 		try:
-			currDelay = serverDict['CommandCooldown']
+			currDelay = self.settings.serverDict['CommandCooldown']
 		except KeyError:
 			currDelay = self.commandCooldown
 		
