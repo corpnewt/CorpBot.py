@@ -97,7 +97,7 @@ class RateLimit:
 				await ctx.channel.send('Cooldown cannot be more than *{} seconds*.'.format(self.maxCooldown))
 			return
 		
-		serverDict['CommandCooldown'] = delay
+		self.settings.serverDict['CommandCooldown'] = delay
 		if delay == 1:
 			await ctx.channel.send('Current command cooldown is now *1 second.*')
 		else:
