@@ -226,9 +226,6 @@ class Music:
 		self.voice_states = {}
 		self.settings = settings
 		self.downloader = downloader.Downloader()
-		self.playlist_level = 3 # 0 = all, 1 = botadmin, 2 = admin, 3 = owner, 4 = no one
-		self.playlist_max = 25 # max number of songs in playlist (-1 for any)
-		self.playlist_delay = 3 # Number of seconds before loading next song - too low and youtube will block!
 
 	async def onready(self):
 		# Clear any previous games
@@ -292,6 +289,152 @@ class Music:
 			return True
 		# If we're here - we're not admin, and not in the same channel, deny
 		return False
+
+	@commands.command(pass_context=True, no_pm=True)
+	async def pmax(self, ctx, *, max_songs = None):
+		"""Sets the maximum number of songs to load from a playlist (owner only).
+		The higher the number, the long it takes to load (-1 to load all).
+		Default is 25."""
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		if max_songs == None:
+			lev = 25
+			try:
+				lev = self.settings.serverDict['PlistMax']
+			except KeyError:
+				pass
+			if lev == -1:
+				await ctx.channel.send("The current playlist max is set to: *All songs*")
+			elif lev == 1:
+				await ctx.channel.send("The current playlist max is set to: *1 song*")
+			else:
+				await ctx.channel.send("The current playlist max is set to: *{} songs*".format(lev))
+		else:
+			try:
+				max_songs = int(max_songs)
+			except Exception:
+				await ctx.channel.send("Playlist max must be an integer.")
+				return
+			if max_songs < -1:
+				max_songs = -1
+			self.settings.serverDict['PlistMax'] = max_songs
+			if max_songs == -1:
+				await ctx.channel.send("The playlist max is now set to: *All songs*")
+			elif max_songs == 1:
+				await ctx.channel.send("The playlist max is now set to: *1 song*")
+			else:
+				await ctx.channel.send("The playlist max is now set to: *{} songs*".format(max_songs))
+
+
+	@commands.command(pass_context=True, no_pm=True)
+	async def pdelay(self, ctx, *, delay = None):
+		"""Sets the delay in seconds between loading songs in playlist (owner only).
+		Lower delay may result in Youtube block - default is 3."""
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		if delay == None:
+			lev = 3
+			try:
+				lev = self.settings.serverDict['PlistDelay']
+			except KeyError:
+				pass
+			if lev == 1:
+				await ctx.channel.send("The current playlist load delay is set to: *1 second*")
+			else:
+				await ctx.channel.send("The current playlist load delay is set to: *{} seconds*".format(lev))
+		else:
+			try:
+				delay = int(delay)
+			except Exception:
+				await ctx.channel.send("Delay must be an integer.")
+				return
+			if delay < 0:
+				delay = 0
+			self.settings.serverDict['PlistDelay'] = delay
+			if delay == 1:
+				await ctx.channel.send("The playlist load delay is now set to: *1 second*")
+			else:
+				await ctx.channel.send("The playlist load delay is now set to: *{} seconds*".format(delay))
+
+
+	@commands.command(pass_context=True, no_pm=True)
+	async def plevel(self, ctx, *, level = None):
+		"""Sets the access level for playlists (owner only):
+		0 = Everyone
+		1 = Bot Admins and up
+		2 = Admins and up
+		3 = Owner
+		4 = Disabled (default)"""
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if level == None:
+			# Get the current level
+			lev = 4
+			pword = "Disabled"
+			try:
+				lev = self.settings.serverDict['PlistLevel']
+			except KeyError:
+				pass
+
+			if lev == 0:
+				pword = "Everyone"
+			elif lev == 1:
+				pword = "Bot Admins"
+			elif lev == 2:
+				pword = "Admins"
+			elif lev == 3:
+				pword = "Owner"
+			await ctx.channel.send("The current playlist level is set to: *{} ({})*".format(pword, lev))
+		else:
+			try:
+				level = int(level)
+			except Exception:
+				await ctx.channel.send("Level must be an integer from 0 to 4.")
+				return
+			if level < 0 or level > 4:
+				await ctx.channel.send("Level must be an integer from 0 to 4.")
+				return
+			pword = "Disabled"
+			if level == 0:
+				pword = "Everyone"
+			elif level == 1:
+				pword = "Bot Admins"
+			elif level == 2:
+				pword = "Admins"
+			elif level == 3:
+				pword = "Owner"
+			self.settings.serverDict['PlistLevel'] = level
+			await ctx.channel.send("Playlist level is now set to: *{} ({})*".format(pword, level))
 
 
 	@commands.command(pass_context=True, no_pm=True)
@@ -397,7 +540,25 @@ class Music:
 		if self.settings.isOwner(ctx.author):
 			author_perms = 3
 
-		if author_perms >= self.playlist_level:
+		# Get server info
+		playlist_level = 4
+		try:
+			playlist_level = self.settings.serverDict['PlistLevel']
+		except KeyError:
+			pass
+		playlist_max = 25
+		try:
+			playlist_max = self.settings.serverDict['PlistMax']
+		except KeyError:
+			pass
+		playlist_delay = 3
+		try:
+			playlist_delay = self.settings.serverDict['PlistDelay']
+		except KeyError:
+			pass
+		
+
+		if author_perms >= playlist_level:
 			plist = True
 		else:
 			plist = False
@@ -423,15 +584,15 @@ class Music:
 		if "entries" in info:
 			# Multiple songs - let's add what we need
 			#
-			if author_perms >= self.playlist_level:
+			if author_perms >= playlist_level:
 				# We can add up to playlist_max
 				entries_added = 0
 				entries_skipped = 0
 				
 				mess = await ctx.channel.send("Adding songs from playlist...")
 				
-				if self.playlist_max > -1:
-					total_songs = self.playlist_max
+				if playlist_max > -1:
+					total_songs = playlist_max
 				else:
 					total_songs = len(list(info['entries']))
 
@@ -477,10 +638,10 @@ class Music:
 					state.playlist.append({ 'song': entry.get('title'), 'duration': entry.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': entry['formats'][len(entry['formats'])-1]['url']})
 
 					# Check if we're out of bounds
-					if self.playlist_max > -1 and entries_added >= self.playlist_max:
+					if playlist_max > -1 and entries_added >= playlist_max:
 						break
 					# Try not to get blocked :/
-					await asyncio.sleep(self.playlist_delay)
+					await asyncio.sleep(playlist_delay)
 					# Check if we're still playing
 					state = self.get_voice_state(ctx.message.guild)
 					if state.voice == None:
