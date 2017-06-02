@@ -43,15 +43,31 @@ class ServerStats:
         server_embed.add_field(name="AFK Channel", value=ctx.guild.afk_channel, inline=True)
         server_embed.add_field(name="Verification", value=ctx.guild.verification_level, inline=True)
         server_embed.add_field(name="Voice Region", value=ctx.guild.region, inline=True)
-        server_embed.add_field(name="Is Large", value=ctx.guild.large, inline=True)
-        emojilist = []
+        server_embed.add_field(name="Considered Large", value=ctx.guild.large, inline=True)
+        emojitext = ""
+        emojicount = 0
         for emoji in ctx.guild.emojis:
             emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
-            emojilist.append(emojiMention)
-        if not len(emojilist):
-            server_embed.add_field(name="Emojis", value="None", inline=True)
-        else:
-            server_embed.add_field(name="Emojis", value=" ".join(emojilist), inline=True)
+            test = emojitext + emojiMention
+            if len(test) > 1024:
+                # TOOO BIIIIIIIIG
+                emojicount += 1
+                if emojicount == 1:
+                    ename = "Emojis"
+                else:
+                    ename = "Emojis (Continued)"
+                server_embed.add_field(name=ename, value=emojitext, inline=True)
+                emojitext=emojiMention
+            else:
+                emojitext = emojitext + emojiMention
+
+        if len(emojitext):
+            if emojicount == 0:
+                emojiname = "Emojis"
+            else:
+                emojiname = "Emojis (Continued)"
+            server_embed.add_field(name=emojiname, value=emojitext, inline=True)
+
 
         if len(ctx.guild.icon_url):
             server_embed.set_thumbnail(url=ctx.guild.icon_url)
@@ -60,6 +76,7 @@ class ServerStats:
             server_embed.set_thumbnail(url=ctx.author.default_avatar_url)
         server_embed.set_footer(text="Server ID: {}".format(ctx.guild.id))
         await ctx.channel.send(embed=server_embed)
+
 
     @commands.command(pass_context=True)
     async def listservers(self, ctx, number : int = 10):
