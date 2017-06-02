@@ -106,6 +106,11 @@ echo.
 call :install "pytz"
 echo.
 
+echo Installing Wikipedia...
+echo.
+call :install "wikipedia"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.

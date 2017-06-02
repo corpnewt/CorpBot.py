@@ -55,6 +55,7 @@ from Cogs import UserRole
 from Cogs import Hw
 from Cogs import GlobalMigration
 from Cogs import Tags
+from Cogs import Wiki
 
 # Let's load our prefix file
 prefix = '$'
@@ -296,6 +297,10 @@ cogList.append(gm)
 # Tags
 tags = Tags.Tags(bot, settings)
 cogList.append(tags)
+
+# Wikipedia
+wiki = Wiki.Wiki(bot)
+cogList.append(wiki)
 
 
 # Main bot events

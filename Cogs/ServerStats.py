@@ -28,6 +28,40 @@ class ServerStats:
         return { 'Ignore' : False, 'Delete' : False}
 
     @commands.command(pass_context=True)
+    async def serverinfo(self, ctx):
+        """Lists some info about the current server."""
+        server_embed = discord.Embed(color=ctx.author.color)
+        server_embed.title = ctx.guild.name
+        server_embed.description = "Created at " + ctx.guild.created_at.strftime("%Y-%m-%d %I:%M %p") + " UTC"
+        server_embed.add_field(name="Members", value=str(len(ctx.guild.members)), inline=True)
+        server_embed.add_field(name="Roles", value=str(len(ctx.guild.roles)), inline=True)
+        chandesc = "{} text, {} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
+        server_embed.add_field(name="Channels", value=chandesc, inline=True)
+        server_embed.add_field(name="Default Channel", value=ctx.guild.default_channel.mention, inline=True)
+        server_embed.add_field(name="Default Role", value=ctx.guild.default_role, inline=True)
+        server_embed.add_field(name="Owner", value=ctx.guild.owner.mention, inline=True)
+        server_embed.add_field(name="AFK Channel", value=ctx.guild.afk_channel, inline=True)
+        server_embed.add_field(name="Verification", value=ctx.guild.verification_level, inline=True)
+        server_embed.add_field(name="Voice Region", value=ctx.guild.region, inline=True)
+        server_embed.add_field(name="Is Large", value=ctx.guild.large, inline=True)
+        emojilist = []
+        for emoji in ctx.guild.emojis:
+            emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
+            emojilist.append(emojiMention)
+        if not len(emojilist):
+            server_embed.add_field(name="Emojis", value="None", inline=True)
+        else:
+            server_embed.add_field(name="Emojis", value=" ".join(emojilist), inline=True)
+
+        if len(ctx.guild.icon_url):
+            server_embed.set_thumbnail(url=ctx.guild.icon_url)
+        else:
+            # No Icon
+            server_embed.set_thumbnail(url=ctx.author.default_avatar_url)
+        server_embed.set_footer(text="Server ID: {}".format(ctx.guild.id))
+        await ctx.channel.send(embed=server_embed)
+
+    @commands.command(pass_context=True)
     async def listservers(self, ctx, number : int = 10):
         """Lists the servers I'm connected to - default is 10, max is 50."""
 

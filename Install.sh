@@ -92,6 +92,16 @@ function main () {
     update "pyspeedtest"
     echo
 
+    echo Updating Pytz
+    echo
+    update "pytz"
+    echo
+
+    echo Updating Wikipedia
+    echo
+    update "wikipedia"
+    echo
+
     #echo Updating Flask...
     #echo
     #update "Flask"
