@@ -226,6 +226,14 @@ class Music:
 		self.voice_states = {}
 		self.settings = settings
 		self.downloader = downloader.Downloader()
+		self.playlist_level = 3 # 0 = all, 1 = botadmin, 2 = admin, 3 = owner, 4 = no one
+		self.playlist_max = 25 # max number of songs in playlist (-1 for any)
+		self.playlist_delay = 3 # Number of seconds before loading next song - too low and youtube will block!
+
+	async def onready(self):
+		# Clear any previous games
+		for guild in self.bot.guilds:
+			self.settings.setServerStat(guild, "Playlisting", None)
 
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
@@ -354,11 +362,19 @@ class Music:
 			success = await ctx.invoke(self.summon)
 			if not success:
 				return
+		else:
+			# Check if we're already adding a playlist
+			try:
+				playlisting = self.settings.getServerStat(ctx.guild, "Playlisting")
+			except Exception:
+				playlisting = None
+			if playlisting:
+				await ctx.channel.send("I'm currently importing a playlist - please wait for that to finish before enqueuing more songs.")
+				return
 
 		#await state.songs.put(entry)
 
 		opts = {
-			'buffersize': '20000000',
 			'f': 'bestaudio',
 			'default_search': 'auto',
 			'quiet': True
@@ -367,7 +383,25 @@ class Music:
 		song = song.strip('<>')
 
 		#info = await self.bot.loop.run_in_executor(None, func)
-		info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+		
+		# First we check for our permission level
+		author_perms = 0
+		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		for role in ctx.author.roles:
+			for aRole in checkAdmin:
+				# Get the role that corresponds to the id
+				if str(aRole['ID']) == str(role.id):
+					author_perms = 1
+		if ctx.message.author.permissions_in(ctx.message.channel).administrator:
+			author_perms = 2
+		if self.settings.isOwner(ctx.author):
+			author_perms = 3
+
+		if author_perms >= self.playlist_level:
+			plist = True
+		else:
+			plist = False
+		info = await self.downloader.extract_info(self.bot.loop, song, playlist=plist, download=False, process=False)
 
 		if info.get('url', '').startswith('ytsearch'):
 			info = await self.downloader.extract_info(
@@ -375,7 +409,8 @@ class Music:
 				song,
 				download=False,
 				process=True,    # ASYNC LAMBDAS WHEN
-				retry_on_error=True
+				retry_on_error=True,
+				playlist=False
 			)
 			if not info:
 				return
@@ -386,9 +421,87 @@ class Music:
 			info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
 		if "entries" in info:
-			info = info['entries'][0]
+			# Multiple songs - let's add what we need
+			#
+			if author_perms >= self.playlist_level:
+				# We can add up to playlist_max
+				entries_added = 0
+				entries_skipped = 0
+				
+				mess = await ctx.channel.send("Adding songs from playlist...")
+				
+				if self.playlist_max > -1:
+					total_songs = self.playlist_max
+				else:
+					total_songs = len(list(info['entries']))
+
+				# Lock our playlisting
+				self.settings.setServerStat(ctx.guild, "Playlisting", True)
+
+				for entry in info['entries']:
+					# Increment our count
+					entries_added += 1
+
+					if not entry.get('ie_key', '').lower() == 'youtube':
+						entries_skipped += 1
+						continue
+
+					# Edit our status message
+					await mess.edit(content="Enqueuing song {} of {} from *{}* ({} skipped)...".format(entries_added, total_songs, info['title'], entries_skipped))
+					
+					# Create a new video url and get info
+					new_url = "https://youtube.com/v/" + entry.get('url', '')
+					try:
+						entry = await self.downloader.extract_info(
+							self.bot.loop,
+							new_url,
+							download=False,
+							process=True,    # ASYNC LAMBDAS WHEN
+							retry_on_error=True,
+							playlist=False
+						)
+					except Exception:
+						entries_skipped += 1
+						continue
+					if entry == None:
+						entries_skipped += 1
+						continue
+
+					# Get duration info
+					seconds = entry.get('duration')
+					hours = seconds // 3600
+					minutes = (seconds % 3600) // 60
+					seconds = seconds % 60
+
+					# Add the song
+					state.playlist.append({ 'song': entry.get('title'), 'duration': entry.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': entry['formats'][len(entry['formats'])-1]['url']})
+
+					# Check if we're out of bounds
+					if self.playlist_max > -1 and entries_added >= self.playlist_max:
+						break
+					# Try not to get blocked :/
+					await asyncio.sleep(self.playlist_delay)
+					# Check if we're still playing
+					state = self.get_voice_state(ctx.message.guild)
+					if state.voice == None:
+						await mess.edit(content="*{}* Cancelled.".format(info['title']))
+						return
+				# Unlock our playlisting
+				self.settings.setServerStat(ctx.guild, "Playlisting", None)
+
+				await mess.edit(content=" ")
+				if entries_added == 1:
+					await ctx.channel.send("Enqueued *1* song from *{}*".format(info['title']))
+				else:
+					await ctx.channel.send("Enqueued *{}* songs from *{}*".format(entries_added, info['title']))
+				return
+			else:
+				# We don't have enough perms
+				info = info['entries'][0]
 		
-		seconds = info.get('duration')
+		print(info)
+		
+		seconds = info.get('duration', 0)
 		hours = seconds // 3600
 		minutes = (seconds % 3600) // 60
 		seconds = seconds % 60

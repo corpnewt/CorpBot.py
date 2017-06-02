@@ -5,6 +5,22 @@ import youtube_dl
 
 from concurrent.futures import ThreadPoolExecutor
 
+ytdl_playlist_format_options = {
+    'format': 'bestaudio/best',
+    'extractaudio': True,
+    'audioformat': 'mp3',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': False,
+    'nocheckcertificate': True,
+    'ignoreerrors': True,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0'
+}
+
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'extractaudio': True,
@@ -13,7 +29,7 @@ ytdl_format_options = {
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
-    'ignoreerrors': False,
+    'ignoreerrors': True,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
@@ -36,6 +52,8 @@ class Downloader:
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
         self.unsafe_ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
         self.safe_ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+        self.unsafe_playlist_ytdl = youtube_dl.YoutubeDL(ytdl_playlist_format_options)
+        self.safe_playlist_ytdl = youtube_dl.YoutubeDL(ytdl_playlist_format_options)
         self.safe_ytdl.params['ignoreerrors'] = True
         self.download_folder = download_folder
 
@@ -52,7 +70,7 @@ class Downloader:
     def ytdl(self):
         return self.safe_ytdl
 
-    async def extract_info(self, loop, *args, on_error=None, retry_on_error=False, **kwargs):
+    async def extract_info(self, loop, *args, on_error=None, retry_on_error=False, playlist=False, **kwargs):
         """
             Runs ytdl.extract_info within the threadpool. Returns a future that will fire when it's done.
             If `on_error` is passed and an exception is raised, the exception will be caught and passed to
@@ -60,8 +78,10 @@ class Downloader:
         """
         if callable(on_error):
             try:
-                return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
-
+                if playlist:
+                    return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_playlist_ytdl.extract_info, *args, **kwargs))
+                else:
+                    return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
             except Exception as e:
 
                 # (youtube_dl.utils.ExtractorError, youtube_dl.utils.DownloadError)
@@ -76,9 +96,15 @@ class Downloader:
                     loop.call_soon_threadsafe(on_error, e)
 
                 if retry_on_error:
-                    return await self.safe_extract_info(loop, *args, **kwargs)
+                    return await self.safe_extract_info(loop, playlist, *args, **kwargs)
         else:
-            return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
+            if playlist:
+                return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_playlist_ytdl.extract_info, *args, **kwargs))
+            else:
+                return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
 
-    async def safe_extract_info(self, loop, *args, **kwargs):
-        return await loop.run_in_executor(self.thread_pool, functools.partial(self.safe_ytdl.extract_info, *args, **kwargs))
+    async def safe_extract_info(self, loop, playlist, *args, **kwargs):
+        if playlist:
+            return await loop.run_in_executor(self.thread_pool, functools.partial(self.safe_playlist_ytdl.extract_info, *args, **kwargs))
+        else:
+            return await loop.run_in_executor(self.thread_pool, functools.partial(self.safe_ytdl.extract_info, *args, **kwargs))
