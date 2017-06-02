@@ -54,12 +54,15 @@ class Bot:
 			if serverName == server.name.lower() or serverID == server.id:
 				# Found it
 				await server.leave()
+				return True
 			# Check for owner name and id quick
 			# Name *MUST* be case-sensitive and have the discriminator for safety
 			namecheck = server.owner.name + "#" + str(server.owner.discriminator)
 			if serv == namecheck or serverID == server.owner.id:
 				# Got the owner
 				await server.leave()
+				return True
+		return False
 
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
@@ -463,7 +466,7 @@ class Bot:
 		
 		if server == None:
 			# No server provided
-			await ctx.send("Usage: `{}block [server name/id]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}block [server name/id or owner name#desc/id]`".format(ctx.prefix))
 			return
 		
 		try:
@@ -475,12 +478,15 @@ class Bot:
 		for serv in serverList:
 			if str(serv).lower() == server.lower():
 				# Found a match - already blocked.
-				await ctx.channel.send("That server is already blocked!")
+				msg = "*{}* is already blocked!".format(serv)
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.channel.send(msg)
 				return
 		
 		# Not blocked
 		self.settings.serverDict['BlockedServers'].append(server)
-		msg = "Server *{}* now blocked!".format(server)
+		msg = "*{}* now blocked!".format(server)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -489,7 +495,7 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def unblock(self, ctx, *, server : str = None):
-		"""Unblocks the bot from joining a server (owner-only)."""
+		"""Unblocks a server or owner (owner-only)."""
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
@@ -509,7 +515,7 @@ class Bot:
 		
 		if server == None:
 			# No server provided
-			await ctx.send("Usage: `{}unblock [server name/id]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}unblock [server name/id or owner name#desc/id]`".format(ctx.prefix))
 			return
 		
 		try:
@@ -538,7 +544,7 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def unblockall(self, ctx):
-		"""Unblocks all blocked servers (owner-only)."""
+		"""Unblocks all blocked servers and owners (owner-only)."""
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
@@ -558,12 +564,12 @@ class Bot:
 		
 		self.settings.serverDict['BlockedServers'] = []
 
-		await ctx.channel.send("*All* servers unblocked!")
+		await ctx.channel.send("*All* servers and owners unblocked!")
 
 
 	@commands.command(pass_context=True)
 	async def blocked(self, ctx):
-		"""Lists all blocked servers (owner-only)."""
+		"""Lists all blocked servers and owners (owner-only)."""
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
@@ -588,7 +594,7 @@ class Bot:
 			serverList = self.settings.serverDict['BlockedServers']
 
 		if not len(serverList):
-			msg = "There are no blocked servers!"
+			msg = "There are no blocked servers or owners!"
 		else:
 			msg = "__Currently Blocked:__\n\n{}".format(', '.join(serverList))
 

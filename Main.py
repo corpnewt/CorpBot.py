@@ -381,12 +381,16 @@ async def on_member_unban(member, server):
 
 @bot.event
 async def on_guild_join(server):
+	didLeave = False
 	for cog in cogList:
 		try:
-			await cog.onserverjoin(server)
+			if await cog.onserverjoin(server):
+				didLeave = True
 		except AttributeError:
 			# Onto the next
 			continue
+	if didLeave:
+		return
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
