@@ -54,6 +54,12 @@ class Bot:
 			if serverName == server.name.lower() or serverID == server.id:
 				# Found it
 				await server.leave()
+			# Check for owner name and id quick
+			# Name *MUST* be case-sensitive and have the discriminator for safety
+			namecheck = server.owner.name + "#" + str(server.owner.discriminator)
+			if serv == namecheck or serverID == server.owner.id:
+				# Got the owner
+				await server.leave()
 
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
@@ -436,7 +442,8 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def block(self, ctx, *, server : str = None):
-		"""Blocks the bot from joining a server - takes either a name or an id (owner-only)."""
+		"""Blocks the bot from joining a server - takes either a name or an id (owner-only).
+		Can also take the id or case-sensitive name + descriminator of the owner (eg. Bob#1234)."""
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
 			suppress = True
