@@ -660,8 +660,6 @@ class Music:
 				# We don't have enough perms
 				info = info['entries'][0]
 		
-		print(info)
-		
 		seconds = info.get('duration', 0)
 		hours = seconds // 3600
 		minutes = (seconds % 3600) // 60
