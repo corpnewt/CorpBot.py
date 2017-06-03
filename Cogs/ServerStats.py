@@ -53,7 +53,7 @@ class ServerStats:
                 # TOOO BIIIIIIIIG
                 emojicount += 1
                 if emojicount == 1:
-                    ename = "Emojis"
+                    ename = "Emojis ({} total)".format(len(ctx.guild.emojis))
                 else:
                     ename = "Emojis (Continued)"
                 server_embed.add_field(name=ename, value=emojitext, inline=True)
@@ -63,7 +63,7 @@ class ServerStats:
 
         if len(emojitext):
             if emojicount == 0:
-                emojiname = "Emojis"
+                emojiname = "Emojis ({} total)".format(len(ctx.guild.emojis))
             else:
                 emojiname = "Emojis (Continued)"
             server_embed.add_field(name=emojiname, value=emojitext, inline=True)
