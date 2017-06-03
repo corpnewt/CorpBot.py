@@ -438,6 +438,23 @@ class Music:
 
 
 	@commands.command(pass_context=True, no_pm=True)
+	async def playingin(self, ctx):
+		"""Shows the number of servers the bot is currently playing music in."""
+		playing_in = 0
+		for serv in self.bot.guilds:
+			state = self.get_voice_state(serv)
+			if state.voice and state.voice.is_playing():
+				playing_in += 1
+		
+		if len(self.bot.guilds) == 1:
+			msg = "Playing music in {} of {} server.".format(playing_in, len(self.bot.guilds))
+		else:
+			msg = "Playing music in {} of {} servers.".format(playing_in, len(self.bot.guilds))
+
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True, no_pm=True)
 	async def join(self, ctx, *, channel : discord.VoiceChannel):
 		"""Joins a voice channel."""
 		try:
