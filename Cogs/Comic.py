@@ -795,7 +795,7 @@ class Comic:
 				
 			date = self.getRandDateBetween(firstDate, todayDate)
 			# Get URL
-			getURL = "http://www.gocomics.com/printable/peanuts/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
+			getURL = "http://www.gocomics.com/peanuts/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
 			# Retrieve html and info
 			imageHTML = ComicHelper.getImageHTML(getURL)
 		
@@ -848,7 +848,7 @@ class Comic:
 		dateDict = self.dateDict(date)
 
 		# Get URL
-		getURL = "http://www.gocomics.com/printable/peanuts/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
+		getURL = "http://www.gocomics.com/peanuts/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
 		
 		# Retrieve html and info
 		imageHTML = ComicHelper.getImageHTML(getURL)

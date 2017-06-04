@@ -4,6 +4,7 @@ import datetime as dt
 import urllib.request
 import urllib
 import requests
+from   pyquery import PyQuery as pq
 
 try:
     # Python 2.6-2.7
@@ -263,8 +264,13 @@ def getGImageURL ( html ):
 def getPeanutsImageURL ( html ):
 	if not html:
 		return None
-		
-	comicBlock = find_last_between( html, 'src=', ' />')
+
+	dom = pq(html)
+
+	pic = dom('picture.img-fluid.item-comic-image')
+	pic = str(pic).strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+
+	comicBlock = find_last_between( pic, 'src=', '/>')
 	
 	if not comicBlock:
 		return None
