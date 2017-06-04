@@ -532,7 +532,7 @@ class Hw:
 	async def hw(self, ctx, *, user = None, build = None):
 		"""Lists the hardware for either the user's default build - or the passed build."""
 		if not user:
-			user = ctx.author.name
+			user = "<"+str(ctx.author.id)+">"
 	
 		# Let's check for username and build name
 		parts = user.split()
