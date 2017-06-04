@@ -579,7 +579,13 @@ class Music:
 			plist = True
 		else:
 			plist = False
-		info = await self.downloader.extract_info(self.bot.loop, song, playlist=plist, download=False, process=False)
+		info = await self.downloader.extract_info(
+				self.bot.loop,
+				song,
+				playlist=plist,
+				download=False,
+				process=False
+			)
 
 		if info.get('url', '').startswith('ytsearch'):
 			info = await self.downloader.extract_info(
@@ -608,18 +614,40 @@ class Music:
 				
 				mess = await ctx.channel.send("Adding songs from playlist...")
 				
+				entries = info['entries']
+				entries = list(entries)
+
+				# Get the dropped song's positionn in the playlist
+				index = 0
+				for e in entries:
+					if not e.get('ie_key', '').lower() == 'youtube':
+						index += 1
+						continue
+					eurl = e.get('url')
+					if "v="+eurl in info['webpage_url']:
+						# We found it!
+						break
+					index += 1
+				
 				if playlist_max > -1:
-					total_songs = playlist_max
+					if len(entries) - index > playlist_max:
+						total_songs = playlist_max
+					else:
+						total_songs = len(entries) - index
 				else:
-					total_songs = len(list(info['entries']))
+					total_songs = len(entries) - index
 
 				# Lock our playlisting
 				self.settings.setServerStat(ctx.guild, "Playlisting", True)
 
-				for entry in info['entries']:
+				checkIndex = 0
+				for entry in entries:
+					# Start with the song that was dropped
+					if checkIndex < index:
+						checkIndex += 1
+						continue
 					# Increment our count
 					entries_added += 1
-
 					if not entry.get('ie_key', '').lower() == 'youtube':
 						entries_skipped += 1
 						continue
