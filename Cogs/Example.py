@@ -455,8 +455,33 @@ class Music:
 
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def join(self, ctx, *, channel : discord.VoiceChannel):
+	async def join(self, ctx, *, channel : str = None):
 		"""Joins a voice channel."""
+		# No channel sent
+		if channel == None:
+			await ctx.channel.send("Usage: `{}join [channel name]`".format(ctx.prefix))
+			return
+		
+		found_channel = None
+		for c in ctx.guild.channels:
+			# Go through our channels, look for VoiceChannels,
+			# and compare names
+			if not type(c) is discord.VoiceChannel:
+				continue
+			# Check name case-insensitive
+			if c.name.lower() == channel.lower():
+				# Found it!
+				found_channel = c
+				break
+				
+		if found_channel == None:
+			# We didn't find it...
+			await ctx.channel.send("I couldn't find that voice channel...")
+			return
+		
+		# At this point - we have a channel - set channel to found_channel
+		channel = found_channel
+		
 		try:
 			await self.create_voice_client(channel)
 		except discord.ClientException:
