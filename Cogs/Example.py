@@ -646,7 +646,6 @@ class Music:
 		except KeyError:
 			pass
 		
-		print("Author: {}\nRequired: {}".format(author_perms, playlist_level))
 		if author_perms >= playlist_level:
 			plist = True
 		else:
