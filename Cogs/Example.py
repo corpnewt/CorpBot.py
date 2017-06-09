@@ -685,12 +685,13 @@ class Music:
 				entries_skipped = 0
 				
 				mess = await ctx.channel.send("Adding songs from playlist...")
-				
+
 				entries = info['entries']
 				entries = list(entries)
 
 				# Get the dropped song's positionn in the playlist
 				index = 0
+				found = False
 				for e in entries:
 					if not e.get('ie_key', '').lower() == 'youtube':
 						index += 1
@@ -698,8 +699,12 @@ class Music:
 					eurl = e.get('url')
 					if "v="+eurl in info['webpage_url']:
 						# We found it!
+						found = True
 						break
 					index += 1
+
+				if not found:
+					index = 0
 				
 				if playlist_max > -1:
 					if len(entries) - index > playlist_max:
@@ -774,10 +779,10 @@ class Music:
 				self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
 
 				await mess.edit(content=" ")
-				if entries_added == 1:
-					await ctx.channel.send("Enqueued *1* song from *{}*".format(info['title']))
+				if entries_added-entries_skipped == 1:
+					await ctx.channel.send("Enqueued *{}* song from *{}* - (*{}* skipped)".format(entries_added-entries_skipped, info['title'], entries_skipped))
 				else:
-					await ctx.channel.send("Enqueued *{}* songs from *{}*".format(entries_added, info['title']))
+					await ctx.channel.send("Enqueued *{}* songs from *{}* - (*{}* skipped)".format(entries_added-entries_skipped, info['title'], entries_skipped))
 				return
 			else:
 				# We don't have enough perms
