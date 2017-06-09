@@ -228,9 +228,10 @@ class Music:
 		self.downloader = downloader.Downloader()
 
 	async def onready(self):
-		# Clear any previous games
+		# Clear any previous playlist settings
 		for guild in self.bot.guilds:
 			self.settings.setServerStat(guild, "Playlisting", None)
+			self.settings.setServerStat(guild, "PlaylistRequestor", None)
 
 	def get_voice_state(self, server):
 		state = self.voice_states.get(server.id)
@@ -436,6 +437,51 @@ class Music:
 			self.settings.serverDict['PlistLevel'] = level
 			await ctx.channel.send("Playlist level is now set to: *{} ({})*".format(pword, level))
 
+	@commands.command(pass_context=True, no_pm=True)
+	async def pskip(self, ctx):
+		"""Skips loading the rest of a playlist - can only be done by the requestor, or bot-admin/admin."""
+
+		try:
+			playlisting = self.settings.getServerStat(ctx.guild, "Playlisting")
+			requestor   = self.settings.getServerStat(ctx.guild, "PlaylistRequestor")
+		except Exception:
+			playlisting = None
+			requestor   = None
+
+		if playlisting == None:
+			await ctx.channel.send("I'm not currently adding a playlist.")
+			return
+
+		# Check requestor id - and see if we have it
+		if not ctx.author.id == requestor:
+			#admin/bot-admin only
+			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+			if not isAdmin:
+				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+				for role in ctx.message.author.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if str(aRole['ID']) == str(role.id):
+							isAdmin = True
+			if not isAdmin:
+				await ctx.channel.send('You do not have sufficient privileges to access this command.')
+				return
+
+		# Check user credentials
+		userInVoice = await self._user_in_voice(ctx)
+		if userInVoice == False:
+			await ctx.channel.send('You\'ll have to join the same voice channel as me to use that.')
+			return
+		elif userInVoice == None:
+			await ctx.channel.send('I\'m not in a voice channel.  Use the `{}summon`, `{}join [channel]` or `{}play [song]` commands to start playing something.'.format(ctx.prefix, ctx.prefix, ctx.prefix))
+			return
+
+		# At this point - we *should* have everything we need to cancel - so do it
+		self.settings.setServerStat(ctx.guild, "Playlisting", None)
+		self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
+
+		await ctx.send("Playlist loading canceled!")
+
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def playingin(self, ctx):
@@ -490,6 +536,7 @@ class Music:
 			await ctx.channel.send('This is not a voice channel...')
 		else:
 			await ctx.channel.send('Ready to play audio in ' + channel.name)
+
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
@@ -664,6 +711,8 @@ class Music:
 
 				# Lock our playlisting
 				self.settings.setServerStat(ctx.guild, "Playlisting", True)
+				# Add requestor's id
+				self.settings.setServerStat(ctx.guild, "PlaylistRequestor", ctx.author.id)
 
 				checkIndex = 0
 				for entry in entries:
@@ -714,11 +763,15 @@ class Music:
 					await asyncio.sleep(playlist_delay)
 					# Check if we're still playing
 					state = self.get_voice_state(ctx.message.guild)
-					if state.voice == None:
-						await mess.edit(content="*{}* Cancelled.".format(info['title']))
+					if state.voice == None or self.settings.getServerStat(ctx.guild, "Playlisting") == None:
+						if entries_added == 1:
+							await mess.edit(content="*{}* Cancelled - *1* song loaded.".format(info['title']))
+						else:
+							await mess.edit(content="*{}* Cancelled - *{}* songs loaded.".format(info['title'], entries_added))
 						return
 				# Unlock our playlisting
 				self.settings.setServerStat(ctx.guild, "Playlisting", None)
+				self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
 
 				await mess.edit(content=" ")
 				if entries_added == 1:
@@ -925,6 +978,10 @@ class Music:
 		state = self.get_voice_state(server)
 
 		self.settings.setServerStat(ctx.message.guild, "Volume", None)
+
+		# Reset our playlist-related vars
+		self.settings.setServerStat(ctx.guild, "Playlisting", None)
+		self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
 
 		if state.is_playing():
 			player = state.voice
