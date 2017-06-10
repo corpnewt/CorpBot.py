@@ -785,7 +785,31 @@ class Music:
 				return
 			else:
 				# We don't have enough perms
-				info = info['entries'][0]
+				entries = info['entries']
+				entries = list(entries)
+				entry = entries[0]
+				if entry.get('ie_key', '').lower() == 'youtube':
+					# Create a new video url and get info
+					new_url = "https://youtube.com/v/" + entry.get('url', '')
+					try:
+						entry = await self.downloader.extract_info(
+							self.bot.loop,
+							new_url,
+							download=False,
+							process=True,    # ASYNC LAMBDAS WHEN
+							retry_on_error=True,
+							playlist=False
+						)
+					except Exception:
+						entry = None
+						pass
+					info = entry
+				else:
+					info = None
+				
+				if info == None:
+					await ctx.send("I couldn't load that song :(")
+					return
 		
 		seconds = info.get('duration', 0)
 		hours = seconds // 3600
