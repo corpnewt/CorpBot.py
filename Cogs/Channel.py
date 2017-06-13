@@ -40,7 +40,7 @@ class Channel:
 			membersOnline = 0
 			for member in server.members:
 				members += 1
-				if str(member.status).lower() == "online":
+				if not str(member.status).lower() == "offline":
 					membersOnline += 1
 
 		for id in channelMOTDList:

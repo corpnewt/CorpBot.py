@@ -808,7 +808,7 @@ class Lists:
 		membersOnline = 0
 		for member in server.members:
 			members += 1
-			if str(member.status).lower() == "online":
+			if not str(member.status).lower() == "offline":
 				membersOnline += 1
 		msg = 'There are *{}* out of *{}* users online.'.format(membersOnline, members)
 		await ctx.channel.send(msg)
