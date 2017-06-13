@@ -33,7 +33,11 @@ class ServerStats:
         server_embed = discord.Embed(color=ctx.author.color)
         server_embed.title = ctx.guild.name
         server_embed.description = "Created at " + ctx.guild.created_at.strftime("%Y-%m-%d %I:%M %p") + " UTC"
-        server_embed.add_field(name="Members", value=str(len(ctx.guild.members)), inline=True)
+        online_members = 0
+        for member in ctx.guild.members:
+            if not str(member.status).lower() == "offline":
+                online_members += 1
+        server_embed.add_field(name="Members", value="{}/{}".format(online_members, len(ctx.guild.members)), inline=True)
         server_embed.add_field(name="Roles", value=str(len(ctx.guild.roles)), inline=True)
         chandesc = "{} text, {} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
