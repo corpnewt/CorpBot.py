@@ -86,32 +86,32 @@ class Feed:
 		if hunger < 0:
 			
 			if hunger <= -1:
-				msg = 'I\'m stuffed ({}% overweight)... maybe I should take a break from eating...'.format(overweight)
+				msg = 'I\'m stuffed ({:,}% overweight)... maybe I should take a break from eating...'.format(overweight)
 			if hunger <= -10:
-				msg = 'I\'m pudgy ({}% overweight)... I may get fat if I keeps going.'.format(overweight)
+				msg = 'I\'m pudgy ({:,}% overweight)... I may get fat if I keeps going.'.format(overweight)
 			if hunger <= -25:
-				msg = 'I am, well fat ({}% overweight)... Diet time?'.format(overweight)
+				msg = 'I am, well fat ({:,}% overweight)... Diet time?'.format(overweight)
 			if hunger <= -50:
-				msg = 'I\'m obese ({}% overweight)... Eating is my enemy right now.'.format(overweight)
+				msg = 'I\'m obese ({:,}% overweight)... Eating is my enemy right now.'.format(overweight)
 			if hunger <= -75:
-				msg = 'I look fat to an extremely unhealthy degree ({}% overweight)... maybe you should think about *my* health?'.format(overweight)
+				msg = 'I look fat to an extremely unhealthy degree ({:,}% overweight)... maybe you should think about *my* health?'.format(overweight)
 			if hunger <= -100:
-				msg = 'I am essentially dead from over-eating ({}% overweight).  I hope you\'re happy.'.format(overweight)
+				msg = 'I am essentially dead from over-eating ({:,}% overweight).  I hope you\'re happy.'.format(overweight)
 			if hunger <= -150:
-				msg = 'I *AM* dead from over-eating ({}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
+				msg = 'I *AM* dead from over-eating ({:,}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
 				
 		elif hunger == 0:
-			msg = 'I\'m full ({}%).  You are safe.  *For now.*'.format(hunger)
+			msg = 'I\'m full ({:,}%).  You are safe.  *For now.*'.format(hunger)
 		elif hunger <= 15:
-			msg = 'I feel mostly full ({}%).  I am appeased.'.format(hunger)
+			msg = 'I feel mostly full ({:,}%).  I am appeased.'.format(hunger)
 		elif hunger <= 25:
-			msg = 'I feel a bit peckish ({}%).  A snack is in order.'.format(hunger)
+			msg = 'I feel a bit peckish ({:,}%).  A snack is in order.'.format(hunger)
 		elif hunger <= 50:
-			msg = 'I\'m hungry ({}%).  Present your offerings.'.format(hunger)
+			msg = 'I\'m hungry ({:,}%).  Present your offerings.'.format(hunger)
 		elif hunger <= 75:
-			msg = 'I\'m *starving* ({}%)!  Do you want me to starve to death?'.format(hunger)
+			msg = 'I\'m *starving* ({:,}%)!  Do you want me to starve to death?'.format(hunger)
 		else:
-			msg = 'I\'m ***hangry*** ({}%)!  Feed me or feel my *wrath!*'.format(hunger)
+			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
 			
 		if isKill.lower() == "yes" and hunger > -150:
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, self.prefix)
@@ -151,7 +151,7 @@ class Feed:
 
 		if food > int(reserveXP):
 			approve = False
-			msg = 'You can\'t feed me *{}*, you only have *{}* xp reserve!'.format(food, reserveXP)
+			msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
 			
 		if food < 0:
 			msg = 'You can\'t feed me less than nothing! You think this is funny?!'
@@ -193,7 +193,7 @@ class Feed:
 
 			if isKill.lower() == "yes":
 				# Bot's dead...
-				msg = '*{}* carelessly shoves *{} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
+				msg = '*{}* carelessly shoves *{:,} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
 				await channel.send(msg)
 				return
 			
@@ -206,12 +206,12 @@ class Feed:
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}\'s* offering of *{}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{} xp!*'.format(DisplayName.name(author), food, int(payout))
+				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(author), food, int(payout))
 				
 				# Got XP - let's see if we need to promote
 				await self.xp.checkroles(author, channel)
 			else:
-				msg = '*{}* fed me *{} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
+				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
 		
 			if hunger <= -150:
 				# Kill the bot here
