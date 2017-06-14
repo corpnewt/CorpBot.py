@@ -37,9 +37,9 @@ class ServerStats:
         for member in ctx.guild.members:
             if not str(member.status).lower() == "offline":
                 online_members += 1
-        server_embed.add_field(name="Members", value="{}/{}".format(online_members, len(ctx.guild.members)), inline=True)
+        server_embed.add_field(name="Members", value="{:,}/{:,}".format(online_members, len(ctx.guild.members)), inline=True)
         server_embed.add_field(name="Roles", value=str(len(ctx.guild.roles)), inline=True)
-        chandesc = "{} text, {} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
+        chandesc = "{:,} text, {:,} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
         server_embed.add_field(name="Default Channel", value=ctx.guild.default_channel.mention, inline=True)
         server_embed.add_field(name="Default Role", value=ctx.guild.default_role, inline=True)
@@ -57,7 +57,7 @@ class ServerStats:
                 # TOOO BIIIIIIIIG
                 emojicount += 1
                 if emojicount == 1:
-                    ename = "Emojis ({} total)".format(len(ctx.guild.emojis))
+                    ename = "Emojis ({:,} total)".format(len(ctx.guild.emojis))
                 else:
                     ename = "Emojis (Continued)"
                 server_embed.add_field(name=ename, value=emojitext, inline=True)
@@ -141,7 +141,7 @@ class ServerStats:
         for server in serverList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}* members\n'.format(i, server['Name'], server['Users'])
+            msg += '{}. *{}* - *{:,}* members\n'.format(i, server['Name'], server['Users'])
             i += 1
 
         if number < len(serverList):
@@ -182,7 +182,7 @@ class ServerStats:
         for server in serverList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}* members\n'.format(i, server['Name'], server['Users'])
+            msg += '{}. *{}* - *{:,}* members\n'.format(i, server['Name'], server['Users'])
             i += 1
 
         if number < len(serverList):
@@ -203,7 +203,7 @@ class ServerStats:
         for server in self.bot.guilds:
             serverCount += 1
             userCount += len(server.members)
-        await ctx.channel.send('There are *{} users* on the *{} servers* I am currently a part of!'.format(userCount, serverCount))
+        await ctx.channel.send('There are *{:,} users* on the *{:,} servers* I am currently a part of!'.format(userCount, serverCount))
 
     
     @commands.command(pass_context=True)
