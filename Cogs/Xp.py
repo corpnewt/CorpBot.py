@@ -172,7 +172,7 @@ class Xp:
 
 		if xpAmount > int(reserveXP):
 			approve = False
-			msg = 'You can\'t give *{} xp*, you only have *{}!*'.format(xpAmount, reserveXP)
+			msg = 'You can\'t give *{:,} xp*, you only have *{:,}!*'.format(xpAmount, reserveXP)
 
 		if author == member:
 			approve = False
@@ -238,7 +238,7 @@ class Xp:
 					# Decrement if needed
 					if decrement:
 						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
-					msg = '*{} collective xp* was given to *{}!*'.format(totalXP, member.name)
+					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, member.name)
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
@@ -252,7 +252,7 @@ class Xp:
 				if decrement:
 					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
-				msg = '*{}* was given *{} xp!*'.format(DisplayName.name(member), xpAmount)
+				msg = '*{}* was given *{:,} xp!*'.format(DisplayName.name(member), xpAmount)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -332,7 +332,7 @@ class Xp:
 			
 		if bet > int(reserveXP):
 			approve = False
-			msg = 'You can\'t bet *{}*, you only have *{}* xp reserve!'.format(bet, reserveXP)
+			msg = 'You can\'t bet *{:,}*, you only have *{:,}* xp reserve!'.format(bet, reserveXP)
 			
 		if bet < 0:
 			msg = 'You can\'t bet negative amounts!'
@@ -381,11 +381,11 @@ class Xp:
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}* bet *{}* and ***WON*** *{} xp!*'.format(DisplayName.name(author), bet, int(payout))
+				msg = '*{}* bet *{:,}* and ***WON*** *{:,} xp!*'.format(DisplayName.name(author), bet, int(payout))
 				# Now we check for promotions
 				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
 			else:
-				msg = '*{}* bet *{}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
+				msg = '*{}* bet *{:,}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
 		await ctx.message.channel.send(msg)
 			
@@ -615,7 +615,7 @@ class Xp:
 			else:
 				cMemberDisplay = promoSorted[index]['Name']
 
-			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
+			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
 		await ctx.message.channel.send(msg)
 
@@ -656,7 +656,7 @@ class Xp:
 					cMemberDisplay = DisplayName.name(cMember)
 			else:
 				cMemberDisplay = promoSorted[index]['Name']
-			msg = '{}\n{}. *{}* - *{} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
+			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
 
 		await ctx.message.channel.send(msg)
 		
@@ -714,8 +714,8 @@ class Xp:
 			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
 			
 		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %I:%M %p")) # I think this will work
-		msg = "{}**XP:** *{}*\n".format(msg, newStat)
-		msg = "{}**XP Reserve:** *{}*\n".format(msg, newState)
+		msg = "{}**XP:** *{:,}*\n".format(msg, newStat)
+		msg = "{}**XP Reserve:** *{:,}*\n".format(msg, newState)
 		
 		# Add Joined
 		stat_embed.add_field(name="Joined", value=member.joined_at.strftime("%Y-%m-%d %I:%M %p"), inline=True)
@@ -761,9 +761,9 @@ class Xp:
 				stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
-			msg = '{}\n*{}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
+			msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
 			# Add Next Rank
-			stat_embed.add_field(name="Next Rank", value='{} ({} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
+			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
 			
 		if member.game:
 			if member.game.name:
