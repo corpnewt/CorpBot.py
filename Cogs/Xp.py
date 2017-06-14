@@ -694,8 +694,8 @@ class Xp:
 		newState = int(self.settings.getUserStat(member, ctx.message.guild, "XPReserve"))
 		
 		# Add XP and XP Reserve
-		stat_embed.add_field(name="XP", value=newStat, inline=True)
-		stat_embed.add_field(name="XP Reserve", value=newState, inline=True)
+		stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
+		stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
 		
 		memName = member.name
 		# Get member's avatar url
