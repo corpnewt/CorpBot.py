@@ -49,7 +49,7 @@ class Channel:
 				motd = id['MOTD'] # A markdown message of the day
 				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
 				if listOnline.lower() == "yes":
-					msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+					msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
 				else:
 					msg = motd
 				try:
@@ -266,7 +266,7 @@ class Channel:
 			if role in roles:
 				# We found it
 				memberCount += 1
-				if str(member.status).lower() == 'online':
+				if not str(member.status).lower() == 'offline':
 					memberOnline += 1
 
 		'''if memberCount == 1:
@@ -276,7 +276,7 @@ class Channel:
 			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
 			role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)'''
 		
-		role_embed.add_field(name="Members", value='{} of {} online.'.format(memberOnline, memberCount), inline=True)
+		role_embed.add_field(name="Members", value='{:,} of {:,} online.'.format(memberOnline, memberCount), inline=True)
 			
 		# await channel.send(msg)
 		await channel.send(embed=role_embed)
