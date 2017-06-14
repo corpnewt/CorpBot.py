@@ -145,7 +145,11 @@ class Calc:
             msg = Nullify.clean(msg)
             await ctx.channel.send(msg)
             return
-
+          
+        if int(answer) == answer:
+            # Check if it's a whole number and cast to int if so
+            answer = int(answer)
+            
         msg = '{} = {}'.format(formula, answer)
         # Say message
         await ctx.channel.send(msg)
