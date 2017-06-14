@@ -208,7 +208,7 @@ class ServerStats:
     
     @commands.command(pass_context=True)
     async def firstjoins(self, ctx, number : int = 10):
-        """Lists the most recent users to join - default is 10, max is 25."""
+        """Lists the first users to join - default is 10, max is 25."""
         # Check if we're suppressing @here and @everyone mentions
         if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
             suppress = True
@@ -280,6 +280,88 @@ class ServerStats:
             msg = '__**Last {} of {} Members to Join:**__\n\n'.format(number, len(joinedList))+msg
         else:
             msg = '__**Last {} Members to Join:**__\n\n'.format(len(joinedList))+msg
+
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await ctx.channel.send(msg)
+        
+    @commands.command(pass_context=True)
+    async def firstservers(self, ctx, number : int = 10):
+        """Lists the first servers I've joined - default is 10, max is 25."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 25:
+            number = 25
+        if number < 1:
+            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
+            return
+
+        joinedList = []
+        for guild in self.bot.guilds:
+            botmember = DisplayName.memberForID(self.bot.user.id, guild)
+            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at })
+        
+        # sort the servers by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+
+        i = 1
+        msg = ''
+        for member in joinedList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            i += 1
+        
+        if number < len(joinedList):
+            msg = '__**First {} of {} Servers I Joined:**__\n\n'.format(number, len(joinedList))+msg
+        else:
+            msg = '__**First {} Servers I Joined:**__\n\n'.format(len(joinedList))+msg
+
+        # Check for suppress
+        if suppress:
+            msg = Nullify.clean(msg)
+        await ctx.channel.send(msg)
+
+    @commands.command(pass_context=True)
+    async def recentservers(self, ctx, number : int = 10):
+        """Lists the most recent users to join - default is 10, max is 25."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if number > 25:
+            number = 25
+        if number < 1:
+            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
+            return
+
+        joinedList = []
+        for guild in self.bot.guilds:
+            botmember = DisplayName.memberForID(self.bot.user.id, guild)
+            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at })
+        
+        # sort the servers by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'], reverse=True)
+
+        i = 1
+        msg = ''
+        for member in joinedList:
+            if i > number:
+                break
+            msg += '{}. *{}* - *{}*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            i += 1
+        
+        if number < len(joinedList):
+            msg = '__**Last {} of {} Servers I Joined:**__\n\n'.format(number, len(joinedList))+msg
+        else:
+            msg = '__**Last {} Servers I Joined:**__\n\n'.format(len(joinedList))+msg
 
         # Check for suppress
         if suppress:
