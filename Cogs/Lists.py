@@ -810,7 +810,7 @@ class Lists:
 			members += 1
 			if not str(member.status).lower() == "offline":
 				membersOnline += 1
-		msg = 'There are *{}* out of *{}* users online.'.format(membersOnline, members)
+		msg = 'There are *{:,}* out of *{:,}* users online.'.format(membersOnline, members)
 		await ctx.channel.send(msg)
 
 
