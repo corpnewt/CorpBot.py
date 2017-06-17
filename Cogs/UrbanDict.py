@@ -19,7 +19,7 @@ class UrbanDict:
 		self.ua = 'CorpNewt DeepThoughtBot'
 
 	@commands.command(pass_context=True)
-	async def define(self, ctx, *, word : str):
+	async def define(self, ctx, *, word : str = None):
 		"""Gives the definition of the word passed."""
 
 		# Check if we're suppressing @here and @everyone mentions
