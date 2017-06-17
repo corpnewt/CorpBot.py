@@ -2,6 +2,7 @@ import asyncio
 import discord
 import requests
 import string
+import random
 from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings
@@ -17,6 +18,7 @@ class UrbanDict:
 		self.bot = bot
 		self.settings = settings
 		self.ua = 'CorpNewt DeepThoughtBot'
+		self.random = True
 
 	@commands.command(pass_context=True)
 	async def define(self, ctx, *, word : str = None):
@@ -38,7 +40,10 @@ class UrbanDict:
 		theJSON = r.json()["list"]
 		if len(theJSON):
 			# Got it - let's build our response
-			ourWord = theJSON[0]
+			if self.random:
+				ourWord = random.choice(theJSON)
+			else:
+				ourWord = theJSON[0]
 			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
