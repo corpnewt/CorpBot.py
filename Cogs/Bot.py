@@ -22,10 +22,12 @@ from   Cogs import ProgressBar
 class Bot:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot, settings, path, pypath):
 		self.bot = bot
 		self.settings = settings
 		self.startTime = int(time.time())
+		self.path = path
+		self.pypath = pypath
 		
 	async def onready(self):
 		# Get ready - play game!
@@ -290,7 +292,7 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def reboot(self, ctx, force = None):
-		"""Shuts down the bot - allows for reboot if using the start script (owner only)."""
+		"""Reboots the bot (owner only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -328,6 +330,55 @@ class Bot:
 		except Exception:
 			pass
 		try:
+			# Try to reboot
+			subprocess.Popen([self.pypath, self.path, "-reboot", "True", "-path", self.pypath])
+			# Kill this process
+			await exit(0)
+		except Exception:
+			pass
+
+
+	@commands.command(pass_context=True)
+	async def shutdown(self, ctx, force = None):
+		"""Shuts down the bot (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		self.settings.flushSettings()
+
+		quiet = False
+		if force and force.lower() == 'force':
+			quiet = True
+		if not quiet:
+			msg = 'Flushed settings to disk.\nShutting down...'
+			await ctx.channel.send(msg)
+		# Logout, stop the event loop, close the loop, quit
+		for task in asyncio.Task.all_tasks():
+			try:
+				task.cancel()
+			except Exception:
+				continue
+		try:
+			await self.bot.logout()
+			self.bot.loop.stop()
+			self.bot.loop.close()
+		except Exception:
+			pass
+		try:
+			# Kill this process
 			await exit(0)
 		except Exception:
 			pass

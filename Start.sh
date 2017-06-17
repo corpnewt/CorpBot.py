@@ -7,8 +7,8 @@ shopt -s extglob
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-gitupdate="Yes"
-autorestart="Yes"
+gitupdate="No"
+autorestart="No"
 
 function main () {
     echo \#\#\# Starting CorpBot \#\#\#
@@ -22,12 +22,12 @@ function runBot () {
         update
     fi
     echo
-    python3 Main.py
+    python3 Main.py -reboot No -path python3
     echo
-    echo "$(timestamp): CorpBot died."
-    echo "Restarting in 10 seconds..."
-    sleep 10
     if [[ "$autorestart" == "Yes" ]]; then
+        echo "$(timestamp): CorpBot died."
+        echo "Restarting in 10 seconds..."
+        sleep 10
         runBot
     fi
 }

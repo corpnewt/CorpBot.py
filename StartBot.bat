@@ -8,8 +8,8 @@ echo.
 
 set "botFile=Main.py"
 set "pyPath=python"
-set "autoRestart=Yes"
-set "update=Yes"
+set "autoRestart=No"
+set "update=No"
 
 set "thisDir=%~dp0"
 
@@ -28,7 +28,10 @@ goto :EOF
 if /i "%update%" == "Yes" (
     call :update
 )
-"%pyPath%" "%botFile%"
+
+REM Launch our script - tell it we didn't reboot, and give it python's path
+"%pyPath%" "%botFile%" -reboot No -path "%pyPath%"
+
 if /i "%autoRestart%"=="Yes" (
     timeout 10
     goto start
