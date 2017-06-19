@@ -173,6 +173,108 @@ class Bot:
 		msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
 		msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
 		await message.edit(content=msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def adminunlim(self, ctx, *, unlimited : str = None):
+		"""Sets whether or not to allow unlimited xp to admins (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		# Get current status
+		adminUnlimited = self.settings.getServerStat(ctx.guild, "AdminUnlimited")
+		
+		if unlimited == None:
+			# Output unlimited status
+			if adminUnlimited.lower() == "yes":
+				await channel.send('Admin unlimited is enabled.')
+			else:
+				await channel.send('Admin unlimited is disabled.')
+			return
+		elif unlimited.lower() == "yes" or unlimited.lower() == "on" or unlimited.lower() == "true":
+			unlimited = "Yes"
+		elif unlimited.lower() == "no" or unlimited.lower() == "off" or unlimited.lower() == "false":
+			unlimited = "No"
+		else:
+			unlimited = None
+
+		if unlimited == "Yes":
+			if adminUnlimited.lower() == "yes":
+				msg = 'Admin unlimited remains enabled.'
+			else:
+				msg = 'Admin unlimited now enabled.'
+		else:
+			if adminUnlimited.lower() == "no":
+				msg = 'Admin unlimited remains disabled.'
+			else:
+				msg = 'Admin unlimited now disabled.'
+		self.settings.setServerStat(ctx.guild, "AdminUnlimited", adminUnlimited)
+		
+		await channel.send(msg)
+		
+	
+	@commands.command(pass_context=True)
+	async def basadmin(self, ctx, *, asadmin : str = None):
+		"""Sets whether or not to treat bot-admins as admins with regards to xp (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		# Get current status
+		botAdminAsAdmin = self.settings.getServerStat(ctx.guild, "BotAdminAsAdmin")
+		
+		if asadmin == None:
+			# Output unlimited status
+			if botAdminAsAdmin.lower() == "yes":
+				await channel.send('Bot-admin as admin is enabled.')
+			else:
+				await channel.send('Bot-admin as admin is disabled.')
+			return
+		elif asadmin.lower() == "yes" or asadmin.lower() == "on" or asadmin.lower() == "true":
+			asadmin = "Yes"
+		elif asadmin.lower() == "no" or asadmin.lower() == "off" or asadmin.lower() == "false":
+			asadmin = "No"
+		else:
+			asadmin = None
+
+		if asadmin == "Yes":
+			if botAdminAsAdmin.lower() == "yes":
+				msg = 'Bot-admin as admin remains enabled.'
+			else:
+				msg = 'Bot-admin as admin now enabled.'
+		else:
+			if botAdminAsAdmin.lower() == "no":
+				msg = 'Bot-admin as admin remains disabled.'
+			else:
+				msg = 'Bot-admin as admin now disabled.'
+		self.settings.setServerStat(ctx.guild, "BotAdminAsAdmin", botAdminAsAdmin)
+		
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
