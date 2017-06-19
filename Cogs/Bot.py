@@ -209,7 +209,7 @@ class Bot:
 		elif unlimited.lower() == "no" or unlimited.lower() == "off" or unlimited.lower() == "false":
 			unlimited = "No"
 		else:
-			unlimited = None
+			unlimited = "No"
 
 		if unlimited == "Yes":
 			if adminUnlimited.lower() == "yes":
@@ -221,7 +221,7 @@ class Bot:
 				msg = 'Admin unlimited remains disabled.'
 			else:
 				msg = 'Admin unlimited now disabled.'
-		self.settings.setServerStat(ctx.guild, "AdminUnlimited", adminUnlimited)
+		self.settings.setServerStat(ctx.guild, "AdminUnlimited", unlimited)
 		
 		await channel.send(msg)
 		
@@ -260,7 +260,7 @@ class Bot:
 		elif asadmin.lower() == "no" or asadmin.lower() == "off" or asadmin.lower() == "false":
 			asadmin = "No"
 		else:
-			asadmin = None
+			asadmin = "No"
 
 		if asadmin == "Yes":
 			if botAdminAsAdmin.lower() == "yes":
@@ -272,7 +272,7 @@ class Bot:
 				msg = 'Bot-admin as admin remains disabled.'
 			else:
 				msg = 'Bot-admin as admin now disabled.'
-		self.settings.setServerStat(ctx.guild, "BotAdminAsAdmin", botAdminAsAdmin)
+		self.settings.setServerStat(ctx.guild, "BotAdminAsAdmin", asadmin)
 		
 		await channel.send(msg)
 
