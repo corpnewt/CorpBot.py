@@ -166,6 +166,8 @@ class Feed:
 		if food < 0:
 			msg = 'You can\'t feed me less than nothing! You think this is funny?!'
 			approve = False
+			# Avoid admins gaining xp
+			decrement = False
 			
 		if food == 0:
 			msg = 'You can\'t feed me *nothing!*'
