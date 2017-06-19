@@ -36,4 +36,4 @@ if /i "%autoRestart%"=="Yes" (
     timeout 10
     goto start
 )
-pause
+pause > nul
