@@ -124,7 +124,7 @@ if reboot:
 	print("\n\n##############################")
 	print("#          REBOOTED          #")
 	print("##############################\n")
-	print("Waiting post-reboot...")
+	print("Waiting 5 seconds post-reboot...\n")
 	time.sleep(5)
 
 # Let's load our prefix file
