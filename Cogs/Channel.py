@@ -140,12 +140,11 @@ class Channel:
 		mutedIn = 0
 		channelList = []
 		for channel in ctx.guild.channels:
-			if not type(channel) is discord.ChannelType.text:
+			if not type(channel) is discord.TextChannel:
 				continue
 			overs = channel.overwrites_for(member)
 			if overs.send_messages == False:
-				# We haven't been muted here yet
-				overs.send_messages = False
+				# member can't send messages here
 				perms = member.permissions_in(channel)
 				if perms.read_messages:
 					mutedIn +=1
