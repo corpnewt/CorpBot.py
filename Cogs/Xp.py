@@ -152,10 +152,20 @@ class Xp:
 			return
 
 		# Get our user/server stats
-		isAdmin    = author.permissions_in(channel).administrator
-		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
-		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
-		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
+		isAdmin         = author.permissions_in(channel).administrator
+		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Check for bot admin
+		isBotAdmin      = False
+		for role in ctx.message.author.roles:
+			for aRole in checkAdmin:
+				# Get the role that corresponds to the id
+				if str(aRole['ID']) == str(role.id):
+					isBotAdmin = True
+					break
+		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
+		adminUnlim      = self.settings.getServerStat(server, "AdminUnlimited")
+		reserveXP       = self.settings.getUserStat(author, server, "XPReserve")
+		requiredXP      = self.settings.getServerStat(server, "RequiredXPRole")
 
 		approve = True
 		decrement = True
@@ -186,11 +196,21 @@ class Xp:
 			msg = 'Wow, very generous of you...'
 			approve = False
 
+		# Check bot admin
+		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+			# Approve as admin
+			approve = True
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
+			
 		# Check admin last - so it overrides anything else
-		if isAdmin and adminUnlim.lower() == "yes":
+		if isAdmin:
 			# No limit - approve
 			approve = True
-			decrement = False
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
 
 		if approve:
 
