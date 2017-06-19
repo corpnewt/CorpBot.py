@@ -109,7 +109,11 @@ if update:
 		print("Something went wrong!  Make sure you have git installed and in your path var!")
 	print(" ")
 	try:
-		subprocess.Popen([pypath, sys.argv[0], "-reboot", "False", "-path", pypath, "-update", "False"])
+		if reboot:
+			r = "True"
+		else:
+			r = "False"
+		subprocess.Popen([pypath, sys.argv[0], "-reboot", r, "-path", pypath, "-update", "False"])
 		# Kill this process
 		exit(0)
 	except Exception:
