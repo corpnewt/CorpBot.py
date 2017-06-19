@@ -137,6 +137,16 @@ class Feed:
 			return
 
 		isAdmin    = author.permissions_in(channel).administrator
+		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Check for bot admin
+		isBotAdmin      = False
+		for role in ctx.message.author.roles:
+			for aRole in checkAdmin:
+				# Get the role that corresponds to the id
+				if str(aRole['ID']) == str(role.id):
+					isBotAdmin = True
+					break
+		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
@@ -175,11 +185,21 @@ class Feed:
 				approve = False
 				msg = 'You don\'t have the permissions to feed me.'
 
+		# Check bot admin
+		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+			# Approve as admin
+			approve = True
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
+			
 		# Check admin last - so it overrides anything else
-		if isAdmin and adminUnlim.lower() == "yes":
+		if isAdmin:
 			# No limit - approve
 			approve = True
-			decrement = False
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
 			
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
