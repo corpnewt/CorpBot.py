@@ -60,6 +60,7 @@ class Settings:
 				"XPRPerMessage"			: 0,		# How much xp reserve per message (typically 0)
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
+				"BotAdminAsAdmin" 		: "No",		# Do bot-admins count as admins with xp?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
