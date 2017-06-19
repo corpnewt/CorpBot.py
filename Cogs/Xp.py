@@ -191,6 +191,8 @@ class Xp:
 		if xpAmount < 0:
 			msg = 'Only admins can take away xp!'
 			approve = False
+			# Avoid admins gaining xp
+			decrement = False
 
 		if xpAmount == 0:
 			msg = 'Wow, very generous of you...'
