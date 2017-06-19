@@ -111,7 +111,7 @@ if update:
 	try:
 		subprocess.Popen([pypath, sys.argv[0], "-reboot", "False", "-path", pypath, "-update", "False"])
 		# Kill this process
-		await exit(0)
+		exit(0)
 	except Exception:
 		pass
 
