@@ -71,7 +71,7 @@ def getopts(argv):
 # Set some reboot vars
 reboot = False
 pypath = "python3"
-# Update defaults to true - we can pass false if need be
+# Update defaults to false - we can pass true if need be
 update = True
 
 # Check if we were rebooted
@@ -94,18 +94,34 @@ if len(sys.argv) > 1:
 			if args[key].lower()[:1] == "n" or args[key].lower() == "false":
 				# update flag
 				update = False
+				
+if update:
+	# Update first, then restart as new process
+	# Allows us to enact changes in one go
+	print("\n\n##############################")
+	print("#          UPDATING          #")
+	print("##############################\n")
+	print("\nTrying to update via git...\n")
+	try:
+		u = subprocess.Popen(['git', 'pull', 'origin', 'rewrite'])
+		u.wait()
+	except Exception:
+		print("Something went wrong!  Make sure you have git installed and in your path var!")
+	print(" ")
+	try:
+		subprocess.Popen([pypath, sys.argv[0], "-reboot", "False", "-path", pypath, "-update", "False"])
+		# Kill this process
+		await exit(0)
+	except Exception:
+		pass
 
 if reboot:
+	# Just show that we've rebooted - and hang out
 	print("\n\n##############################")
 	print("#          REBOOTED          #")
 	print("##############################\n")
 	print("Waiting post-reboot...")
 	time.sleep(5)
-if update:
-	print("\nUpdating...\n")
-	u = subprocess.Popen(['git', 'pull', 'origin', 'rewrite'])
-	u.wait()
-	print(" ")
 
 # Let's load our prefix file
 prefix = '$'
