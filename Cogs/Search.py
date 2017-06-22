@@ -112,13 +112,13 @@ class Search:
 
 
 	@commands.command(pass_context=True)
-	async def convert(self, ctx, amount : int = 0 , frm = None, *, to = None):
+	async def convert(self, ctx, amount = None , frm = None, *, to = None):
 		"""convert currencies"""
 
 		hasError = False
 
 		try:
-			amount = int(amount)
+			amount = float(amount)
 		except:
 			hasError = True
 
