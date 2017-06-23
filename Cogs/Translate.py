@@ -2,6 +2,7 @@ import asyncio
 import discord
 from   Cogs import Nullify
 from   Cogs import DisplayName
+from   discord.ext import commands
 import json
 import os
 import mtranslate
