@@ -8,7 +8,7 @@ import mtranslate
 
 # Requires the mtranslate module be installed
 
-class Translate
+class Translate:
             
     def __init__(self, bot, settings, language_file = "Languages.json"):
         self.bot = bot
