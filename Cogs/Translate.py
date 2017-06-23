@@ -17,8 +17,8 @@ class Translate:
 
         if os.path.exists(language_file):
             f = open(language_file,'r')
-            f.close()
             filedata = f.read()
+            f.close()
             self.languages = json.loads(filedata)
         else:
             self.languages = []
