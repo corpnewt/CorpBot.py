@@ -102,6 +102,11 @@ function main () {
     update "wikipedia"
     echo
 
+    echo Updating MTranslate
+    echo
+    update "mtranslate"
+    echo
+
     #echo Updating Flask...
     #echo
     #update "Flask"

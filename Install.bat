@@ -111,6 +111,11 @@ echo.
 call :install "wikipedia"
 echo.
 
+echo Installing MTranslate...
+echo.
+call :install "mtranslate"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.

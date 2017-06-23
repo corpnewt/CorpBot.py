@@ -58,6 +58,7 @@ from Cogs import Hw
 from Cogs import GlobalMigration
 from Cogs import Tags
 from Cogs import Wiki
+from Cogs import Translate
 
 # Get our cli args
 def getopts(argv):
@@ -371,6 +372,10 @@ cogList.append(tags)
 # Wikipedia
 wiki = Wiki.Wiki(bot)
 cogList.append(wiki)
+
+# Google Translate
+tran = Translate.Translate(bot, settings)
+cogList.append(tran)
 
 
 # Main bot events
