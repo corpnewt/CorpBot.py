@@ -48,7 +48,7 @@ class Translate:
         else:
             suppress = False
 
-        usage = "Usage: `{}tr [words] [language]`".format(ctx.context)
+        usage = "Usage: `{}tr [words] [language]`".format(ctx.prefix)
         if translate == None:
             await ctx.send(usage)
             return
