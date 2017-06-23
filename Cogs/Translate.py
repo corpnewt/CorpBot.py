@@ -68,6 +68,14 @@ class Translate:
             if item["Name"].lower() == lang.lower():
                 lang_code = item["Code"]
                 break
+        if not lang_code and len(word_list) > 2:
+            # Maybe simplified/traditional chinese or other 2 word lang
+            lang = " ".join(word_list[len(word_list)-2:])
+            trans = " ".join(word_list[:-2])
+            for item in self.languages:
+                if item["Name"].lower() == lang.lower():
+                    lang_code = item["Code"]
+                    break
         
         if not lang_code:
             await ctx.send("I couldn't find that language!")
