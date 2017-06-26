@@ -102,7 +102,7 @@ class Hw:
 			return
 		if len(output) > 2000:
 			msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-			msg += '/nMaybe see if you can prune up that list a bit and try again?'
+			msg += '\nMaybe see if you can prune up that list a bit and try again?'
 			await ctx.channel.send(msg)
 			return
 
