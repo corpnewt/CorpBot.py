@@ -61,6 +61,7 @@ class Settings:
 				"RequireOnline" 		: "Yes",	# Must be online for xp?
 				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
 				"BotAdminAsAdmin" 		: "No",		# Do bot-admins count as admins with xp?
+				"JoinPM"				: "Yes",	# Do we pm new users with rules?
 				"XPPromote" 			: "Yes",	# Can xp raise your rank?
 				"XPDemote" 				: "No",		# Can xp lower your rank?
 				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
