@@ -275,6 +275,57 @@ class Bot:
 		self.settings.setServerStat(ctx.guild, "BotAdminAsAdmin", asadmin)
 		
 		await channel.send(msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def joinpm(self, ctx, *, join_pm : str = None):
+		"""Sets whether or not to pm the rules to new users when they join (owner only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		# Get current status
+		join_pm_setting = self.settings.getServerStat(ctx.guild, "JoinPM")
+		
+		if join_pm == None:
+			# Output unlimited status
+			if join_pm_setting.lower() == "yes":
+				await channel.send('New user pm is enabled.')
+			else:
+				await channel.send('New user pm is disabled.')
+			return
+		elif join_pm.lower() == "yes" or join_pm.lower() == "on" or join_pm.lower() == "true":
+			join_pm = "Yes"
+		elif join_pm.lower() == "no" or join_pm.lower() == "off" or join_pm.lower() == "false":
+			join_pm = "No"
+		else:
+			join_pm = "No"
+
+		if join_pm == "Yes":
+			if join_pm_setting.lower() == "yes":
+				msg = 'New user pm remains enabled.'
+			else:
+				msg = 'New user pm now enabled.'
+		else:
+			if join_pm_setting.lower() == "no":
+				msg = 'New user pm remains disabled.'
+			else:
+				msg = 'New user pm now disabled.'
+		self.settings.setServerStat(ctx.guild, "JoinPM", join_pm)
+		
+		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
