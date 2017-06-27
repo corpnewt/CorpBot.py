@@ -507,12 +507,13 @@ async def on_member_join(member):
 		except AttributeError:
 			# Onto the next
 			continue
-
-	help = 'Type `{}help` for a list of available user commands.'.format(prefix)
-
-	# PM User
-	fmt = "*{}* Rules:\n{}\n\n{}".format(server.name, rules, help)
-	await member.send(fmt)
+			
+	pm_user = settings.getServerStat(server, "JoinPM")
+	if pm_user.lower() == "yes":
+		help = 'Type `{}help` for a list of available user commands.'.format(prefix)
+		# PM User
+		fmt = "*{}* Rules:\n{}\n\n{}".format(server.name, rules, help)
+		await member.send(fmt)
 
 @bot.event
 async def on_member_update(before, after):	
