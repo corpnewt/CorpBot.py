@@ -413,7 +413,7 @@ async def on_ready():
 			"Fear not!  I have returned!",
 			"I'm alive!"
 		]
-		awat return_channel.send(random.choice(return_options))
+		await return_channel.send(random.choice(return_options))
 	
 
 @bot.event
