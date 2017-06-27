@@ -279,21 +279,24 @@ class Bot:
 		
 	@commands.command(pass_context=True)
 	async def joinpm(self, ctx, *, join_pm : str = None):
-		"""Sets whether or not to pm the rules to new users when they join (owner only)."""
+		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
 			return
 		
 		# Get current status
