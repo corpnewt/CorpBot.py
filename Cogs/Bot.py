@@ -487,7 +487,7 @@ class Bot:
 			pass
 		try:
 			# Try to reboot
-			subprocess.Popen([self.pypath, self.path, "-reboot", "True", "-path", self.pypath])
+			subprocess.Popen([self.pypath, self.path, "-reboot", "True", "-channel", str(ctx.channel.id), "-path", self.pypath])
 			# Kill this process
 			await exit(0)
 		except Exception:
