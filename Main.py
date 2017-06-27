@@ -102,7 +102,8 @@ if len(sys.argv) > 1:
 			# We got a return channel
 			print("Return channel id:  {}".format(args[key]))
 			try:
-				return_channel = bot.get_channel(int(args[key]))
+				# Cast as int if possible
+				return_channel = int(args[key])
 			except Exception:
 				return_channel = None
 				
@@ -408,6 +409,7 @@ async def on_ready():
 			# Onto the next
 			continue
 	if not return_channel == None:
+		message_to = bot.get_channel(return_channel)
 		return_options = [
 			"I'm back!",
 			"I have returned!",
@@ -415,7 +417,7 @@ async def on_ready():
 			"Fear not!  I have returned!",
 			"I'm alive!"
 		]
-		await return_channel.send(random.choice(return_options))
+		await message_to.send(random.choice(return_options))
 	
 
 @bot.event
