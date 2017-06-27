@@ -64,10 +64,10 @@ class Example:
             sign = "+"
             if add < 0:
                 sign = ""
-            number_string += "\n= Pre-Total =========================\n{}".format(number_sum)
-            number_string += "\n= Modifier ==========================\n{}{}".format(sign, add)
+            number_string += "\n\n= Pre-Total =========================\n{}".format(number_sum)
+            number_string += "\n\n= Modifier ==========================\n{}{}".format(sign, add)
         
-        number_string += "\n= Final Total =======================\n{}```".format(number_sum + add)
+        number_string += "\n\n= Final Total =======================\n{}```".format(number_sum + add)
         await ctx.channel.send(number_string)
 
     @commands.command(description='For when you wanna settle the score some other way')
