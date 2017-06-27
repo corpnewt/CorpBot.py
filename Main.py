@@ -408,6 +408,9 @@ async def on_ready():
 			continue
 	if not return_channel == None:
 		message_to = bot.get_channel(return_channel)
+		if message_to == None:
+			# No channel
+			return
 		return_options = [
 			"I'm back!",
 			"I have returned!",
