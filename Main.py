@@ -3,6 +3,7 @@ import discord
 import time
 import sys
 import os
+import random
 import subprocess
 from   discord.ext import commands
 from   discord import errors
@@ -74,6 +75,8 @@ reboot = False
 pypath = "python3"
 # Update defaults to false - we can pass true if need be
 update = True
+# Default to no channel for return message
+return_channel = None
 
 # Check if we were rebooted
 if len(sys.argv) > 1:
@@ -95,6 +98,13 @@ if len(sys.argv) > 1:
 			if args[key].lower()[:1] == "n" or args[key].lower() == "false":
 				# update flag
 				update = False
+		elif key.lower() == "-channel":
+			# We got a return channel
+			try:
+				return_channel = bot.get_channel(int(args[key]))
+			except Exception:
+				return_channel = None
+				
 				
 if update:
 	# Update first, then restart as new process
@@ -114,7 +124,12 @@ if update:
 			r = "True"
 		else:
 			r = "False"
-		subprocess.Popen([pypath, sys.argv[0], "-reboot", r, "-path", pypath, "-update", "False"])
+		sub_args = [pypath, sys.argv[0], "-reboot", r, "-path", pypath, "-update", "False"]
+		if not return_channel == None:
+			# Add our return channel if we have one
+			sub_args.append("-channel")
+			sub_args.append(str(return_channel.id))
+		subprocess.Popen(sub_args)
 		# Kill this process
 		exit(0)
 	except Exception:
@@ -390,6 +405,15 @@ async def on_ready():
 		except AttributeError:
 			# Onto the next
 			continue
+	if not return_channel == None:
+		return_options = [
+			"I'm back!",
+			"I have returned!",
+			"Guess who's back?",
+			"Fear not!  I have returned!",
+			"I'm alive!"
+		]
+		awat return_channel.send(random.choice(return_options))
 	
 
 @bot.event
