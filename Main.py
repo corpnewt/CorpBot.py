@@ -100,7 +100,6 @@ if len(sys.argv) > 1:
 				update = False
 		elif key.lower() == "-channel":
 			# We got a return channel
-			print("Return channel id:  {}".format(args[key]))
 			try:
 				# Cast as int if possible
 				return_channel = int(args[key])
@@ -131,7 +130,6 @@ if update:
 			# Add our return channel if we have one
 			sub_args.append("-channel")
 			sub_args.append(str(return_channel.id))
-		print("Rebooting post-update with: {}".format(sub_args))
 		subprocess.Popen(sub_args)
 		# Kill this process
 		exit(0)
