@@ -304,7 +304,7 @@ class ServerStats:
         joinedList = []
         for guild in self.bot.guilds:
             botmember = DisplayName.memberForID(self.bot.user.id, guild)
-            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at })
+            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at, 'Members': len(guild.members) })
         
         # sort the servers by join date
         joinedList = sorted(joinedList, key=lambda x:x['Joined'])
@@ -314,7 +314,10 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            if member['Members'] == 1:
+                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            else:
+                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"), member['Members'])
             i += 1
         
         if number < len(joinedList):
@@ -345,7 +348,7 @@ class ServerStats:
         joinedList = []
         for guild in self.bot.guilds:
             botmember = DisplayName.memberForID(self.bot.user.id, guild)
-            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at })
+            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at, 'Members': len(guild.members) })
         
         # sort the servers by join date
         joinedList = sorted(joinedList, key=lambda x:x['Joined'], reverse=True)
@@ -355,7 +358,10 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            if member['Members'] == 1:
+                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            else:
+                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"), member['Members'])
             i += 1
         
         if number < len(joinedList):
