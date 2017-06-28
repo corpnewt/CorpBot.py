@@ -183,15 +183,10 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
 			return
 		
 		# Get current status
@@ -228,21 +223,16 @@ class Bot:
 	
 	@commands.command(pass_context=True)
 	async def basadmin(self, ctx, *, asadmin : str = None):
-		"""Sets whether or not to treat bot-admins as admins with regards to xp (owner only)."""
+		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
 			return
 		
 		# Get current status
