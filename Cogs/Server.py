@@ -109,7 +109,7 @@ class Server:
 
 
 	@commands.command(pass_context=True)
-	async def prefix(self, ctx):
+	async def getprefix(self, ctx):
 		"""Output's the server's prefix - custom or otherwise."""
 
 		try:
