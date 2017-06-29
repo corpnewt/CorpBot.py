@@ -8,6 +8,7 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import FuzzySearch
+from   Cogs import Message
 
 class Tags:
 
@@ -352,7 +353,8 @@ class Tags:
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		await channel.send(tagText[:-2])
+		#await channel.send(tagText[:-2])
+		await Message.say(self.bot, tagText[:-2], ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
