@@ -8,6 +8,7 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import FuzzySearch
+from   Cogs import Message
 
 # This is the lists module.
 
@@ -310,7 +311,8 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await channel.send(linkText[:-2])
+		#await channel.send(linkText[:-2])
+		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
@@ -632,7 +634,8 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await channel.send(linkText[:-2])
+		#await channel.send(linkText[:-2])
+		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
 
 
 	@commands.command(pass_context=True)
