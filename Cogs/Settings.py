@@ -91,6 +91,7 @@ class Settings:
 				"Tags"					: [],		# List of tags
 				"Members" 				: [],		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
+				"GifArray"				: [],		# List of roles that can use giphy
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"			: [],		# List of options to log
 				"MuteList"			: [],		# List of muted members

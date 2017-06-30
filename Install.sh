@@ -107,6 +107,13 @@ function main () {
     update "mtranslate"
     echo
 
+    echo Updating GiphyPop
+    echo
+    update "git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"
+    echo
+
+    
+
     #echo Updating Flask...
     #echo
     #update "Flask"

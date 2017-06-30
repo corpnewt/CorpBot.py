@@ -918,11 +918,12 @@ class Admin:
 			await ctx.message.channel.send(usage)
 			return
 
+		roleName = role
 		if type(role) is str:
-			if role == "everyone":
-				role = "@everyone"
-			roleName = role
-			role = DisplayName.roleForName(roleName, ctx.message.guild)
+			if role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.default_role
+			else:
+				role = DisplayName.roleForName(roleName, ctx.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
 				# Check for suppress
@@ -988,10 +989,10 @@ class Admin:
 		# Name placeholder
 		roleName = role
 		if type(role) is str:
-			if role == "everyone":
-				role = "@everyone"
-			# If this fails - role will be None, then we know to look at names only
-			role = DisplayName.roleForName(roleName, ctx.message.guild)
+			if role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.default_role
+			else:
+				role = DisplayName.roleForName(role, ctx.guild)
 
 		# If we're here - then the role is a real one
 		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")

@@ -60,6 +60,7 @@ from Cogs import GlobalMigration
 from Cogs import Tags
 from Cogs import Wiki
 from Cogs import Translate
+from Cogs import Giphy
 
 # Get our cli args
 def getopts(argv):
@@ -392,6 +393,10 @@ cogList.append(wiki)
 # Google Translate
 tran = Translate.Translate(bot, settings)
 cogList.append(tran)
+
+# Giphy
+giphy = Giphy.Giphy(bot, settings)
+cogList.append(giphy)
 
 
 # Main bot events

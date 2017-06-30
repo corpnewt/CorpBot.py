@@ -116,6 +116,11 @@ echo.
 call :install "mtranslate"
 echo.
 
+echo Installing GiphyPop
+echo.
+call :install "git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.
