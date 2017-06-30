@@ -247,7 +247,7 @@ class Giphy:
 				my_gif = None
 		else:
 			try:
-				my_gif = self.giphy.search(phrase=gif, limit=100)
+				my_gif = self.giphy.search(phrase=gif, limit=20)
 				my_gif = list(my_gif)
 				my_gif = random.choice(my_gif)
 			except Exception:
