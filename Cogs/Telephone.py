@@ -105,16 +105,16 @@ class Telephone:
 				entries.append({ "Name": guild.name, "Number": teleNum })
 
 		if not len(entries):
-			await ctx.send("The phonebook is *empty!*")
+			await ctx.send(":telephone: The phonebook is *empty!*")
 			return
 		
 		max_entries = 20
 		if look_up == None:
 			if len(entries) > 20:
-				title = "__First 20 of {} Phonebook Entries:__\n\n".format(len(entries))
+				title = ":telephone: __First 20 of {} Phonebook Entries:__\n\n".format(len(entries))
 			else:
 				max_entries = len(entries)
-				title = "__Phonebook:__\n\n"
+				title = ":telephone: __Phonebook:__\n\n"
 			count = 0
 			for i in entries:
 				count += 1
@@ -134,7 +134,7 @@ class Telephone:
 				# Found it!
 				num = idMatch[0]['Item']['Number']
 				i_form = num[:3] + "-" + num[3:]
-				msg = "__Phonebook:__\n\n{} - *{}*".format(idMatch[0]['Item']['Name'], i_form)
+				msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(idMatch[0]['Item']['Name'], i_form)
 				await ctx.send(msg)
 				return
 		# Look up by name now
@@ -144,7 +144,7 @@ class Telephone:
 			# Found it!
 			num = nameMatch[0]['Item']['Number']
 			i_form = num[:3] + "-" + num[3:]
-			msg = "__Phonebook:__\n\n{} - *{}*".format(nameMatch[0]['Item']['Name'], i_form)
+			msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(nameMatch[0]['Item']['Name'], i_form)
 			await ctx.send(msg)
 			return
 		# now we need to find which is better
@@ -154,7 +154,7 @@ class Telephone:
 		else:
 			matchCheck = idMatch
 
-		msg = "__Phonebook - Closest Matches:__\n\n"
+		msg = ":telephone: __Phonebook - Closest Matches:__\n\n"
 		count = 0
 		for m in matchCheck:
 			count += 1
