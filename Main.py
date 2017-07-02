@@ -61,6 +61,7 @@ from Cogs import Tags
 from Cogs import Wiki
 from Cogs import Translate
 from Cogs import Giphy
+from Cogs import Telephone
 
 # Get our cli args
 def getopts(argv):
@@ -398,6 +399,10 @@ cogList.append(tran)
 giphy = Giphy.Giphy(bot, settings)
 cogList.append(giphy)
 
+# Telephone
+tele = Telephone.Telephone(bot, settings)
+cogList.append(tele)
+
 
 # Main bot events
 @bot.event
@@ -463,6 +468,14 @@ async def on_voice_state_update(user, beforeState, afterState):
 		await state.voice.disconnect()
 	except:
 		pass
+
+@bot.event
+async def on_typing(channel, user, when):
+	for cog in cogList:
+		try:
+			await cog.ontyping(channel, user, when)
+		except AttributeError:
+			continue
 
 @bot.event
 async def on_member_remove(member):

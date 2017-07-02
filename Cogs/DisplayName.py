@@ -41,6 +41,32 @@ def memberForName(name, server):
         return newMem
     return None
 
+def channelForID(id, server, typeCheck = None):
+    for channel in server.channels:
+        if typeCheck:
+            if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+                continue
+            if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+                continue
+        if str(channel.id) == str(id):
+            return channel
+    return None
+
+def channelForName(name, server, typeCheck = None):
+    for channel in server.channels:
+        if typeCheck:
+            if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+                continue
+            if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+                continue
+        if channel.name.lower() == name.lower():
+            return channel
+    chanID = re.sub(r'\W+', '', name)
+    newChan = channelForID(chanID, server, typeCheck)
+    if newChan:
+        return newChan
+    return None
+
 def roleForID(id, server):
     for role in server.roles:
         if str(role.id) == str(id):
