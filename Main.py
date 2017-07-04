@@ -429,7 +429,6 @@ async def on_ready():
 			"I'm alive!"
 		]
 		await message_to.send(random.choice(return_options))
-	
 
 @bot.event
 async def on_voice_state_update(user, beforeState, afterState):

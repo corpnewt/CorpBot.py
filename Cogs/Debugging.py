@@ -18,7 +18,7 @@ class Debugging:
 		self.logvars = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
-				'message.edit' ]
+				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.join', 'user.leave' ]
 		self.normal = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 			       'message.edit', 'message.delete' ]
@@ -74,7 +74,19 @@ class Debugging:
 			if check.lower() in serverLogVars:
 				return True
 		return False
-			
+
+	# Catch custom xp event
+	@asyncio.coroutine
+	async def on_xp(self, to_user, from_user, amount):
+		server = from_user.guild
+		if not self.shouldLog('xp', server):
+			return
+		if type(to_user) is discord.Role:
+			msg = "*{}#{}* gave *{} xp* to the *{}* role.".format(from_user.name, from_user.discriminator, amount, to_user.name)
+		else:
+			msg = "*{}#{}* gave *{} xp* to *{}#{}*.".format(from_user.name, from_user.discriminator, amount, to_user.name, to_user.discriminator)
+		await self._logEvent(server, msg)
+
 	async def onban(self, member):
 		server = member.guild
 		if not self.shouldLog('user.ban', server):

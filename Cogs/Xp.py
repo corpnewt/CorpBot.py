@@ -83,7 +83,7 @@ class Xp:
 								await CheckRoles.checkroles(user, targetChan, self.settings, self.bot)
 							except Exception:
 								continue
-						
+
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
@@ -215,6 +215,8 @@ class Xp:
 				decrement = False
 
 		if approve:
+
+			self.bot.dispatch("xp", member, ctx.author, xpAmount)
 
 			if isRole:
 				# XP was approved - let's iterate through the users of that role,
