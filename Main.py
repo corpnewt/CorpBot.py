@@ -62,6 +62,7 @@ from Cogs import Wiki
 from Cogs import Translate
 from Cogs import Giphy
 from Cogs import Telephone
+from Cogs import XpStack
 
 # Get our cli args
 def getopts(argv):
@@ -121,6 +122,7 @@ if update:
 		u.wait()
 	except Exception:
 		print("Something went wrong!  Make sure you have git installed and in your path var!")
+	time.sleep(3)
 	print(" ")
 	try:
 		if reboot:
@@ -402,6 +404,10 @@ cogList.append(giphy)
 # Telephone
 tele = Telephone.Telephone(bot, settings)
 cogList.append(tele)
+
+# XpStack
+xpstack = XpStack.XpStack(bot, settings)
+cogList.append(xpstack)
 
 
 # Main bot events

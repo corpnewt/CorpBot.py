@@ -54,6 +54,8 @@ class Settings:
 				"BanList"				: [],		# List of id's that have been banned
 				"Prefix"				: None,		# Custom Prefix
 				"AutoPCPP"				: None,		# Auto-format pcpartpicker links?
+				"XP Count"				: 10,		# Default number of xp transactions to log
+				"XP Array"				: [],		# Holds the xp transaction list
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
