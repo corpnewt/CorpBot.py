@@ -83,7 +83,7 @@ class XpStack:
 			xp_array = []
 
 		if not len(xp_array):
-			await ctx.author.send("No recent XP transactions in *{}*.".format(ctx.guild.name))
+			await ctx.send("No recent XP transactions in *{}*.".format(ctx.guild.name))
 			return
 
 		count = 0
