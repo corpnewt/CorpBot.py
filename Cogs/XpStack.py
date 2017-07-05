@@ -45,7 +45,7 @@ class XpStack:
 			return
 
 		self.settings.setServerStat(ctx.guild, "XP Count", count)
-		await ctx.send("Set the xp count to of {}.".format(count))
+		await ctx.send("Set the xp count to {}.".format(count))
 
 	@commands.command(pass_context=True)
 	async def xpcount(self, ctx, count = None):
