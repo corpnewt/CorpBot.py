@@ -194,6 +194,14 @@ class Feed:
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
+			else:
+				if food < 0:
+					# Don't decrement if negative
+					decrement = False
+				if food > int(reserveXP):
+					# Don't approve if we don't have enough
+					msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
+					approve = False
 			
 		# Check admin last - so it overrides anything else
 		if isAdmin:
@@ -208,6 +216,7 @@ class Feed:
 					decrement = False
 				if food > int(reserveXP):
 					# Don't approve if we don't have enough
+					msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
 					approve = False
 			
 		if approve:
