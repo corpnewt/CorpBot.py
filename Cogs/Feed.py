@@ -202,6 +202,13 @@ class Feed:
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
+			else:
+				if food < 0:
+					# Don't decrement if negative
+					decrement = False
+				if food > int(reserveXP):
+					# Don't approve if we don't have enough
+					approve = False
 			
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
