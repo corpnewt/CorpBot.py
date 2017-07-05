@@ -88,16 +88,14 @@ class XpStack:
 
 		count = 0
 		msg = "__Recent XP Transactions in *{}*:__\n\n".format(ctx.guild.name)
-		for i in xp_array:
+		for i in range(len(xp_array)):
+			i = xp_array[len(xp_array)-1-i]
 			count += 1
 			to_user = i["To"]
 			from_user = i["From"]
 			time = i["Time"]
 			amount = i["Amount"]
-			if type(to_user) is discord.Role:
-				msg += "{}. *{}* --{} xp--> *{}* role at {}\n".format(count, from_user, amount, to_user, time)
-			else:
-				msg += "{}. *{}* --{} xp--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
+			msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
 
 		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
 
@@ -109,7 +107,7 @@ class XpStack:
 		if num == None:
 			num = self.xp_save_count
 		if type(to_user) is discord.Role:
-			to_name = to_user.name
+			to_name = to_user.name + " role"
 		else:
 			to_name = "{}#{}".format(to_user.name, to_user.discriminator)
 		f_name = "{}#{}".format(from_user.name, from_user.discriminator)
