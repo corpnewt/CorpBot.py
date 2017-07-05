@@ -211,6 +211,7 @@ class Xp:
 					decrement = False
 				if xpAmount > int(reserveXP):
 					# Don't approve if we don't have enough
+					msg = 'You can\'t give *{:,} xp*, you only have *{:,}!*'.format(xpAmount, reserveXP)
 					approve = False
 			
 		# Check admin last - so it overrides anything else
@@ -226,6 +227,7 @@ class Xp:
 					decrement = False
 				if xpAmount > int(reserveXP):
 					# Don't approve if we don't have enough
+					msg = 'You can\'t give *{:,} xp*, you only have *{:,}!*'.format(xpAmount, reserveXP)
 					approve = False
 
 		if approve:
@@ -413,6 +415,7 @@ class Xp:
 					decrement = False
 				if bet > int(reserveXP):
 					# Don't approve if we don't have enough
+					msg = 'You can\'t bet *{:,}*, you only have *{:,}* xp reserve!'.format(bet, reserveXP)
 					approve = False
 			
 		# Check admin last - so it overrides anything else
@@ -428,6 +431,7 @@ class Xp:
 					decrement = False
 				if bet > int(reserveXP):
 					# Don't approve if we don't have enough
+					msg = 'You can\'t bet *{:,}*, you only have *{:,}* xp reserve!'.format(bet, reserveXP)
 					approve = False
 			
 		if approve:
