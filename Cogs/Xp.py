@@ -220,6 +220,13 @@ class Xp:
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
+			else:
+				if xpAmount < 0:
+					# Don't decrement if negative
+					decrement = False
+				if xpAmount > int(reserveXP):
+					# Don't approve if we don't have enough
+					approve = False
 
 		if approve:
 
@@ -347,6 +354,16 @@ class Xp:
 			return
 
 		isAdmin    = author.permissions_in(channel).administrator
+		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Check for bot admin
+		isBotAdmin      = False
+		for role in ctx.message.author.roles:
+			for aRole in checkAdmin:
+				# Get the role that corresponds to the id
+				if str(aRole['ID']) == str(role.id):
+					isBotAdmin = True
+					break
+		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
@@ -382,12 +399,36 @@ class Xp:
 			if not foundRole:
 				approve = False
 				msg = msg = 'You don\'t have the permissions to gamble.'
+				
+		# Check bot admin
+		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+			# Approve as admin
+			approve = True
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
+			else:
+				if bet < 0:
+					# Don't decrement if negative
+					decrement = False
+				if bet > int(reserveXP):
+					# Don't approve if we don't have enough
+					approve = False
 			
 		# Check admin last - so it overrides anything else
-		if isAdmin and adminUnlim.lower() == "yes":
+		if isAdmin:
 			# No limit - approve
 			approve = True
-			decrement = False
+			if adminUnlim.lower() == "yes":
+				# No limit
+				decrement = False
+			else:
+				if bet < 0:
+					# Don't decrement if negative
+					decrement = False
+				if bet > int(reserveXP):
+					# Don't approve if we don't have enough
+					approve = False
 			
 		if approve:
 			# Bet was approved - let's take the XPReserve right away
