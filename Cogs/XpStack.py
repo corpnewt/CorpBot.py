@@ -62,6 +62,32 @@ class XpStack:
 		
 		await ctx.send("The current number of xp transactions to save is {}.".format(num))
 		
+
+	@commands.command(pass_context=True)
+	async def clearxp(self, ctx):
+		"""Clears the xp transaction list (bot-admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+		
+		xp_array = self.settings.getServerStat(ctx.guild, "XP Array")
+		if xp_array == None:
+			xp_array = []
+		
+		self.settings.setServerStat(ctx.guild, "XP Array", [])
+		if len(xp_array) == 1:
+			await ctx.send("Cleared 1 entry from the xp transactions list.")
+		else:
+			await ctx.send("Cleared {} entries from the xp transactions list.".format(len(xp_array)))
+
 		
 	@commands.command(pass_context=True)
 	async def checkxp(self, ctx):
