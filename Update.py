@@ -76,7 +76,7 @@ try:
     if not return_channel == None:
         # Add our return channel if we have one
         sub_args.append("-channel")
-        sub_args.append(str(return_channel.id))
+        sub_args.append(str(return_channel))
     subprocess.Popen(sub_args)
     # Kill this process
     exit(0)
