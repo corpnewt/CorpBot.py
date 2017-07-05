@@ -205,6 +205,13 @@ class Xp:
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
+			else:
+				if xpAmount < 0:
+					# Don't decrement if negative
+					decrement = False
+				if xpAmount > int(reserveXP):
+					# Don't approve if we don't have enough
+					approve = False
 			
 		# Check admin last - so it overrides anything else
 		if isAdmin:
