@@ -5,6 +5,7 @@ from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import DisplayName
+from   Cogs import Nullify
 
 # This is the Debugging module. It keeps track of how long the bot's been up
 
@@ -194,6 +195,11 @@ class Debugging:
 	
 	async def _logEvent(self, server, log_message, filename = None):
 		# Here's where we log our info
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 		# Get log channel
 		logChanID = self.settings.getServerStat(server, "LogChannel")
 		if not logChanID:
@@ -205,6 +211,9 @@ class Debugging:
 		if filename:
 			await logChan.send(log_message, file=discord.File(filename))
 		else:
+			# Check for suppress
+			if suppress:
+				log_message = Nullify.clean(log_message)
 			await logChan.send(log_message)
 
 
