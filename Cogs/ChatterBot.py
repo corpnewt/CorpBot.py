@@ -35,10 +35,10 @@ class ChatterBot:
 			for file in files:
 				self.chatBot.learn(self.botDir + '/' + file)
 			# Save brain
-			self.chatBot.saveBrain("standard.brn")
+			self.chatBot.saveBrain(self.botBrain)
 		else:
 			# Already have a brain - load it
-			self.chatBot.bootstrap(brainFile="standard.brn")
+			self.chatBot.bootstrap(brainFile=self.botBrain)
 		# Learned by this point - let's set our owner's name/gender
 		# Start the convo
 		self.chatBot.respond('Hello')
