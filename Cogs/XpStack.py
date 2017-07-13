@@ -103,6 +103,12 @@ class XpStack:
 		if not isAdmin:
 			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
 			return
+		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
 
 		xp_array = self.settings.getServerStat(ctx.guild, "XP Array")
 		if xp_array == None:
@@ -122,7 +128,9 @@ class XpStack:
 			time = i["Time"]
 			amount = i["Amount"]
 			msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
-
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
 
 	# Catch custom xp event
