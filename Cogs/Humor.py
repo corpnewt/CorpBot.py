@@ -33,7 +33,12 @@ class Humor:
 		if message == None:
 			await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))
 			return
-		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+			
 		marks = map(chr, range(768, 879))
 		marks = list(marks)
 		
@@ -42,7 +47,9 @@ class Humor:
 				for _ in range(i // 2 + 1)) * c.isalnum()
 				for c in word)
 				for i, word in enumerate(words))
-		
+		# Check for suppress
+		if suppress:
+			zalgo = Nullify.clean(zalgo)
 		await ctx.send(zalgo)
 
 
