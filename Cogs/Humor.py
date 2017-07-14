@@ -25,6 +25,25 @@ class Humor:
 			with open(listName) as f:
 				for line in f:
 					self.adj.append(line)
+					
+					
+	@commands.command(pass_context=True)
+	async def zalgo(self, ctx, *, message = None):
+		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
+		if message == None:
+			await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))
+			return
+		
+		marks = map(chr, range(768, 879))
+		marks = list(marks)
+		
+		words = message.split()
+		zalgo = ' '.join(''.join(c + ''.join(random.choice(marks)
+				for _ in range(i // 2 + 1)) * c.isalnum()
+				for c in word)
+				for i, word in enumerate(words))
+		
+		await ctx.send(zalgo)
 
 
 	@commands.command(pass_context=True)
