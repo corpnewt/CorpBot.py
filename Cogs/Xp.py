@@ -681,7 +681,7 @@ class Xp:
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
 			startIndex = len(promoSorted)-1
-			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.guild.name)
+			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
@@ -723,7 +723,7 @@ class Xp:
 		
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
-			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, ctx.message.guild.name)
+			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
