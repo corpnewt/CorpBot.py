@@ -29,6 +29,12 @@ class Debugging:
 				'message.edit' ]
 		self.cleanChannels = []
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
 
 	async def oncommand(self, ctx):
 		if self.debug:
@@ -93,28 +99,28 @@ class Debugging:
 		if not self.shouldLog('user.ban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* was **banned** from *{}*.'.format(member.name, member.discriminator, server.name)
+		msg = '*{}#{}* was **banned** from *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 
 	async def onunban(self, server, member):
 		if not self.shouldLog('user.unban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* was **unbanned** from *{}*.'.format(member.name, member.discriminator, server.name)
+		msg = '*{}#{}* was **unbanned** from *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 			
 	async def onjoin(self, member, server):
 		if not self.shouldLog('user.join', server):
 			return
 		# A new member joined
-		msg = '*{}#{}* joined *{}*.'.format(member.name, member.discriminator, server.name)
+		msg = '*{}#{}* joined *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 		
 	async def onleave(self, member, server):
 		if not self.shouldLog('user.leave', server):
 			return
 		# A member left
-		msg = '*{}#{}* left *{}*.'.format(member.name, member.discriminator, server.name)
+		msg = '*{}#{}* left *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 		
 	async def member_update(self, before, after):
@@ -288,7 +294,7 @@ class Debugging:
 		# Remove channel from list
 		self.cleanChannels.remove(ctx.channel)
 
-		msg = 'Messages cleaned by {}#{} in {} - #{}\n\n'.format(ctx.message.author.name, ctx.message.author.discriminator, ctx.guild.name, ctx.channel.name) + msg
+		msg = 'Messages cleaned by {}#{} in {} - #{}\n\n'.format(ctx.message.author.name, ctx.message.author.discriminator, self.suppressed(ctx.guild, ctx.guild.name), ctx.channel.name) + msg
 
 		# Timestamp and save to file
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
@@ -299,9 +305,9 @@ class Debugging:
 
 		# Send the cleaner a pm letting them know we're done
 		if counter == 1:
-			await ctx.message.author.send('*1* message removed from *#{}* in *{}!*'.format(channel.name, server.name))
+			await ctx.message.author.send('*1* message removed from *#{}* in *{}!*'.format(channel.name, self.suppressed(server, server.name)))
 		else:
-			await ctx.message.author.send('*{}* messages removed from *#{}* in *{}!*'.format(counter, channel.name, server.name))
+			await ctx.message.author.send('*{}* messages removed from *#{}* in *{}!*'.format(counter, channel.name, self.suppressed(server, server.name)))
 		# PM the file
 		await ctx.message.author.send(file=discord.File(filename))
 		if self.shouldLog('message.delete', message.guild):

@@ -19,6 +19,13 @@ class XpStack:
 		self.settings = settings
 		self.xp_save_count = 10
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	@commands.command(pass_context=True)
 	async def setxpcount(self, ctx, count = None):
 		"""Sets the number of xp transactions to keep (default is 10)."""
@@ -115,11 +122,11 @@ class XpStack:
 			xp_array = []
 
 		if not len(xp_array):
-			await ctx.send("No recent XP transactions in *{}*.".format(ctx.guild.name))
+			await ctx.send("No recent XP transactions in *{}*.".format(self.suppressed(ctx.guild, ctx.guild.name)))
 			return
 
 		count = 0
-		msg = "__Recent XP Transactions in *{}*:__\n\n".format(ctx.guild.name)
+		msg = "__Recent XP Transactions in *{}*:__\n\n".format(self.suppressed(ctx.guild, ctx.guild.name))
 		for i in range(len(xp_array)):
 			i = xp_array[len(xp_array)-1-i]
 			count += 1

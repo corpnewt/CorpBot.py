@@ -8,6 +8,7 @@ import json
 import os
 import copy
 from   Cogs        import DisplayName
+from   Cogs        import Nullify
 
 
 # This is the settings module - it allows the other modules to work with
@@ -106,6 +107,13 @@ class Settings:
 			# File doesn't exist - create a placeholder
 			self.serverDict = {}
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	async def onjoin(self, member, server):
 		# Welcome - and initialize timers
 		self.bot.loop.create_task(self.giveRole(member, server))
@@ -155,7 +163,7 @@ class Settings:
 			if not foundRole:
 				try:
 					await member.add_roles(defRole)
-					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, server.name)
+					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, self.suppressed(server, server.name))
 					await member.send(fmt)
 				except Exception:
 					pass

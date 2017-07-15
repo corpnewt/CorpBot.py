@@ -21,6 +21,13 @@ class Admin:
 		self.bot = bot
 		self.settings = settings
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed
 		return await self.message(message)
@@ -56,10 +63,10 @@ class Admin:
 			if checkTime:
 				# We have a cooldown
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, message.guild.name)
+				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, self.suppressed(message.guild, message.guild.name))
 			else:
 				# No cooldown - muted indefinitely
-				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(message.guild.name)
+				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(self.suppressed(message.guild, message.guild.name))
 
 			if checkTime and currentTime >= checkTime:
 				# We have passed the check time

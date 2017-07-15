@@ -20,6 +20,13 @@ class Remind:
 		self.bot = bot
 		self.settings = settings
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	async def onready(self):
 		await self.bot.wait_until_ready()
 		# Check all reminders - and start timers
@@ -115,7 +122,7 @@ class Remind:
 
 		# Add reminder
 		reminders = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Reminders")
-		reminder = { 'End' : end, 'Message' : message, 'Server' : ctx.message.guild.name }
+		reminder = { 'End' : end, 'Message' : message, 'Server' : self.suppressed(ctx.guild, ctx.guild.name) }
 		reminders.append(reminder)
 		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "Reminders", reminders)
 

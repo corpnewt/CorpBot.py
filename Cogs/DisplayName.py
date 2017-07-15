@@ -2,6 +2,7 @@ import asyncio
 import discord
 import re
 from   discord.ext import commands
+from   Cogs import Nullify
 
 def name(member : discord.Member):
     # A helper function to return the member's display name
@@ -15,9 +16,9 @@ def name(member : discord.Member):
     except AttributeError:
         pass
     if nick:
-        return nick
+        return Nullify.clean(nick)
     if name:
-        return name
+        return Nullify.clean(name)
     return None
 
 def memberForID(checkid, server):

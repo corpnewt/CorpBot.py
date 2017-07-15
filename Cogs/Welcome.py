@@ -19,6 +19,13 @@ class Welcome:
         self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
         self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
 
+    def suppressed(self, guild, msg):
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+            return Nullify.clean(msg)
+        else:
+            return msg
+
     async def onjoin(self, member, server):
         # Welcome
         welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
@@ -240,7 +247,7 @@ class Welcome:
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(server.name), message)
+        message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
 
         if suppress:
             message = Nullify.clean(message)
@@ -266,7 +273,7 @@ class Welcome:
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(server.name), message)
+        message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
 
         if suppress:
             message = Nullify.clean(message)

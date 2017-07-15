@@ -2,6 +2,7 @@ import asyncio
 import discord
 import time
 from Cogs import DisplayName
+from Cogs import Nullify
 
 class Mute:
 
@@ -10,7 +11,13 @@ class Mute:
         self.bot = bot
         self.settings = settings
         
-        
+    def suppressed(self, guild, msg):
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+            return Nullify.clean(msg)
+        else:
+            return msg
+
     async def onjoin(self, member, server):
         # Check if the new member was muted when they left
         muteList = self.settings.getServerStat(server, "MuteList")
@@ -72,7 +79,7 @@ class Mute:
         isMute = self.settings.getUserStat(member, server, "Muted")
         if isMute.lower() == "yes":
             await self.unmute(member, server)
-            pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(server.name)
+            pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(self.suppressed(server, server.name))
             await member.send(pm)
 
 

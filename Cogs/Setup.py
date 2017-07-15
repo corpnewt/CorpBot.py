@@ -13,6 +13,13 @@ class Setup:
 		self.bot = bot
 		self.settings = settings
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	@commands.command(pass_context=True)
 	async def setup(self, ctx):
 		"""Runs first-time setup (server owner only)."""
@@ -858,6 +865,6 @@ class Setup:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		await author.send('__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `{}help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(server.name, DisplayName.name(author), ctx.prefix))
+		await author.send('__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `{}help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(self.suppressed(server, server.name), DisplayName.name(author), ctx.prefix))
 
 # Calling a bot command:  await self.setup.callback(self, ctx)

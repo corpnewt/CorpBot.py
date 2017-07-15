@@ -19,6 +19,13 @@ class BotAdmin:
 		self.settings = settings
 		self.muter = muter
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
 		"""Set another user's parts list (owner only)."""
@@ -194,10 +201,10 @@ class BotAdmin:
 			mins = "minutes"
 			checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 			msg = '*{}* has been **Muted** for *{}*.'.format(DisplayName.name(member), checkRead)
-			pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), checkRead, ctx.message.guild.name)
+			pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), checkRead, self.suppressed(ctx.guild, ctx.guild.name))
 		else:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
-			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), ctx.message.guild.name)
+			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), self.suppressed(ctx.guild, ctx.guild.name))
 
 		await ctx.channel.send(msg)
 		await member.send(pm)
@@ -250,7 +257,7 @@ class BotAdmin:
 
 		await self.muter.unmute(member, ctx.message.guild)
 
-		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), ctx.message.guild.name)
+		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), self.suppressed(ctx.guild, ctx.guild.name))
 		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
 
 		await ctx.channel.send(msg)

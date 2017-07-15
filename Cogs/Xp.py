@@ -18,6 +18,13 @@ class Xp:
 		self.bot = bot
 		self.settings = settings
 		self.bot.loop.create_task(self.addXP())
+
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
 		
 	async def addXP(self):
 		await self.bot.wait_until_ready()
@@ -764,7 +771,7 @@ class Xp:
 
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
-					    
+						
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))
 		newState = int(self.settings.getUserStat(member, ctx.message.guild, "XPReserve"))
@@ -869,7 +876,7 @@ class Xp:
 		else:
 			suppress = False
 
-		serverName = server.name
+		serverName = self.suppressed(server, server.name)
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
 		xpPerMessage = int(self.settings.getServerStat(server, "XPPerMessage"))

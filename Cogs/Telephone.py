@@ -18,6 +18,13 @@ class Telephone:
 		self.settings = settings
 		self.switchboard = []
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	async def onready(self):
 		# Clear any previous games
 		for guild in self.bot.guilds:
@@ -121,7 +128,7 @@ class Telephone:
 				num = i['Number']
 				i_form = num[:3] + "-" + num[3:]
 				title += "{}. {} - *{}*\n".format(count, i["Name"], i_form)
-			await ctx.send(title)
+			await ctx.send(self.suppressed(ctx.guild, title))
 			return
 
 		# Search time!
@@ -135,7 +142,7 @@ class Telephone:
 				num = idMatch[0]['Item']['Number']
 				i_form = num[:3] + "-" + num[3:]
 				msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(idMatch[0]['Item']['Name'], i_form)
-				await ctx.send(msg)
+				await ctx.send(self.suppressed(ctx.guild, msg))
 				return
 		# Look up by name now
 		nameMatch = FuzzySearch.search(look_up, entries, 'Name', 3)
@@ -145,7 +152,7 @@ class Telephone:
 			num = nameMatch[0]['Item']['Number']
 			i_form = num[:3] + "-" + num[3:]
 			msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(nameMatch[0]['Item']['Name'], i_form)
-			await ctx.send(msg)
+			await ctx.send(self.suppressed(ctx.guild, msg))
 			return
 		# now we need to find which is better
 		matchCheck = []
@@ -162,7 +169,7 @@ class Telephone:
 			i_form = num[:3] + "-" + num[3:]
 			msg += "{}. {} - *{}*\n".format(count, m['Item']['Name'], i_form)
 
-		await ctx.send(msg)
+		await ctx.send(self.suppressed(ctx.guild, msg))
 
 	@commands.command(pass_context=True)
 	async def telenumber(self, ctx):
@@ -184,6 +191,7 @@ class Telephone:
 			return
 		if channel == None:
 			self.settings.setServerStat(ctx.message.guild, "TeleChannel", "")
+			self.settings.setServerStat(ctx.guild, "TeleNumber", None)
 			msg = ':telephone: *disabled*.'
 			await ctx.channel.send(msg)
 			return

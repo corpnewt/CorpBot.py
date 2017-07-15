@@ -20,6 +20,12 @@ class Channel:
 		self.bot = bot
 		self.settings = settings
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
 
 	async def member_update(self, before, after):
 		server = after.guild
@@ -75,7 +81,7 @@ class Channel:
 	async def rules(self, ctx):
 		"""Display the server's rules."""
 		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
-		msg = "*{}* Rules:\n{}".format(ctx.message.guild.name, rules)
+		msg = "*{}* Rules:\n{}".format(self.suppressed(ctx.guild, ctx.guild.name), rules)
 		await ctx.channel.send(msg)
 
 

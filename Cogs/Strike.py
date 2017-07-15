@@ -28,6 +28,13 @@ class Strike:
 		self.settings = settings
 		self.mute = mute
 
+	def suppressed(self, guild, msg):
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+			return Nullify.clean(msg)
+		else:
+			return msg
+
 	async def onjoin(self, member, server):
 		# Check id against the kick and ban list and react accordingly
 		kickList = self.settings.getServerStat(server, "KickList")
@@ -163,9 +170,9 @@ class Strike:
 				cooldownFinal = currentTime+86400
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 				if message:
-					mutemessage = 'You have been muted in *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, message)
+					mutemessage = 'You have been muted in *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
 				else:
-					mutemessage = 'You have been muted in *{}*.'.format(ctx.message.guild.name)
+					mutemessage = 'You have been muted in *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
 				# Check if already muted
 				alreadyMuted = self.settings.getUserStat(member, ctx.message.guild, "Muted")
 				if alreadyMuted.lower() == "yes":
@@ -176,9 +183,9 @@ class Strike:
 							self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
 							timeRemains = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 							if message:
-								mutemessage = 'Your muted time in *{}* has been extended to *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, timeRemains, message)
+								mutemessage = 'Your muted time in *{}* has been extended to *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), timeRemains, message)
 							else:
-								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(ctx.message.guild.name, timeRemains)
+								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name), timeRemains)
 				else:
 					self.settings.setUserStat(member, ctx.message.guild, "Muted", "Yes")
 					self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
@@ -191,9 +198,9 @@ class Strike:
 					kickList.append(str(member.id))
 					self.settings.setServerStat(ctx.message.guild, "KickList", kickList)
 				if message:
-					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, message)
+					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
 				else:
-					kickmessage = 'You have been kicked from *{}*.'.format(ctx.message.guild.name)
+					kickmessage = 'You have been kicked from *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
 				await member.send(kickmessage)
 				await ctx.guild.kick(member)
 			else:
@@ -202,9 +209,9 @@ class Strike:
 					banList.append(str(member.id))
 					self.settings.setServerStat(ctx.message.guild, "BanList", banList)
 				if message:
-					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(ctx.message.guild.name, message)
+					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
 				else:
-					banmessage = 'You have been banned from *{}*.'.format(ctx.message.guild.name)
+					banmessage = 'You have been banned from *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
 				await member.send(banmessage)
 				await ctx.guild.ban(member)
 			self.settings.incrementStat(member, ctx.message.guild, "StrikeLevel", 1)
