@@ -581,11 +581,11 @@ class Music:
         if state.is_playing():
             await ctx.channel.send('I\`m already playing in a channel, Join me there instead! :D')
             return
-
-        summoned_channel = ctx.message.author.voice.channel
-        if summoned_channel is None:
+        
+        if ctx.message.author.voice is None:
             await ctx.channel.send('You are not in a voice channel.')
             return False
+        summoned_channel = ctx.message.author.voice.channel
 
         if state.voice is None:
             state.voice = await summoned_channel.connect() # self.bot.join_voice_channel(summoned_channel)
