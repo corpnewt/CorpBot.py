@@ -200,10 +200,14 @@ class ServerStats:
         """Lists the total number of users on all servers I'm connected to."""
         userCount = 0
         serverCount = 0
+        counted_users = []
         for server in self.bot.guilds:
             serverCount += 1
             userCount += len(server.members)
-        await ctx.channel.send('There are *{:,} users* on the *{:,} servers* I am currently a part of!'.format(userCount, serverCount))
+            for member in server.members:
+                if not member.id in counted_users:
+                    counted_users.append(member.id)
+        await ctx.channel.send('There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))
 
     
     @commands.command(pass_context=True)
