@@ -887,7 +887,7 @@ class Hw:
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel)
+			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
 				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
