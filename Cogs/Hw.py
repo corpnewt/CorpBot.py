@@ -291,7 +291,7 @@ class Hw:
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel)
+			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
 				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
@@ -411,7 +411,7 @@ class Hw:
 
 		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel)
+			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not buildName:
 				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
@@ -864,7 +864,7 @@ class Hw:
 		# Get the build name
 		newBuild = { 'Main': True }
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel)
+			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not buildName:
 				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
@@ -1035,11 +1035,12 @@ class Hw:
 
 		while True:
 			def littleCheck(m):
-				return author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
+				return ctx.author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
 			try:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
 			except Exception:
 				talk = None
+
 			if not talk:
 				if authorName:
 					msg = "*{}*, I'm out of time...".format(authorName)
@@ -1061,7 +1062,28 @@ class Hw:
 				else:
 					return False
 
-	async def prompt(self, ctx, message, dest = None):
+	async def prompt(self, ctx, message, dest = None, author = None):
+		# Get author name
+		authorName = None
+		if author:
+			if type(author) is str:
+				authorName = author
+			else:
+				try:
+					authorName = DisplayName.name(author)
+				except Exception:
+					pass
+		else:
+			if message:
+				try:
+					author = message.author
+				except Exception:
+					pass
+			try:
+				authorName = DisplayName.name(message.author)
+			except Exception:
+				pass
+
 		if not dest:
 			dest = ctx.channel
 		if self.checkSuppress(ctx):
@@ -1075,23 +1097,23 @@ class Hw:
 			except Exception:
 				talk = None
 			if not talk:
-				msg = "*{}*, I'm out of time...".format(DisplayName.name(ctx.author))
+				msg = "*{}*, I'm out of time...".format(authorName)
 				await dest.send(msg)
 				return None
 			else:
 				# Check for a stop
 				if talk.content.lower() == 'stop':
-					msg = "No problem, *{}!*  See you later!".format(DisplayName.name(ctx.author), ctx.prefix)
+					msg = "No problem, *{}!*  See you later!".format(authorName, ctx.prefix)
 					await dest.send(msg)
 					return None
 				# Make sure
-				conf = await self.confirm(ctx, talk, dest)
+				conf = await self.confirm(ctx, talk, dest, "", author)
 				if conf == True:
 					# We're sure - return the value
 					return talk
 				elif conf == False:
 					# Not sure - ask again
-					return await self.prompt(ctx, message, dest)
+					return await self.prompt(ctx, message, dest, author)
 				else:
 					# Timed out
 					return None
