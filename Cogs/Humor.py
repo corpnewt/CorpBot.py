@@ -29,7 +29,7 @@ class Humor:
 					
 	@commands.command(pass_context=True)
 	async def zalgo(self, ctx, *, message = None):
-		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
+		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌... (25 max loops)"""
 		if message == None:
 			await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))
 			return
@@ -46,8 +46,8 @@ class Humor:
 		except Exception:
 			iterations = 1
 			
-		if iterations > 100:
-			iterations = 100
+		if iterations > 25:
+			iterations = 25
 		if iterations < 1:
 			iterations = 1
 			
