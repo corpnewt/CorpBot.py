@@ -3,7 +3,7 @@ import discord
 import textwrap
 from   discord.ext import commands
 
-async def say(bot, msg, target, requestor, maxMessage : int = 5, characters : int = 2000):
+async def say(bot, msg, target, requestor, maxMessage : int = 5, characters : int = 2000, maxPage = None):
     """A helper function to get the bot to cut his text into chunks."""
     if not bot or not msg or not target:
         return False
@@ -23,8 +23,13 @@ async def say(bot, msg, target, requestor, maxMessage : int = 5, characters : in
         # PM the contents to the requestor
         await target.send("Since this message is *{} pages* - I'm just going to DM it to you.".format(len(textList)))
         target = requestor
-        
+    
+    page_count = 0
     for message in textList:
+        page_count += 1
         await target.send(message)
+        if not maxPage == None and page_count >= maxPage:
+            # At our max
+            break
     
     return True
