@@ -48,6 +48,8 @@ class Humor:
 		except Exception:
 			iterations = 1
 			
+		if iterations > 100:
+			iterations = 100
 		if iterations < 1:
 			iterations = 1
 			
