@@ -58,7 +58,8 @@ class Humor:
 		# Check for suppress
 		if suppress:
 			zalgo = Nullify.clean(zalgo)
-		await ctx.send(zalgo)
+		await Message.say(self.bot, zalgo, ctx.message.channel, ctx.message.author, 1)
+		#await ctx.send(zalgo)
 		
 	def _zalgo(self, text):
 		marks = map(chr, range(768, 879))
