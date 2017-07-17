@@ -38,9 +38,6 @@ class Humor:
 			suppress = True
 		else:
 			suppress = False
-			
-		marks = map(chr, range(768, 879))
-		marks = list(marks)
 		
 		words = message.split()
 		try:
@@ -59,6 +56,8 @@ class Humor:
 		await ctx.send(zalgo)
 		
 	def _zalgo(self, text):
+		marks = map(chr, range(768, 879))
+		marks = list(marks)
 		words = text.split()
 		zalgo = ' '.join(''.join(c + ''.join(random.choice(marks)
 				for _ in range(i // 2 + 1)) * c.isalnum()
