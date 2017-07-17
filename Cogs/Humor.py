@@ -56,10 +56,11 @@ class Humor:
 		zalgo = " ".join(words)
 		for i in range(iterations):
 			if len(zalgo) > 2000:
-				zalgo = zalgo[:2000]
 				break
 			zalgo = self._zalgo(zalgo)
-			
+		
+		zalgo = zalgo[:2000]
+
 		# Check for suppress
 		if suppress:
 			zalgo = Nullify.clean(zalgo)
