@@ -167,7 +167,13 @@ class Debugging:
 		if not self.shouldLog('message.send', message.guild):
 			return { 'Ignore' : False, 'Delete' : False}
 		# A message was sent
-		msg = '*{}#{}*, in *#{}*, sent: ```\n{}```'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		msg = '*{}#{}*, in *#{}*, sent: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		if len(message.attachments):
+			msg += "\n--- Attachments ---\n\n"
+			for a in message.attachments:
+				msg += a.url + "\n"
+		msg += "```"
+		
 		await self._logEvent(message.guild, msg)
 		return { 'Ignore' : False, 'Delete' : False}
 		
@@ -180,9 +186,20 @@ class Debugging:
 			# Edit was likely a preview happening
 			return { 'Ignore' : False, 'Delete' : False}
 		# A message was edited
-		msg = '*{}#{}*, in *#{}*, edited: ```\n{}```'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
+		msg = '*{}#{}*, in *#{}*, edited: ```\n{}\n'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
+		if len(before.attachments):
+			msg += "\n--- Attachments ---\n\n"
+			for a in before.attachments:
+				msg += a.url + "\n"
+		msg += "```"
 		await self._logEvent(before.guild, msg)
-		msg = 'To: ```\n{}```'.format(after.content)
+		msg = 'To: ```\n{}\n'.format(after.content)
+		if len(after.attachments):
+			msg += "\n--- Attachments ---\n\n"
+			for a in after.attachments:
+				msg += a.url + "\n"
+		msg += "```"
+		
 		await self._logEvent(before.guild, msg)
 		return { 'Ignore' : False, 'Delete' : False}
 		
@@ -196,7 +213,12 @@ class Debugging:
 			# Don't log these - as they'll spit out a text file later
 			return
 		# A message was deleted
-		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}```'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		if len(message.attachments):
+			msg += "\n--- Attachments ---\n\n"
+			for a in message.attachments:
+				msg += a.url + "\n"
+		msg += "```"
 		await self._logEvent(message.guild, msg)
 	
 	async def _logEvent(self, server, log_message, filename = None):

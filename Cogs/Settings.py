@@ -43,6 +43,10 @@ class Settings:
 				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
+				"TeleChannel"			: "",		# ID or blank for disabled
+				"LastCallHidden"		: "no",		# Was the last call with *67?
+				"TeleNumber"			: None,		# The 7-digit number of the server
+				"TeleBlock"				: [],		# List of blocked numbers
 				"MadLibsChannel"        : "",       # ID or blank for any channel
 				"ChatChannel"			: "", 		# ID or blank for no channel
 				"HardwareChannel"       : "",		# ID or blank for no channel

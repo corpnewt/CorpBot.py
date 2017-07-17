@@ -39,6 +39,9 @@ class Telephone:
 		call = self._incall(channel.guild)
 		if not call:
 			return
+		if not call["Connected"]:
+			# Don't forward typing until they pick up
+			return
 		for caller in call['Members']:
 			if caller is channel.guild:
 				continue
@@ -220,6 +223,139 @@ class Telephone:
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(teleChan))
 
 	@commands.command(pass_context=True)
+	async def teleblock(self, ctx, *, guild_name = None):
+		"""Blocks all tele-numbers associated with the passed guild (bot-admin only)."""
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if guild_name == None:
+			await ctx.send("Usage: `{}teleblock [guild_name]`".format(ctx.prefix))
+			return
+
+		# Verify our guild
+		found = False
+		target = None
+		for guild in self.bot.guilds:
+			teleNum = self.settings.getServerStat(guild, "TeleNumber")
+			if not teleNum:
+				continue
+			if guild.name.lower() == guild_name.lower():
+				if guild.id == ctx.guild.id:
+					# We're uh... blocking ourselves.
+					await ctx.send("You can't block your own number...")
+					return
+				found = True
+				target = guild
+				break
+		if not found:
+			await ctx.send("I couldn't find that guild to block.  Maybe they're not setup for :telephone: yet?")
+			return
+
+		# Here, we should have a guild to block
+		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
+		if block_list == None:
+			block_list = []
+		block_list.append(target.id)
+		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+
+		msg = "You are now blocking *{}!*".format(target.name)
+		await ctx.send(self.suppressed(ctx.guild, msg))
+
+
+	@commands.command(pass_context=True)
+	async def teleunblock(self, ctx, *, guild_name = None):
+		"""Unblocks all tele-numbers associated with the passed guild (bot-admin only)."""
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if guild_name == None:
+			await ctx.send("Usage: `{}teleunblock [guild_name]`".format(ctx.prefix))
+			return
+
+		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
+		if block_list == None:
+			block_list = []
+		
+		if not len(block_list):
+			await ctx.send("No blocked numbers - nothing to unblock!")
+			return
+
+		# Verify our guild
+		found = False
+		target = None
+		for guild in self.bot.guilds:
+			teleNum = self.settings.getServerStat(guild, "TeleNumber")
+			if guild.name.lower() == guild_name.lower():
+				found = True
+				target = guild
+				break
+		if not found:
+			await ctx.send("I couldn't find that guild...")
+			return
+
+		if not target.id in block_list:
+			msg = "*{}* is not currently blocked."
+			await ctx.send(self.suppressed(ctx.guild, msg))
+			return
+
+		# Here, we should have a guild to unblock
+		block_list.remove(target.id)
+		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+
+		msg = "You have unblocked *{}!*".format(target.name)
+		await ctx.send(self.suppressed(ctx.guild, msg))
+
+
+	@commands.command(pass_context=True)
+	async def teleblocks(self, ctx):
+		"""Lists guilds with blocked tele-numbers."""
+
+		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
+		if block_list == None:
+			block_list = []
+		
+		if not len(block_list):
+			await ctx.send("No blocked numbers!")
+			return
+
+		block_names = []
+		for block in block_list:
+			server = self.bot.get_guild(block)
+			if not server:
+				block_list.remove(block)
+				continue
+			block_names.append("*" + server.name + "*")
+		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+
+		msg = "__Tele-Blocked Servers:__\n\n"
+
+		#msg += ", ".join(str(x) for x in block_list)
+		msg += ", ".join(block_names)
+
+		await ctx.send(self.suppressed(ctx.guild, msg))
+
+
+	@commands.command(pass_context=True)
 	async def call(self, ctx, *, number = None):
 		"""Calls the passed number.  Can use *67 to hide your identity - or *69 to connect to the last incoming call (ignored if another number is present)."""
 		teleChan = self._gettelechannel(ctx.guild)
@@ -239,7 +375,7 @@ class Telephone:
 			caller = self._gettelechannel(ctx.guild)
 			if caller:
 				await caller.send(":telephone: You're already in a call with: *{}*".format(call_with))
-				return
+			return
 
 		hidden = False
 		target = None
@@ -280,7 +416,7 @@ class Telephone:
 						caller = self._gettelechannel(caller)
 						if caller:
 							await caller.send(":telephone: ***Beep beep beep beep!*** *Busy signal...*")
-							return
+						return
 					found = True
 					target = guild
 					break
@@ -291,7 +427,22 @@ class Telephone:
 			caller = self._gettelechannel(caller)
 			if caller:
 				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, the number you've dialed is not in service at this time.*")
-				return
+			return
+
+		# Check for a blocked server
+		block_list = self.settings.getServerStat(caller, "TeleBlock")
+		if block_list == None:
+			block_list = []
+		tblock_list = self.settings.getServerStat(target, "TeleBlock")
+		if tblock_list == None:
+			block_list = []
+		
+		if target.id in block_list or caller.id in tblock_list:
+			# Blocked! - checks if both parties are blocked by each other
+			caller = self._gettelechannel(caller)
+			if caller:
+				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, your call cannot be completed as dialed.*")
+			return
 
 		target_channel = self._gettelechannel(target)
 		if target_channel == None:
@@ -299,7 +450,7 @@ class Telephone:
 			caller = self._gettelechannel(caller)
 			if caller:
 				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, the number you've dialed is not in service at this time.*")
-				return
+			return
 
 		# Check if the caller is in a call currently
 		if self._incall(target):
@@ -307,7 +458,7 @@ class Telephone:
 			caller = self._gettelechannel(caller)
 			if caller:
 				await caller.send(":telephone: ***Beep beep beep beep!*** *Busy signal...*")
-				return
+			return
 		
 		# Ring!
 		await self._ring(caller, target, hidden, dial_hide)
@@ -322,10 +473,11 @@ class Telephone:
 			return
 
 		# Add both to the call list
-		self.switchboard.append({ "Members": [caller, receiver], "Hidden": hidden })
+		self.switchboard.append({ "Members": [caller, receiver], "Hidden": hidden, "Connected": False })
+		our_call = self.switchboard[len(self.switchboard)-1]
 
 		# Let the caller know we're dialing
-		msg = ":telephone: Dialing..."
+		msg = ":telephone: Dialing... "
 		teleNum = self.settings.getServerStat(receiver, "TeleNumber")
 		msg_add = []
 		if hidden:
@@ -388,6 +540,8 @@ class Telephone:
 			await receiver_chan.send(":telephone: Ringing stops.")
 			return
 		
+		# Connect the call:
+		our_call["Connected"] = True
 		# They answered!
 		await caller_chan.send(":telephone_receiver: Connected.\nType *hangup* to end the call.")
 		await receiver_chan.send(":telephone_receiver: Connected.\nType *hangup* to end the call.")
@@ -399,6 +553,7 @@ class Telephone:
 					return False
 				if msg.channel == receiver_chan or msg.channel == caller_chan:
 					return True
+				return False
 			try:
 				# 1 minute timeout
 				talk = await self.bot.wait_for('message', check=check_in_call, timeout=60)
