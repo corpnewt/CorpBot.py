@@ -99,7 +99,10 @@ class Reddit:
 			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r.json()["data"]["children"][randnum]["data"]
-				returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']) }
+				if 'over_18' in theJSON:
+					returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': theJSON['over_18'] }
+				else:
+					returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': False }
 				break
 			except IndexError:
 				continue
@@ -169,11 +172,67 @@ class Reddit:
 		"""I hope you're not tired..."""
 		msg = self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
 		if not msg:
-			await self.bot.send_message(ctx.message.channel, "Whoops! I couldn't find a working link.")
+			await ctx.send("Whoops! I couldn't find a working link.")
 			return
 		mess = '__**{}**__\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.say(self.bot, mess, ctx.message.author, ctx.message.author)
+		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
+		#await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def joke(self, ctx):
+		"""Let's see if reddit can be funny..."""
+		msg = self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=100')
+		if not msg:
+			await ctx.send("Whoops! I couldn't find a working link.")
+			return
+		# Check for nsfw - and for now, only allow admins/botadmins to post those
+		if msg['over_18']:
+			# NSFW - check admin
+			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+			if not isAdmin:
+				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+				for role in ctx.message.author.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if aRole['ID'] == role.id:
+							isAdmin = True
+			# Only allow admins to change server stats
+			if not isAdmin:
+				await ctx.channel.send('You do not have sufficient privileges to access nsfw subreddits.')
+				return
+
+		mess = '*{}*\n\n'.format(msg['title'])
+		mess += msg['content']
+		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
+		#await self.bot.send_message(ctx.message.channel, msg)
+
+
+	@commands.command(pass_context=True)
+	async def dirtyjoke(self, ctx):
+		"""Let's see if reddit can be dir-... oh... uh.. funny... (bot-admin only)"""
+		# NSFW - check admin
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if aRole['ID'] == role.id:
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access nsfw subreddits.')
+			return
+		
+		msg = self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
+		if not msg:
+			await ctx.send("Whoops! I couldn't find a working link.")
+			return
+		mess = '*{}*\n\n'.format(msg['title'])
+		mess += msg['content']
+		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
 	
