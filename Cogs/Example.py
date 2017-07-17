@@ -1199,7 +1199,7 @@ class Music:
             else:
                 total_keeps = total_keeps + XP
         
-        await ctx.channel.send('**Total Votes**:\nKeeps Score: *{}*\nSkips Score : *{}*'.format(total_keeps, total_skips))
+        await ctx.channel.send('**Total Votes**:\nKeeps Score: *{:,}*\nSkips Score : *{:,}*'.format(total_keeps, total_skips))
 
         return {'total_skips': total_skips, 'total_keeps': total_keeps}
 
