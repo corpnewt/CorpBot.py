@@ -43,15 +43,28 @@ class Humor:
 		marks = list(marks)
 		
 		words = message.split()
-		zalgo = ' '.join(''.join(c + ''.join(random.choice(marks)
-				for _ in range(i // 2 + 1)) * c.isalnum()
-				for c in word)
-				for i, word in enumerate(words))
+		try:
+			iterations = int(words[len(words)-1])
+			words = words[:-1]
+		except Exception:
+			iterations = 1
+			
+		zalgo = " ".join(words)
+		for i in range(iterations):
+			zalgo = self._zalgo(zalgo)
+			
 		# Check for suppress
 		if suppress:
 			zalgo = Nullify.clean(zalgo)
 		await ctx.send(zalgo)
-
+		
+	def _zalgo(self, text):
+		words = text.split()
+		zalgo = ' '.join(''.join(c + ''.join(random.choice(marks)
+				for _ in range(i // 2 + 1)) * c.isalnum()
+				for c in word)
+				for i, word in enumerate(words))
+		return zalgo
 
 	@commands.command(pass_context=True)
 	async def holy(self, ctx, *, subject : str = None):
