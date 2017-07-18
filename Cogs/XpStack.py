@@ -27,6 +27,24 @@ class XpStack:
 			return msg
 
 	@commands.command(pass_context=True)
+	async def clearallxp(self, ctx):
+		"""Clears all xp transactions from the transaction list for all servers (owner-only)."""
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		for guild in self.bot.guilds:
+			self.settings.setServerStat(guild, "XP Array", [])
+		
+		await ctx.send("All xp transactions from the transaction list for all servers cleared!")
+		
+	@commands.command(pass_context=True)
 	async def setxpcount(self, ctx, count = None):
 		"""Sets the number of xp transactions to keep (default is 10)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -130,8 +148,16 @@ class XpStack:
 		for i in range(len(xp_array)):
 			i = xp_array[len(xp_array)-1-i]
 			count += 1
-			to_user = i["To"]
-			from_user = i["From"]
+			to_user = DisplayName.memberForID(i["To"], ctx.guild)
+			if to_user == None:
+				to_user = DisplayName.roleForID(i["To"], ctx.guild)
+				if to_user == None:
+					to_user = "ID: " + i["To"]
+			from_user = DisplayName.memberForID(i["From"], ctx.guild)
+			if from_user == None:
+				from_user = DisplayName.roleForID(i["From"], ctx.guild)
+				if from_user == None:
+					from_user = "ID: " + i["From"]
 			time = i["Time"]
 			amount = i["Amount"]
 			msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
@@ -147,11 +173,13 @@ class XpStack:
 		num = self.settings.getServerStat(server, "XP Count")
 		if num == None:
 			num = self.xp_save_count
-		if type(to_user) is discord.Role:
-			to_name = to_user.name + " role"
+		'''if type(to_user) is discord.Role:
+			#to_name = to_user.name + " role"
 		else:
-			to_name = "{}#{}".format(to_user.name, to_user.discriminator)
-		f_name = "{}#{}".format(from_user.name, from_user.discriminator)
+			to_name = "{}#{}".format(to_user.name, to_user.discriminator)'''
+		to_name = to_user.id
+		f_name = from_user.id
+		#f_name = "{}#{}".format(from_user.name, from_user.discriminator)
 		# Add new xp transaction
 		xp_transaction = { "To": to_name, "From": f_name, "Time": datetime.today().strftime("%Y-%m-%d %H.%M"), "Amount": amount }
 		xp_array = self.settings.getServerStat(server, "XP Array")
