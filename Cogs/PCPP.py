@@ -148,6 +148,23 @@ def getMarkdown( url, style = None, escape = False):
 		if name.lower().startswith('note:'):
 			# Not a part
 			continue
+		if "From parametric filter" in name:
+			# Got a parametric filter - strip that out
+			name_list = name.split("From parametric filter")
+			if not len(name_list):
+				# Only a parametric filter - skip
+				continue
+			# Name should be everything *prior* to the parametric filter
+			name = name_list[0].strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+		if "From parametric selection" in name:
+			# Got a parametric filter - strip that out
+			name_list = name.split("From parametric selection")
+			if not len(name_list):
+				# Only a parametric filter - skip
+				continue
+			# Name should be everything *prior* to the parametric filter
+			name = name_list[0].strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
+
 		names.append(name)
 		if not len(type):
 			if not len(types):
