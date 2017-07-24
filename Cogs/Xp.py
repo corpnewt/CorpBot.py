@@ -853,6 +853,10 @@ class Xp:
 				# Playing a game!
 				stat_embed.add_field(name="Playing", value=str(member.game.name), inline=True)
 
+		# add created_at footer
+		created = "Created at " + member.created_at.strftime("%Y-%m-%d %I:%M %p") + " UTC"
+		stat_embed.set_footer(text=created)
+
 		#await ctx.message.channel.send(msg)
 		await ctx.message.channel.send(embed=stat_embed)
 		
