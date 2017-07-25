@@ -144,7 +144,15 @@ class XpStack:
 			return
 
 		count = 0
-		msg = "__Recent XP Transactions in *{}*:__\n\n".format(self.suppressed(ctx.guild, ctx.guild.name))
+		msg = "__Recent XP Transactions in *{}*:__\n\n```".format(self.suppressed(ctx.guild, ctx.guild.name))
+		
+		longest_num  = 0
+		longest_to   = 0
+		longest_from = 0
+		longest_xp   = 0
+		
+		transections = []
+		
 		for i in range(len(xp_array)):
 			i = xp_array[len(xp_array)-1-i]
 			count += 1
@@ -158,9 +166,38 @@ class XpStack:
 				from_user = DisplayName.roleForID(i["From"], ctx.guild)
 				if from_user == None:
 					from_user = "ID: " + str(i["From"])
+					
 			time = i["Time"]
 			amount = i["Amount"]
-			msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
+			xp_string = "--[{} xp]-->".format(amount)
+			to_string = "*{}* at {}".format(to_user, time)
+			
+			# Check lengths
+			if len(str(count)) > longest_num:
+				longest_num = len(str(count))
+			if len(from_user) > longest_from:
+				longest_from = len(from_user)
+			if len(to_string) > longest_to:
+				longest_to = len(to_string)
+			if len(xp_string) > longest_xp:
+				longest_xp = len(xp_string)
+			# Add to list
+			transections.append([ str(count), from_user, xp_string, to_string ])
+			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
+		# Format
+		for t in transections:
+			msg += "{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}}\n".format(
+				t[0], 
+				t[1], 
+				t[2], 
+				t[3], 
+				n_w=longest_num, 
+				f_w=longest_from, 
+				x_w=longest_xp,
+				t_w=longest_to
+			)
+		msg += "```"
+		
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
