@@ -68,6 +68,9 @@ class XpStack:
 		if count < 0:
 			await ctx.send("Count must be at least 0.")
 			return
+		
+		if count > 100:
+			count = 100
 
 		self.settings.setServerStat(ctx.guild, "XP Count", count)
 		await ctx.send("Set the xp count to {}.".format(count))
