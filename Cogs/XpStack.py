@@ -190,7 +190,7 @@ class XpStack:
 			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
 		# Format
 		for t in transections:
-			msg += "{:>{n_w}}. *{:>{f_w}}* {:^{x_w}} *{:<{t_w}}* {:<{ti_w}}\n".format(
+			msg += "{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}} {:<{ti_w}}\n".format(
 				t[0], 
 				t[1], 
 				t[2], 
