@@ -61,62 +61,42 @@ class ChatterBot:
 		return True
 	
 	async def killcheck(self, message):
-		# Pulled from the Feed.py module - checks if we should ignore due to death
-		# or hunger.
 		ignore = False
-		delete = False
-		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
-		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
-		isKill = self.settings.getServerStat(message.guild, "Killed")
-		if isKill.lower() == "yes":
-			ignore = True
-			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
-				ignore = False
-				
-		if hunger >= 100 and hungerLock.lower() == "yes":
-			ignore = True
-			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
-				ignore = False
-				
-		# Check if admin and override
-		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if isAdmin:
-			ignore = False
-			delete = False
-		
-		return { 'Ignore' : ignore, 'Delete' : delete}
+		for cog in self.bot.cogs:
+			real_cog = self.bot.get_cog(cog)
+			if real_cog == self:
+				# Don't check ourself
+				continue
+			try:
+				check = await real_cog.message(message)
+			except AttributeError:
+				continue
+			try:
+				if check['Ignore']:
+					ignore = True
+			except KeyError:
+				pass
+		return ignore
+
 
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
-		ignore = False
-		delete = False
 		msg = message.content
 		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
-		if chatChannel and not message.author == self.bot.user and not msg.startswith(self.prefix):
+		the_prefix = await self.bot.command_prefix(self.bot, message)
+		if chatChannel and not message.author.id == self.bot.user.id and not msg.startswith(the_prefix):
 			# We have a channel
 			# Now we check if we're hungry/dead and respond accordingly
-			check = await self.killcheck(message)
-			if check['Ignore']:
-				# We're too hungry - or dead
-				return check
+			if await self.killcheck(message):
+				return { "Ignore" : True, "Delete" : False }
 			if str(message.channel.id) == str(chatChannel):
 				# We're in that channel!
 				#ignore = True
 				# Strip prefix
-				pre = '{}chat '.format(self.prefix)
 				msg = message.content
-				if msg.lower().startswith(pre):
-					msg = msg[len(pre):]
 				await self._chat(message.channel, message.guild, msg)
-		return { 'Ignore' : ignore, 'Delete' : delete}
+		return { 'Ignore' : False, 'Delete' : False}
 
 
 	@commands.command(pass_context=True)
