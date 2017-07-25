@@ -76,22 +76,22 @@ class Encode:
 		"""Data converter from string <--> hex <--> base64."""
 
 		if value == None or from_type == None or to_type == None:
-			msg = 'Usage: `{}plist "[value]" [from_type] [to_type]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
+			msg = 'Usage: `{}encode "[value]" [from_type] [to_type]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
 			await ctx.send(msg)
 			return
 
 		types = [ "base64", "hex", "ascii" ]
 
 		if not from_type.lower() in types:
-			await ctx.send("Invalid from type!")
+			await ctx.send("Invalid *from* type!")
 			return
 
 		if not to_type.lower() in types:
-			await ctx.send("Invalid to type!")
+			await ctx.send("Invalid *to* type!")
 			return
 
 		if from_type.lower() == to_type.lower():
-			await ctx.send("No need to convert from and to the same type.")
+			await ctx.send("*Poof!* Your encoding was done before it started!")
 			return
 
 		try:
