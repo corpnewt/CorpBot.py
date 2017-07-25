@@ -488,10 +488,10 @@ async def on_member_remove(member):
 			continue
 
 @bot.event
-async def on_member_ban(member):
+async def on_member_ban(guild, member):
 	for cog in cogList:
 		try:
-			await cog.onban(member)
+			await cog.onban(guild, member)
 		except AttributeError:
 			# Onto the next
 			continue
