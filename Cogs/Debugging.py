@@ -94,8 +94,8 @@ class Debugging:
 			msg = "*{}#{}* gave *{} xp* to *{}#{}*.".format(from_user.name, from_user.discriminator, amount, to_user.name, to_user.discriminator)
 		await self._logEvent(server, msg)
 
-	async def onban(self, member):
-		server = member.guild
+	async def onban(self, guild, member):
+		server = guild
 		if not self.shouldLog('user.ban', server):
 			return
 		# A member was banned
