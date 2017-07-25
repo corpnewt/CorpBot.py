@@ -199,7 +199,7 @@ class XpStack:
 				n_w=longest_num, 
 				f_w=longest_from, 
 				x_w=longest_xp,
-				t_w=longest_to
+				t_w=longest_to,
 				ti_w=longest_time
 			)
 		msg += "```"
