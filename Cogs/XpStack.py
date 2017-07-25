@@ -175,14 +175,14 @@ class XpStack:
 			# Check lengths
 			if len(str(count)) > longest_num:
 				longest_num = len(str(count))
-			if len(from_user) > longest_from:
-				longest_from = len(from_user)
+			if len(str(from_user)) > longest_from:
+				longest_from = len(str(from_user))
 			if len(to_string) > longest_to:
 				longest_to = len(to_string)
 			if len(xp_string) > longest_xp:
 				longest_xp = len(xp_string)
 			# Add to list
-			transections.append([ str(count), from_user, xp_string, to_string ])
+			transections.append([ str(count), str(from_user), xp_string, to_string ])
 			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
 		# Format
 		for t in transections:
