@@ -3,6 +3,7 @@ import discord
 import random
 import datetime
 import subprocess
+import re
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
@@ -254,6 +255,8 @@ class Music:
         self.voice_states = {}
         self.settings = settings
         self.downloader = downloader.Downloader()
+        # Regex for extracting urls from strings
+        self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
     async def onready(self):
         # Clear any previous playlist settings
@@ -641,6 +644,12 @@ class Music:
         }
 
         song = song.strip('<>')
+
+        # Check if url - if not, remove /
+        matches = re.finditer(self.regex, song)
+        matches = list(matches)
+        if not len(matches):
+            song = song.replace('/', '')
 
         #info = await self.bot.loop.run_in_executor(None, func)
         
