@@ -150,6 +150,7 @@ class XpStack:
 		longest_to   = 0
 		longest_from = 0
 		longest_xp   = 0
+		longest_time = 0
 		
 		transections = []
 		
@@ -170,7 +171,8 @@ class XpStack:
 			time = i["Time"]
 			amount = i["Amount"]
 			xp_string = "--[{} xp]-->".format(amount)
-			to_string = "*{}* at {}".format(to_user, time)
+			to_string = "{}".format(to_user)
+			time_string = "at {}".format(time)
 			
 			# Check lengths
 			if len(str(count)) > longest_num:
@@ -181,20 +183,24 @@ class XpStack:
 				longest_to = len(to_string)
 			if len(xp_string) > longest_xp:
 				longest_xp = len(xp_string)
+			if len(time_string) > longest_time:
+				longest_time = len(time_string)
 			# Add to list
-			transections.append([ str(count), str(from_user), xp_string, to_string ])
+			transections.append([ str(count), str(from_user), xp_string, to_string, time_string ])
 			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
 		# Format
 		for t in transections:
-			msg += "{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}}\n".format(
+			msg += "{:>{n_w}}. *{:>{f_w}}* {:^{x_w}} *{:<{t_w}}* {:<{ti_w}}\n".format(
 				t[0], 
 				t[1], 
 				t[2], 
-				t[3], 
+				t[3],
+				t[4],
 				n_w=longest_num, 
 				f_w=longest_from, 
 				x_w=longest_xp,
 				t_w=longest_to
+				ti_w=longest_time
 			)
 		msg += "```"
 		
