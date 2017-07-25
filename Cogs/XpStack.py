@@ -152,12 +152,12 @@ class XpStack:
 			if to_user == None:
 				to_user = DisplayName.roleForID(i["To"], ctx.guild)
 				if to_user == None:
-					to_user = "ID: " + i["To"]
+					to_user = "ID: " + str(i["To"])
 			from_user = DisplayName.memberForID(i["From"], ctx.guild)
 			if from_user == None:
 				from_user = DisplayName.roleForID(i["From"], ctx.guild)
 				if from_user == None:
-					from_user = "ID: " + i["From"]
+					from_user = "ID: " + str(i["From"])
 			time = i["Time"]
 			amount = i["Amount"]
 			msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
