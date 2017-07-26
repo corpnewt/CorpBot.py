@@ -29,6 +29,24 @@ class Telephone:
 		# Clear any previous games
 		for guild in self.bot.guilds:
 			self.settings.setServerStat(guild, "TeleConnected", False)
+			
+	async def killcheck(self, message):
+		ignore = False
+		for cog in self.bot.cogs:
+			real_cog = self.bot.get_cog(cog)
+			if real_cog == self:
+				# Don't check ourself
+				continue
+			try:
+				check = await real_cog.message(message)
+			except AttributeError:
+				continue
+			try:
+				if check['Ignore']:
+					ignore = True
+			except KeyError:
+				pass
+		return ignore
 
 	async def ontyping(self, channel, user, when):
 		# Check if the channel is typing, and send typing to receiving
@@ -513,6 +531,8 @@ class Telephone:
 		# Ring for 30 seconds - then report no answer
 		# Setup the check
 		def check(msg):
+			if await self.killcheck(message):
+				return False
 			if msg.author.bot:
 				return False
 			m_cont = msg.content.lower()
@@ -548,7 +568,9 @@ class Telephone:
 		# Wait on the call
 		while True:
 			# Setup the check
-			def check_in_call(msg):	
+			def check_in_call(msg):
+				if await self.killcheck(message):
+					return False
 				if msg.author.bot:
 					return False
 				if msg.channel == receiver_chan or msg.channel == caller_chan:
