@@ -530,8 +530,8 @@ class Telephone:
 
 		# Ring for 30 seconds - then report no answer
 		# Setup the check
-		def check(msg):
-			if yield from self.killcheck(message):
+		async def check(msg):
+			if await self.killcheck(message):
 				return False
 			if msg.author.bot:
 				return False
@@ -568,8 +568,8 @@ class Telephone:
 		# Wait on the call
 		while True:
 			# Setup the check
-			def check_in_call(msg):
-				if yield from self.killcheck(message):
+			async def check_in_call(msg):
+				if await self.killcheck(message):
 					return False
 				if msg.author.bot:
 					return False
