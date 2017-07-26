@@ -531,7 +531,7 @@ class Telephone:
 		# Ring for 30 seconds - then report no answer
 		# Setup the check
 		async def check(msg):
-			if await self.killcheck(message):
+			if await self.killcheck(msg):
 				return False
 			if msg.author.bot:
 				return False
@@ -569,7 +569,7 @@ class Telephone:
 		while True:
 			# Setup the check
 			async def check_in_call(msg):
-				if await self.killcheck(message):
+				if await self.killcheck(msg):
 					return False
 				if msg.author.bot:
 					return False
