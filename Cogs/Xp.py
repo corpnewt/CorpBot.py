@@ -486,6 +486,8 @@ class Xp:
 		if not isAdmin:
 			await channel.send('You do not have sufficient privileges to access this command.')
 			return
+		
+		message = await ctx.channel.send('Checking roles...')
 
 		changeCount = 0
 		for member in server.members:
@@ -494,9 +496,11 @@ class Xp:
 				changeCount += 1
 		
 		if changeCount == 1:
-			await channel.send('Done checking roles.\n\n*1 user* updated.')
+			await message.edit(content='Done checking roles.\n\n*1 user* updated.')
+			#await channel.send('Done checking roles.\n\n*1 user* updated.')
 		else:
-			await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
+			await message.edit(content='Done checking roles.\n\n*{} users* updated.'.format(changeCount))
+			#await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
 	@commands.command(pass_context=True)
 	async def recheckrole(self, ctx, *, user : discord.Member = None):
