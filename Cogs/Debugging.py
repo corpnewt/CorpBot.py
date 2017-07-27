@@ -302,7 +302,13 @@ class Debugging:
 			try:
 				async for message in channel.history(limit=tempNum):
 					# Save to a text file
-					msg = '{}#{}:\n    {}\n\n'.format(message.author.name, message.author.discriminator, message.content) + msg
+					new_msg = '{}#{}:\n    {}\n'.format(message.author.name, message.author.discriminator, message.content)
+					if len(message.attachments):
+						new_msg += "\n    --- Attachments ---\n\n"
+						for a in message.attachments:
+							new_msg += "    " + a.url + "\n"
+					new_msg += "\n"
+					msg = new_msg + msg
 					await message.delete()
 					gotMessage = True
 					counter += 1
