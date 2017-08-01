@@ -147,7 +147,7 @@ class XpStack:
 			return
 
 		count = 0
-		msg = "__Recent XP Transactions in *{}*:__\n\n```".format(self.suppressed(ctx.guild, ctx.guild.name))
+		msg = "__Recent XP Transactions in *{}*:__\n\n".format(self.suppressed(ctx.guild, ctx.guild.name))
 		
 		longest_num  = 0
 		longest_to   = 0
@@ -193,7 +193,7 @@ class XpStack:
 			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
 		# Format
 		for t in transections:
-			msg += "{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}} {:<{ti_w}}\n".format(
+			msg += "`{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}} {:<{ti_w}}`\n".format(
 				t[0], 
 				t[1], 
 				t[2], 
@@ -205,7 +205,6 @@ class XpStack:
 				t_w=longest_to,
 				ti_w=longest_time
 			)
-		msg += "```"
 		
 		# Check for suppress
 		if suppress:
