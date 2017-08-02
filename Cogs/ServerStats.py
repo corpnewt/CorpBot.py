@@ -41,7 +41,12 @@ class ServerStats:
         server_embed.add_field(name="Roles", value=str(len(ctx.guild.roles)), inline=True)
         chandesc = "{:,} text, {:,} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
-        server_embed.add_field(name="Default Channel", value=ctx.guild.default_channel.mention, inline=True)
+        # Get the default text channel
+        for tc in ctx.guild.text_channels:
+            if tc.is_default():
+                default = tc
+                break
+        server_embed.add_field(name="Default Channel", value=default.mention, inline=True)
         server_embed.add_field(name="Default Role", value=ctx.guild.default_role, inline=True)
         server_embed.add_field(name="Owner", value=ctx.guild.owner.mention, inline=True)
         server_embed.add_field(name="AFK Channel", value=ctx.guild.afk_channel, inline=True)

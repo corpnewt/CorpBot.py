@@ -114,7 +114,12 @@ class Admin:
 	async def defaultchannel(self, ctx):
 		"""Lists the server's default channel, whether custom or not."""
 		# Returns the default channel for the server
-		targetChan = ctx.guild.default_channel
+		default = None
+		for tc in ctx.guild.text_channels:
+			if tc.is_default():
+				targetChan = tc
+				default = tc
+				break
 		targetChanID = self.settings.getServerStat(ctx.guild, "DefaultChannel")
 		if len(str(targetChanID)):
 			# We *should* have a channel
@@ -122,7 +127,7 @@ class Admin:
 			if tChan:
 				# We *do* have one
 				targetChan = tChan
-		if targetChan.id == ctx.guild.default_channel.id:
+		if targetChan.id == default.id:
 			# We're using the server default
 			msg = "The default channel is the server's original default: **{}**".format(targetChan.name)
 		else:
@@ -141,9 +146,15 @@ class Admin:
 			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
+		default = None
+		for tc in ctx.guild.text_channels:
+			if tc.is_default():
+				default = tc
+				break
+
 		if channel == None:
 			self.settings.setServerStat(ctx.message.guild, "DefaultChannel", "")
-			msg = 'Default channel has been returned to **{}**.'.format(ctx.guild.default_channel.name)
+			msg = 'Default channel has been returned to **{}**.'.format(default.name)
 			await ctx.message.channel.send(msg)
 			return
 
@@ -1123,7 +1134,10 @@ class Admin:
 		
 		for server in self.bot.guilds:
 			# Get the default channel
-			targetChan = server.default_channel
+			for tc in ctx.guild.text_channels:
+				if tc.is_default():
+					targetChan = tc
+					break
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 			if len(str(targetChanID)):
 				# We *should* have a channel

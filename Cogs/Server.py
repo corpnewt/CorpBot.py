@@ -280,7 +280,10 @@ class Server:
 			if str(aServer.id) == str(targetServer):
 				# Found it by id
 				try:
-					await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+					for tc in aServer.text_channels:
+						if tc.is_default():
+							await tc.send('Thanks for having me - but it\'s my time to go...')
+							break
 				except Exception:
 					pass
 				await aServer.leave()
@@ -290,7 +293,10 @@ class Server:
 			if aServer.name.lower() == targetServer.lower():
 				# Found it by name
 				try:
-					await aServer.default_channel.send('Thanks for having me - but it\'s my time to go...')
+					for tc in aServer.text_channels:
+						if tc.is_default():
+							await tc.send('Thanks for having me - but it\'s my time to go...')
+							break
 				except Exception:
 					pass
 				await aServer.leave()

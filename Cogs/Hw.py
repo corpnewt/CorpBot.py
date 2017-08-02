@@ -956,7 +956,10 @@ class Hw:
 			elif type(dest) is discord.TextChannel:
 				dest = dest.id
 			elif type(dest) is discord.Guild:
-				dest = dest.default_channel.id
+				for tc in dest.text_channels:
+					if tc.is_default():
+						dest = tc.id
+						break
 			if not dest == msg.channel.id:
 				return False 
 		else:

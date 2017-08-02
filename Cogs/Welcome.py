@@ -57,7 +57,10 @@ class Welcome:
             
     def _getDefault(self, server):
         # Returns the default channel for the server
-        targetChan = server.default_channel
+        for tc in server.text_channels:
+            if tc.is_default():
+                targetChan = tc
+                break
         targetChanID = self.settings.getServerStat(server, "DefaultChannel")
         if len(str(targetChanID)):
             # We *should* have a channel

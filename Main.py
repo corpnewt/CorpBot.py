@@ -11,12 +11,12 @@ from   Cogs import ReadableTime
 
 # Get our cli args
 def getopts(argv):
-    opts = {}  # Empty dictionary to store key-value pairs.
-    while argv:  # While there are arguments left to parse...
-        if argv[0][0] == '-':  # Found a "-name value" pair.
-            opts[argv[0]] = argv[1]  # Add key and value to the dictionary.
-        argv = argv[1:]  # Reduce the argument list by copying it starting from index 1.
-    return opts
+	opts = {}  # Empty dictionary to store key-value pairs.
+	while argv:  # While there are arguments left to parse...
+		if argv[0][0] == '-':  # Found a "-name value" pair.
+			opts[argv[0]] = argv[1]  # Add key and value to the dictionary.
+		argv = argv[1:]  # Reduce the argument list by copying it starting from index 1.
+	return opts
 
 # Set some reboot vars
 reboot = False
@@ -522,7 +522,10 @@ async def on_guild_join(server):
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
 	try:
-		await server.default_channel.send(msg)
+		for tc in server.text_channels:
+			if tc.is_default():
+				await tc.send(msg)
+				break
 	except Exception:
 		pass
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
