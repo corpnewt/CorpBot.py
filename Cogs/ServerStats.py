@@ -83,6 +83,22 @@ class ServerStats:
 
 
     @commands.command(pass_context=True)
+    async def sharedservers(self, ctx):
+        """Lists how many servers you share with the bot."""
+
+        count = 0
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                if member.id == ctx.author.id:
+                    count += 1
+        
+        if count == 1:
+            await ctx.send("You share *1* server with me. :blush:")
+        else:
+            await ctx.send("You share *{}* servers with me. :blush:".format(count))
+
+
+    @commands.command(pass_context=True)
     async def listservers(self, ctx, number : int = 10):
         """Lists the servers I'm connected to - default is 10, max is 50."""
 

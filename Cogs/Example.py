@@ -163,9 +163,8 @@ class VoiceState:
             comm = self.audio_process.communicate()
             rc = self.audio_process.returncode
             if not rc == 0:
+                self.playlist[0]["Error"] = True
                 print("Exited abnormally!: {}".format(rc))
-            else:
-                print("Exited normally: {}".format(rc))
         except Exception:
             print("Couldn't get return.")
             
@@ -201,7 +200,16 @@ class VoiceState:
             await self.current.channel.send('Now playing *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"], round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
 
             await self.play_next_song.wait()
+
             self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
+            # Song is done
+            if "Error" in self.playlist[0]:
+                await self.current.channel.send("An error occurred trying to play *{}* - removing from the queue.".fromat(self.playlist[0]["song"]))
+                # We got an error
+                # Remove the song and jump back
+                del self.playlist[0]
+                continue
+
             if self.repeat:
                 self.playlist.append(self.playlist[0])
             del self.playlist[0]
@@ -227,7 +235,21 @@ class VoiceState:
                 volume = 0.6
 
         try:
-            
+
+            # Get the link to the video - should prevent dead urls
+            entry = await downloader.Downloader().extract_info(
+                self.bot.loop,
+                song,
+                download=False,
+                process=True,    # ASYNC LAMBDAS WHEN
+                retry_on_error=True,
+                playlist=False
+            )
+
+            # Reset the song to the direct link
+            song = entry['formats'][len(entry['formats'])-1]['url']
+
+
             # Create a rewrite player because why not...
             # PS - Look at all these shitty attempts?!
             #
@@ -808,7 +830,8 @@ class Music:
                     seconds = seconds % 60
 
                     # Add the song
-                    state.playlist.append({ 'song': entry.get('title'), 'duration': entry.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': entry['formats'][len(entry['formats'])-1]['url']})
+                    #state.playlist.append({ 'song': entry.get('title'), 'duration': entry.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': entry['formats'][len(entry['formats'])-1]['url']})
+                    state.playlist.append({ 'song': entry.get('title'), 'duration': entry.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': new_url })
 
                     # Check if we're out of bounds
                     if playlist_max > -1 and entries_added >= playlist_max:
@@ -866,8 +889,8 @@ class Music:
         minutes = (seconds % 3600) // 60
         seconds = seconds % 60
         
-        # state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
-        state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': info['formats'][len(info['formats'])-1]['url']})
+        state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
+        # state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': info['formats'][len(info['formats'])-1]['url']})
         await ctx.channel.send('Enqueued - *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
     
