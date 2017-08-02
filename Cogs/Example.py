@@ -133,6 +133,7 @@ class VoiceState:
         self.repeat = False
         self.votes = []
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+        self.audio_process = None
         self.start_time = datetime.datetime.now()
         self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
         self.is_paused = False
@@ -157,6 +158,16 @@ class VoiceState:
     def toggle_next(self, error):
         if error:
             print("Error and shit... Should probably handle this one day.")
+            
+        try:
+            rc = self.audio_process.returncode
+            if not rc == 0:
+                print("Exited abnormally!")
+            else:
+                print("Exited normally.")
+        except Exception:
+            print("Couldn't get return.")
+            
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
     async def audio_player_task(self):
@@ -228,6 +239,7 @@ class VoiceState:
             # VICTORY!
             #
             audioProc = subprocess.Popen( "ffmpeg -hide_banner -loglevel error -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 2 -i \"" + song + "\" -ac 2 -f s16le -ar 48000 pipe:1", stdout=subprocess.PIPE, shell=True )
+            self.audio_process = audioProc
             rawAudio = discord.PCMAudio(audioProc.stdout)
             volumeSource = discord.PCMVolumeTransformer(rawAudio)
             #
