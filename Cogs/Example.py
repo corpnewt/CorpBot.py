@@ -162,9 +162,9 @@ class VoiceState:
         try:
             rc = self.audio_process.returncode
             if not rc == 0:
-                print("Exited abnormally!")
+                print("Exited abnormally!: {}".format(rc))
             else:
-                print("Exited normally.")
+                print("Exited normally: {}".format(rc))
         except Exception:
             print("Couldn't get return.")
             
