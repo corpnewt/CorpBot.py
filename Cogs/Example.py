@@ -160,6 +160,7 @@ class VoiceState:
             print("Error and shit... Should probably handle this one day.")
             
         try:
+            comm = self.audio_process.communicate()
             rc = self.audio_process.returncode
             if not rc == 0:
                 print("Exited abnormally!: {}".format(rc))
