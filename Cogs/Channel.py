@@ -39,7 +39,7 @@ class Channel:
 		try:
 			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
 		except KeyError:
-			channelMOTDList = []
+			channelMOTDList = {}
 
 		if len(channelMOTDList) > 0:
 			members = 0
@@ -50,17 +50,22 @@ class Channel:
 					membersOnline += 1
 
 		for id in channelMOTDList:
-			channel = self.bot.get_channel(int(id['ID']))
+			channel = self.bot.get_channel(int(id))
 			if channel:
-				motd = id['MOTD'] # A markdown message of the day
-				listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?	
+				# Got our channel - let's update
+				motd = channelMOTDList[id]['MOTD'] # A markdown message of the day
+				listOnline = channelMOTDList[id]['ListOnline'] # Yes/No - do we list all online members or not?
 				if listOnline.lower() == "yes":
-					msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
+					if members == 1:
+						msg = '{} - ({:,}/{:,} user online)'.format(motd, int(membersOnline), int(members))
+					else:
+						msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
 				else:
 					msg = motd
-				try:
+				try:		
 					await channel.edit(topic=msg)
 				except Exception:
+					# If someone has the wrong perms - we just move on
 					continue
 		
 

@@ -7,6 +7,7 @@ import time
 import json
 import os
 import copy
+import subprocess
 from   Cogs        import DisplayName
 from   Cogs        import Nullify
 
@@ -44,6 +45,7 @@ class Settings:
 				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"TeleChannel"			: "",		# ID or blank for disabled
+				"TeleConnected"			: False,	# Disconnect any lingering calls
 				"LastCallHidden"		: "no",		# Was the last call with *67?
 				"TeleNumber"			: None,		# The 7-digit number of the server
 				"TeleBlock"				: [],		# List of blocked numbers
@@ -91,22 +93,32 @@ class Settings:
 				"SuppressMentions"		: "Yes",	# Will the bot suppress @here and @everyone in its own output?
 				"Volume"				: "",		# Float volume for music player
 				"DefaultVolume"			: 0.6,		# Default volume for music player
+				"Playlisting"			: None,		# Not adding a playlist
+				"PlaylistRequestor"		: None,		# No one requested a playlist
 				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
 				"LastComic"				: [],		# List of julian dates for last comic
 				"Hacks" 				: [],		# List of hack tips
 				"Links" 				: [],		# List of links
 				"Tags"					: [],		# List of tags
-				"Members" 				: [],		# List of members
+				"Members" 				: {},		# List of members
 				"AdminArray"	 		: [],		# List of admin roles
 				"GifArray"				: [],		# List of roles that can use giphy
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"			: [],		# List of options to log
 				"MuteList"			: [],		# List of muted members
-				"ChannelMOTD" 			: []}		# List of channel messages of the day
+				"ChannelMOTD" 			: {}}		# List of channel messages of the day
 
 		# Let's load our settings file
 		if os.path.exists(file):
 			self.serverDict = json.load(open(file))
+			if type(self.serverDict["Servers"]) is list and os.path.exists("MigrateSettings.py"):
+				# Wrong type!  Update
+				print("Updating settings...\n")
+				sub_args = ['python', 'MigrateSettings.py', file ]
+				proc = subprocess.Popen(sub_args)
+				proc.wait()
+				# Reload json
+				self.serverDict = json.load(open(file))
 		else:
 			# File doesn't exist - create a placeholder
 			self.serverDict = {}
@@ -242,67 +254,51 @@ class Settings:
 		# Assumes server = discord.Server and serverList is a dict
 		if not "Servers" in self.serverDict:
 			# Let's add an empty placeholder
-			self.serverDict["Servers"] = []
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server
-				found = True
-				# Verify all the default keys have values
-				for key in self.defaultServer:
-					if not key in x:
-						#print("Adding: {} -> {}".format(key, server.name))
-						if type(self.defaultServer[key]) == dict:
-							x[key] = {}
-						elif type(self.defaultServer[key]) == list:
-							# We have lists/dicts - copy them
-							x[key] = copy.deepcopy(self.defaultServer[key])
-						else:
-							x[key] = self.defaultServer[key]
+			self.serverDict["Servers"] = {}
 
-		if not found:
+		if str(server.id) in self.serverDict["Servers"]:
+			# Found it
+			# Verify all the default keys have values
+			for key in self.defaultServer:
+				if not key in self.serverDict["Servers"][str(server.id)]:
+					#print("Adding: {} -> {}".format(key, server.name))
+					if type(self.defaultServer[key]) == dict:
+						self.serverDict["Servers"][str(server.id)][key] = {}
+					elif type(self.defaultServer[key]) == list:
+						# We have lists/dicts - copy them
+						self.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(self.defaultServer[key])
+					else:
+						self.serverDict["Servers"][str(server.id)][key] = self.defaultServer[key]
+
+		else:
 			# We didn't locate our server
 			# print("Server not located, adding...")
 			# Set name and id - then compare to default server
-			newServer = { "Name" : server.name, "ID" : server.id }
+			self.serverDict["Servers"][str(server.id)] = {}
 			for key in self.defaultServer:
-				newServer[key] = self.defaultServer[key]
 				if type(self.defaultServer[key]) == dict:
-					newServer[key] = {}
+					self.serverDict["Servers"][str(server.id)][key] = {}
 				elif type(self.defaultServer[key]) == list:
 					# We have lists/dicts - copy them
-					newServer[key] = copy.deepcopy(self.defaultServer[key])
+					self.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(self.defaultServer[key])
 				else:
-					newServer[key] = self.defaultServer[key]
-			
-			self.serverDict["Servers"].append(newServer)
-			#self.flushSettings()
+					self.serverDict["Servers"][str(server.id)][key] = self.defaultServer[key]
 
 	# Let's make sure the user is in the specified server
 	def removeServer(self, server):
 		# Check for our server name
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				found = True
-				# We found our server - remove
-				self.serverDict["Servers"].remove(x)
+		self.serverDict["Servers"].pop(str(server.id), None)
 		self.checkGlobalUsers()
-		#if found:
-			#self.flushSettings()
+
 
 	def removeServerID(self, id):
 		# Check for our server ID
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(id):
-				found = True
-				# We found our server - remove
-				self.serverDict["Servers"].remove(x)
+		self.serverDict["Servers"].pop(str(id), None)
 		self.checkGlobalUsers()
-		#if found:
-			#self.flushSettings()
 
+	#"""""""""""""""""""""""""#
+	#""" NEEDS TO BE FIXED """#
+	#"""""""""""""""""""""""""#
 
 	def removeChannel(self, channel):
 		motdArray = self.settings.getServerStat(channel.guild, "ChannelMOTD")
@@ -328,113 +324,80 @@ class Settings:
 	def checkUser(self, user, server):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		# Check for our username
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(user.id):
-						found = True
-						needsUpdate = False
-						if not "XP" in y:
-							y["XP"] = int(self.getServerStat(server, "DefaultXP"))
-							needsUpdate = True
-						if not "XPLeftover" in y:
-							y["XPLeftover"] = 0
-							needsUpdate = True
-						if not "XPRealLeftover" in y:
-							y["XPRealLeftover"] = 0
-							needsUpdate = True
-						if not "XPReserve" in y:
-							y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
-							needsUpdate = True
-						if not "ID" in y:
-							y["ID"] = user.id
-							needsUpdate = True
-						if not "Discriminator" in y:
-							y["Discriminator"] = user.discriminator
-							needsUpdate = True
-						if not "Name" in y:
-							y["Name"] = user.name
-							needsUpdate = True
-						if not "DisplayName" in y:
-							y["DisplayName"] = user.display_name
-							needsUpdate = True
-						if not "Parts" in y:
-							y["Parts"] = ""
-							needsUpdate = True
-						if not "Muted" in y:
-							y["Muted"] = "No"
-							needsUpdate = True
-						if not "LastOnline" in y:
-							y["LastOnline"] = None
-							needsUpdate = True
-						if not "Cooldown" in y:
-							y["Cooldown"] = None
-							needsUpdate = True
-						if not "Reminders" in y:
-							y["Reminders"] = []
-							needsUpdate = True
-						if not "Strikes" in y:
-							y["Strikes"] = []
-							needsUpdate = True
-						if not "StrikeLevel" in y:
-							y["StrikeLevel"] = 0
-							needsUpdate = True
-						if not "Profiles" in y:
-							y["Profiles"] = []
-							needsUpdate = True
-						if not "UTCOffset" in y:
-							y["UTCOffset"] = None
-							needsUpdate = True
-						if not "LastCommand" in y:
-							y["LastCommand"] = 0
-						if not "Hardware" in y:
-							y["Hardware"] = []
-						if not "VerificationTime" in y:
-							currentTime = int(time.time())
-							waitTime = int(self.getServerStat(server, "VerificationTime"))
-							y["VerificationTime"] = currentTime + (waitTime * 60)
-				if not found:
-					needsUpdate = True
-					# We didn't locate our user - add them
-					newUser = { "Name" 			: user.name,
-								"DisplayName" 	: user.display_name,
-								"XP" 			: int(self.getServerStat(server, "DefaultXP")),
-								"XPReserve" 	: (self.getServerStat(server, "DefaultXPReserve")),
-								"ID" 			: user.id,
-								"Discriminator" : user.discriminator,
-								"Parts"			: "",
-								"Muted"			: "No",
-								"LastOnline"	: "Unknown",
-								"Reminders"		: [],
-								"Profiles"		: [] }
-					if not newUser["XP"]:
-						newUser["XP"] = 0
-					if not newUser["XPReserve"]:
-						newUser["XPReserve"] = 0
-					x["Members"].append(newUser)
-				#if needsUpdate:
-					#self.flushSettings()
+		if str(user.id) in self.serverDict["Servers"][str(server.id)]["Members"]:
+			y = self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]
+			needsUpdate = False
+			if not "XP" in y:
+				y["XP"] = int(self.getServerStat(server, "DefaultXP"))
+				needsUpdate = True
+			if not "XPLeftover" in y:
+				y["XPLeftover"] = 0
+				needsUpdate = True
+			if not "XPRealLeftover" in y:
+				y["XPRealLeftover"] = 0
+				needsUpdate = True
+			if not "XPReserve" in y:
+				y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
+				needsUpdate = True
+			if not "Parts" in y:
+				y["Parts"] = ""
+				needsUpdate = True
+			if not "Muted" in y:
+				y["Muted"] = "No"
+				needsUpdate = True
+			if not "LastOnline" in y:
+				y["LastOnline"] = None
+				needsUpdate = True
+			if not "Cooldown" in y:
+				y["Cooldown"] = None
+				needsUpdate = True
+			if not "Reminders" in y:
+				y["Reminders"] = []
+				needsUpdate = True
+			if not "Strikes" in y:
+				y["Strikes"] = []
+				needsUpdate = True
+			if not "StrikeLevel" in y:
+				y["StrikeLevel"] = 0
+				needsUpdate = True
+			if not "Profiles" in y:
+				y["Profiles"] = []
+				needsUpdate = True
+			if not "UTCOffset" in y:
+				y["UTCOffset"] = None
+				needsUpdate = True
+			if not "LastCommand" in y:
+				y["LastCommand"] = 0
+			if not "Hardware" in y:
+				y["Hardware"] = []
+			if not "VerificationTime" in y:
+				currentTime = int(time.time())
+				waitTime = int(self.getServerStat(server, "VerificationTime"))
+				y["VerificationTime"] = currentTime + (waitTime * 60)
+		else:
+			needsUpdate = True
+			# We didn't locate our user - add them
+			newUser = { "XP" 			: int(self.getServerStat(server, "DefaultXP")),
+						"XPReserve" 	: (self.getServerStat(server, "DefaultXPReserve")),
+						"Parts"			: "",
+						"Muted"			: "No",
+						"LastOnline"	: "Unknown",
+						"Reminders"		: [],
+						"Profiles"		: [] }
+			if not newUser["XP"]:
+				newUser["XP"] = 0
+			if not newUser["XPReserve"]:
+				newUser["XPReserve"] = 0
+			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)] = newUser
+
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		# Check for our username
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(user.id):
-						found = True
-						# Found our user - remove
-						x["Members"].remove(y)
+		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(user.id), None)
 		self.checkGlobalUsers()
-		#if found:
-			#self.flushSettings()
+
 
 	def checkGlobalUsers(self):
 		try:
@@ -442,48 +405,25 @@ class Settings:
 		except:
 			userList = []
 		for u in userList:
-			if not self.bot.get_user(u['ID']):
+			if not self.bot.get_user(int(u)):
 				# Can't find... delete!
-				userList.remove(u)
+				userList.pop(u, None)
 		self.serverDict['GlobalMembers'] = userList
 
 	# Let's make sure the user is in the specified server
 	def removeUserID(self, id, server):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		# Check for our username
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(id):
-						found = True
-						# Found our user - remove
-						x["Members"].remove(y)
+		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(id), None)
 		self.checkGlobalUsers()
-		#if found:
-			#self.flushSettings()
 
 	
 	# Return the requested stat
 	def getUserStat(self, user, server, stat):
 		# Make sure our user and server exists in the list
 		self.checkUser(user, server)
-		# Check for our username
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(user.id):
-						# Found our user - now check for the stat
-						if stat in y:
-							# Stat exists - return it
-							return y[stat]
-						else:
-							# Stat does not exist - return None
-							return None
-		# If we were unable to add/find the user (unlikely), return None
+		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
+			return self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat]
 		return None
 	
 	
@@ -493,14 +433,9 @@ class Settings:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			return None
-		for u in userList:
-			if u['ID'] == user.id:
-				# Got a match, check the stat
-				try:
-					uStat = u[stat]
-				except KeyError:
-					uStat = None
-				return uStat
+		if str(user.id) in userList:
+			if stat in userList[str(user.id)]:
+				return userList[str(user.id)][stat]
 		return None
 	
 	
@@ -508,15 +443,7 @@ class Settings:
 	def setUserStat(self, user, server, stat, value):
 		# Make sure our user and server exists in the list
 		self.checkUser(user, server)
-		# Check for our username
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(user.id):
-						# Found our user - let's set the stat
-						y[stat] = value
-						#self.flushSettings()
+		self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = value
 						
 						
 	# Set a provided global stat
@@ -525,13 +452,12 @@ class Settings:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			userList = []
-		for u in userList:
-			if u['ID'] == user.id:
-				u[stat] = value
-				return
-		# Add the user
-		u = { "ID": user.id, stat: value }
-		userList.append(u)
+		
+		if str(user.id) in userList:
+			userList[str(user.id)][stat] = value
+			return
+
+		userList[str(user.id)] = { stat : value }
 		self.serverDict['GlobalMembers'] = userList
 						
 					
@@ -541,41 +467,19 @@ class Settings:
 		# Make sure our user and server exist
 		self.checkUser(user, server)
 		# Check for our username
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server, now to iterate users
-				for y in x["Members"]:
-					if str(y["ID"]) == str(user.id):
-						# Found our user - check for stat
-						if stat in y:
-							# Found
-							tempStat = int(y[stat])
-							tempStat += int(incrementAmount)
-							y[stat] = tempStat
-							#self.flushSettings()
-							return tempStat
-						else:
-							# No stat - set stat to increment amount
-							y[stat] = incrementAmount
-							#self.flushSettings()
-							return incrementAmount
-		# If we made it here - we failed somewhere, return None
-		return None
+		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
+			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] += incrementAmount
+		else:
+			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = incrementAmount
+		return self.getUserStat(user, server, stat)
 	
 	
 	# Get the requested stat
 	def getServerStat(self, server, stat):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		# Check for our server
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# Found the server, check for the stat
-				if stat in x:
-					return x[stat]
-				else:
-					return None
-		# Server was not located - return None
+		if stat in self.serverDict["Servers"][str(server.id)]:
+			return self.serverDict["Servers"][str(server.id)][stat]
 		return None
 	
 	
@@ -583,12 +487,8 @@ class Settings:
 	def setServerStat(self, server, stat, value):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		# Check for our server
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				# We found our server - set the stat
-				x[stat] = value
-				#self.flushSettings()
+		self.serverDict["Servers"][str(server.id)][stat] = value
+
 
 	@commands.command(pass_context=True)
 	async def dumpsettings(self, ctx):
@@ -644,7 +544,12 @@ class Settings:
 		else:
 			self.serverDict['OwnerLock'] = "No"
 			msg = 'Owner lock **Disabled**.'
-			await self.bot.change_presence(game=None)
+			if self.serverDict["Game"]:
+				# Reset the game if there was one
+				await self.bot.change_presence(game=discord.Game(name=self.serverDict["Game"]))
+			else:
+				# Set to nothing - no game prior
+				await self.bot.change_presence(game=None)
 		await channel.send(msg)
 		#self.flushSettings()
 
@@ -829,11 +734,11 @@ class Settings:
 		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
 		await channel.send(msg)
 
-	# Catch errors for stat
+	'''# Catch errors for stat
 	@getstat.error
 	async def getstat_error(self, error, ctx):
 		msg = 'getstat Error: {}'.format(error)
-		await ctx.channel.send(msg)
+		await ctx.channel.send(msg)'''
 		
 
 	@commands.command(pass_context=True)
@@ -944,19 +849,15 @@ class Settings:
 		removedSettings = 0
 		settingsWord = "settings"
 
-		for serv in self.serverDict["Servers"]:
-			if str(serv["ID"]) == str(server.id):
-				# Found it - let's check settings
-				removeKeys = []
-				for key in serv:
-					if not key in self.defaultServer:
-						if key == "Name" or key == "ID":
-							continue
-						# Key isn't in default list - clear it
-						removeKeys.append(key)
-						removedSettings += 1
-				for key in removeKeys:
-					serv.pop(key, None)
+		if str(server.id) in self.serverDict["Servers"]:
+			removeKeys = []
+			for key in self.serverDict["Servers"][str(server.id)]:
+				if not key in self.defaultServer:
+					# Key isn't in default list - clear it
+					removeKeys.append(key)
+					removedSettings += 1
+			for key in removeKeys:
+				self.serverDict["Servers"][str(server.id)].pop(key, None)
 
 		if removedSettings is 1:
 			settingsWord = "setting"
@@ -965,6 +866,77 @@ class Settings:
 		await ctx.channel.send(msg)
 		# Flush settings
 		self.flushSettings()
+
+
+	def _prune_servers(self):
+		# Remove any orphaned servers
+		removed = 0
+		servers = []
+		for server in self.serverDict["Servers"]:
+			# Check if the bot is still connected to the server
+			g_check = self.bot.get_guild(int(server))
+			if not g_check:
+				servers.append(server)
+		for server in servers:
+			self.serverDict["Servers"].pop(server, None)
+			removed += 1
+		return removed
+
+	def _prune_users(self):
+		# Remove any orphaned servers
+		removed = 0
+		for server in self.serverDict["Servers"]:
+			# Check if the bot is still connected to the server
+			g_check = self.bot.get_guild(int(server))
+			if not g_check:
+				# Skip
+				continue
+			mems = []
+			for mem in self.serverDict["Servers"][server]["Members"]:
+				m_check = g_check.get_member(int(mem))
+				if not m_check:
+					mems.append(mem)
+			for mem in mems:
+				self.serverDict["Servers"][server]["Members"].pop(mem, None)
+				removed += 1
+		return removed
+
+	def _prune_channels(self):
+		# Remove orphaned MOTD settings
+		removed = 0
+		for server in self.serverDict["Servers"]:
+			# Check if the bot is still connected to the server
+			g_check = self.bot.get_guild(int(server))
+			if not g_check:
+				# Skip
+				continue
+			chans = []
+			for chan in self.serverDict["Servers"][server]["ChannelMOTD"]:
+				c_check = g_check.get_channel(int(chan))
+				if not c_check:
+					chans.append(chan)
+			for chan in chans:
+				self.serverDict["Servers"][server]["ChannelMOTD"].pop(chan, None)
+				removed += 1
+		return removed
+
+	def _prune_settings(self):
+		# Remove orphaned settings
+		removed = 0
+		for server in self.serverDict["Servers"]:
+			# Check if the bot is still connected to the server
+			g_check = self.bot.get_guild(int(server))
+			if not g_check:
+				# Skip
+				continue
+			keys = []
+			for key in self.serverDict["Servers"][server]:
+				if not key in self.defaultServer:
+					keys.append(key)
+			for key in keys:
+				self.serverDict["Servers"][server].pop(key, None)
+				removed += 1
+		return removed
 
 
 	@commands.command(pass_context=True)
@@ -992,7 +964,7 @@ class Settings:
 		for serv in self.serverDict["Servers"]:
 			# Found it - let's check settings
 			removeKeys = []
-			for key in serv:
+			for key in self.serverDict["Servers"][serv]:
 				if not key in self.defaultServer:
 					if key == "Name" or key == "ID":
 						continue
@@ -1000,7 +972,7 @@ class Settings:
 					removeKeys.append(key)
 					removedSettings += 1
 			for key in removeKeys:
-				serv.pop(key, None)
+				self.serverDict["Servers"][serv].pop(key, None)
 
 		if removedSettings is 1:
 			settingsWord = "setting"
@@ -1029,84 +1001,28 @@ class Settings:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
 			await ctx.channel.send(msg)
 			return
+
+		ser = self._prune_servers()
+		sst = self._prune_settings()
+		mem = self._prune_users()
+		cha = self._prune_channels()
+
+		ser_str = "servers"
+		sst_str = "settings"
+		mem_str = "members"
+		cha_str = "channels"
+
+		if ser == 1:
+			ser_str = "server"
+		if sst == 1:
+			sst_str = "setting"
+		if mem == 1:
+			mem_str = "member"
+		if cha == 1:
+			cha_str = "channel"
 		
-		# Set up vars
-		removedUsers = 0
-		removedChannels = 0
-		removedServers = 0
-		channelWord = "channels"
-		serverWord = "servers"
-		usersWord = "users"
-		# Set (array) to hold our servers to delete
-		serverSet = []
-
-		for botServer in self.serverDict["Servers"]:
-			# Let's check through each server first - then members
-			foundServer = False
-			for serve in self.bot.guilds:
-				# Check ID in case of name change
-				if str(botServer["ID"]) == str(serve.id):
-					foundServer = True
-					# Create some blank sets (actually arrays) to hold orphaned users/channels
-					userSet    = []
-					channelSet = []
-					# Now we check users...
-					for botMember in botServer["Members"]:
-						foundMember = False
-						for member in serve.members:
-							if str(botMember["ID"]) == str(member.id):
-								foundMember = True
-							
-						if not foundMember:
-							# Add to set
-							userSet.append(botMember)
-							# We didn't find this member - remove them
-							# self.removeUserID(botMember['ID'], serve)
-							removedUsers +=1
-					# Remove users that are in userSet
-					if len(userSet):
-						# There's something to remove
-						for key in userSet:
-							botServer["Members"].remove(key)
-
-					for botChannel in botServer["ChannelMOTD"]:
-						foundChannel = False
-						for chan in serve.channels:
-							if str(botChannel['ID']) == str(chan.id):
-								foundChannel = True
-						
-						if not foundChannel:
-							# Add to set
-							channelSet.append(botChannel)
-							# We didn't find this channel - remove
-							# self.removeChannelID(botChannel['ID'], serve)
-							removedChannels += 1
-							
-					# Remove users that are in userSet
-					if len(channelSet):
-						# There's something to remove
-						for key in channelSet:
-							botServer["ChannelMOTD"].remove(key)
-						
-			if not foundServer:
-				# Add to set
-				serverSet.append(botServer)
-				# We didn't find this server - remove it
-				# self.removeServerID(botServer['ID'])
-				removedServers += 1
-				
-		# Remove servers in serverSet
-		if len(serverSet):
-			# There's something to remove
-			for key in serverSet:
-				self.serverDict["Servers"].remove(key)
-
-		if removedServers is 1:
-			serverWord = "server"
-		if removedChannels is 1:
-			channelWord = "channel"
-		if removedUsers is 1:
-			usersWord = "user"
-		
-		msg = 'Pruned *{} {}*, *{} {}*, and *{} {}*.'.format(removedUsers, usersWord, removedChannels, channelWord, removedServers, serverWord)
+		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, cha, cha_str)
 		await ctx.channel.send(msg)
+
+		# Flush settings
+		self.flushSettings()

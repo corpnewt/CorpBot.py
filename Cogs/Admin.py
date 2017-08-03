@@ -1134,7 +1134,7 @@ class Admin:
 		
 		for server in self.bot.guilds:
 			# Get the default channel
-			for tc in ctx.guild.text_channels:
+			for tc in server.text_channels:
 				if tc.is_default():
 					targetChan = tc
 					break
@@ -1180,21 +1180,19 @@ class Admin:
 		
 		# At this point - we should have the necessary stuff
 		motdArray = self.settings.getServerStat(server, "ChannelMOTD")
-		for a in motdArray:
-			# Get the channel that corresponds to the id
-			if str(a['ID']) == str(chan.id):
-				# We found it - throw an error message and return
-				a['MOTD'] = message
-				a['ListOnline'] = users
-				self.settings.setServerStat(server, "ChannelMOTD", motdArray)
-				
-				msg = 'MOTD for *{}* changed.'.format(chan.name)
-				await channel.send(msg)
-				await self.updateMOTD()
-				return
+		if str(chan.id) in motdArray:
+			# We found it - update
+			motdArray[str(chan.id)]['MOTD'] = message
+			motdArray[str(chan.id)]['ListOnline'] = users
+			self.settings.setServerStat(server, "ChannelMOTD", motdArray)
+			
+			msg = 'MOTD for *{}* changed.'.format(chan.name)
+			await channel.send(msg)
+			await self.updateMOTD()
+			return
 
 		# If we made it this far - then we can add it
-		motdArray.append({ 'ID' : chan.id, 'MOTD' : message, 'ListOnline' : users })
+		motdArray[str(chan.id)] = { 'MOTD' : message, 'ListOnline' : users }
 		self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 
 		msg = 'MOTD for *{}* added.'.format(chan.name)
@@ -1214,7 +1212,7 @@ class Admin:
 			try:
 				channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
 			except KeyError:
-				channelMOTDList = []
+				channelMOTDList = {}
 			
 			if len(channelMOTDList) > 0:
 				members = 0
@@ -1225,14 +1223,17 @@ class Admin:
 						membersOnline += 1
 				
 			for id in channelMOTDList:
-				channel = self.bot.get_channel(id['ID'])
+				channel = self.bot.get_channel(int(id))
 				if channel:
 					# Got our channel - let's update
-					motd = id['MOTD'] # A markdown message of the day
-					listOnline = id['ListOnline'] # Yes/No - do we list all online members or not?
+					motd = channelMOTDList[id]['MOTD'] # A markdown message of the day
+					listOnline = channelMOTDList[id]['ListOnline'] # Yes/No - do we list all online members or not?
 						
 					if listOnline.lower() == "yes":
-						msg = '{} - ({}/{} users online)'.format(motd, int(membersOnline), int(members))
+						if members == 1:
+							msg = '{} - ({:,}/{:,} user online)'.format(motd, int(membersOnline), int(members))
+						else:
+							msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
 					else:
 						msg = motd
 							

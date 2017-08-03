@@ -5,6 +5,7 @@ import sys
 import os
 import random
 import subprocess
+import traceback
 from   discord.ext import commands
 from   discord import errors
 from   Cogs import ReadableTime
@@ -646,6 +647,18 @@ async def on_command_completion(command):
 		except AttributeError:
 			# Onto the next
 			continue
+
+@bot.event
+async def on_command_error(ctx, error):
+	# if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
+	if not isinstance(error, (commands.CommandNotFound)):
+		await ctx.send("{}: {}".format(type(error).__name__, error))
+		formatted_help = await bot.formatter.format_help_for(ctx, ctx.command)
+		for page in formatted_help:
+			await ctx.send(page)
+	#print("".join(traceback.format_exception(etype=type(error),value=error,tb=error.__traceback__)))
+	if traceback.print_tb(error.__traceback__):
+		print(traceback.print_tb(error.__traceback__))
 
 @bot.event
 async def on_message_delete(message):

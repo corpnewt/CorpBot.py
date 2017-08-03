@@ -38,6 +38,9 @@ ServerList*
 # Settings
 Settings*
 
+# Previous settings
+Old-Settings*
+
 # Deck
 deck.json
 

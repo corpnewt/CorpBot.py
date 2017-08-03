@@ -88,19 +88,51 @@ class ServerStats:
 
 
     @commands.command(pass_context=True)
-    async def sharedservers(self, ctx):
+    async def sharedservers(self, ctx, *, member = None):
         """Lists how many servers you share with the bot."""
+
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if member == None:
+            member = ctx.author
+        
+        if type(member) is str:
+            member_check = DisplayName.memberForName(member, ctx.guild)
+            if not member_check:
+                msg = "I couldn't find *{}* on this server...".format(member)
+                if suppress:
+                    msg = Nullify.clean(msg)
+                await ctx.send(msg)
+                return
+            member = member_check
+
+        if member.id == self.bot.user.id:
+            count = len(self.bot.guilds)
+            if count == 1:
+                await ctx.send("I'm on *1* server. :blush:")
+            else:
+                await ctx.send("I'm on *{}* servers. :blush:".format(count))
+            return
+
 
         count = 0
         for guild in self.bot.guilds:
-            for member in guild.members:
-                if member.id == ctx.author.id:
+            for mem in guild.members:
+                if mem.id == member.id:
                     count += 1
-        
-        if count == 1:
-            await ctx.send("You share *1* server with me. :blush:")
+        if ctx.author.id == member.id:
+            targ = "You share"
         else:
-            await ctx.send("You share *{}* servers with me. :blush:".format(count))
+            targ = "*{}* shares".format(DisplayName.name(member))
+
+        if count == 1:
+            await ctx.send("{} *1* server with me. :blush:".format(targ))
+        else:
+            await ctx.send("{} *{}* servers with me. :blush:".format(targ, count))
 
 
     @commands.command(pass_context=True)
