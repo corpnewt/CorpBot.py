@@ -876,12 +876,19 @@ class Admin:
 		
 	@commands.command(pass_context=True)
 	async def setrules(self, ctx, *, rules : str = None):
-		"""Set the server's rules (admin only)."""
+		"""Set the server's rules (bot-admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 		
 		if rules == None:
