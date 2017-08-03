@@ -672,8 +672,7 @@ class Xp:
 	async def leaderboard(self, ctx, total : int = 10):
 		"""List the top xp-holders (max of 50)."""
 		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
-		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
-		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
 		if total > 50:
@@ -694,7 +693,7 @@ class Xp:
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex-i
 			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.guild)
+			cMember = DisplayName.memberForID(promoSorted[index], ctx.message.guild)
 			#if ctx.message.guild.get_member_named(cMemName):
 				# Member exists
 				#cMember = ctx.message.guild.get_member_named(cMemName)
@@ -703,9 +702,9 @@ class Xp:
 			if cMember:
 				cMemberDisplay = DisplayName.name(cMember)
 			else:
-				cMemberDisplay = promoSorted[index]['Name']
+				cMemberDisplay = promoSorted[index]
 
-			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
+			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
 		await ctx.message.channel.send(msg)
 
@@ -716,7 +715,7 @@ class Xp:
 		"""List the bottom xp-holders (max of 50)."""
 		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
-		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
 		if total > 50:
@@ -736,7 +735,7 @@ class Xp:
 			# Loop through from startIndex to startIndex+total-1
 			index = startIndex+i
 			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index]['ID'], ctx.message.guild)
+			cMember = DisplayName.memberForID(promoSorted[index], ctx.message.guild)
 			#if ctx.message.guild.get_member_named(cMemName):
 				# Member exists
 				#cMember = ctx.message.guild.get_member_named(cMemName)
@@ -745,8 +744,8 @@ class Xp:
 			if cMember:
 					cMemberDisplay = DisplayName.name(cMember)
 			else:
-				cMemberDisplay = promoSorted[index]['Name']
-			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoSorted[index]['XP'])
+				cMemberDisplay = promoSorted[index]
+			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
 		await ctx.message.channel.send(msg)
 		
