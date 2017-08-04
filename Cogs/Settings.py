@@ -403,11 +403,14 @@ class Settings:
 		try:
 			userList = self.serverDict['GlobalMembers']
 		except:
-			userList = []
+			userList = {}
+		remove_users = []
 		for u in userList:
 			if not self.bot.get_user(int(u)):
 				# Can't find... delete!
-				userList.pop(u, None)
+				remove_users.append(u)
+		for u in remove_users:
+			userList.pop(u, None)
 		self.serverDict['GlobalMembers'] = userList
 
 	# Let's make sure the user is in the specified server
