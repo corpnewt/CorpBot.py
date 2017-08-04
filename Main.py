@@ -648,7 +648,7 @@ async def on_command_completion(command):
 			# Onto the next
 			continue
 
-@bot.event
+'''@bot.event
 async def on_command_error(ctx, error):
 	# if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
 	if not isinstance(error, (commands.CommandNotFound)):
@@ -658,7 +658,7 @@ async def on_command_error(ctx, error):
 			await ctx.send(page)
 	#print("".join(traceback.format_exception(etype=type(error),value=error,tb=error.__traceback__)))
 	if traceback.print_tb(error.__traceback__):
-		print(traceback.print_tb(error.__traceback__))
+		print(traceback.print_tb(error.__traceback__))'''
 
 @bot.event
 async def on_message_delete(message):
