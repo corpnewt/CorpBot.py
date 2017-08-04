@@ -412,6 +412,7 @@ class Settings:
 		for u in remove_users:
 			userList.pop(u, None)
 		self.serverDict['GlobalMembers'] = userList
+		return len(remove_users)
 
 	# Let's make sure the user is in the specified server
 	def removeUserID(self, id, server):
@@ -1009,11 +1010,13 @@ class Settings:
 		sst = self._prune_settings()
 		mem = self._prune_users()
 		cha = self._prune_channels()
+		glo = self.checkGlobalUsers()
 
 		ser_str = "servers"
 		sst_str = "settings"
 		mem_str = "members"
 		cha_str = "channels"
+		glo_str = "global users"
 
 		if ser == 1:
 			ser_str = "server"
@@ -1023,8 +1026,10 @@ class Settings:
 			mem_str = "member"
 		if cha == 1:
 			cha_str = "channel"
+		if glo == 1:
+			glo_str = "global user"
 		
-		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, cha, cha_str)
+		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, cha, cha_str, glo, glo_str)
 		await ctx.channel.send(msg)
 
 		# Flush settings
