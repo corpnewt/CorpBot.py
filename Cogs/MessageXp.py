@@ -18,6 +18,16 @@ class MessageXp:
 		# This module doesn't need to cancel messages.
 
 		server = message.guild
+
+		# Check if we're blocked
+		xpblock = self.settings.getServerStat(server, "XpBlockArray")
+		if message.author.id in xpblock:
+			# No xp for you
+			return { 'Ignore' : False, 'Delete' : False}
+		for role in message.author.roles:
+			if role.id in xpblock:
+				return { 'Ignore' : False, 'Delete' : False}
+
 		xpAmount   = int(self.settings.getServerStat(server, "XPPerMessage"))
 		xpRAmount  = int(self.settings.getServerStat(server, "XPRPerMessage"))
 		
