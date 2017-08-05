@@ -426,6 +426,7 @@ class Xp:
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
+		xpblock    = self.settings.getServerStat(server, "XpBlockArray")
 
 		approve = True
 		decrement = True
@@ -488,6 +489,16 @@ class Xp:
 				if bet > int(reserveXP):
 					# Don't approve if we don't have enough
 					msg = 'You can\'t bet *{:,}*, you only have *{:,}* xp reserve!'.format(bet, reserveXP)
+					approve = False
+
+		# Check if we're blocked
+		if ctx.author.id in xpblock:
+			msg = "You can't gamble for xp!"
+			approve = False
+		else:
+			for role in ctx.author.roles:
+				if role.id in xpblock:
+					msg = "Your role cannot gamble for xp!"
 					approve = False
 			
 		if approve:

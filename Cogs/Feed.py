@@ -151,8 +151,9 @@ class Feed:
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
 		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
 		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-		isKill = self.settings.getServerStat(server, "Killed")
-		hunger = int(self.settings.getServerStat(server, "Hunger"))
+		isKill     = self.settings.getServerStat(server, "Killed")
+		hunger     = int(self.settings.getServerStat(server, "Hunger"))
+		xpblock    = self.settings.getServerStat(server, "XpBlockArray")
 
 		approve = True
 		decrement = True
@@ -219,6 +220,16 @@ class Feed:
 					msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
 					approve = False
 			
+		# Check if we're blocked
+		if ctx.author.id in xpblock:
+			msg = "You can't feed the bot!"
+			approve = False
+		else:
+			for role in ctx.author.roles:
+				if role.id in xpblock:
+					msg = "Your role cannot feed the bot!"
+					approve = False
+
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
 			# Apply food - then check health
