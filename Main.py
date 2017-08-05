@@ -137,6 +137,7 @@ from Cogs import Giphy
 from Cogs import Telephone
 from Cogs import XpStack
 from Cogs import Encode
+from Cogs import XpBlock
 
 
 # Let's load our prefix file
@@ -403,6 +404,10 @@ cogList.append(xpstack)
 # Encode base64 <--> hex <--> ascii
 enc = Encode.Encode(bot, settings)
 cogList.append(enc)
+
+# XpBlock
+xpb = XpBlock.XpBlock(bot, settings)
+cogList.append(xpb)
 
 
 # Main bot events

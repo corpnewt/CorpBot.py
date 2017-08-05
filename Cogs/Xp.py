@@ -47,6 +47,17 @@ class Xp:
 					else:
 						if str(user.status).lower() == "online":
 							bumpXP = True
+
+					# Check if we're blocked
+					xpblock = self.settings.getServerStat(server, "XpBlockArray")
+					if user.id in xpblock:
+						# No xp for you
+						continue
+
+					for role in user.roles:
+						if role.id in xpblock:
+							bumpXP = False
+							break
 							
 					if bumpXP:
 						if xpAmount > 0:
@@ -172,13 +183,16 @@ class Xp:
 				if str(aRole['ID']) == str(role.id):
 					isBotAdmin = True
 					break
+
 		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
 		adminUnlim      = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP       = self.settings.getUserStat(author, server, "XPReserve")
 		requiredXP      = self.settings.getServerStat(server, "RequiredXPRole")
+		xpblock         = self.settings.getServerStat(server, "XpBlockArray")
 
 		approve = True
 		decrement = True
+		admin_override = False
 
 		# RequiredXPRole
 		if requiredXP:
@@ -212,6 +226,7 @@ class Xp:
 		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
 			# Approve as admin
 			approve = True
+			admin_override = True
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
@@ -228,6 +243,7 @@ class Xp:
 		if isAdmin:
 			# No limit - approve
 			approve = True
+			admin_override = True
 			if adminUnlim.lower() == "yes":
 				# No limit
 				decrement = False
@@ -238,6 +254,32 @@ class Xp:
 				if xpAmount > int(reserveXP):
 					# Don't approve if we don't have enough
 					msg = 'You can\'t give *{:,} xp*, you only have *{:,}!*'.format(xpAmount, reserveXP)
+					approve = False
+
+		# Check author and target for blocks
+		# overrides admin because admins set this.
+		if type(member) is discord.Role:
+			if member.id in xpblock:
+				msg = "That role cannot receive xp!"
+				approve = False
+		else:
+			# User
+			if member.id in xpblock:
+				msg = "That member cannot receive xp!"
+				approve = False
+			else:
+				for role in member.roles:
+					if role.id in xpblock:
+						msg = "That member's role cannot receive xp!"
+						approve = False
+		
+		if ctx.author.id in xpblock:
+			msg = "You can't give xp!"
+			approve = False
+		else:
+			for role in ctx.author.roles:
+				if role.id in xpblock:
+					msg = "Your role cannot give xp!"
 					approve = False
 
 		if approve:
@@ -254,15 +296,19 @@ class Xp:
 				for amem in server.members:
 					if amem == author:
 						continue
+					if amem.id in xpblock:
+						# Blocked - only if not admin sending it
+						continue
 					roles = amem.roles
 					if member in roles:
 						# This member has our role
 						# Add to our list
 						for smem in sMemberList:
 							# Find our server entry
-							if str(smem["ID"]) == str(amem.id):
+							if str(smem) == str(amem.id):
 								# Add it.
-								memberList.append(smem)
+								sMemberList[smem]["ID"] = smem
+								memberList.append(sMemberList[smem])
 				memSorted = sorted(memberList, key=lambda x:int(x['XP']))
 				if len(memSorted):
 					# There actually ARE members in said role
@@ -313,10 +359,10 @@ class Xp:
 		else:
 			await channel.send(msg)
 			
-	@xp.error
+	'''@xp.error
 	async def xp_error(self, ctx, error):
 		msg = 'xp Error: {}'.format(error)
-		await ctx.channel.send(msg)
+		await ctx.channel.send(msg)'''
 
 	@commands.command(pass_context=True)
 	async def defaultrole(self, ctx):
