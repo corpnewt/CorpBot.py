@@ -138,6 +138,14 @@ class Settings:
 
 	async def onready(self):
 		# Check all verifications - and start timers if needed
+		self.bot.loop.create_task(self.checkAll())
+		# Start the backup loop
+		self.bot.loop.create_task(self.backup())
+		# Start the settings loop
+		self.bot.loop.create_task(self.flushLoop())
+
+	async def checkAll(self):
+		# Check all verifications - and start timers if needed
 		for server in self.bot.guilds:
 			# Get default role
 			defRole = self.getServerStat(server, "DefaultRole")
@@ -153,10 +161,6 @@ class Settings:
 					if not foundRole:
 						# We don't have the role - set a timer
 						self.bot.loop.create_task(self.giveRole(member, server))
-		# Start the backup loop
-		self.bot.loop.create_task(self.backup())
-		# Start the settings loop
-		self.bot.loop.create_task(self.flushLoop())
 
 	async def giveRole(self, member, server):
 		# Start the countdown
