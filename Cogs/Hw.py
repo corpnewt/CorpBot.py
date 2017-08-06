@@ -40,6 +40,16 @@ class Hw:
 
 
 	@commands.command(pass_context=True)
+	async def cancelhw(self, ctx):
+		"""Cancels a current hardware session."""
+		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			self.settings.setGlobalUserStat(ctx.author, "HWActive", False)
+			await ctx.send("You've left your current hardware session!".format(ctx.prefix))
+			return
+		await ctx.send("You're not in a current hardware session.")
+
+
+	@commands.command(pass_context=True)
 	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets the channel for hardware (admin only)."""
 		
@@ -243,6 +253,7 @@ class Hw:
 
 		# Make sure we're not already in a parts transaction
 		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
@@ -373,6 +384,7 @@ class Hw:
 
 		# Make sure we're not already in a parts transaction
 		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
@@ -847,6 +859,7 @@ class Hw:
 
 		# Make sure we're not already in a parts transaction
 		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
 		# Set our HWActive flag
@@ -949,6 +962,9 @@ class Hw:
 
 	# New HW helper methods
 	def channelCheck(self, msg, dest = None):
+		if self.stillHardwaring(msg.author) == False:
+			# any message is a valid check if we're not editing
+			return True
 		if dest:
 			# We have a target channel
 			if type(dest) is discord.User or type(dest) is discord.Member:
@@ -976,6 +992,11 @@ class Hw:
 					if not type(msg.channel) == discord.DMChannel:
 						return False
 		return True
+
+	# Makes sure we're still editing - if this gets set to False,
+	# that means the user stopped editing/newhw
+	def stillHardwaring(self, author):
+		return self.settings.getGlobalUserStat(author, "HWActive")
 
 	def confirmCheck(self, msg, dest = None):
 		if not self.channelCheck(msg, dest):
@@ -1044,6 +1065,10 @@ class Hw:
 			except Exception:
 				talk = None
 
+			# Hardware ended
+			if not self.stillHardwaring(ctx.author):
+				return None
+
 			if not talk:
 				if authorName:
 					msg = "*{}*, I'm out of time...".format(authorName)
@@ -1099,6 +1124,11 @@ class Hw:
 				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
 			except Exception:
 				talk = None
+
+			# Hardware ended
+			if not self.stillHardwaring(ctx.author):
+				return None
+
 			if not talk:
 				msg = "*{}*, I'm out of time...".format(authorName)
 				await dest.send(msg)
