@@ -124,7 +124,38 @@ class XpBlock:
 		await ctx.message.channel.send(msg)
 		return
 		
-		
+	
+	@commands.command(pass_context=True)
+	async def xpunblockall(self, ctx):
+		"""Removes all users and roles from the xp block list (bot-admin only)."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		xparray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
+		self.settings.setServerStat(ctx.message.guild, "XpBlockArray", [])
+		if len(xparray) == 1:
+			await ctx.send("*1* user/role unblocked from the xp system.")
+		else:
+			await ctx.send("*{}* users/roles unblocked from the xp system.".format(len(xparray)))
+
+
 	@commands.command(pass_context=True)
 	async def xpunblock(self, ctx, *, user_or_role : str = None):
 		"""Removes a user or role from the xp block list (bot-admin only)."""
