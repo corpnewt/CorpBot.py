@@ -811,7 +811,7 @@ class Lists:
 		membersOnline = 0
 		for member in server.members:
 			members += 1
-			if not str(member.status).lower() == "offline":
+			if not member.status == discord.Status.offline:
 				membersOnline += 1
 		msg = 'There are *{:,}* out of *{:,}* users online.'.format(membersOnline, members)
 		await ctx.channel.send(msg)
@@ -849,7 +849,7 @@ class Lists:
 		name = DisplayName.name(member)
 
 		# We have a member here
-		if not str(member.status).lower() == "offline":
+		if not member.status == discord.Status.offline:
 			msg = '*{}* is here right now.'.format(name)
 		else:
 			lastOnline = self.settings.getUserStat(member, server, "LastOnline")
