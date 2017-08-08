@@ -31,7 +31,7 @@ class Channel:
 		server = after.guild
 
 		# Check if the member went offline and log the time
-		if str(after.status).lower() == "offline":
+		if after.status == discord.Status.offline:
 			currentTime = int(time.time())
 			self.settings.setUserStat(after, server, "LastOnline", currentTime)
 
@@ -46,7 +46,7 @@ class Channel:
 			membersOnline = 0
 			for member in server.members:
 				members += 1
-				if not str(member.status).lower() == "offline":
+				if not member.status == discord.Status.offline:
 					membersOnline += 1
 
 		for id in channelMOTDList:
@@ -276,7 +276,7 @@ class Channel:
 			if role in roles:
 				# We found it
 				memberCount += 1
-				if not str(member.status).lower() == 'offline':
+				if not member.status == discord.Status.offline:
 					memberOnline += 1
 
 		'''if memberCount == 1:
