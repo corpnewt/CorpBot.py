@@ -1226,7 +1226,7 @@ class Admin:
 				membersOnline = 0
 				for member in server.members:
 					members += 1
-					if str(member.status).lower() == "online":
+					if member.status == discord.Status.online:
 						membersOnline += 1
 				
 			for id in channelMOTDList:
