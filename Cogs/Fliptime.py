@@ -46,6 +46,13 @@ class Fliptime:
 		if '┻' in conts or '┻' in conts or '╙' in conts or '╨' in conts or '╜' in conts or 'ǝʃqɐʇ' in conts:
 			table = True
 		if face and table:
+			
+			# Testing stuff
+			await message.channel.send("Normally I'd correct you - but I'm currently under construction!")
+			return { 'Ignore' : False, 'Delete' : False}
+			# End testing
+			
+			
 			# Contains all characters
 			# Table flip - add time
 			currentTime = int(time.time())
