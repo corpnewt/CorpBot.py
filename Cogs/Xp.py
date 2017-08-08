@@ -45,7 +45,7 @@ class Xp:
 					if onlyOnline.lower() == "no":
 						bumpXP = True
 					else:
-						if str(user.status).lower() == "online":
+						if user.status == discord.Status.online:
 							bumpXP = True
 
 					# Check if we're blocked
