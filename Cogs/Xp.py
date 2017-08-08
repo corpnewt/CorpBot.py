@@ -911,6 +911,16 @@ class Xp:
 			# Add Next Rank
 			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
 			
+		# Add status
+		status_text = ":green_heart:"
+		if member.status == discord.Status.offline:
+			status_text = ":black_heart:"
+		elif member.status == discord.Status.dnd:
+			status_text = ":heart:"
+		elif member.status == discord.Status.idle:
+			status_text = ":yellow_heart:"
+		stat_embed.add_field(name="Status", value=status_text, inline=True)
+		
 		if member.game:
 			if member.game.name:
 				# Playing a game!
