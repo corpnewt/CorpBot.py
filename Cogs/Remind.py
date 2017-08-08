@@ -46,7 +46,7 @@ class Remind:
 			await asyncio.sleep(countDown)
 		
 		# Check if member is online - if so - remind them
-		if not str(member.status).lower() == "offline":
+		if not member.status == discord.Status.offline:
 			# Well, they're not Offline...
 			reminders = self.settings.getUserStat(member, member.guild, "Reminders")
 			# Verify reminder is still valid
@@ -68,7 +68,7 @@ class Remind:
 		#### async def status(self, member): ####
 		# Check the user's status - and if they have any reminders
 		# If so - pm them - if not, ignore
-		if not str(member.status).lower() == "offline":
+		if not member.status == discord.Status.offline:
 			# They're not offline
 			currentTime = int(time.time())
 			reminders = self.settings.getUserStat(member, member.guild, "Reminders")
