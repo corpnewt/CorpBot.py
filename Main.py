@@ -139,6 +139,7 @@ from Cogs import XpStack
 from Cogs import Encode
 from Cogs import XpBlock
 from Cogs import DJRoles
+from Cogs import Jpeg
 
 
 # Let's load our prefix file
@@ -413,6 +414,10 @@ cogList.append(xpb)
 # DJ Roles
 djr = DJRoles.DJRoles(bot, settings)
 cogList.append(djr)
+
+# Jpegify
+jpeg = Jpeg.Jpeg(bot, settings)
+cogList.append(jpeg)
 
 
 # Main bot events
