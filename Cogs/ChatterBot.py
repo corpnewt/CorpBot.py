@@ -68,9 +68,12 @@ class ChatterBot:
 				# Don't check ourself
 				continue
 			try:
-				check = await real_cog.message(message)
+				check = await real_cog.test_message(message)
 			except AttributeError:
-				continue
+				try:
+					check = await real_cog.message(message)
+				except AttributeError:
+					continue
 			try:
 				if check['Ignore']:
 					ignore = True

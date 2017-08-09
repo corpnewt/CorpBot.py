@@ -1,42 +1,23 @@
 import asyncio
 import discord
-import time
-import random
-import giphypop
-import re
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import GetImage
-from   Cogs import Message
 from   Cogs import Nullify
 from   Cogs import DisplayName
 
-class Giphy:
+class DJRoles:
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.ua = 'CorpNewt DeepThoughtBot'
-		self.giphy = giphypop.Giphy()
 			
-	def canDisplay(self, server):
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# await channel.send('Too many images at once - please wait a few seconds.')
-			return False
-		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
-		return True
 
 	@commands.command(pass_context=True)
-	async def addgif(self, ctx, *, role : str = None):
-		"""Adds a new role to the gif list (admin only)."""
+	async def adddj(self, ctx, *, role : str = None):
+		"""Adds a new role to the dj list (bot-admin only)."""
 
-		usage = 'Usage: `{}addgif [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}adddj [role]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
@@ -45,9 +26,16 @@ class Giphy:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if role == None:
@@ -69,7 +57,7 @@ class Giphy:
 				return
 
 		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
 
 		for aRole in promoArray:
 			# Get the role that corresponds to the id
@@ -84,7 +72,7 @@ class Giphy:
 
 		# If we made it this far - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
-		self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
+		self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
 		# Check for suppress
@@ -92,19 +80,13 @@ class Giphy:
 			msg = Nullify.clean(msg)
 		await ctx.message.channel.send(msg)
 		return
-
-	@addgif.error
-	async def addgif_error(self, ctx, error):
-		# do stuff
-		msg = 'addgif Error: {}'.format(error)
-		await ctx.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removegif(self, ctx, *, role : str = None):
-		"""Removes a role from the gif list (admin only)."""
+	async def removedj(self, ctx, *, role : str = None):
+		"""Removes a role from the dj list (bot-admin only)."""
 
-		usage = 'Usage: `{}removegif [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}removedj [role]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
@@ -113,9 +95,16 @@ class Giphy:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
 		if role == None:
@@ -131,14 +120,14 @@ class Giphy:
 				role = DisplayName.roleForName(role, ctx.guild)
 
 		# If we're here - then the role is a real one
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
 
 		for aRole in promoArray:
 			# Check for Name
 			if aRole['Name'].lower() == roleName.lower():
 				# We found it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
+				self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
 				msg = '**{}** removed successfully.'.format(aRole['Name'])
 				# Check for suppress
 				if suppress:
@@ -150,7 +139,7 @@ class Giphy:
 			if role and (str(aRole['ID']) == str(role.id)):
 				# We found it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
+				self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
 				msg = '**{}** removed successfully.'.format(role.name)
 				# Check for suppress
 				if suppress:
@@ -165,15 +154,10 @@ class Giphy:
 			msg = Nullify.clean(msg)
 		await ctx.message.channel.send(msg)
 
-	@removegif.error
-	async def removegif_error(self, error, ctx):
-		# do stuff
-		msg = 'removegif Error: {}'.format(error)
-		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def listgif(self, ctx):
-		"""Lists gif roles and id's."""
+	async def listdj(self, ctx):
+		"""Lists dj roles and id's."""
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
@@ -181,18 +165,18 @@ class Giphy:
 		else:
 			suppress = False
 
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
 		
 		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
 		
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
 
 		if not len(promoSorted):
-			roleText = "There are no gif roles set yet.  Use `{}addgif [role]` to add some.".format(ctx.prefix)
+			roleText = "There are no dj roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix)
 			await ctx.channel.send(roleText)
 			return
 		
-		roleText = "__**Current Gif Roles:**__\n\n"
+		roleText = "__**Current DJ Roles:**__\n\n"
 
 		for arole in promoSorted:
 			found = False
@@ -209,51 +193,3 @@ class Giphy:
 			roleText = Nullify.clean(roleText)
 
 		await ctx.channel.send(roleText)
-
-	@commands.command(pass_context=True)
-	async def gif(self, ctx, *, gif = None):
-		"""Search for some giphy!"""
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're admin - or can use this command
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "GifArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
-
-		if not self.canDisplay(server):
-			return
-
-		if not gif == None:
-			gif = re.sub(r'([^\s\w]|_)+', '', gif)
-
-		my_gif = None
-
-		if gif == None:
-			# Random
-			try:
-				my_gif = self.giphy.random_gif()
-			except Exception:
-				my_gif = None
-		else:
-			try:
-				my_gif = self.giphy.search(phrase=gif, limit=20)
-				my_gif = list(my_gif)
-				my_gif = random.choice(my_gif)
-			except Exception:
-				my_gif = None
-		
-		if my_gif == None:
-			my_gif = "I couldn't get a working link!"
-		
-		await ctx.send(my_gif)

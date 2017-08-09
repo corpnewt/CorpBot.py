@@ -299,6 +299,28 @@ class Music:
             self.settings.setServerStat(guild, "Playlisting", None)
             self.settings.setServerStat(guild, "PlaylistRequestor", None)
 
+    async def _check_role(self, ctx):
+        isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+        if not isAdmin:
+            checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+            for role in ctx.author.roles:
+                for aRole in checkAdmin:
+                    # Get the role that corresponds to the id
+                    if str(aRole['ID']) == str(role.id):
+                        isAdmin = True
+        if isAdmin:
+            # Admin and bot-admin override
+            return True
+        promoArray = self.settings.getServerStat(ctx.guild, "DJArray")
+        if not len(promoArray):
+            await ctx.send("There are no dj roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix))
+            return None
+        for aRole in promoArray:
+            for role in ctx.author.roles:
+                if str(role.id) == str(aRole["ID"]):
+                    return True
+        return False
+
     def get_voice_state(self, server):
         state = self.voice_states.get(server.id)
         if state is None:
@@ -507,6 +529,14 @@ class Music:
     async def pskip(self, ctx):
         """Skips loading the rest of a playlist - can only be done by the requestor, or bot-admin/admin."""
 
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         try:
             playlisting = self.settings.getServerStat(ctx.guild, "Playlisting")
             requestor   = self.settings.getServerStat(ctx.guild, "PlaylistRequestor")
@@ -569,6 +599,15 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def join(self, ctx, *, channel : str = None):
         """Joins a voice channel."""
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # No channel sent
         if channel == None:
             await ctx.channel.send("Usage: `{}join [channel name]`".format(ctx.prefix))
@@ -608,6 +647,14 @@ class Music:
     async def summon(self, ctx):
         """Summons the bot to join your voice channel."""
 
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
         if userInVoice == False:
@@ -643,6 +690,14 @@ class Music:
         The list of supported sites can be found here:
         https://rg3.github.io/youtube-dl/supportedsites.html
         """
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
 
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
@@ -897,6 +952,15 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def repeat(self, ctx, *, repeat = None):
         """Checks or sets whether to repeat or not."""
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
         if userInVoice == False:
@@ -953,6 +1017,14 @@ class Music:
     async def volume(self, ctx, value = None):
         """Sets the volume of the currently playing song."""
 
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
         if userInVoice == False:
@@ -993,6 +1065,14 @@ class Music:
     async def pause(self, ctx):
         """Pauses the currently played song."""
 
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
         if userInVoice == False:
@@ -1012,6 +1092,14 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
         """Resumes the currently played song."""
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
 
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
@@ -1036,6 +1124,14 @@ class Music:
 
         This also clears the queue.
         """
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
 
         channel = ctx.message.channel
         author  = ctx.message.author
@@ -1100,6 +1196,14 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
         """Vote to skip a song. The song requester can automatically skip."""
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
 
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
@@ -1180,6 +1284,14 @@ class Music:
     async def keep(self, ctx):
         """Vote to keep a song."""
 
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
+
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)
         if userInVoice == False:
@@ -1207,6 +1319,7 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def unvote(self, ctx):
         """Remove your song vote."""
+
         state = self.get_voice_state(ctx.message.guild)
         if not state.is_playing():
             await ctx.channel.send('Not playing anything right now...')
@@ -1324,6 +1437,14 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def removesong(self, ctx, idx : int = None):
         """Removes a song in the playlist by the index."""
+
+        # Role check
+        chk = await self._check_role(ctx)
+        if chk == False:
+            await ctx.send("You need a dj role to do that!")
+            return
+        elif chk == None:
+            return
 
         # Check user credentials
         userInVoice = await self._user_in_voice(ctx)

@@ -138,6 +138,7 @@ from Cogs import Telephone
 from Cogs import XpStack
 from Cogs import Encode
 from Cogs import XpBlock
+from Cogs import DJRoles
 
 
 # Let's load our prefix file
@@ -408,6 +409,10 @@ cogList.append(enc)
 # XpBlock
 xpb = XpBlock.XpBlock(bot, settings)
 cogList.append(xpb)
+
+# DJ Roles
+djr = DJRoles.DJRoles(bot, settings)
+cogList.append(djr)
 
 
 # Main bot events

@@ -210,7 +210,7 @@ class Channel:
 			await ctx.channel.send(roleText)
 			return
 		
-		roleText = "Current Admin Roles:\n"
+		roleText = "__**Current Admin Roles:**__\n\n"
 
 		for arole in promoSorted:
 			found = False

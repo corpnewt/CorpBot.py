@@ -21,9 +21,18 @@ class Fliptime:
 		# Pipe the edit into our message func to respond if needed
 		return await self.message(message)
 
+	async def test_message(self, message):
+		# Implemented to bypass having this called twice
+		return { "Ignore" : False, "Delete" : False }
+
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
+		# Check if our server supports it
+		table = self.settings.getServerStat(message.guild, "TableFlipMute")
+
+		if not table:
+			return { 'Ignore' : False, 'Delete' : False}
 
 		# Check for admin status
 		isAdmin = message.author.permissions_in(message.channel).administrator
@@ -36,8 +45,6 @@ class Fliptime:
 						isAdmin = True
 
 		# Check if the message contains the flip chars
-
-		# if message.content.startswith('(') and message.content.endswith('┻'):
 		conts = message.content
 		face = table = False
 		if '(' in conts:
@@ -45,14 +52,7 @@ class Fliptime:
 				face = True
 		if '┻' in conts or '┻' in conts or '╙' in conts or '╨' in conts or '╜' in conts or 'ǝʃqɐʇ' in conts:
 			table = True
-		if face and table:
-			
-			# Testing stuff
-			await message.channel.send("Normally I'd correct you - but I'm currently under construction!")
-			return { 'Ignore' : False, 'Delete' : False}
-			# End testing
-			
-			
+		if face and table:	
 			# Contains all characters
 			# Table flip - add time
 			currentTime = int(time.time())
@@ -65,7 +65,6 @@ class Fliptime:
 					if alreadyMuted.lower() == "yes":
 						# We're perma-muted - ignore
 						return { 'Ignore' : False, 'Delete' : False}
-
 					previousCooldown = 0
 				if int(previousCooldown) > currentTime:
 					# Already cooling down - add to it.
@@ -83,3 +82,54 @@ class Fliptime:
 				return { 'Ignore' : True, 'Delete' : True }		
 
 		return { 'Ignore' : False, 'Delete' : False}
+
+	@commands.command(pass_context=True)
+	async def tableflip(self, ctx, *, table = None):
+		"""Turns on/off table flip muting (bot-admin only; always off by default)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		current_table = self.settings.getServerStat(ctx.guild, "TableFlipMute")
+
+		if table == None:
+			# Output debug status
+			if current_table:
+				await channel.send('Table flip muting is enabled.')
+			else:
+				await channel.send('Table flip muting is disabled.')
+			return
+		elif table.lower() == "yes" or table.lower() == "on" or table.lower() == "true":
+			table = True
+		elif table.lower() == "no" or table.lower() == "off" or table.lower() == "false":
+			table = False
+		else:
+			table = None
+
+		if table == True:
+			if current_table == True:
+				msg = 'Table flip muting remains enabled.'
+			else:
+				msg = 'Table flip muting now enabled.'
+		else:
+			if current_table == False:
+				msg = 'Table flip muting remains disabled.'
+			else:
+				msg = 'Table flip muting now disabled.'
+		self.settings.setServerStat(ctx.guild, "TableFlipMute", table)
+		
+		await channel.send(msg)
