@@ -39,6 +39,7 @@ class Settings:
 				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
 				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
 				"TableFlipMute"			: False,	# Do we mute people who flip tables?
+				"IgnoreDeath"			: True,		# Does the bot keep talking post-mortem?
 				"DJArray"				: [],		# List of roles that can use music
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only

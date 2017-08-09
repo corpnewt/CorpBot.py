@@ -1125,14 +1125,6 @@ class Music:
         This also clears the queue.
         """
 
-        # Role check
-        chk = await self._check_role(ctx)
-        if chk == False:
-            await ctx.send("You need a dj role to do that!")
-            return
-        elif chk == None:
-            return
-
         channel = ctx.message.channel
         author  = ctx.message.author
         server  = ctx.message.guild
