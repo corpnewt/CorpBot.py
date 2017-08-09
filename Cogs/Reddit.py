@@ -358,6 +358,27 @@ class Reddit:
 			return
 		
 		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		
+		
+	@commands.command(pass_context=True)
+	async def pun(self, ctx):
+		"""I don't know, don't ask..."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = self.getInfo('https://www.reddit.com/r/puns/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await ctx.channel.send("Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
 	
 	
 	@commands.command(pass_context=True)
