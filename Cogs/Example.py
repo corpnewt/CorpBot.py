@@ -176,7 +176,7 @@ class VoiceState:
             self.play_next_song.clear()
 
             if len(self.playlist) <= 0:
-                await asyncio.sleep(1)
+                await asyncio.sleep(3)
                 continue
 
 
