@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+import os
 from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
@@ -27,10 +28,18 @@ class Jpeg:
 	def _jpeg(self, image, compression = 1):
 		try:
 			img = Image.open(image)
+			img = self._remove_transparency(img)
 			img.save(image, 'JPEG', quality=compression)
 		except Exception:
 			return False
 		return True
+
+	def _remove_transparency(self, image, fill_color = 'black'):
+		if image.mode in ('RGBA', 'LA'):
+			background = Image.new(image.mode[:-1], image.size, fill_color)
+			background.paste(image, image.split()[-1])
+			image = background
+		return image
 
 
 	@commands.command(pass_context=True)
