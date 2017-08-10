@@ -65,5 +65,6 @@ def getTimeFromTZ(tz, t = None):
 	if t == None:
 		zone_now = datetime.datetime.now(zone)
 	else:
-		zone_now = t.astimezone(zone)
+		zone_now = pytz.utc.localize(t, is_dst=None).astimezone(zone)
+		#zone_now = t.astimezone(zone)
 	return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime("%I:%M %p") }
