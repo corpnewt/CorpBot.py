@@ -9,7 +9,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import downloader
-from   Cogs import Time
+from   Cogs import UserTime
 import youtube_dl
 import functools
 
@@ -103,11 +103,9 @@ class Example:
                 await ctx.channel.send(msg)
                 return
 
-        local_time = Time.Time.getUserTime(Time.Time, ctx.author, self.settings, member.joined_at)
-        if not local_time['zone']:
-            time_str = "{} UTC".format(local_time['time'])
-        else:
-            time_str = "{} {}".format(local_time['time'], local_time['zone'])
+        # Get localized user time
+        local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
+        time_str = "{} {}".format(local_time['time'], local_time['zone'])
             
         await ctx.channel.send('*{}* joined *{}*'.format(DisplayName.name(member), time_str))
 
