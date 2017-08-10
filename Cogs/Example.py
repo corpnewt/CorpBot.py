@@ -9,6 +9,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import downloader
+from   Cogs import Time
 import youtube_dl
 import functools
 
@@ -102,7 +103,13 @@ class Example:
                 await ctx.channel.send(msg)
                 return
 
-        await ctx.channel.send('*{}* joined *{} UTC*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
+        local_time = Time.Time.getUserTime(ctx.author, member.joined_at)
+        if not local_time['zone']:
+            time_str = "{} UTC".format(local_time['time'])
+        else:
+            time_str = "{} {}".format(local_time['time'], local_time['zone'])
+            
+        await ctx.channel.send('*{}* joined *{}*'.format(DisplayName.name(member), time_str))
 
 class VoiceEntry:
     def __init__(self, message, player, title, duration, ctx):
