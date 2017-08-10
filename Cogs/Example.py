@@ -103,7 +103,7 @@ class Example:
                 await ctx.channel.send(msg)
                 return
 
-        local_time = Time.Time.getUserTime(self, ctx.author, self.settings, member.joined_at)
+        local_time = Time.Time.getUserTime(Time.Time, ctx.author, self.settings, member.joined_at)
         if not local_time['zone']:
             time_str = "{} UTC".format(local_time['time'])
         else:
