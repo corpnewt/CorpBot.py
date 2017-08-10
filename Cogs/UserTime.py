@@ -3,14 +3,14 @@ import pytz
 from   Cogs import FuzzySearch
 
 
-def getUserTime(member, settings, time = None):
+def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p"):
 	# Returns a dict representing the time from the passed member's perspective
 	offset = settings.getGlobalUserStat(member, "TimeZone")
 	if offset == None:
 		offset = settings.getGlobalUserStat(member, "UTCOffset")
 	if offset == None:
 		# No offset or tz - return UTC
-		return { "zone" : 'UTC', "time" : time.strftime("%I:%M %p") }
+		return { "zone" : 'UTC', "time" : time.strftime(strft) }
 		
 	# At this point - we need to determine if we have an offset - or possibly a timezone passed
 	t = getTimeFromTZ(offset, time)
