@@ -860,7 +860,7 @@ class Xp:
 			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
-        	j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
+		j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		
 		msg = "{}**Joined:** *{}*\n".format(msg, j_time_str) # I think this will work
 		msg = "{}**XP:** *{:,}*\n".format(msg, newStat)
@@ -931,7 +931,7 @@ class Xp:
 
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
-        	c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
+		c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		# add created_at footer
 		created = "Created at " + c_time_str
 		stat_embed.set_footer(text=created)
