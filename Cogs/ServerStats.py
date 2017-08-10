@@ -296,7 +296,10 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            # Get localized user time
+            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
+            time_str = "{} {}".format(local_time['time'], local_time['zone'])
+            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), time_str)
             i += 1
         
         if number < len(joinedList):
@@ -336,7 +339,10 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
-            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+            # Get localized user time
+            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
+            time_str = "{} {}".format(local_time['time'], local_time['zone'])
+            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), time_str)
             i += 1
         
         if number < len(joinedList):
@@ -377,10 +383,13 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
+            # Get localized user time
+            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
+            time_str = "{} {}".format(local_time['time'], local_time['zone'])
             if member['Members'] == 1:
-                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], time_str)
             else:
-                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"), member['Members'])
+                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], time_str, member['Members'])
             i += 1
         
         if number < len(joinedList):
@@ -421,10 +430,13 @@ class ServerStats:
         for member in joinedList:
             if i > number:
                 break
+            # Get localized user time
+            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
+            time_str = "{} {}".format(local_time['time'], local_time['zone'])
             if member['Members'] == 1:
-                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"))
+                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], time_str)
             else:
-                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], member['Joined'].strftime("%Y-%m-%d %I:%M %p"), member['Members'])
+                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], time_str, member['Members'])
             i += 1
         
         if number < len(joinedList):
