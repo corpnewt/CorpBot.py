@@ -5,6 +5,7 @@ from   operator    import itemgetter
 from   discord.ext import commands
 from   Cogs        import Nullify
 from   Cogs        import DisplayName
+from   Cogs        import UserTime
 
 class ServerStats:
 
@@ -32,7 +33,12 @@ class ServerStats:
         """Lists some info about the current server."""
         server_embed = discord.Embed(color=ctx.author.color)
         server_embed.title = ctx.guild.name
-        server_embed.description = "Created at " + ctx.guild.created_at.strftime("%Y-%m-%d %I:%M %p") + " UTC"
+        
+        # Get localized user time
+        local_time = UserTime.getUserTime(ctx.author, self.settings, ctx.guild.created_at)
+        time_str = "{} {}".format(local_time['time'], local_time['zone'])
+        
+        server_embed.description = "Created at {}".format(time_str)
         online_members = 0
         for member in ctx.guild.members:
             if not member.status == discord.Status.offline:
