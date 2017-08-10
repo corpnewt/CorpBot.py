@@ -215,9 +215,22 @@ class Time:
 		
 		# Say message
 		await ctx.channel.send(msg)
+		
+		
+	def getUserTime(self, member, time = None):
+		# Returns a dict representing the time from the passed member's perspective
+		offset = self.settings.getGlobalUserStat(member, "TimeZone")
+		if offset == None:
+			offset = self.settings.getGlobalUserStat(member, "UTCOffset")
+		# At this point - we need to determine if we have an offset - or possibly a timezone passed
+		t = self.getTimeFromTZ(offset, time)
+		if t == None:
+			# We did not get a zone
+			t = self.getTimeFromOffset(offset, time)
+		return t
 
 
-	def getTimeFromOffset(self, offset):
+	def getTimeFromOffset(self, offset, t = None):
 		offset = offset.replace('+', '')
 		# Split time string by : and get hour/minute values
 		try:
@@ -232,7 +245,8 @@ class Time:
 				# return
 		msg = 'UTC'
 		# Get the time
-		t = datetime.datetime.utcnow()
+		if t == None:
+			t = datetime.datetime.utcnow()
 		# Apply offset
 		if hours > 0:
 			# Apply positive offset
@@ -250,7 +264,7 @@ class Time:
 		return { "zone" : msg, "time" : newTime.strftime("%I:%M %p") }
 
 
-	def getTimeFromTZ(self, tz):
+	def getTimeFromTZ(self, tz, t = None):
 		# Assume sanitized zones - as they're pulled from pytz
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
@@ -258,5 +272,8 @@ class Time:
 			# We didn't find a complete match
 			return None
 		zone = pytz.timezone(tz_list[0]['Item'])
-		zone_now = datetime.datetime.now(zone)
+		if t == None:
+			zone_now = datetime.datetime.now(zone)
+		else:
+			zone_now = t.astimezone(zone)
 		return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime("%I:%M %p") }
