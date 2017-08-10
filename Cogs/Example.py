@@ -102,7 +102,7 @@ class Example:
                 await ctx.channel.send(msg)
                 return
 
-        await ctx.channel.send('*{}* joined *{}*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
+        await ctx.channel.send('*{}* joined *{} UTC*'.format(DisplayName.name(member), member.joined_at.strftime("%Y-%m-%d %I:%M %p")))
 
 class VoiceEntry:
     def __init__(self, message, player, title, duration, ctx):
