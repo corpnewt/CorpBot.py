@@ -858,13 +858,16 @@ class Xp:
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
 			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
-			
-		msg = "{}**Joined:** *{}*\n".format(msg, member.joined_at.strftime("%Y-%m-%d %I:%M %p")) # I think this will work
+		# Get localized user time
+		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
+        	j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
+		
+		msg = "{}**Joined:** *{}*\n".format(msg, j_time_str) # I think this will work
 		msg = "{}**XP:** *{:,}*\n".format(msg, newStat)
 		msg = "{}**XP Reserve:** *{:,}*\n".format(msg, newState)
 		
 		# Add Joined
-		stat_embed.add_field(name="Joined", value=member.joined_at.strftime("%Y-%m-%d %I:%M %p"), inline=True)
+		stat_embed.add_field(name="Joined", value=j_time_str, inline=True)
 
 		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
 
@@ -926,8 +929,11 @@ class Xp:
 				# Playing a game!
 				stat_embed.add_field(name="Playing", value=str(member.game.name), inline=True)
 
+		# Get localized user time
+		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
+        	c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		# add created_at footer
-		created = "Created at " + member.created_at.strftime("%Y-%m-%d %I:%M %p") + " UTC"
+		created = "Created at " + c_time_str
 		stat_embed.set_footer(text=created)
 
 		#await ctx.message.channel.send(msg)
