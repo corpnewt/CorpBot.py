@@ -20,7 +20,7 @@ def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p"):
 	return t
 
 
-def getTimeFromOffset(offset, t = None):
+def getTimeFromOffset(offset, t = None, strft):
 	offset = offset.replace('+', '')
 	# Split time string by : and get hour/minute values
 	try:
@@ -51,10 +51,10 @@ def getTimeFromOffset(offset, t = None):
 	else:
 		# No offset
 		newTime = t
-	return { "zone" : msg, "time" : newTime.strftime("%I:%M %p") }
+	return { "zone" : msg, "time" : newTime.strftime(strft) }
 
 
-def getTimeFromTZ(tz, t = None):
+def getTimeFromTZ(tz, t = None, strft):
 	# Assume sanitized zones - as they're pulled from pytz
 	# Let's get the timezone list
 	tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
@@ -67,4 +67,4 @@ def getTimeFromTZ(tz, t = None):
 	else:
 		zone_now = pytz.utc.localize(t, is_dst=None).astimezone(zone)
 		#zone_now = t.astimezone(zone)
-	return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime("%I:%M %p") }
+	return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime(strft) }
