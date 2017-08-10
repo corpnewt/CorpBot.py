@@ -23,6 +23,10 @@ class RateLimit:
 			return True
 		else:
 			return False
+		
+	async def test_message(self, message):
+		# Implemented to bypass having this called twice
+		return { "Ignore" : False, "Delete" : False }
 
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
