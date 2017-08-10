@@ -8,6 +8,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import CheckRoles
+from   Cogs import UserTime
 
 # This is the xp module.  It's likely to be retarded.
 
