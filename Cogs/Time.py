@@ -222,6 +222,10 @@ class Time:
 		offset = self.settings.getGlobalUserStat(member, "TimeZone")
 		if offset == None:
 			offset = self.settings.getGlobalUserStat(member, "UTCOffset")
+		if offset == None:
+			# No offset or tz
+			return { "zone" : None, "time" : time.strftime("%I:%M %p") }
+			
 		# At this point - we need to determine if we have an offset - or possibly a timezone passed
 		t = self.getTimeFromTZ(offset, time)
 		if t == None:
