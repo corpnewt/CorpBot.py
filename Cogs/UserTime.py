@@ -54,7 +54,7 @@ def getTimeFromOffset(offset, t = None):
 	return { "zone" : msg, "time" : newTime.strftime("%I:%M %p") }
 
 
-def getTimeFromTZ(self, tz, t = None):
+def getTimeFromTZ(tz, t = None):
 	# Assume sanitized zones - as they're pulled from pytz
 	# Let's get the timezone list
 	tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
