@@ -215,23 +215,6 @@ class Time:
 		
 		# Say message
 		await ctx.channel.send(msg)
-		
-		
-	def getUserTime(self, member, settings, time = None):
-		# Returns a dict representing the time from the passed member's perspective
-		offset = settings.getGlobalUserStat(member, "TimeZone")
-		if offset == None:
-			offset = settings.getGlobalUserStat(member, "UTCOffset")
-		if offset == None:
-			# No offset or tz
-			return { "zone" : None, "time" : time.strftime("%I:%M %p") }
-			
-		# At this point - we need to determine if we have an offset - or possibly a timezone passed
-		t = self.getTimeFromTZ(offset, time)
-		if t == None:
-			# We did not get a zone
-			t = self.getTimeFromOffset(offset, time)
-		return t
 
 
 	def getTimeFromOffset(self, offset, t = None):
