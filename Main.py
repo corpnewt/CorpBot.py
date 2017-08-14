@@ -140,6 +140,7 @@ from Cogs import Encode
 from Cogs import XpBlock
 from Cogs import DJRoles
 from Cogs import Jpeg
+from Cogs import LangFilter
 
 
 # Let's load our prefix file
@@ -418,6 +419,10 @@ cogList.append(djr)
 # Jpegify
 jpeg = Jpeg.Jpeg(bot, settings)
 cogList.append(jpeg)
+
+# Language Filter
+lang = LangFilter.LangFilter(bot, settings)
+cogList.append(lang)
 
 
 # Main bot events
