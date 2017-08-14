@@ -41,6 +41,7 @@ class Settings:
 				"TableFlipMute"			: False,	# Do we mute people who flip tables?
 				"IgnoreDeath"			: True,		# Does the bot keep talking post-mortem?
 				"DJArray"				: [],		# List of roles that can use music
+				"FilteredWords"			: [],		# List of words to filter out of user messages
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredTagRole" 		: "", 		# ID or blank for Admin-Only
