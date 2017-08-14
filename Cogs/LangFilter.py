@@ -234,7 +234,7 @@ class LangFilter:
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
-			await ctx.author.send("The filtered words list is empty!")
+			await ctx.send("The filtered words list is empty!")
 			return
 		
 		string_list = ", ".join(serverOptions)
