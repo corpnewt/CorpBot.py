@@ -133,7 +133,7 @@ class LangFilter:
 			await ctx.send('You do not have sufficient privileges to access this command.')
 			return
 			
-		if options == None:
+		if words == None:
 			msg = 'Usage: `{}addfilter word1, word2, word3...`'.format(ctx.prefix)
 			await ctx.send(msg)
 			return
@@ -176,7 +176,7 @@ class LangFilter:
 			await ctx.send('You do not have sufficient privileges to access this command.')
 			return
 			
-		if options == None:
+		if words == None:
 			msg = 'Usage: `{}remfilter word1, word2, word3...`'.format(ctx.prefix)
 			await ctx.send(msg)
 			return
