@@ -102,6 +102,18 @@ class LangFilter:
 		if not len(word_list):
 			# No filter
 			return { "Ignore" : False, "Delete" : False }
+	
+		# Check for admin/bot-admin
+		isAdmin = message.author.permissions_in(message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
+			for role in message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if isAdmin:
+			return { "Ignore" : False, "Delete" : False }
 		
 		f = ProfanitiesFilter(word_list, replacements=self.replacements)
 		f.ignore_case = True
@@ -229,7 +241,7 @@ class LangFilter:
 		
 		msg = "__**Filtered Words:**__\n\n" + string_list
 		
-		await Message.say(self.bot, msg, ctx.author, ctx.author)
+		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
 		
 	@commands.command(pass_context=True)
 	async def clearfilter(self, ctx):
@@ -254,7 +266,7 @@ class LangFilter:
 		if len(serverOptions) == 1:
 			await ctx.send('*1* word removed from language filter.')
 		else:
-			await ctx.send('*{}* words removed from language filter.'.format(len(addedOptions)))
+			await ctx.send('*{}* words removed from language filter.'.format(len(serverOptions)))
 			
 	@commands.command(pass_context=True)
 	async def dumpfilter(self, ctx):
