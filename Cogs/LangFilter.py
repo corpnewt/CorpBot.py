@@ -216,7 +216,7 @@ class LangFilter:
 		
 	@commands.command(pass_context=True)
 	async def listfilter(self, ctx):
-		"""Prints out list of words that will be filtered (bot-admin only)."""
+		"""Prints out the list of words that will be filtered (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
