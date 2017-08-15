@@ -30,16 +30,9 @@ class Bot:
 		self.pypath = pypath
 		
 	async def onready(self):
-		# Get ready - play game!
-		game = None
-		try:
-			game = self.settings.serverDict['Game']
-		except KeyError:
-			pass
-		if game:
-			await self.bot.change_presence(game=discord.Game(name=game))
-		else:
-			await self.bot.change_presence(game=None)
+		await self._update_status()
+
+
 
 	async def onserverjoin(self, server):
 		try:
@@ -546,7 +539,91 @@ class Bot:
 		else:
 			msg = 'I am a part of *{}* servers!'.format(total)
 		await channel.send(msg)
-		
+
+
+	async def _update_status(self):
+		# Helper method to update the status based on the server dict
+		# Get ready - play game!
+		game = None
+		try:
+			game = self.settings.serverDict['Game']
+		except KeyError:
+			pass
+		try:
+			url = self.settings.serverDict['Stream']
+		except KeyError:
+			url = None
+		# Set status
+		try:
+			status = self.settings.serverDict["Status"]
+		except KeyError:
+			status = "1"
+		if status == "1":
+			s = discord.Status.online
+		elif status == "2":
+			s = discord.Status.idle
+		elif status == "3":
+			s = discord.Status.dnd
+		elif status == "4":
+			s = discord.Status.invisible
+		else:
+			# Online when in doubt
+			s = discord.Status.online
+		if url:
+			await self.bot.change_presence(status=s, game=discord.Game(name=game, url=url, type=1))
+		else:
+			await self.bot.change_presence(status=s, game=discord.Game(name=game))
+
+
+	@commands.command(pass_context=True)
+	async def status(self, ctx, status = None):
+		"""Gets or sets the bot's online status (owner-only).
+		Options are:
+		1. Online
+		2. Idle
+		3. DnD
+		4. Invisible"""
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if status == None:
+			botmem = ctx.guild.get_member(self.bot.user.id)
+			await ctx.send("I'm currently set to *{}!*".format(botmem.status))
+			return
+
+		stat_string = "1"
+		if status == "1" or status.lower() == "online":
+			s = discord.Status.online
+			stat_name = "online"
+		elif status == "2" or status.lower() == "idle" or status.lower() == "away" or status.lower() == "afk":
+			stat_string = "2"
+			s = discord.Status.idle
+			stat_name = "idle"
+		elif status == "3" or status.lower() == "dnd" or status.lower() == "do not disturb" or status.lower() == "don't disturb":
+			stat_string = "3"
+			s = discord.Status.dnd
+			stat_name = "dnd"
+		elif status == "4" or status.lower() == "offline" or status.lower() == "invisible":
+			stat_string = "4"
+			s = discord.Status.invisible
+			stat_name = "invisible"
+		else:
+			await ctx.send("That is not a valid status.")
+			return
+
+		self.settings.serverDict["Status"] = stat_string
+		await self._update_status()
+		await ctx.send("Status changed to *{}!*".format(stat_name))
+			
 		
 	@commands.command(pass_context=True)
 	async def playgame(self, ctx, *, game : str = None):
@@ -575,28 +652,86 @@ class Bot:
 
 		if game == None:
 			self.settings.serverDict['Game'] = None
+			self.settings.serverDict['Stream'] = None
 			msg = 'Removing my playing status...'
 			status = await channel.send(msg)
 
-			await self.bot.change_presence(game=None)
+			await self._update_status()
 			
 			await status.edit(content='Playing status removed!')
-			self.settings.flushSettings()
 			return
 
 		self.settings.serverDict['Game'] = game
+		self.settings.serverDict['Stream'] = None
 		msg = 'Setting my playing status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
 		status = await channel.send(msg)
 
-		await self.bot.change_presence(game=discord.Game(name=game))
+		await self._update_status()
 		# Check for suppress
 		if suppress:
 			game = Nullify.clean(game)
 		await status.edit(content='Playing status set to *{}!*'.format(game))
-		self.settings.flushSettings()
+
+
+	@commands.command(pass_context=True)
+	async def streamgame(self, ctx, url = None, *, game : str = None):
+		"""Sets the streaming status of the bot, requires the url and the game (owner-only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if url == None:
+			self.settings.serverDict['Game'] = None
+			self.settings.serverDict['Stream'] = None
+			msg = 'Removing my streaming status...'
+			status = await channel.send(msg)
+
+			await self._update_status()
+			
+			await status.edit(content='Streaming status removed!')
+			return
+
+		if game == None:
+			# We're missing parts
+			msg = "Usage: `{}streamgame [url] [game]`".format(ctx.prefix)
+			await ctx.send(msg)
+			return
+
+		self.settings.serverDict['Game'] = game
+		self.settings.serverDict['Stream'] = url
+		msg = 'Setting my streaming status to *{}*...'.format(game)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		status = await channel.send(msg)
+
+		await self._update_status()
+		# Check for suppress
+		if suppress:
+			game = Nullify.clean(game)
+		await status.edit(content='Streaming status set to *{}* at *{}!*'.format(game, url))
+	
 
 	@commands.command(pass_context=True)
 	async def setbotparts(self, ctx, *, parts : str = None):
