@@ -40,8 +40,19 @@ class Xp:
 				xpRAmount  = float(xpRAmount/6)
 				
 				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
+				requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 				
 				for user in server.members:
+					# RequiredXPRole
+					if requiredXP:
+						foundRole = False
+						for checkRole in user.roles:
+							if str(checkRole.id) == str(requiredXP):
+								foundRole = True
+								break
+						if not foundRole:
+							continue
+
 					bumpXP = False
 					if onlyOnline.lower() == "no":
 						bumpXP = True
