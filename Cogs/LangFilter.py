@@ -199,6 +199,12 @@ class LangFilter:
 		optionList = words.split(',')
 		addedOptions = []
 		for option in optionList:
+			# Clear any instances of \( to (
+			# Reset them to \(
+			# This should allow either \( or ( to work correctly -
+			# While still allowing \\( or whatever as well
+			option = option.replace("\(", "(").replace("\)", ")")
+			option = option.replace("(", "\(").replace(")", "\)")
 			if option.lower() in serverOptions:
 				# Only add if not already added
 				addedOptions.append(option.lower())
