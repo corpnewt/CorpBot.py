@@ -1,6 +1,7 @@
 import asyncio
 import discord
 from   discord.ext import commands
+from   operator import itemgetter
 import base64
 import binascii
 import re
@@ -69,18 +70,28 @@ class Morse:
 			num_per_row = 5
 		
 		msg = "__**Morse Code Lookup Table:**__\n```\n"
+		max_length = 0
 		current_row = 0
-		row_list = []
-		for key in self.to_morse:
-			current_row += 1
+		row_list = [[]]
+		cur_list = []
+		sorted_list = sorted(self.to_morse)
+		print(sorted_list)
+		for key in sorted_list:
+			print(key)
 			entry = "{} : {}".format(key.upper(), self.to_morse[key])
-			row_list.append(entry)
-			if current_row > num_per_row:
-				msg += "   ".join(row_list)
-				row_list = []
-				current_row = 0
-		if len(row_list):
-			msg += "   ".join(row_list)
+			if len(entry) > max_length:
+				max_length = len(entry)
+			row_list[len(row_list)-1].append(entry)
+			if len(row_list[len(row_list)-1]) >= num_per_row:
+				row_list.append([])
+				current_row += 1
+		
+		for row in row_list:
+			for entry in row:
+				entry = entry.ljust(max_length)
+				msg += entry + "  "
+			msg += "\n"
+		
 		msg += "```"
 		await ctx.send(self.suppressed(ctx.guild, msg))
 
