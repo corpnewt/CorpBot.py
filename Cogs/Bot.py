@@ -544,23 +544,21 @@ class Bot:
 	async def _update_status(self):
 		# Helper method to update the status based on the server dict
 		# Get ready - play game!
-		game = None
 		try:
 			game = self.settings.serverDict['Game']
-		except KeyError:
-			pass
+		except Exception:
+			game = None
 		try:
 			url = self.settings.serverDict['Stream']
-		except KeyError:
+		except Exception:
 			url = None
 		# Set status
 		try:
 			status = self.settings.serverDict["Status"]
-		except KeyError:
-			status = "1"
-		if status == "1":
-			s = discord.Status.online
-		elif status == "2":
+		except Exception:
+			status = None
+		
+		if status == "2":
 			s = discord.Status.idle
 		elif status == "3":
 			s = discord.Status.dnd
