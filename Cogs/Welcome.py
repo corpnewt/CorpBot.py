@@ -57,10 +57,7 @@ class Welcome:
             
     def _getDefault(self, server):
         # Returns the default channel for the server
-        for tc in server.text_channels:
-            if tc.is_default():
-                targetChan = tc
-                break
+        targetChan = server.get_channel(server.id)
         targetChanID = self.settings.getServerStat(server, "DefaultChannel")
         if len(str(targetChanID)):
             # We *should* have a channel
@@ -147,9 +144,9 @@ class Welcome:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
-            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.name)
+            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
         else:
-            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
+            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
         await ctx.channel.send(msg)
 
 
@@ -232,9 +229,9 @@ class Welcome:
                     welcomeChannel = channel
                     break
         if welcomeChannel:
-            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.name)
+            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
         else:
-            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
+            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
         await ctx.channel.send(msg)
 
 
@@ -308,7 +305,7 @@ class Welcome:
 
         if channel == None:
             self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
-            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).name)
+            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
             await ctx.channel.send(msg)
             return
 
@@ -322,7 +319,7 @@ class Welcome:
         # If we made it this far - then we can add it
         self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", channel.id)
 
-        msg = 'Welcome and goodbye messages will be displayed in **{}**.'.format(channel.name)
+        msg = 'Welcome and goodbye messages will be displayed in **{}**.'.format(channel.mention)
         await ctx.channel.send(msg)
 
 

@@ -115,11 +115,9 @@ class Admin:
 		"""Lists the server's default channel, whether custom or not."""
 		# Returns the default channel for the server
 		default = None
-		for tc in ctx.guild.text_channels:
-			if tc.is_default():
-				targetChan = tc
-				default = tc
-				break
+		targetChan = ctx.guild.get_channel(ctx.guild.id)
+		default = targetChan
+
 		targetChanID = self.settings.getServerStat(ctx.guild, "DefaultChannel")
 		if len(str(targetChanID)):
 			# We *should* have a channel
@@ -129,10 +127,10 @@ class Admin:
 				targetChan = tChan
 		if targetChan.id == default.id:
 			# We're using the server default
-			msg = "The default channel is the server's original default: **{}**".format(targetChan.name)
+			msg = "The default channel is the server's original default: **{}**".format(targetChan.mention)
 		else:
 			# We have a custom channel
-			msg = "The default channel is set to **{}**.".format(targetChan.name)
+			msg = "The default channel is set to **{}**.".format(targetChan.mention)
 		await ctx.channel.send(msg)
 		
 	
@@ -146,22 +144,18 @@ class Admin:
 			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
 			return
 
-		default = None
-		for tc in ctx.guild.text_channels:
-			if tc.is_default():
-				default = tc
-				break
+		default = ctx.guild.get_channel(ctx.guild.id)
 
 		if channel == None:
 			self.settings.setServerStat(ctx.message.guild, "DefaultChannel", "")
-			msg = 'Default channel has been returned to **{}**.'.format(default.name)
+			msg = 'Default channel has been returned to **{}**.'.format(default.mention)
 			await ctx.message.channel.send(msg)
 			return
 
 		# If we made it this far - then we can add it
 		self.settings.setServerStat(ctx.message.guild, "DefaultChannel", channel.id)
 
-		msg = 'Default channel set to **{}**.'.format(channel.name)
+		msg = 'Default channel set to **{}**.'.format(channel.mention)
 		await ctx.message.channel.send(msg)
 		
 	
@@ -1141,10 +1135,7 @@ class Admin:
 		
 		for server in self.bot.guilds:
 			# Get the default channel
-			for tc in server.text_channels:
-				if tc.is_default():
-					targetChan = tc
-					break
+			targetChan = server.get_channel(server.id)
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 			if len(str(targetChanID)):
 				# We *should* have a channel

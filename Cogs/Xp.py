@@ -99,10 +99,7 @@ class Xp:
 							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
 
 							# Check our default channels
-							for tc in server.text_channels:
-								if tc.is_default():
-									targetChan = tc
-									break
+							targetChan = server.get_channel(server.id)
 							targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 							if len(str(targetChanID)):
 								# We *should* have a channel
