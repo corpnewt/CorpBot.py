@@ -58,11 +58,36 @@ class Morse:
 			return Nullify.clean(msg)
 		else:
 			return msg
+		
+		
+	@commands.command(pass_context=True)
+	async def morsetable(self, ctx, num_per_row = None):
+		"""Prints out the morse code lookup table."""
+		try:
+			num_per_row = int(num_per_row)
+		except Exception:
+			num_per_row = 5
+		
+		msg = "__**Morse Code Lookup Table:**__\n```\n"
+		current_row = 0
+		row_list = []
+		for key in self.to_morse:
+			current_row += 1
+			entry = "{} : {}".format(key.upper(), self.to_morse[key])
+			row_list.append(entry)
+			if current_row > num_per_row:
+				msg += "   ".join(row_list)
+				row_list = []
+				current_row = 0
+		if len(row_list):
+			msg += "   ".join(row_list)
+		msg += "```"
+		await ctx.send(self.suppressed(ctx.guild, msg))
 
 
 	@commands.command(pass_context=True)
 	async def morse(self, ctx, *, content = None):
-		"""Converts ascii to morse code.  Accepts a-z and 0-9.  Each letter is comprised of - or . and separated by 1 space.  Each word is separated by 4 spaces."""
+		"""Converts ascii to morse code.  Accepts a-z and 0-9.  Each letter is comprised of "-" or "." and separated by 1 space.  Each word is separated by 4 spaces."""
 
 		if content == None:
 			await ctx.send("Usage `{}morse [content]`".format(ctx.prefix))
