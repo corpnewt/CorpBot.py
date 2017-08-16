@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import re
 import psutil
 import platform
 import time
@@ -28,10 +29,11 @@ class Bot:
 		self.startTime = int(time.time())
 		self.path = path
 		self.pypath = pypath
+		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		
+
 	async def onready(self):
 		await self._update_status()
-
 
 
 	async def onserverjoin(self, server):
@@ -552,6 +554,10 @@ class Bot:
 			url = self.settings.serverDict['Stream']
 		except Exception:
 			url = None
+		if url:
+			t=1
+		else:
+			t=0
 		# Set status
 		try:
 			status = self.settings.serverDict["Status"]
@@ -567,10 +573,8 @@ class Bot:
 		else:
 			# Online when in doubt
 			s = discord.Status.online
-		if url:
-			await self.bot.change_presence(status=s, game=discord.Game(name=game, url=url, type=1))
-		else:
-			await self.bot.change_presence(status=s, game=discord.Game(name=game))
+		dgame = discord.Game(name=game, url=url, type=t)
+		await self.bot.change_presence(status=s, game=dgame)
 
 
 	@commands.command(pass_context=True)
@@ -716,6 +720,17 @@ class Bot:
 			await ctx.send(msg)
 			return
 
+		# Verify url
+		matches = re.finditer(self.regex, url)
+		match_url = None
+		for match in matches:
+			match_url = match.group(0)
+		
+		if not match_url:
+			# No valid url found
+			await ctx.send("Url is invalid!")
+			return
+
 		self.settings.serverDict['Game'] = game
 		self.settings.serverDict['Stream'] = url
 		msg = 'Setting my streaming status to *{}*...'.format(game)
@@ -728,7 +743,7 @@ class Bot:
 		# Check for suppress
 		if suppress:
 			game = Nullify.clean(game)
-		await status.edit(content='Streaming status set to *{}* at *{}!*'.format(game, url))
+		await status.edit(content='Streaming status set to *{}* at `{}`!'.format(game, url))
 	
 
 	@commands.command(pass_context=True)
