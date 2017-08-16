@@ -141,6 +141,7 @@ from Cogs import XpBlock
 from Cogs import DJRoles
 from Cogs import Jpeg
 from Cogs import LangFilter
+from Cogs import Morse
 
 
 # Let's load our prefix file
@@ -423,6 +424,10 @@ cogList.append(jpeg)
 # Language Filter
 lang = LangFilter.LangFilter(bot, settings)
 cogList.append(lang)
+
+# Morse Code
+morse = Morse.Morse(bot, settings)
+cogList.append(morse)
 
 
 # Main bot events
