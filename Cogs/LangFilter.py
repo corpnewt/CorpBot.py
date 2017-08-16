@@ -155,6 +155,7 @@ class LangFilter:
 		optionList = words.split(',')
 		addedOptions = []
 		for option in optionList:
+			option = option.replace("(", "\(").replace(")", "\)")
 			if not option.lower() in serverOptions:
 				# Only add if not already added
 				addedOptions.append(option.lower())
