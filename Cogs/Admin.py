@@ -432,7 +432,9 @@ class Admin:
 			# Get the role that corresponds to the id
 			if str(aRole['ID']) == str(role.id):
 				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.  Required xp: *{}*'.format(role.name, aRole['XP'])
+				aRole['XP'] = xp
+				msg = '**{}** updated!  Required xp:  *{:,}*'.format(role.name, xp)
+				# msg = '**{}** is already in the list.  Required xp: *{}*'.format(role.name, aRole['XP'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -443,7 +445,7 @@ class Admin:
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name, 'XP' : xp })
 		self.settings.setServerStat(server, "PromotionArray", promoArray)
 
-		msg = '**{}** added to list.  Required xp: *{}*'.format(role.name, xp)
+		msg = '**{}** added to list.  Required xp: *{:,}*'.format(role.name, xp)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
