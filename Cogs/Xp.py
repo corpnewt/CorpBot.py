@@ -644,9 +644,9 @@ class Xp:
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
-						roleText = '{}You need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
 					else:
-						roleText = '{}You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
 					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
 				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that setting.'.format(roleText, role)
