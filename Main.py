@@ -546,15 +546,8 @@ async def on_guild_join(server):
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
-	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
-	try:
-		tc = server.get_channel(server.id)
-		if tc:
-			# Only message if we have a default channel of the days of old
-			await tc.send(msg)
-	except Exception:
-		pass
-	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
+	msg = 'Hello there! Thanks for having me on your server! ({})\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.\n\n'.format(server.name, prefix)
+	msg += 'Whenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
 	try:
 		await owner.send(msg)
 	except Exception:
