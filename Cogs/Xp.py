@@ -110,7 +110,11 @@ class Xp:
 							
 							# Check for promotion/demotion
 							try:
-								await CheckRoles.checkroles(user, targetChan, self.settings, self.bot)
+								if targetChan:
+									await CheckRoles.checkroles(user, targetChan, self.settings, self.bot)
+								else:
+									# No channel - just pass the server, and we'll do without messages
+									await CheckRoles.checkroles(user, server, self.settings, self.bot)
 							except Exception:
 								continue
 
