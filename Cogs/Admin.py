@@ -125,6 +125,9 @@ class Admin:
 			if tChan:
 				# We *do* have one
 				targetChan = tChan
+		if targetChan == None:
+			# We don't have a default
+			msg = "There is currently no default channel set."
 		if targetChan.id == default.id:
 			# We're using the server default
 			msg = "The default channel is the server's original default: **{}**".format(targetChan.mention)
@@ -148,7 +151,10 @@ class Admin:
 
 		if channel == None:
 			self.settings.setServerStat(ctx.message.guild, "DefaultChannel", "")
-			msg = 'Default channel has been returned to **{}**.'.format(default.mention)
+			if default == None:
+				msg = 'Default channel has been *removed completely*.'
+			else:
+				msg = 'Default channel has been returned to the server\'s original:  **{}**.'.format(default.mention)
 			await ctx.message.channel.send(msg)
 			return
 
