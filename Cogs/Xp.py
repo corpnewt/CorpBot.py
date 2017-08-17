@@ -568,7 +568,7 @@ class Xp:
 			await message.edit(content='Done checking roles.\n\n*1 user* updated.')
 			#await channel.send('Done checking roles.\n\n*1 user* updated.')
 		else:
-			await message.edit(content='Done checking roles.\n\n*{} users* updated.'.format(changeCount))
+			await message.edit(content='Done checking roles.\n\n*{:,} users* updated.'.format(changeCount))
 			#await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
 	@commands.command(pass_context=True)
@@ -628,9 +628,9 @@ class Xp:
 					if str(role.id) == str(arole['ID']):
 						# We found it
 						foundRole = True
-						roleText = '{}**{}** : *{} XP*\n'.format(roleText, role.name, arole['XP'])
+						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, role.name, arole['XP'])
 				if not foundRole:
-					roleText = '{}**{}** : *{} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
+					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
