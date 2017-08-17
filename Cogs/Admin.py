@@ -128,7 +128,7 @@ class Admin:
 		if targetChan == None:
 			# We don't have a default
 			msg = "There is currently no default channel set."
-		if targetChan.id == default.id:
+		elif targetChan.id == default.id:
 			# We're using the server default
 			msg = "The default channel is the server's original default: **{}**".format(targetChan.mention)
 		else:
