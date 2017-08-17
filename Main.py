@@ -549,7 +549,9 @@ async def on_guild_join(server):
 	msg = 'Hello everyone! Thanks for inviting me to your server!\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.'.format(prefix)
 	try:
 		tc = server.get_channel(server.id)
-		await tc.send(msg)
+		if tc:
+			# Only message if we have a default channel of the days of old
+			await tc.send(msg)
 	except Exception:
 		pass
 	msg = 'Hey there - I\'m new here!\n\nWhenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
