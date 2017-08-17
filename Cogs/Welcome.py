@@ -146,7 +146,10 @@ class Welcome:
         if welcomeChannel:
             msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
         else:
-            msg = 'The current welcome channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            if self._getDefault(ctx.guild):
+                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for welcome messages.'
         await ctx.channel.send(msg)
 
 
@@ -231,7 +234,10 @@ class Welcome:
         if welcomeChannel:
             msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
         else:
-            msg = 'The current goodbye channel is the server\'s default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            if self._getDefault(ctx.guild):
+                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for goodbye messages.'
         await ctx.channel.send(msg)
 
 
@@ -256,7 +262,9 @@ class Welcome:
             await channel.send(message)
         else:
             try:
-                await self._getDefault(server).send(message)
+                if self._getDefault(server):
+                    # Only message if we can
+                    await self._getDefault(server).send(message)
             except Exception:
                 pass
 
@@ -281,7 +289,9 @@ class Welcome:
             await channel.send(message)
         else:
             try:
-                await self._getDefault(server).send(message)
+                if self._getDefault(server):
+                    # Only message if we can
+                    await self._getDefault(server).send(message)
             except Exception:
                 pass
 
@@ -305,16 +315,12 @@ class Welcome:
 
         if channel == None:
             self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
-            msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            if self._getDefault(ctx.guild):
+                msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = "Welcome and goodbye messages will **not** be displayed."
             await ctx.channel.send(msg)
             return
-
-        if type(channel) is str:
-            try:
-                role = discord.utils.get(message.guild.channels, name=role)
-            except:
-                print("That channel does not exist")
-                return
 
         # If we made it this far - then we can add it
         self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", channel.id)
