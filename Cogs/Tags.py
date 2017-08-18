@@ -220,7 +220,7 @@ class Tags:
 
 		for atag in tagList:
 			if atag['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'])
+				msg = '**{}:**\n\n{}'.format(atag['Name'], atag['URL'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)

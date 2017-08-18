@@ -661,7 +661,7 @@ class Hw:
 				return
 		
 		# At this point - we *should* have a user and a build
-		msg = "__**{}'s {}:**__\n{}".format(DisplayName.name(memFromName), buildParts['Name'], buildParts['Hardware'])
+		msg = "__**{}'s {}:**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], buildParts['Hardware'])
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
@@ -792,7 +792,7 @@ class Hw:
 		p = p.replace('*', '\\*')
 		p = p.replace('`', '\\`')
 		p = p.replace('_', '\\_')
-		msg = "__**{}'s {} (Raw Markdown):**__\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
+		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)

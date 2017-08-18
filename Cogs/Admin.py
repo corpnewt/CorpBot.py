@@ -237,18 +237,25 @@ class Admin:
 		if xpAmount == None:
 			# Check if we have trailing xp
 			nameCheck = DisplayName.checkNameForInt(member, server)
-			if not nameCheck:
-				await ctx.message.channel.send(usage)
-				return
-			if not nameCheck["Member"]:
+			if not nameCheck or nameCheck['Member'] is None:
+				nameCheck = DisplayName.checkRoleForInt(member, server)
+				if not nameCheck:
+					await ctx.message.channel.send(usage)
+					return
+			if "Role" in nameCheck:
+				mem = nameCheck["Role"]
+			else:
+				mem = nameCheck["Member"]
+			exp = nameCheck["Int"]
+			if not mem:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
-			member   = nameCheck["Member"]
-			xpAmount = nameCheck["Int"]
+			member   = mem
+			xpAmount = exp
 			
 		# Check for formatting issues
 		if xpAmount == None:
@@ -256,20 +263,19 @@ class Admin:
 			await channel.send(usage)
 			return
 
-		self.settings.setUserStat(member, server, "XP", xpAmount)
-		msg = '*{}\'s* xp was set to *{}!*'.format(DisplayName.name(member), xpAmount)
+		if type(member) is discord.Member:
+			self.settings.setUserStat(member, server, "XP", xpAmount)
+		else:
+			for m in ctx.guild.members:
+				if member in m.roles:
+					self.settings.setUserStat(m, server, "XP", xpAmount)
+		msg = '*{}\'s* xp was set to *{:,}!*'.format(DisplayName.name(member), xpAmount)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
 		await channel.send(msg)
 		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 
-
-	@setxp.error
-	async def setxp_error(self, error, ctx):
-		# do stuff
-		msg = 'setxp Error: {}'.format(error)
-		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def setxpreserve(self, ctx, *, member = None, xpAmount : int = None):
@@ -300,35 +306,41 @@ class Admin:
 		if xpAmount == None:
 			# Check if we have trailing xp
 			nameCheck = DisplayName.checkNameForInt(member, server)
-			if not nameCheck:
-				await ctx.message.channel.send(usage)
-				return
-			if not nameCheck["Member"]:
+			if not nameCheck or nameCheck['Member'] is None:
+				nameCheck = DisplayName.checkRoleForInt(member, server)
+				if not nameCheck:
+					await ctx.message.channel.send(usage)
+					return
+			if "Role" in nameCheck:
+				mem = nameCheck["Role"]
+			else:
+				mem = nameCheck["Member"]
+			exp = nameCheck["Int"]
+			if not mem:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
-			member   = nameCheck["Member"]
-			xpAmount = nameCheck["Int"]
+			member   = mem
+			xpAmount = exp
 			
 		# Check for formatting issues
 		if xpAmount == None:
-			# Still no xp
+			# Still no xp...
 			await channel.send(usage)
 			return
 
-		self.settings.setUserStat(member, server, "XPReserve", xpAmount)
-		msg = '*{}\'s* XPReserve was set to *{}*!'.format(DisplayName.name(member), xpAmount)
+		if type(member) is discord.Member:
+			self.settings.setUserStat(member, server, "XPReserve", xpAmount)
+		else:
+			for m in ctx.guild.members:
+				if member in m.roles:
+					self.settings.setUserStat(m, server, "XPReserve", xpAmount)
+		msg = '*{}\'s* XPReserve was set to *{:,}!*'.format(DisplayName.name(member), xpAmount)
 		await channel.send(msg)
 
-
-	@setxpreserve.error
-	async def setxpreserve_error(self, error, ctx):
-		# do stuff
-		msg = 'setxpreserve Error: {}'.format(error)
-		await ctx.channel.send(msg)
 	
 	@commands.command(pass_context=True)
 	async def setdefaultrole(self, ctx, *, role : str = None):

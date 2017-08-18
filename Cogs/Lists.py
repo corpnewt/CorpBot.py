@@ -178,7 +178,7 @@ class Lists:
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
+				msg = '**{}:**\n\n{}'.format(alink['Name'], alink['URL'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -501,7 +501,7 @@ class Lists:
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'])
+				msg = '**{}:**\n\n{}'.format(alink['Name'], alink['Hack'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -706,7 +706,7 @@ class Lists:
 			await channel.send(msg)
 			return
 
-		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
+		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -759,7 +759,7 @@ class Lists:
 		p = p.replace('`', '\\`')
 		p = p.replace('_', '\\_')
 
-		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n{}'.format(DisplayName.name(member), ctx.prefix, p)
+		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, p)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
