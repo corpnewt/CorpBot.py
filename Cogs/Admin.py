@@ -208,6 +208,72 @@ class Admin:
 		msg = 'setmadlibschannel Error: {}'.format(error)
 		await ctx.channel.send(msg)
 
+
+	@commands.command(pass_context=True)
+	async def xpreservelimit(self, ctx, *, limit = None):
+		"""Gets and sets a limit to the maximum xp reserve a member can get.  Pass a negative value for unlimited."""
+
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+			
+		if limit == None:
+			# print the current limit
+			server_lim = self.settings.getServerStat(ctx.guild, "XPReserveLimit")
+			if server_lim == None:
+				await ctx.send("There is no xp reserve limit.")
+				return
+			else:
+				await ctx.send("The current xp reserve limit is *{:,}*.".format(server_lim))
+
+		try:
+			limit = int(limit)
+		except Exception:
+			await channel.send("Limit must be an integer.")
+			return
+
+		if limit < 0:
+			self.settings.setServerStat(ctx.guild, "XPReserveLimit", None)
+			await ctx.send("Xp reserve limit removed!")
+		else:
+			self.settings.setServerStat(ctx.guild, "XPReserveLimit", limit)
+			await ctx.send("Xp reserve limit set to *{:,}*.".format(limit))
+
+	@commands.command(pass_context=True)
+	async def xplimit(self, ctx, *, limit = None):
+		"""Gets and sets a limit to the maximum xp a member can get.  Pass a negative value for unlimited."""
+
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+			
+		if limit == None:
+			# print the current limit
+			server_lim = self.settings.getServerStat(ctx.guild, "XPLimit")
+			if server_lim == None:
+				await ctx.send("There is no xp limit.")
+				return
+			else:
+				await ctx.send("The current xp limit is *{:,}*.".format(server_lim))
+
+		try:
+			limit = int(limit)
+		except Exception:
+			await channel.send("Limit must be an integer.")
+			return
+
+		if limit < 0:
+			self.settings.setServerStat(ctx.guild, "XPLimit", None)
+			await ctx.send("Xp limit removed!")
+		else:
+			self.settings.setServerStat(ctx.guild, "XPLimit", limit)
+			await ctx.send("Xp limit set to *{:,}*.".format(limit))
+			
+
 	@commands.command(pass_context=True)
 	async def setxp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Sets an absolute value for the member's xp (admin only)."""

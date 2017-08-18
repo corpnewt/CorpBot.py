@@ -30,15 +30,44 @@ class MessageXp:
 
 		xpAmount   = int(self.settings.getServerStat(server, "XPPerMessage"))
 		xpRAmount  = int(self.settings.getServerStat(server, "XPRPerMessage"))
+
+		xpLimit    = self.settings.getServerStat(server, "XPLimit")
+		xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
 		
 		if xpRAmount > 0:
-			# Bump xp reserve
-			self.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
+			# First we check if we'll hit our limit
+			skip = False
+			if not xprLimit == None:
+				# Get the current values
+				newxp = self.settings.getUserStat(message.author, server, "XPReserve")
+				# Make sure it's this xpr boost that's pushing us over
+				# This would only push us up to the max, but not remove
+				# any we've already gotten
+				if newxp + xpRAmount > xprLimit:
+					skip = True
+					if newxp < xprLimit:
+						self.settings.setUserStat(message.author, server, "XPReserve", xprLimit)
+			if not skip:
+				# Bump xp reserve
+				self.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
 		
 		if xpAmount > 0:
-			# Bump xp
-			self.settings.incrementStat(message.author, server, "XP", xpAmount)
-			# Check for promotion/demotion
+			# First we check if we'll hit our limit
+			skip = False
+			if not xpLimit == None:
+				# Get the current values
+				newxp = self.settings.getUserStat(message.author, server, "XP")
+				# Make sure it's this xpr boost that's pushing us over
+				# This would only push us up to the max, but not remove
+				# any we've already gotten
+				if newxp + xpAmount > xpLimit:
+					skip = True
+					if newxp < xpLimit:
+						self.settings.setUserStat(message.author, server, "XP", xpLimit)
+			if not skip:
+				# Bump xp
+				self.settings.incrementStat(message.author, server, "XP", xpAmount)
+				# Check for promotion/demotion
 			await CheckRoles.checkroles(message.author, message.channel, self.settings, self.bot)
 			
 		return { 'Ignore' : False, 'Delete' : False}

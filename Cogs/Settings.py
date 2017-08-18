@@ -67,6 +67,8 @@ class Settings:
 				"AutoPCPP"				: None,		# Auto-format pcpartpicker links?
 				"XP Count"				: 10,		# Default number of xp transactions to log
 				"XP Array"				: [],		# Holds the xp transaction list
+				"XPLimit"				: None,		# The maximum xp a member can get
+				"XPReserveLimit"		: None,		# The maximum xp reserve a member can get
 				"XpBlockArray"			: [],		# List of roles/users blocked from xp
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)

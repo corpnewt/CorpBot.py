@@ -38,6 +38,9 @@ class Xp:
 				xpAmount   = float(xpAmount/6)
 				xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
 				xpRAmount  = float(xpRAmount/6)
+
+				xpLimit    = self.settings.getServerStat(server, "XPLimit")
+				xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
 				
 				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
 				requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
@@ -74,29 +77,58 @@ class Xp:
 					if bumpXP:
 						if xpAmount > 0:
 							# User is online add hourly xp reserve
-							xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
-							if xpLeftover == None:
-								xpLeftover = 0
-							else:
-								xpLeftover = float(xpLeftover)
-							gainedXp = xpLeftover+xpAmount
-							gainedXpInt = int(gainedXp) # Strips the decimal point off
-							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
-							self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
-							self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
+							
+							# First we check if we'll hit our limit
+							skip = False
+							if not xprLimit == None:
+								# Get the current values
+								newxp = self.settings.getUserStat(user, server, "XPReserve")
+								# Make sure it's this xpr boost that's pushing us over
+								# This would only push us up to the max, but not remove
+								# any we've already gotten
+								if newxp + xpAmount > xprLimit:
+									skip = True
+									if newxp < xprLimit:
+										self.settings.setUserStat(user, server, "XPReserve", xprLimit)
+							if not skip:
+								xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
+
+								if xpLeftover == None:
+									xpLeftover = 0
+								else:
+									xpLeftover = float(xpLeftover)
+								gainedXp = xpLeftover+xpAmount
+								gainedXpInt = int(gainedXp) # Strips the decimal point off
+								xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
+								self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
+								self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
 						
 						if xpRAmount > 0:
 							# User is online add hourly xp
-							xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
-							if xpRLeftover == None:
-								xpRLeftover = 0
-							else:
-								xpRLeftover = float(xpRLeftover)
-							gainedXpR = xpRLeftover+xpRAmount
-							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
-							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
-							self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
-							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
+
+							# First we check if we'll hit our limit
+							skip = False
+							if not xpLimit == None:
+								# Get the current values
+								newxp = self.settings.getUserStat(user, server, "XP")
+								# Make sure it's this xpr boost that's pushing us over
+								# This would only push us up to the max, but not remove
+								# any we've already gotten
+								if newxp + xpRAmount > xpLimit:
+									skip = True
+									if newxp < xpLimit:
+										self.settings.setUserStat(user, server, "XP", xpLimit)
+							if not skip:
+								xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
+								if xpRLeftover == None:
+									xpRLeftover = 0
+								else:
+									xpRLeftover = float(xpRLeftover)
+								gainedXpR = xpRLeftover+xpRAmount
+								gainedXpRInt = int(gainedXpR) # Strips the decimal point off
+								xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
+								self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
+								self.settings.incrementStat(user, server, "XP", gainedXpRInt)
 
 							# Check our default channels
 							targetChan = server.get_channel(server.id)
@@ -107,7 +139,7 @@ class Xp:
 								if tChan:
 									# We *do* have one
 									targetChan = tChan
-							
+						
 							# Check for promotion/demotion
 							try:
 								if targetChan:
