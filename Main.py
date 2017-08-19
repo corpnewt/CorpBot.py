@@ -456,6 +456,25 @@ async def on_ready():
 		]
 		await message_to.send(random.choice(return_options))
 
+'''@bot.event
+async def on_command_error(ctx, error):
+	if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
+		await ctx.send("{}: {}".format(type(error).__name__, error))
+		formatted_help = await bot.formatter.format_help_for(ctx, ctx.command)
+		for page in formatted_help:
+			await ctx.send(page)
+
+
+@bot.event
+async def on_error(event_method, *args, **kwargs):
+	exc_str = "Ignoring exception in {}:\n    ".format(event_method)
+	exc_str += "{}: {}".format(sys.exc_info()[0].__name__, sys.exc_info()[1])
+	#print('Ignoring exception in {}'.format(event_method), file=sys.stderr)
+	#traceback.print_exc()
+	print(exc_str)'''
+	
+
+
 @bot.event
 async def on_voice_state_update(user, beforeState, afterState):
 	if not user.guild:

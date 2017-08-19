@@ -25,7 +25,7 @@ class Encode:
 		return in_string.encode('utf-8')
 	
 	def _to_string(self, in_bytes):
-			return in_bytes.decode('utf-8')
+		return in_bytes.decode('utf-8')
 
 	# Check hex value
 	def _check_hex(self, hex_string):
@@ -72,8 +72,101 @@ class Encode:
 		return self._to_string(hex_bytes)
 
 	@commands.command(pass_context=True)
+	async def hexdec(self, ctx, *, input_hex = None):
+		"""Converts hex to decimal."""
+		if input_hex == None:
+			await ctx.send("Usage: `{}hexdec [input_hex]`".format(ctx.prefix))
+			return
+		
+		input_hex = self._check_hex(input_hex)
+		if not len(input_hex):
+			await ctx.send("Malformed hex - try again.")
+			return
+		
+		try:
+			dec = int(input_hex, 16)
+		except Exception:
+			await ctx.send("I couldn't make that conversion!")
+			return	
+
+		await ctx.send(dec)
+
+	@commands.command(pass_context=True)
+	async def dechex(self, ctx, *, input_dec = None):
+		"""Converts an int to hex."""
+		if input_dec == None:
+			await ctx.send("Usage: `{}dechex [input_dec]`".format(ctx.prefix))
+			return
+
+		try:
+			input_dec = int(input_dec)
+		except Exception:
+			await ctx.send("Input must be an integer.")
+			return
+
+		await ctx.send("0x" + "{:x}".format(input_dec).upper())
+
+
+	@commands.command(pass_context=True)
+	async def strbin(self, ctx, *, input_string = None):
+		"""Converts the input string to its binary representation."""
+		if input_string == None:
+			await ctx.send("Usage: `{}strbin [input_string]`".format(ctx.prefix))
+			return
+		msg = ''.join('{:08b}'.format(ord(c)) for c in input_string)
+		if len(msg) > 2000:
+			await ctx.send("Well... that was *a lot* of 1s and 0s.  Maybe try a smaller string... Discord won't let me send all that.")
+			return
+		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
+	async def binstr(self, ctx, *, input_binary = None):
+		"""Converts the input binary to its string representation."""
+		if input_binary == None:
+			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
+			return
+		# Clean the string
+		new_bin = ""
+		for char in input_binary:
+			if char is "0" or char is "1":
+				new_bin += char
+		if not len(new_bin):
+			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
+			return
+		msg = ''.join(chr(int(new_bin[i:i+8], 2)) for i in range(0, len(new_bin), 8))
+		await ctx.send(self.suppressed(ctx.guild, msg))
+
+	@commands.command(pass_context=True)
+	async def binint(self, ctx, *, input_binary = None):
+		"""Converts the input binary to its integer representation."""
+		if input_binary == None:
+			await ctx.send("Usage: `{}binint [input_binary]`".format(ctx.prefix))
+			return
+		try:
+			msg = int(input_binary, 2)
+		except Exception:
+			msg = "I couldn't make that conversion!"
+		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
+	async def intbin(self, ctx, *, input_int = None):
+		"""Converts the input integer to its binary representation."""
+		if input_int == None:
+			await ctx.send("Usage: `{}intbin [input_int]`".format(ctx.prefix))
+			return
+		try:
+			input_int = int(input_int)
+		except Exception:
+			await ctx.send("Input must be an integer.")
+			return
+
+		await ctx.send("{:08b}".format(input_int))
+
+	
+
+	@commands.command(pass_context=True)
 	async def encode(self, ctx, value = None , from_type = None, *, to_type = None):
-		"""Data converter from string <--> hex <--> base64."""
+		"""Data converter from ascii <--> hex <--> base64."""
 
 		if value == None or from_type == None or to_type == None:
 			msg = 'Usage: `{}encode "[value]" [from_type] [to_type]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
