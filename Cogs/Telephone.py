@@ -138,14 +138,16 @@ class Telephone:
 		
 		max_entries = 20
 		if look_up == None:
-			if len(entries) > 20:
-				title = ":telephone: __First 20 of {} Phonebook Entries:__\n\n".format(len(entries))
+			if len(entries) > max_entries:
+				title = ":telephone: __First {} of {} Phonebook Entries:__\n\n".format(max_entries, len(entries))
 			else:
 				max_entries = len(entries)
 				title = ":telephone: __Phonebook:__\n\n"
 			count = 0
 			for i in entries:
 				count += 1
+				if count > max_entries:
+					break
 				num = i['Number']
 				i_form = num[:3] + "-" + num[3:]
 				title += "{}. {} - *{}*\n".format(count, i["Name"], i_form)
