@@ -1236,14 +1236,14 @@ class Admin:
 
 		
 	@commands.command(pass_context=True)
-	async def setmotd(self, ctx, message : str = None, users : str = "No", chan : discord.TextChannel = None):
+	async def setmotd(self, ctx, message : str = None, chan : discord.TextChannel = None):
 		"""Adds a message of the day to the selected channel."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		usage = 'Usage: `{}setmotd "[message]" [usercount Yes/No (default is No)] [channel]`'.format(ctx.prefix)
+		usage = 'Usage: `{}setmotd "[message]" [channel]`'.format(ctx.prefix)
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -1261,27 +1261,10 @@ class Admin:
 			except:
 				print("That channel does not exist")
 				return
-		
-		# At this point - we should have the necessary stuff
-		motdArray = self.settings.getServerStat(server, "ChannelMOTD")
-		if str(chan.id) in motdArray:
-			# We found it - update
-			motdArray[str(chan.id)]['MOTD'] = message
-			motdArray[str(chan.id)]['ListOnline'] = users
-			self.settings.setServerStat(server, "ChannelMOTD", motdArray)
-			
-			msg = 'MOTD for *{}* changed.'.format(chan.name)
-			await channel.send(msg)
-			await self.updateMOTD()
-			return
-
-		# If we made it this far - then we can add it
-		motdArray[str(chan.id)] = { 'MOTD' : message, 'ListOnline' : users }
-		self.settings.setServerStat(server, "ChannelMOTD", motdArray)
 
 		msg = 'MOTD for *{}* added.'.format(chan.name)
 		await channel.send(msg)
-		await self.updateMOTD()
+		await chan.edit(topic=message)
 
 		
 	@setmotd.error
@@ -1289,41 +1272,3 @@ class Admin:
 		# do stuff
 		msg = 'setmotd Error: {}'.format(error)
 		await ctx.channel.send(msg)
-		
-		
-	async def updateMOTD(self):
-		for server in self.bot.guilds:
-			try:
-				channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
-			except KeyError:
-				channelMOTDList = {}
-			
-			if len(channelMOTDList) > 0:
-				members = 0
-				membersOnline = 0
-				for member in server.members:
-					members += 1
-					if member.status == discord.Status.online:
-						membersOnline += 1
-				
-			for id in channelMOTDList:
-				channel = self.bot.get_channel(int(id))
-				if channel:
-					# Got our channel - let's update
-					motd = channelMOTDList[id]['MOTD'] # A markdown message of the day
-					listOnline = channelMOTDList[id]['ListOnline'] # Yes/No - do we list all online members or not?
-						
-					if listOnline.lower() == "yes":
-						if members == 1:
-							msg = '{} - ({:,}/{:,} user online)'.format(motd, int(membersOnline), int(members))
-						else:
-							msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
-					else:
-						msg = motd
-							
-					# print(msg)
-					try:		
-						await channel.edit(topic=msg)
-					except Exception:
-						# If someone has the wrong perms - we just move on
-						continue

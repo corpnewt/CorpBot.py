@@ -12,14 +12,13 @@ async def say(bot, msg, target, requestor, maxMessage : int = 5, characters : in
 
     if not len(textList):
         return False
-    
-    if not requestor.dm_channel:
-        # No dm channel - create it
-        await requestor.create_dm()
-        
-    dmChannel = requestor.dm_channel
+    # dm channel is none by default
+    dmChannel = None
+    if requestor.dm_channel:
+        # dm channel exists - set to id
+        dmChannel = requestor.dm_channel.id
 
-    if len(textList) > maxMessage and dmChannel.id != target.id :
+    if len(textList) > maxMessage and dmChannel != target.id :
         # PM the contents to the requestor
         if not maxPage == None and len(textList) > maxPage:
             await target.send("I'll just dm *{}* of the *{} pages* to you.".format(maxPage, len(textList)))

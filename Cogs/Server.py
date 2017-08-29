@@ -287,6 +287,10 @@ class Server:
 				except Exception:
 					pass
 				await aServer.leave()
+				try:
+					await ctx.channel.send('Alright - I left that server.')
+				except Exception:
+					pass
 				return
 		# Didn't find it - try by name
 		for aServer in self.bot.guilds:
@@ -300,6 +304,10 @@ class Server:
 				except Exception:
 					pass
 				await aServer.leave()
+				try:
+					await ctx.channel.send('Alright - I left that server.')
+				except Exception:
+					pass
 				return
 
 		await ctx.channel.send('I couldn\'t find that server.')

@@ -35,7 +35,9 @@ class Channel:
 			currentTime = int(time.time())
 			self.settings.setUserStat(after, server, "LastOnline", currentTime)
 
-		self.settings.checkServer(server)
+
+		# Removed due to spam
+		'''self.settings.checkServer(server)
 		try:
 			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
 		except KeyError:
@@ -66,7 +68,7 @@ class Channel:
 					await channel.edit(topic=msg)
 				except Exception:
 					# If someone has the wrong perms - we just move on
-					continue
+					continue'''
 		
 
 	@commands.command(pass_context=True)
