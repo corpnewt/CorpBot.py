@@ -112,8 +112,9 @@ class Settings:
 				"GifArray"				: [],		# List of roles that can use giphy
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"			: [],		# List of options to log
-				"MuteList"			: [],		# List of muted members
-				"ChannelMOTD" 			: {}}		# List of channel messages of the day
+				"MuteList"			: []}		# List of muted members
+				# Removed for spam
+				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
 
 		# Let's load our settings file
 		if os.path.exists(file):
@@ -916,7 +917,7 @@ class Settings:
 				removed += 1
 		return removed
 
-	def _prune_channels(self):
+	'''def _prune_channels(self):
 		# Remove orphaned MOTD settings
 		removed = 0
 		for server in self.serverDict["Servers"]:
@@ -933,7 +934,7 @@ class Settings:
 			for chan in chans:
 				self.serverDict["Servers"][server]["ChannelMOTD"].pop(chan, None)
 				removed += 1
-		return removed
+		return removed'''
 
 	def _prune_settings(self):
 		# Remove orphaned settings
@@ -1020,13 +1021,13 @@ class Settings:
 		ser = self._prune_servers()
 		sst = self._prune_settings()
 		mem = self._prune_users()
-		cha = self._prune_channels()
+		#cha = self._prune_channels()
 		glo = self.checkGlobalUsers()
 
 		ser_str = "servers"
 		sst_str = "settings"
 		mem_str = "members"
-		cha_str = "channels"
+		#cha_str = "channels"
 		glo_str = "global users"
 
 		if ser == 1:
@@ -1035,12 +1036,12 @@ class Settings:
 			sst_str = "setting"
 		if mem == 1:
 			mem_str = "member"
-		if cha == 1:
-			cha_str = "channel"
+		#if cha == 1:
+		#	cha_str = "channel"
 		if glo == 1:
 			glo_str = "global user"
 		
-		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, cha, cha_str, glo, glo_str)
+		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
 		await ctx.channel.send(msg)
 
 		# Flush settings
