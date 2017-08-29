@@ -262,7 +262,68 @@ class ServerStats:
                     counted_users.append(member.id)
         await ctx.channel.send('There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))
 
-    
+
+    @commands.command(pass_context=True)
+    async def joinpos(self, ctx, *, member = None):
+        """Tells when a user joined compared to other users."""
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        if member == None:
+            member = ctx.author
+        
+        if type(member) is str:
+            member_check = DisplayName.memberForName(member, ctx.guild)
+            if not member_check:
+                msg = "I couldn't find *{}* on this server...".format(member)
+                if suppress:
+                    msg = Nullify.clean(msg)
+                await ctx.send(msg)
+                return
+            member = member_check
+
+        joinedList = []
+        for mem in ctx.message.guild.members:
+            joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
+        
+        # sort the users by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+
+        check_item = { "ID" : member.id, "Joined" : member.joined_at }
+
+        total = len(joinedList)
+        position = joinedList.index(check_item) + 1
+
+        before = ""
+        after  = ""
+        
+        msg = "*{}'s* join position is **{:,}**.".format(DisplayName.name(member), position, total)
+        if position-1 == 1:
+            # We have previous members
+            before = "**1** user"
+        elif position-1 > 1:
+            before = "**{:,}** users".format(position-1)
+        if total-position == 1:
+            # There were users after as well
+            after = "**1** user"
+        elif total-position > 1:
+            after = "**{:,}** users".format(total-position)
+        # Build the string!
+        if len(before) and len(after):
+            # Got both
+            msg += "\n\n{} joined before, and {} after.".format(before, after)
+        elif len(before):
+            # Just got before
+            msg += "\n\n{} joined before.".format(before)
+        elif len(after):
+            # Just after
+            msg += "\n\n{} joined after.".format(after)
+        await ctx.send(msg)
+
+
     @commands.command(pass_context=True)
     async def firstjoins(self, ctx, number : int = 10):
         """Lists the first users to join - default is 10, max is 25."""
