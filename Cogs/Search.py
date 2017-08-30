@@ -32,7 +32,7 @@ class Search:
 
 		lmgtfy = "http://lmgtfy.com/?q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -47,7 +47,7 @@ class Search:
 
 		lmgtfy = "http://letmebingthatforyou.com/?q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -62,7 +62,7 @@ class Search:
 
 		lmgtfy = "https://lmddgtfy.net/?q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -106,7 +106,7 @@ class Search:
 		for post in posts:
 			if ctr < limit:
 				ctr = ctr + 1
-				result_string += '__{}__\nhttps://corpnewt.com/topic/{}\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
+				result_string += '__{}__\n<https://corpnewt.com/topic/{}>\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
 			
 		await ctx.channel.send(result_string)
 
