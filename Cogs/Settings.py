@@ -111,8 +111,15 @@ class Settings:
 				"AdminArray"	 		: [],		# List of admin roles
 				"GifArray"				: [],		# List of roles that can use giphy
 				"LogChannel"			: "",		# ID or blank for no logging
-				"LogVars"			: [],		# List of options to log
-				"MuteList"			: []}		# List of muted members
+				"LogVars"				: [],		# List of options to log
+				"VoteKickChannel"		: None,		# ID or none if not setup
+				"VoteKickMention"		: None,		# ID of role to mention - or none for no mention
+				"VotesToMute"			: 0,		# Positive number - or 0 for disabled
+				"VotesToMention"		: 0,		# Positive number - or 0 for disabled
+				"VotesMuteTime"			: 0,		# Number of seconds to mute - or 0 for disabled
+				"VotesResetTime"		: 0,		# Number of seconds to roll off - or 0 for disabled
+				"VoteKickArray"			: [],		# Contains a list of users who were voted to kick - and who voted against them
+				"MuteList"				: []}		# List of muted members
 				# Removed for spam
 				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
 

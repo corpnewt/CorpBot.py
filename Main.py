@@ -142,6 +142,7 @@ from Cogs import DJRoles
 from Cogs import Jpeg
 from Cogs import LangFilter
 from Cogs import Morse
+from Cogs import VoteKick
 
 
 # Let's load our prefix file
@@ -428,6 +429,10 @@ cogList.append(lang)
 # Morse Code
 morse = Morse.Morse(bot, settings)
 cogList.append(morse)
+
+# Vote kick
+vk = VoteKick.VoteKick(bot, settings, mute)
+cogList.append(vk)
 
 
 # Main bot events

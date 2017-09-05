@@ -29,6 +29,7 @@ def memberForID(checkid, server):
 
 def memberForName(name, server):
     # Check nick first - then name
+    name = str(name)
     for member in server.members:
         if member.nick:
             if member.nick.lower() == name.lower():
@@ -54,6 +55,7 @@ def channelForID(id, server, typeCheck = None):
     return None
 
 def channelForName(name, server, typeCheck = None):
+    name = str(name)
     for channel in server.channels:
         if typeCheck:
             if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
@@ -75,6 +77,7 @@ def roleForID(id, server):
     return None
 
 def roleForName(name, server):
+    name = str(name)
     for role in server.roles:
         if role.name.lower() == name.lower():
             return role
@@ -92,6 +95,7 @@ def serverNick(user, server):
     return None
 
 def checkNameForInt(name, server):
+    name = str(name)
     theList = name.split()
     # We see if we have multiple parts split by a space
     if len(theList)<2:
@@ -151,6 +155,7 @@ def checkNameForInt(name, server):
     return None
 
 def checkRoleForInt(name, server):
+    name = str(name)
     theList = name.split()
     # We see if we have multiple parts split by a space
     if len(theList)<2:
