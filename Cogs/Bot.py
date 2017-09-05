@@ -335,11 +335,15 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 
-		if filename is None:
+		if filename is None and len(ctx.message.attachments) == 0:
 			await self.bot.user.edit(avatar=None)
 			await ctx.channel.send('Avatar removed!')
 			# await self.bot.edit_profile(avatar=None)
 			return
+		
+		# Check if attachment
+		if filename == None:
+			filename = ctx.message.attachments[0].url
 
 		# Check if we created a temp folder for this image
 		isTemp = False
