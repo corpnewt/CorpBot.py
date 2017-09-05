@@ -57,6 +57,60 @@ class VoteKick:
 				self.settings.setServerStat(guild, "VoteKickArray", vote_list)
 
 	@commands.command(pass_context=True)
+	async def vkinfo(self, ctx):
+		"""Lists the vote-kick info."""
+
+		mute_votes = self.settings.getServerStat(ctx.guild, "VotesToMute")
+		ment_votes = self.settings.getServerStat(ctx.guild, "VotesToMention")
+		mute_time  = self.settings.getServerStat(ctx.guild, "VotesMuteTime")
+		ment_chan  = self.settings.getServerStat(ctx.guild, "VoteKickChannel")
+		vote_ment  = self.settings.getServerStat(ctx.guild, "VoteKickMention")
+		vote_rest  = self.settings.getServerStat(ctx.guild, "VotesResetTime")
+		vote_list  = self.settings.getServerStat(ctx.guild, "VoteKickArray")
+
+		msg = "__**Current Vote-Kick Settings For {}:**__\n```\n".format(Nullify.clean(ctx.guild.name))
+
+		msg += "   Votes To Mute: {}\n".format(mute_votes)
+		msg += "       Muted For: {}\n".format(ReadableTime.getReadableTimeBetween(0, mute_time))
+		msg += "Votes to Mention: {}\n".format(ment_votes)
+		if vote_ment:
+			role_check = DisplayName.roleForName(vote_ment, ctx.guild)
+			if not role_check:
+				user_check = DisplayName.memberForName(vote_ment, ctx.guild)
+				if not user_check:
+					msg += "         Mention: None\n"
+				else:
+					msg += "         Mention: {}\n".format(user_check)
+			else:
+				msg += "         Mention: {} (role)\n".format(role_check)
+		else:
+			msg += "         Mention: None\n"
+				
+		m_channel = self.bot.get_channel(ment_chan)
+		if m_channel:
+			msg += "      Mention in: #{}\n".format(m_channel.name)
+		else:
+			msg += "      Mention in: None\n"
+		if vote_rest == 0:
+			msg += "      Vote reset: Permanent\n"
+		elif vote_rest == 1:
+			msg += "      Vote reset: After 1 second\n"
+		else:
+			msg += "      Vote reset: After {}\n".format(ReadableTime.getReadableTimeBetween(0, vote_rest))
+		votes = 0
+		for user in vote_list:
+			votes += len(user["Kicks"])
+		msg += "    Active votes: {}\n```".format(votes)
+
+		# Check if mention and mute are disabled
+		if (ment_votes == 0 or ment_chan == None or ment_chan == None) and (mute_votes == 0 or mute_time == 0):
+			msg += "\nSystem **not** configured fully."
+
+		await ctx.send(msg)
+
+
+
+	@commands.command(pass_context=True)
 	async def vkmention(self, ctx):
 		"""Gets which user or role is mentioned when enough votes against a user are reached."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -85,7 +139,6 @@ class VoteKick:
 			await ctx.send("The current user to mention is *{}*.".format(Nullify.clean(DisplayName.name(current_user))))
 			return
 		await ctx.send("The current id ({}) does not match any users or roles - please consider updating this setting.".format(current_id))
-
 
 	@commands.command(pass_context=True)
 	async def setvkmention(self, ctx, *, user_or_role = None):
@@ -375,6 +428,19 @@ class VoteKick:
 		if user == None:
 			await ctx.send("Usage:  `{}vk [user]`".format(ctx.prefix))
 			return
+
+		mute_votes = self.settings.getServerStat(ctx.guild, "VotesToMute")
+		ment_votes = self.settings.getServerStat(ctx.guild, "VotesToMention")
+		mute_time  = self.settings.getServerStat(ctx.guild, "VotesMuteTime")
+		ment_chan  = self.settings.getServerStat(ctx.guild, "VoteKickChannel")
+		vote_ment  = self.settings.getServerStat(ctx.guild, "VoteKickMention")
+
+		# Check if mention and mute are disabled
+		if (ment_votes == 0 or ment_chan == None or ment_chan == None) and (mute_votes == 0 or mute_time == 0):
+			await ctx.send('This function is not setup yet.')
+			return
+		
+
 		check_user = DisplayName.memberForName(user, ctx.guild)
 		if not check_user:
 			await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user)))
