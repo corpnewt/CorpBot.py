@@ -151,6 +151,68 @@ class Welcome:
             else:
                 msg = 'There is *no channel* set for welcome messages.'
         await ctx.channel.send(msg)
+        
+        
+    @commands.command(pass_context=True)
+    async def rawwelcome(self, ctx, *, member = None):
+        """Prints the current welcome message's markdown (bot-admin only)."""
+
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+        if not isAdmin:
+            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            for role in ctx.message.author.roles:
+                for aRole in checkAdmin:
+                    # Get the role that corresponds to the id
+                    if str(aRole['ID']) == str(role.id):
+                        isAdmin = True
+
+        # Only allow admins to change server stats
+        if not isAdmin:
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            return
+
+        if member == None:
+            member = ctx.message.author
+        if type(member) is str:
+            memberName = member
+            member = DisplayName.memberForName(memberName, ctx.message.guild)
+            if not member:
+                msg = 'I couldn\'t find *{}*...'.format(memberName)
+                # Check for suppress
+                if suppress:
+                    msg = Nullify.clean(msg)
+                await ctx.channel.send(msg)
+                return
+        # Here we have found a member, and stuff.
+        # Let's make sure we have a message
+        message = self.settings.getServerStat(ctx.message.guild, "Welcome")
+        if message == None:
+            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
+            return
+        # Escape the markdown
+        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        await ctx.send(message)
+        # Print the welcome channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.guild.channels:
+                if str(channel.id) == str(welcomeChannel):
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
+        else:
+            if self._getDefault(ctx.guild):
+                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for welcome messages.'
+        await ctx.channel.send(msg)
 
 
     @commands.command(pass_context=True)
@@ -224,6 +286,68 @@ class Welcome:
             return
         await self._goodbye(member, ctx.message.guild, ctx.message.channel)
         
+        # Print the goodbye channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.guild.channels:
+                if str(channel.id) == str(welcomeChannel):
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
+        else:
+            if self._getDefault(ctx.guild):
+                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for goodbye messages.'
+        await ctx.channel.send(msg)
+        
+        
+    @commands.command(pass_context=True)
+    async def rawgoodbye(self, ctx, *, member = None):
+        """Prints the current goodbye message's markdown (bot-admin only)."""
+
+        # Check if we're suppressing @here and @everyone mentions
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+            suppress = True
+        else:
+            suppress = False
+
+        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+        if not isAdmin:
+            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+            for role in ctx.message.author.roles:
+                for aRole in checkAdmin:
+                    # Get the role that corresponds to the id
+                    if str(aRole['ID']) == str(role.id):
+                        isAdmin = True
+
+        # Only allow admins to change server stats
+        if not isAdmin:
+            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+            return
+
+        if member == None:
+            member = ctx.message.author
+        if type(member) is str:
+            memberName = member
+            member = DisplayName.memberForName(memberName, ctx.message.guild)
+            if not member:
+                msg = 'I couldn\'t find *{}*...'.format(memberName)
+                # Check for suppress
+                if suppress:
+                    msg = Nullify.clean(msg)
+                await ctx.channel.send(msg)
+                return
+        # Here we have found a member, and stuff.
+        # Let's make sure we have a message
+        message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
+        if message == None:
+            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
+            return
+        # Escape the markdown
+        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        await ctx.send(message)
         # Print the goodbye channel
         welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
         if welcomeChannel:
