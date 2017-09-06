@@ -235,7 +235,7 @@ class Welcome:
         [[atuser]] = user mention
         [[server]] = server name
         [[count]]  = user count
-        [[place]]  = user's place (1st, 2nd, 3rd, etc)
+        [[place]]  = user's place (1st, 2nd, 3rd, etc) - will be count + 1
         [[online]] = count of users not offline"""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
@@ -444,7 +444,7 @@ class Welcome:
         message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
         message = re.sub(self.regexCount,    "{:,}".format(len(server.members)), message)
         # Get place info
-        place_str = str(len(server.members))
+        place_str = str(len(server.members)+1)
         end_str = "th"
         if place_str.endswith("1") and not place_str.endswith("11"):
             end_str = "st"
@@ -452,7 +452,7 @@ class Welcome:
             end_str = "nd"
         elif place_str.endswith("3") and not place_str.endswith("13"):
             end_str = "rd"
-        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
+        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members)+1, end_str), message)
         # Get online users
         online_count = 0
         for m in server.members:
