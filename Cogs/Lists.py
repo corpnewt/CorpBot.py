@@ -178,7 +178,7 @@ class Lists:
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n\n{}'.format(alink['Name'], alink['URL'])
+				msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -501,7 +501,7 @@ class Lists:
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n\n{}'.format(alink['Name'], alink['Hack'])
+				msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
