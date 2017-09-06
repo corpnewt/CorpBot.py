@@ -981,6 +981,26 @@ class Admin:
 		
 		
 	@commands.command(pass_context=True)
+	async def rawrules(self, ctx):
+		"""Display the markdown for the server's rules (bot-admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
+		rules = rules.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+		msg = "*{}* Rules (Raw Markdown):\n{}".format(self.suppressed(ctx.guild, ctx.guild.name), rules)
+		await ctx.channel.send(msg)
+		
+		
+	@commands.command(pass_context=True)
 	async def lock(self, ctx):
 		"""Toggles whether the bot only responds to admins (admin only)."""
 		
