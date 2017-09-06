@@ -20,6 +20,7 @@ class Welcome:
         self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
         self.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
         self.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
+        self.regexOnline   = re.compile(r"\[\[[online]+\]\]", re.IGNORECASE)
 
     def suppressed(self, guild, msg):
         # Check if we're suppressing @here and @everyone mentions
@@ -71,7 +72,15 @@ class Welcome:
 
     @commands.command(pass_context=True)
     async def setwelcome(self, ctx, *, message = None):
-        """Sets the welcome message for your server (bot-admin only). [[user]] = user name, [[atuser]] = user mention, [[server]] = server name"""
+        """Sets the welcome message for your server (bot-admin only). 
+        Available Options:
+        
+        [[user]]   = user name
+        [[atuser]] = user mention
+        [[server]] = server name
+        [[count]]  = user count
+        [[place]]  = user's place (1st, 2nd, 3rd, etc)
+        [[online]] = count of users not offline"""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
@@ -219,7 +228,15 @@ class Welcome:
 
     @commands.command(pass_context=True)
     async def setgoodbye(self, ctx, *, message = None):
-        """Sets the goodbye message for your server (bot-admin only). [[user]] = user name, [[atuser]] = user mention, [[server]] = server name"""
+        """Sets the goodbye message for your server (bot-admin only).
+        Available Options:
+        
+        [[user]]   = user name
+        [[atuser]] = user mention
+        [[server]] = server name
+        [[count]]  = user count
+        [[place]]  = user's place (1st, 2nd, 3rd, etc)
+        [[online]] = count of users not offline"""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         if not isAdmin:
@@ -391,7 +408,13 @@ class Welcome:
         elif place_str.endswith("3") and not place_str.endswith("13"):
             end_str = "rd"
         message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
-
+        # Get online users
+        online_count = 0
+        for m in server.members:
+            if not m.status == discord.Status.offline:
+                online_count += 1
+        message = re.sub(self.regexOnline,    "{:,}".format(online_count), message)
+                
         if suppress:
             message = Nullify.clean(message)
 
@@ -430,6 +453,12 @@ class Welcome:
         elif place_str.endswith("3") and not place_str.endswith("13"):
             end_str = "rd"
         message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
+        # Get online users
+        online_count = 0
+        for m in server.members:
+            if not m.status == discord.Status.offline:
+                online_count += 1
+        message = re.sub(self.regexOnline,    "{:,}".format(online_count), message)
 
         if suppress:
             message = Nullify.clean(message)
