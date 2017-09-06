@@ -18,6 +18,8 @@ class Welcome:
         self.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
         self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
         self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
+        self.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
+        self.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
 
     def suppressed(self, guild, msg):
         # Check if we're suppressing @here and @everyone mentions
@@ -378,6 +380,17 @@ class Welcome:
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
         message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
+        message = re.sub(self.regexCount,    "{:,}".format(len(server.members)), message)
+        # Get place info
+        place_str = str(len(server.members))
+        end_str = "th"
+        if place_str.endswith("1") and not place_str.endswith("11"):
+            end_str = "st"
+        elif place_str.endswith("2") and not place_str.endswith("12"):
+            end_str = "nd"
+        elif place_str.endswith("3") and not place_str.endswith("13"):
+            end_str = "rd"
+        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
 
         if suppress:
             message = Nullify.clean(message)
@@ -406,6 +419,17 @@ class Welcome:
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
         message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
+        message = re.sub(self.regexCount,    "{:,}".format(len(server.members)), message)
+        # Get place info
+        place_str = str(len(server.members))
+        end_str = "th"
+        if place_str.endswith("1") and not place_str.endswith("11"):
+            end_str = "st"
+        elif place_str.endswith("2") and not place_str.endswith("12"):
+            end_str = "nd"
+        elif place_str.endswith("3") and not place_str.endswith("13"):
+            end_str = "rd"
+        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
 
         if suppress:
             message = Nullify.clean(message)
