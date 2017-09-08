@@ -51,7 +51,7 @@ class Profile:
 				return'''
 				
 		# Passed role requirements!
-		if not (name or link):
+		if name == None or link == None:
 			msg = 'Usage: `{}addprofile "[profile name]" [link]`'.format(ctx.prefix)
 			await channel.send(msg)
 			return
@@ -97,7 +97,8 @@ class Profile:
 		else:
 			suppress = False
 		
-		# Check for role requirements
+		# Why did I do this?  There shouldn't be role requirements for your own profiles...
+		'''# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredXPRole")
 		if requiredRole == "":
 			#admin only
@@ -113,7 +114,7 @@ class Profile:
 					hasPerms = True
 			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+				return'''
 		
 		if name == None:
 			msg = 'Usage: `{}removeprofile "[profile name]"`'.format(ctx.prefix)
