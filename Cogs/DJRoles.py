@@ -28,10 +28,10 @@ class DJRoles:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			for trole in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					if str(aRole['ID']) == str(trole.id):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -97,10 +97,10 @@ class DJRoles:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			for trole in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					if str(aRole['ID']) == str(trole.id):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
