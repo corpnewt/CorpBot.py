@@ -29,40 +29,58 @@ class ServerStats:
         return { 'Ignore' : False, 'Delete' : False}
 
     @commands.command(pass_context=True)
-    async def serverinfo(self, ctx):
-        """Lists some info about the current server."""
+    async def serverinfo(self, ctx, *, guild_name = None):
+        """Lists some info about the current or passed server."""
+        
+        # Check if we passed another guild
+        guild = None
+        if guild_name == None:
+            guild = ctx.guild
+        else:
+            for g in self.bot.guilds:
+                if g.name.lower() == guild_name.lower():
+                    guild = g
+                    break
+                if str(g.id) == str(guild_name):
+                    guild = g
+                    break
+        if guild == None:
+            # We didn't find it
+            await ctx.send("I couldn't find that guild...")
+            return
+        
         server_embed = discord.Embed(color=ctx.author.color)
-        server_embed.title = ctx.guild.name
+        server_embed.title = guild.name
         
         # Get localized user time
-        local_time = UserTime.getUserTime(ctx.author, self.settings, ctx.guild.created_at)
+        local_time = UserTime.getUserTime(ctx.author, self.settings, guild.created_at)
         time_str = "{} {}".format(local_time['time'], local_time['zone'])
         
         server_embed.description = "Created at {}".format(time_str)
         online_members = 0
-        for member in ctx.guild.members:
+        for member in guild.members:
             if not member.status == discord.Status.offline:
                 online_members += 1
-        server_embed.add_field(name="Members", value="{:,}/{:,}".format(online_members, len(ctx.guild.members)), inline=True)
-        server_embed.add_field(name="Roles", value=str(len(ctx.guild.roles)), inline=True)
-        chandesc = "{:,} text, {:,} voice".format(len(ctx.guild.text_channels), len(ctx.guild.voice_channels))
+        server_embed.add_field(name="Members", value="{:,}/{:,}".format(online_members, len(guild.members)), inline=True)
+        server_embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
+        chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
-        server_embed.add_field(name="Default Role", value=ctx.guild.default_role, inline=True)
-        server_embed.add_field(name="Owner", value=ctx.guild.owner.mention, inline=True)
-        server_embed.add_field(name="AFK Channel", value=ctx.guild.afk_channel, inline=True)
-        server_embed.add_field(name="Verification", value=ctx.guild.verification_level, inline=True)
-        server_embed.add_field(name="Voice Region", value=ctx.guild.region, inline=True)
-        server_embed.add_field(name="Considered Large", value=ctx.guild.large, inline=True)
+        server_embed.add_field(name="Default Role", value=guild.default_role, inline=True)
+        server_embed.add_field(name="Owner", value=guild.owner.mention, inline=True)
+        server_embed.add_field(name="AFK Channel", value=guild.afk_channel, inline=True)
+        server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
+        server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
+        server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
         emojitext = ""
         emojicount = 0
-        for emoji in ctx.guild.emojis:
+        for emoji in guild.emojis:
             emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
             test = emojitext + emojiMention
             if len(test) > 1024:
                 # TOOO BIIIIIIIIG
                 emojicount += 1
                 if emojicount == 1:
-                    ename = "Emojis ({:,} total)".format(len(ctx.guild.emojis))
+                    ename = "Emojis ({:,} total)".format(len(guild.emojis))
                 else:
                     ename = "Emojis (Continued)"
                 server_embed.add_field(name=ename, value=emojitext, inline=True)
@@ -72,18 +90,18 @@ class ServerStats:
 
         if len(emojitext):
             if emojicount == 0:
-                emojiname = "Emojis ({} total)".format(len(ctx.guild.emojis))
+                emojiname = "Emojis ({} total)".format(len(guild.emojis))
             else:
                 emojiname = "Emojis (Continued)"
             server_embed.add_field(name=emojiname, value=emojitext, inline=True)
 
 
-        if len(ctx.guild.icon_url):
-            server_embed.set_thumbnail(url=ctx.guild.icon_url)
+        if len(guild.icon_url):
+            server_embed.set_thumbnail(url=guild.icon_url)
         else:
             # No Icon
             server_embed.set_thumbnail(url=ctx.author.default_avatar_url)
-        server_embed.set_footer(text="Server ID: {}".format(ctx.guild.id))
+        server_embed.set_footer(text="Server ID: {}".format(guild.id))
         await ctx.channel.send(embed=server_embed)
 
 
