@@ -335,7 +335,7 @@ class BotAdmin:
 
 
 	@commands.command(pass_context=True)
-	async def listen(self, ctx, *, member : discord.Member = None):
+	async def listen(self, ctx, *, member = None):
 		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
 
 		# Check if we're suppressing @here and @everyone mentions
