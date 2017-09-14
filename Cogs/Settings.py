@@ -126,7 +126,7 @@ class Settings:
 		# Let's load our settings file
 		if os.path.exists(file):
 			self.serverDict = json.load(open(file))
-			if type(self.serverDict["Servers"]) is list and os.path.exists("MigrateSettings.py"):
+			if "Servers" in self.serverDict and type(self.serverDict["Servers"]) is list and os.path.exists("MigrateSettings.py"):
 				# Wrong type!  Update
 				print("Updating settings...\n")
 				sub_args = ['python', 'MigrateSettings.py', file ]
