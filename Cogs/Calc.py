@@ -132,7 +132,7 @@ class Calc:
         try:
             answer=self.nsp.eval(formula)
         except:
-            msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula)
+            msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula.replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
             msg += 'I understand the following syntax:\n```\n'
             msg += "expop   :: '^'\n"
             msg += "multop  :: 'x' | '/'\n"
