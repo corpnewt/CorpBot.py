@@ -117,6 +117,15 @@ class Bot:
 		if not len(avatar):
 			avatar = bot_member.default_avatar_url
 			
+		# Get status
+		status_text = ":green_heart:"
+		if bot_member.status == discord.Status.offline:
+			status_text = ":black_heart:"
+		elif bot_member.status == discord.Status.dnd:
+			status_text = ":heart:"
+		elif bot_member.status == discord.Status.idle:
+			status_text = ":yellow_heart:"
+			
 		# Build the embed
 		server_embed.add_field(name="Members", value=member_count, inline=True)
 		server_embed.add_field(name="Servers", value=guild_count, inline=True)
@@ -125,6 +134,9 @@ class Bot:
 		server_embed.add_field(name="Joined", value=joined_at, inline=True)
 		server_embed.add_field(name="Owners", value=owners, inline=True)
 		server_embed.add_field(name="Prefix", value=prefix, inline=True)
+		server_embed.add_field(name="Status", value=status_text, inline=True)
+		if bot_member.game and bot_member.game.name:
+			server_embed.add_field(name="Playing", value=str(bot_member.game.name), inline=True)
 		server_embed.set_thumbnail(url=avatar)
 		# Send the embed
 		await ctx.channel.send(embed=server_embed)
