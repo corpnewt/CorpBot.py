@@ -39,18 +39,19 @@ class Printer:
 			
 			# Let's scale down
 			w, h = 0, 0
-			w = img.size[0]*2
+			adjust = 2
+			w = img.size[0]*adjust
 			h = img.size[1]
 
 			# Make sure we're under max params of 50h, 50w
 			ratio = 1
-			max_side = 50
-			if h > w:
-				if h > max_side:
-					ratio = max_side/h
+			max_wide = 80
+			if h*2 > w:
+				if h > max_wide/adjust:
+					ratio = max_wide/adjust/h
 			else:
-				if w > max_side:
-					ratio = max_side/w
+				if w > max_wide:
+					ratio = max_wide/w
 			h = ratio * h
 			w = ratio * w
 
