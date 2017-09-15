@@ -126,6 +126,8 @@ class Bot:
 		server_embed.add_field(name="Owners", value=owners, inline=True)
 		server_embed.add_field(name="Prefix", value=prefix, inline=True)
 		server_embed.set_thumbnail(url=avatar)
+		# Send the embed
+		await ctx.channel.send(embed=server_embed)
 		
 
 	@commands.command(pass_context=True)
