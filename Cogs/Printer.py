@@ -8,6 +8,7 @@ import numpy as np
 from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
+from   Cogs import DisplayName
 
 class Printer:
 
@@ -29,10 +30,13 @@ class Printer:
 		return True
 
 	def _ascii(self, image):
-		try:
+		#try:
 			chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
 			f, WCF, GCF = image, 7/4, .6
 			img = Image.open(image)
+			# Make sure we have frame 1
+			img = img.convert('RGBA')
+			
 			# Let's scale down
 			w, h = 0, 0
 			w = img.size[0]*2
@@ -66,9 +70,9 @@ class Printer:
 			a = "\n".join( ("".join(r) for r in chars[img.astype(int)]))
 			a = "```\n" + a + "```"
 			return a
-		except Exception:
-			pass
-		return False
+		#except Exception:
+		#	pass
+		#return False
 
 	@commands.command(pass_context=True)
 	async def printer(self, ctx, *, url = None):
@@ -81,6 +85,15 @@ class Printer:
 
 		if url == None:
 			url = ctx.message.attachments[0].url
+
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(url, ctx.guild)
+		if test_user:
+			# Got a user!
+			url = test_user.avatar_url
+			if not len(url):
+				url = test_user.default_avatar_url
+
 
 		message = await ctx.send("Downloading...")
 		
