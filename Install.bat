@@ -121,6 +121,11 @@ echo.
 call :install "git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"
 echo.
 
+echo Installing NumPy
+echo.
+call :install "numpy"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.

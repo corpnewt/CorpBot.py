@@ -112,6 +112,11 @@ function main () {
     update "git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"
     echo
 
+    echo Updating NumPy
+    echo
+    update "numpy"
+    echo
+
     
 
     #echo Updating Flask...

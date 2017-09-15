@@ -143,6 +143,7 @@ from Cogs import Jpeg
 from Cogs import LangFilter
 from Cogs import Morse
 from Cogs import VoteKick
+from Cogs import Printer
 
 
 # Let's load our prefix file
@@ -434,6 +435,9 @@ cogList.append(morse)
 vk = VoteKick.VoteKick(bot, settings, mute)
 cogList.append(vk)
 
+# Printer
+pr = Printer.Printer(bot, settings)
+cogList.append(pr)
 
 # Main bot events
 @bot.event
