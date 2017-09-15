@@ -35,17 +35,29 @@ class Printer:
 			img = Image.open(image)
 			# Let's scale down
 			w, h = 0, 0
-			w = img.size[0]*WCF
+			w = img.size[0]*2
 			h = img.size[1]
+
+			# Make sure we're under max params of 50h, 50w
+			ratio = 1
+			max_side = 50
+			if h > w:
+				if h > max_side:
+					ratio = max_side/h
+			else:
+				if w > max_side:
+					ratio = max_side/w
+			h = ratio * h
+			w = ratio * w
 
 			# Shrink to an area of 1900 or so (allows for extra chars)
 			target = 1900
-			r = h/w
-			w1 = math.sqrt(target/r)
-			h1 = target/w1
-
-			w = w1
-			h = h1
+			if w*h > target:
+				r = h/w
+				w1 = math.sqrt(target/r)
+				h1 = target/w1
+				w = w1
+				h = h1
 
 			S = ( round(w), round(h) )
 			img = np.sum( np.asarray( img.resize(S) ), axis=2)
