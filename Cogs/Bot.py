@@ -76,10 +76,10 @@ class Bot:
 		userCount = 0
 		counted_users = []
 		for server in self.bot.guilds:
-		    userCount += len(server.members)
-		    for member in server.members:
+			userCount += len(server.members)
+			for member in server.members:
 			if not member.id in counted_users:
-			    counted_users.append(member.id)
+				counted_users.append(member.id)
 		if userCount == len(counted_users):
 			member_count = "{:,}".format(userCount)
 		else:
