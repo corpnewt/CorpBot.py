@@ -30,7 +30,7 @@ class Printer:
 		return True
 
 	def _ascii(self, image):
-		#try:
+		try:
 			chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
 			f, WCF, GCF = image, 7/4, .6
 			img = Image.open(image)
@@ -70,9 +70,27 @@ class Printer:
 			a = "\n".join( ("".join(r) for r in chars[img.astype(int)]))
 			a = "```\n" + a + "```"
 			return a
-		#except Exception:
-		#	pass
-		#return False
+		except Exception:
+			pass
+		return False
+
+	@commands.command(pass_context=True)
+	async def printavi(self, ctx, *, member = None):
+		"""Returns a url to the passed member's avatar."""
+		if member == None:
+			# Assume author
+			member = ctx.author
+		if type(member) is str:
+			new_mem = DisplayName.memberForName(member, ctx.guild)
+			if not new_mem:
+				await ctx.send("I couldn't find that member...")
+				return
+			member = new_mem
+		url = member.avatar_url
+		if not len(url):
+			url = member.default_avatar_url
+		url = url.split("?size=")[0]
+		await ctx.send(url)
 
 	@commands.command(pass_context=True)
 	async def printer(self, ctx, *, url = None):
