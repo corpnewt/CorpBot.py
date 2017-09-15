@@ -3,6 +3,7 @@ import discord
 import time
 import os
 import random
+import math
 import numpy as np
 from   PIL import Image
 from   discord.ext import commands
@@ -30,15 +31,23 @@ class Printer:
 	def _ascii(self, image):
 		try:
 			chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
-			f, WCF, MAXW, GCF = image, 7/4, 30, .6
+			f, WCF, GCF = image, 7/4, .6
 			img = Image.open(image)
 			# Let's scale down
-			w, h, ratio = 0, 0, 1
-			if img.size[0] > MAXW:
-				ratio = MAXW/img.size[0]
-			w = img.size[0] * ratio
-			h = img.size[1] * ratio
-			S = ( round(w*WCF), round(h) )
+			w, h = 0, 0
+			w = img.size[0]*WCF
+			h = img.size[1]
+
+			# Shrink to an area of 1900 or so (allows for extra chars)
+			target = 1900
+			r = h/w
+			w1 = math.sqrt(target/r)
+			h1 = target/w1
+
+			w = w1
+			h = h1
+
+			S = ( round(w), round(h) )
 			img = np.sum( np.asarray( img.resize(S) ), axis=2)
 			img -= img.min()
 			img = (1.0 - img/img.max())**GCF*(chars.size-1)
@@ -74,6 +83,10 @@ class Printer:
 			GetImage.remove(path)
 		if not final:
 			await message.edit(content="I couldn't print that image...  Make sure you're pointing me to a valid image file.")
+			return
+		if len(final) > 2000:
+			# Too many bigs
+			await message.edit(content="Whoops!  I ran out of ink - maybe try a different image.")
 			return
 
 		print_sounds = [ "ZZzzzzzt", "Bzzt", "Vvvvrrrr", "Chhhaakkakaka", "Errrttt", "Kkkkkkkktttt", "Eeehhhnnkkk" ]
