@@ -17,6 +17,7 @@ from   Cogs import ReadableTime
 from   Cogs import GetImage
 from   Cogs import Nullify
 from   Cogs import ProgressBar
+from   Cogs import UserTime
 
 # This is the Bot module - it contains things like nickname, status, etc
 
@@ -60,6 +61,72 @@ class Bot:
 				await server.leave()
 				return True
 		return False
+	
+	@commands.command(pass_context=True)
+	async def botinfo(self, ctx):
+		"""Lists some general stats about the bot."""
+		bot_member = ctx.guild.get_member(self.bot.user.id)
+		server_embed = discord.Embed(color=bot_member.color)
+		server_embed.title = DisplayName.name(bot_member) + " Info"
+		
+		# Get guild count
+		guild_count = "{:,}".format(len(self.bot.guilds))
+			
+		# Get member count
+		mem = 0
+		for guild in self.bot.guilds:
+			mem += len(guild.members)
+		member_count = "{:,}".format(mem)
+			
+		# Get commands/cogs count
+		cog_count = "{:,} cog".format(len(self.bot.cogs))
+		# Easy way to append "s" if needed:
+		if not len(self.bot.cogs) == 1:
+			cog_count += "s"
+		command_count = "{:,}".format(len(self.bot.commands))
+		
+		# Get localized created time
+		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.created_at)
+		created_at = "{} {}".format(local_time['time'], local_time['zone'])
+		
+		# Get localized joined time
+		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.joined_at)
+		joined_at = "{} {}".format(local_time['time'], local_time['zone'])
+		
+		# Get the current prefix
+		prefix = await self.bot.command_prefix(self.bot, ctx.message)
+		prefix = ", ".join(prefix)
+
+		# Get the owners
+		ownerList = self.settings.serverDict['Owner']
+		owners = "Unclaimed..."
+		if len(ownerList):
+			userList = []
+			for owner in ownerList:
+				# Get the owner's name
+				user = self.bot.get_user(int(owner))
+				if not user:
+					userString = "Unknown User ({})".format(owner)
+				else:
+					userString = "{}".format(user.name)
+				userList.append(userString)
+			owners = ', '.join(userList)
+			
+		# Get bot's avatar url
+		avatar = bot_member.avatar_url
+		if not len(avatar):
+			avatar = bot_member.default_avatar_url
+			
+		# Build the embed
+		server_embed.add_field(name="Members", value=member_count, inline=True)
+		server_embed.add_field(name="Servers", value=guild_count, inline=True)
+		server_embed.add_field(name="Commands", value=command_count + " (in {})".format(cog_count), inline=True)
+		server_embed.add_field(name="Created", value=created_at, inline=True)
+		server_embed.add_field(name="Joined", value=joined_at, inline=True)
+		server_embed.add_field(name="Owners", value=owners, inline=True)
+		server_embed.add_field(name="Prefix", value=prefix, inline=True)
+		server_embed.set_thumbnail(url=avatar)
+		
 
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
