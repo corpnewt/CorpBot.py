@@ -483,11 +483,11 @@ class CardsAgainstHumanity:
             else:
                 stat_embed.set_author(name='{} won!'.format(winnerName))
             if len(winner['Cards']) == 1:
-                msg = 'The **Winning** card was:\n\n{}'.format('{}'.format(' - '.join(winner['Cards'])))
+                stat_embed.add_field(name='The WINNING card was:', value='{}'.format(' - '.join(winner['Cards'])))
             else:
-                msg = 'The **Winning** cards were:\n\n{}'.format('{}'.format(' - '.join(winner['Cards'])))
+                stat_embed.add_field(name='The WINNING cards were:', value='{}'.format(' - '.join(winner['Cards'])))
             await member['User'].send(embed=stat_embed)
-            await member['User'].send(msg)
+            # await member['User'].send(msg)
             await asyncio.sleep(self.loopsleep)
 
             # await self.nextPlay(ctx, game)
@@ -549,8 +549,8 @@ class CardsAgainstHumanity:
             blackCard = 'None.'
             blackNum  = 0
 
-        msg = '{} the judge.\n\n'.format(judge)
-        msg += '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
+        # msg = '{} the judge.\n\n'.format(judge)
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
         
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
@@ -572,8 +572,9 @@ class CardsAgainstHumanity:
         
         stat_embed.set_author(name='Current Play')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
+        stat_embed.add_field(name="{} the judge.".format(judge), value=msg)
         await user.send(embed=stat_embed)
-        await user.send(msg)
+        #await user.send(msg)
         
     async def showHand(self, ctx, user):
         # Shows the user's hand in an embed
@@ -599,10 +600,11 @@ class CardsAgainstHumanity:
             blackCard = '**{}**'.format(game['BlackCard']['Text'])
         except Exception:
             blackCard = '**None.**'
-        stat_embed.set_author(name='Your Hand - {}'.format(points))
+        stat_embed.add_field(name="Your Hand - {}".format(points), value=msg)
+        # stat_embed.set_author(name='Your Hand - {}'.format(points))
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
         await user.send(embed=stat_embed)
-        await user.send(msg)
+        # await user.send(msg)
                             
     async def showOptions(self, ctx, user):
         # Shows the judgement options
@@ -613,7 +615,6 @@ class CardsAgainstHumanity:
         # Add title
         stat_embed.set_author(name='JUDGEMENT TIME!!')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
-        await user.send(embed=stat_embed)
 
         if game['Members'][game['Judge']]['User'] == user:
             judge = '**YOU** are'
@@ -625,8 +626,7 @@ class CardsAgainstHumanity:
                 judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
         blackCard = game['BlackCard']['Text']
 
-        msg = '{} judging.\n\n'.format(judge)
-        msg += '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
         msg += '__Submitted White Cards:__\n\n'
 
         i = 0
@@ -635,7 +635,10 @@ class CardsAgainstHumanity:
             msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
         if judge == '**YOU** are':
             msg += '\nPick a winner with `{}pick [submission number]`.'.format(self.prefix)
-        await user.send(msg)
+
+        stat_embed.add_field(name="{} judging.".format(judge), value=msg)
+        await user.send(embed=stat_embed)
+        # await user.send(msg)
         
     async def drawCard(self, game):
         # Draws a random unused card and shuffles the deck if needed
