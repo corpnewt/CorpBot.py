@@ -162,6 +162,10 @@ class Debugging:
 			await self._logEvent(server, msg)
 		
 	async def message(self, message):
+		# context = await self.bot.get_context(message)
+		# print(context)
+		# print(context.command)
+		
 		if message.author.bot:
 			return { 'Ignore' : False, 'Delete' : False}
 		if not self.shouldLog('message.send', message.guild):

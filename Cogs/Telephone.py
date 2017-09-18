@@ -25,6 +25,17 @@ class Telephone:
 		else:
 			return msg
 
+	# Proof-of-concept placeholders
+	@asyncio.coroutine
+	async def on_message_context(self, ctx, message):
+		return
+
+	@asyncio.coroutine
+	async def on_message(self, message):
+		context = await self.bot.get_context(message)
+		self.bot.dispatch("message_context", context, message)
+		return
+
 	async def onready(self):
 		# Clear any previous games
 		for guild in self.bot.guilds:
@@ -226,7 +237,7 @@ class Telephone:
 		teleNumber = self._getsafenumber(str(channel.id)[len(str(channel.id))-7:], ctx.guild)
 		self.settings.setServerStat(ctx.guild, "TeleNumber", teleNumber)
 		
-		msg = ':telephone: channel set to **{}**.'.format(channel.name)
+		msg = ':telephone: channel set to {}'.format(channel.mention)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
@@ -238,7 +249,7 @@ class Telephone:
 			return
 		channel = DisplayName.channelForName(str(teleChan), ctx.guild, "text")
 		if channel:
-			await ctx.send("The current :telephone: channel is **{}**.".format(channel.name))
+			await ctx.send("The current :telephone: channel is {}".format(channel.mention))
 			return
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(teleChan))
 
@@ -381,6 +392,9 @@ class Telephone:
 		teleChan = self._gettelechannel(ctx.guild)
 		if not teleChan:
 			await ctx.send(":telephone: is currently *disabled*.  You can set it up with `{}settelechannel [channel]`".format(ctx.prefix))
+			return
+		if not teleChan.id == ctx.channel.id:
+			await ctx.send(":telephone: calls must be made in {}".format(teleChan.mention))
 			return
 		
 		# Check if we're already in a call
@@ -532,9 +546,9 @@ class Telephone:
 
 		# Ring for 30 seconds - then report no answer
 		# Setup the check
-		def check(msg):
-			'''if await self.killcheck(msg):
-				return False'''
+		def check(ctx, msg):
+			# This now catches the message and the context
+			# print(ctx)
 			if msg.author.bot:
 				return False
 			m_cont = msg.content.lower()
@@ -545,9 +559,11 @@ class Telephone:
 			return False
 		# Wait for a response
 		try:
-			talk = await self.bot.wait_for('message', check=check, timeout=30)
+			talk = await self.bot.wait_for('message_context', check=check, timeout=30)
 		except Exception:
 			talk = None
+		if talk:
+			talk = talk[1]
 
 		if talk == None:
 			# No answer - hangup
@@ -571,8 +587,6 @@ class Telephone:
 		while True:
 			# Setup the check
 			def check_in_call(msg):
-				'''if await self.killcheck(msg):
-					return False'''
 				if msg.author.bot:
 					return False
 				if msg.channel == receiver_chan or msg.channel == caller_chan:

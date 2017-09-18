@@ -144,6 +144,7 @@ from Cogs import LangFilter
 from Cogs import Morse
 from Cogs import VoteKick
 from Cogs import Printer
+from Cogs import Help
 
 
 # Let's load our prefix file
@@ -438,6 +439,11 @@ cogList.append(vk)
 # Printer
 pr = Printer.Printer(bot, settings)
 cogList.append(pr)
+
+# Help
+h = Help.Help(bot)
+cogList.append(h)
+bot.remove_command("help")
 
 # Main bot events
 @bot.event
