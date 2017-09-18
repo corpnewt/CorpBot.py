@@ -67,6 +67,7 @@ class VoteKick:
 		vote_ment  = self.settings.getServerStat(ctx.guild, "VoteKickMention")
 		vote_rest  = self.settings.getServerStat(ctx.guild, "VotesResetTime")
 		vote_list  = self.settings.getServerStat(ctx.guild, "VoteKickArray")
+		vote_anon  = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
 
 		msg = "__**Current Vote-Kick Settings For {}:**__\n```\n".format(Nullify.clean(ctx.guild.name))
 
@@ -100,6 +101,7 @@ class VoteKick:
 		votes = 0
 		for user in vote_list:
 			votes += len(user["Kicks"])
+		msg += " Anonymous votes: {}\n".format(vote_anon)
 		msg += "    Active votes: {}\n```".format(votes)
 
 		# Check if mention and mute are disabled
@@ -419,6 +421,56 @@ class VoteKick:
 			self.settings.setServerStat(ctx.guild, "VotesResetTime", seconds)
 			await ctx.send("Votes will expire after {}.".format(ReadableTime.getReadableTimeBetween(0, seconds)))
 
+	@commands.command(pass_context=True)
+	async def vkanon(self, ctx, *, ignore = None):
+		"""Sets whether vote messages are removed after voting (bot-admin only; always off by default)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		current_ignore = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
+
+		if ignore == None:
+			# Output debug status
+			if current_ignore:
+				await channel.send('Vote kick anon is enabled.')
+			else:
+				await channel.send('Vote kick anon is disabled.')
+			return
+		elif ignore.lower() == "yes" or ignore.lower() == "on" or ignore.lower() == "true":
+			ignore = True
+		elif ignore.lower() == "no" or ignore.lower() == "off" or ignore.lower() == "false":
+			ignore = False
+		else:
+			ignore = False
+
+		if ignore == True:
+			if current_ignore == True:
+				msg = 'Vote kick anon remains enabled.'
+			else:
+				msg = 'Vote kick anon now enabled.'
+		else:
+			if current_ignore == False:
+				msg = 'Vote kick anon remains disabled.'
+			else:
+				msg = 'Vote kick anon now disabled.'
+		self.settings.setServerStat(ctx.guild, "VoteKickAnon", ignore)
+		
+		await channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def vk(self, ctx, *, user = None):
@@ -434,6 +486,10 @@ class VoteKick:
 		mute_time  = self.settings.getServerStat(ctx.guild, "VotesMuteTime")
 		ment_chan  = self.settings.getServerStat(ctx.guild, "VoteKickChannel")
 		vote_ment  = self.settings.getServerStat(ctx.guild, "VoteKickMention")
+		vote_anon  = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
+		
+		if vote_anon:
+			await ctx.message.delete()
 
 		# Check if mention and mute are disabled
 		if (ment_votes == 0 or ment_chan == None or ment_chan == None) and (mute_votes == 0 or mute_time == 0):
