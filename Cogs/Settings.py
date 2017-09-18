@@ -119,6 +119,7 @@ class Settings:
 				"VotesMuteTime"			: 0,		# Number of seconds to mute - or 0 for disabled
 				"VotesResetTime"		: 0,		# Number of seconds to roll off - or 0 for disabled
 				"VoteKickArray"			: [],		# Contains a list of users who were voted to kick - and who voted against them
+				"VoteKickAnon"			: False,	# Are vk messages deleted after sending?
 				"MuteList"				: []}		# List of muted members
 				# Removed for spam
 				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
