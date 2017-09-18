@@ -103,7 +103,7 @@ class Help:
 		result = await self._get_info(ctx, command)
 
 		if result == None:
-			await ctx.send("No command called \"{}\" found.".format(Nullify.clean(command)))
+			await ctx.send("No command called *\"{}\"* found.  Remember that commands and cogs are case-sensitive.".format(Nullify.clean(command)))
 			return
 
 		# Build the embed
@@ -136,7 +136,6 @@ class Help:
 				discord.Color.greyple()
 				]
 			help_embed = discord.Embed(color=random.choice(colors))
-		help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(ctx.prefix))
 		help_embed.title = result["title"]
 
 		to_pm = len(result["fields"]) > 10
@@ -148,6 +147,8 @@ class Help:
 			help_embed.add_field(name=embed["name"], value=embed["value"], inline=embed["inline"])
 			# 25 field max - send the embed if we get there
 			if len(help_embed.fields) >= 25:
+				if page_total == page_count:
+					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(ctx.prefix))
 				await self._send_embed(ctx, help_embed, to_pm)
 				help_embed.clear_fields()
 				page_count += 1
@@ -155,6 +156,7 @@ class Help:
 					help_embed.title = result["title"] + " (Page {:,} of {:,})".format(page_count, page_total)
 		
 		if len(help_embed.fields):
+			help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(ctx.prefix))
 			await self._send_embed(ctx, help_embed, to_pm)
 				
 
