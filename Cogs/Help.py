@@ -77,7 +77,7 @@ class Help:
 					if not command.name == com:
 						continue
 					embed_list = {"title" : cog, "fields" : [] }
-					embed_list["fields"].append({ "name" : command.name, "value" : command.help, "inline" : False })
+					embed_list["fields"].append({ "name" : command.signature, "value" : command.help, "inline" : False })
 					return embed_list
 		# At this point - we got nothing...
 		return None
