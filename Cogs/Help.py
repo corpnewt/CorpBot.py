@@ -64,7 +64,7 @@ class Help:
 					if command.hidden:
 						continue
 					command_help = (command.help[:77]+"...") if len(command.help) > 80 else command.help
-					embed_list["fields"].append({ "name" : command.name, "value" : "└─ " + command_help, "inline" : False })
+					embed_list["fields"].append({ "name" : ctx.prefix + command.signature, "value" : "└─ " + command_help, "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):
 					return None
@@ -77,7 +77,7 @@ class Help:
 					if not command.name == com:
 						continue
 					embed_list = {"title" : cog, "fields" : [] }
-					embed_list["fields"].append({ "name" : command.signature, "value" : command.help, "inline" : False })
+					embed_list["fields"].append({ "name" : ctx.prefix + command.signature, "value" : command.help, "inline" : False })
 					return embed_list
 		# At this point - we got nothing...
 		return None
