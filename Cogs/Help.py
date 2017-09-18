@@ -15,18 +15,22 @@ class Help:
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-
-	async def _get_info(self, ctx, com = None):
-		# Helper method to return a list of embed content
-		# or None if no results
 		
+	def _get_prefix(self, ctx):
+		# Helper method to get the simplified prefix
 		# Setup a clean prefix
 		if ctx.guild:
 			bot_member = ctx.guild.get_member(self.bot.user.id)
 		else:
 			bot_member = ctx.bot.user
 		# Replace name and nickname mentions
-		prefix = ctx.prefix.replace(bot_member.mention, '@' + DisplayName.name(bot_member))
+		return ctx.prefix.replace(bot_member.mention, '@' + DisplayName.name(bot_member))
+
+	async def _get_info(self, ctx, com = None):
+		# Helper method to return a list of embed content
+		# or None if no results
+
+		prefix = self._get_prefix(ctx)
 
 		# Setup the footer
 		footer = "\nType `{}help command` for more info on a command. \n".format(prefix)
@@ -156,7 +160,7 @@ class Help:
 			# 25 field max - send the embed if we get there
 			if len(help_embed.fields) >= 25:
 				if page_total == page_count:
-					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(ctx.prefix))
+					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
 				await self._send_embed(ctx, help_embed, to_pm)
 				help_embed.clear_fields()
 				page_count += 1
@@ -164,7 +168,7 @@ class Help:
 					help_embed.title = result["title"] + " (Page {:,} of {:,})".format(page_count, page_total)
 		
 		if len(help_embed.fields):
-			help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(ctx.prefix))
+			help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx)))
 			await self._send_embed(ctx, help_embed, to_pm)
 				
 
