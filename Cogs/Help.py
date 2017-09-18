@@ -21,7 +21,7 @@ class Help:
 		# or None if no results
 		
 		# Setup a clean prefix
-		user = self.context.bot.user
+		user = ctx.bot.user
 		prefix = ctx.prefix.replace(self.bot.user.mention, '@' + user.name)
 
 		# Setup the footer
