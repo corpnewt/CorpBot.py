@@ -21,8 +21,12 @@ class Help:
 		# or None if no results
 		
 		# Setup a clean prefix
-		user = ctx.bot.user
-		prefix = ctx.prefix.replace(self.bot.user.mention, '@' + user.name)
+		if ctx.guild:
+			bot_member = ctx.guild.get_member(self.bot.user.id)
+		else:
+			bot_member = ctx.bot.user
+		bot_name = DisplayName.name(bot_member)
+		prefix = ctx.prefix.replace(self.bot.user.mention, '@' + bot_name)
 
 		# Setup the footer
 		footer = "\nType `{}help command` for more info on a command. \n".format(prefix)
