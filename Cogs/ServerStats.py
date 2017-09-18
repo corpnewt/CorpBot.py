@@ -66,7 +66,7 @@ class ServerStats:
         chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
         server_embed.add_field(name="Default Role", value=guild.default_role, inline=True)
-        server_embed.add_field(name="Owner", value=guild.owner.mention, inline=True)
+        server_embed.add_field(name="Owner", value=guild.owner.name + "#" + guild.owner.discriminator, inline=True)
         server_embed.add_field(name="AFK Channel", value=guild.afk_channel, inline=True)
         server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
