@@ -160,7 +160,7 @@ class Help:
 			# 25 field max - send the embed if we get there
 			if len(help_embed.fields) >= 25:
 				if page_total == page_count:
-					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
+					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx)))
 				await self._send_embed(ctx, help_embed, to_pm)
 				help_embed.clear_fields()
 				page_count += 1
