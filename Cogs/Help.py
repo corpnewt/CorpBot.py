@@ -19,10 +19,14 @@ class Help:
 	async def _get_info(self, ctx, com = None):
 		# Helper method to return a list of embed content
 		# or None if no results
+		
+		# Setup a clean prefix
+		user = self.context.bot.user
+		prefix = ctx.prefix.replace(self.bot.user.mention, '@' + user.name)
 
 		# Setup the footer
-		footer = "\nType `{}help command` for more info on a command. \n".format(ctx.prefix)
-		footer += "You can also type `{}help category` for more info on a category.".format(ctx.prefix)
+		footer = "\nType `{}help command` for more info on a command. \n".format(prefix)
+		footer += "You can also type `{}help category` for more info on a category.".format(prefix)
 
 		if com == None:
 			# No command or cog - let's send the coglist
@@ -64,7 +68,7 @@ class Help:
 					if command.hidden:
 						continue
 					command_help = (command.help[:77]+"...") if len(command.help) > 80 else command.help
-					embed_list["fields"].append({ "name" : ctx.prefix + command.signature, "value" : "└─ " + command_help, "inline" : False })
+					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : "└─ " + command_help, "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):
 					return None
@@ -77,7 +81,7 @@ class Help:
 					if not command.name == com:
 						continue
 					embed_list = {"title" : cog, "fields" : [] }
-					embed_list["fields"].append({ "name" : ctx.prefix + command.signature, "value" : command.help, "inline" : False })
+					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
 					return embed_list
 		# At this point - we got nothing...
 		return None
