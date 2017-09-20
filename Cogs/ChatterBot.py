@@ -36,7 +36,7 @@ class ChatterBot:
 		self.timeout = 3
 		self.chatBot = Kernel()
 
-	async def _load(self):
+	def _load(self):
 		# We're ready - let's load the bots
 		if not os.path.exists(self.botBrain):
 			# No brain, let's learn and create one
