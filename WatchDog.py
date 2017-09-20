@@ -40,7 +40,6 @@ def update():
     print("#          UPDATING          #")
     print("##############################\n")
     print("\nTrying to update via git...\n")
-    print("Using update script...\n")
     try:
         u = subprocess.Popen([git, 'pull'])
         u.wait()
