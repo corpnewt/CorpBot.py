@@ -327,7 +327,8 @@ async def on_message(message):
 			await message.channel.send(respond)
 		if react:
 			# We have something to react with
-			await message.add_reaction(react)
+			for r in react:
+				await message.add_reaction(r)
 		await bot.process_commands(message)
 
 @bot.event
