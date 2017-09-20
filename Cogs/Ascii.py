@@ -7,6 +7,10 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 import requests
 import urllib
+
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Ascii(bot))
 	
 class Ascii:
     

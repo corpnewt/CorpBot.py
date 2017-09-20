@@ -7,6 +7,11 @@ from   discord.ext import commands
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Debugging(bot, settings))
+
 # This is the Debugging module. It keeps track of how long the bot's been up
 
 class Debugging:

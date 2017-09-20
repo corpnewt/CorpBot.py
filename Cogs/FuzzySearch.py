@@ -1,6 +1,10 @@
 import difflib
 from   operator    import itemgetter
 
+def setup(bot):
+	# This module isn't actually a cog
+    return
+
 def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
 	"""Searches the provided list for the searchTerm - using a keyName if provided for dicts."""
 	if len(list) < 1:

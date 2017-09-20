@@ -10,6 +10,11 @@ from   Cogs import Nullify
 from   Cogs import FuzzySearch
 from   Cogs import Message
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Tags(bot, settings))
+
 class Tags:
 
 	# Init with the bot reference, and a reference to the settings var

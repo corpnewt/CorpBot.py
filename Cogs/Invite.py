@@ -3,6 +3,10 @@ import discord
 from   discord.ext import commands
 from   Cogs import DisplayName
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Invite(bot))
+
 class Invite:
 
 	# Init with the bot reference, and a reference to the settings var

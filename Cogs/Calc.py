@@ -11,6 +11,10 @@ from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
 import math
 import operator
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Calc(bot))
+
 __author__='Paul McGuire'
 __version__ = '$Revision: 0.0 $'
 __date__ = '$Date: 2009-03-20 $'

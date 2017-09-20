@@ -4,6 +4,11 @@ import time
 from Cogs import DisplayName
 from Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Mute(bot, settings))
+
 class Mute:
 
     # Init with the bot reference, and a reference to the settings var

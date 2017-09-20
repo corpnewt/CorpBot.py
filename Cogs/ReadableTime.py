@@ -1,3 +1,7 @@
+def setup(bot):
+	# This module isn't actually a cog
+    return
+
 def getReadableTimeBetween(first, last):
     # A helper function to make a readable string between two times
     timeBetween = int(last-first)

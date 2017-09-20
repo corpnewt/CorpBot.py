@@ -10,6 +10,11 @@ from   discord.ext import commands
 from   Cogs import GetImage
 from   Cogs import DisplayName
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Printer(bot, settings))
+
 class Printer:
 
 	# Init with the bot reference
@@ -94,7 +99,7 @@ class Printer:
 		await ctx.send(url)
 
 	@commands.command(pass_context=True)
-	async def printer(self, ctx, *, url = None):
+	async def print(self, ctx, *, url = None):
 		"""DOT MATRIX.  Accepts a url - or picks the first attachment."""
 		if not self.canDisplay(ctx.guild):
 			return

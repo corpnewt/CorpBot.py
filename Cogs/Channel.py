@@ -10,6 +10,11 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Channel(bot, settings))
+
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
 

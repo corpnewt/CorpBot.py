@@ -19,12 +19,17 @@ from   Cogs import Nullify
 from   Cogs import ProgressBar
 from   Cogs import UserTime
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Bot(bot, settings, sys.argv[0], 'python'))
+
 # This is the Bot module - it contains things like nickname, status, etc
 
 class Bot:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings, path, pypath):
+	def __init__(self, bot, settings, path = None, pypath = None):
 		self.bot = bot
 		self.settings = settings
 		self.startTime = int(time.time())
@@ -523,6 +528,7 @@ class Bot:
 		await status.edit(content='Avatar set!')
 
 
+	# Needs rewrite!
 	@commands.command(pass_context=True)
 	async def reboot(self, ctx, force = None):
 		"""Reboots the bot (owner only)."""
@@ -542,6 +548,8 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 		
+		# Save the return channel and flush settings
+		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
 		self.settings.flushSettings()
 
 		quiet = False
@@ -554,21 +562,16 @@ class Bot:
 		for task in asyncio.Task.all_tasks():
 			try:
 				task.cancel()
-			except Exception:
+			except:
 				continue
 		try:
 			await self.bot.logout()
 			self.bot.loop.stop()
 			self.bot.loop.close()
-		except Exception:
+		except:
 			pass
-		try:
-			# Try to reboot
-			subprocess.Popen([self.pypath, self.path, "-reboot", "True", "-channel", str(ctx.channel.id), "-path", self.pypath])
-			# Kill this process
-			await exit(0)
-		except Exception:
-			pass
+		# Kill this process
+		os._exit(2)
 
 
 	@commands.command(pass_context=True)
@@ -610,11 +613,8 @@ class Bot:
 			self.bot.loop.close()
 		except Exception:
 			pass
-		try:
-			# Kill this process
-			await exit(0)
-		except Exception:
-			pass
+		# Kill this process
+		os._exit(3)
 			
 
 	@commands.command(pass_context=True)

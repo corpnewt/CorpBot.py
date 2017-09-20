@@ -16,6 +16,10 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+def setup(bot):
+	# This module isn't actually a cog
+    return
+
 # A helper module for images.
 
 def get_ext(url):

@@ -9,6 +9,12 @@ from   Cogs import ReadableTime
 from   Cogs import Nullify
 from   Cogs import Mute
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	mute     = bot.get_cog("Mute")
+	bot.add_cog(VoteKick(bot, settings, mute))
+
 class VoteKick:
 
 	# Init with the bot reference, and a reference to the settings var

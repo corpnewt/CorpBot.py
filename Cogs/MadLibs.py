@@ -9,6 +9,11 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(MadLibs(bot, settings))
+
 class MadLibs:
 
 	# Init with the bot reference, and a reference to the settings var

@@ -4,6 +4,11 @@ import random
 from   discord.ext import commands
 from   Cogs import Settings
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(DrBeer(bot, settings))
+
 # This is the Uptime module. It keeps track of how long the bot's been up
 
 class DrBeer:

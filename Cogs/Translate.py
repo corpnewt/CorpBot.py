@@ -7,6 +7,11 @@ import json
 import os
 import mtranslate
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Translate(bot, settings))
+
 # Requires the mtranslate module be installed
 
 class Translate:

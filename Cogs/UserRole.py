@@ -6,6 +6,11 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(UserRole(bot, settings))
+
 class UserRole:
     
 	def __init__(self, bot, settings):

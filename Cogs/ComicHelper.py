@@ -13,6 +13,10 @@ except ImportError:
     # Python 3
     from html.parser import HTMLParser
 
+def setup(bot):
+	# Not a cog - pass
+	pass
+
 # This module contains all the shit methods used for getting comic URLs... ugh.
 
 def julianDate(my_date):

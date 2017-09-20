@@ -13,6 +13,12 @@ from   Cogs import UserTime
 import youtube_dl
 import functools
 
+def setup(bot):
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Example(bot, settings))
+    bot.add_cog(Music(bot, settings))
+
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
     # or libopus.so on linux in the current directory

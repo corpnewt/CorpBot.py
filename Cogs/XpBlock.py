@@ -10,6 +10,11 @@ from   Cogs import Message
 from   Cogs import Nullify
 from   Cogs import DisplayName
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(XpBlock(bot, settings))
+
 class XpBlock:
 
 	# Init with the bot reference, and a reference to the settings var and xp var

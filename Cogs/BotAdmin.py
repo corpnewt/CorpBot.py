@@ -10,6 +10,11 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	mute     = bot.get_cog("Mute")
+	bot.add_cog(BotAdmin(bot, settings, mute))
 
 class BotAdmin:
 

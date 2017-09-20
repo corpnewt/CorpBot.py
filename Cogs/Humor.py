@@ -12,6 +12,11 @@ from Cogs import FuzzySearch
 from Cogs import GetImage
 from Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Humor(bot, settings))
+
 # This module is for random funny things I guess...
 
 class Humor:

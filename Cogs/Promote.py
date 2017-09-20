@@ -9,6 +9,11 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import Xp
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Promote(bot, settings))
+
 # This module is for auto promoting/demoting of roles - admin only
 
 class Promote:

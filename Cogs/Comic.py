@@ -9,6 +9,11 @@ from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import ComicHelper
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Comic(bot, settings))
+
 # This module will probably get comics... *finges crossed*
 
 class Comic:

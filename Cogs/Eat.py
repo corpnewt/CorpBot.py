@@ -5,6 +5,10 @@ from   discord.ext import commands
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Eat(bot))
+
 class Eat:
 
 	# Init with the bot reference, and a reference to the settings var

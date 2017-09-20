@@ -12,6 +12,11 @@ from   Cogs        import DisplayName
 from   Cogs        import Nullify
 
 
+def setup(bot):
+	# Add the cog
+	bot.add_cog(Settings(bot))
+
+
 # This is the settings module - it allows the other modules to work with
 # a global settings variable and to make changes
 

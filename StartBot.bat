@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 
 cls
 echo   ###                ###
@@ -6,34 +7,27 @@ echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
 
-set "botFile=Main.py"
+set "botFile=WatchDog.py"
 set "pyPath=python"
-set "autoRestart=No"
-set "update=No"
+
+for /f %%i in ('where python 2^>nul') do (
+    set "p=%%i"
+    if /i NOT "!p:~0,5!"=="INFO:" (
+        set "pyPath=%%i"
+    )
+)
+
+
 
 set "thisDir=%~dp0"
 
 goto start
-
-:update
-pushd "%thisDir%"
-echo Updating...
-echo.
-git pull origin rewrite
-echo.
-popd
-goto :EOF
 
 :start
 if /i "%update%" == "Yes" (
     call :update
 )
 
-REM Launch our script - tell it we didn't reboot, and give it python's path
-"%pyPath%" "%botFile%" -reboot No -path "%pyPath%"
+"%pyPath%" "%botFile%"
 
-if /i "%autoRestart%"=="Yes" (
-    timeout 10
-    goto start
-)
 pause > nul

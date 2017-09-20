@@ -5,6 +5,9 @@ import textwrap
 from   discord.ext import commands
 from   Cogs import Settings
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Wiki(bot))
 
 # This is the Face module. It sends faces.
 

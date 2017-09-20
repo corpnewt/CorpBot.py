@@ -5,6 +5,11 @@ from   discord.ext import commands
 from   Cogs import Nullify
 from   Cogs import DisplayName
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(DJRoles(bot, settings))
+
 class DJRoles:
 
 	# Init with the bot reference, and a reference to the settings var and xp var

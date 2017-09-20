@@ -1,6 +1,10 @@
 import requests
 from   pyquery import PyQuery as pq
 
+def setup(bot):
+	# Not a cog
+	return
+
 def find_last_between( source, start_sep, end_sep ):
 	result=[]
 	tmp=source.split(start_sep)

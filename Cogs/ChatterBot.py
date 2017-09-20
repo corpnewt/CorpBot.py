@@ -11,6 +11,11 @@ from Cogs import Nullify
 from pyquery import PyQuery as pq
 from Cogs import FuzzySearch
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(ChatterBot(bot, settings))
+
 class ChatterBot:
 
 	# Init with the bot reference, and a reference to the settings var

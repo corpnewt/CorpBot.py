@@ -5,6 +5,10 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# This module isn't actually a cog
+    return
+
 async def checkroles(user, channel, settings, bot, suppress : bool = False):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.

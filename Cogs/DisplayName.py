@@ -4,6 +4,10 @@ import re
 from   discord.ext import commands
 from   Cogs import Nullify
 
+def setup(bot):
+	# This module isn't actually a cog
+    return
+
 def name(member : discord.Member):
     # A helper function to return the member's display name
     nick = name = None

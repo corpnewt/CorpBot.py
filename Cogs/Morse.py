@@ -7,6 +7,11 @@ import binascii
 import re
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Morse(bot, settings))
+
 class Morse:
 
 	# Init with the bot reference

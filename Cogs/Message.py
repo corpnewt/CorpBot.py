@@ -3,6 +3,10 @@ import discord
 import textwrap
 from   discord.ext import commands
 
+def setup(bot):
+	# Not a cog
+    return
+
 async def say(bot, msg, target, requestor, maxMessage : int = 5, characters : int = 2000, maxPage = None):
     """A helper function to get the bot to cut his text into chunks."""
     if not bot or not msg or not target:

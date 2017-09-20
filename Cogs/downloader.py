@@ -5,6 +5,10 @@ import youtube_dl
 
 from concurrent.futures import ThreadPoolExecutor
 
+def setup(bot):
+	# Not a cog
+	pass
+
 ytdl_playlist_format_options = {
     'format': 'bestaudio/best',
     'extractaudio': True,

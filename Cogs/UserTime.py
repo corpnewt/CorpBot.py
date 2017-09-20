@@ -2,6 +2,9 @@ import datetime
 import pytz
 from   Cogs import FuzzySearch
 
+def setup(bot):
+	# This module isn't actually a cog
+    return
 
 def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p"):
 	# Returns a dict representing the time from the passed member's perspective

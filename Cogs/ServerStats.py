@@ -7,6 +7,11 @@ from   Cogs        import Nullify
 from   Cogs        import DisplayName
 from   Cogs        import UserTime
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(ServerStats(bot, settings))
+
 class ServerStats:
 
     def __init__(self, bot, settings):

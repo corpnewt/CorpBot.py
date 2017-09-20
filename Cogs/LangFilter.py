@@ -10,6 +10,11 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import Message
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(LangFilter(bot, settings))
+
 class ProfanitiesFilter(object):
 	def __init__(self, filterlist, ignore_case=True, replacements="$@%-?!", 
 				 complete=True, inside_words=False):

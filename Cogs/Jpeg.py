@@ -6,6 +6,11 @@ from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Jpeg(bot, settings))
+
 class Jpeg:
 
 	# Init with the bot reference

@@ -11,6 +11,11 @@ from   Cogs import DisplayName
 from   Cogs import TinyURL
 from   pyquery import PyQuery as pq
 
+def setup(bot):
+	# Add the bot and deps
+	auth = "corpSiteAuth.txt"
+	bot.add_cog(Search(bot, auth))
+
 class Search:
 
 	# Init with the bot reference

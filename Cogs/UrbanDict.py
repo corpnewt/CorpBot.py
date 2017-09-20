@@ -9,6 +9,11 @@ from   Cogs import Settings
 from   Cogs import Message
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(UrbanDict(bot, settings))
+
 # This module grabs Urban Dictionary definitions
 
 class UrbanDict:

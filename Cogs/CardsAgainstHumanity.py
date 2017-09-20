@@ -15,6 +15,9 @@ from   Cogs import DisplayName
 from   Cogs import ReadableTime
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(CardsAgainstHumanity(bot))
 
 class CardsAgainstHumanity:
 
@@ -565,10 +568,10 @@ class CardsAgainstHumanity:
             # Judge doesn't need to lay a card
             if blackNum == 1:
                 # Singular
-                msg += '\n\nLay a card with `{}lay [card number]`'.format(self.prefix)
+                msg += '\n\nLay a card with `{}lay [card number]`'.format(ctx.prefix)
             elif blackNum > 1:
                 # Plural
-                msg += '\n\nLay **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, self.prefix)
+                msg += '\n\nLay **{} cards** with `{}lay [card numbers separated by commas (1,2,3)]`'.format(blackNum, ctx.prefix)
         
         stat_embed.set_author(name='Current Play')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(game['ID']))
@@ -634,7 +637,7 @@ class CardsAgainstHumanity:
             i+=1
             msg += '{}. {}\n'.format(i, ' - '.join(sub['Cards']))
         if judge == '**YOU** are':
-            msg += '\nPick a winner with `{}pick [submission number]`.'.format(self.prefix)
+            msg += '\nPick a winner with `{}pick [submission number]`.'.format(ctx.prefix)
 
         stat_embed.add_field(name="{} judging.".format(judge), value=msg)
         await user.send(embed=stat_embed)
@@ -896,14 +899,14 @@ class CardsAgainstHumanity:
             except Exception:
                 card = []
             if not len(card) == numberCards:
-                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
+                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return
             # Got something
             # Check for duplicates
             if not len(card) == len(set(card)):
-                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
+                msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return
@@ -912,7 +915,7 @@ class CardsAgainstHumanity:
                 try:
                     c = int(c)
                 except Exception:
-                    msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, self.prefix)
+                    msg = 'You need to lay **{} cards** (no duplicates) with `{}lay [card numbers separated by commas (1,2,3)]`'.format(numberCards, ctx.prefix)
                     await ctx.author.send(msg)
                     await self.showHand(ctx, author)
                     return
@@ -935,7 +938,7 @@ class CardsAgainstHumanity:
             try:
                 card = int(card)
             except Exception:
-                msg = 'You need to lay a valid card with `{}lay [card number]`'.format(self.prefix)
+                msg = 'You need to lay a valid card with `{}lay [card number]`'.format(ctx.prefix)
                 await ctx.author.send(msg)
                 await self.showHand(ctx, author)
                 return

@@ -13,6 +13,11 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Cats(bot, settings))
+
 # This module grabs Reddit posts and selects one at random
 
 class Cats:

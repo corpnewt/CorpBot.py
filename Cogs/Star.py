@@ -7,6 +7,12 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 import requests
 
+def setup(bot):
+	# Removed for now
+	return
+	# Add the bot
+	bot.add_cog(Star(bot))
+
 class Star:
     
 	def __init__(self, bot):

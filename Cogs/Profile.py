@@ -9,6 +9,11 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import Message
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Profile(bot, settings))
+
 # This is the profiles module.
 
 class Profile:

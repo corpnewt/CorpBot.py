@@ -7,6 +7,12 @@ from   Cogs import Settings
 from   Cogs import Xp
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import CheckRoles
+
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Feed(bot, settings))
 
 # This is the feed module.  It allows the bot to be fed,
 # get hungry, die, be resurrected, etc.
@@ -14,12 +20,10 @@ from   Cogs import Nullify
 class Feed:
 
 	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings, xp, prefix):
+	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.xp = xp
 		self.bot.loop.create_task(self.getHungry())
-		self.prefix = prefix
 		
 	async def message(self, message):
 		# Check the message and see if we should allow it.
@@ -32,14 +36,16 @@ class Feed:
 		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
 		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
 		isKill = self.settings.getServerStat(message.guild, "Killed")
+		# Get any commands in the message
+		context = await self.bot.get_context(message)
 		if isKill.lower() == "yes":
 			ignore = True
-			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
+			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
 				ignore = False
 				
 		if hunger >= 100 and hungerLock.lower() == "yes":
 			ignore = True
-			if message.content.startswith('{}iskill'.format(self.prefix)) or message.content.startswith('{}resurrect'.format(self.prefix)) or message.content.startswith('{}hunger'.format(self.prefix)) or message.content.startswith('{}feed'.format(self.prefix)):
+			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
 				ignore = False
 				
 		# Check if admin and override
@@ -170,7 +176,7 @@ class Feed:
 			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
 			
 		if isKill.lower() == "yes" and hunger > -150:
-			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, self.prefix)
+			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
 			
 		await channel.send(msg)
 		
@@ -314,7 +320,7 @@ class Feed:
 				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(author), food, int(payout))
 				
 				# Got XP - let's see if we need to promote
-				await self.xp.checkroles(author, channel)
+				await CheckRoles.checkroles(author, channel)
 			else:
 				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
 		

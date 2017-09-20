@@ -4,6 +4,11 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import CheckRoles
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(MessageXp(bot, settings))
+
 # This is the message xp module.  It's also likely to be retarded.
 
 class MessageXp:

@@ -8,6 +8,11 @@ from   Cogs import ReadableTime
 from   Cogs import Nullify
 from   Cogs import DisplayName
 
+def setup(bot):
+	# Add the cog
+	bot.remove_command("help")
+	bot.add_cog(Help(bot))
+
 # This is the Help module. It replaces the built-in help command
 
 class Help:
@@ -25,6 +30,21 @@ class Help:
 			bot_member = ctx.bot.user
 		# Replace name and nickname mentions
 		return ctx.prefix.replace(bot_member.mention, '@' + DisplayName.name(bot_member))
+
+	def _get_help(self, command, max_len = 0):
+		# A helper method to return the command help - or a placeholder if none
+		if max_len == 0:
+			# Get the whole thing
+			if command.help == None:
+				return "Help not available..."
+			else:
+				return command.help
+		else:
+			if command.help == None:
+				c_help = "Help not available..."
+			else:
+				c_help = command.help.split("\n")[0]
+			return (c_help[:max_len-3]+"...") if len(c_help) > max_len else c_help
 
 	async def _get_info(self, ctx, com = None):
 		# Helper method to return a list of embed content
@@ -75,7 +95,7 @@ class Help:
 					# Make sure there are non-hidden commands here
 					if command.hidden:
 						continue
-					command_help = (command.help[:77]+"...") if len(command.help) > 80 else command.help
+					command_help = self._get_help(command, 80)
 					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : "└─ " + command_help, "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):

@@ -17,6 +17,11 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Reddit(bot, settings))
+
 # This module grabs Reddit posts and selects one at random
 
 class MLStripper(HTMLParser):

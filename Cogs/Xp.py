@@ -10,6 +10,11 @@ from   Cogs import Nullify
 from   Cogs import CheckRoles
 from   Cogs import UserTime
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Xp(bot, settings))
+
 # This is the xp module.  It's likely to be retarded.
 
 class Xp:

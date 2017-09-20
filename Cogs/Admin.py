@@ -14,6 +14,11 @@ from   Cogs import CheckRoles
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Admin(bot, settings))
+
 class Admin:
 
 	# Init with the bot reference, and a reference to the settings var

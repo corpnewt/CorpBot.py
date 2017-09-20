@@ -5,7 +5,12 @@ import time
 from   datetime import datetime
 from   discord.ext import commands
 
-# This is the RateLimit module. It keeps users from being able to spam commands
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(GlobalMigration(bot, settings))
+
+# This is the GlobalMigration module.
 
 class GlobalMigration:
 

@@ -5,6 +5,10 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
 
+def setup(bot):
+	# Add the bot
+	bot.add_cog(Uptime(bot))
+
 # This is the Uptime module. It keeps track of how long the bot's been up
 
 class Uptime:

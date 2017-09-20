@@ -9,6 +9,12 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	mute     = bot.get_cog("Mute")
+	bot.add_cog(Strike(bot, settings, mute))
+
 # This is the Strike module. It keeps track of warnings and kicks/bans accordingly
 
 # Strikes = [ time until drops off ]
@@ -56,6 +62,8 @@ class Strike:
 		for server in self.bot.guilds:
 			for member in server.members:
 				strikes = self.settings.getUserStat(member, server, "Strikes")
+				if strikes == None:
+					continue
 				if len(strikes):
 					# We have a list
 					for strike in strikes:
@@ -222,8 +230,8 @@ class Strike:
 	@strike.error
 	async def strike_error(self, ctx, error):
 		# do stuff
-		msg = 'strike Error: {}'.format(ctx)
-		await error.channel.send(msg)
+		msg = 'strike Error: {}'.format(error)
+		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)

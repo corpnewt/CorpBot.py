@@ -9,6 +9,11 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Nullify
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Remind(bot, settings))
+
 # This is the Remind module. It sends a pm to a user after a specified amount of time
 
 # Reminder = { "End" : timeToEnd, "Message" : whatToSay }

@@ -7,6 +7,12 @@ from   Cogs import ReadableTime
 from   Cogs import DisplayName
 from   Cogs import Mute
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	mute     = bot.get_cog("Mute")
+	bot.add_cog(Fliptime(bot, settings, mute))
+
 # This is the Uptime module. It keeps track of how long the bot's been up
 
 class Fliptime:

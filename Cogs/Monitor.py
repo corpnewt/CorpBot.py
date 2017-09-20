@@ -2,6 +2,13 @@ import asyncio
 import discord
 from   discord.ext import commands
 
+def setup(bot):
+	# Disabled for now
+	return
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(Monitor(bot, settings))
+
 # This is the Monitor module. It keeps track of how many messages fail
 
 class Monitor:

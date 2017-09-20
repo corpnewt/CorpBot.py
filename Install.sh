@@ -2,8 +2,6 @@
 
 function main () {
     echo \#\#\# Updating CorpBot \#\#\#
-    
-    
     # Check for some linux
     if [[ "$(uname)" == "Linux"  && "$ignorepkg" != 1 ]]; then
         # Check what Linux we're on

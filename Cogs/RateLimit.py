@@ -5,6 +5,11 @@ import time
 from   datetime import datetime
 from   discord.ext import commands
 
+def setup(bot):
+	# Add the bot and deps
+	settings = bot.get_cog("Settings")
+	bot.add_cog(RateLimit(bot, settings))
+
 # This is the RateLimit module. It keeps users from being able to spam commands
 
 class RateLimit:
