@@ -132,12 +132,12 @@ class CogManager:
 			await ctx.send("It looks like my host environment doesn't have git in its path var :(")
 			return
 		# Try to update
-		try:
-			u = subprocess.Popen([git, 'pull'])
-			u.wait()
-			out, err = u.communicate()
-		except:
-			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
-			return
+		#try:
+		u = subprocess.Popen([git, 'pull'])
+		u.wait()
+		out, err = u.communicate()
+		#except:
+		#	await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
+		#	return
 		await ctx.send("Updated!")
 		
