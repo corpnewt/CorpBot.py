@@ -101,3 +101,42 @@ class CogManager:
 				await ctx.send("Extension failed to load...")
 			else:
 				await ctx.send("Extension reloaded!")
+				
+	@commands.command(pass_context=True)
+	async def update(self, ctx):
+		"""Updates from git."""
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		# Let's find out if we *have* git first
+		if os.name == 'nt':
+			# Check for git
+			command = "where"
+		else:
+			command = "which"
+		try:
+			p = subprocess.run(command + " git", shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+			git_location = p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
+		except:
+			git_location = None
+			
+		if not git_location:
+			await ctx.send("It looks like my host environment doesn't have git in its path var :(")
+			return
+		# Try to update
+		try:
+			u = subprocess.Popen([git, 'pull'])
+			u.wait()
+			out, err = u.communicate()
+		except:
+			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
+			return
+		await ctx.send("Updated!")
+		
