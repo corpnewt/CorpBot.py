@@ -285,7 +285,7 @@ async def on_message(message):
 	
 	# Check if we need to ignore or delete the message
 	# or respond or replace
-	ignore = delete = False
+	ignore, delete, react = False, False, False
 	respond = None
 	for cog in bot.cogs:
 		cog = bot.get_cog(cog)
@@ -308,6 +308,10 @@ async def on_message(message):
 			respond = check['Respond']
 		except KeyError:
 			pass
+		try:
+			react = check['Reaction']
+		except KeyError:
+			pass
 
 	if delete:
 		# We need to delete the message - top priority
@@ -318,6 +322,9 @@ async def on_message(message):
 		if respond:
 			# We have something to say
 			await message.channel.send(respond)
+		if react:
+			# We have something to react with
+			await message.add_reaction(react)
 		await bot.process_commands(message)
 
 @bot.event
