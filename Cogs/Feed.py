@@ -368,7 +368,7 @@ class Feed:
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms:
+			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 
@@ -405,7 +405,7 @@ class Feed:
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms:
+			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 
