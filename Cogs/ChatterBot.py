@@ -79,6 +79,9 @@ class ChatterBot:
 					check = await real_cog.message(message)
 				except AttributeError:
 					continue
+			if not type(check) is dict:
+				# Force it to be a dict
+				check = {}
 			try:
 				if check['Ignore']:
 					ignore = True
