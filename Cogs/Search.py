@@ -145,7 +145,7 @@ class Search:
 			to = to.replace("to","")
 			to = to.strip()
 
-		convert_url = "https://www.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
+		convert_url = "https://finance.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
 		r = requests.get(convert_url)
 		doc = pq(r.text)
 		result = str(doc('#currency_converter_result span').text())
