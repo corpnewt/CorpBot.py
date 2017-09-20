@@ -93,7 +93,6 @@ class ChatterBot:
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
-		print("Got message")
 		msg = message.content
 		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
 		the_prefix = await self.bot.command_prefix(self.bot, message)
@@ -101,10 +100,8 @@ class ChatterBot:
 			# We have a channel
 			# Now we check if we're hungry/dead and respond accordingly
 			if await self.killcheck(message):
-				print("Ignoring")
 				return { "Ignore" : True, "Delete" : False }
 			if str(message.channel.id) == str(chatChannel):
-				print("In chat channel")
 				# We're in that channel!
 				#ignore = True
 				# Strip prefix
