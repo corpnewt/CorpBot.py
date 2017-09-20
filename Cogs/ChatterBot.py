@@ -15,7 +15,10 @@ def setup(bot):
 	# Add the bot and deps
 	print("ChatterBot Setup Run")
 	settings = bot.get_cog("Settings")
-	bot.add_cog(ChatterBot(bot, settings))
+	c_bot = ChatterBot(bot, settings)
+	c_bot._load()
+	bot.add_cog(c_bot)
+	
 
 class ChatterBot:
 
@@ -33,7 +36,7 @@ class ChatterBot:
 		self.timeout = 3
 		self.chatBot = Kernel()
 
-	async def onready(self):
+	async def _load(self):
 		# We're ready - let's load the bots
 		if not os.path.exists(self.botBrain):
 			# No brain, let's learn and create one
