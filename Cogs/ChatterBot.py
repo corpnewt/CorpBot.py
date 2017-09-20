@@ -42,6 +42,9 @@ class ChatterBot:
 			# No brain, let's learn and create one
 			files = listdir(self.botDir)
 			for file in files:
+				# Omit files starting with .
+				if file.startswith("."):
+					continue
 				self.chatBot.learn(self.botDir + '/' + file)
 			# Save brain
 			self.chatBot.saveBrain(self.botBrain)
