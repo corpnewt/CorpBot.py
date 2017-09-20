@@ -294,6 +294,9 @@ async def on_message(message):
 		except AttributeError:
 			# Onto the next
 			continue
+		# Make sure we have things formatted right
+		if not type(check) is dict:
+			check = {}
 		try:
 			if check['Delete']:
 				delete = True
