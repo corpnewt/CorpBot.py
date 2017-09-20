@@ -24,6 +24,17 @@ class Heart:
 		except Exception:
 			# Couldn't get a member - just get the user
 			botMember = self.bot.user
+		react_list = []
+		# Get our hug phrases
+		hugs = [ "i need a hug", "i wish i had a hug", "i could use a hug", "hug me" ]
+		for hug in hugs:
+			if hug in message.content.lower():
+				# We need a hug, stat!
+				react_list.append("🤗")
+				break
 		if botMember.mention in message.content:
 			# We got a mention!
-			return { "Reaction" : "❤"}
+			react_list.append("❤")
+		# Return our reactions - if any
+		if len(react_list):
+			return { "Reaction" : react_list }
