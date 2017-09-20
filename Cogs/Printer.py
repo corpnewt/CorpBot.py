@@ -104,7 +104,7 @@ class Printer:
 		if not self.canDisplay(ctx.guild):
 			return
 		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}printer [url or attachment]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}print [url or attachment]`".format(ctx.prefix))
 			return
 
 		if url == None:
