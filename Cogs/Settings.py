@@ -480,7 +480,7 @@ class Settings:
 		try:
 			userList = self.serverDict['GlobalMembers']
 		except:
-			userList = []
+			userList = {}
 		
 		if str(user.id) in userList:
 			userList[str(user.id)][stat] = value
