@@ -8,6 +8,7 @@ import subprocess
 import traceback
 from   discord.ext import commands
 from   discord import errors
+from   Cogs import DisplayName
 
 # Let's load our prefix file
 prefix = '$'

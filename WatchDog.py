@@ -21,7 +21,7 @@ def get_bin(binary):
         command = "which"
     try:
         p = subprocess.run(command+" "+binary, shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
-        return p.stdout.decode("utf-8").strip("\n").strip("\r")
+        return p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
     except:
         return None
 
@@ -42,7 +42,7 @@ def update():
     print("\nTrying to update via git...\n")
     print("Using update script...\n")
     try:
-        u = subprocess.Popen([git, 'pull', 'origin', 'rewrite'])
+        u = subprocess.Popen([git, 'pull'])
         u.wait()
     except:
         print("Something went wrong!  Make sure you have git installed and in your path var!")
