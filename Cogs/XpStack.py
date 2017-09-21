@@ -172,7 +172,7 @@ class XpStack:
 		title = "Recent XP Transactions in {}".format(ctx.guild.name)
 		help_embed.title = title
 		
-		to_pm = len(help_embed.fields) > 25
+		to_pm = len(xp_array) > 25
 		page_count = 1
 		page_total = math.ceil(len(xp_array)/25)
 		
@@ -217,69 +217,7 @@ class XpStack:
 		if len(help_embed.fields):
 			help_embed.set_footer(text="Requested by " + str(ctx.author))
 			await self._send_embed(ctx, help_embed, to_pm)
-		
-		'''longest_num  = 0
-		longest_to   = 0
-		longest_from = 0
-		longest_xp   = 0
-		longest_time = 0
-		
-		
-		transections = []
-		
-		for i in range(len(xp_array)):
-			i = xp_array[len(xp_array)-1-i]
-			count += 1
-			to_user = DisplayName.memberForID(i["To"], ctx.guild)
-			if to_user == None:
-				to_user = DisplayName.roleForID(i["To"], ctx.guild)
-				if to_user == None:
-					to_user = "ID: " + str(i["To"])
-			from_user = DisplayName.memberForID(i["From"], ctx.guild)
-			if from_user == None:
-				from_user = DisplayName.roleForID(i["From"], ctx.guild)
-				if from_user == None:
-					from_user = "ID: " + str(i["From"])
-					
-			time = i["Time"]
-			amount = i["Amount"]
-			xp_string = "--[{} xp]-->".format(amount)
-			to_string = "{}".format(to_user)
-			time_string = "at {}".format(time)
-			
-			# Check lengths
-			if len(str(count)) > longest_num:
-				longest_num = len(str(count))
-			if len(str(from_user)) > longest_from:
-				longest_from = len(str(from_user))
-			if len(to_string) > longest_to:
-				longest_to = len(to_string)
-			if len(xp_string) > longest_xp:
-				longest_xp = len(xp_string)
-			if len(time_string) > longest_time:
-				longest_time = len(time_string)
-			# Add to list
-			transections.append([ str(count), str(from_user), xp_string, to_string, time_string ])
-			# msg += "{}. *{}* --[{} xp]--> *{}* at {}\n".format(count, from_user, amount, to_user, time)
-		# Format
-		for t in transections:
-			msg += "`{:>{n_w}}. {:>{f_w}} {:^{x_w}} {:<{t_w}} {:<{ti_w}}`\n".format(
-				t[0], 
-				t[1], 
-				t[2], 
-				t[3],
-				t[4],
-				n_w=longest_num, 
-				f_w=longest_from, 
-				x_w=longest_xp,
-				t_w=longest_to,
-				ti_w=longest_time
-			)
-		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)'''
+
 
 	# Catch custom xp event
 	@asyncio.coroutine
