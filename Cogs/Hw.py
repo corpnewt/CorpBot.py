@@ -300,7 +300,7 @@ class Hw:
 		msg = '"{}"\'s current parts:'.format(bname)
 		await hwChannel.send(msg)
 		if hwChannel == ctx.author:
-			await ctx.message.add_reaction("📫")
+			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
 
 		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
@@ -425,7 +425,7 @@ class Hw:
 
 		# Post the dm reaction
 		if hwChannel == ctx.author:
-			await ctx.message.add_reaction("📫")
+			await ctx.message.add_reaction("📬")
 
 		# Here, we have a build
 		bname = mainBuild['Name']
@@ -884,7 +884,7 @@ class Hw:
 
 		await hwChannel.send(msg)
 		if hwChannel == ctx.author:
-			await ctx.message.add_reaction("📫")
+			await ctx.message.add_reaction("📬")
 		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
 		
 		# Get the build name
