@@ -232,14 +232,14 @@ class Tags:
 				await channel.send(msg)
 				return
 				
-		msg = 'Tag "*{}*" not found!'.format(name)
+		msg = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
 		
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
 			msg+='```'
 		
 		# Check for suppress
@@ -281,14 +281,14 @@ class Tags:
 				await channel.send(msg)
 				return
 				
-		msg = 'Tag "*{}*" not found!'.format(name)
+		msg = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
 		
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
 			msg+='```'
 		
 		# Check for suppress
