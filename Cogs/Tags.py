@@ -245,7 +245,56 @@ class Tags:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await channel.send(msg)		
+		await channel.send(msg)	
+		
+	@commands.command(pass_context=True)
+	async def rawtag(self, ctx, *, name : str = None):
+		"""Retrieve a tag's raw markdown from the tag list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		if not name:
+			msg = 'Usage: `{}rawtag "[tag name]"`'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		tagList = self.settings.getServerStat(server, "Tags")
+		if not tagList or tagList == []:
+			msg = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		for atag in tagList:
+			if atag['Name'].lower() == name.lower():
+				msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'])
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await channel.send(msg)
+				return
+				
+		msg = 'Tag "*{}*" not found!'.format(name)
+		
+		# No tag - let's fuzzy search
+		potentialList = FuzzySearch.search(name, tagList, 'Name')
+		if len(potentialList):
+			msg+='\n\nDid you maybe mean one of the following?\n```\n'
+			for pot in potentialList:
+				msg+='{}\n'.format(pot['Item']['Name'])
+			msg+='```'
+		
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+		await channel.send(msg)
 
 	@commands.command(pass_context=True)
 	async def taginfo(self, ctx, *, name : str = None):
@@ -358,6 +407,52 @@ class Tags:
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
+		#await channel.send(tagText[:-2])
+		await Message.say(self.bot, tagText[:-2], ctx.channel, ctx.author, 1)
+		
+		
+	@commands.command(pass_context=True)
+	async def rawtags(self, ctx):
+		"""List raw markdown of all tags in the tags list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		argList = ctx.message.content.split()
+
+		if len(argList) > 1:
+			extraArgs = ' '.join(argList[1:len(argList)])
+			# We have a random attempt at a passed variable - Thanks Sydney!
+			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `{}tag {}`?'.format(extraArgs, ctx.prefix, extraArgs)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+		
+		tagList = self.settings.getServerStat(server, "Tags")
+		if tagList == None or tagList == []:
+			msg = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+			
+		# Sort by tag name
+		tagList = sorted(tagList, key=itemgetter('Name'))
+		tagText = "Current Tags:\n\n"
+		for atag in tagList:
+			tagText = '{}*{}*, '.format(tagText, atag['Name'])
+
+		# Speak the tag list while cutting off the end ", "
+		# Check for suppress
+		if suppress:
+			tagText = Nullify.clean(tagText.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
 		#await channel.send(tagText[:-2])
 		await Message.say(self.bot, tagText[:-2], ctx.channel, ctx.author, 1)
 
