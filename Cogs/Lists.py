@@ -64,7 +64,7 @@ class Lists:
 				return
 				
 		# Passed role requirements!
-		if not (name or link):
+		if name == None or link == None:
 			msg = 'Usage: `{}addlink "[link name]" [url]`'.format(ctx.prefix)
 			await channel.send(msg)
 			return
@@ -190,20 +190,69 @@ class Lists:
 				await channel.send(msg)
 				return
 				
-		msg = 'Link "*{}*" not found!'.format(name)
+		msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
 		
 		# No link - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
 			msg+='```'
 		
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await channel.send(msg)		
+		await channel.send(msg)	
+		
+	@commands.command(pass_context=True)
+	async def rawlink(self, ctx, *, name : str = None):
+		"""Retrieve a link's raw markdown from the link list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		if not name:
+			msg = 'Usage: `{}rawlink "[link name]"`'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		linkList = self.settings.getServerStat(server, "Links")
+		if not linkList or linkList == []:
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		for alink in linkList:
+			if alink['Name'].lower() == name.lower():
+				msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await channel.send(msg)
+				return
+				
+		msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		
+		# No link - let's fuzzy search
+		potentialList = FuzzySearch.search(name, linkList, 'Name')
+		if len(potentialList):
+			msg+='\n\nDid you maybe mean one of the following?\n```\n'
+			for pot in potentialList:
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
+			msg+='```'
+		
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await channel.send(msg)	
 
 	@commands.command(pass_context=True)
 	async def linkinfo(self, ctx, *, name : str = None):
@@ -293,7 +342,8 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
+			extraArgs = extraArgs.replace('`', '\\`')
+			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -311,6 +361,53 @@ class Lists:
 		linkText = "Current Links:\n\n"
 		for alink in linkList:
 			linkText = '{}*{}*, '.format(linkText, alink['Name'])
+
+		# Speak the link list while cutting off the end ", "
+		# Check for suppress
+		if suppress:
+			linkText = Nullify.clean(linkText)
+		#await channel.send(linkText[:-2])
+		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		
+		
+	@commands.command(pass_context=True)
+	async def rawlinks(self, ctx):
+		"""List raw markdown of all links in the link list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		argList = ctx.message.content.split()
+
+		if len(argList) > 1:
+			extraArgs = ' '.join(argList[1:len(argList)])
+			# We have a random attempt at a passed variable - Thanks Sydney!
+			extraArgs = extraArgs.replace('`', '\\`')
+			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+		
+		linkList = self.settings.getServerStat(server, "Links")
+		if linkList == None or linkList == []:
+			msg = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+			
+		# Sort by link name
+		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkText = "Current Links:\n\n"
+		for alink in linkList:
+			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
 
 		# Speak the link list while cutting off the end ", "
 		# Check for suppress
@@ -386,7 +483,7 @@ class Lists:
 				return
 				
 		# Passed role requirements!
-		if not (name or hack):
+		if name == None or hack == None:
 			msg = 'Usage: `{}addhack "[hack name]" [hack]`'.format(ctx.prefix)
 			await channel.send(msg)
 			return
@@ -512,14 +609,62 @@ class Lists:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
-		msg = 'Hack "*{}*" not found!'.format(name)
+		msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
 		
 		# No hack - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
 			msg+='\n\nDid you maybe mean one of the following?\n```\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'])
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
+			msg+='```'
+		
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await channel.send(msg)
+		
+	@commands.command(pass_context=True)
+	async def rawhack(self, ctx, *, name : str = None):
+		"""Retrieve a hack's raw markdown from the hack list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		if not name:
+			msg = 'Usage: `{}rawhack "[hack name]"`'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		linkList = self.settings.getServerStat(server, "Hacks")
+		if not linkList or linkList == []:
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		for alink in linkList:
+			if alink['Name'].lower() == name.lower():
+				msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await channel.send(msg)
+				return
+		msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		
+		# No hack - let's fuzzy search
+		potentialList = FuzzySearch.search(name, linkList, 'Name')
+		if len(potentialList):
+			msg+='\n\nDid you maybe mean one of the following?\n```\n'
+			for pot in potentialList:
+				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
 			msg+='```'
 		
 		# Check for suppress
@@ -615,7 +760,8 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			msg = 'You passed *{}* to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
+			extraArgs = extraArgs.replace('`', '\\`')
+			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -634,6 +780,54 @@ class Lists:
 
 		for alink in linkList:
 			linkText = '{}*{}*, '.format(linkText, alink['Name'])
+
+		# Speak the hack list while cutting off the end ", "
+		# Check for suppress
+		if suppress:
+			linkText = Nullify.clean(linkText)
+		#await channel.send(linkText[:-2])
+		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		
+		
+	@commands.command(pass_context=True)
+	async def rawhacks(self, ctx):
+		"""List raw markdown of all hacks in the hack list."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		argList = ctx.message.content.split()
+
+		if len(argList) > 1:
+			extraArgs = ' '.join(argList[1:len(argList)])
+			# We have a random attempt at a passed variable - Thanks Sydney!
+			extraArgs = extraArgs.replace('`', '\\`')
+			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+
+		linkList = self.settings.getServerStat(server, "Hacks")
+		if not linkList or linkList == []:
+			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
+			await channel.send(msg)
+			return
+
+		# Sort by link name
+		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkText = "Current Hacks:\n\n"
+
+		for alink in linkList:
+			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
 
 		# Speak the hack list while cutting off the end ", "
 		# Check for suppress
