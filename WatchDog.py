@@ -65,9 +65,10 @@ def main():
         if bot_process.returncode == 3:
             print("\nShut down.")
             exit(0)
-        elif bot_process.returncode == 1:
-            print("\nERROR LEVEL 1 - Exiting.")
-            exit(1)
+        # Removed to force a restart
+        # elif bot_process.returncode == 1:
+        #     print("\nERROR LEVEL 1 - Exiting.")
+        #     exit(1)
         elif bot_process.returncode == 2:
             print("\nRebooting...")
             update()
