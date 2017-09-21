@@ -106,7 +106,7 @@ class Tags:
 				return
 				
 		# Passed role requirements!
-		if not (name or tag):
+		if name == None or tag == None:
 			msg = 'Usage: `{}addtag "[tag name]" [tag]`'.format(ctx.prefix)
 			await channel.send(msg)
 			return
