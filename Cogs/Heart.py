@@ -36,7 +36,7 @@ class Heart:
 				react_list.append("🤗")
 				break'''
 		matches = re.finditer(self.regex, message.content.lower())
-		if len(matches):
+		if len(list(matches)):
 			# We need a hug, stat!
 			react_list.append("🤗")
 		if botMember.mention in message.content:
