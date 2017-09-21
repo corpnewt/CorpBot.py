@@ -456,7 +456,7 @@ class Profile:
 		linkList = sorted(linkList, key=itemgetter('Name'))
 		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
 		for alink in linkList:
-			linkText += '`{}`, '.format(linkText, alink['Name'].replace('`', '\\`'))
+			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
 
 		# Check for suppress
 		if suppress:
