@@ -120,7 +120,7 @@ class Help:
 			# More than 2 pages, try to dm
 			try:
 				await ctx.author.send(embed=embed)
-				await ctx.message.add_reaction("📫")
+				await ctx.message.add_reaction("📬")
 			except discord.Forbidden:
 				await ctx.send(embed=embed)
 			return
