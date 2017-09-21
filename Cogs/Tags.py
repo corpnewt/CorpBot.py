@@ -274,7 +274,7 @@ class Tags:
 
 		for atag in tagList:
 			if atag['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'])
+				msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -293,7 +293,7 @@ class Tags:
 		
 		# Check for suppress
 		if suppress:
-			msg = Nullify.clean(msg.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+			msg = Nullify.clean(msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
