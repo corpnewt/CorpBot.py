@@ -174,7 +174,7 @@ class XpStack:
 		
 		to_pm = len(help_embed.fields) > 25
 		page_count = 1
-		page_total = math.ceil(len(result["fields"])/25)
+		page_total = math.ceil(len(xp_array)/25)
 		
 		if page_total > 1:
 			help_embed.title = title + " (Page {:,} of {:,})".format(page_count, page_total)
