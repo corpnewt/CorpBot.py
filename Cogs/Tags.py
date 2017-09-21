@@ -430,7 +430,7 @@ class Tags:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+			extraArgs = extraArgs.replace('`', '\\`')
 			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}tag {}`?'.format(extraArgs, ctx.prefix, extraArgs)
 			# Check for suppress
 			if suppress:
@@ -448,7 +448,7 @@ class Tags:
 		tagList = sorted(tagList, key=itemgetter('Name'))
 		tagText = "Current Tags:\n\n"
 		for atag in tagList:
-			tagText +='`{}`, '.format(atag['Name'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+			tagText +='`{}`, '.format(atag['Name'].replace('`', '\\`'))
 
 		# Speak the tag list while cutting off the end ", "
 		# Check for suppress
