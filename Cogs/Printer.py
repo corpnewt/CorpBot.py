@@ -73,7 +73,7 @@ class Printer:
 			img = np.sum( np.asarray( img.resize(S) ), axis=2)
 			img -= img.min()
 			img = (1.0 - img/img.max())**GCF*(chars.size-1)
-			a = "\n".join( ("".join(r) for r in chars[img.astype(int)]))
+			a = "\n".join( ("".join(r) for r in chars[len(chars)-img.astype(int)-1]))
 			a = "```\n" + a + "```"
 			return a
 		except Exception:
