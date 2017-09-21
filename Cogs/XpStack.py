@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import random
+import math
 from   datetime import datetime
 from   discord.ext import commands
 from   operator import itemgetter
@@ -30,6 +31,18 @@ class XpStack:
 			return Nullify.clean(msg)
 		else:
 			return msg
+		
+	async def _send_embed(self, ctx, embed, pm = False):
+		# Helper method to send embeds to their proper location
+		if pm == True and not ctx.channel == ctx.author.dm_channel:
+			# More than 2 pages, try to dm
+			try:
+				await ctx.author.send(embed=embed)
+				await ctx.message.add_reaction("📫")
+			except discord.Forbidden:
+				await ctx.send(embed=embed)
+			return
+		await ctx.send(embed=embed)
 
 	@commands.command(pass_context=True)
 	async def clearallxp(self, ctx):
@@ -152,13 +165,65 @@ class XpStack:
 			return
 
 		count = 0
-		msg = "__Recent XP Transactions in *{}*:__\n\n".format(self.suppressed(ctx.guild, ctx.guild.name))
 		
-		longest_num  = 0
+		# msg = "__Recent XP Transactions in *{}*:__\n\n".format(self.suppressed(ctx.guild, ctx.guild.name))
+		
+		help_embed = discord.Embed(color=ctx.author.color)
+		title = "Recent XP Transactions in {}".format(ctx.guild.name)
+		help_embed.title = title
+		
+		to_pm = len(help_embed.fields) > 25
+		page_count = 1
+		page_total = math.ceil(len(result["fields"])/25)
+		
+		if page_total > 1:
+			help_embed.title = title + " (Page {:,} of {:,})".format(page_count, page_total)
+		for i in range(len(xp_array)):
+			i = xp_array[len(xp_array)-1-i]
+			# Add the field
+			to_user = DisplayName.memberForID(i["To"], ctx.guild)
+			if to_user == None:
+				to_user = DisplayName.roleForID(i["To"], ctx.guild)
+				if to_user == None:
+					to_user = "ID: " + str(i["To"])
+			from_user = DisplayName.memberForID(i["From"], ctx.guild)
+			if from_user == None:
+				from_user = DisplayName.roleForID(i["From"], ctx.guild)
+				if from_user == None:
+					from_user = "ID: " + str(i["From"])
+			
+			# Build the name of the field
+			f_name = "{} -- to --> {}".format(from_user, to_user)
+			# Make sure the field names are 256 chars max
+			f_name = (f_name[:253]+"...") if len(f_name) > 256 else f_name
+			
+			# Get the xp amount and time
+			f_value = "\* {} xp\n\* {}".format(i["Amount"], i["Time"])
+			# Make sure it's 1024 chars max
+			f_value = (f_value[:1021]+"...") if len(f_value) > 1024 else f_value
+			
+			# Add the field
+			help_embed.add_field(name=f_name, value=f_value, inline=False)
+			# 25 field max - send the embed if we get there
+			if len(help_embed.fields) >= 25:
+				if page_total == page_count:
+					help_embed.set_footer(text="Requested by " + str(ctx.author))
+				await self._send_embed(ctx, help_embed, to_pm)
+				help_embed.clear_fields()
+				page_count += 1
+				if page_total > 1:
+					help_embed.title = title + " (Page {:,} of {:,})".format(page_count, page_total)
+		
+		if len(help_embed.fields):
+			help_embed.set_footer(text="Requested by " + str(ctx.author))
+			await self._send_embed(ctx, help_embed, to_pm)
+		
+		'''longest_num  = 0
 		longest_to   = 0
 		longest_from = 0
 		longest_xp   = 0
 		longest_time = 0
+		
 		
 		transections = []
 		
@@ -214,7 +279,7 @@ class XpStack:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
+		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)'''
 
 	# Catch custom xp event
 	@asyncio.coroutine
