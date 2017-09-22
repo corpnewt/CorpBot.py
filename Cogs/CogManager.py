@@ -153,11 +153,11 @@ class CogManager:
 			if not str(extension) in ext_list:
 				ext_list[str(extension)] = []
 			# Get the extension
-			# b_ext = self.bot.extensions.get(extension)
+			b_ext = self.bot.extensions.get(extension)
 			for cog in self.bot.cogs:
 				# Get the cog
-				# b_cog = self.bot.get_cog(cog)
-				if self._is_submodule(str(extension), str(cog)):
+				b_cog = self.bot.get_cog(cog)
+				if self._is_submodule(b_ext.__name__, b_cog.__module__):
 					# Submodule - add it to the list
 					ext_list[str(extension)].append(str(cog))
 		
@@ -175,7 +175,10 @@ class CogManager:
 		else:
 			help_embed.title = "Extensions"
 		for embed in ext_list:
-			help_embed.add_field(name=embed, value=", ".join(ext_list[embed]), inline=embed["inline"])
+			if len(ext_list[embed]):
+				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=False)
+			else:
+				help_embed.add_field(name=embed, value="└─ None", inline=False)
 			# 25 field max - send the embed if we get there
 			if len(help_embed.fields) >= 25:
 				if page_total == page_count:
