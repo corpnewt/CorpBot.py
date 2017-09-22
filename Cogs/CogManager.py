@@ -40,8 +40,16 @@ class CogManager:
 				if ext.lower().endswith(".py") and not (ext.lower() in ["settings.py", "mute.py"]):
 					# Valid cog - load it
 					cog_count += 1
+					# Try unloading
+					try:
+						self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+						self.bot.unload_extension("Cogs."+ext[:-3])
+					except:
+						pass
+					# Try to load
 					try:
 						self.bot.load_extension("Cogs." + ext[:-3])
+						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 						cog_loaded += 1
 					except:
 						print("{} not loaded!".format(ext[:-3]))
