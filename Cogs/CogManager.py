@@ -149,9 +149,10 @@ class CogManager:
 			
 		# Setup blank dict
 		ext_list = {}
+		cog_less = []
 		for extension in self.bot.extensions:
-			if not str(extension) in ext_list:
-				ext_list[str(extension)] = []
+			if not str(extension)[5:] in ext_list:
+				ext_list[str(extension)[5:]] = []
 			# Get the extension
 			b_ext = self.bot.extensions.get(extension)
 			for cog in self.bot.cogs:
@@ -159,13 +160,16 @@ class CogManager:
 				b_cog = self.bot.get_cog(cog)
 				if self._is_submodule(b_ext.__name__, b_cog.__module__):
 					# Submodule - add it to the list
-					ext_list[str(extension)].append(str(cog))
+					ext_list[str(extension)[5:]].append(str(cog))
+			if not len(ext_list[str(extension)[5:]]):
+				ext_list.pop(str(extension)[5:])
+				cog_less.append(str(extension)[5:])
 		
-		if not len(ext_list):
+		if not len(ext_list) and not len(cog_less):
 			# no extensions - somehow... just return
 			return
 		
-		print(ext_list)
+		ext_list["Cogless"] = cog_less
 		
 		to_pm = len(ext_list) > 25
 		page_count = 1
