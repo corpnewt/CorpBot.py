@@ -50,7 +50,7 @@ settings = None
 with open('token.txt', 'r') as f:
 	token = f.read().strip()
 
-def _load_extensions():
+'''def _load_extensions():
 	# Start with settings and mute as it's imperitive to load them first
 	global settings
 	bot.load_extension("Cogs.Settings")
@@ -77,25 +77,45 @@ def _load_extensions():
 	if cog_count == 1:
 		print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
 	else:
-		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
+		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))'''
 
 # Main bot events
 @bot.event
 async def on_ready():
 	print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
-
-	# Load extensions
-	_load_extensions()
-
-	# Let cogs ready up
-	respond = None
+	
+	# Globalize Settings for later use
+	global settings
+	
+	# Load extensions - Bypassed for now
+	# _load_extensions()
+	
+	# Let's try to use the CogManager class to load things
+	bot.load_extension("Cogs.CogManager")
+	cg_man = bot.get_cog("CogManager")
+	
+	# Load up the rest of the extensions
+	cog_loaded, cog_count = cg_man._load_extension()
+	
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
+	
+	# Output the load counts
+	if cog_count == 1:
+		print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
+	else:
+		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
+	
+	
+	# Let cogs ready up - removed in lieu of the on_loaded_extension() event handler
+	'''respond = None
 	for cog in bot.cogs:
 		cog = bot.get_cog(cog)
 		try:
 			await cog.onready()
 		except AttributeError:
 			# Onto the next
-			continue
+			continue'''
 
 	# Return the dict key or None if it doesn't exist
 	# Also deletes said key
