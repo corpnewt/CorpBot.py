@@ -7,15 +7,14 @@ from   Cogs import DisplayName
 
 def setup(bot):
 	# Add the bot
-	settings = bot.get_cog("Settings")
-	bot.add_cog(CogManager(bot, settings))
+	bot.add_cog(CogManager(bot))
 
 class CogManager:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
+	def __init__(self, bot):
 		self.bot = bot
-		self.settings = settings
+		self.settings = None
 
 	@asyncio.coroutine
 	async def on_ready(self):
@@ -28,10 +27,10 @@ class CogManager:
 		if extension == None:
 			# Load them all!
 			self.bot.load_extension("Cogs.Settings")
-			bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Settings"))
-			settings = self.bot.get_cog("Settings")
+			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Settings"))
+			self.settings = self.bot.get_cog("Settings")
 			self.bot.load_extension("Cogs.Mute")
-			bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Mute"))
+			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Mute"))
 			cog_count = 2 # Assumes the prior 2 loaded correctly
 			cog_loaded = 2 # Again, assumes success above
 			# Load the rest of the cogs
