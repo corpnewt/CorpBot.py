@@ -157,7 +157,7 @@ class CogManager:
 			for cog in self.bot.cogs:
 				# Get the cog
 				b_cog = self.bot.get_cog(cog)
-				if self._is_submodule(b_ext, b_cog):
+				if self._is_submodule(extension, cog):
 					# Submodule - add it to the list
 					ext_list[extension].append(cog)
 		
