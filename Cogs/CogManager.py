@@ -153,11 +153,11 @@ class CogManager:
 			if not extension in ext_list:
 				ext_list[extension] = []
 			# Get the extension
-			b_ext = self.bot.extensions.get(extension)
+			# b_ext = self.bot.extensions.get(extension)
 			for cog in self.bot.cogs:
 				# Get the cog
-				b_cog = self.bot.get_cog(cog)
-				if self._is_submodule(extension, cog):
+				# b_cog = self.bot.get_cog(cog)
+				if self._is_submodule(str(extension), str(cog)):
 					# Submodule - add it to the list
 					ext_list[extension].append(cog)
 		
