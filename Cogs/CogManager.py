@@ -1,6 +1,8 @@
 import asyncio
 import discord
 import os
+import random
+import math
 import subprocess
 from   discord.ext import commands
 from   Cogs import DisplayName
@@ -15,6 +17,30 @@ class CogManager:
 	def __init__(self, bot):
 		self.bot = bot
 		self.settings = None
+		self.colors = [ 
+				discord.Color.teal(),
+				discord.Color.dark_teal(),
+				discord.Color.green(),
+				discord.Color.dark_green(),
+				discord.Color.blue(),
+				discord.Color.dark_blue(),
+				discord.Color.purple(),
+				discord.Color.dark_purple(),
+				discord.Color.magenta(),
+				discord.Color.dark_magenta(),
+				discord.Color.gold(),
+				discord.Color.dark_gold(),
+				discord.Color.orange(),
+				discord.Color.dark_orange(),
+				discord.Color.red(),
+				discord.Color.dark_red(),
+				discord.Color.lighter_grey(),
+				discord.Color.dark_grey(),
+				discord.Color.light_grey(),
+				discord.Color.darker_grey(),
+				discord.Color.blurple(),
+				discord.Color.greyple()
+				]
 
 	@asyncio.coroutine
 	async def on_ready(self):
@@ -90,7 +116,81 @@ class CogManager:
 				except:
 					return ( 0, 1 )
 		return ( 0, 0 )
+	
+	async def _send_embed(self, ctx, embed, pm = False):
+		# Helper method to send embeds to their proper location
+		if pm == True and not ctx.channel == ctx.author.dm_channel:
+			# More than 2 pages, try to dm
+			try:
+				await ctx.author.send(embed=embed)
+				await ctx.message.add_reaction("📬")
+			except discord.Forbidden:
+				await ctx.send(embed=embed)
+			return
+		await ctx.send(embed=embed)
+		
+	# Proof of concept stuff for reloading cog/extension
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+	
 
+	@commands.command(pass_context=True)
+	async def extensions(self, ctx):
+		"""Lists all extensions and their corresponding cogs."""
+		# Build the embed
+		if type(ctx.author) is discord.Member:
+			help_embed = discord.Embed(color=ctx.author.color)
+		else:
+			help_embed = discord.Embed(color=random.choice(self.colors))
+			
+		# Setup blank dict
+		ext_list = {}
+		for extension in self.bot.extensions:
+			if not extension in ext_list:
+				ext_list[extension] = []
+			# Get the extension
+			b_ext = self.bot.extensions.get(extension)
+			for cog in self.bot.cogs:
+				# Get the cog
+				b_cog = self.bot.get_cog(cog)
+				if self._is_submodule(b_ext, b_cog):
+					# Submodule - add it to the list
+					ext_list[extension].append(cog)
+		
+		if not len(ext_list):
+			# no extensions - somehow... just return
+			return
+		
+		to_pm = len(ext_list) > 10
+		page_count = 1
+		page_total = math.ceil(len(ext_list)/25)
+		if page_total > 1:
+			help_embed.title = "Extensions (Page {:,} of {:,})".format(page_count, page_total)
+		else:
+			help_embed.title = "Extensions"
+		for embed in ext_list:
+			help_embed.add_field(name=embed, value=", ".join(ext_list[embed]), inline=embed["inline"])
+			# 25 field max - send the embed if we get there
+			if len(help_embed.fields) >= 25:
+				if page_total == page_count:
+					if len(ext_list) == 1:
+						help_embed.set_footer(text="1 Extension Total")
+					else:
+						help_embed.set_footer(text="{} Extensions Total".format(len(ext_list)))
+				await self._send_embed(ctx, help_embed, to_pm)
+				help_embed.clear_fields()
+				page_count += 1
+				if page_total > 1:
+					help_embed.title = "Extensions (Page {:,} of {:,})".format(page_count, page_total)
+		
+		if len(help_embed.fields):
+			if len(ext_list) == 1:
+				help_embed.set_footer(text="1 Extension Total")
+			else:
+				help_embed.set_footer(text="{} Extensions Total".format(len(ext_list)))
+			await self._send_embed(ctx, help_embed, to_pm)
+		
+	
 	@commands.command(pass_context=True)
 	async def reload(self, ctx, *, extension = None):
 		"""Reloads the passed extension."""
