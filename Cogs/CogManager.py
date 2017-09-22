@@ -167,7 +167,7 @@ class CogManager:
 		
 		print(ext_list)
 		
-		to_pm = len(ext_list) > 10
+		to_pm = len(ext_list) > 25
 		page_count = 1
 		page_total = math.ceil(len(ext_list)/25)
 		if page_total > 1:
@@ -176,7 +176,7 @@ class CogManager:
 			help_embed.title = "Extensions"
 		for embed in ext_list:
 			if len(ext_list[embed]):
-				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=False)
+				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=True)
 			else:
 				help_embed.add_field(name=embed, value="└─ None", inline=False)
 			# 25 field max - send the embed if we get there
