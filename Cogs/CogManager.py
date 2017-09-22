@@ -169,7 +169,14 @@ class CogManager:
 			# no extensions - somehow... just return
 			return
 		
-		ext_list["Cogless"] = cog_less
+		# Get all keys and sort them
+		key_list = list(ext_list.keys())
+		key_list = sorted(key_list)
+		
+		if len(cog_less):
+			ext_list["Cogless"] = cog_less
+			# add the cogless extensions at the end
+			key_list.append("Cogless")
 		
 		to_pm = len(ext_list) > 25
 		page_count = 1
@@ -178,7 +185,7 @@ class CogManager:
 			help_embed.title = "Extensions (Page {:,} of {:,})".format(page_count, page_total)
 		else:
 			help_embed.title = "Extensions"
-		for embed in ext_list:
+		for embed in key_list:
 			if len(ext_list[embed]):
 				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=True)
 			else:
