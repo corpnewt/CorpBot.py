@@ -41,8 +41,10 @@ class CogManager:
 					cog_count += 1
 					# Try unloading
 					try:
-						self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-						self.bot.unload_extension("Cogs."+ext[:-3])
+						# Only unload if loaded
+						if "Cogs."+ext[:-3] in self.bot.extensions:
+							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+							self.bot.unload_extension("Cogs."+ext[:-3])
 					except:
 						pass
 					# Try to load
@@ -60,8 +62,10 @@ class CogManager:
 					# Found it - check if loaded
 					# Try unloading
 					try:
-						self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-						self.bot.unload_extension("Cogs."+ext[:-3])
+						# Only unload if loaded
+						if "Cogs."+ext[:-3] in self.bot.extensions:
+							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+							self.bot.unload_extension("Cogs."+ext[:-3])
 					except:
 						pass
 					# Try to load
