@@ -165,6 +165,8 @@ class CogManager:
 			# no extensions - somehow... just return
 			return
 		
+		print(ext_list)
+		
 		to_pm = len(ext_list) > 10
 		page_count = 1
 		page_total = math.ceil(len(ext_list)/25)
