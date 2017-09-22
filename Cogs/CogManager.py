@@ -6,17 +6,22 @@ import math
 import subprocess
 from   discord.ext import commands
 from   Cogs import DisplayName
+from   Cogs import Settings
 
 def setup(bot):
 	# Add the bot
-	bot.add_cog(CogManager(bot))
+	try:
+		settings = bot.get_cog("Settings")
+	except:
+		settings = None
+	bot.add_cog(CogManager(bot, settings))
 
 class CogManager:
 
 	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
+	def __init__(self, bot, settings):
 		self.bot = bot
-		self.settings = None
+		self.settings = settings
 		self.colors = [ 
 				discord.Color.teal(),
 				discord.Color.dark_teal(),
@@ -54,8 +59,6 @@ class CogManager:
 			# Load them all!
 			self.bot.load_extension("Cogs.Settings")
 			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Settings"))
-			self.settings = self.bot.get_cog("Settings")
-			print("Got setings: {}".format(self.settings))
 			self.bot.load_extension("Cogs.Mute")
 			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Mute"))
 			cog_count = 2 # Assumes the prior 2 loaded correctly
