@@ -50,35 +50,6 @@ settings = None
 with open('token.txt', 'r') as f:
 	token = f.read().strip()
 
-'''def _load_extensions():
-	# Start with settings and mute as it's imperitive to load them first
-	global settings
-	bot.load_extension("Cogs.Settings")
-	bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Settings"))
-	settings = bot.get_cog("Settings")
-	bot.load_extension("Cogs.Mute")
-	bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Mute"))
-	cog_count = 2 # Assumes the prior 2 loaded correctly
-	cog_loaded = 2 # Again, assumes success above
-	# Load the rest of the cogs
-	for ext in os.listdir("Cogs"):
-		# Avoid reloading Settings and Mute
-		if ext.lower().endswith(".py") and not (ext.lower() == "settings.py" or ext.lower() == "mute.py"):
-			# Valid cog - load it
-			cog_count += 1
-			#try:
-			c = "Cogs." + ext[:-3]
-			bot.load_extension(c)
-			bot.dispatch("loaded_extension", bot.extensions.get(c))
-			cog_loaded += 1
-			#except:
-			#	print("{} not loaded!".format(ext[:-3]))
-			#	pass
-	if cog_count == 1:
-		print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
-	else:
-		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))'''
-
 # Main bot events
 @bot.event
 async def on_ready():
@@ -105,17 +76,6 @@ async def on_ready():
 		print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
 	else:
 		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
-	
-	
-	# Let cogs ready up - removed in lieu of the on_loaded_extension() event handler
-	'''respond = None
-	for cog in bot.cogs:
-		cog = bot.get_cog(cog)
-		try:
-			await cog.onready()
-		except AttributeError:
-			# Onto the next
-			continue'''
 
 	# Return the dict key or None if it doesn't exist
 	# Also deletes said key
