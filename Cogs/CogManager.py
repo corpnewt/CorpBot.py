@@ -55,6 +55,7 @@ class CogManager:
 			self.bot.load_extension("Cogs.Settings")
 			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Settings"))
 			self.settings = self.bot.get_cog("Settings")
+			print("Got setings: {}".format(self.settings))
 			self.bot.load_extension("Cogs.Mute")
 			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Mute"))
 			cog_count = 2 # Assumes the prior 2 loaded correctly
