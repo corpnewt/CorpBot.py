@@ -33,6 +33,7 @@ class Strike:
 		self.bot = bot
 		self.settings = settings
 		self.mute = mute
+		self.loop_list = []
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -57,7 +58,23 @@ class Strike:
 			self.settings.setUserStat(member, server, "Cooldown", None)
 			await self.mute.mute(member, server)
 
-	async def onready(self):
+	# Proof of concept stuff for reloading cog/extension
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@asyncio.coroutine
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for task in self.loop_list:
+			task.cancel()
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
 		# Check all strikes - and start timers
 		for server in self.bot.guilds:
 			for member in server.members:
@@ -69,7 +86,7 @@ class Strike:
 					for strike in strikes:
 						# Make sure it's a strike that *can* roll off
 						if not strike['Time'] == -1:
-							self.bot.loop.create_task(self.checkStrike(member, strike))
+							self.loop_list.append(self.bot.loop.create_task(self.checkStrike(member, strike)))
 
 	async def checkStrike(self, member, strike):
 		# Start our countdown
@@ -151,7 +168,7 @@ class Strike:
 			strike['Time'] = -1
 		else:
 			strike['Time'] = currentTime+(86400*days)
-			self.bot.loop.create_task(self.checkStrike(member, strike))
+			self.loop_list.append(self.bot.loop.create_task(self.checkStrike(member, strike)))
 		strike['Message'] = message
 		strike['GivenBy'] = ctx.message.author.id
 		strikes = self.settings.getUserStat(member, ctx.message.guild, "Strikes")

@@ -5,9 +5,9 @@ from Cogs import DisplayName
 from Cogs import Nullify
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Mute(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Mute(bot, settings))
 
 class Mute:
 
@@ -15,6 +15,36 @@ class Mute:
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        self.loop_list = []
+
+    def _is_submodule(self, parent, child):
+        return parent == child or child.startswith(parent + ".")
+
+    @asyncio.coroutine
+    async def on_unloaded_extension(self, ext):
+        # Called to shut things down
+        if not self._is_submodule(ext.__name__, self.__module__):
+            return
+        for task in self.loop_list:
+            task.cancel()
+
+    @asyncio.coroutine
+    async def on_loaded_extension(self, ext):
+        # See if we were loaded
+        if not self._is_submodule(ext.__name__, self.__module__):
+            return
+        # Check all mutes and start timers
+        for server in self.bot.guilds:
+            muteList = self.settings.getServerStat(server, "MuteList")
+            for entry in muteList:
+                member = DisplayName.memberForID(entry['ID'], server)
+                if member:
+                    # We have a user! Check for a cooldown
+                    cooldown = entry['Cooldown']
+                    if cooldown == None:
+                        continue
+                    self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+                    
         
     def suppressed(self, guild, msg):
         # Check if we're suppressing @here and @everyone mentions
@@ -30,32 +60,6 @@ class Mute:
             if str(entry['ID']) == str(member.id):
                 # Found them - mute them
                 await self.mute(member, server, entry['Cooldown'])
-
-    '''async def onready(self):
-        # Check all reminders - and start timers
-        for server in self.bot.servers:
-            for member in server.members:
-                isMute = self.settings.getUserStat(member, server, "Muted")
-                if isMute.lower() == "yes":
-                    # We're muted
-                    cooldown = self.settings.getUserStat(member, server, "Cooldown")
-                    if cooldown == None:
-                        continue
-                    self.bot.loop.create_task(self.checkMute(member, server, cooldown))'''
-    
-    async def onready(self):
-        # Check all mutes and start timers
-        for server in self.bot.guilds:
-            muteList = self.settings.getServerStat(server, "MuteList")
-            for entry in muteList:
-                member = DisplayName.memberForID(entry['ID'], server)
-                if member:
-                    # We have a user! Check for a cooldown
-                    cooldown = entry['Cooldown']
-                    if cooldown == None:
-                        continue
-                    self.bot.loop.create_task(self.checkMute(member, server, cooldown))
-
 
     async def checkMute(self, member, server, cooldown):
         # Check if we have a cooldown left - and unmute accordingly

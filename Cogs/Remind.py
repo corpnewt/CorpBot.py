@@ -34,7 +34,7 @@ class Remind:
 			return msg
 
 	# Proof of concept stuff for reloading cog/extension
-	'''def _is_submodule(self, parent, child):
+	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
@@ -57,9 +57,9 @@ class Remind:
 				if len(reminders):
 					# We have a list
 					for reminder in reminders:
-						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))'''
+						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))
 
-	async def onready(self):
+	'''async def onready(self):
 		# Check all reminders - and start timers
 		for server in self.bot.guilds:
 			for member in server.members:
@@ -67,7 +67,7 @@ class Remind:
 				if len(reminders):
 					# We have a list
 					for reminder in reminders:
-						self.bot.loop.create_task(self.checkRemind(member, reminder))
+						self.bot.loop.create_task(self.checkRemind(member, reminder))'''
 
 
 	async def checkRemind(self, member, reminder):

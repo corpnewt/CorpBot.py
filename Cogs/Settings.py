@@ -37,6 +37,7 @@ class Settings:
 		self.bot = bot
 		self.serverDict = {}
 		self.prefix = prefix
+		self.loop_list = []
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
@@ -155,14 +156,29 @@ class Settings:
 		# Welcome - and initialize timers
 		self.bot.loop.create_task(self.giveRole(member, server))
 
+	# Proof of concept stuff for reloading cog/extension
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
 
-	async def onready(self):
+	@asyncio.coroutine
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for task in self.loop_list:
+			task.cancel()
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
 		# Check all verifications - and start timers if needed
-		self.bot.loop.create_task(self.checkAll())
+		self.loop_list.append(self.bot.loop.create_task(self.checkAll()))
 		# Start the backup loop
-		self.bot.loop.create_task(self.backup())
+		self.loop_list.append(self.bot.loop.create_task(self.backup()))
 		# Start the settings loop
-		self.bot.loop.create_task(self.flushLoop())
+		self.loop_list.append(self.bot.loop.create_task(self.flushLoop()))
 
 	async def checkAll(self):
 		# Check all verifications - and start timers if needed

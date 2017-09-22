@@ -54,8 +54,10 @@ def _load_extensions():
 	# Start with settings and mute as it's imperitive to load them first
 	global settings
 	bot.load_extension("Cogs.Settings")
+	bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Settings"))
 	settings = bot.get_cog("Settings")
 	bot.load_extension("Cogs.Mute")
+	bot.dispatch("loaded_extension", bot.extensions.get("Cogs.Mute"))
 	cog_count = 2 # Assumes the prior 2 loaded correctly
 	cog_loaded = 2 # Again, assumes success above
 	# Load the rest of the cogs

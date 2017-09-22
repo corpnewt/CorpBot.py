@@ -37,8 +37,14 @@ class Bot:
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
 
-	async def onready(self):
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
 		await self._update_status()
 
 

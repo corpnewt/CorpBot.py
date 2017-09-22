@@ -16,8 +16,8 @@ from   Cogs import ReadableTime
 from   Cogs import Nullify
 
 def setup(bot):
-	# Add the bot
-	bot.add_cog(CardsAgainstHumanity(bot))
+    # Add the bot
+    bot.add_cog(CardsAgainstHumanity(bot))
 
 class CardsAgainstHumanity:
 
@@ -40,6 +40,7 @@ class CardsAgainstHumanity:
         self.botName = 'Rando Cardrissian'
         self.minMembers = 3
         self.loopsleep = 0.05
+        self.loop_list = []
         if file == None:
             file = "deck.json"
         # Let's load our deck file
@@ -53,8 +54,26 @@ class CardsAgainstHumanity:
         else:
             # File doesn't exist - create a placeholder
             self.deck = {}
-        self.bot.loop.create_task(self.checkDead())
-        self.bot.loop.create_task(self.checkUserTimeout())
+
+    # Proof of concept stuff for reloading cog/extension
+    def _is_submodule(self, parent, child):
+        return parent == child or child.startswith(parent + ".")
+
+    @asyncio.coroutine
+    async def on_unloaded_extension(self, ext):
+        # Called to shut things down
+        if not self._is_submodule(ext.__name__, self.__module__):
+            return
+        for task in self.loop_list:
+            task.cancel()
+
+    @asyncio.coroutine
+    async def on_loaded_extension(self, ext):
+        # See if we were loaded
+        if not self._is_submodule(ext.__name__, self.__module__):
+            return
+        self.loop_list.append(self.bot.loop.create_task(self.checkDead()))
+        self.loop_list.append(self.bot.loop.create_task(self.checkUserTimeout()))
 
     def cleanJson(self, json):
         json = html.unescape(json)
@@ -1046,8 +1065,8 @@ class CardsAgainstHumanity:
         member = { 'ID': author.id, 'User': author, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': False, 'Creator': True, 'Task': None, 'Time': currentTime }
         newGame['Members'].append(member)
         newGame['Running'] = True
-        task = self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame))
-        task = self.bot.loop.create_task(self.checkCards(ctx, newGame))
+        self.loop_list.append(self.bot.loop.create_task(self.gameCheckLoop(ctx, newGame)))
+        self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, newGame)))
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
         await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
@@ -1133,8 +1152,8 @@ class CardsAgainstHumanity:
                     currentTime = int(time.time())
                     game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False, 'Timeout': True }
                     game['Running'] = True
-                    task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
-                    task = self.bot.loop.create_task(self.checkCards(ctx, game))
+                    self.loop_list.append(self.bot.loop.create_task(self.gameCheckLoop(ctx, game)))
+                    self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, game)))
                     self.games.append(game)
                     # Tell the user they created a new game and list its ID
                     await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
@@ -1152,8 +1171,8 @@ class CardsAgainstHumanity:
             currentTime = int(time.time())
             game = { 'ID': gameID, 'Members': [], 'Discard': [], 'BDiscard': [], 'Judge': -1, 'Time': currentTime, 'BlackCard': None, 'Submitted': [], 'NextHand': asyncio.Event(), 'Judging': False, 'Timeout': True }
             game['Running'] = True
-            task = self.bot.loop.create_task(self.gameCheckLoop(ctx, game))
-            task = self.bot.loop.create_task(self.checkCards(ctx, game))
+            self.loop_list.append(self.bot.loop.create_task(self.gameCheckLoop(ctx, game)))
+            self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, game)))
             self.games.append(game)
             # Tell the user they created a new game and list its ID
             await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))

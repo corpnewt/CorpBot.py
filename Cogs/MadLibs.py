@@ -26,7 +26,15 @@ class MadLibs:
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
 
-	async def onready(self):
+	# Proof of concept stuff for reloading cog/extension
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
 		# Clear any previous games
 		for guild in self.bot.guilds:
 			self.settings.setServerStat(guild, "PlayingMadLibs", None)
