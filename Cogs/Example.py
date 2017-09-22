@@ -390,6 +390,44 @@ class Music:
         # If we're here - we're not admin, and not in the same channel, deny
         return False
 
+    @asyncio.coroutine
+    async def on_voice_state_update(self, user, beforeState, afterState):
+        if not user.guild:
+            return
+        # Get our member on the same server as the user
+        botMember = DisplayName.memberForID(self.bot.user.id, user.guild)
+        botVoice = botMember.voice
+        if not botVoice:
+            # We're not in a voice channel - don't care
+            return
+        voiceChannel = botVoice.channel
+
+        if not beforeState.channel is voiceChannel:
+            # Not pertaining to our channel
+            return
+
+        if len(beforeState.channel.members) > 1:
+            # More than one user
+            return
+
+        # if we made it here - then we're alone - disconnect
+        server = beforeState.channel.guild
+        state = self.get_voice_state(server)
+
+        self.settings.setServerStat(server, "Volume", None)
+
+        if state.is_playing():
+            player = state.voice
+            player.stop()
+        try:
+            state.audio_player.cancel()
+            del self.voice_states[server.id]
+            state.playlist = []
+            state.repeat = False
+            await state.voice.disconnect()
+        except:
+            pass
+
     @commands.command(pass_context=True, no_pm=True)
     async def pmax(self, ctx, *, max_songs = None):
         """Sets the maximum number of songs to load from a playlist (owner only).

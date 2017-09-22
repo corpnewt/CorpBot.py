@@ -24,6 +24,7 @@ class Remind:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.loop_list = []
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -32,8 +33,33 @@ class Remind:
 		else:
 			return msg
 
+	# Proof of concept stuff for reloading cog/extension
+	'''def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@asyncio.coroutine
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for task in self.loop_list:
+			task.cancel()
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		# Check all reminders - and start timers
+		for server in self.bot.guilds:
+			for member in server.members:
+				reminders = self.settings.getUserStat(member, server, "Reminders")
+				if len(reminders):
+					# We have a list
+					for reminder in reminders:
+						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))'''
+
 	async def onready(self):
-		await self.bot.wait_until_ready()
 		# Check all reminders - and start timers
 		for server in self.bot.guilds:
 			for member in server.members:
@@ -42,6 +68,7 @@ class Remind:
 					# We have a list
 					for reminder in reminders:
 						self.bot.loop.create_task(self.checkRemind(member, reminder))
+
 
 	async def checkRemind(self, member, reminder):
 		# Start our countdown

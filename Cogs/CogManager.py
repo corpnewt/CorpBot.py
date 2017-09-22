@@ -28,18 +28,18 @@ class CogManager:
 		if extension == None:
 			# Load them all!
 			self.bot.load_extension("Cogs.Settings")
-			settings = bot.get_cog("Settings")
+			settings = self.bot.get_cog("Settings")
 			self.bot.load_extension("Cogs.Mute")
 			cog_count = 2 # Assumes the prior 2 loaded correctly
 			cog_loaded = 2 # Again, assumes success above
 			# Load the rest of the cogs
 			for ext in os.listdir("Cogs"):
 				# Avoid reloading Settings and Mute
-				if ext.lower().endswith(".py") and not (ext.lower() in ["settings.py", "mute.py", "cogmanager.py"]):
+				if ext.lower().endswith(".py") and not (ext.lower() in ["settings.py", "mute.py"]):
 					# Valid cog - load it
 					cog_count += 1
 					try:
-						bot.load_extension("Cogs." + ext[:-3])
+						self.bot.load_extension("Cogs." + ext[:-3])
 						cog_loaded += 1
 					except:
 						print("{} not loaded!".format(ext[:-3]))
@@ -51,12 +51,14 @@ class CogManager:
 					# Found it - check if loaded
 					# Try unloading
 					try:
+						self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 						self.bot.unload_extension("Cogs."+ext[:-3])
 					except:
 						pass
 					# Try to load
 					try:
 						self.bot.load_extension("Cogs."+ext[:-3])
+						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 					except:
 						print("{} failed to load!".format(ext[:-3]))
 						return ( 0, 1 )
@@ -65,7 +67,7 @@ class CogManager:
 			return ( 0, 0 )
 
 	def _unload_extension(self, extension = None):
-		if extension == None or extension.lower() == "cogmanager":
+		if extension == None:
 			# NEED an extension to unload
 			return ( 0, 1 )
 		for cog in self.bot.cogs:
