@@ -166,10 +166,17 @@ class CogManager:
 				help_embed = discord.Embed(color=random.choice(self.colors))
 			help_embed.title = str(e[5:]) + " Extension"
 			if len(cog_list):
-				if len(self.bot.get_cog_commands(cog)) == 1:
-					comm = "└─ 1 command"
+				total_commands = 0
+				for cog in cog_list:
+					total_commands += len(self.bot.get_cog_commands(cog))
+				if len(cog_list) > 1:
+					comm = "total command"
 				else:
-					comm = "└─ {:,} commands".format(len(self.bot.get_cog_commands(cog)))
+					comm = "command"
+				if total_commands == 1:
+					comm = "└─ 1 " + comm
+				else:
+					comm = "└─ {:,} {}s".format(total_commands, comm)
 				help_embed.add_field(name=", ".join(cog_list), value=comm, inline=True)
 			else:
 				help_embed.add_field(name="No Cogs", value="└─ 0 commands", inline=True)
