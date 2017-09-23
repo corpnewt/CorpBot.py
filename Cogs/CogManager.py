@@ -139,6 +139,46 @@ class CogManager:
 	
 
 	@commands.command(pass_context=True)
+	async def extension(self, ctx, *, extension = None):
+		"""Outputs the cogs attatched to the passed extension."""
+		if extension == None:
+			# run the extensions command
+			await ctx.invoke(self.extensions)
+			return
+
+		cog_list = []
+		for e in self.bot.extensions:
+			if not str(e[5:]).lower() == extension.lower():
+				continue
+			# At this point - we should've found it
+			# Get the extension
+			b_ext = self.bot.extensions.get(e)
+			for cog in self.bot.cogs:
+				# Get the cog
+				b_cog = self.bot.get_cog(cog)
+				if self._is_submodule(b_ext.__name__, b_cog.__module__):
+					# Submodule - add it to the list
+					cog_list.append(str(cog))
+			# build the embed
+			if type(ctx.author) is discord.Member:
+				help_embed = discord.Embed(color=ctx.author.color)
+			else:
+				help_embed = discord.Embed(color=random.choice(self.colors))
+			help_embed.title = str(e[5:]) + " Extension"
+			if len(cog_list):
+				if len(self.bot.get_cog_commands(cog)) == 1:
+					comm = "└─ 1 command"
+				else:
+					comm = "└─ {:,} commands".format(len(self.bot.get_cog_commands(cog)))
+				help_embed.add_field(name=", ".join(cog_list), value=comm, inline=True)
+			else:
+				help_embed.add_field(name="No Cogs", value="└─ 0 commands", inline=True)
+			await ctx.send(embed=help_embed)
+			return
+		await ctx.send("I couldn't find that extension.")
+
+
+	@commands.command(pass_context=True)
 	async def extensions(self, ctx):
 		"""Lists all extensions and their corresponding cogs."""
 		# Build the embed
@@ -189,7 +229,7 @@ class CogManager:
 			if len(ext_list[embed]):
 				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=True)
 			else:
-				help_embed.add_field(name=embed, value="└─ None", inline=False)
+				help_embed.add_field(name=embed, value="└─ None", inline=True)
 			# 25 field max - send the embed if we get there
 			if len(help_embed.fields) >= 25:
 				if page_total == page_count:

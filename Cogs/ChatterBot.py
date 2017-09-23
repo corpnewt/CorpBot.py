@@ -13,7 +13,6 @@ from Cogs import FuzzySearch
 
 def setup(bot):
 	# Add the bot and deps
-	print("ChatterBot Setup Run")
 	settings = bot.get_cog("Settings")
 	c_bot = ChatterBot(bot, settings)
 	c_bot._load()
