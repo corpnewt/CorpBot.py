@@ -31,6 +31,9 @@ class Help:
 		# Replace name and nickname mentions
 		return ctx.prefix.replace(bot_member.mention, '@' + DisplayName.name(bot_member))
 
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
 	def _get_help(self, command, max_len = 0):
 		# A helper method to return the command help - or a placeholder if none
 		if max_len == 0:
@@ -90,7 +93,17 @@ class Help:
 				# Found the cog - let's build our text
 				cog_commands = self.bot.get_cog_commands(cog)
 				cog_commands = sorted(cog_commands, key=lambda x:x.name)
-				embed_list = {"title" : cog, "fields" : [] }
+				# Get the extension
+				the_cog = self.bot.get_cog(cog)
+				embed_list = None
+				for e in self.bot.extensions:
+					b_ext = self.bot.extensions.get(e)
+					if self._is_submodule(b_ext.__name__, the_cog.__module__):
+						# It's a submodule
+						embed_list = {"title" : "{} - {} Extension". format(cog, e[5:]), "fields" : [] }
+						break
+				if not embed_list:
+					embed_list = {"title" : cog, "fields" : [] }
 				for command in cog_commands:
 					# Make sure there are non-hidden commands here
 					if command.hidden:
@@ -108,7 +121,17 @@ class Help:
 				for command in cog_commands:
 					if not command.name == com:
 						continue
-					embed_list = {"title" : cog, "fields" : [] }
+					# Get the extension
+					the_cog = self.bot.get_cog(cog)
+					embed_list = None
+					for e in self.bot.extensions:
+						b_ext = self.bot.extensions.get(e)
+						if self._is_submodule(b_ext.__name__, the_cog.__module__):
+							# It's a submodule
+							embed_list = {"title" : "{} - {} Extension". format(cog, e[5:]), "fields" : [] }
+							break
+					if not embed_list:
+						embed_list = {"title" : cog, "fields" : [] }
 					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
 					return embed_list
 		# At this point - we got nothing...
