@@ -540,12 +540,6 @@ class Admin:
 			msg = Nullify.clean(msg)
 		await channel.send(msg)
 		return
-
-	@addxprole.error
-	async def addxprole_error(self, error, ctx):
-		# do stuff
-		msg = 'addxprole Error: {}'.format(error)
-		await ctx.channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def removexprole(self, ctx, *, role = None):
