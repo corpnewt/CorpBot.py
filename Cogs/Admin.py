@@ -576,7 +576,7 @@ class Admin:
 
 			for aRole in promoArray:
 				# Get the role that corresponds to the name
-				if aRole['Name'].lower() == role.lower() or aRole["ID"] == role:
+				if aRole['Name'].lower() == role.lower() or str(aRole["ID"]) == str(role):
 					# We found it - let's remove it
 					promoArray.remove(aRole)
 					self.settings.setServerStat(server, "PromotionArray", promoArray)
