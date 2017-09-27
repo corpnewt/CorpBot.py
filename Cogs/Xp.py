@@ -979,9 +979,15 @@ class Xp:
 				stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
 		
 		if nextRole and (newStat < int(nextRole['XP'])):
-			msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, nextRole['Name'])
+			# Get role
+			next_role = DisplayName.roleForID(int(nextRole["ID"]), ctx.guild)
+			if not next_role:
+				next_role_text = "Role ID: {} (Removed from server)".format(nextRole["ID"])
+			else:
+				next_role_text = next_role.name
+			msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, next_role_text)
 			# Add Next Rank
-			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(nextRole['Name'], int(nextRole['XP'])-newStat), inline=True)
+			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(next_role_text, int(nextRole['XP'])-newStat), inline=True)
 			
 		# Add status
 		status_text = ":green_heart:"
