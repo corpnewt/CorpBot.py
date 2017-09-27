@@ -576,7 +576,7 @@ class Admin:
 
 			for aRole in promoArray:
 				# Get the role that corresponds to the name
-				if aRole['Name'].lower() == role.lower():
+				if aRole['Name'].lower() == role.lower() or aRole["ID"] == role:
 					# We found it - let's remove it
 					promoArray.remove(aRole)
 					self.settings.setServerStat(server, "PromotionArray", promoArray)
@@ -610,7 +610,7 @@ class Admin:
 						return
 				
 			# If we made it this far - then we didn't find it
-			msg = '{} not found in list.'.format(roleCheck.name)
+			msg = '{} not found in list.'.format(role)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
