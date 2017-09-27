@@ -640,12 +640,6 @@ class Admin:
 			msg = Nullify.clean(msg)
 		await channel.send(msg)
 
-	@removexprole.error
-	async def removexprole_error(self, error, ctx):
-		# do stuff
-		msg = 'removexprole Error: {}'.format(error)
-		await ctx.channel.send(msg)
-
 	@commands.command(pass_context=True)
 	async def prunexproles(self, ctx):
 		"""Removes any roles from the xp promotion/demotion system that are no longer on the server (admin only)."""
