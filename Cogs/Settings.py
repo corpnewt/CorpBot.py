@@ -101,6 +101,7 @@ class Settings:
 				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
 				"Info"					: "",		# This is where you can say a bit about your server
 				"PromotionArray" 		: [],		# An array of roles for promotions
+				"OnlyOneRole"			: False,	# Only allow one role from the promo array at a time
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
 				"SuppressMentions"		: "Yes",	# Will the bot suppress @here and @everyone in its own output?

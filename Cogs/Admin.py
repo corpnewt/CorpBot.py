@@ -247,6 +247,45 @@ class Admin:
 			await ctx.send("Xp reserve limit set to *{:,}*.".format(limit))
 
 	@commands.command(pass_context=True)
+	async def onexprole(self, ctx, *, onlyone = None):
+		"""Gets and sets whether or not to remove all but the current xp role a user has acquired."""
+
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+		
+		only = self.settings.getServerStat(ctx.guild, "OnlyOneRole")
+		if onlyone == None:
+			# Output what we have
+			if only:
+				await ctx.send("One xp role at a time *enabled.*")
+			else:
+				await ctx.send("One xp role at a time *disabled.*")
+			return
+		elif onlyone.lower() == "yes" or onlyone.lower() == "on" or onlyone.lower() == "true":
+			onlyone = True
+		elif onlyone.lower() == "no" or onlyone.lower() == "off" or onlyone.lower() == "false":
+			onlyone = False
+		else:
+			onlyone = False
+
+		if onlyone == True:
+			if only == True:
+				msg = 'One xp role at a time remains *enabled*.'
+			else:
+				msg = 'One xp role at a time is now *enabled*.'
+		else:
+			if only == False:
+				msg = 'One xp role at a time remains *disabled*.'
+			else:
+				msg = 'One xp role at a time is now *disabled*.'
+		self.settings.setServerStat(ctx.guild, "OnlyOneRole", onlyone)
+		await ctx.send(msg)
+
+
+	@commands.command(pass_context=True)
 	async def xplimit(self, ctx, *, limit = None):
 		"""Gets and sets a limit to the maximum xp a member can get.  Pass a negative value for unlimited."""
 

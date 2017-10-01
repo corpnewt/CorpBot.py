@@ -75,15 +75,18 @@ class CogManager:
 						if "Cogs."+ext[:-3] in self.bot.extensions:
 							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 							self.bot.unload_extension("Cogs."+ext[:-3])
-					except:
+					except Exception as e:
+						print("{} failed to unload!".format(ext[:-3]))
+						print("    " + e)
 						pass
 					# Try to load
 					try:
 						self.bot.load_extension("Cogs." + ext[:-3])
 						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 						cog_loaded += 1
-					except:
-						print("{} not loaded!".format(ext[:-3]))
+					except Exception as e:
+						print("{} failed to load!".format(ext[:-3]))
+						print("    " + e)
 						pass
 			return ( cog_loaded, cog_count )
 		else:
@@ -96,14 +99,17 @@ class CogManager:
 						if "Cogs."+ext[:-3] in self.bot.extensions:
 							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 							self.bot.unload_extension("Cogs."+ext[:-3])
-					except:
+					except Exception as e:
+						print("{} failed to unload!".format(ext[:-3]))
+						print("    " + e)
 						pass
 					# Try to load
 					try:
 						self.bot.load_extension("Cogs."+ext[:-3])
 						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-					except:
+					except Exception as e:
 						print("{} failed to load!".format(ext[:-3]))
+						print("    " + e)
 						return ( 0, 1 )
 					return ( 1, 1 )
 			# Not found
