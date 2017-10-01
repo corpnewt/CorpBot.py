@@ -72,6 +72,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
             for role in promoArray:
                 test_role = DisplayName.roleForID(role['ID'], server)
                 if test_role != target_role and test_role in user.roles:
+                    changed = True
                     remRoles.append(test_role)
         else:
             # Demote if needed
@@ -84,12 +85,14 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                         if test_role != target_role and test_role in user.roles:
                             remRoles.append(test_role)
                     addRoles.append(target_role)
+                    changed = True
                 else:
                     # We're not demoting - but let's add only the current role to the list
                     for role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
                         if test_role != current_role and test_role in user.roles:
                             remRoles.append(test_role)
+                            changed = True
             # Promote if needed
             else:
                 if xpPromote.lower() == "yes":
@@ -100,12 +103,14 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                         if test_role != target_role and test_role in user.roles:
                             remRoles.append(test_role)
                     addRoles.append(target_role)
+                    changed = True
                 else:
                     # We're not promoting - but let's add only the current role to the list
                     for role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
                         if test_role != current_role and test_role in user.roles:
                             remRoles.append(test_role)
+                            changed = True
 
     else:
         # Check promotions first

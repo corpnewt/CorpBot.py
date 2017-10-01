@@ -339,7 +339,7 @@ class Feed:
 				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(author), food, int(payout))
 				
 				# Got XP - let's see if we need to promote
-				await CheckRoles.checkroles(author, channel)
+				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
 			else:
 				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
 		
