@@ -5,6 +5,7 @@ import os
 from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
+from   Cogs import DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -58,6 +59,12 @@ class Jpeg:
 
 		if url == None:
 			url = ctx.message.attachments[0].url
+			
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(url, ctx.guild)
+		if test_user:
+			# Got a user!
+			url = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
 
 		message = await ctx.send("Downloading...")
 		
