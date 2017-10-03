@@ -33,6 +33,8 @@ class Jpeg:
 
 	def _jpeg(self, image, compression = 1):
 		try:
+			# Get frame 1
+			img = img.convert('RGBA')
 			img = Image.open(image)
 			img = self._remove_transparency(img)
 			img.save(image, 'JPEG', quality=compression)
