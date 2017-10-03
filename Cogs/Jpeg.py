@@ -32,14 +32,14 @@ class Jpeg:
 		return True
 
 	def _jpeg(self, image, compression = 1):
-		try:
-			# Get frame 1
-			img = img.convert('RGB')
-			img = Image.open(image)
-			img = self._remove_transparency(img)
-			img.save(image, 'JPEG', quality=compression)
-		except Exception:
-			return False
+		#try:
+		# Get frame 1
+		img = img.convert('RGB')
+		img = Image.open(image)
+		img = self._remove_transparency(img)
+		img.save(image, 'JPEG', quality=compression)
+		#except Exception:
+		#	return False
 		return True
 
 	def _remove_transparency(self, image, fill_color = 'black'):
