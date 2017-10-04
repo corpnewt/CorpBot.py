@@ -1464,7 +1464,6 @@ class CardsAgainstHumanity:
         stat_embed = discord.Embed(color=discord.Color.purple())
         stat_embed.set_author(name='Current Score')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(userGame['ID']))
-        await ctx.author.send(embed=stat_embed)
         users = sorted(userGame['Members'], key=lambda card:int(card['Points']), reverse=True)
         msg = ''
         i = 0
@@ -1490,7 +1489,9 @@ class CardsAgainstHumanity:
                 else:
                     # Bot
                     msg += '{}. *{} ({})* - {} points\n'.format(i, self.botName, user['ID'], user['Points'])
-        await ctx.author.send(msg)
+        stat_embed.add_field(name="Current Score", value=msg)
+        await ctx.author.send(embed=stat_embed)
+        # await ctx.author.send(msg)
 
     @commands.command(pass_context=True)
     async def laid(self, ctx):
