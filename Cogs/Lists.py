@@ -1012,7 +1012,7 @@ class Lists:
 			members += 1
 			if not member.status == discord.Status.offline:
 				membersOnline += 1
-		msg = 'There are *{:,}* out of *{:,}* users online.'.format(membersOnline, members)
+		msg = 'There are *{:,}* out of *{:,}* (*{:.2f}%*) users online.'.format(membersOnline, members, (membersOnline/members)*100)
 		await ctx.channel.send(msg)
 
 
