@@ -65,8 +65,8 @@ class ServerStats:
         online_members = 0
 	bot_member     = 0
         for member in guild.members:
-	    if member.bot:
-		bot_member += 1
+            if member.bot:
+                bot_member += 1
             if not member.status == discord.Status.offline:
                 online_members += 1
 	bot_percent = "{:.2f}%".format((bot_member/len(guild.members))*100)
