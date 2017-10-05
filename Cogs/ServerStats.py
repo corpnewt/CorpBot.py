@@ -63,10 +63,14 @@ class ServerStats:
         
         server_embed.description = "Created at {}".format(time_str)
         online_members = 0
+	bot_member     = 0
         for member in guild.members:
+	    if member.bot:
+		bot_member += 1
             if not member.status == discord.Status.offline:
                 online_members += 1
-        server_embed.add_field(name="Members", value="{:,}/{:,}".format(online_members, len(guild.members)), inline=True)
+	bot_percent = "{:.2f}%".format((bot_member/len(guild.members))*100)
+        server_embed.add_field(name="Members", value="{:,}/{:,} ({} bots)".format(online_members, len(guild.members)), bot_percent, inline=True)
         server_embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
         chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
