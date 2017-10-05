@@ -70,7 +70,7 @@ class ServerStats:
             if not member.status == discord.Status.offline:
                 online_members += 1
         bot_percent = "{:.2f}%".format((bot_member/len(guild.members))*100)
-        server_embed.add_field(name="Members", value="{:,}/{:,} ({} bots)".format(online_members, len(guild.members)), bot_percent, inline=True)
+        server_embed.add_field(name="Members", value="{:,}/{:,} ({} bots)".format(online_members, len(guild.members), bot_percent), inline=True)
         server_embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
         chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
