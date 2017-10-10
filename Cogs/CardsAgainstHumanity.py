@@ -853,22 +853,34 @@ class CardsAgainstHumanity:
             await ctx.author.send(msg)
             return
         userGame['Time'] = int(time.time())
+        
+        stat_embed = discord.Embed(color=discord.Color.default())
+        stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(userGame['ID']))
+        
         if message == None:
-            msg = "Ooookay, you say *nothing...*"
-            await ctx.author.send(msg)
+            stat_embed.add_field(name="{} says:".format(ctx.author.name), value="Ooookay, you say *nothing...*")
+            await ctx.author.send(embed=stat_embed)
             return
-        msg = '*{}* says: {}'.format(ctx.message.author.name, message)
+        stat_embed.add_field(name="{} says:".format(ctx.author.name), value=message)
+        # msg = '*{}* says: {}'.format(ctx.message.author.name, message)
+        member_count = 0
         for member in userGame['Members']:
             if member['IsBot']:
                 continue
             # Tell them all!!
             if not member['User'] == author:
                 # Don't tell yourself
-                await member['User'].send(msg)
+                member_count += 1
+                await member['User'].send(embed=stat_embed)
             else:
                 # Update member's time
                 member['Time'] = int(time.time())
-        await ctx.author.send('Message sent!')
+        stat_embed.clear_fields()
+        if member_count == 1:
+            stat_embed.add_field(name="Message sent!", value="1 recipient")
+        else:
+            stat_embed.add_field(name="Message sent!", value="{} recipients".format(member_count))
+        await ctx.author.send(embed=stat_embed)
             
                 
     @commands.command(pass_context=True)
@@ -1462,7 +1474,7 @@ class CardsAgainstHumanity:
             await ctx.author.send(msg)
             return
         stat_embed = discord.Embed(color=discord.Color.purple())
-        stat_embed.set_author(name='Current Score')
+        # stat_embed.set_author(name='Current Score')
         stat_embed.set_footer(text='Cards Against Humanity - id: {}'.format(userGame['ID']))
         users = sorted(userGame['Members'], key=lambda card:int(card['Points']), reverse=True)
         msg = ''
