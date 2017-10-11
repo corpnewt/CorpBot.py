@@ -208,14 +208,14 @@ class VoiceState:
 
             self.votes = []
             self.votes.append({ 'user' : self.current.requester, 'value' : 'keep' })
-            await self.current.channel.send('Now playing *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"], round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
+            await self.current.channel.send('Now playing `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"].replace('`', '\\`'), round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
 
             await self.play_next_song.wait()
 
             self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
             # Song is done
             if "Error" in self.playlist[0]:
-                await self.current.channel.send("An error occurred trying to play *{}* - removing from the queue.".fromat(self.playlist[0]["song"]))
+                await self.current.channel.send("An error occurred trying to play `{}` - removing from the queue.".fromat(self.playlist[0]["song"].replace('`', '\\`')))
                 # We got an error
                 # Remove the song and jump back
                 del self.playlist[0]
@@ -915,7 +915,7 @@ class Music:
                         continue
 
                     # Edit our status message
-                    await mess.edit(content="Enqueuing song {} of {} from *{}* ({} skipped)...".format(entries_added, total_songs, info['title'], entries_skipped))
+                    await mess.edit(content="Enqueuing song {} of {} from `{}` ({} skipped)...".format(entries_added, total_songs, info['title'].replace('`', '\\`'), entries_skipped))
                     
                     # Create a new video url and get info
                     new_url = "https://youtube.com/v/" + entry.get('url', '')
@@ -964,9 +964,9 @@ class Music:
 
                 await mess.edit(content=" ")
                 if entries_added-entries_skipped == 1:
-                    await ctx.channel.send("Enqueued *{}* song from *{}* - (*{}* skipped)".format(entries_added-entries_skipped, info['title'], entries_skipped))
+                    await ctx.channel.send("Enqueued *{}* song from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
                 else:
-                    await ctx.channel.send("Enqueued *{}* songs from *{}* - (*{}* skipped)".format(entries_added-entries_skipped, info['title'], entries_skipped))
+                    await ctx.channel.send("Enqueued *{}* songs from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
                 return
             else:
                 # We don't have enough perms
@@ -1003,7 +1003,7 @@ class Music:
         
         state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
         # state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': info['formats'][len(info['formats'])-1]['url']})
-        await ctx.channel.send('Enqueued - *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
+        await ctx.channel.send('Enqueued - `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title').replace('`', '\\`'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
     
     @commands.command(pass_context=True, no_pm=True)
@@ -1441,7 +1441,7 @@ class Music:
             dSeconds = state.playlist[0]["duration"]
             percent = diff_time.total_seconds() / dSeconds * 100
 
-            await ctx.channel.send('Now playing - *{}* [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.playlist[0]["song"],round(hours), round(minutes), round(seconds), round(percent, 2)))
+            await ctx.channel.send('Now playing - `{}` [at {:02d}h:{:02d}m:{:02d}s] - {}%'.format(state.playlist[0]["song"].replace('`', '\\`'),round(hours), round(minutes), round(seconds), round(percent, 2)))
 
 
     @commands.command(pass_context=True, no_pm=True)
@@ -1465,12 +1465,14 @@ class Music:
                 break
 
             seconds = i["duration"]
-            total_seconds += seconds
-            hours = seconds // 3600
-            minutes = (seconds % 3600) // 60
-            seconds = seconds % 60
-
-            playlist_string += '{}. *{}* - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*\n'.format(count, str(i["song"]),round(hours), round(minutes), round(seconds), DisplayName.name(i['requester']))
+            if not seconds:
+                playlist_string += '{}. `{}` - [Unknown time] - requested by *{}*\n'.format(count, str(i["song"]).replace('`', '\\`'), DisplayName.name(i['requester']))
+            else:
+                total_seconds += seconds
+                hours = seconds // 3600
+                minutes = (seconds % 3600) // 60
+                seconds = seconds % 60
+                playlist_string += '{}. `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*\n'.format(count, str(i["song"]).replace('`', '\\`'),round(hours), round(minutes), round(seconds), DisplayName.name(i['requester']))
             count = count + 1
         #playlist_string += '```'
         hours = total_seconds // 3600
@@ -1547,5 +1549,5 @@ class Music:
             if not canRemove:
                 await channel.send('You do not have sufficient privileges to remove *other* users\' songs.')
                 return
-        await ctx.channel.send('Deleted *{}* from playlist'.format(str(current["song"])))
+        await ctx.channel.send('Deleted `{}` from playlist'.format(str(current["song"]).replace('`', '\\`')))
         del state.playlist[idx]
