@@ -166,6 +166,8 @@ class Settings:
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		# Flush settings
+		self.flushSettings()
 		for task in self.loop_list:
 			task.cancel()
 
