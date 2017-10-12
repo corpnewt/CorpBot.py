@@ -70,8 +70,9 @@ class Embed:
         self.url = kwargs.get("url", None)
         self.description = kwargs.get("description", None)
         self.image = kwargs.get("image", None)
-        self.footer_text = kwargs.get("footer_text", discord.Embed.Empty)
-        self.footer_icon = kwargs.get("footer_icon", discord.Embed.Empty)
+	self.footer = kwargs.get("footer", None)
+        # self.footer_text = kwargs.get("footer_text", discord.Embed.Empty)
+        # self.footer_icon = kwargs.get("footer_icon", discord.Embed.Empty)
         self.thumbnail = kwargs.get("thumbnail", None)
         self.author = kwargs.get("author", None)
         self.fields = kwargs.get("fields", [])
@@ -173,6 +174,20 @@ class Embed:
             else:
                 # Cast to string and hope for the best
                 em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
+		
+	# Get our footer if we have one
+	footer_text, footer_icon = discord.Embed.Empty
+	if type(self.footer) is str:
+		footer_text = self.footer
+	elif type(self.footer) is dict:
+		footer_text = self.footer.get("text", discord.Embed.Empty)
+		footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+	elif self.footer == None:
+		# Never setup
+		pass
+	else:
+		# Try to cast it
+		footer_text = str(self.footer)
         
         # Only pm if our self.pm_after is above 0
         to_pm = len(self.fields) > self.pm_after if self.pm_after else False
@@ -190,11 +205,11 @@ class Embed:
                 inline=field.get("inline", False)
             )
             # 25 field max - send the embed if we get there
-            if len(em.fields) >= 25:
+            if len(em.fields) >= self.field_max:
                 if page_total == page_count:
                     em.set_footer(
-                        text=self.footer_text,
-                        icon_url=self.footer_icon
+                        text=self._truncate_string(footer_text, self.foot_max),
+                        icon_url=footer_icon
                     )
                 await self._send_embed(ctx, em, to_pm)
                 em.clear_fields()
@@ -205,7 +220,7 @@ class Embed:
 
         if len(em.fields):
             em.set_footer(
-                text=self._truncate_string(self.footer_text, self.foot_max),
-                icon_url=self.footer_icon
+                text=self._truncate_string(footer_text, self.foot_max),
+                icon_url=footer_icon
             )
             await self._send_embed(ctx, em, to_pm)
