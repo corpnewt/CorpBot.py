@@ -441,9 +441,14 @@ class Settings:
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
+		print("Removing ", user)
 		# Make sure our server exists in the list
 		self.checkServer(server)
+		if str(user.id) in self.serverDict["Servers"][str(server.id)]["Members"]:
+			print("User Exists.")
 		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(user.id), None)
+		if str(user.id) in self.serverDict["Servers"][str(server.id)]["Members"]:
+			print("User STILL Exists.")
 		self.checkGlobalUsers()
 
 
