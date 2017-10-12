@@ -296,13 +296,14 @@ class ServerStats:
         userCount = 0
         serverCount = 0
         counted_users = []
+        message = await ctx.send("Counting users...")
         for server in self.bot.guilds:
             serverCount += 1
             userCount += len(server.members)
             for member in server.members:
                 if not member.id in counted_users:
                     counted_users.append(member.id)
-        await ctx.channel.send('There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))
+        await message.edit(content='There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))
 
 
     @commands.command(pass_context=True)
