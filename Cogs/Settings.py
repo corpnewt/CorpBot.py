@@ -203,7 +203,11 @@ class Settings:
 
 	async def giveRole(self, member, server):
 		# Start the countdown
-		verifiedAt  = int(self.getUserStat(member, server, "VerificationTime"))
+		verifiedAt  = self.getUserStat(member, server, "VerificationTime")
+		try:
+			verifiedAt = int(verifiedAt)
+		except ValueError:
+			verifiedAt = 0
 		currentTime = int(time.time())
 		timeRemain  = verifiedAt - currentTime
 		if timeRemain > 0:
