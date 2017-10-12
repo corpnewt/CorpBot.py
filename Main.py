@@ -125,6 +125,7 @@ async def on_member_remove(member):
 	server = member.guild
 	# Set the settings var up
 	settings = bot.get_cog("Settings")
+	print(settings)
 	settings.removeUser(member, server)
 	for cog in bot.cogs:
 		cog = bot.get_cog(cog)
