@@ -325,8 +325,8 @@ class CogManager:
 		# Try to update
 		message = await ctx.send("Updating...")
 		try:
-			u = subprocess.Popen([git_location, 'pull'])
-			u.wait()
+			u = subprocess.Popen([git_location, 'pull'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			# u.wait()
 			out, err = u.communicate()
 			print(out)
 			print(err)
