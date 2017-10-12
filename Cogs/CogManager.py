@@ -279,9 +279,10 @@ class CogManager:
 			return
 
 		if extension == None:
+			message = await ctx.send("Reloading all extensions...")
 			result = self._load_extension()
 			res_str = "*{}* of *{}* extensions reloaded successfully!".format(result[0], result[1])
-			await ctx.send(res_str)
+			await message.edit(content=res_str)
 			return
 
 		result = self._load_extension(extension)
