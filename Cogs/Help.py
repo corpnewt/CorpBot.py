@@ -190,12 +190,12 @@ class Help:
 				for pot in com_match:
 					com_mess += '└─ {}\n'.format(pot['Item'].replace('`', '\\`'))
 				m.add_field(name="Close Command Matches:", value=com_mess)
-			m.footer_text = "Remember that commands and cogs are case-sensitive."
+			m.footer = "Remember that commands and cogs are case-sensitive."
 			await m.send(ctx)
 			return
 		m = Message.Embed(**result)
 		# Build the embed
 		if type(ctx.author) is discord.Member:
 			m.color = ctx.author.color
-		m.footer_text = self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
+		m.footer = self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
 		await m.send(ctx)
