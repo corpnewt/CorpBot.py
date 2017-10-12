@@ -332,7 +332,7 @@ class CogManager:
 			if len(out):
 				msg += "```\n" + out.decode("utf-8").replace("`", "\`") + "```\n"
 			if len(err):
-				msg += "```\n" + err.decode("utf-8")..replace("`", "\`") + "```"
+				msg += "```\n" + err.decode("utf-8").replace("`", "\`") + "```"
 			await message.edit(content=msg)
 		except:
 			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
