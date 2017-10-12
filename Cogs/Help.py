@@ -190,7 +190,7 @@ class Help:
 				for pot in com_match:
 					com_mess += '└─ {}\n'.format(pot['Item'].replace('`', '\\`'))
 				m.add_field(name="Close Command Matches:", value=com_mess)
-			m.footer = "Remember that commands and cogs are case-sensitive."
+			m.footer = { "text" : "Remember that commands and cogs are case-sensitive.", "icon_url" : self.bot.user.avatar_url }
 			await m.send(ctx)
 			return
 		m = Message.Embed(**result)
