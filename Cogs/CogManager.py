@@ -329,9 +329,9 @@ class CogManager:
 			u.wait()
 			out, err = u.communicate()
 			msg = ""
-			if len(out):
+			if len(out.decode("utf-8")):
 				msg += "```\n" + out.decode("utf-8").replace("`", "\`") + "```\n"
-			if len(err):
+			if len(err.decode("utf-8")):
 				msg += "```\n" + err.decode("utf-8").replace("`", "\`") + "```"
 			await message.edit(content=msg)
 		except:
