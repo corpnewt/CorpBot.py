@@ -25,6 +25,25 @@ class Xp:
 		self.settings = settings
 		self.loop_list = []
 
+	def _can_xp(self, user, server):
+		# Checks whether or not said user has access to the xp system
+		requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
+		promoArray  = self.settings.getServerStat(server, "PromotionArray")
+		userXP      = self.settings.getUserStat(user, server, "XP")
+		if not requiredXP:
+			return True
+
+		for checkRole in user.roles:
+			if str(checkRole.id) == str(requiredXP):
+				return True
+		# Still check if we have enough xp
+		for role in promoArray:
+			if str(role["ID"]) == str(requiredXP):
+				if userXP >= role["XP"]:
+					return True
+				break
+		return False
+
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
@@ -70,15 +89,9 @@ class Xp:
 				requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
 				
 				for user in server.members:
-					# RequiredXPRole
-					if requiredXP:
-						foundRole = False
-						for checkRole in user.roles:
-							if str(checkRole.id) == str(requiredXP):
-								foundRole = True
-								break
-						if not foundRole:
-							continue
+					
+					if not self._can_xp(user, server):
+						continue
 
 					bumpXP = False
 					if onlyOnline.lower() == "no":
@@ -264,14 +277,9 @@ class Xp:
 		admin_override = False
 
 		# RequiredXPRole
-		if requiredXP:
-			foundRole = False
-			for checkRole in author.roles:
-				if str(checkRole.id) == str(requiredXP):
-					foundRole = True
-			if not foundRole:
-				approve = False
-				msg = msg = 'You don\'t have the permissions to give xp.'
+		if not self._can_xp(author, server):
+			approve = False
+			msg = 'You don\'t have the permissions to give xp.'
 
 		if xpAmount > int(reserveXP):
 			approve = False
@@ -519,14 +527,9 @@ class Xp:
 			approve = False
 
 		# RequiredXPRole
-		if requiredXP:
-			foundRole = False
-			for checkRole in author.roles:
-				if str(checkRole.id) == str(requiredXP):
-					foundRole = True
-			if not foundRole:
-				approve = False
-				msg = msg = 'You don\'t have the permissions to gamble.'
+		if not self._can_xp(author, server):
+			approve = False
+			msg = 'You don\'t have the permissions to gamble.'
 				
 		# Check bot admin
 		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
