@@ -326,15 +326,12 @@ class CogManager:
 		message = await ctx.send("Updating...")
 		try:
 			u = subprocess.Popen([git_location, 'pull'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			# u.wait()
 			out, err = u.communicate()
-			print(out)
-			print(err)
 			msg = ""
 			if len(out.decode("utf-8")):
-				msg += "```\n" + out.decode("utf-8").replace("`", "\`") + "```\n"
+				msg += "Output:\n```\n" + out.decode("utf-8").replace("`", "\`") + "```\n"
 			if len(err.decode("utf-8")):
-				msg += "```\n" + err.decode("utf-8").replace("`", "\`") + "```"
+				msg += "Error:\n```\n" + err.decode("utf-8").replace("`", "\`") + "```"
 			await message.edit(content=msg)
 		except:
 			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
