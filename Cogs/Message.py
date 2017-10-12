@@ -175,19 +175,19 @@ class Embed:
                 # Cast to string and hope for the best
                 em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
 		
-	# Get our footer if we have one
-	footer_text, footer_icon = discord.Embed.Empty
-	if type(self.footer) is str:
-		footer_text = self.footer
-	elif type(self.footer) is dict:
-		footer_text = self.footer.get("text", discord.Embed.Empty)
-		footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
-	elif self.footer == None:
-		# Never setup
-		pass
-	else:
-		# Try to cast it
-		footer_text = str(self.footer)
+        # Get our footer if we have one
+        footer_text, footer_icon = discord.Embed.Empty
+        if type(self.footer) is str:
+                footer_text = self.footer
+        elif type(self.footer) is dict:
+                footer_text = self.footer.get("text", discord.Embed.Empty)
+                footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+        elif self.footer == None:
+                # Never setup
+                pass
+        else:
+                # Try to cast it
+                footer_text = str(self.footer)
         
         # Only pm if our self.pm_after is above 0
         to_pm = len(self.fields) > self.pm_after if self.pm_after else False
