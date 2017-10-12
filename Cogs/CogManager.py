@@ -328,6 +328,8 @@ class CogManager:
 			u = subprocess.Popen([git_location, 'pull'])
 			u.wait()
 			out, err = u.communicate()
+			print(out)
+			print(err)
 			msg = ""
 			if len(out.decode("utf-8")):
 				msg += "```\n" + out.decode("utf-8").replace("`", "\`") + "```\n"
