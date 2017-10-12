@@ -45,7 +45,6 @@ bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot t
 jsonFile = "Settings.json"
 deckFile = "deck.json"
 corpSiteAuth = "corpSiteAuth.txt"
-settings = None
 # Open our token
 with open('token.txt', 'r') as f:
 	token = f.read().strip()
@@ -54,9 +53,6 @@ with open('token.txt', 'r') as f:
 @bot.event
 async def on_ready():
 	print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
-	
-	# Globalize Settings for later use
-	global settings
 	
 	# Load extensions - Bypassed for now
 	# _load_extensions()
@@ -127,6 +123,8 @@ async def on_typing(channel, user, when):
 @bot.event
 async def on_member_remove(member):
 	server = member.guild
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
 	settings.removeUser(member, server)
 	for cog in bot.cogs:
 		cog = bot.get_cog(cog)
@@ -169,6 +167,8 @@ async def on_guild_join(server):
 			continue
 	if didLeave:
 		return
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
 	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
@@ -181,15 +181,21 @@ async def on_guild_join(server):
 
 @bot.event
 async def on_guild_remove(server):
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
 	settings.removeServer(server)
 
 @bot.event
 async def on_channel_delete(channel):
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
 	settings.removeChannelID(channel.id, channel.guild)
 
 @bot.event
 async def on_member_join(member):
 	server = member.guild
+	# Set the settings var up
+	settings = bot.get_cog("Settings")
 	# Initialize the user
 	settings.checkUser(member, server)
 
