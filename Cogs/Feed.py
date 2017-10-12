@@ -29,6 +29,25 @@ class Feed:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
+	def _can_xp(self, user, server):
+		# Checks whether or not said user has access to the xp system
+		requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
+		promoArray  = self.settings.getServerStat(server, "PromotionArray")
+		userXP      = self.settings.getUserStat(user, server, "XP")
+		if not requiredXP:
+			return True
+
+		for checkRole in user.roles:
+			if str(checkRole.id) == str(requiredXP):
+				return True
+		# Still check if we have enough xp
+		for role in promoArray:
+			if str(role["ID"]) == str(requiredXP):
+				if userXP >= role["XP"]:
+					return True
+				break
+		return False
+
 	@asyncio.coroutine
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
@@ -260,14 +279,9 @@ class Feed:
 			#msg = 'You don\'t have the permissions to feed me.'
 		
 		# RequiredXPRole
-		if requiredXP:
-			foundRole = False
-			for checkRole in author.roles:
-				if str(checkRole.id) == str(requiredXP):
-					foundRole = True
-			if not foundRole:
-				approve = False
-				msg = 'You don\'t have the permissions to feed me.'
+		if not self._can_xp(author, server):
+			approve = False
+			msg = 'You don\'t have the permissions to feed me.'
 
 		# Check bot admin
 		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
