@@ -8,6 +8,7 @@ from   Cogs import ReadableTime
 from   Cogs import Nullify
 from   Cogs import DisplayName
 from   Cogs import Message
+from   Cogs import FuzzySearch
 
 def setup(bot):
 	# Add the cog
@@ -159,7 +160,38 @@ class Help:
 		result = await self._get_info(ctx, command)
 
 		if result == None:
-			await ctx.send("No command called *\"{}\"* found.  Remember that commands and cogs are case-sensitive.".format(Nullify.clean(command)))
+			# Get a list of all commands and modules and server up the 3 closest
+			cog_name_list = []
+			com_name_list = []
+			for cog in self.bot.cogs:
+				if not cog in cog_name_list:
+					cog_name_list.append(cog)
+				cog_commands = self.bot.get_cog_commands(cog)
+				for comm in cog_commands:
+					if not comm.name in com_name_list:
+						com_name_list.append(comm.name)
+			
+			# Get cog list:
+			cog_match = FuzzySearch.search(command, cog_name_list)
+			com_match = FuzzySearch.search(command, com_name_list)
+
+			# Build the embed
+			m = Message.Embed()
+			if type(ctx.author) is discord.Member:
+				m.color = ctx.author.color
+			m.title = "No command called \"{}\" found".format(Nullify.clean(command))
+			if len(cog_match):
+				cog_mess = ""
+				for pot in cog_match:
+					cog_mess += '└─ {}\n'.format(pot['Item'].replace('`', '\\`'))
+				m.add_field(name="Close Cog Matches:", value=cog_mess)
+			if len(com_match):
+				com_mess = ""
+				for pot in com_match:
+					com_mess += '└─ {}\n'.format(pot['Item'].replace('`', '\\`'))
+				m.add_field(name="Close Command Matches:", value=com_mess)
+			m.footer_text = "Remember that commands and cogs are case-sensitive."
+			await m.send(ctx)
 			return
 		m = Message.Embed(**result)
 		# Build the embed
