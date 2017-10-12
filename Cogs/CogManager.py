@@ -266,7 +266,7 @@ class CogManager:
 	
 	@commands.command(pass_context=True)
 	async def reload(self, ctx, *, extension = None):
-		"""Reloads the passed extension."""
+		"""Reloads the passed extension - or all if none passed."""
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
 		if isOwner == None:
@@ -279,7 +279,9 @@ class CogManager:
 			return
 
 		if extension == None:
-			await ctx.send("Usage `{}reload [extension]`".format(ctx.prefix))
+			result = self._load_extension()
+			res_str = "*{}* of *{}* extensions reloaded successfully!".format(result[0], result[1])
+			await ctx.send(res_str)
 			return
 
 		result = self._load_extension(extension)
