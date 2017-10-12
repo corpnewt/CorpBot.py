@@ -523,7 +523,7 @@ class Hw:
 			# We're in business
 			if self.checkSuppress(ctx):
 				foundStr = Nullify.clean(foundStr)
-			await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
+			await Message.Message(message=foundStr).send(ctx)
 			return
 
 		# If we're here - then we didn't find a member - set it to the author, and run another quick search
@@ -556,7 +556,7 @@ class Hw:
 			# Nothing found...
 		if self.checkSuppress(ctx):
 			foundStr = Nullify.clean(foundStr)
-		await Message.say(self.bot, foundStr, ctx.channel, ctx.author, 1)
+		await Message.Message(message=foundStr).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -848,7 +848,7 @@ class Hw:
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		# Limit output to 1 page - if more than that, send to pm
-		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
+		await Message.Message(message=msg).send(ctx)
 
 
 	@commands.command(pass_context=True)

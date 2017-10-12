@@ -101,6 +101,9 @@ class LangFilter:
 		# Implemented to bypass having message called twice
 		return { "Ignore" : False, "Delete" : False }
 
+	async def message_edit(self, before, message):
+		return await self.message(message)
+
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
 		word_list = self.settings.getServerStat(message.guild, "FilteredWords")
@@ -253,7 +256,7 @@ class LangFilter:
 		
 		msg = "__**Filtered Words:**__\n\n" + string_list
 		
-		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
+		await Message.Message(message=msg).send(ctx)
 		
 	@commands.command(pass_context=True)
 	async def clearfilter(self, ctx):

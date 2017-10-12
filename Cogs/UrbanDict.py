@@ -57,7 +57,8 @@ class UrbanDict:
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
+		await Message.Message(message=msg).send(ctx)
+		# await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
 
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
@@ -73,4 +74,4 @@ class UrbanDict:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
 		
 		# await ctx.channel.send(msg)
-		await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
+		await Message.Message(message=msg).send(ctx)

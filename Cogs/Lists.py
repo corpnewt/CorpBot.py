@@ -366,8 +366,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		#await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -413,8 +412,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		#await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -785,8 +783,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		#await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -833,8 +830,7 @@ class Lists:
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		#await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)
 
 
 	@commands.command(pass_context=True)

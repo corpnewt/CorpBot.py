@@ -412,8 +412,7 @@ class Profile:
 			linkText = Nullify.clean(linkText)
 
 		# Speak the link list while cutting off the end ", "
-		# await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)
 		
 	@commands.command(pass_context=True)
 	async def rawprofiles(self, ctx, *, member : str = None):
@@ -463,5 +462,4 @@ class Profile:
 			linkText = Nullify.clean(linkText)
 
 		# Speak the link list while cutting off the end ", "
-		# await channel.send(linkText[:-2])
-		await Message.say(self.bot, linkText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=linkText[:-2]).send(ctx)

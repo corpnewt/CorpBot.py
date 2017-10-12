@@ -181,7 +181,7 @@ class Reddit:
 			return
 		mess = '__**{}**__\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
+		await Message.Message(message=mess).send(ctx)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
 
@@ -210,7 +210,7 @@ class Reddit:
 
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
+		await Message.Message(message=mess).send(ctx)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
 
@@ -237,7 +237,7 @@ class Reddit:
 			return
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.say(self.bot, mess, ctx.channel, ctx.message.author, 1)
+		await Message.Message(message=mess).send(ctx)
 		#await self.bot.send_message(ctx.message.channel, msg)
 
 	

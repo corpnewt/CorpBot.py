@@ -97,10 +97,22 @@ class Bot:
 			member_count = "{:,} ({:,} unique)".format(userCount, len(counted_users))
 			
 		# Get commands/cogs count
-		cog_count = "{:,} cog".format(len(self.bot.cogs))
+		cog_amnt  = 0
+		empty_cog = 0
+		for cog in self.bot.cogs:
+			if not len(self.bot.get_cog_commands(cog)):
+				empty_cog +=1
+				# Skip empty cogs
+				continue
+			cog_amnt += 1
+				
+		cog_count = "{:,} cog".format(cog_amnt)
 		# Easy way to append "s" if needed:
 		if not len(self.bot.cogs) == 1:
 			cog_count += "s"
+		if empty_cog:
+			cog_count += " [{:,} without commands]".format(empty_cog)
+
 		command_count = "{:,}".format(len(self.bot.commands))
 		
 		# Get localized created time
@@ -151,7 +163,7 @@ class Bot:
 		server_embed.add_field(name="Created", value=created_at, inline=True)
 		server_embed.add_field(name="Joined", value=joined_at, inline=True)
 		server_embed.add_field(name="Owners", value=owners, inline=True)
-		server_embed.add_field(name="Prefix", value=prefix, inline=True)
+		server_embed.add_field(name="Prefixes", value=prefix, inline=True)
 		server_embed.add_field(name="Status", value=status_text, inline=True)
 		if bot_member.game and bot_member.game.name:
 			server_embed.add_field(name="Playing", value=str(bot_member.game.name), inline=True)

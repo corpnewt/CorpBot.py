@@ -407,8 +407,7 @@ class Tags:
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		#await channel.send(tagText[:-2])
-		await Message.say(self.bot, tagText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=tagText[:-2]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -454,8 +453,7 @@ class Tags:
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		#await channel.send(tagText[:-2])
-		await Message.say(self.bot, tagText[:-2], ctx.channel, ctx.author, 1)
+		await Message.Message(message=tagText[:-2]).send(ctx)
 
 
 	@commands.command(pass_context=True)
