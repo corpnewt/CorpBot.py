@@ -7,6 +7,7 @@ from   discord.ext import commands
 from   Cogs import ReadableTime
 from   Cogs import Nullify
 from   Cogs import DisplayName
+from   Cogs import Message
 
 def setup(bot):
 	# Add the cog
@@ -160,59 +161,9 @@ class Help:
 		if result == None:
 			await ctx.send("No command called *\"{}\"* found.  Remember that commands and cogs are case-sensitive.".format(Nullify.clean(command)))
 			return
-
+		m = Message.Embed(**result)
 		# Build the embed
 		if type(ctx.author) is discord.Member:
-			help_embed = discord.Embed(color=ctx.author.color)
-		else:
-			# No default color - pick a random
-			colors = [ 
-				discord.Color.teal(),
-				discord.Color.dark_teal(),
-				discord.Color.green(),
-				discord.Color.dark_green(),
-				discord.Color.blue(),
-				discord.Color.dark_blue(),
-				discord.Color.purple(),
-				discord.Color.dark_purple(),
-				discord.Color.magenta(),
-				discord.Color.dark_magenta(),
-				discord.Color.gold(),
-				discord.Color.dark_gold(),
-				discord.Color.orange(),
-				discord.Color.dark_orange(),
-				discord.Color.red(),
-				discord.Color.dark_red(),
-				discord.Color.lighter_grey(),
-				discord.Color.dark_grey(),
-				discord.Color.light_grey(),
-				discord.Color.darker_grey(),
-				discord.Color.blurple(),
-				discord.Color.greyple()
-				]
-			help_embed = discord.Embed(color=random.choice(colors))
-		help_embed.title = result["title"]
-
-		to_pm = len(result["fields"]) > 10
-		page_count = 1
-		page_total = math.ceil(len(result["fields"])/25)
-		if page_total > 1:
-			help_embed.title = result["title"] + " (Page {:,} of {:,})".format(page_count, page_total)
-		for embed in result["fields"]:
-			help_embed.add_field(name=embed["name"], value=embed["value"], inline=embed["inline"])
-			# 25 field max - send the embed if we get there
-			if len(help_embed.fields) >= 25:
-				if page_total == page_count:
-					help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx)))
-				await self._send_embed(ctx, help_embed, to_pm)
-				help_embed.clear_fields()
-				page_count += 1
-				if page_total > 1:
-					help_embed.title = result["title"] + " (Page {:,} of {:,})".format(page_count, page_total)
-		
-		if len(help_embed.fields):
-			help_embed.set_footer(text=self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx)))
-			await self._send_embed(ctx, help_embed, to_pm)
-				
-
-			
+			m.color = ctx.author.color
+		m.footer_text = self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
+		await m.send(ctx)
