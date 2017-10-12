@@ -70,7 +70,7 @@ class Embed:
         self.url = kwargs.get("url", None)
         self.description = kwargs.get("description", None)
         self.image = kwargs.get("image", None)
-	self.footer = kwargs.get("footer", None)
+        self.footer = kwargs.get("footer", None)
         # self.footer_text = kwargs.get("footer_text", discord.Embed.Empty)
         # self.footer_icon = kwargs.get("footer_icon", discord.Embed.Empty)
         self.thumbnail = kwargs.get("thumbnail", None)
