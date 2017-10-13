@@ -7,6 +7,7 @@ import subprocess
 from   discord.ext import commands
 from   Cogs import DisplayName
 from   Cogs import Settings
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot
@@ -333,7 +334,8 @@ class CogManager:
 			if len(err.decode("utf-8")):
 				msg += err.decode("utf-8").replace("`", "\`") + "\n"
 			msg += "```"
-			await message.edit(content=msg)
+			await message.edit(content=" ")
+			await Message.EmbedText(title="Update Results:", description=msg, color=ctx.author).send(ctx)
 		except:
 			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
 			return

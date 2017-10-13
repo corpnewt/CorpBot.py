@@ -186,6 +186,9 @@ class Settings:
 	async def checkAll(self):
 		# Check all verifications - and start timers if needed
 		for server in self.bot.guilds:
+			# Check if we can even manage roles here
+			if not server.me.guild_permissions.manage_roles:
+				continue
 			# Get default role
 			defRole = self.getServerStat(server, "DefaultRole")
 			defRole = DisplayName.roleForID(defRole, server)

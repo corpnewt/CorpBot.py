@@ -40,7 +40,8 @@ class UrbanDict:
 			await ctx.channel.send(msg)
 			return
 		url = "http://api.urbandictionary.com/v0/define?term={}".format(quote(word))
-		msg = 'I couldn\'t find a definition for "{}"...'.format(word) 
+		msg = 'I couldn\'t find a definition for "{}"...'.format(word)
+		title = permalink = None
 		r = requests.get(url, headers = {'User-agent': self.ua})
 		theJSON = r.json()["list"]
 		if len(theJSON):
@@ -52,26 +53,36 @@ class UrbanDict:
 			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
+			permalink = ourWord["permalink"]
+			title = "Urban Dictionary Link"
 		
 		# await ctx.channel.send(msg)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await Message.Message(message=msg).send(ctx)
+		# await Message.Message(message=msg).send(ctx)
+		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)
 		# await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
 
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
 		"""Gives a random word and its definition."""
 		url = "http://api.urbandictionary.com/v0/random"
+		title = permalink = None
 		r = requests.get(url, headers = {'User-agent': self.ua})
 		theJSON = r.json()["list"]
 		if len(theJSON):
 			# Got it - let's build our response
-			ourWord = theJSON[0]
+			if self.random:
+				ourWord = random.choice(theJSON)
+			else:
+				ourWord = theJSON[0]
 			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
 			if ourWord["example"]:
 				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
+			permalink = ourWord["permalink"]
+			title = "Urban Dictionary Link"
 		
 		# await ctx.channel.send(msg)
-		await Message.Message(message=msg).send(ctx)
+		# await Message.Message(message=msg).send(ctx)
+		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)
