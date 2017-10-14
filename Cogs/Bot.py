@@ -285,7 +285,7 @@ class Bot:
 		url         (str)
 		description (str)
 		image       (str)
-		footer      (str)
+		footer      (str or dict { text, icon_url })
 		thumbnail   (str)
 		author      (str, dict, or User/Member)
 		color       (user/member)
