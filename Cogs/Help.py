@@ -82,9 +82,9 @@ class Help:
 				# Add the name of each cog in the list
 				new_dict = { "name" : cog }
 				if len(self.bot.get_cog_commands(cog)) == 1:
-					new_dict["value"] = "└─ 1 command"
+					new_dict["value"] = "`└─ 1 command`"
 				else:
-					new_dict["value"] = "└─ {:,} commands".format(len(self.bot.get_cog_commands(cog)))
+					new_dict["value"] = "`└─ {:,} commands`".format(len(self.bot.get_cog_commands(cog)))
 				new_dict["inline"] = True
 				embed_list["fields"].append(new_dict)
 			return embed_list
@@ -111,7 +111,7 @@ class Help:
 					if command.hidden:
 						continue
 					command_help = self._get_help(command, 80)
-					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : "└─ " + command_help, "inline" : False })
+					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : "`└─ " + command_help + "`", "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):
 					return None
@@ -133,8 +133,10 @@ class Help:
 							embed_list = {"title" : "{} - {} Extension". format(cog, e[5:]), "fields" : [] }
 							break
 					if not embed_list:
-						embed_list = {"title" : cog, "fields" : [] }
-					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
+						# embed_list = {"title" : cog, "fields" : [] }
+						embed_list = { "title" : cog }
+					# embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
+					embed_list["description"] = "**{}**\n```\n{}```".format(prefix + command.signature, command.help) 
 					return embed_list
 		# At this point - we got nothing...
 		return None

@@ -9,6 +9,7 @@ import sys
 import fnmatch
 import subprocess
 import pyspeedtest
+import json
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -18,6 +19,7 @@ from   Cogs import GetImage
 from   Cogs import Nullify
 from   Cogs import ProgressBar
 from   Cogs import UserTime
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -250,6 +252,73 @@ class Bot:
 		msg += '{} uptime```'.format(timeString)
 
 		await message.edit(content=msg)
+
+	@commands.command(pass_context=True)
+	async def embed(self, ctx, embed_type = "field", *, embed):
+		"""Builds an embed using json formatting (owner only).
+
+		Types:
+		field
+		text
+
+		----------------------------------
+		
+		Options     (All):
+
+		pm_after    (int - fields, or pages)
+		pm_react    (str)
+		title       (str)
+		page_count  (bool)
+		url         (str)
+		description (str)
+		image       (str)
+		footer      (str)
+		thumbnail   (str)
+		author      (str, dict, or User/Member)
+		color       (user/member)
+
+		----------------------------------
+
+		Options      (field only):
+
+		fields       (list of dicts { name (str), value (str), inline (bool) })
+
+		----------------------------------
+
+		Options      (text only):
+
+		desc_head    (str)
+		desc_foot    (str)
+		max_pages    (int)
+		"""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		try:
+			embed_dict = json.loads(embed)
+		except Exception as e:
+			await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
+			return
+
+		if embed_type.lower() == "field":
+			await Message.Embed(**embed_dict).send(ctx)
+		elif embed_type.lower() == "text":
+			await Message.EmbedText(**embed_dict).send(ctx)
+		else:
+			await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
 
 
 	@commands.command(pass_context=True)

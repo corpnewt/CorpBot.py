@@ -247,7 +247,11 @@ class Embed:
         self.color = kwargs.get("color", random.choice(self.colors))
 
     def add_field(self, **kwargs):
-        self.fields.append({"name" : kwargs.get("name", "None"), "value" : kwargs.get("value", "None")})
+        self.fields.append({
+            "name" : kwargs.get("name", "None"),
+            "value" : kwargs.get("value", "None"),
+            "inline" : kwargs.get("inline", False)
+        })
 
     def clear_fields(self):
         self.fields = []
