@@ -102,7 +102,7 @@ class Embed:
             discord.Color.greyple(),
             discord.Color.default()
         ]
-        self.color = kwargs.get("color", random.choice(self.colors))
+        self.color = kwargs.get("color", None)
 
     def add_field(self, **kwargs):
         self.fields.append({
@@ -147,7 +147,9 @@ class Embed:
         return tot
 
     def _embed_with_self(self):
-        if type(self.color) is discord.Member:
+        if self.color == None:
+            self.color = random.choice(self.colors)
+        elif type(self.color) is discord.Member:
             self.color = self.color.color
         elif type(self.color) is discord.User:
             self.color = random.choice(self.colors)
@@ -200,6 +202,9 @@ class Embed:
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
+        # check if we can steal the color from the message
+        if self.color == None and len(message.embeds):
+            self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
@@ -220,7 +225,7 @@ class Embed:
             return await message.edit(content=None, embed=em)
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
-        if new_message.channel == ctx.author.dm_channel:
+        if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em)
         else:
@@ -290,6 +295,9 @@ class EmbedText(Embed):
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
+        # check if we can steal the color from the message
+        if self.color == None and len(message.embeds):
+            self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
@@ -313,7 +321,7 @@ class EmbedText(Embed):
             return await message.edit(content=None, embed=em)
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
-        if new_message.channel == ctx.author.dm_channel:
+        if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em)
         else:
