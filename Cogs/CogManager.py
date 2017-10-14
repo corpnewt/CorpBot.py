@@ -324,7 +324,7 @@ class CogManager:
 			await ctx.send("It looks like my host environment doesn't have git in its path var :(")
 			return
 		# Try to update
-		message = await ctx.send("Updating...")
+		message = await Message.EmbedText(title="Updating...", description="git pull", color=ctx.author).send(ctx)
 		try:
 			u = subprocess.Popen([git_location, 'pull'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			out, err = u.communicate()
@@ -334,8 +334,7 @@ class CogManager:
 			if len(err.decode("utf-8")):
 				msg += err.decode("utf-8").replace("`", "\`") + "\n"
 			msg += "```"
-			await message.edit(content=" ")
-			await Message.EmbedText(title="Update Results:", description=msg, color=ctx.author).send(ctx)
+			await Message.EmbedText(title="Update Results:", description=msg, color=ctx.author).edit(ctx, message)
 		except:
 			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
 			return

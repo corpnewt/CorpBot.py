@@ -217,12 +217,12 @@ class Embed:
                 text=self._truncate_string(footer_text, self.foot_max),
                 icon_url=footer_icon
             )
-            return await message.edit(embed=em)
+            return await message.edit(content=None, embed=em)
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(embed=em)
+            await message.edit(content=None, embed=em)
         else:
             await message.edit(content=" ", embed=None)
 
@@ -284,6 +284,7 @@ class EmbedText(Embed):
         Embed.__init__(self, **kwargs)
         # Creates a new embed - with an option setup dictionary
         self.pm_after = kwargs.get("pm_after", 1)
+        self.max_pages = 0
         self.desc_head = kwargs.get("desc_head", "") # Header for description markdown
         self.desc_foot = kwargs.get("desc_foot", "") # Footer for description markdown
 
@@ -309,12 +310,12 @@ class EmbedText(Embed):
                 text=self._truncate_string(footer_text, self.foot_max),
                 icon_url=footer_icon
             )
-            return await message.edit(embed=em)
+            return await message.edit(content=None, embed=em)
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(embed=em)
+            await message.edit(content=None, embed=em)
         else:
             await message.edit(content=" ", embed=None)
 
