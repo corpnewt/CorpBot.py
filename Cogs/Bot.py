@@ -255,11 +255,24 @@ class Bot:
 
 	@commands.command(pass_context=True)
 	async def embed(self, ctx, embed_type = "field", *, embed):
-		"""Builds an embed using json formatting (owner only).
+		"""Builds an embed using json formatting.
 
 		Types:
 		field
 		text
+
+		----------------------------------
+
+		Limits      (All - owner only):
+
+		title_max   (256)
+		desc_max    (2048)
+		field_max   (25)
+		fname_max   (256)
+		fval_max    (1024)
+		foot_max    (2048)
+		auth_max    (256)
+		total_max   (6000)
 
 		----------------------------------
 		
@@ -296,33 +309,40 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner
+		# Only allow owner to modify the limits
 		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
 
 		try:
 			embed_dict = json.loads(embed)
 		except Exception as e:
 			await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 			return
+		
+		# Only allow owner to modify the limits
+		isOwner = self.settings.isOwner(ctx.author)
+		if not isOwner:
+			embed_dict["title_max"] = 256
+			embed_dict["desc_max"] = 2048
+			embed_dict["field_max"] = 25
+			embed_dict["fname_max"] = 256
+			embed_dict["fval_max"] = 1024
+			embed_dict["foot_max"] = 2048
+			embed_dict["auth_max"] = 256
+			embed_dict["total_max"] = 6000
 
-		message = await Message.Embed(title="Embedding...").send(ctx)
-
-		await asyncio.sleep(3)
-
-		if embed_type.lower() == "field":
-			await Message.Embed(**embed_dict).edit(ctx, message)
-		elif embed_type.lower() == "text":
-			await Message.EmbedText(**embed_dict).edit(ctx, message)
-		else:
-			await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
+		try:
+			if embed_type.lower() == "field":
+				await Message.Embed(**embed_dict).send(ctx)
+			elif embed_type.lower() == "text":
+				await Message.EmbedText(**embed_dict).send(ctx)
+			else:
+				await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
+		except Exception as e:
+			try:
+				e = str(e)
+			except:
+				e = "An error occurred :("
+			await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
 
 
 	@commands.command(pass_context=True)

@@ -55,14 +55,14 @@ class Message:
 class Embed:
     def __init__(self, **kwargs):
         # Set defaults
-        self.title_max = 256
-        self.desc_max = 2048
-        self.field_max = 25
-        self.fname_max = 256
-        self.fval_max = 1024
-        self.foot_max = 2048
-        self.auth_max = 256
-        self.total_max = 6000
+        self.title_max = kwargs.get("title_max", 256)
+        self.desc_max = kwargs.get("desc_max", 2048)
+        self.field_max = kwargs.get("field_max", 25)
+        self.fname_max = kwargs.get("fname_max", 256)
+        self.fval_max = kwargs.get("fval_max", 1024)
+        self.foot_max = kwargs.get("foot_max", 2048)
+        self.auth_max = kwargs.get("auth_max", 256)
+        self.total_max = kwargs.get("total_max", 6000)
         # Creates a new embed - with an option setup dictionary
         self.pm_after = kwargs.get("pm_after", 10)
         self.pm_react = kwargs.get("pm_react", "📬")
@@ -299,7 +299,7 @@ class EmbedText(Embed):
         Embed.__init__(self, **kwargs)
         # Creates a new embed - with an option setup dictionary
         self.pm_after = kwargs.get("pm_after", 1)
-        self.max_pages = 0
+        self.max_pages = kwargs.get("max_pages", 0)
         self.desc_head = kwargs.get("desc_head", "") # Header for description markdown
         self.desc_foot = kwargs.get("desc_foot", "") # Footer for description markdown
 
