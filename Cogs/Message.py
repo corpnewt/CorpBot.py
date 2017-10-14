@@ -130,7 +130,7 @@ class EmbedText:
         em.title = self._truncate_string(self.title, self.title_max)
         em.url = self.url
         if self.image:
-            em.set_image(self.image)
+            em.set_image(url=self.image)
         if self.thumbnail:
             em.set_thumbnail(self.thumbnail)
         if self.author:
@@ -168,6 +168,16 @@ class EmbedText:
                 # Try to cast it
                 footer_text = str(self.footer)
 
+        # First check if we have any fields at all - and try to send
+        # as one page if not
+        if self.description == None or not len(self.description):
+            em.set_footer(
+                text=self._truncate_string(footer_text, self.foot_max),
+                icon_url=footer_icon
+            )
+            await self._send_embed(ctx, em, False)
+            return
+        
         text_list = textwrap.wrap(
             self.description,
             self.desc_max - len(self.desc_head) - len(self.desc_foot),
@@ -302,7 +312,7 @@ class Embed:
         em.url = self.url
         em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
-            em.set_image(self.image)
+            em.set_image(url=self.image)
         if self.thumbnail:
             em.set_thumbnail(self.thumbnail)
         if self.author:
