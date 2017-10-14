@@ -221,7 +221,7 @@ class Embed:
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel:
-            em = Embed(title=self.title, description="📬 Check your dm's")._embed_with_self()
+            em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(embed=em)
         else:
             await message.edit(content=" ", embed=None)
@@ -313,7 +313,7 @@ class EmbedText(Embed):
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel:
-            em = Embed(title=self.title, description="📬 Check your dm's")._embed_with_self()
+            em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(embed=em)
         else:
             await message.edit(content=" ", embed=None)
