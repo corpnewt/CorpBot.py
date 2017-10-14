@@ -153,6 +153,16 @@ class Embed:
             self.color = self.color.color
         elif type(self.color) is discord.User:
             self.color = random.choice(self.colors)
+        elif type(self.color) is tuple or type(self.color) is list:
+            if len(self.color) == 3:
+                try:
+                    r, g, b = [ int(a) for a in self.color ]
+                    self.color = discord.Color.from_rgb(r, g, b)
+                except:
+                    self.color = random.choice(self.colors)
+            else:
+                self.color = random.choice(self.colors)
+
         # Sends the current embed
         em = discord.Embed(color=self.color)
         em.title = self._truncate_string(self.title, self.title_max)
