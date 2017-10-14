@@ -313,10 +313,14 @@ class Bot:
 			await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 			return
 
+		message = await Message.Embed(title="Embedding...").send(ctx)
+
+		await asyncio.sleep(3)
+
 		if embed_type.lower() == "field":
-			await Message.Embed(**embed_dict).send(ctx)
+			await Message.Embed(**embed_dict).edit(ctx, message)
 		elif embed_type.lower() == "text":
-			await Message.EmbedText(**embed_dict).send(ctx)
+			await Message.EmbedText(**embed_dict).edit(ctx, message)
 		else:
 			await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
 
