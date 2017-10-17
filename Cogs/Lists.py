@@ -1002,14 +1002,27 @@ class Lists:
 	async def online(self, ctx):
 		"""Lists the number of users online."""
 		server = ctx.message.guild
-		members = 0
-		membersOnline = 0
+		members = membersOnline = bots = botsOnline = 0
 		for member in server.members:
-			members += 1
-			if not member.status == discord.Status.offline:
-				membersOnline += 1
-		msg = 'There are *{:,}* out of *{:,}* (*{:.2f}%*) users online.'.format(membersOnline, members, (membersOnline/members)*100)
-		await ctx.channel.send(msg)
+			if member.bot:
+				bots += 1
+				if not member.status == discord.Status.offline:
+					botsOnline += 1
+			else:
+				members += 1
+				if not member.status == discord.Status.offline:
+					membersOnline += 1
+		await Message.Embed(
+			title="Member Stats",
+			description="Current member information for {}".format(server.name),
+			fields=[
+				{ "name" : "Members", "value" : "└─ {}/{} online ({:.2f}%)".format(membersOnline, members, round(members/membersOnline, 2), "inline" : False},
+				{ "name" : "Bots", "value" : "└─ {}/{} online ({:.2f}%)".format(botsOnline, bots, round(bots/botsOnline, 2), "inline" : False},
+				{ "name" : "Total", "value" : "└─ {}/{} online ({:.2f}%)".format(membersOnline + botsOnline, len(server.members), round((membersOnline + botsOnline)/len(server.members), 2), "inline" : False}
+			],
+			color=ctx.message.author).send(ctx)
+		#msg = 'There are *{:,}* out of *{:,}* (*{:.2f}%*) users online.'.format(membersOnline, members, (membersOnline/members)*100)
+		#await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
