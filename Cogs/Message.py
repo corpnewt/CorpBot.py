@@ -218,7 +218,7 @@ class Embed:
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
-        to_pm = len(self.fields) > self.pm_after if self.pm_after else False
+        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
 
         if len(self.fields) <= self.pm_after and not to_pm:
             # Edit in place, nothing else needs to happen
@@ -319,7 +319,7 @@ class EmbedText(Embed):
                 self.desc_max - len(self.desc_head) - len(self.desc_foot),
                 break_long_words=True,
                 replace_whitespace=False)
-        to_pm = len(text_list) > self.pm_after if self.pm_after else False
+        to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
         if len(text_list) <= 1 and not to_pm:
             # Edit in place, nothing else needs to happen
             if len(text_list):
