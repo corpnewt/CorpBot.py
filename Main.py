@@ -22,6 +22,8 @@ if os.path.exists('prefix.txt'):
 async def get_prefix(bot, message):
 	# Check commands against some things and do stuff or whatever...
 	try:
+		# Set the settings var up
+		settings = bot.get_cog("Settings")
 		serverPrefix = settings.getServerStat(message.guild, "Prefix")
 	except Exception:
 		serverPrefix = None
