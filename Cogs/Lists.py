@@ -1016,9 +1016,9 @@ class Lists:
 			title="Member Stats",
 			description="Current member information for {}".format(server.name),
 			fields=[
-				{ "name" : "Members", "value" : "└─ {}/{} online ({:.2f}%)".format(membersOnline, members, round((membersOnline/members)*100, 2)), "inline" : False},
-				{ "name" : "Bots", "value" : "└─ {}/{} online ({:.2f}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
-				{ "name" : "Total", "value" : "└─ {}/{} online ({:.2f}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/len(server.members))*100, 2)), "inline" : False}
+				{ "name" : "Members", "value" : "└─ {}/{} online ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2)), "inline" : False},
+				{ "name" : "Bots", "value" : "└─ {}/{} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
+				{ "name" : "Total", "value" : "└─ {}/{} online ({:,g}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/len(server.members))*100, 2)), "inline" : False}
 			],
 			color=ctx.message.author).send(ctx)
 		#msg = 'There are *{:,}* out of *{:,}* (*{:.2f}%*) users online.'.format(membersOnline, members, (membersOnline/members)*100)
