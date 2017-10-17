@@ -73,13 +73,13 @@ class ServerStats:
                 continue
             if not member.status == discord.Status.offline:
                 online_members += 1
-        bot_percent = "{:.2f}%".format((bot_member/len(guild.members))*100)
-        user_string = "{:,}/{:,} online ({:.2f}%)".format(
+        bot_percent = "{:,g}%".format((bot_member/len(guild.members))*100)
+        user_string = "{:,}/{:,} online ({:,g}%)".format(
                 online_members,
                 len(guild.members) - bot_member,
                 (online_members/(len(guild.members) - bot_member) * 100)
         )
-        user_string += "\n{:,}/{:,} bots online ({:.2f}%)".format(
+        user_string += "\n{:,}/{:,} bots online ({:,g}%)".format(
                 bot_online,
                 bot_member,
                 (bot_online/bot_member)*100
