@@ -13,7 +13,7 @@ class Message:
     def __init__(self, **kwargs):
         # Creates a new message - with an optional setup dictionary
         self.max_chars = 2000
-        self.pm_after = kwargs.get("pm_after", 1)
+        self.pm_after = kwargs.get("pm_after", 1) # -1 to disable, 0 to always pm
         self.header = kwargs.get("header", "")
         self.footer = kwargs.get("footer", "")
         self.pm_react = kwargs.get("pm_react", "📬")
@@ -41,8 +41,8 @@ class Message:
             break_long_words=True,
             replace_whitespace=False)
 
-        # Only pm if our self.pm_after is above 0
-        to_pm = len(text_list) > self.pm_after if self.pm_after else False
+        # Only pm if our self.pm_after is above -1
+        to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
 
         page_count = 1
         for m in text_list:
@@ -257,8 +257,8 @@ class Embed:
             )
             return await self._send_embed(ctx, em, False)
         
-        # Only pm if our self.pm_after is above 0
-        to_pm = len(self.fields) > self.pm_after if self.pm_after else False
+        # Only pm if our self.pm_after is above -1
+        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
 
         page_count = 1
         page_total = math.ceil(len(self.fields)/self.field_max)
@@ -359,8 +359,8 @@ class EmbedText(Embed):
             break_long_words=True,
             replace_whitespace=False)
 
-        # Only pm if our self.pm_after is above 0
-        to_pm = len(text_list) > self.pm_after if self.pm_after else False
+        # Only pm if our self.pm_after is above -1
+        to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
 
         i = 0
         for i in range(len(text_list)):
