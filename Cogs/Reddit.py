@@ -188,7 +188,7 @@ class Reddit:
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
 			error = theJSON.get("error", "An error has occurred.")
-			await Message.EmbedText(title=theJSON["message"], description=error, color=ctx.author).send(ctx)
+			await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
 			return
 		# Build our embed
 		e = { 
