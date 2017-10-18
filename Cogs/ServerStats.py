@@ -73,16 +73,16 @@ class ServerStats:
                 continue
             if not member.status == discord.Status.offline:
                 online_members += 1
-        bot_percent = "{:,g}%".format((bot_member/len(guild.members))*100)
+        # bot_percent = "{:,g}%".format((bot_member/len(guild.members))*100)
         user_string = "{:,}/{:,} online ({:,g}%)".format(
                 online_members,
                 len(guild.members) - bot_member,
-                (online_members/(len(guild.members) - bot_member) * 100)
+                round((online_members/(len(guild.members) - bot_member) * 100), 2)
         )
         user_string += "\n{:,}/{:,} bots online ({:,g}%)".format(
                 bot_online,
                 bot_member,
-                (bot_online/bot_member)*100
+                round((bot_online/bot_member)*100, 2)
         )
         #server_embed.add_field(name="Members", value="{:,}/{:,} online ({:.2f}%)\n{:,} {} ({}%)".format(online_members, len(guild.members), bot_percent), inline=True)
         server_embed.add_field(name="Members ({} total)".format(len(guild.members)), value=user_string, inline=True)
