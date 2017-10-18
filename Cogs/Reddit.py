@@ -4,12 +4,16 @@ import random
 import requests
 import time
 import mimetypes
+from   datetime import datetime
+from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import Message
+from   Cogs import ReadableTime
+from   Cogs import UserTime
 from   pyquery import PyQuery as pq
 
 try:
@@ -171,6 +175,37 @@ class Reddit:
 		# If we made it here - set the LastPicture method
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
+	
+	@commands.command(pass_context=True)
+	async def ruser(self, ctx, *, user_name = None):
+		"""Gets some info on the passed username - attempts to use your username if none provided."""
+		if user_name == None:
+			user_name = ctx.author.nick if ctx.author.nick else ctx.author.name
+		# Get the info
+		url = "https://www.reddit.com/user/{}/about.json?raw_json=1".format(quote(user_name))
+		r = requests.get(url, headers = {'User-agent': self.ua})
+		theJSON = r.json()
+		# Returns:  {"message": "Not Found", "error": 404}  if not found
+		if "message" in theJSON:
+			error = theJSON.get("error", "An error has occurred.")
+			await Message.EmbedText(title=theJSON["message"], description=error, color=ctx.author).send(ctx)
+			return
+		# Build our embed
+		e = { "title" : "/u/" + theJSON["data"]["name"], "color" : ctx.author, "fields" : [] }
+		created_s = time.gmtime(theJSON["data"]["created_utc"]))
+		created_dt = datetime(*created_s[:6])
+		# Get the actual user time of creation
+		created = UserTime.getUserTime(ctx.author, self.settings, created_dt)
+		created_string = "{} {}".format(created['time'], created['zone'])
+		e["fields"].append({ "name" : "Created", "value" : created_string, "inline" : False })
+		e["fields"].append({ "name" : "Link Karma", "value" : theJSON["data"]["link_karma"], "inline" : False })
+		e["fields"].append({ "name" : "Comment Karma", "value" : theJSON["data"]["comment_karma"], "inline" : False })
+		e["fields"].append({ "name" : "Has Gold", "value" : str(theJSON["data"]["is_gold"]), "inline" : False })
+		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : False })
+		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : False })
+		# Send the embed
+		await e.send(ctx)
+		
 
 	@commands.command(pass_context=True)
 	async def nosleep(self, ctx):
