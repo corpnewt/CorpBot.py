@@ -258,6 +258,7 @@ class Bot:
 		"""Builds an embed using json formatting.
 
 		Types:
+		
 		field
 		text
 
