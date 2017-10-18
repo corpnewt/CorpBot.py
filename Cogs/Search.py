@@ -149,8 +149,10 @@ class Search:
 		r = requests.get(convert_url)
 		doc = pq(r.text)
 		result = str(doc('#currency_converter_result span').text())
-		if result:
-			await ctx.channel.send("{:,g} {} is {:,g}".format(amount,str(frm).upper(),float(result)))
+		results = result.split(" ")
+		
+		if len(results):
+			await ctx.channel.send("{:,g} {} is {:,g} {}".format(amount,str(frm).upper(),float(results[0]), results[1]))
 		else:
 			await ctx.channel.send("Whoops!  I couldn't make that conversion.")
 
