@@ -204,7 +204,7 @@ class Reddit:
 		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : False })
 		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : False })
 		# Send the embed
-		await e.send(ctx)
+		await Message.Embed(**e).send(ctx)
 		
 
 	@commands.command(pass_context=True)
