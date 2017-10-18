@@ -192,7 +192,7 @@ class Reddit:
 			return
 		# Build our embed
 		e = { "title" : "/u/" + theJSON["data"]["name"], "color" : ctx.author, "fields" : [] }
-		created_s = time.gmtime(theJSON["data"]["created_utc"]))
+		created_s = time.gmtime(theJSON["data"]["created_utc"])
 		created_dt = datetime(*created_s[:6])
 		# Get the actual user time of creation
 		created = UserTime.getUserTime(ctx.author, self.settings, created_dt)
