@@ -191,18 +191,22 @@ class Reddit:
 			await Message.EmbedText(title=theJSON["message"], description=error, color=ctx.author).send(ctx)
 			return
 		# Build our embed
-		e = { "title" : "/u/" + theJSON["data"]["name"], "color" : ctx.author, "fields" : [] }
+		e = { 
+			"title" : "/u/" + theJSON["data"]["name"],
+			"url" : "https://www.reddit.com/user/" + theJSON["data"]["name"],
+			"color" : ctx.author, 
+			"fields" : [] }
 		created_s = time.gmtime(theJSON["data"]["created_utc"])
 		created_dt = datetime(*created_s[:6])
 		# Get the actual user time of creation
 		created = UserTime.getUserTime(ctx.author, self.settings, created_dt)
 		created_string = "{} {}".format(created['time'], created['zone'])
-		e["fields"].append({ "name" : "Created", "value" : created_string, "inline" : False })
-		e["fields"].append({ "name" : "Link Karma", "value" : theJSON["data"]["link_karma"], "inline" : False })
-		e["fields"].append({ "name" : "Comment Karma", "value" : theJSON["data"]["comment_karma"], "inline" : False })
-		e["fields"].append({ "name" : "Has Gold", "value" : str(theJSON["data"]["is_gold"]), "inline" : False })
-		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : False })
-		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : False })
+		e["fields"].append({ "name" : "Created", "value" : created_string, "inline" : True })
+		e["fields"].append({ "name" : "Link Karma", "value" : theJSON["data"]["link_karma"], "inline" : True })
+		e["fields"].append({ "name" : "Comment Karma", "value" : theJSON["data"]["comment_karma"], "inline" : True })
+		e["fields"].append({ "name" : "Has Gold", "value" : str(theJSON["data"]["is_gold"]), "inline" : True })
+		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : True })
+		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : True })
 		# Send the embed
 		await Message.Embed(**e).send(ctx)
 		
