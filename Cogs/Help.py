@@ -165,13 +165,22 @@ class Help:
 			# Get a list of all commands and modules and server up the 3 closest
 			cog_name_list = []
 			com_name_list = []
+			
 			for cog in self.bot.cogs:
 				if not cog in cog_name_list:
-					cog_name_list.append(cog)
+					if not len(self.bot.get_cog_commands(cog)):
+						# Skip empty cogs
+						continue
 				cog_commands = self.bot.get_cog_commands(cog)
+				hid = True
 				for comm in cog_commands:
+					if comm.hidden:
+						continue
+					hid = False
 					if not comm.name in com_name_list:
 						com_name_list.append(comm.name)
+				if not hid:
+					cog_name_list.append(cog)
 			
 			# Get cog list:
 			cog_match = FuzzySearch.search(command, cog_name_list)
