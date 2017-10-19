@@ -153,7 +153,7 @@ class Humor:
 		
 		fields = []
 		for template in templates:
-			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : True })
+			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
 		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
 
 		'''templates_string = "**Meme Templates**\n"
