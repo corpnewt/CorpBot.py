@@ -36,6 +36,7 @@ class Message:
                         await Embed(title="An error occurred!", description="Could not dm this message to you :(", color=ctx.author).send(ctx)
                     except:
                         # We tried...
+                        pass
                     return
                 pass
         return await ctx.send(message)
@@ -139,6 +140,7 @@ class Embed:
                         await Embed(title="An error occurred!", description="Could not dm this message to you :(", color=self.color).send(ctx)
                     except:
                         # We tried...
+                        pass
                     return
                 pass
         return await ctx.send(embed=embed)
