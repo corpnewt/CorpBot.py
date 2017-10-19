@@ -2,6 +2,7 @@ import asyncio
 import discord
 from   Cogs import Nullify
 from   Cogs import DisplayName
+from   Cogs import Message
 from   discord.ext import commands
 import json
 import os
@@ -35,13 +36,16 @@ class Translate:
         if not len(self.languages):
             await ctx.send("I can't seem to find any languages :(")
             return
-
-        # Pm languages to author
+	fields = []
+	for lang in self.languages:
+		fields.append({ "name" : lang["name"], "value" : lang["code"], "inline" : False })
+	await Message.Embed(title="Language List", force_pm=True, fields=fields, color=ctx.author).send(ctx)
+        '''# Pm languages to author
         await ctx.send("I'll pm them to you.")
         msg = "Languages:\n\n"
         for lang in self.languages:
             msg += lang["Name"] + "\n"
-        await ctx.author.send(msg)
+        await ctx.author.send(msg)'''
 
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate = None):
@@ -53,7 +57,7 @@ class Translate:
         else:
             suppress = False
 
-        usage = "Usage: `{}tr [words] [language]`".format(ctx.prefix)
+        usage = "Usage: `{}tr [words] [language code]`".format(ctx.prefix)
         if translate == None:
             await ctx.send(usage)
             return
@@ -70,17 +74,9 @@ class Translate:
         lang_code = None
 
         for item in self.languages:
-            if item["Name"].lower() == lang.lower():
-                lang_code = item["Code"]
+            if item["code"].lower() == lang.lower():
+                lang_code = item["code"]
                 break
-        if not lang_code and len(word_list) > 2:
-            # Maybe simplified/traditional chinese or other 2 word lang
-            lang = " ".join(word_list[len(word_list)-2:])
-            trans = " ".join(word_list[:-2])
-            for item in self.languages:
-                if item["Name"].lower() == lang.lower():
-                    lang_code = item["Code"]
-                    break
         
         if not lang_code:
             await ctx.send("I couldn't find that language!")
@@ -96,4 +92,11 @@ class Translate:
         if suppress:
             result = Nullify.clean(result)
 
-        await ctx.send("*{}*, your translation is:\n\n{}".format(DisplayName.name(ctx.author), result))
+	await Message.EmbedText(
+		title="{}, your translation is:".format(DisplayName.name(ctx.author)),
+		force_pm=True,
+		fields=fields,
+		color=ctx.author,
+		description=result
+	).send(ctx)
+        # await ctx.send("*{}*, your translation is:\n\n{}".format(DisplayName.name(ctx.author), result))
