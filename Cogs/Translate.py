@@ -36,10 +36,10 @@ class Translate:
         if not len(self.languages):
             await ctx.send("I can't seem to find any languages :(")
             return
-        fields = []
+        description = ""
         for lang in self.languages:
-                fields.append({ "name" : lang["name"], "value" : lang["code"], "inline" : False })
-        await Message.Embed(title="Language List", force_pm=True, fields=fields, color=ctx.author).send(ctx)
+                description += "**{}** - {}\n".foramt(lang["name"], lang["code"])
+        await Message.EmbedText(title="Language List", force_pm=True, description=description, color=ctx.author).send(ctx)
         '''# Pm languages to author
         await ctx.send("I'll pm them to you.")
         msg = "Languages:\n\n"
