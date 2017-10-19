@@ -95,8 +95,8 @@ class Translate:
         await Message.EmbedText(
                 title="{}, your translation is:".format(DisplayName.name(ctx.author)),
                 force_pm=True,
-                fields=fields,
                 color=ctx.author,
-                description=result
+                description=result,
+                footer="Powered by Google Translate"
         ).send(ctx)
         # await ctx.send("*{}*, your translation is:\n\n{}".format(DisplayName.name(ctx.author), result))
