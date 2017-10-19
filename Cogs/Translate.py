@@ -36,10 +36,10 @@ class Translate:
         if not len(self.languages):
             await ctx.send("I can't seem to find any languages :(")
             return
-	fields = []
-	for lang in self.languages:
-		fields.append({ "name" : lang["name"], "value" : lang["code"], "inline" : False })
-	await Message.Embed(title="Language List", force_pm=True, fields=fields, color=ctx.author).send(ctx)
+        fields = []
+        for lang in self.languages:
+                fields.append({ "name" : lang["name"], "value" : lang["code"], "inline" : False })
+        await Message.Embed(title="Language List", force_pm=True, fields=fields, color=ctx.author).send(ctx)
         '''# Pm languages to author
         await ctx.send("I'll pm them to you.")
         msg = "Languages:\n\n"
@@ -92,11 +92,11 @@ class Translate:
         if suppress:
             result = Nullify.clean(result)
 
-	await Message.EmbedText(
-		title="{}, your translation is:".format(DisplayName.name(ctx.author)),
-		force_pm=True,
-		fields=fields,
-		color=ctx.author,
-		description=result
-	).send(ctx)
+        await Message.EmbedText(
+                title="{}, your translation is:".format(DisplayName.name(ctx.author)),
+                force_pm=True,
+                fields=fields,
+                color=ctx.author,
+                description=result
+        ).send(ctx)
         # await ctx.send("*{}*, your translation is:\n\n{}".format(DisplayName.name(ctx.author), result))
