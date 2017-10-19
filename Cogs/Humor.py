@@ -11,6 +11,7 @@ from Cogs import Message
 from Cogs import FuzzySearch
 from Cogs import GetImage
 from Cogs import Nullify
+from Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -149,8 +150,13 @@ class Humor:
 		templates = result_json["data"]["memes"]
 
 		templates_string_list = []
+		
+		fields = []
+		for template in templates:
+			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : True })
+		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
 
-		templates_string = "**Meme Templates**\n"
+		'''templates_string = "**Meme Templates**\n"
 		for template in templates:
 			length_test = templates_string + "* [`{}` - `{}`]\n".format(template["id"], template["name"])
 			if len(length_test) > 2000:
@@ -166,7 +172,7 @@ class Humor:
 			templates_string_list.append(templates_string)
 		# Iterate over all the template strings and display them
 		for string in templates_string_list:
-			await ctx.message.author.send(string)
+			await ctx.message.author.send(string)'''
 
 		# await Message.say(self.bot, templates_string, ctx.message.author)
 
