@@ -178,7 +178,7 @@ class Help:
 			com_match = FuzzySearch.search(command, com_name_list)
 
 			# Build the embed
-			m = Message.Embed()
+			m = Message.Embed(force_pm=True)
 			if type(ctx.author) is discord.Member:
 				m.color = ctx.author.color
 			m.title = "No command called \"{}\" found".format(Nullify.clean(command))
@@ -196,6 +196,7 @@ class Help:
 			await m.send(ctx)
 			return
 		m = Message.Embed(**result)
+		m.force_pm = True
 		# Build the embed
 		if type(ctx.author) is discord.Member:
 			m.color = ctx.author.color
