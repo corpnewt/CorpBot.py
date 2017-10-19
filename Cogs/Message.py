@@ -14,6 +14,7 @@ class Message:
         # Creates a new message - with an optional setup dictionary
         self.max_chars = 2000
         self.pm_after = kwargs.get("pm_after", 1) # -1 to disable, 0 to always pm
+        self.force_pm = kwargs.get("force_pm", False)
         self.header = kwargs.get("header", "")
         self.footer = kwargs.get("footer", "")
         self.pm_react = kwargs.get("pm_react", "📬")
@@ -29,6 +30,13 @@ class Message:
                 await ctx.message.add_reaction(self.pm_react)
                 return message
             except discord.Forbidden:
+                if self.force_pm:
+                    # send an error embed
+                    try:
+                        await Embed(title="An error occurred!", description="Could not dm this message to you :(", color=ctx.author).send(ctx)
+                    except:
+                        # We tried...
+                    return
                 pass
         return await ctx.send(message)
 
@@ -65,6 +73,7 @@ class Embed:
         self.total_max = kwargs.get("total_max", 6000)
         # Creates a new embed - with an option setup dictionary
         self.pm_after = kwargs.get("pm_after", 10)
+        self.force_pm = kwargs.get("force_pm", False)
         self.pm_react = kwargs.get("pm_react", "📬")
         self.title = kwargs.get("title", None)
         self.page_count = kwargs.get("page_count", True)
@@ -124,6 +133,13 @@ class Embed:
                 await ctx.message.add_reaction(self.pm_react)
                 return message
             except discord.Forbidden:
+                if self.force_pm:
+                    # send an error embed
+                    try:
+                        await Embed(title="An error occurred!", description="Could not dm this message to you :(", color=self.color).send(ctx)
+                    except:
+                        # We tried...
+                    return
                 pass
         return await ctx.send(embed=embed)
 
