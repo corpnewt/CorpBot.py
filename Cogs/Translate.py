@@ -38,7 +38,7 @@ class Translate:
             return
         description = ""
         for lang in self.languages:
-                description += "**{}** - {}\n".foramt(lang["name"], lang["code"])
+                description += "**{}** - {}\n".format(lang["name"], lang["code"])
         await Message.EmbedText(title="Language List", force_pm=True, description=description, color=ctx.author).send(ctx)
         '''# Pm languages to author
         await ctx.send("I'll pm them to you.")
