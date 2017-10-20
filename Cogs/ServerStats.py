@@ -85,7 +85,7 @@ class ServerStats:
                 round((bot_online/bot_member)*100, 2)
         )
         #server_embed.add_field(name="Members", value="{:,}/{:,} online ({:.2f}%)\n{:,} {} ({}%)".format(online_members, len(guild.members), bot_percent), inline=True)
-        server_embed.add_field(name="Members ({} total)".format(len(guild.members)), value=user_string, inline=True)
+        server_embed.add_field(name="Members ({:,} total)".format(len(guild.members)), value=user_string, inline=True)
         server_embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
         chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
