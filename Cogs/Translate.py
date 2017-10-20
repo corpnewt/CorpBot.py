@@ -84,14 +84,31 @@ class Translate:
                 break
         
         if not lang_code:
-            await ctx.send("I couldn't find that language!")
+            await Message.EmbedText(
+                        title="Something went wrong...",
+                        description="I couldn't find that language!",
+                        color=ctx.author
+                ).send(ctx)
             return
 
         result = mtranslate.translate(trans, lang_code, "auto")
         
         if not result:
-            await ctx.send("I wasn't able to translate that!")
+            await Message.EmbedText(
+                        title="Something went wrong...",
+                        description="I wasn't able to translate that!",
+                        color=ctx.author
+                ).send(ctx)
             return
+        
+        if result == trans:
+                # We got back what we put in...
+                await Message.EmbedText(
+                        title="Something went wrong...",
+                        description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language (en -> en)",
+                        color=ctx.author
+                ).send(ctx)
+                return
 
         # Check for suppress
         if suppress:
