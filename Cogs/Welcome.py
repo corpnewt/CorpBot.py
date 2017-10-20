@@ -108,6 +108,21 @@ class Welcome:
         self.settings.setServerStat(ctx.message.guild, "Welcome", message)
         await ctx.channel.send('Welcome message updated!\n\nHere\'s a preview:')
         await self._welcome(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        # Print the welcome channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.guild.channels:
+                if str(channel.id) == str(welcomeChannel):
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
+        else:
+            if self._getDefault(ctx.guild):
+                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for welcome messages.'
+        await ctx.channel.send(msg)
 
     @commands.command(pass_context=True)
     async def testwelcome(self, ctx, *, member = None):
@@ -264,6 +279,21 @@ class Welcome:
         self.settings.setServerStat(ctx.message.guild, "Goodbye", message)
         await ctx.channel.send('Goodbye message updated!\n\nHere\'s a preview:')
         await self._goodbye(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        # Print the goodbye channel
+        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        if welcomeChannel:
+            for channel in ctx.message.guild.channels:
+                if str(channel.id) == str(welcomeChannel):
+                    welcomeChannel = channel
+                    break
+        if welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
+        else:
+            if self._getDefault(ctx.guild):
+                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            else:
+                msg = 'There is *no channel* set for goodbye messages.'
+        await ctx.channel.send(msg)
 
 
     @commands.command(pass_context=True)
