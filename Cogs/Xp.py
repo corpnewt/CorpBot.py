@@ -904,9 +904,16 @@ class Xp:
 				await ctx.message.channel.send(msg)
 				return
 
+		url = member.avatar_url
+		if not len(url):
+			url = member.default_avatar_url
+		url = url.split("?size=")[0]
+
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
 						
+		stat_embed.set_thumbnail(url=url)
+
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))
 		newState = int(self.settings.getUserStat(member, ctx.message.guild, "XPReserve"))
@@ -925,11 +932,11 @@ class Xp:
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 			
 			# Add to embed
-			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=avURL)
+			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick))
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
-			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
+			stat_embed.set_author(name='{}'.format(member.name))
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
 		j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
