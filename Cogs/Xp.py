@@ -1001,6 +1001,9 @@ class Xp:
 		elif member.status == discord.Status.idle:
 			status_text = ":yellow_heart:"
 		stat_embed.add_field(name="Status", value=status_text, inline=True)
+
+		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
+		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
 		
 		if member.game:
 			if member.game.name:
