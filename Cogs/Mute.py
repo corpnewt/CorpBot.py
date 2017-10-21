@@ -21,9 +21,9 @@ class Mute:
         return parent == child or child.startswith(parent + ".")
 
     async def onjoin(self, member, server):
-		# Check id against the mute list and react accordingly
-		mute_list = self.settings.getServerStat(server, "MuteList")
-		for mem in mute_list:
+        # Check id against the mute list and react accordingly
+        mute_list = self.settings.getServerStat(server, "MuteList")
+        for mem in mute_list:
             if str(member.id) == str(mem["ID"]):
                 # The user was muted when they left - remute
                 cd = mem["Cooldown"]
