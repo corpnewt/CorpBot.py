@@ -12,7 +12,7 @@ def setup(bot):
 	bot.add_cog(UserRole(bot, settings))
 
 class UserRole:
-    
+	
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
@@ -164,7 +164,7 @@ class UserRole:
 						return
 				
 			# If we made it this far - then we didn't find it
-			msg = '{} not found in list.'.format(roleCheck.name)
+			msg = '*{}* not found in list.'.format(roleCheck.name)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -193,7 +193,7 @@ class UserRole:
 				return
 
 		# If we made it this far - then we didn't find it
-		msg = '{} not found in list.'.format(role.name)
+		msg = '*{}* not found in list.'.format(role.name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -255,11 +255,226 @@ class UserRole:
 		await channel.send(roleText)
 
 	@commands.command(pass_context=True)
+	async def oneuserrole(self, ctx, *, on_off = None):
+		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
+
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		current_on_off = self.settings.getServerStat(ctx.guild, "OnlyOneUserRole")
+
+		if on_off == None:
+			# Output debug status
+			if current_on_off:
+				await channel.send('One user role at a time is enabled.')
+			else:
+				await channel.send('One user role at a time is disabled.')
+			return
+		elif on_off.lower() == "yes" or on_off.lower() == "on" or on_off.lower() == "true":
+			on_off = True
+		elif on_off.lower() == "no" or on_off.lower() == "off" or on_off.lower() == "false":
+			on_off = False
+		else:
+			on_off = True
+
+		if on_off == True:
+			if current_on_off == True:
+				msg = 'One user role at a time remains enabled.'
+			else:
+				msg = 'One user role at a time now enabled.'
+		else:
+			if current_on_off == False:
+				msg = 'One user role at a time remains disabled.'
+			else:
+				msg = 'One user role at a time now disabled.'
+		self.settings.setServerStat(ctx.guild, "OnlyOneUserRole", on_off)
+		
+		await channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def remrole(self, ctx, *, role = None):
+		"""Removes a role from the user role list from your roles."""
+
+		if role == None:
+			await ctx.send("Usage: `{}remrole [role name]`".format(ctx.prefix))
+			return
+
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		if self.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(self.setrole, role=None)
+			return
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(server, "UserRoles")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+
+		# Check if role is real
+		roleCheck = DisplayName.roleForName(role, server)
+		if not roleCheck:
+			# No luck...
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+		
+		# Got a role - set it
+		role = roleCheck
+
+		remRole = []
+		for arole in promoArray:
+			roleTest = DisplayName.roleForID(arole['ID'], server)
+			if not roleTest:
+				# Not a real role - skip
+				continue
+			if str(arole['ID']) == str(role.id):
+				# We found it!
+				if roleTest in ctx.author.roles:
+					# We have it
+					remRole.append(roleTest)
+				else:
+					# We don't have it...
+					await ctx.send("You don't currently have that role.")
+					return
+				break
+
+		if not len(remRole):
+			# We didn't find that role
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+
+		if len(remRole):
+			try:
+				await ctx.author.remove_roles(*remRole)
+			except Exception:
+				pass
+
+		msg = '*{}* has been removed from **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
+		if suppress:
+			msg = Nullify.clean(msg)
+		await channel.send(msg)
+		
+
+	@commands.command(pass_context=True)
+	async def addrole(self, ctx, *, role = None):
+		"""Adds a role from the user role list to your roles.  You can have multiples at a time."""
+
+		if role == None:
+			await ctx.send("Usage: `{}addrole [role name]`".format(ctx.prefix))
+			return
+
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		if self.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(self.setrole, role=role)
+			return
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+		
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(server, "UserRoles")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+
+		# Check if role is real
+		roleCheck = DisplayName.roleForName(role, server)
+		if not roleCheck:
+			# No luck...
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+		
+		# Got a role - set it
+		role = roleCheck
+
+		addRole = []
+		for arole in promoArray:
+			roleTest = DisplayName.roleForID(arole['ID'], server)
+			if not roleTest:
+				# Not a real role - skip
+				continue
+			if str(arole['ID']) == str(role.id):
+				# We found it!
+				if roleTest in ctx.author.roles:
+					# We already have it
+					await ctx.send("You already have that role.")
+					return
+				addRole.append(roleTest)
+				break
+
+		if not len(addRole):
+			# We didn't find that role
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await channel.send(msg)
+			return
+
+		if len(addRole):
+			try:
+				await ctx.author.add_roles(*addRole)
+			except Exception:
+				pass
+
+		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
+		if suppress:
+			msg = Nullify.clean(msg)
+		await channel.send(msg)
+
+	@commands.command(pass_context=True)
 	async def setrole(self, ctx, *, role = None):
 		"""Sets your role from the user role list.  You can only have one at a time."""
 
 		server  = ctx.message.guild
 		channel = ctx.message.channel
+
+		if not self.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(self.addrole, role=role)
+			return
 
 		# Check if we're suppressing @here and @everyone mentions
 		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
@@ -302,7 +517,7 @@ class UserRole:
 		roleCheck = DisplayName.roleForName(role, server)
 		if not roleCheck:
 			# No luck...
-			msg = '{} not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)
@@ -328,7 +543,7 @@ class UserRole:
 
 		if not len(addRole):
 			# We didn't find that role
-			msg = '{} not found in list.'.format(role.name)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
 			# Check for suppress
 			if suppress:
 				msg = Nullify.clean(msg)

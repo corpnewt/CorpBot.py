@@ -48,6 +48,8 @@ class Settings:
 				"IgnoreDeath"			: True,		# Does the bot keep talking post-mortem?
 				"DJArray"				: [],		# List of roles that can use music
 				"FilteredWords"			: [],		# List of words to filter out of user messages
+				"UserRoles"				: [],		# List of roles users can self-select
+				"OnlyOneUserRole"		: True,		# Limits user role selection to one at a time
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
 				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
 				"RequiredTagRole" 		: "", 		# ID or blank for Admin-Only
