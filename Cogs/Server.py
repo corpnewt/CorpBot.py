@@ -265,35 +265,33 @@ class Server:
 		for aServer in self.bot.guilds:
 			if str(aServer.id) == str(targetServer):
 				# Found it by id
-				#try:
-				tc = aServer.get_channel(aServer.id)
-				#if tc:
-				#	await tc.send('Thanks for having me - but it\'s my time to go...')
-				#except Exception:
-				#	pass
+				try:
+					tc = aServer.get_channel(aServer.id)
+					if tc:
+						await tc.send('Thanks for having me - but it\'s my time to go...')
+				except Exception:
+					pass
 				await aServer.leave()
-				break
-				#try:
-				await ctx.channel.send('Alright - I left that server.')
-				#except Exception:
-				#	pass
-				#return
+				try:
+					await ctx.channel.send('Alright - I left that server.')
+				except Exception:
+					pass
+				return
 		# Didn't find it - try by name
 		for aServer in self.bot.guilds:
 			if aServer.name.lower() == targetServer.lower():
 				# Found it by name
-				#try:
-				tc = aServer.get_channel(aServer.id)
-				#if tc:
-				#	await tc.send('Thanks for having me - but it\'s my time to go...')
-				#except Exception:
-				#	pass
+				try:
+					tc = aServer.get_channel(aServer.id)
+					if tc:
+						await tc.send('Thanks for having me - but it\'s my time to go...')
+				except Exception:
+					pass
 				await aServer.leave()
-				break
-				#try:
-				await ctx.channel.send('Alright - I left that server.')
-				#except Exception:
-				#pass
+				try:
+					await ctx.channel.send('Alright - I left that server.')
+				except Exception:
+					pass
 				return
 
 		await ctx.channel.send('I couldn\'t find that server.')
