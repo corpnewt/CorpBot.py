@@ -96,7 +96,7 @@ class Debugging:
 		if type(to_user) is discord.Role:
 			msg = "*{}#{}* ({}) gave *{} xp* to the *{}* role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
 		else:
-			msg = "*{}#{}* gave *{} xp* to *{}#{}* ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
+			msg = "*{}#{}* ({}) gave *{} xp* to *{}#{}* ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
 		await self._logEvent(server, msg)
 
 	async def onban(self, guild, member):
