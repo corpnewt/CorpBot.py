@@ -52,7 +52,7 @@ class UrbanDict:
 				ourWord = theJSON[0]
 			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
 			if ourWord["example"]:
-				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
+				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
 			permalink = ourWord["permalink"]
 			title = "Urban Dictionary Link"
 		
@@ -79,7 +79,7 @@ class UrbanDict:
 				ourWord = theJSON[0]
 			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
 			if ourWord["example"]:
-				msg = '{}\n\n__Example(s):__\n\n*{}*'.format(msg, ourWord["example"])
+				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
 			permalink = ourWord["permalink"]
 			title = "Urban Dictionary Link"
 		
