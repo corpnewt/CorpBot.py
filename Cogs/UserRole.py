@@ -38,6 +38,10 @@ class UserRole:
 		if not isAdmin:
 			await channel.send('You do not have sufficient privileges to access this command.')
 			return
+		
+		if role == None:
+			await ctx.send(usage)
+			return
 
 		if type(role) is str:
 			if role == "everyone":
@@ -45,7 +49,10 @@ class UserRole:
 			# It' a string - the hope continues
 			roleCheck = DisplayName.roleForName(role, server)
 			if not roleCheck:
-				await ctx.channel.send(usage)
+				msg = "I couldn't find **{}**...".format(role)
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.send(msg)
 				return
 			role = roleCheck
 
