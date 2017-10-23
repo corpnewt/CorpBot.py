@@ -94,9 +94,9 @@ class Debugging:
 		if not self.shouldLog('xp', server):
 			return
 		if type(to_user) is discord.Role:
-			msg = "*{}#{}* gave *{} xp* to the *{}* role.".format(from_user.name, from_user.discriminator, amount, to_user.name)
+			msg = "*{}#{}* ({}) gave *{} xp* to the *{}* role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
 		else:
-			msg = "*{}#{}* gave *{} xp* to *{}#{}*.".format(from_user.name, from_user.discriminator, amount, to_user.name, to_user.discriminator)
+			msg = "*{}#{}* gave *{} xp* to *{}#{}* ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
 		await self._logEvent(server, msg)
 
 	async def onban(self, guild, member):
@@ -104,28 +104,28 @@ class Debugging:
 		if not self.shouldLog('user.ban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* was **banned** from *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
+		msg = '*{}#{}* ({}) was **banned** from *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 
 	async def onunban(self, server, member):
 		if not self.shouldLog('user.unban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* was **unbanned** from *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
+		msg = '*{}#{}* ({}) was **unbanned** from *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 			
 	async def onjoin(self, member, server):
 		if not self.shouldLog('user.join', server):
 			return
 		# A new member joined
-		msg = '*{}#{}* joined *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
+		msg = '*{}#{}* ({}) joined *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 		
 	async def onleave(self, member, server):
 		if not self.shouldLog('user.leave', server):
 			return
 		# A member left
-		msg = '*{}#{}* left *{}*.'.format(member.name, member.discriminator, self.suppressed(server, server.name))
+		msg = '*{}#{}* ({}) left *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, msg)
 		
 	async def member_update(self, before, after):
@@ -134,7 +134,7 @@ class Debugging:
 		# A member changed something about their user-profile
 		server = before.guild
 		if not str(before.status).lower() == str(after.status).lower() and self.shouldLog('user.status', server):
-			msg = '*{}#{}* went from *{}* to *{}*.'.format(before.name, before.discriminator, str(before.status).lower(), str(after.status).lower())
+			msg = '*{}#{}* ({)} went from *{}* to *{}*.'.format(before.name, before.discriminator, before.id, str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg)
 		if not before.game == after.game:
 			# Something changed
@@ -155,15 +155,15 @@ class Debugging:
 					await self._logEvent(server, msg)
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
 			# Avatar changed
-			msg = '*{}#{}* changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.avatar_url, after.avatar_url)
+			msg = '*{}#{}* ({}) changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.avatar_url, after.avatar_url)
 			await self._logEvent(server, msg)
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
-			msg = '*{}#{}* changed nickname: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.nick, after.nick)
+			msg = '*{}#{}* ({}) changed nickname: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.nick, after.nick)
 			await self._logEvent(server, msg)
 		if not before.name == after.name and self.shouldLog('user.name', server):
 			# Name changed
-			msg = '*{}#{}* changed name: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.name, after.name)
+			msg = '*{}#{}* ({}) changed name: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.name, after.name)
 			await self._logEvent(server, msg)
 		
 	async def message(self, message):
@@ -176,7 +176,7 @@ class Debugging:
 		if not self.shouldLog('message.send', message.guild):
 			return { 'Ignore' : False, 'Delete' : False}
 		# A message was sent
-		msg = '*{}#{}*, in *#{}*, sent: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		msg = '*{}#{}* ({}), in *#{}*, sent: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name, message.content)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
@@ -195,7 +195,7 @@ class Debugging:
 			# Edit was likely a preview happening
 			return { 'Ignore' : False, 'Delete' : False}
 		# A message was edited
-		msg = '*{}#{}*, in *#{}*, edited: ```\n{}\n'.format(before.author.name, before.author.discriminator, before.channel.name, before.content)
+		msg = '*{}#{}* ({}), in *#{}*, edited: ```\n{}\n'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name, before.content)
 		if len(before.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in before.attachments:
@@ -222,7 +222,7 @@ class Debugging:
 			# Don't log these - as they'll spit out a text file later
 			return
 		# A message was deleted
-		msg = '*{}#{}*, in *#{}*, deleted: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.channel.name, message.content)
+		msg = '*{}#{}* ({}), in *#{}*, deleted: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name, message.content)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
