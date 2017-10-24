@@ -26,7 +26,7 @@ async def async_head_json(url, headers = None):
             return await response.json()
 
 async def async_dl(url, headers = None):
-    print("Attempting to download {}".format(url))
+    # print("Attempting to download {}".format(url))
     total_size = 0
     data = b""
     async with aiohttp.ClientSession(headers=headers) as session:
@@ -41,7 +41,7 @@ async def async_dl(url, headers = None):
                     break
                 if total_size > 8000000:
                     # Too big...
-                    print("{}\n - Aborted - file too large.".format(url))
+                    # print("{}\n - Aborted - file too large.".format(url))
                     return None
     return data
 
