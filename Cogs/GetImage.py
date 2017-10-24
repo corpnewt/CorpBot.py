@@ -41,19 +41,13 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	imagePath = dirpath + "/" + tempFileName
 	rImage = None
 	
-	# try:
-	hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-		'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-		'Accept-Encoding': 'none',
-		'Accept-Language': 'en-US,en;q=0.8',
-		'Connection': 'keep-alive'}
-	rImage = await DL.async_dl(url)
-	print("Got {} bytes".format(len(rImage)))
-	#except:
-	#	pass
+	try:
+		rImage = await DL.async_dl(url)
+		#print("Got {} bytes".format(len(rImage)))
+	except:
+		pass
 	if not rImage:
-		print("{}\n - Returned no data.".format(url))
+		#print("{}\n - Returned no data.".format(url))
 		remove(dirpath)
 		return None
 
@@ -65,7 +59,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 
 	# Check if the file exists
 	if not os.path.exists(imagePath):
-		print("{}\n - Doesn't exist.".format(imagePath))
+		#print("{}\n - Doesn't exist.".format(imagePath))
 		remove(dirpath)
 		return None
 	
@@ -85,7 +79,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 			imageSize = os.stat(imagePath)
 		except Exception:
 			# Image too big and can't be opened
-			print("{}\n - Image too large and can't be opened.".format(imagePath))
+			#print("{}\n - Image too large and can't be opened.".format(imagePath))
 			remove(dirpath)
 			return None
 	try:
@@ -95,7 +89,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 		img.close()
 	except Exception:
 		# Not something we understand - error out
-		print("{}\n - Couldn't get extension.".format(imagePath))
+		#print("{}\n - Couldn't get extension.".format(imagePath))
 		remove(dirpath)
 		return None
 	
