@@ -42,7 +42,13 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	rImage = None
 	
 	# try:
-	rImage = await DL.async_dl(url, { "Accept" : "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5", "User-Agent" : "CorpNewt DeepThoughtBot" })
+	hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+		'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+		'Accept-Encoding': 'none',
+		'Accept-Language': 'en-US,en;q=0.8',
+		'Connection': 'keep-alive'}
+	rImage = await DL.async_dl(url, hdr)
 	print("Got {} bytes".format(len(rImage)))
 	#except:
 	#	pass
