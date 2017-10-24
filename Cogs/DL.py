@@ -29,7 +29,7 @@ async def async_dl(url, headers = None):
     print("Attempting to download {}".format(url))
     total_size = 0
     data = b""
-    with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
             print(response.status)
             assert response.status == 200
