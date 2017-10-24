@@ -41,11 +41,11 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	imagePath = dirpath + "/" + tempFileName
 	rImage = None
 	
-	try:
-		rImage = await DL.async_dl(url)
-		print("Got {} bytes".format(len(rImage)))
-	except:
-		pass
+	# try:
+	rImage = await DL.async_dl(url)
+	print("Got {} bytes".format(len(rImage)))
+	#except:
+	#	pass
 	if not rImage:
 		print("{}\n - Returned no data.".format(url))
 		remove(dirpath)
