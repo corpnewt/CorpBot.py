@@ -26,6 +26,7 @@ async def async_head_json(url, headers = None):
             return await response.json()
 
 async def async_dl(url, headers = None):
+    print("Attempting to download {}".format(url))
     total_size = 0
     data = b""
     with aiohttp.ClientSession(headers=headers) as session:
