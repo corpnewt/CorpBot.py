@@ -39,6 +39,7 @@ async def async_dl(url, headers = None):
                     break
                 if total_size > 8000000:
                     # Too big...
+                    print("{}\n - Aborted - file too large.".format(url))
                     return None
     return data
 
