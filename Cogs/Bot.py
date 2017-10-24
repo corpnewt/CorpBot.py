@@ -261,7 +261,7 @@ class Bot:
 		isOwner = self.settings.isOwner(ctx.author)
 		if not isOwner:
 			return
-		returned await DL.async_dl(image)
+		returned = await DL.async_dl(image)
 		print(returned)
 		print(len(returned))
 		
