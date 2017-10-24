@@ -261,7 +261,10 @@ class Bot:
 		isOwner = self.settings.isOwner(ctx.author)
 		if not isOwner:
 			return
-		await DL.async_dl(image)
+		returned await DL.async_dl(image)
+		print(returned)
+		print(len(returned))
+		
 
 	@commands.command(pass_context=True)
 	async def embed(self, ctx, embed_type = "field", *, embed):
