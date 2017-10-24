@@ -20,6 +20,7 @@ from   Cogs import Nullify
 from   Cogs import ProgressBar
 from   Cogs import UserTime
 from   Cogs import Message
+from   Cogs import DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -252,6 +253,15 @@ class Bot:
 		msg += '{} uptime```'.format(timeString)
 
 		await message.edit(content=msg)
+		
+	@commands.command(pass_context=True)
+	async def getimage(self, ctx, *, image):
+		"""Tests downloading - owner only"""
+		# Only allow owner to modify the limits
+		isOwner = self.settings.isOwner(ctx.author)
+		if not isOwner:
+			return
+		await DL.async_dl(image)
 
 	@commands.command(pass_context=True)
 	async def embed(self, ctx, embed_type = "field", *, embed):
