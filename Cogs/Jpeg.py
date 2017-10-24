@@ -70,7 +70,7 @@ class Jpeg:
 
 		message = await ctx.send("Downloading...")
 		
-		path = GetImage.download(url)
+		path = await GetImage.download(url)
 		if not path:
 			await message.edit(content="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.")
 			return

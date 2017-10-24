@@ -118,7 +118,7 @@ class Hw:
 		else:
 			escape = False
 		
-		output = PCPP.getMarkdown(url, style, escape)
+		output = await PCPP.getMarkdown(url, style, escape)
 		if not output:
 			msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 			await ctx.channel.send(msg)
@@ -334,7 +334,7 @@ class Hw:
 						partList.append(None)
 					output = None
 					try:
-						output = PCPP.getMarkdown(partList[0], partList[1], False)
+						output = await PCPP.getMarkdown(partList[0], partList[1], False)
 					except:
 						pass
 					if not output:
@@ -938,7 +938,7 @@ class Hw:
 						partList.append(None)
 					output = None
 					try:
-						output = PCPP.getMarkdown(partList[0], partList[1], False)
+						output = await PCPP.getMarkdown(partList[0], partList[1], False)
 					except:
 						pass
 					#output = PCPP.getMarkdown(parts.content)

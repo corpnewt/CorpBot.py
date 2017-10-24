@@ -118,10 +118,9 @@ class Printer:
 			if not len(url):
 				url = test_user.default_avatar_url
 
-
 		message = await ctx.send("Downloading...")
 		
-		path = GetImage.download(url)
+		path = await GetImage.download(url)
 		if not path:
 			await message.edit(content="I guess I couldn't print that one...  Make sure you're passing a valid url or attachment.")
 			return

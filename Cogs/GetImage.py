@@ -1,20 +1,15 @@
 import asyncio
+import aiohttp
 import discord
 from   discord.ext import commands
 import json
 import os
 import tempfile
 import shutil
-import urllib.request
-import urllib
-import requests
 import time
 from   os.path     import splitext
 from   PIL         import Image
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from   Cogs        import DL
 
 def setup(bot):
 	# This module isn't actually a cog
@@ -36,7 +31,7 @@ def canDisplay( firstTime, threshold ):
 	else:
 		return False
 
-def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
+async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download the passed URL and return the file path."""
 	# Set up a temp directory
 	dirpath = tempfile.mkdtemp()
@@ -46,15 +41,16 @@ def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'Corp
 	imagePath = dirpath + "/" + tempFileName
 	
 	try:
-		rImage = requests.get(url, stream = True, headers = {'User-agent': ua})
+		rImage = await DL.async_dl(url)
 	except:
 		remove(dirpath)
 		return None
 
 	with open(imagePath, 'wb') as f:
-		for chunk in rImage.iter_content(chunk_size=1024):
-			if chunk:
-				f.write(chunk)
+		f.write(rImage)
+		#for chunk in rImage.iter_content(chunk_size=1024):
+		#	if chunk:
+		#		f.write(chunk)
 
 	# Check if the file exists
 	if not os.path.exists(imagePath):
@@ -111,8 +107,10 @@ def remove(path):
 
 async def get(url, bot, channel, title : str = 'Unknown', ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download passed image, and upload it to passed channel."""
+
 	message = await channel.send('Downloading...')
-	afile = download(url)
+	afile = await download(url)
+
 	if not afile:
 		await message.edit(content='Oh *shoot* - I couldn\'t get that image...')
 		return

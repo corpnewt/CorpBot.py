@@ -1,10 +1,8 @@
 import random
 import math
 import datetime as dt
-import urllib.request
-import urllib
-import requests
 from   pyquery import PyQuery as pq
+from   Cogs import DL
 
 try:
     # Python 2.6-2.7
@@ -118,12 +116,9 @@ def find_last_between( source, start_sep, end_sep ):
 	else:
 		return result[len(result)-1] # Return last item
 
-def getImageHTML ( url, ua : str = '' ):
+async def getImageHTML ( url, ua : str = '' ):
     try:
-        req = urllib.request.Request(url, data=None,headers={'User-Agent': ua})
-        with urllib.request.urlopen(req) as f:
-            htmlSource = str(f.read())
-            return htmlSource
+        return await DL.async_text(url, {'User-Agent': ua})
     except Exception as e:
         return None
 

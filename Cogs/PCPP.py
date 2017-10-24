@@ -1,5 +1,5 @@
-import requests
-from   pyquery import PyQuery as pq
+from pyquery import PyQuery as pq
+from Cogs import DL 
 
 def setup(bot):
 	# Not a cog
@@ -98,7 +98,7 @@ def boldItalicStyle(types, names, escape = False):
 	partdown = partdown[:-1]
 	return partdown
 		
-def getMarkdown( url, style = None, escape = False):
+async def getMarkdown( url, style = None, escape = False):
 	# Ensure we're using a list
 	if url.lower().endswith("pcpartpicker.com/list/"):
 		# Not *just* the list... we want actual parts
@@ -107,10 +107,10 @@ def getMarkdown( url, style = None, escape = False):
 	if '/b/' in url.lower():
 		# We have a build - let's try to convert to list
 		try:
-			response = requests.get(url)
+			response = await DL.async_text(url)
 		except Exception:
 			return None
-		dom = pq(response.text)
+		dom = pq(response)
 		listLink = dom('span.header-actions')
 		newLink = None
 		for link in listLink.children():
@@ -125,10 +125,10 @@ def getMarkdown( url, style = None, escape = False):
 	if not style:
 		style = 'normal'
 	try:
-		response = requests.get(url)
+		response = await DL.async_text(url)
 	except Exception:
 		return None
-	dom = pq(response.text)
+	dom = pq(response)
 	
 	# Experimental crap because developing while not at home
 	table = dom('table.manual-zebra').children('tbody').children()

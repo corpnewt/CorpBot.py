@@ -14,6 +14,7 @@ from   Cogs import GetImage
 from   Cogs import Message
 from   Cogs import ReadableTime
 from   Cogs import UserTime
+from   Cogs import DL
 from   pyquery import PyQuery as pq
 
 try:
@@ -59,13 +60,13 @@ class Reddit:
 		s.feed(html)
 		return s.get_data()
 	
-	def getImageHEAD(self, url):
-		response = requests.head(url)
-		return response.headers['content-type']
+	async def getImageHEAD(self, url):
+		response = await DL.async_head_json(url)
+		return response['content-type']
 
-	def getTitle(self, url, answer : bool = False, image : bool = False):
+	async def getTitle(self, url, answer : bool = False, image : bool = False):
 		# Load url - with self.posts number of posts
-		r = requests.get(url, headers = {'User-agent': self.ua})
+		r = await DL.async_json(url, {'User-agent': self.ua})
 		# If we need an image - make sure we have a valid one
 		gotLink = False
 		while not gotLink:
@@ -75,19 +76,19 @@ class Reddit:
 					randnum = random.randint(0,self.posts)
 				
 					try:
-						theJSON = r.json()["data"]["children"][randnum]["data"]
+						theJSON = r["data"]["children"][randnum]["data"]
 					except IndexError:
 						# Failed - set to none
 						theJSON = { "url" : "" }
 
-					if GetImage.get_ext(theJSON["url"]) in self.extList:
+					if GetImage.get_ext(theJSON["url"]).lower() in self.extList:
 						gotImage = True
 						gotLink  = True
 			else:
 				randnum = random.randint(0,self.posts)
 				
 				try:
-					theJSON = r.json()["data"]["children"][randnum]["data"]
+					theJSON = r["data"]["children"][randnum]["data"]
 					gotLink = True
 				except IndexError:
 					theJSON = { "url" : "" }
@@ -99,15 +100,15 @@ class Reddit:
 			# We need the image or the answer
 			return {'title' : theJSON['title'], 'url' : theJSON["url"]}
 
-	def getText(self, url):
+	async def getText(self, url):
 		# Load url - with self.posts number of posts
-		r = requests.get(url, headers = {'User-agent': self.ua})
+		r = await DL.async_json(url, {'User-agent': self.ua})
 		gotLink = False
 		returnDict = None
 		for i in range(0, 10):
 			randnum = random.randint(0,self.posts)
 			try:
-				theJSON = r.json()["data"]["children"][randnum]["data"]
+				theJSON = r["data"]["children"][randnum]["data"]
 				if 'over_18' in theJSON:
 					returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': theJSON['over_18'] }
 				else:
@@ -117,11 +118,11 @@ class Reddit:
 				continue
 		return returnDict
 	
-	def getInfo(self, url):
+	async def getInfo(self, url):
 		# Let's try using reddit's json info to get our images
 		try:
-			r = requests.get(url, headers = {'User-agent': self.ua})
-			numPosts = len(r.json()['data']['children'])
+			r = await DL.async_json(url, {'User-agent': self.ua})
+			numPosts = len(r['data']['children'])
 		except Exception:
 			numPosts = 0
 		if numPosts <= 0:
@@ -132,7 +133,7 @@ class Reddit:
 		for i in range(0, 10):
 			randnum = random.randint(0, numPosts-1)
 			try:
-				theJSON = r.json()["data"]["children"][randnum]["data"]
+				theJSON = r["data"]["children"][randnum]["data"]
 				theURL = None
 				if 'preview' in theJSON:
 					# We've got images right in the json
@@ -142,7 +143,7 @@ class Reddit:
 					imageURL = theJSON['url']
 					if 'imgur.com/a/' in imageURL.lower():
 						# It's an imgur album
-						response = requests.get(imageURL)
+						response = await DL.async_text(imageURL)
 						dom = pq(response.text)
 						# Get the first image
 						image = dom('.image-list-link')[0]
@@ -152,7 +153,7 @@ class Reddit:
 						# Not an imgur album - let's try for a single image
 						if GetImage.get_ext(imageURL).lower() in self.extList:
 							theURL = imageURL
-						elif self.getImageHEAD(imageURL) in self.headList:
+						elif await self.getImageHEAD(imageURL).lower() in self.headList:
 							# Check header as a last resort
 							theURL = imageURL
 							
@@ -183,8 +184,7 @@ class Reddit:
 			user_name = ctx.author.nick if ctx.author.nick else ctx.author.name
 		# Get the info
 		url = "https://www.reddit.com/user/{}/about.json?raw_json=1".format(quote(user_name))
-		r = requests.get(url, headers = {'User-agent': self.ua})
-		theJSON = r.json()
+		theJSON = await DL.async_json(url, {'User-agent': self.ua})
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
 			error = theJSON.get("error", "An error has occurred.")
@@ -214,7 +214,7 @@ class Reddit:
 	@commands.command(pass_context=True)
 	async def nosleep(self, ctx):
 		"""I hope you're not tired..."""
-		msg = self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -227,7 +227,7 @@ class Reddit:
 	@commands.command(pass_context=True)
 	async def joke(self, ctx):
 		"""Let's see if reddit can be funny..."""
-		msg = self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=100')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -270,7 +270,7 @@ class Reddit:
 			await ctx.send('You do not have sufficient privileges to access nsfw subreddits.')
 			return
 		
-		msg = self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -283,49 +283,49 @@ class Reddit:
 	@commands.command(pass_context=True)
 	async def lpt(self, ctx):
 		"""Become a pro - AT LIFE."""
-		msg = self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def shittylpt(self, ctx):
 		"""Your advise is bad, and you should feel bad."""
-		msg = self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
-		msg = self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
 		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def brainfart(self, ctx):
 		"""Spout out some uh... intellectual brilliance..."""
-		msg = self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def nocontext(self, ctx):
 		"""Spout out some intersexual brilliance."""
-		msg = self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def withcontext(self, ctx):
 		"""Spout out some contextual brilliance."""
-		msg = self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
 		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):
 		"""Spout out some interstellar questioning... ?"""
-		infoDict = self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
+		infoDict = await self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
 		self.settings.setServerStat(ctx.message.guild, "LastAnswer", infoDict["url"])
 		msg = '{}'.format(infoDict["title"])
 		await ctx.channel.send(msg)
@@ -357,7 +357,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -395,7 +395,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/macsetups/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/macsetups/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -416,7 +416,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/puns/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/puns/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -437,7 +437,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/Shitty_Car_Mods/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/Shitty_Car_Mods/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -458,7 +458,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/battlestations/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/battlestations/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -479,7 +479,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/shittybattlestations/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/shittybattlestations/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -500,7 +500,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -521,7 +521,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -542,7 +542,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -563,7 +563,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -584,7 +584,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -605,7 +605,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -626,7 +626,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -647,7 +647,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -668,7 +668,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -689,7 +689,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -710,7 +710,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -731,7 +731,7 @@ class Reddit:
 			return
 		
 		# Grab our image title and url
-		infoDict = self.getInfo('https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=100')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")

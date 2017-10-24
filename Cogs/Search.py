@@ -1,7 +1,5 @@
 import asyncio
 import discord
-import urllib
-import requests
 import json
 import os
 from   urllib.parse import quote
@@ -9,6 +7,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import TinyURL
+from   Cogs import DL
 from   pyquery import PyQuery as pq
 
 def setup(bot):
@@ -88,8 +87,7 @@ class Search:
 			return
 
 		categories_url = "https://corpnewt.com/api/categories"
-		r = requests.get(categories_url, headers={'Authorization': auth})
-		categories_json = json.loads(r.text)
+		categories_json = await DL.async_json(categories_url, headers={'Authorization': auth})
 		categories = categories_json["categories"]
 
 		category = await self.find_category(categories, category_name)
@@ -99,8 +97,7 @@ class Search:
 			return
 
 		search_url = "https://corpnewt.com/api/search?term={}&in=titlesposts&categories[]={}&searchChildren=true&showAs=posts".format(query, category["cid"])
-		r = requests.get(search_url, headers={'Authorization': auth})
-		search_json = json.loads(r.text)
+		search_json = await DL.async_json(search_url, headers={'Authorization': auth})
 		posts = search_json["posts"]
 		resultString = 'Results'
 		if len(posts) == 1 :
@@ -146,8 +143,8 @@ class Search:
 			to = to.strip()
 
 		convert_url = "https://finance.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
-		r = requests.get(convert_url)
-		doc = pq(r.text)
+		r = await DL.async_text(convert_url)
+		doc = pq(r)
 		result = str(doc('#currency_converter_result span').text())
 		results = result.split(" ")
 		

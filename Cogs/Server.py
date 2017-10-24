@@ -1,6 +1,5 @@
 import asyncio
 import discord
-import requests
 import string
 import os
 import re
@@ -57,7 +56,7 @@ class Server:
 		if autopcpp == None:
 			return { "Ignore" : False, "Delete" : False }
 
-		ret = PCPP.getMarkdown(pcpplink, autopcpp)
+		ret = await PCPP.getMarkdown(pcpplink, autopcpp)
 		return { "Ignore" : False, "Delete" : False, "Respond" : ret }
 
 		

@@ -1,8 +1,6 @@
 import asyncio
 import discord
 import random
-import urllib
-import requests
 import json
 import time
 import os
@@ -12,6 +10,7 @@ from Cogs import FuzzySearch
 from Cogs import GetImage
 from Cogs import Nullify
 from Cogs import Message
+from Cogs import DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -145,8 +144,7 @@ class Humor:
 	async def memetemps(self, ctx):
 		"""Get Meme Templates"""
 		url = "https://api.imgflip.com/get_memes"
-		r = requests.get(url)
-		result_json = json.loads(r.text)
+		result_json = await DL.async_json(url)
 		templates = result_json["data"]["memes"]
 
 		templates_string_list = []
@@ -155,26 +153,6 @@ class Humor:
 		for template in templates:
 			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
 		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
-
-		'''templates_string = "**Meme Templates**\n"
-		for template in templates:
-			length_test = templates_string + "* [`{}` - `{}`]\n".format(template["id"], template["name"])
-			if len(length_test) > 2000:
-				# We're past our character limit - add it to the list and reset the
-				# templates_string
-				templates_string_list.append(templates_string)
-				templates_string = ''
-				continue
-			# Not over the limit - add it to the string
-			templates_string += "* [`{}` - `{}`]\n".format(template["id"], template["name"])
-		# Add the templates_string to the list here if it contains anything
-		if len(templates_string):
-			templates_string_list.append(templates_string)
-		# Iterate over all the template strings and display them
-		for string in templates_string_list:
-			await ctx.message.author.send(string)'''
-
-		# await Message.say(self.bot, templates_string, ctx.message.author)
 
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
@@ -192,7 +170,7 @@ class Humor:
 			await ctx.channel.send(msg)
 			return
 
-		templates = self.getTemps()
+		templates = await self.getTemps()
 
 		chosenTemp = None
 		msg = ''
@@ -214,8 +192,8 @@ class Humor:
 
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
-		r = requests.post(url, data=payload)
-		result_json = json.loads(r.text)
+		result_json = await DL.async_post_json(url, payload)
+		# json.loads(r.text)
 		result = result_json["data"]["url"]
 		if msg:
 			# result = '{}\n{}'.format(msg, result)
@@ -224,10 +202,9 @@ class Humor:
 		await GetImage.get(result, self.bot, ctx.message.channel, " ")
 
 
-	def getTemps(self):
+	async def getTemps(self):
 		url = "https://api.imgflip.com/get_memes"
-		r = requests.get(url)
-		result_json = json.loads(r.text)
+		result_json = await DL.async_json(url)
 		templates = result_json["data"]["memes"]
 		if templates:
 			return templates

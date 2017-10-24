@@ -557,9 +557,9 @@ class Bot:
 
 		# File name is *something* - let's first check it as a url, then a file
 		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
-		if GetImage.get_ext(filename) in extList:
+		if GetImage.get_ext(filename).lower() in extList:
 			# URL has an image extension
-			file = GetImage.download(filename)
+			file = await GetImage.download(filename)
 			if file:
 				# we got a download - let's reset and continue
 				filename = file

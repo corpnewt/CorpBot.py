@@ -1,13 +1,13 @@
 import asyncio
 import discord
 import random
-import requests
 import time
 import datetime as dt
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import ComicHelper
+from   Cogs import DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -157,7 +157,7 @@ class Comic:
 			# Try to get a valid comic
 			date      = self.getRandDateBetween(firstDate, todayDate)
 			url       = self.buildDilbertURL(date)
-			imageHTML = ComicHelper.getImageHTML(url)
+			imageHTML = await ComicHelper.getImageHTML(url)
 			
 			if imageHTML:
 				# Got it!
@@ -211,7 +211,7 @@ class Comic:
 		
 		# Build our url and check if it's valid
 		url       = self.buildDilbertURL(self.dateDict(date))
-		imageHTML = ComicHelper.getImageHTML(url)
+		imageHTML = await ComicHelper.getImageHTML(url)
 		
 		if not imageHTML:
 			msg = 'No comic found for *{}*'.format(date)
@@ -241,7 +241,7 @@ class Comic:
 		
 		# Must be a comic number
 		archiveURL = "http://xkcd.com/archive/"
-		archiveHTML = ComicHelper.getImageHTML(archiveURL)
+		archiveHTML = await ComicHelper.getImageHTML(archiveURL)
 		newest = int(ComicHelper.getNewestXKCD(archiveHTML))
 		
 		# Start a loop to find a comic
@@ -257,7 +257,7 @@ class Comic:
 			comicURL = "http://xkcd.com/" + str(date) + "/"
 
 			# now we get the actual comic info
-			imageHTML = ComicHelper.getImageHTML(comicURL)
+			imageHTML = await ComicHelper.getImageHTML(comicURL)
 		
 			if imageHTML:
 				gotComic = True
@@ -303,7 +303,7 @@ class Comic:
 				return
 			# Must be a comic number
 			archiveURL = "http://xkcd.com/archive/"
-			archiveHTML = ComicHelper.getImageHTML(archiveURL)
+			archiveHTML = await ComicHelper.getImageHTML(archiveURL)
 			newest = int(ComicHelper.getNewestXKCD(archiveHTML))
 			if int(date) > int(newest) or int(date) < 1:
 				msg = "Comic out of range. Must be between 1 and {}".format(newest)
@@ -324,7 +324,7 @@ class Comic:
 			dateDict = self.dateDict(date)
 			# Get URL
 			archiveURL = "http://xkcd.com/archive/"
-			archiveHTML = ComicHelper.getImageHTML(archiveURL)
+			archiveHTML = await ComicHelper.getImageHTML(archiveURL)
 
 			xkcdDate = "{}-{}-{}".format(int(dateDict['Year']), int(dateDict['Month']), int(dateDict['Day']))
 			comicURL = ComicHelper.getXKCDURL( archiveHTML, xkcdDate )
@@ -338,7 +338,7 @@ class Comic:
 		comicURL = "http://xkcd.com" + comicURL
 
 		# now we get the actual comic info
-		imageHTML = ComicHelper.getImageHTML(comicURL)
+		imageHTML = await ComicHelper.getImageHTML(comicURL)
 		imageURL = ComicHelper.getXKCDImageURL(imageHTML)
 		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
 		title = '{} *({})*'.format(imageDisplayName, comicNumber)
@@ -380,11 +380,11 @@ class Comic:
 			getURL = "http://explosm.net/comics/archive/" + date['Year'] + "/" + date['Month']
 		
 			# Retrieve html and info
-			imageHTML = ComicHelper.getImageHTML(getURL)
+			imageHTML = await ComicHelper.getImageHTML(getURL)
 			if imageHTML:
 				imagePage = ComicHelper.getCHURL(imageHTML, date['Year'] + "." + date['Month'] + "." + date['Day'])
 				if imagePage:
-					comicHTML = ComicHelper.getImageHTML(imagePage)
+					comicHTML = await ComicHelper.getImageHTML(imagePage)
 					if comicHTML:
 						imageURL  = ComicHelper.getCHImageURL( comicHTML )
 						if imageURL:
@@ -438,11 +438,11 @@ class Comic:
 		getURL = "http://explosm.net/comics/archive/" + dateDict['Year'] + "/" + dateDict['Month']
 
 		gotComic = False
-		imageHTML = ComicHelper.getImageHTML(getURL)
+		imageHTML = await ComicHelper.getImageHTML(getURL)
 		if imageHTML:
 			imagePage = ComicHelper.getCHURL(imageHTML, dateDict['Year'] + "." + dateDict['Month'] + "." + dateDict['Day'])
 			if imagePage:
-				comicHTML = ComicHelper.getImageHTML(imagePage)
+				comicHTML = await ComicHelper.getImageHTML(imagePage)
 				if comicHTML:
 					imageURL  = ComicHelper.getCHImageURL( comicHTML )
 					if imageURL:
@@ -487,10 +487,11 @@ class Comic:
 						
 			date = self.getRandDateBetween(firstDate, todayDate)
 			# Get URL
-			getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + date['Year'] + "/" + date['Month'] + "/" + date['Year'] + date['Month'] + date['Day'] + ".gif"
+			# getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + date['Year'] + "/" + date['Month'] + "/" + date['Year'] + date['Month'] + date['Day'] + ".gif"
+			getURL = "http://downloads.esbasura.com/comics/Calvin%20and%20Hobbes/" + date["Year"] + "/" + "ch" + date["Year"][2:] + date["Month"] + date["Day"] + ".gif"
 
 			# Retrieve html and info
-			imageHTML = ComicHelper.getImageHTML(getURL)
+			imageHTML = await ComicHelper.getImageHTML(getURL, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 		
 			if imageHTML:
 				imageURL  = getURL
@@ -541,10 +542,11 @@ class Comic:
 
 		dateDict = self.dateDict(date)
 		# Get URL
-		getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Year'] + dateDict['Month'] + dateDict['Day'] + ".gif"
+		# getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Year'] + dateDict['Month'] + dateDict['Day'] + ".gif"
+		getURL = "http://downloads.esbasura.com/comics/Calvin%20and%20Hobbes/" + dateDict["Year"] + "/" + "ch" + dateDict["Year"][2:] + dateDict["Month"] + dateDict["Day"] + ".gif"
 
 		# Retrieve html and info
-		imageHTML = ComicHelper.getImageHTML(getURL)
+		imageHTML = await ComicHelper.getImageHTML(getURL, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 		
 		if not imageHTML:
 			msg = 'No comic found for *{}*'.format(date)
@@ -588,7 +590,7 @@ class Comic:
 			# Get URL
 			getURL = "http://garfieldminusgarfield.net/day/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
 			# Retrieve html and info
-			imageHTML = ComicHelper.getImageHTML(getURL)
+			imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 			if imageHTML:
 				imageURL  = ComicHelper.getGMGImageURL(imageHTML)
@@ -644,7 +646,7 @@ class Comic:
 		getURL = "http://garfieldminusgarfield.net/day/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
 		
 		# Retrieve html and info
-		imageHTML = ComicHelper.getImageHTML(getURL)
+		imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 		# Comment out to test
 		'''if imageHTML == None:
@@ -696,7 +698,7 @@ class Comic:
 			# Get URL
 			getURL = "https://garfield.com/comic/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
 			# Retrieve html and info
-			imageHTML = ComicHelper.getImageHTML(getURL)
+			imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 			if imageHTML:
 				imageURL  = ComicHelper.getGImageURL(imageHTML)
@@ -750,7 +752,7 @@ class Comic:
 		getURL = "https://garfield.com/comic/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
 		
 		# Retrieve html and info
-		imageHTML = ComicHelper.getImageHTML(getURL)
+		imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 		# Comment out to test
 		'''if imageHTML == None:
@@ -802,7 +804,7 @@ class Comic:
 			# Get URL
 			getURL = "http://www.gocomics.com/peanuts/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
 			# Retrieve html and info
-			imageHTML = ComicHelper.getImageHTML(getURL)
+			imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 			if imageHTML:
 				imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
@@ -856,7 +858,7 @@ class Comic:
 		getURL = "http://www.gocomics.com/peanuts/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
 		
 		# Retrieve html and info
-		imageHTML = ComicHelper.getImageHTML(getURL)
+		imageHTML = await ComicHelper.getImageHTML(getURL)
 		
 		# Comment out to test
 		'''if imageHTML == None:

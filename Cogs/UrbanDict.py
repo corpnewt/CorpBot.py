@@ -1,6 +1,5 @@
 import asyncio
 import discord
-import requests
 import string
 import random
 from   urllib.parse import quote
@@ -8,6 +7,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
 from   Cogs import Nullify
+from   Cogs import DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -42,8 +42,8 @@ class UrbanDict:
 		url = "http://api.urbandictionary.com/v0/define?term={}".format(quote(word))
 		msg = 'I couldn\'t find a definition for "{}"...'.format(word)
 		title = permalink = None
-		r = requests.get(url, headers = {'User-agent': self.ua})
-		theJSON = r.json()["list"]
+		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
+		theJSON = theJSON["list"]
 		if len(theJSON):
 			# Got it - let's build our response
 			if self.random:
@@ -69,8 +69,8 @@ class UrbanDict:
 		"""Gives a random word and its definition."""
 		url = "http://api.urbandictionary.com/v0/random"
 		title = permalink = None
-		r = requests.get(url, headers = {'User-agent': self.ua})
-		theJSON = r.json()["list"]
+		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
+		theJSON = theJSON["list"]
 		if len(theJSON):
 			# Got it - let's build our response
 			if self.random:

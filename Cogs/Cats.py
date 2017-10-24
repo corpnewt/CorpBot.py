@@ -1,17 +1,12 @@
 import asyncio
 import discord
 import random
-import requests
 import time
 from   os.path import splitext
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import GetImage
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from   Cogs import DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -57,8 +52,11 @@ class Cats:
 		url = 'http://random.cat/meow'
 
 		# Grab our image url
-		r = requests.get(url, headers = {'User-agent': self.ua})
+		r = await DL.async_json(url, headers = {'User-agent': self.ua})
+		if not r:
+			await ctx.send("Hmmm - something went wrong...")
+			return
 
-		catURL = r.json()['file']
+		catURL = r['file']
 		
 		await GetImage.get(catURL, self.bot, channel, 'A cat for you!', self.ua)
