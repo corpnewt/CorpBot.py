@@ -47,6 +47,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	except:
 		pass
 	if not rImage:
+		print("{}\n - Returned no data.".format(url))
 		remove(dirpath)
 		return None
 
