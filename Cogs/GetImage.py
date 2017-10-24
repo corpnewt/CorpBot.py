@@ -48,7 +48,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 		'Accept-Encoding': 'none',
 		'Accept-Language': 'en-US,en;q=0.8',
 		'Connection': 'keep-alive'}
-	rImage = await DL.async_dl(url, hdr)
+	rImage = await DL.async_dl(url)
 	print("Got {} bytes".format(len(rImage)))
 	#except:
 	#	pass
