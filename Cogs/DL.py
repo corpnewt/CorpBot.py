@@ -31,7 +31,6 @@ async def async_dl(url, headers = None):
     data = b""
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
-            print(response.status)
             assert response.status == 200
             while True:
                 chunk = await response.content.read(4*1024) # 4k

@@ -10,6 +10,10 @@ import time
 from   os.path     import splitext
 from   PIL         import Image
 from   Cogs        import DL
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 def setup(bot):
 	# This module isn't actually a cog
@@ -47,41 +51,19 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	except:
 		pass
 	if not rImage:
-		#print("{}\n - Returned no data.".format(url))
+		#print("'{}'\n - Returned no data.".format(url))
 		remove(dirpath)
 		return None
 
 	with open(imagePath, 'wb') as f:
 		f.write(rImage)
-		#for chunk in rImage.iter_content(chunk_size=1024):
-		#	if chunk:
-		#		f.write(chunk)
 
 	# Check if the file exists
 	if not os.path.exists(imagePath):
-		#print("{}\n - Doesn't exist.".format(imagePath))
+		#print("'{}'\n - Doesn't exist.".format(imagePath))
 		remove(dirpath)
 		return None
-	
-	# Let's make sure it's less than the passed limit
-	imageSize = os.stat(imagePath)
-	
-	while int(imageSize.st_size) > sizeLimit:
-		try:
-			# Image is too big - resize
-			myimage = Image.open(imagePath)
-			xsize, ysize = myimage.size
-			ratio = sizeLimit/int(imageSize.st_size)
-			xsize *= ratio
-			ysize *= ratio
-			myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
-			myimage.save(imagePath)
-			imageSize = os.stat(imagePath)
-		except Exception:
-			# Image too big and can't be opened
-			#print("{}\n - Image too large and can't be opened.".format(imagePath))
-			remove(dirpath)
-			return None
+
 	try:
 		# Try to get the extension
 		img = Image.open(imagePath)
@@ -89,11 +71,11 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 		img.close()
 	except Exception:
 		# Not something we understand - error out
-		#print("{}\n - Couldn't get extension.".format(imagePath))
+		#print("'{}'\n - Couldn't get extension.".format(imagePath))
 		remove(dirpath)
 		return None
 	
-	if ext:
+	if ext and not imagePath.lower().endswith("."+ext.lower()):
 		os.rename(imagePath, '{}.{}'.format(imagePath, ext))
 		return '{}.{}'.format(imagePath, ext)
 	else:

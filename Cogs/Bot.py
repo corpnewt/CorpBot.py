@@ -21,6 +21,10 @@ from   Cogs import ProgressBar
 from   Cogs import UserTime
 from   Cogs import Message
 from   Cogs import DL
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 def setup(bot):
 	# Add the bot and deps
@@ -535,7 +539,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def avatar(self, ctx, filename : str = None, sizeLimit : int = 8000000):
+	async def avatar(self, ctx, filename = None):
 		"""Sets the bot's avatar (owner only)."""
 
 		channel = ctx.message.channel
@@ -553,15 +557,27 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 
-		if filename is None and len(ctx.message.attachments) == 0:
-			await self.bot.user.edit(avatar=None)
-			await ctx.channel.send('Avatar removed!')
+		if filename is None and not len(ctx.message.attachments):
+			m = await ctx.send("Removing avatar...")
+			try:
+				await self.bot.user.edit(avatar=None)
+			except discord.errors.HTTPException as e:
+				await m.edit(content="Looks like I can't do that right now.  Try again later!")
+				return
+			await m.edit(content='Avatar removed!')
 			# await self.bot.edit_profile(avatar=None)
 			return
 		
 		# Check if attachment
 		if filename == None:
 			filename = ctx.message.attachments[0].url
+
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(filename, ctx.guild)
+		if test_user:
+			# Got a user!
+			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+			filename = filename.split("?size=")[0]
 
 		# Check if we created a temp folder for this image
 		isTemp = False
@@ -615,33 +631,16 @@ class Bot:
 			# Tall
 			dh = int((h-w)/2)
 		# Run the crop
-		await status.edit(content='Cropping (if needed)...')
 		img.crop((dw, dh, w-dw, h-dh)).save(filename)
-
-		# Should be a square png here - let's check size
-		# Let's make sure it's less than the passed limit
-
-		imageSize = os.stat(filename)
-		await status.edit(content='Resizing (if needed)...')
-		while int(imageSize.st_size) > sizeLimit:
-			# Image is too big - resize
-			myimage = Image.open(filename)
-			xsize, ysize = myimage.size
-			ratio = sizeLimit/int(imageSize.st_size)
-			xsize *= ratio
-			ysize *= ratio
-			myimage = myimage.resize((int(xsize), int(ysize)), Image.ANTIALIAS)
-			myimage.save(filename)
-			imageSize = os.stat(filename)
-		# Image is resized - let's save it
-		img = Image.open(filename)
-		ext = img.format
-		img.close()
 
 		await status.edit(content='Uploading and applying avatar...')
 		with open(filename, 'rb') as f:
 			newAvatar = f.read()
-			await self.bot.user.edit(avatar=newAvatar)
+			try:
+				await self.bot.user.edit(avatar=newAvatar)
+			except discord.errors.HTTPException as e:
+				await status.edit(content="Looks like I can't do that right now.  Try again later!")
+				return
 			# await self.bot.edit_profile(avatar=newAvatar)
 		# Cleanup - try removing with shutil.rmtree, then with os.remove()
 		await status.edit(content='Cleaning up...')

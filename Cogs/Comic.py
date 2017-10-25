@@ -174,6 +174,9 @@ class Comic:
 		# Got a comic link
 		imageURL  = ComicHelper.getImageURL(imageHTML)
 		imageDisplayName = ComicHelper.getImageTitle(imageHTML)
+		if imageDisplayName.lower().startswith("dilbert comic for "):
+			d = imageDisplayName.split(" ")[-1].split("-")
+			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
@@ -221,6 +224,9 @@ class Comic:
 		# Got a comic link
 		imageURL  = ComicHelper.getImageURL(imageHTML)
 		imageDisplayName = ComicHelper.getImageTitle(imageHTML)
+		if imageDisplayName.lower().startswith("dilbert comic for "):
+			d = imageDisplayName.split(" ")[-1].split("-")
+			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
@@ -399,7 +405,7 @@ class Comic:
 			
 		imageDisplayName = "Cyanide & Happiness " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await GetImage.get(imageURL.strip(), self.bot, channel, imageDisplayName)
 
 
 
@@ -453,9 +459,9 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Cyanide & Happiness " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		imageDisplayName = "Cyanide & Happiness " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await GetImage.get(imageURL.strip(), self.bot, channel, imageDisplayName)
 		
 		
 	  # ############### #
@@ -491,7 +497,7 @@ class Comic:
 			getURL = "http://downloads.esbasura.com/comics/Calvin%20and%20Hobbes/" + date["Year"] + "/" + "ch" + date["Year"][2:] + date["Month"] + date["Day"] + ".gif"
 
 			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+			imageHTML = await ComicHelper.getImageHTML(getURL.strip(), "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
 		
 			if imageHTML:
 				imageURL  = getURL
@@ -504,7 +510,7 @@ class Comic:
 			await channel.send(msg)
 			return
 			
-		imageDisplayName = "Calvin & Hobbes " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 
@@ -553,7 +559,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Calvin & Hobbes " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await GetImage.get(getURL, self.bot, channel, imageDisplayName)
 		
@@ -661,7 +667,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
@@ -767,7 +773,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
@@ -873,6 +879,6 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + dateDict['Year'] + "-" + dateDict['Month'] + "-" + dateDict['Day']
+		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
