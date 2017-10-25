@@ -773,7 +773,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
 		
@@ -879,6 +879,6 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
