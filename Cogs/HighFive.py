@@ -63,7 +63,7 @@ class HighFive:
 			return
 
 		# Assume we're eating something else
-		itemList = [ 	'neat... you just high fived *{}*.*'.format(member),
+		itemList = [ 	'neat... you just high fived *{}*.'.format(member),
 						'your hand flops through the air - hitting *{}* with a soft thud.'.format(member),
 						'you read out a hand, gently pressing your palm to *{}*.  A soft *"high five"* escapes your lips as a tear runs down your cheek...'.format(member),
 						'like an open-handed piston of ferocity - you drive your palm into *{}*.'.format(member)]
