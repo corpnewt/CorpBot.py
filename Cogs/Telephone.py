@@ -508,7 +508,22 @@ class Telephone:
 			return
 		
 		# Ring!
-		await self._ring(caller, target, hidden, dial_hide)
+		try:
+			await self._ring(caller, target, hidden, dial_hide)
+		except:
+			# Something went wrong - hang up and inform both parties that the call was disconnected
+			self._hangup(caller)
+			caller = self._gettelechannel(caller)
+			target = self._gettelechannel(target)
+			try:
+				await caller.send(":telephone: The line went dead!")
+			except:
+				pass
+			try:
+				await target.send(":telephone: The line went dead!")
+			except:
+				pass
+				
 
 	async def _ring(self, caller, receiver, hidden, dial_hide):
 		# This should be called when he have a valid caller, receiver, and no one is busy
