@@ -6,6 +6,7 @@ from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
 from   Cogs import DisplayName
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -68,23 +69,22 @@ class Jpeg:
 			# Got a user!
 			url = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
 			url = url.split("?size=")[0]
-			
-		message = await ctx.send("Downloading...")
+		
+		message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 		
 		path = await GetImage.download(url)
 		if not path:
-			await message.edit(content="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.")
+			await Message.Embed(title="An error occurred!", description="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.")
 			return
 
-		await message.edit(content="Jpegifying...")
+		message = await Message.Embed(description="Jpegifying...").edit(ctx, message)
 		# JPEEEEEEEEGGGGG
 		if not self._jpeg(path):
-			await message.edit(content="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.")
+			await Message.Embed(title="An error occurred!", description="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.")
 			if os.path.exists(path):
 				GetImage.remove(path)
 			return
 
-		await message.edit(content="Uploading...")
-		await GetImage.upload(path, self.bot, ctx.channel)
-		await message.edit(content=" ")
+		message = await Message.Embed(description="Uploading...").edit(ctx, message)
+		message = await Message.Embed(file=path).edit(ctx, message)
 		GetImage.remove(path)

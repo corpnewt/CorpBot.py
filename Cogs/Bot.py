@@ -265,9 +265,12 @@ class Bot:
 		isOwner = self.settings.isOwner(ctx.author)
 		if not isOwner:
 			return
-		returned = await DL.async_dl(image)
-		print(returned)
-		print(len(returned))
+		
+		mess = await Message.Embed(title="Test", description="Downloading file...").send(ctx)
+		file_path = await GetImage.download(image)
+		mess = await Message.Embed(title="Test", description="Uploading file...").edit(ctx, mess)
+		await Message.EmbedText(title="Image", file=file_path).edit(ctx, mess)
+		GetImage.remove(file_path)
 		
 
 	@commands.command(pass_context=True)

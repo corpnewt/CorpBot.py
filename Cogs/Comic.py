@@ -8,6 +8,7 @@ from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import ComicHelper
 from   Cogs import DL
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -179,7 +180,8 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
 	@commands.command(pass_context=True)
@@ -229,7 +231,8 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	  # #### #
 	 # XKCD #
@@ -281,7 +284,8 @@ class Comic:
 		title = '{} *({})*'.format(imageDisplayName, date)
 
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, title)
+		await Message.Embed(title=title, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, title)
 
 
 	@commands.command(pass_context=True)
@@ -349,7 +353,8 @@ class Comic:
 		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
 		title = '{} *({})*'.format(imageDisplayName, comicNumber)
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, title)
+		await Message.Embed(title=title, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, title)
 		
 		
 	  # ################### #
@@ -405,7 +410,8 @@ class Comic:
 			
 		imageDisplayName = "Cyanide & Happiness " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
 		# Download Image
-		await GetImage.get(imageURL.strip(), self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
 
 
 
@@ -461,7 +467,8 @@ class Comic:
 		
 		imageDisplayName = "Cyanide & Happiness " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await GetImage.get(imageURL.strip(), self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
 		
 		
 	  # ############### #
@@ -512,7 +519,8 @@ class Comic:
 			
 		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 
 
 
@@ -561,7 +569,8 @@ class Comic:
 
 		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await GetImage.get(getURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=getURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, getURL, imageDisplayName)
 		
 		
 	  # ####################### #
@@ -612,7 +621,8 @@ class Comic:
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 
 
 
@@ -669,7 +679,8 @@ class Comic:
 
 		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
 	  # ######## #
@@ -720,7 +731,8 @@ class Comic:
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	@commands.command(pass_context=True)
 	async def garfield(self, ctx, *, date : str = None):
@@ -775,7 +787,8 @@ class Comic:
 
 		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
 	  # ####### #	
@@ -826,7 +839,8 @@ class Comic:
 		
 		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	@commands.command(pass_context=True)
 	async def peanuts(self, ctx, *, date : str = None):
@@ -881,4 +895,5 @@ class Comic:
 
 		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
-		await GetImage.get(imageURL, self.bot, channel, imageDisplayName)
+		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, imageURL, imageDisplayName)

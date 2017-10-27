@@ -199,7 +199,8 @@ class Humor:
 			# result = '{}\n{}'.format(msg, result)
 			await ctx.channel.send(msg)
 		# Download Image - set title as a space so it disappears on upload
-		await GetImage.get(result, self.bot, ctx.message.channel, " ")
+		await Message.Embed(image=result, color=ctx.author).send(ctx)
+		# await GetImage.get(ctx, result)
 
 
 	async def getTemps(self):

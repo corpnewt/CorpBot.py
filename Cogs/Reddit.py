@@ -379,7 +379,7 @@ class Reddit:
 				await ctx.channel.send('You do not have sufficient privileges to access nsfw subreddits.')
 				return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 		
 		
 	
@@ -401,7 +401,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 		
 		
 	@commands.command(pass_context=True)
@@ -422,7 +422,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 	
 	
 	@commands.command(pass_context=True)
@@ -443,7 +443,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 	
 	
 	@commands.command(pass_context=True)
@@ -464,7 +464,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 		
 		
 	@commands.command(pass_context=True)
@@ -485,7 +485,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -506,7 +506,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -527,7 +527,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -548,7 +548,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -569,7 +569,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 		
 
 	@commands.command(pass_context=True)
@@ -590,7 +590,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -611,7 +611,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -632,7 +632,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 		
 	@commands.command(pass_context=True)
@@ -653,7 +653,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 		
 		
 	@commands.command(pass_context=True)
@@ -674,7 +674,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -695,7 +695,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 
 	@commands.command(pass_context=True)
@@ -716,7 +716,7 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 	
 	@commands.command(pass_context=True)
@@ -737,4 +737,4 @@ class Reddit:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
 			return
 		
-		await GetImage.get(infoDict['url'], self.bot, channel, infoDict['title'], self.ua)
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)

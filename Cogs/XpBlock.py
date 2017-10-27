@@ -5,7 +5,6 @@ import random
 import re
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import GetImage
 from   Cogs import Message
 from   Cogs import Nullify
 from   Cogs import DisplayName

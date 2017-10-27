@@ -10,6 +10,7 @@ import time
 from   os.path     import splitext
 from   PIL         import Image
 from   Cogs        import DL
+from   Cogs        import Message
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -37,6 +38,7 @@ def canDisplay( firstTime, threshold ):
 
 async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download the passed URL and return the file path."""
+	url = url.strip("<>")
 	# Set up a temp directory
 	dirpath = tempfile.mkdtemp()
 	tempFileName = url.rsplit('/', 1)[-1]
@@ -81,9 +83,8 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	else:
 		return imagePath
 	
-async def upload(path, bot, channel):
-	with open (path, 'rb') as f:
-		await channel.send(file=discord.File(f))
+async def upload(ctx, file_path, title = None):
+	return await Message.Embed(title=title, file=file_path, color=ctx.author)
 
 def addExt(path):
 	img = Image.open(path)
@@ -93,19 +94,16 @@ def addExt(path):
 	
 def remove(path):
 	"""Removed the passed file's containing directory."""
-	shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+	if not path == None and os.path.exists(path):
+		shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
-async def get(url, bot, channel, title : str = 'Unknown', ua : str = 'CorpNewt DeepThoughtBot'):
+async def get(ctx, url, title = None, ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download passed image, and upload it to passed channel."""
-
-	message = await channel.send('Downloading...')
+	message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 	afile = await download(url)
-
 	if not afile:
-		await message.edit(content='Oh *shoot* - I couldn\'t get that image...')
-		return
-
-	await message.edit(content='Uploading...')
-	await upload(afile, bot, channel)
-	await message.edit(content=title)
+		return await Message.Embed(title="An error occurred!", description="Oh *shoot* - I couldn't get that image...")
+	message = await Message.Embed(description="Uploading...").edit(ctx, message)
+	message = await Message.Embed(title=title, file=afile).edit(ctx, message)
 	remove(afile)
+	return message
