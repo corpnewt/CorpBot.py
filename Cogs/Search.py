@@ -149,7 +149,10 @@ class Search:
 		results = result.split(" ")
 		
 		if len(results):
-			await ctx.channel.send("{:,g} {} is {:,g} {}".format(amount,str(frm).upper(),float(results[0]), results[1]))
+			amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
+			results[0] = float(results[0])
+			results[0] = "{:,}".format(int(results[0])) if int(results[0]) == float(results[0]) else "{:,f}".format(results[0]).rstrip("0")
+			await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(),results[0], results[1]))
 		else:
 			await ctx.channel.send("Whoops!  I couldn't make that conversion.")
 
