@@ -339,7 +339,7 @@ class Embed:
                 text=self._truncate_string(footer_text, self.foot_max),
                 icon_url=footer_icon
             )
-            return await self._send_embed(ctx, em, self.force_pm, self.file)
+            return await self._send_embed(ctx, em, False, self.file)
         
         # Only pm if our self.pm_after is above -1
         to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
@@ -456,7 +456,7 @@ class EmbedText(Embed):
                 text=self._truncate_string(footer_text, self.foot_max),
                 icon_url=footer_icon
             )
-            return await self._send_embed(ctx, em, self.force_pm, self.file)
+            return await self._send_embed(ctx, em, False, self.file)
         
         text_list = textwrap.wrap(
             self.description,
