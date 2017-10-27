@@ -105,7 +105,7 @@ class Embed:
         self.pm_react = kwargs.get("pm_react", "📬")
         self.title = kwargs.get("title", None)
         self.page_count = kwargs.get("page_count", True)
-        self.url = kwargs.get("url", None) # use "attachment" for upload url
+        self.url = kwargs.get("url", None)
         self.description = kwargs.get("description", None)
         self.image = kwargs.get("image", None)
         self.footer = kwargs.get("footer", None)
@@ -160,8 +160,8 @@ class Embed:
         fname = "Upload." + ext[-1] if len(ext) > 1 else "Upload"
         file_handle = discord.File(fp=file_path, filename=fname)
         # Check if self.url = "attachment" and react
-        if self.url and self.url.lower() == "attachment":
-            self.url = "attachment://" + fname
+        #if self.url and self.url.lower() == "attachment":
+        #    self.url = "attachment://" + fname
         return (file_handle, fname)
 
     # Embed stuff!
