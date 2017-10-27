@@ -55,7 +55,7 @@ with open('token.txt', 'r') as f:
 @bot.event
 async def on_ready():
 	print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
-	print("Invite Link:\n\nhttps://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8\n\n".format(bot.user.id))
+	print("Invite Link:\nhttps://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8\n".format(bot.user.id))
 	
 	# Load extensions - Bypassed for now
 	# _load_extensions()
