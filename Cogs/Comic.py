@@ -180,7 +180,7 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
@@ -231,7 +231,7 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	  # #### #
@@ -284,7 +284,7 @@ class Comic:
 		title = '{} *({})*'.format(imageDisplayName, date)
 
 		# Download Image
-		await Message.Embed(title=title, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, title)
 
 
@@ -353,7 +353,7 @@ class Comic:
 		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
 		title = '{} *({})*'.format(imageDisplayName, comicNumber)
 		# Download Image
-		await Message.Embed(title=title, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, title)
 		
 		
@@ -410,7 +410,7 @@ class Comic:
 			
 		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), url=imageURL.strip(), color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
 
 
@@ -467,7 +467,7 @@ class Comic:
 		
 		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), url=imageURL.strip(), color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
 		
 		
@@ -519,7 +519,7 @@ class Comic:
 			
 		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 
 
@@ -569,7 +569,7 @@ class Comic:
 
 		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=getURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=getURL, url=getURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, getURL, imageDisplayName)
 		
 		
@@ -621,7 +621,7 @@ class Comic:
 		
 		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 
 
@@ -679,7 +679,7 @@ class Comic:
 
 		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
@@ -731,7 +731,7 @@ class Comic:
 		
 		imageDisplayName = "Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	@commands.command(pass_context=True)
@@ -787,7 +787,7 @@ class Comic:
 
 		imageDisplayName = "Garfield Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 		
@@ -839,7 +839,7 @@ class Comic:
 		
 		imageDisplayName = "Peanuts Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
 	@commands.command(pass_context=True)
@@ -895,5 +895,5 @@ class Comic:
 
 		imageDisplayName = "Peanuts Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
