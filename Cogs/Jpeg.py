@@ -86,5 +86,5 @@ class Jpeg:
 			return
 
 		message = await Message.Embed(description="Uploading...").edit(ctx, message)
-		message = await Message.Embed(file=path).edit(ctx, message)
+		message = await Message.Embed(file=path, title="Moar Jpeg!", url="attachment").edit(ctx, message)
 		GetImage.remove(path)
