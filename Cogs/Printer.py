@@ -9,6 +9,7 @@ from   PIL import Image
 from   discord.ext import commands
 from   Cogs import GetImage
 from   Cogs import DisplayName
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -96,7 +97,13 @@ class Printer:
 		if not len(url):
 			url = member.default_avatar_url
 		url = url.split("?size=")[0]
-		await ctx.send(url)
+		name = DisplayName.name(member)
+		if name[-1].lower() == "s":
+			name += "' Avatar"
+		else:
+			name += "'s Avatar"
+		await Message.Embed(title=name, image=url, color=ctx.author).send(ctx)
+		# await ctx.send(url)
 
 	@commands.command(pass_context=True)
 	async def print(self, ctx, *, url = None):
