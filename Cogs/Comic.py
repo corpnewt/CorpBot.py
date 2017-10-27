@@ -408,7 +408,7 @@ class Comic:
 			await channel.send(msg)
 			return
 			
-		imageDisplayName = "Cyanide & Happiness " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
@@ -465,7 +465,7 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Cyanide & Happiness " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
@@ -517,7 +517,7 @@ class Comic:
 			await channel.send(msg)
 			return
 			
-		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -567,7 +567,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Calvin & Hobbes " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=getURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, getURL, imageDisplayName)
@@ -619,7 +619,7 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -677,7 +677,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -729,7 +729,7 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		imageDisplayName = "Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -785,7 +785,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
+		imageDisplayName = "Garfield Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -837,7 +837,7 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Day " + date['Year'] + "-" + date['Month'] + "-" + date['Day']
+		imageDisplayName = "Peanuts Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
@@ -893,7 +893,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Day " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
+		imageDisplayName = "Peanuts Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
