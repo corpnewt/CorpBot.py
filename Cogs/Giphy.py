@@ -259,6 +259,21 @@ class Giphy:
 				my_gif = None
 		
 		if my_gif == None:
-			my_gif = "I couldn't get a working link!"
+			await ctx.send("I couldn't get a working link!")
+			return
 		
-		await ctx.send(my_gif)
+		try:
+			gif_url = my_gif["original"]["url"].split("?")[0]
+		except:
+			gif_url = None
+		try:
+			title = my_gif["raw_data"]["title"]
+		except:
+			title = "Gif for \"{}\"".format(gif)
+		if not gif_url:
+			await ctx.send("I couldn't get a working link!")
+			return
+			
+		# Download Image
+		await Message.Embed(title=title, image=gif_url, url=gif_url, color=ctx.author).send(ctx)
+		# await ctx.send(my_gif)
