@@ -205,6 +205,13 @@ class Reddit:
 		e["fields"].append({ "name" : "Link Karma", "value" : "{:,}".format(theJSON["data"]["link_karma"]), "inline" : True })
 		e["fields"].append({ "name" : "Comment Karma", "value" : "{:,}".format(theJSON["data"]["comment_karma"]), "inline" : True })
 		e["fields"].append({ "name" : "Has Gold", "value" : str(theJSON["data"]["is_gold"]), "inline" : True })
+		if theJSON["data"]["is_gold"]:
+			gold_s = time.gmtime(theJSON["data"]["gold_expiration"])
+			gold_dt = datetime(*gold_s[:6])
+			# Get the actual user time of gold expiration
+			gold = UserTime.getUserTime(ctx.author, self.settings, gold_dt)
+			gold_string = "{} {}".format(gold['time'], gold['zone'])
+			e["fields"].append({ "name" : "Gold Expires", "value" : gold_string, "inline" : True })
 		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : True })
 		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : True })
 		# Send the embed
