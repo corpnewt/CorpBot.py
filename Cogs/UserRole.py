@@ -265,52 +265,46 @@ class UserRole:
 	async def oneuserrole(self, ctx, *, on_off = None):
 		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
 
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.send("You do not have permission to use this command.")
 			return
 
-		current_on_off = self.settings.getServerStat(ctx.guild, "OnlyOneUserRole")
+		setting_name = "One user role at a time"
+		setting_val  = "OnlyOneUserRole"
 
-		if on_off == None:
-			# Output debug status
-			if current_on_off:
-				await channel.send('One user role at a time is enabled.')
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				await channel.send('One user role at a time is disabled.')
-			return
-		elif on_off.lower() == "yes" or on_off.lower() == "on" or on_off.lower() == "true":
-			on_off = True
-		elif on_off.lower() == "no" or on_off.lower() == "off" or on_off.lower() == "false":
-			on_off = False
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			on_off = True
-
-		if on_off == True:
-			if current_on_off == True:
-				msg = 'One user role at a time remains enabled.'
-			else:
-				msg = 'One user role at a time now enabled.'
-		else:
-			if current_on_off == False:
-				msg = 'One user role at a time remains disabled.'
-			else:
-				msg = 'One user role at a time now disabled.'
-		self.settings.setServerStat(ctx.guild, "OnlyOneUserRole", on_off)
-		
-		await channel.send(msg)
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)

@@ -247,41 +247,40 @@ class Admin:
 			await ctx.send("Xp reserve limit set to *{:,}*.".format(limit))
 
 	@commands.command(pass_context=True)
-	async def onexprole(self, ctx, *, onlyone = None):
+	async def onexprole(self, ctx, *, yes_no = None):
 		"""Gets and sets whether or not to remove all but the current xp role a user has acquired."""
 
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		setting_name = "One xp role at a time"
+		setting_val  = "OnlyOneRole"
 
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
 			await ctx.send('You do not have sufficient privileges to access this command.')
 			return
-		
-		only = self.settings.getServerStat(ctx.guild, "OnlyOneRole")
-		if onlyone == None:
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
 			# Output what we have
-			if only:
-				await ctx.send("One xp role at a time *enabled.*")
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				await ctx.send("One xp role at a time *disabled.*")
-			return
-		elif onlyone.lower() == "yes" or onlyone.lower() == "on" or onlyone.lower() == "true":
-			onlyone = True
-		elif onlyone.lower() == "no" or onlyone.lower() == "off" or onlyone.lower() == "false":
-			onlyone = False
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			onlyone = False
-
-		if onlyone == True:
-			if only == True:
-				msg = 'One xp role at a time remains *enabled*.'
-			else:
-				msg = 'One xp role at a time is now *enabled*.'
-		else:
-			if only == False:
-				msg = 'One xp role at a time remains *disabled*.'
-			else:
-				msg = 'One xp role at a time is now *disabled*.'
-		self.settings.setServerStat(ctx.guild, "OnlyOneRole", onlyone)
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
 

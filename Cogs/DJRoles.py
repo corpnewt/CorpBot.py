@@ -17,6 +17,42 @@ class DJRoles:
 		self.bot = bot
 		self.settings = settings
 			
+	@commands.command(pass_context=True)
+	async def ytlist(self, ctx, yes_no = None):
+		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
+		
+		setting_name = "Youtube search list"
+		setting_val  = "YTMultiple"
+
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			# Output what we have
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
+			else:
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
+		else:
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def adddj(self, ctx, *, role : str = None):

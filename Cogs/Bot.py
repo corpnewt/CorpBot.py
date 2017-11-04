@@ -396,104 +396,8 @@ class Bot:
 		
 		
 	@commands.command(pass_context=True)
-	async def adminunlim(self, ctx, *, unlimited : str = None):
+	async def adminunlim(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to allow unlimited xp to admins (owner only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-		
-		# Get current status
-		adminUnlimited = self.settings.getServerStat(ctx.guild, "AdminUnlimited")
-		
-		if unlimited == None:
-			# Output unlimited status
-			if adminUnlimited.lower() == "yes":
-				await channel.send('Admin unlimited is enabled.')
-			else:
-				await channel.send('Admin unlimited is disabled.')
-			return
-		elif unlimited.lower() == "yes" or unlimited.lower() == "on" or unlimited.lower() == "true":
-			unlimited = "Yes"
-		elif unlimited.lower() == "no" or unlimited.lower() == "off" or unlimited.lower() == "false":
-			unlimited = "No"
-		else:
-			unlimited = "No"
-
-		if unlimited == "Yes":
-			if adminUnlimited.lower() == "yes":
-				msg = 'Admin unlimited remains enabled.'
-			else:
-				msg = 'Admin unlimited now enabled.'
-		else:
-			if adminUnlimited.lower() == "no":
-				msg = 'Admin unlimited remains disabled.'
-			else:
-				msg = 'Admin unlimited now disabled.'
-		self.settings.setServerStat(ctx.guild, "AdminUnlimited", unlimited)
-		
-		await channel.send(msg)
-		
-	
-	@commands.command(pass_context=True)
-	async def basadmin(self, ctx, *, asadmin : str = None):
-		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-		
-		# Get current status
-		botAdminAsAdmin = self.settings.getServerStat(ctx.guild, "BotAdminAsAdmin")
-		
-		if asadmin == None:
-			# Output unlimited status
-			if botAdminAsAdmin.lower() == "yes":
-				await channel.send('Bot-admin as admin is enabled.')
-			else:
-				await channel.send('Bot-admin as admin is disabled.')
-			return
-		elif asadmin.lower() == "yes" or asadmin.lower() == "on" or asadmin.lower() == "true":
-			asadmin = "Yes"
-		elif asadmin.lower() == "no" or asadmin.lower() == "off" or asadmin.lower() == "false":
-			asadmin = "No"
-		else:
-			asadmin = "No"
-
-		if asadmin == "Yes":
-			if botAdminAsAdmin.lower() == "yes":
-				msg = 'Bot-admin as admin remains enabled.'
-			else:
-				msg = 'Bot-admin as admin now enabled.'
-		else:
-			if botAdminAsAdmin.lower() == "no":
-				msg = 'Bot-admin as admin remains disabled.'
-			else:
-				msg = 'Bot-admin as admin now disabled.'
-		self.settings.setServerStat(ctx.guild, "BotAdminAsAdmin", asadmin)
-		
-		await channel.send(msg)
-		
-		
-	@commands.command(pass_context=True)
-	async def joinpm(self, ctx, *, join_pm : str = None):
-		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
 
 		# Check for admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
@@ -504,41 +408,131 @@ class Bot:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		
 		if not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
-		
-		# Get current status
-		join_pm_setting = self.settings.getServerStat(ctx.guild, "JoinPM")
-		
-		if join_pm == None:
-			# Output unlimited status
-			if join_pm_setting.lower() == "yes":
-				await channel.send('New user pm is enabled.')
-			else:
-				await channel.send('New user pm is disabled.')
-			return
-		elif join_pm.lower() == "yes" or join_pm.lower() == "on" or join_pm.lower() == "true":
-			join_pm = "Yes"
-		elif join_pm.lower() == "no" or join_pm.lower() == "off" or join_pm.lower() == "false":
-			join_pm = "No"
-		else:
-			join_pm = "No"
 
-		if join_pm == "Yes":
-			if join_pm_setting.lower() == "yes":
-				msg = 'New user pm remains enabled.'
+		setting_name = "Admin unlimited xp"
+		setting_val  = "AdminUnlimited"
+
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			# Output what we have
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				msg = 'New user pm now enabled.'
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			if join_pm_setting.lower() == "no":
-				msg = 'New user pm remains disabled.'
-			else:
-				msg = 'New user pm now disabled.'
-		self.settings.setServerStat(ctx.guild, "JoinPM", join_pm)
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 		
-		await channel.send(msg)
+	
+	@commands.command(pass_context=True)
+	async def basadmin(self, ctx, *, yes_no : str = None):
+		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
+
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
+			return
+
+		setting_name = "Bot-admin as admin"
+		setting_val  = "BotAdminAsAdmin"
+
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			# Output what we have
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
+			else:
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
+		else:
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
+		
+		
+	@commands.command(pass_context=True)
+	async def joinpm(self, ctx, *, yes_no : str = None):
+		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
+
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
+			return
+
+		setting_name = "New user pm"
+		setting_val  = "JoinPM"
+
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
+			else:
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
+		else:
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)

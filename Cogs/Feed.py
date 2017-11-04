@@ -122,55 +122,50 @@ class Feed:
 					self.settings.setServerStat(server, "Hunger", hunger)
 
 	@commands.command(pass_context=True)
-	async def ignoredeath(self, ctx, *, ignore = None):
+	async def ignoredeath(self, ctx, *, yes_no = None):
 		"""Sets whether the bot ignores its own death and continues to respond post-mortem (bot-admin only; always off by default)."""
 
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.send("You do not have permission to use this command.")
 			return
 
-		current_ignore = self.settings.getServerStat(ctx.guild, "IgnoreDeath")
+		setting_name = "Ignore death"
+		setting_val  = "IgnoreDeath"
 
-		if ignore == None:
-			# Output debug status
-			if current_ignore:
-				await channel.send('Ignore death is enabled.')
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				await channel.send('Ignore death is disabled.')
-			return
-		elif ignore.lower() == "yes" or ignore.lower() == "on" or ignore.lower() == "true":
-			ignore = True
-		elif ignore.lower() == "no" or ignore.lower() == "off" or ignore.lower() == "false":
-			ignore = False
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			ignore = None
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
-		if ignore == True:
-			if current_ignore == True:
-				msg = 'Ignore death remains enabled.'
-			else:
-				msg = 'Ignore death now enabled.'
-		else:
-			if current_ignore == False:
-				msg = 'Ignore death remains disabled.'
-			else:
-				msg = 'Ignore death now disabled.'
-		self.settings.setServerStat(ctx.guild, "IgnoreDeath", ignore)
-		
-		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def hunger(self, ctx):

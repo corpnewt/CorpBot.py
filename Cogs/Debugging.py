@@ -592,9 +592,9 @@ class Debugging:
 			else:
 				await channel.send('Debugging is disabled.')
 			return
-		elif debug.lower() == "yes" or debug.lower() == "on" or debug.lower() == "true":
+		elif debug.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			debug = True
-		elif debug.lower() == "no" or debug.lower() == "off" or debug.lower() == "false":
+		elif debug.lower() in [ "no", "off", "false", "disabled", "disable" ]:
 			debug = False
 		else:
 			debug = None

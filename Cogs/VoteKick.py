@@ -445,55 +445,49 @@ class VoteKick:
 			await ctx.send("Votes will expire after {}.".format(ReadableTime.getReadableTimeBetween(0, seconds)))
 
 	@commands.command(pass_context=True)
-	async def vkanon(self, ctx, *, ignore = None):
+	async def vkanon(self, ctx, *, yes_no = None):
 		"""Sets whether vote messages are removed after voting (bot-admin only; always off by default)."""
 
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.send("You do not have permission to use this command.")
 			return
 
-		current_ignore = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
+		setting_name = "Vote kick anon"
+		setting_val  = "VoteKickAnon"
 
-		if ignore == None:
-			# Output debug status
-			if current_ignore:
-				await channel.send('Vote kick anon is enabled.')
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				await channel.send('Vote kick anon is disabled.')
-			return
-		elif ignore.lower() == "yes" or ignore.lower() == "on" or ignore.lower() == "true":
-			ignore = True
-		elif ignore.lower() == "no" or ignore.lower() == "off" or ignore.lower() == "false":
-			ignore = False
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			ignore = False
-
-		if ignore == True:
-			if current_ignore == True:
-				msg = 'Vote kick anon remains enabled.'
-			else:
-				msg = 'Vote kick anon now enabled.'
-		else:
-			if current_ignore == False:
-				msg = 'Vote kick anon remains disabled.'
-			else:
-				msg = 'Vote kick anon now disabled.'
-		self.settings.setServerStat(ctx.guild, "VoteKickAnon", ignore)
-		
-		await channel.send(msg)
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def vk(self, ctx, *, user = None):

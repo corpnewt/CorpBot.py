@@ -836,7 +836,8 @@ class Music:
             )
 
         if info.get('url', '').startswith('ytsearch'):
-            info['url'] = info['url'].replace("ytsearch:", "ytsearch5:")
+            if self.settings.getServerStat(ctx.guild, "YTMultiple"):
+                info['url'] = info['url'].replace("ytsearch:", "ytsearch5:")
             info = await self.downloader.extract_info(
                 self.bot.loop,
                 #song,
@@ -853,35 +854,41 @@ class Music:
                 # empty list, no data
                 await message.edit(content="No results for that search :(")
                 return
-            # Show a list
-            count = 0
-            list_show = "Please type the number of the video you'd like to add:\n\n"
-            for v in info['entries']:
-                count += 1
-                list_show += "{}. `{}`\n".format(count, v['title'])
-            await message.edit(content=list_show)
-            # Wait for response
-            def littleCheck(m):
-                if m.author.id != ctx.author.id:
-                    return False
+            song_index = 0
+            if len(info['entries']) > 1:
+                # Show a list
+                count = 0
+                list_show = "Please type the number of the video you'd like to add:\n\n"
+                for v in info['entries']:
+                    count += 1
+                    list_show += "{}. `{}`\n".format(count, v['title'])
+                await message.edit(content=list_show)
+                # Wait for response
+                def littleCheck(m):
+                    if m.author.id != ctx.author.id:
+                        return False
+                    # Check if we're trying to play something else
+                    
+                    try:
+                        m_int = int(m.content)
+                    except:
+                        return False
+                    if m_int < 1 or m_int > count:
+                        return False
+                    return True
+
                 try:
-                    m_int = int(m.content)
-                except:
-                    return False
-                if m_int < 1 or m_int > count:
-                    return False
-                return True
+                    song_ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+                except Exception:
+                    song_ind = None
 
-            try:
-                song_ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
-            except Exception:
-                song_ind = None
+                if song_ind == None:
+                    await message.edit(content="Times up!  We can search for music another time.")
+                    return
 
-            if song_ind == None:
-                await message.edit("Times up!  We can search for music another time.")
-                return
+                song_index = int(song_ind.content)-1
 
-            song = info['entries'][int(song_ind.content)-1]['webpage_url']
+            song = info['entries'][song_index]['webpage_url']
             info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
         if "entries" in info:
@@ -1031,7 +1038,7 @@ class Music:
 
     
     @commands.command(pass_context=True, no_pm=True)
-    async def repeat(self, ctx, *, repeat = None):
+    async def repeat(self, ctx, *, yes_no = None):
         """Checks or sets whether to repeat or not."""
 
         # Role check
@@ -1049,39 +1056,32 @@ class Music:
             return
 
         state = self.get_voice_state(ctx.message.guild)
-
-        if repeat == None:
-            # Just checking
-            if state.repeat:
-                await ctx.channel.send('Repeat is currently **on**.')
+        current = stat.repeat
+        setting_name = "Repeat"
+        if yes_no == None:
+            if current:
+                msg = "{} currently *enabled.*".format(setting_name)
             else:
-                await ctx.channel.send('Repeat is currently **off**.')
-            return
-        elif repeat.lower() == "on" or repeat.lower() == "yes" or repeat.lower() == "true":
-            # Trying to enable repeat
-            if state.repeat:
-                await ctx.channel.send('Repeat will remain **on**.')
+                msg = "{} currently *disabled.*".format(setting_name)
+        elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+            yes_no = True
+            if current == True:
+                msg = '{} remains *enabled*.'.format(setting_name)
             else:
-                state.repeat = True
-                await ctx.channel.send('Repeat is now **on**.')
-            return
-        elif repeat.lower() == "off" or repeat.lower() == "no" or repeat.lower() == "false":
-            # Trying to disable repeat
-            if not state.repeat:
-                await ctx.channel.send('Repeat will remain **off**.')
+                msg = '{} is now *enabled*.'.format(setting_name)
+        elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+            yes_no = False
+            if current == False:
+                msg = '{} remains *disabled*.'.format(setting_name)
             else:
-                state.repeat = False
-                await ctx.channel.send('Repeat is now **off**.')
-            return
+                msg = '{} is now *disabled*.'.format(setting_name)
         else:
-            # No working variable - let's just output repeat status
-            if state.repeat:
-                await ctx.channel.send('Repeat is currently **on**.')
-            else:
-                await ctx.channel.send('Repeat is currently **off**.')
-            return
+            msg = "That's not a valid setting."
+            yes_no = current
+        if not yes_no == None and not yes_no == current:
+            state.repeat = yes_no
 
-
+        
     @commands.command(pass_context=True, no_pm=True)
     async def willrepeat(self, ctx):
         """Displays whether or not repeat is active."""

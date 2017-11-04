@@ -93,49 +93,43 @@ class Fliptime:
 	async def tableflip(self, ctx, *, table = None):
 		"""Turns on/off table flip muting (bot-admin only; always off by default)."""
 
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			await ctx.send("You do not have permission to use this command.")
 			return
 
-		current_table = self.settings.getServerStat(ctx.guild, "TableFlipMute")
+		setting_name = "Table flip muting"
+		setting_val  = "TableFlipMute"
 
-		if table == None:
-			# Output debug status
-			if current_table:
-				await channel.send('Table flip muting is enabled.')
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
 			else:
-				await channel.send('Table flip muting is disabled.')
-			return
-		elif table.lower() == "yes" or table.lower() == "on" or table.lower() == "true":
-			table = True
-		elif table.lower() == "no" or table.lower() == "off" or table.lower() == "false":
-			table = False
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
 		else:
-			table = None
-
-		if table == True:
-			if current_table == True:
-				msg = 'Table flip muting remains enabled.'
-			else:
-				msg = 'Table flip muting now enabled.'
-		else:
-			if current_table == False:
-				msg = 'Table flip muting remains disabled.'
-			else:
-				msg = 'Table flip muting now disabled.'
-		self.settings.setServerStat(ctx.guild, "TableFlipMute", table)
-		
-		await channel.send(msg)
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
