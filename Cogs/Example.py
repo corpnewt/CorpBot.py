@@ -187,7 +187,7 @@ class VoiceState:
             self.play_next_song.clear()
 
             if len(self.playlist) <= 0:
-                await asyncio.sleep(3)
+                await asyncio.sleep(1)
                 continue
 
 
@@ -782,13 +782,8 @@ class Music:
                 await ctx.channel.send("I'm currently importing a playlist - please wait for that to finish before enqueuing more songs.")
                 return
 
-        #await state.songs.put(entry)
-
-        opts = {
-            'f': 'bestaudio',
-            'default_search': 'auto',
-            'quiet': True
-        }
+        # Send a starter message
+        message = await ctx.send("Collecting sound bytes...")
 
         song = song.strip('<>')
 
@@ -797,8 +792,6 @@ class Music:
         matches = list(matches)
         if not len(matches):
             song = song.replace('/', '')
-
-        #info = await self.bot.loop.run_in_executor(None, func)
         
         # First we check for our permission level
         author_perms = 0
@@ -837,26 +830,58 @@ class Music:
         info = await self.downloader.extract_info(
                 self.bot.loop,
                 song,
-                playlist=plist,
                 download=False,
-                process=False
+                process=False,
+                playlist=plist
             )
 
         if info.get('url', '').startswith('ytsearch'):
+            info['url'] = info['url'].replace("ytsearch:", "ytsearch5:")
             info = await self.downloader.extract_info(
                 self.bot.loop,
-                song,
+                #song,
+                info['url'],
                 download=False,
                 process=True,    # ASYNC LAMBDAS WHEN
                 retry_on_error=True,
                 playlist=False
             )
             if not info:
+                await message.edit(content="No results for that search :(")
                 return
             if not all(info.get('entries', [])):
                 # empty list, no data
+                await message.edit(content="No results for that search :(")
                 return
-            song = info['entries'][0]['webpage_url']
+            # Show a list
+            count = 0
+            list_show = "Please type the number of the video you'd like to add:\n\n"
+            for v in info['entries']:
+                count += 1
+                list_show += "{}. `{}`\n".format(count, v['title'])
+            await message.edit(content=list_show)
+            # Wait for response
+            def littleCheck(m):
+                if m.author.id != ctx.author.id:
+                    return False
+                try:
+                    m_int = int(m.content)
+                except:
+                    return False
+                if m_int < 1 or m_int > count:
+                    return False
+                return True
+
+            try:
+                song_ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+            except Exception:
+                song_ind = None
+
+            if song_ind == None:
+                await message.edit("Times up!  We can search for music another time.")
+                return
+
+            song = info['entries'][int(song_ind.content)-1]['webpage_url']
             info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
         if "entries" in info:
@@ -867,7 +892,7 @@ class Music:
                 entries_added = 0
                 entries_skipped = 0
                 
-                mess = await ctx.channel.send("Adding songs from playlist...")
+                await message.edit(content="Adding songs from playlist...")
 
                 entries = info['entries']
                 entries = list(entries)
@@ -915,7 +940,7 @@ class Music:
                         continue
 
                     # Edit our status message
-                    await mess.edit(content="Enqueuing song {} of {} from `{}` ({} skipped)...".format(entries_added, total_songs, info['title'].replace('`', '\\`'), entries_skipped))
+                    await message.edit(content="Enqueuing song {} of {} from `{}` ({} skipped)...".format(entries_added, total_songs, info['title'].replace('`', '\\`'), entries_skipped))
                     
                     # Create a new video url and get info
                     new_url = "https://youtube.com/v/" + entry.get('url', '')
@@ -954,19 +979,18 @@ class Music:
                     state = self.get_voice_state(ctx.message.guild)
                     if state.voice == None or self.settings.getServerStat(ctx.guild, "Playlisting") == None:
                         if entries_added == 1:
-                            await mess.edit(content="*{}* Cancelled - *1* song loaded.".format(info['title']))
+                            await message.edit(content="*{}* Cancelled - *1* song loaded.".format(info['title']))
                         else:
-                            await mess.edit(content="*{}* Cancelled - *{}* songs loaded.".format(info['title'], entries_added))
+                            await message.edit(content="*{}* Cancelled - *{}* songs loaded.".format(info['title'], entries_added))
                         return
                 # Unlock our playlisting
                 self.settings.setServerStat(ctx.guild, "Playlisting", None)
                 self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
 
-                await mess.edit(content=" ")
                 if entries_added-entries_skipped == 1:
-                    await ctx.channel.send("Enqueued *{}* song from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
+                    await message.edit(content="Enqueued *{}* song from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
                 else:
-                    await ctx.channel.send("Enqueued *{}* songs from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
+                    await message.edit(content="Enqueued *{}* songs from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
                 return
             else:
                 # We don't have enough perms
@@ -993,7 +1017,7 @@ class Music:
                     info = None
                 
                 if info == None:
-                    await ctx.send("I couldn't load that song :(")
+                    await message.edit(content="I couldn't load that song :(")
                     return
         
         seconds = info.get('duration', 0)
@@ -1003,7 +1027,7 @@ class Music:
         
         state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': song})
         # state.playlist.append({ 'song': info.get('title'), 'duration': info.get('duration'), 'ctx': ctx, 'requester': ctx.message.author, 'raw_song': info['formats'][len(info['formats'])-1]['url']})
-        await ctx.channel.send('Enqueued - `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title').replace('`', '\\`'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
+        await message.edit(content='Enqueued - `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(info.get('title').replace('`', '\\`'), round(hours), round(minutes), round(seconds), DisplayName.name(ctx.message.author)))
 
     
     @commands.command(pass_context=True, no_pm=True)
