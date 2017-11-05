@@ -1056,7 +1056,7 @@ class Music:
             return
 
         state = self.get_voice_state(ctx.message.guild)
-        current = stat.repeat
+        current = state.repeat
         setting_name = "Repeat"
         if yes_no == None:
             if current:
@@ -1080,6 +1080,7 @@ class Music:
             yes_no = current
         if not yes_no == None and not yes_no == current:
             state.repeat = yes_no
+        await ctx.send(msg)
 
         
     @commands.command(pass_context=True, no_pm=True)
