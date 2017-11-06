@@ -74,13 +74,13 @@ class Jpeg:
 		
 		path = await GetImage.download(url)
 		if not path:
-			await Message.Embed(title="An error occurred!", description="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.")
+			await Message.Embed(title="An error occurred!", description="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
 			return
 
 		message = await Message.Embed(description="Jpegifying...").edit(ctx, message)
 		# JPEEEEEEEEGGGGG
 		if not self._jpeg(path):
-			await Message.Embed(title="An error occurred!", description="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.")
+			await Message.Embed(title="An error occurred!", description="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.").edit(ctx, message)
 			if os.path.exists(path):
 				GetImage.remove(path)
 			return
