@@ -225,6 +225,10 @@ async def on_member_update(before, after):
 
 @bot.event
 async def on_message(message):
+	# Post the context too
+	context = await bot.get_context(message)
+	bot.dispatch("message_context", context, message)
+
 	if not message.guild:
 		# This wasn't said in a server, process commands, then return
 		await bot.process_commands(message)

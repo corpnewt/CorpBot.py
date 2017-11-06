@@ -207,9 +207,12 @@ class Lists:
 			# All done
 			return
 		# Wait for response
-		def littleCheck(m):
+		def littleCheck(ctx, m):
 			if m.author.id != ctx.author.id:
 				return False
+			# Check if we're re-running the same command
+			if ctx.command and (ctx.command.name == "link" or ctx.command.name == "links"):
+				return True
 			try:
 				m_int = int(m.content)
 			except:
@@ -218,10 +221,10 @@ class Lists:
 				return False
 			return True
 		try:
-			ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
 		except Exception:
 			ind = None
-		if ind == None:
+		if ind == None or (ind[0].command and (ind[0].command.name == "link" or ind[0].command.name == "links")):
 			# Timed out
 			msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
 			if suppress:
@@ -231,7 +234,7 @@ class Lists:
 		# Got one
 		await message.edit(content=" ")
 		# Invoke this command again with the right name
-		await ctx.invoke(self.link, name=potentialList[int(ind.content)-1]['Item']['Name'])	
+		await ctx.invoke(self.link, name=potentialList[int(ind[1].content)-1]['Item']['Name'])
 		
 	@commands.command(pass_context=True)
 	async def rawlink(self, ctx, *, name : str = None):
@@ -370,12 +373,8 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('`', '\\`')
-			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await channel.send(msg)
+			# Invoke this command again with the right name
+			await ctx.invoke(self.link, name=extraArgs)
 			return
 		
 		linkList = self.settings.getServerStat(server, "Links")
@@ -652,9 +651,12 @@ class Lists:
 			# All done
 			return
 		# Wait for response
-		def littleCheck(m):
+		def littleCheck(ctx, m):
 			if m.author.id != ctx.author.id:
 				return False
+			# Check if we're re-running the same command
+			if ctx.command and (ctx.command.name == "hack" or ctx.command.name == "hacks"):
+				return True
 			try:
 				m_int = int(m.content)
 			except:
@@ -663,10 +665,10 @@ class Lists:
 				return False
 			return True
 		try:
-			ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
 		except Exception:
 			ind = None
-		if ind == None:
+		if ind == None or (ind[0].command and (ind[0].command.name == "hack" or ind[0].command.name == "hacks")):
 			# Timed out
 			msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
 			if suppress:
@@ -676,7 +678,7 @@ class Lists:
 		# Got one
 		await message.edit(content=" ")
 		# Invoke this command again with the right name
-		await ctx.invoke(self.hack, name=potentialList[int(ind.content)-1]['Item']['Name'])	
+		await ctx.invoke(self.hack, name=potentialList[int(ind[1].content)-1]['Item']['Name'])
 		
 	@commands.command(pass_context=True)
 	async def rawhack(self, ctx, *, name : str = None):
@@ -814,12 +816,8 @@ class Lists:
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('`', '\\`')
-			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await channel.send(msg)
+			# Invoke this command again with the right name
+			await ctx.invoke(self.hack, name=extraArgs)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")

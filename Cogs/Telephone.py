@@ -35,11 +35,12 @@ class Telephone:
 	async def on_message_context(self, ctx, message):
 		return
 
-	@asyncio.coroutine
+	# Now in Main.py
+	"""@asyncio.coroutine
 	async def on_message(self, message):
 		context = await self.bot.get_context(message)
 		self.bot.dispatch("message_context", context, message)
-		return
+		return"""
 
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
