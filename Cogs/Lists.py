@@ -191,19 +191,47 @@ class Lists:
 				return
 				
 		msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
-		
+		count = 0
 		# No link - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```\n'
+			msg+='\n\nSelect one of the following close matches:\n\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
-			msg+='```'
-		
+				count += 1
+				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await channel.send(msg)	
+		message = await channel.send(msg)
+		if not count:
+			# All done
+			return
+		# Wait for response
+		def littleCheck(m):
+			if m.author.id != ctx.author.id:
+				return False
+			try:
+				m_int = int(m.content)
+			except:
+				return False
+			if m_int < 1 or m_int > count:
+				return False
+			return True
+		try:
+			ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+		except Exception:
+			ind = None
+		if ind == None:
+			# Timed out
+			msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+			if suppress:
+				msg = Nullify.clean(msg)
+			await message.edit(content=msg)
+			return
+		# Got one
+		await message.edit(content=" ")
+		# Invoke this command again with the right name
+		await ctx.invoke(self.link, name=potentialList[int(ind.content)-1]['Item']['Name'])	
 		
 	@commands.command(pass_context=True)
 	async def rawlink(self, ctx, *, name : str = None):
@@ -608,19 +636,47 @@ class Lists:
 				await channel.send(msg)
 				return
 		msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
-		
+		count = 0
 		# No hack - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```\n'
+			msg+='\n\nSelect one of the following close matches:\n\n'
 			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
-			msg+='```'
-		
+				count += 1
+				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await channel.send(msg)
+		message = await channel.send(msg)
+		if not count:
+			# All done
+			return
+		# Wait for response
+		def littleCheck(m):
+			if m.author.id != ctx.author.id:
+				return False
+			try:
+				m_int = int(m.content)
+			except:
+				return False
+			if m_int < 1 or m_int > count:
+				return False
+			return True
+		try:
+			ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+		except Exception:
+			ind = None
+		if ind == None:
+			# Timed out
+			msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+			if suppress:
+				msg = Nullify.clean(msg)
+			await message.edit(content=msg)
+			return
+		# Got one
+		await message.edit(content=" ")
+		# Invoke this command again with the right name
+		await ctx.invoke(self.hack, name=potentialList[int(ind.content)-1]['Item']['Name'])	
 		
 	@commands.command(pass_context=True)
 	async def rawhack(self, ctx, *, name : str = None):
