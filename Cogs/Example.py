@@ -174,8 +174,9 @@ class VoiceState:
             comm = self.audio_process.communicate()
             rc = self.audio_process.returncode
             if not rc == 0:
-                self.playlist[0]["Error"] = True
+                # self.playlist[0]["Error"] = True
                 print("Exited abnormally!: {}".format(rc))
+                del self.playlist[0]
         except Exception:
             print("Couldn't get return.")
             
