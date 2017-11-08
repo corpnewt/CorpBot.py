@@ -864,11 +864,12 @@ class Music:
                     list_show += "{}. `{}`\n".format(count, v['title'])
                 await message.edit(content=list_show)
                 # Wait for response
-                def littleCheck(m):
+                def littleCheck(ctx, m):
                     if m.author.id != ctx.author.id:
                         return False
                     # Check if we're trying to play something else
-                    
+                    if ctx.command and ctx.command.name == "play":
+                        return True
                     try:
                         m_int = int(m.content)
                     except:
@@ -878,15 +879,19 @@ class Music:
                     return True
 
                 try:
-                    song_ind = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+                    song_ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
                 except Exception:
                     song_ind = None
 
                 if song_ind == None:
                     await message.edit(content="Times up!  We can search for music another time.")
                     return
+                
+                if song_ind[0].command and song_ind[0].command.name == "play":
+                    await message.edit(content="Another song was requested - aborting...")
+                    return
 
-                song_index = int(song_ind.content)-1
+                song_index = int(song_ind[1].content)-1
 
             song = info['entries'][song_index]['webpage_url']
             info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
