@@ -174,9 +174,8 @@ class VoiceState:
             comm = self.audio_process.communicate()
             rc = self.audio_process.returncode
             if not rc == 0:
-                # self.playlist[0]["Error"] = True
+                self.playlist[0]["Error"] = True
                 print("Exited abnormally!: {}".format(rc))
-                del self.playlist[0]
         except Exception:
             print("Couldn't get return.")
             
@@ -191,16 +190,13 @@ class VoiceState:
                 await asyncio.sleep(1)
                 continue
 
-
             self.start_time = datetime.datetime.now()
             self.current = await self.create_youtube_entry(self.playlist[0]["ctx"], self.playlist[0]["raw_song"], self.playlist[0]['song'], self.playlist[0]['duration'])
-
 
             #Check if youtube-dl found the song
             if self.current == False:
                 del self.playlist[0]
                 continue
-                
             
             seconds = self.playlist[0]["duration"]
             hours = seconds // 3600
@@ -212,18 +208,18 @@ class VoiceState:
             await self.current.channel.send('Now playing - `{}` - [{:02d}h:{:02d}m:{:02d}s] - requested by *{}*'.format(self.playlist[0]["song"].replace('`', '\\`'), round(hours), round(minutes), round(seconds), DisplayName.name(self.playlist[0]['requester'])))
 
             await self.play_next_song.wait()
+            
+            print("Song ended")
 
             self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
             # Song is done
-            if "Error" in self.playlist[0]:
+            if self.playlist[0].get("Error", None):
+                print("An error occurred")
                 await self.current.channel.send("An error occurred trying to play `{}` - removing from the queue.".fromat(self.playlist[0]["song"].replace('`', '\\`')))
                 # We got an error
-                # Remove the song and jump back
-                del self.playlist[0]
-                continue
-
-            if self.repeat:
+            elif self.repeat:
                 self.playlist.append(self.playlist[0])
+            print("Removing and onto the next.")
             del self.playlist[0]
 
 
