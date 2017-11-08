@@ -209,17 +209,13 @@ class VoiceState:
 
             await self.play_next_song.wait()
             
-            print("Song ended")
-
             self.total_playing_time = datetime.datetime.now() - datetime.datetime.now()
             # Song is done
             if self.playlist[0].get("Error", None):
-                print("An error occurred")
-                await self.current.channel.send("An error occurred trying to play `{}` - removing from the queue.".fromat(self.playlist[0]["song"].replace('`', '\\`')))
+                await self.current.channel.send("An error occurred trying to play `{}` - removing from the queue.".format(self.playlist[0]["song"].replace('`', '\\`')))
                 # We got an error
             elif self.repeat:
                 self.playlist.append(self.playlist[0])
-            print("Removing and onto the next.")
             del self.playlist[0]
 
 
