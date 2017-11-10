@@ -303,14 +303,14 @@ class ServerStats:
             for member in server.members:
                 if not member.id in counted_users:
                     counted_users.append(member.id)
-                        if member.bot:
-                            bots += 1
-                            if not member.status == discord.Status.offline:
-                                    botsOnline += 1
-                        else:
-                            members += 1
-                            if not member.status == discord.Status.offline:
-                                    membersOnline += 1
+                if member.bot:
+                    bots += 1
+                    if not member.status == discord.Status.offline:
+                        botsOnline += 1
+                else:
+                    members += 1
+                    if not member.status == discord.Status.offline:
+                        membersOnline += 1
         await Message.Embed(
             title="Member Stats",
             description="Current User Information".format(server.name),
