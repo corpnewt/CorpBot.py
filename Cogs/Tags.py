@@ -255,6 +255,9 @@ class Tags:
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "tag" or c.command.name == "tags"):
 				return True
+			# Check for cancellation
+			if m.content.lower() == "cancel":
+				return True
 			try:
 				m_int = int(m.content)
 			except:
@@ -266,7 +269,7 @@ class Tags:
 			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
 		except Exception:
 			ind = None
-		if ind == None or (ind[0].command and (ind[0].command.name == "tag" or ind[0].command.name == "tags")):
+		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and (ind[0].command.name == "tag" or ind[0].command.name == "tags")):
 			# Timed out
 			msg = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
 			if suppress:
