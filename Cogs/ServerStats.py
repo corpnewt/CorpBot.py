@@ -6,6 +6,7 @@ from   discord.ext import commands
 from   Cogs        import Nullify
 from   Cogs        import DisplayName
 from   Cogs        import UserTime
+from   Cogs        import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -293,7 +294,35 @@ class ServerStats:
     @commands.command(pass_context=True)
     async def users(self, ctx):
         """Lists the total number of users on all servers I'm connected to."""
-        userCount = 0
+        
+	message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
+        servers = members = membersOnline = bots = botsOnline = 0
+        counted_users = []
+        for server in self.bot.guilds:
+            servers += 1
+            for member in server.members:
+                if not member.id in counted_users:
+                    counted_users.append(member.id)
+                        if member.bot:
+                            bots += 1
+                            if not member.status == discord.Status.offline:
+                                    botsOnline += 1
+                        else:
+                            members += 1
+                            if not member.status == discord.Status.offline:
+                                    membersOnline += 1
+        await Message.Embed(
+            title="Member Stats",
+            description="Current User Information".format(server.name),
+            fields=[
+		{ "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
+                { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,}/{:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), members, round((len(counted_users)/members)*100, 2)), "inline" : False},
+                { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
+                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/len(server.members))*100, 2)), "inline" : False}
+            ],
+            color=ctx.message.author).edit(ctx, message)
+        
+        '''userCount = 0
         serverCount = 0
         counted_users = []
         message = await ctx.send("Counting users...")
@@ -303,9 +332,9 @@ class ServerStats:
             for member in server.members:
                 if not member.id in counted_users:
                     counted_users.append(member.id)
-        await message.edit(content='There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))
+        await message.edit(content='There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))'''
 
-
+	
     @commands.command(pass_context=True)
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""
