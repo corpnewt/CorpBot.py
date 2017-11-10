@@ -249,11 +249,11 @@ class Tags:
 			# All done
 			return
 		# Wait for response
-		def littleCheck(ctx, m):
-			if m.author.id != ctx.author.id:
+		def littleCheck(c, m):
+			if m.author.id != c.author.id:
 				return False
 			# Check if we're re-running the same command
-			if ctx.command and (ctx.command.name == "tag" or ctx.command.name == "tags"):
+			if c.command and (c.command.name == "tag" or c.command.name == "tags"):
 				return True
 			try:
 				m_int = int(m.content)
