@@ -207,11 +207,11 @@ class Lists:
 			# All done
 			return
 		# Wait for response
-		def littleCheck(ctx, m):
+		def littleCheck(c, m):
 			if m.author.id != ctx.author.id:
 				return False
 			# Check if we're re-running the same command
-			if ctx.command and (ctx.command.name == "link" or ctx.command.name == "links"):
+			if c.command and (c.command.name == "link" or c.command.name == "links"):
 				return True
 			try:
 				m_int = int(m.content)
@@ -651,11 +651,11 @@ class Lists:
 			# All done
 			return
 		# Wait for response
-		def littleCheck(ctx, m):
+		def littleCheck(c, m):
 			if m.author.id != ctx.author.id:
 				return False
 			# Check if we're re-running the same command
-			if ctx.command and (ctx.command.name == "hack" or ctx.command.name == "hacks"):
+			if c.command and (c.command.name == "hack" or c.command.name == "hacks"):
 				return True
 			try:
 				m_int = int(m.content)
