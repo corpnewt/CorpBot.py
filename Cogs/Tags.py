@@ -250,7 +250,7 @@ class Tags:
 			return
 		# Wait for response
 		def littleCheck(c, m):
-			if m.author.id != c.author.id:
+			if m.author.id != ctx.author.id:
 				return False
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "tag" or c.command.name == "tags"):
