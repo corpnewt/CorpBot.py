@@ -851,7 +851,7 @@ class Music:
             if len(info['entries']) > 1:
                 # Show a list
                 count = 0
-                list_show = "Please type the number of the video you'd like to add:\n\n"
+                list_show = "Please type the number of the video you'd like to add - or type `cancel`:\n\n"
                 for v in info['entries']:
                     count += 1
                     list_show += "{}. `{}`\n".format(count, v['title'])
@@ -862,6 +862,9 @@ class Music:
                         return False
                     # Check if we're trying to play something else
                     if c.command and c.command.name == "play":
+                        return True
+                    # Check for cancellation
+                    if m.content.lower() == "cancel":
                         return True
                     try:
                         m_int = int(m.content)
@@ -878,6 +881,10 @@ class Music:
 
                 if song_ind == None:
                     await message.edit(content="Times up!  We can search for music another time.")
+                    return
+                
+                if song_ind[1].content.lower() == "cancel":
+                    await message.edit(content="Aborting!  We can search for music another time.")
                     return
                 
                 if song_ind[0].command and song_ind[0].command.name == "play":
