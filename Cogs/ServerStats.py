@@ -295,7 +295,7 @@ class ServerStats:
     async def users(self, ctx):
         """Lists the total number of users on all servers I'm connected to."""
         
-	message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
+        message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
         servers = members = membersOnline = bots = botsOnline = 0
         counted_users = []
         for server in self.bot.guilds:
@@ -315,7 +315,7 @@ class ServerStats:
             title="Member Stats",
             description="Current User Information".format(server.name),
             fields=[
-		{ "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
+                { "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
                 { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,}/{:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), members, round((len(counted_users)/members)*100, 2)), "inline" : False},
                 { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
                 { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/len(server.members))*100, 2)), "inline" : False}
