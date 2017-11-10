@@ -316,9 +316,9 @@ class ServerStats:
             description="Current User Information".format(server.name),
             fields=[
                 { "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
-                { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,}/{:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), members, round((len(counted_users)/members)*100, 2)), "inline" : False},
+                { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), round((len(counted_users)/members)*100, 2)), "inline" : False},
                 { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
-                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/len(server.members))*100, 2)), "inline" : False}
+                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(server.members), round(((membersOnline + botsOnline)/(members+bots))*100, 2)), "inline" : False}
             ],
             color=ctx.message.author).edit(ctx, message)
         
