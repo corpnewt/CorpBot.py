@@ -298,17 +298,20 @@ class ServerStats:
         message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
         servers = members = membersOnline = bots = botsOnline = 0
         counted_users = []
+        counted_bots  = []
         for server in self.bot.guilds:
             servers += 1
             for member in server.members:
-                if not member.id in counted_users:
-                    counted_users.append(member.id)
                 if member.bot:
                     bots += 1
+                    if not member.id in counted_bots:
+                        counted_bots.append(member.id)
                     if not member.status == discord.Status.offline:
                         botsOnline += 1
                 else:
                     members += 1
+                    if not member.id in counted_users:
+                        counted_users.append(member.id)
                     if not member.status == discord.Status.offline:
                         membersOnline += 1
         await Message.Embed(
@@ -317,7 +320,7 @@ class ServerStats:
             fields=[
                 { "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
                 { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), round((len(counted_users)/members)*100, 2)), "inline" : False},
-                { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
+                { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2), len(counted_bots), round((len(counted_bots)/bots*100, 2)), "inline" : False},
                 { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, members+bots, round(((membersOnline + botsOnline)/(members+bots))*100, 2)), "inline" : False}
             ],
             color=ctx.message.author).edit(ctx, message)
