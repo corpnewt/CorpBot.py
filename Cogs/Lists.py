@@ -195,7 +195,7 @@ class Lists:
 		# No link - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches:\n\n'
+			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n'
 			for pot in potentialList:
 				count += 1
 				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
@@ -213,6 +213,9 @@ class Lists:
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "link" or c.command.name == "links"):
 				return True
+			# Check for cancellation
+			if m.content.lower() == "cancel":
+				return True
 			try:
 				m_int = int(m.content)
 			except:
@@ -224,7 +227,7 @@ class Lists:
 			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
 		except Exception:
 			ind = None
-		if ind == None or (ind[0].command and (ind[0].command.name == "link" or ind[0].command.name == "links")):
+		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and (ind[0].command.name == "link" or ind[0].command.name == "links")):
 			# Timed out
 			msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
 			if suppress:
@@ -639,7 +642,7 @@ class Lists:
 		# No hack - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches:\n\n'
+			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n'
 			for pot in potentialList:
 				count += 1
 				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
@@ -657,6 +660,9 @@ class Lists:
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "hack" or c.command.name == "hacks"):
 				return True
+			# Check for cancellation
+			if m.content.lower() == "cancel":
+				return True
 			try:
 				m_int = int(m.content)
 			except:
@@ -668,7 +674,7 @@ class Lists:
 			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
 		except Exception:
 			ind = None
-		if ind == None or (ind[0].command and (ind[0].command.name == "hack" or ind[0].command.name == "hacks")):
+		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and (ind[0].command.name == "hack" or ind[0].command.name == "hacks")):
 			# Timed out
 			msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
 			if suppress:
