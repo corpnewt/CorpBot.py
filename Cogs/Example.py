@@ -857,11 +857,11 @@ class Music:
                     list_show += "{}. `{}`\n".format(count, v['title'])
                 await message.edit(content=list_show)
                 # Wait for response
-                def littleCheck(ctx, m):
+                def littleCheck(c, m):
                     if m.author.id != ctx.author.id:
                         return False
                     # Check if we're trying to play something else
-                    if ctx.command and ctx.command.name == "play":
+                    if c.command and c.command.name == "play":
                         return True
                     try:
                         m_int = int(m.content)
