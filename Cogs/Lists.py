@@ -208,7 +208,7 @@ class Lists:
 			return
 		# Wait for response
 		def littleCheck(c, m):
-			if m.author.id != ctx.author.id:
+			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
 				return False
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "link" or c.command.name == "links"):
@@ -655,7 +655,7 @@ class Lists:
 			return
 		# Wait for response
 		def littleCheck(c, m):
-			if m.author.id != ctx.author.id:
+			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
 				return False
 			# Check if we're re-running the same command
 			if c.command and (c.command.name == "hack" or c.command.name == "hacks"):

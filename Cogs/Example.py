@@ -863,7 +863,7 @@ class Music:
                 await message.edit(content=list_show)
                 # Wait for response
                 def littleCheck(c, m):
-                    if m.author.id != ctx.author.id:
+                    if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
                         return False
                     # Check if we're trying to play something else
                     if c.command and c.command.name == "play":
