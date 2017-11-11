@@ -90,7 +90,10 @@ class Remind:
 			if not message:
 				message = 'You wanted me to remind you of something...'
 			msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
-			await member.send(msg)
+			try:
+				await member.send(msg)
+			except:
+				pass
 			reminders.remove(reminder)
 			self.settings.setUserStat(member, member.guild, "Reminders", reminders)
 					
