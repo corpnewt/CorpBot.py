@@ -828,6 +828,11 @@ class Music:
                 playlist=plist
             )
 
+        if not info:
+            # We got nothing
+            await message.edit(content="Whoops!  Looks like that wasn't a supported link...")
+            return
+
         if info.get('url', '').startswith('ytsearch'):
             if self.settings.getServerStat(ctx.guild, "YTMultiple"):
                 info['url'] = info['url'].replace("ytsearch:", "ytsearch5:")
@@ -1031,6 +1036,11 @@ class Music:
                 if info == None:
                     await message.edit(content="I couldn't load that song :(")
                     return
+
+        if info.get('title') == None:
+            # We got nothing
+            await message.edit(content="Whoops!  Looks like that wasn't a supported link...")
+            return
         
         seconds = info.get('duration', 0)
         hours = seconds // 3600
