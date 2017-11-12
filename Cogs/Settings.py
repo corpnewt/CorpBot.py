@@ -636,7 +636,7 @@ class Settings:
 				if not user:
 					userString = "*Unknown User ({})*".format(owner)
 				else:
-					userString = "*{}*".format(user.name)
+					userString = "*{}#{}*".format(user.name, user.discriminator)
 				userList.append(userString)
 			msg += ', '.join(userList)
 
