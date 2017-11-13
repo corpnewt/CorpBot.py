@@ -723,7 +723,12 @@ class Music:
         summoned_channel = ctx.message.author.voice.channel
 
         if state.voice is None:
-            state.voice = await summoned_channel.connect() # self.bot.join_voice_channel(summoned_channel)
+            try:
+                await self.create_voice_client(summoned_channel)
+                return True
+            except:
+                # Return false on exception
+                return False
         else:
             await state.voice.move_to(summoned_channel)
 
@@ -1278,7 +1283,7 @@ class Music:
             del self.voice_states[server.id]
             state.playlist = []
             state.repeat = False
-            await state.voice.disconnect()
+            await state.voice.disconnect(force=True)
         except:
             pass
 
