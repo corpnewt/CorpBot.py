@@ -342,7 +342,7 @@ class Music:
         return state
 
     async def create_voice_client(self, channel):
-        voice = await channel.connect()
+        voice = await channel.connect(timeout=10, reconnect=False)
         state = self.get_voice_state(channel.guild)
         state.voice = voice
 
@@ -689,6 +689,10 @@ class Music:
             await ctx.channel.send('Already in a voice channel...')
         except discord.InvalidArgument:
             await ctx.channel.send('This is not a voice channel...')
+        except asyncio.TimeoutError:
+            await ctx.channel.send("I timed out when connecting to that channel...")
+        except:
+            await ctx.channel.send("Unknown error when connecting...")
         else:
             await ctx.channel.send('Ready to play audio in ' + channel.name)
 
@@ -723,12 +727,23 @@ class Music:
         summoned_channel = ctx.message.author.voice.channel
 
         if state.voice is None:
+            success = False
             try:
                 await self.create_voice_client(summoned_channel)
-                return True
+            except discord.ClientException:
+                msg = 'Already in a voice channel...'
+            except discord.InvalidArgument:
+                msg = 'This is not a voice channel...'
+            except asyncio.TimeoutError:
+                msg = "I timed out when connecting to that channel..."
             except:
-                # Return false on exception
-                return False
+                msg = "Unknown error when connecting..."
+            else:
+                msg = 'Ready to play audio in ' + summoned_channel.name
+                success = True
+            if ctx.command.name == "summon":
+                await ctx.send(msg)
+            return success
         else:
             await state.voice.move_to(summoned_channel)
 
@@ -1279,12 +1294,15 @@ class Music:
             player.stop()
 
         try:
+            message = await ctx.channel.send('Stopping...')
             state.audio_player.cancel()
             del self.voice_states[server.id]
             state.playlist = []
             state.repeat = False
             await state.voice.disconnect(force=True)
-        except:
+            await message.edit(content="I've left the voice channel!")
+        except Exception as e:
+            print("Stop exception: {}".format(e))
             pass
 
     @commands.command(pass_context=True, no_pm=True)
