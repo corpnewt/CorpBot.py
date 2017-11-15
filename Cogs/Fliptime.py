@@ -53,10 +53,12 @@ class Fliptime:
 		# Check if the message contains the flip chars
 		conts = message.content
 		face = table = False
-		if '(' in conts:
-			if ')' in conts or '）' in conts:
-				face = True
-		if '┻' in conts or '┻' in conts or '╙' in conts or '╨' in conts or '╜' in conts or 'ǝʃqɐʇ' in conts:
+		table_list  = [ '┻', '╙', '╨', '╜', 'ǝʃqɐʇ', '┺' ]
+		front_list = [ '(' ]
+		back_list  = [ ')', '）' ]
+		if any(ext in conts for ext in front_list) and any(ext in conts for ext in back_list):
+			face = True
+		if any(ext in conts for ext in table_list):
 			table = True
 		if face and table:	
 			# Contains all characters
