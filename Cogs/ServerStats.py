@@ -591,3 +591,20 @@ class ServerStats:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} message!*'.format(messages))
         else:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} messages!*'.format(messages))
+	
+    @commands.command(pass_context=True)
+    async def allmessages(self, ctx):
+        """Lists the number of messages I've seen on all severs so far. (only applies after this module's inception, and if I'm online)"""
+        messages = 0
+        for guild in self.bot.guilds:
+            temp = 0 if self.settings.getServerStat(guild, "TotalMessages") is None else self.settings.getServerStat(guild, "TotalMessages")
+	    messages += int(temp)
+        messages -= 1
+        if messages == 1:
+            await ctx.channel.send('So far, I\'ve witnessed *{:,} message across all servers!*'.format(messages))
+        else:
+            await ctx.channel.send('So far, I\'ve witnessed *{:,} messages across all servers!*'.format(messages))
+        # Set our message count locally -1
+        messages = int(self.settings.getServerStat(ctx.message.guild, "TotalMessages"))
+        messages -= 1
+        self.settings.setServerStat(ctx.message.guild, "TotalMessages", messages)
