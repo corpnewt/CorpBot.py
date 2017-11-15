@@ -195,10 +195,11 @@ class Lists:
 		# No link - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n'
+			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n```\n'
 			for pot in potentialList:
 				count += 1
-				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
+				msg+='{}. {}\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))
+			msg += "```"
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -642,10 +643,11 @@ class Lists:
 		# No hack - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n'
+			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n```\n'
 			for pot in potentialList:
 				count += 1
-				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
+				msg+='{}. {}\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))
+			msg += "```"
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
