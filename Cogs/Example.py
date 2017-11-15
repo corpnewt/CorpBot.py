@@ -876,10 +876,11 @@ class Music:
             if len(info['entries']) > 1:
                 # Show a list
                 count = 0
-                list_show = "Please type the number of the video you'd like to add - or type `cancel`:\n\n"
+                list_show = "Please type the number of the video you'd like to add - or type `cancel`:\n\n```\n"
                 for v in info['entries']:
                     count += 1
-                    list_show += "{}. `{}`\n".format(count, v['title'])
+                    list_show += "{}. {}\n".format(count, v['title'])
+                list_show += "```"
                 await message.edit(content=list_show)
                 # Wait for response
                 def littleCheck(c, m):
