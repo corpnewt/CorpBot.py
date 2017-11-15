@@ -469,6 +469,8 @@ class EmbedText(Embed):
 
         # Only pm if our self.pm_after is above -1
         to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
+        page_count = 1
+        page_total = len(text_list)
 
         if len(text_list) > 1 and self.page_count and self.title:
             add_title = " (Page {:,} of {:,})".format(page_count, page_total)
@@ -495,10 +497,11 @@ class EmbedText(Embed):
                 # Clear any image if needed
                 em.set_image(url="")
                 message = await self._send_embed(ctx, em, to_pm)
-            if len(text_list) > 1 and self.page_count and self.title:
-                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
             # Break if things didn't work
             if not message:
                 return None
+            page_count += 1
+            if len(text_list) > 1 and self.page_count and self.title:
+                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
+                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
         return message
