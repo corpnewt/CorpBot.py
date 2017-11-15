@@ -33,17 +33,54 @@ class Time:
 		
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
+		count = 0
 		if not tz_list[0]['Ratio'] == 1:
 			# We didn't find a complete match
-			msg = "I couldn't find that TimeZone!\n\nMaybe you meant one of the following?\n```"
+			msg = 'TimeZone `{}` not found!\n\n'.format(tz.replace('`', '\\`'))
+			msg += "Select one of the following close matches - or type `cancel`:\n\n```"
 			for tz in tz_list:
-				msg += tz['Item'] + "\n"
+				count += 1
+				msg += "{}. {}\n".format(count, tz['Item']).replace('`', '\\`')
 			msg += '```'
-			await ctx.channel.send(msg)
+		else:
+			# We got a time zone
+			self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
+			msg = "TimeZone set to *{}!*".format(tz_list[0]['Item'])
+		message = await ctx.send(msg)
+		if not count:
 			return
-		# We got a time zone
-		self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
-		await ctx.channel.send("TimeZone set to *{}!*".format(tz_list[0]['Item']))
+		# Wait for response
+		def littleCheck(c, m):
+			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
+				return False
+			# Check if we're re-running the same command
+			if c.command and c.command.name == "settz":
+				return True
+			# Check for cancellation
+			if m.content.lower() == "cancel":
+				return True
+			try:
+				m_int = int(m.content)
+			except:
+				return False
+			if m_int < 1 or m_int > count:
+				return False
+			return True
+		try:
+			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
+		except Exception:
+			ind = None
+		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and ind[0].command.name == "tag"):
+			# Timed out
+			msg = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
+			if suppress:
+				msg = Nullify.clean(msg)
+			await message.edit(content=msg)
+			return
+		# Got one
+		await message.edit(content=" ")
+		# Invoke this command again with the right name
+		await ctx.invoke(self.settz, tz=potentialList[int(ind[1].content)-1]['Item'])
 
 	
 	@commands.command(pass_context=True)
@@ -60,7 +97,7 @@ class Time:
 			for tz in tz_list:
 				msg += tz['Item'] + "\n"
 
-		await Message.say(self.bot, msg, ctx.channel, ctx.author, 1)
+		await Message.Message(message=msg, header="```\n", footer="```").send(ctx)
 
 
 	@commands.command(pass_context=True)
