@@ -598,7 +598,7 @@ class ServerStats:
         messages = 0
         for guild in self.bot.guilds:
             temp = 0 if self.settings.getServerStat(guild, "TotalMessages") is None else self.settings.getServerStat(guild, "TotalMessages")
-	    messages += int(temp)
+            messages += int(temp)
         messages -= 1
         if messages == 1:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} message across all servers!*'.format(messages))
