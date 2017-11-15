@@ -73,8 +73,6 @@ class Time:
 		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and ind[0].command.name == "tag"):
 			# Timed out
 			msg = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
-			if suppress:
-				msg = Nullify.clean(msg)
 			await message.edit(content=msg)
 			return
 		# Got one
