@@ -237,10 +237,11 @@ class Tags:
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n'
+			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n```'
 			for pot in potentialList:
 				count += 1
-				msg+='{}. `{}`\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))		
+				msg+='{}. {}\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))
+			msg += "```"
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
