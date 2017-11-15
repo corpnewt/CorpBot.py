@@ -80,7 +80,7 @@ class Time:
 		# Got one
 		await message.edit(content=" ")
 		# Invoke this command again with the right name
-		await ctx.invoke(self.settz, tz=potentialList[int(ind[1].content)-1]['Item'])
+		await ctx.invoke(self.settz, tz=tz_list[int(ind[1].content)-1]['Item'])
 
 	
 	@commands.command(pass_context=True)
