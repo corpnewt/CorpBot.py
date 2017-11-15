@@ -591,7 +591,7 @@ class ServerStats:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} message!*'.format(messages))
         else:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} messages!*'.format(messages))
-	
+
     @commands.command(pass_context=True)
     async def allmessages(self, ctx):
         """Lists the number of messages I've seen on all severs so far. (only applies after this module's inception, and if I'm online)"""
