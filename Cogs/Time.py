@@ -38,9 +38,9 @@ class Time:
 			# We didn't find a complete match
 			msg = 'TimeZone `{}` not found!\n\n'.format(tz.replace('`', '\\`'))
 			msg += "Select one of the following close matches - or type `cancel`:\n\n```"
-			for tz in tz_list:
+			for t in tz_list:
 				count += 1
-				msg += "{}. {}\n".format(count, tz['Item']).replace('`', '\\`')
+				msg += "{}. {}\n".format(count, t['Item']).replace('`', '\\`')
 			msg += '```'
 		else:
 			# We got a time zone
@@ -87,17 +87,18 @@ class Time:
 	async def listtz(self, ctx, *, tz_search = None):
 		"""List all the supported TimeZones in PM."""
 
+		msg = ""
 		if not tz_search:
-			msg = "__Available TimeZones:__\n\n"
+			title = "Available TimeZones"
 			for tz in pytz.all_timezones:
 				msg += tz + "\n"
 		else:
 			tz_list = FuzzySearch.search(tz_search, pytz.all_timezones)
-			msg = "__Top 3 TimeZone Matches:__\n\n"
+			title = "Top 3 TimeZone Matches"
 			for tz in tz_list:
 				msg += tz['Item'] + "\n"
 
-		await Message.Message(message=msg, header="```\n", footer="```").send(ctx)
+		await Message.EmbedText(title=title, color=ctx.author, description=msg).send(ctx)
 
 
 	@commands.command(pass_context=True)
