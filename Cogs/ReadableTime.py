@@ -14,29 +14,29 @@ def getReadableTimeBetween(first, last):
     
     if weeks > 0:
         if weeks == 1:
-            msg = '{}{} week, '.format(msg, str(weeks))
+            msg = '{}{:,} week, '.format(msg, str(weeks))
         else:
-            msg = '{}{} weeks, '.format(msg, str(weeks))
+            msg = '{}{:,} weeks, '.format(msg, str(weeks))
     if days > 0:
         if days == 1:
-            msg = '{}{} day, '.format(msg, str(days))
+            msg = '{}{:,} day, '.format(msg, str(days))
         else:
-            msg = '{}{} days, '.format(msg, str(days))
+            msg = '{}{:,} days, '.format(msg, str(days))
     if hours > 0:
         if hours == 1:
-            msg = '{}{} hour, '.format(msg, str(hours))
+            msg = '{}{:,} hour, '.format(msg, str(hours))
         else:
-            msg = '{}{} hours, '.format(msg, str(hours))
+            msg = '{}{:,} hours, '.format(msg, str(hours))
     if minutes > 0:
         if minutes == 1:
-            msg = '{}{} minute, '.format(msg, str(minutes))
+            msg = '{}{:,} minute, '.format(msg, str(minutes))
         else:
-            msg = '{}{} minutes, '.format(msg, str(minutes))
+            msg = '{}{:,} minutes, '.format(msg, str(minutes))
     if seconds > 0:
         if seconds == 1:
-            msg = '{}{} second, '.format(msg, str(seconds))
+            msg = '{}{:,} second, '.format(msg, str(seconds))
         else:
-            msg = '{}{} seconds, '.format(msg, str(seconds))
+            msg = '{}{:,} seconds, '.format(msg, str(seconds))
 
     if not msg:
         return "0 seconds"
