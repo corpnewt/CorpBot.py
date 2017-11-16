@@ -759,15 +759,11 @@ class Bot:
 	async def _update_status(self):
 		# Helper method to update the status based on the server dict
 		# Get ready - play game!
-		game = self.settings.serverDict.get("Game", None)
-		url  = self.settings.serverDict.get("Stream", None)
-		t    = self.settings.serverDict.get("Type", 0)
+		game   = self.settings.serverDict.get("Game", None)
+		url    = self.settings.serverDict.get("Stream", None)
+		t      = self.settings.serverDict.get("Type", 0)
+		status = self.settings.serverDict.get("Status", None)
 		# Set status
-		try:
-			status = self.settings.serverDict["Status"]
-		except Exception:
-			status = None
-		
 		if status == "2":
 			s = discord.Status.idle
 		elif status == "3":
