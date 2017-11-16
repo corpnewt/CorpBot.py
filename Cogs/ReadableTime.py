@@ -13,15 +13,15 @@ def getReadableTimeBetween(first, last):
     msg = ""
     
     if weeks > 0:
-	msg += "1 week, " if weeks == 1 else "{:,} weeks, ".format(weeks)
+        msg += "1 week, " if weeks == 1 else "{:,} weeks, ".format(weeks)
     if days > 0:
-	msg += "1 day, " if days == 1 else "{:,} days, ".format(days)
+        msg += "1 day, " if days == 1 else "{:,} days, ".format(days)
     if hours > 0:
-	msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
+        msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
     if minutes > 0:
-	msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
+        msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
     if seconds > 0:
-	msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
+        msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
 
     if msg == "":
         return "0 seconds"
