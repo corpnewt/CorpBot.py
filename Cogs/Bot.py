@@ -759,18 +759,9 @@ class Bot:
 	async def _update_status(self):
 		# Helper method to update the status based on the server dict
 		# Get ready - play game!
-		try:
-			game = self.settings.serverDict['Game']
-		except Exception:
-			game = None
-		try:
-			url = self.settings.serverDict['Stream']
-		except Exception:
-			url = None
-		if url:
-			t=1
-		else:
-			t=0
+		game = self.settings.serverDict.get("Game", None)
+		url  = self.settings.serverDict.get("Stream", None)
+		t    = self.settings.serverDict.get("Type", 0)
 		# Set status
 		try:
 			status = self.settings.serverDict["Status"]
@@ -868,6 +859,7 @@ class Bot:
 		if game == None:
 			self.settings.serverDict['Game'] = None
 			self.settings.serverDict['Stream'] = None
+			self.settings.serverDict['Type'] = 0
 			msg = 'Removing my playing status...'
 			status = await channel.send(msg)
 
@@ -878,6 +870,7 @@ class Bot:
 
 		self.settings.serverDict['Game'] = game
 		self.settings.serverDict['Stream'] = None
+		self.settings.serverDict['Type'] = 0
 		msg = 'Setting my playing status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
@@ -889,6 +882,110 @@ class Bot:
 		if suppress:
 			game = Nullify.clean(game)
 		await status.edit(content='Playing status set to *{}!*'.format(game))
+		
+	@commands.command(pass_context=True)
+	async def watchgame(self, ctx, *, game : str = None):
+		"""Sets the watching status of the bot (owner-only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if game == None:
+			self.settings.serverDict['Game'] = None
+			self.settings.serverDict['Stream'] = None
+			self.settings.serverDict['Type'] = 0
+			msg = 'Removing my watching status...'
+			status = await channel.send(msg)
+
+			await self._update_status()
+			
+			await status.edit(content='Watching status removed!')
+			return
+
+		self.settings.serverDict['Game'] = game
+		self.settings.serverDict['Stream'] = None
+		self.settings.serverDict['Type'] = 3
+		msg = 'Setting my watching status to *{}*...'.format(game)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		status = await channel.send(msg)
+
+		await self._update_status()
+		# Check for suppress
+		if suppress:
+			game = Nullify.clean(game)
+		await status.edit(content='Watching status set to *{}!*'.format(game))
+		
+	@commands.command(pass_context=True)
+	async def listengame(self, ctx, *, game : str = None):
+		"""Sets the listening status of the bot (owner-only)."""
+
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+			suppress = True
+		else:
+			suppress = False
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		if game == None:
+			self.settings.serverDict['Game'] = None
+			self.settings.serverDict['Stream'] = None
+			self.settings.serverDict['Type'] = 0
+			msg = 'Removing my listening status...'
+			status = await channel.send(msg)
+
+			await self._update_status()
+			
+			await status.edit(content='Listening status removed!')
+			return
+
+		self.settings.serverDict['Game'] = game
+		self.settings.serverDict['Stream'] = None
+		self.settings.serverDict['Type'] = 2
+		msg = 'Setting my listening status to *{}*...'.format(game)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		status = await channel.send(msg)
+
+		await self._update_status()
+		# Check for suppress
+		if suppress:
+			game = Nullify.clean(game)
+		await status.edit(content='Listening status set to *{}!*'.format(game))
 
 
 	@commands.command(pass_context=True)
@@ -919,6 +1016,7 @@ class Bot:
 		if url == None:
 			self.settings.serverDict['Game'] = None
 			self.settings.serverDict['Stream'] = None
+			self.settings.serverDict['Type'] = 0
 			msg = 'Removing my streaming status...'
 			status = await channel.send(msg)
 
@@ -946,6 +1044,7 @@ class Bot:
 
 		self.settings.serverDict['Game'] = game
 		self.settings.serverDict['Stream'] = url
+		self.settings.serverDict['Type'] = 1
 		msg = 'Setting my streaming status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
