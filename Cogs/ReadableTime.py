@@ -13,32 +13,17 @@ def getReadableTimeBetween(first, last):
     msg = ""
     
     if weeks > 0:
-        if weeks == 1:
-            msg = '{}{:,} week, '.format(msg, str(weeks))
-        else:
-            msg = '{}{:,} weeks, '.format(msg, str(weeks))
+	msg += "1 week, " if weeks == 1 else "{:,} weeks, ".format(weeks)
     if days > 0:
-        if days == 1:
-            msg = '{}{:,} day, '.format(msg, str(days))
-        else:
-            msg = '{}{:,} days, '.format(msg, str(days))
+	msg += "1 day, " if days == 1 else "{:,} days, ".format(days)
     if hours > 0:
-        if hours == 1:
-            msg = '{}{:,} hour, '.format(msg, str(hours))
-        else:
-            msg = '{}{:,} hours, '.format(msg, str(hours))
+	msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
     if minutes > 0:
-        if minutes == 1:
-            msg = '{}{:,} minute, '.format(msg, str(minutes))
-        else:
-            msg = '{}{:,} minutes, '.format(msg, str(minutes))
+	msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
     if seconds > 0:
-        if seconds == 1:
-            msg = '{}{:,} second, '.format(msg, str(seconds))
-        else:
-            msg = '{}{:,} seconds, '.format(msg, str(seconds))
+	msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
 
-    if not msg:
+    if msg == "":
         return "0 seconds"
     else:
         return msg[:-2]	
