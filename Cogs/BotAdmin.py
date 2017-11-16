@@ -198,7 +198,7 @@ class BotAdmin:
 			cooldownFinal = currentTime+cooldown
 		else:
 			cooldownFinal = None
-
+		mess = await ctx.send("Muting...")
 		# Do the actual muting
 		await self.muter.mute(member, ctx.message.guild, cooldownFinal)
 
@@ -211,8 +211,11 @@ class BotAdmin:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
 			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), self.suppressed(ctx.guild, ctx.guild.name))
 
-		await ctx.channel.send(msg)
-		await member.send(pm)
+		await mess.edit(content=msg)
+		try:
+			await member.send(pm)
+		except Exception:
+			pass
 		
 	@mute.error
 	async def mute_error(self, error, ctx):
@@ -259,13 +262,14 @@ class BotAdmin:
 					msg = Nullify.clean(msg)
 				await ctx.channel.send(msg)
 				return
-
+			
+		mess = await ctx.send("Unmuting...")
 		await self.muter.unmute(member, ctx.message.guild)
 
 		pm = 'You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.'.format(DisplayName.name(ctx.message.author), self.suppressed(ctx.guild, ctx.guild.name))
 		msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
 
-		await ctx.channel.send(msg)
+		await mess.edit(content=msg)
 		try:
 			await member.send(pm)
 		except Exception:
