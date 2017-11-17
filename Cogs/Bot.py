@@ -861,6 +861,9 @@ class Bot:
 		self.settings.serverDict["Status"] = stat
 		self.settings.serverDict["Type"]   = play
 		
+		# Actually update our shit
+		await self._update_status()
+		
 		# Let's formulate a sexy little response concoction
 		await Message.Embed(
 			title="Presence Update",
