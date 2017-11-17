@@ -92,7 +92,7 @@ class Fliptime:
 		return { 'Ignore' : False, 'Delete' : False}
 
 	@commands.command(pass_context=True)
-	async def tableflip(self, ctx, *, table = None):
+	async def tableflip(self, ctx, *, yes_no = None):
 		"""Turns on/off table flip muting (bot-admin only; always off by default)."""
 
 		# Check for admin status
