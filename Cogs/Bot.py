@@ -876,7 +876,7 @@ class Bot:
 				{ "name" : "Game",   "value" : str(game),   "inline" : False },
 				{ "name" : "Status", "value" : stat_string, "inline" : False },
 				{ "name" : "Type",   "value" : play_string, "inline" : False },
-				{ "name" : "URL",    "value" : str(url),    "inline" : False}
+				{ "name" : "URL",    "value" : str(url),    "inline" : False }
 			]
 		).send(ctx)
 
