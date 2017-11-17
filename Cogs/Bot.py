@@ -833,6 +833,10 @@ class Bot:
 			await ctx.send("Playing type is invalid!")
 			return
 		
+		# Clear the URL if we're not streaming
+		if not play == 1:
+			url = None
+		
 		# Check status type
 		stat = None
 		stat_string = ""
