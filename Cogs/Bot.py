@@ -869,14 +869,15 @@ class Bot:
 		await self._update_status()
 		
 		# Let's formulate a sexy little response concoction
+		inline = True
 		await Message.Embed(
 			title="Presence Update",
 			color=ctx.author,
 			fields=[
-				{ "name" : "Game",   "value" : str(game),   "inline" : False },
-				{ "name" : "Status", "value" : stat_string, "inline" : False },
-				{ "name" : "Type",   "value" : play_string, "inline" : False },
-				{ "name" : "URL",    "value" : str(url),    "inline" : False }
+				{ "name" : "Game",   "value" : str(game),   "inline" : inline },
+				{ "name" : "Status", "value" : stat_string, "inline" : inline },
+				{ "name" : "Type",   "value" : play_string, "inline" : inline },
+				{ "name" : "URL",    "value" : str(url),    "inline" : inline }
 			]
 		).send(ctx)
 
