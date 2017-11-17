@@ -119,7 +119,22 @@ class Encode:
 			await ctx.send("Usage: `{}strbin [input_string]`".format(ctx.prefix))
 			return
 		msg = ''.join('{:08b}'.format(ord(c)) for c in input_string)
-		if len(msg) > 2000:
+		# Format into blocks:
+		# - First split into chunks of 8
+		msg_list = re.findall('........?', msg)
+		# Now we format!
+		count = 1
+		msg = "```\n"
+		for m in msg_list:
+			if count > 4:
+				# New Row
+				msg += "\n"
+				count = 1
+			msg += m + " "
+			count += 1
+		msg += "```"
+				
+		if len(msg) > 1996:
 			await ctx.send("Well... that was *a lot* of 1s and 0s.  Maybe try a smaller string... Discord won't let me send all that.")
 			return
 		await ctx.send(msg)
