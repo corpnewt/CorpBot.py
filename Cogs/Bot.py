@@ -775,6 +775,103 @@ class Bot:
 			s = discord.Status.online
 		dgame = discord.Game(name=game, url=url, type=t)
 		await self.bot.change_presence(status=s, game=dgame)
+		
+		
+	@commands.command(pass_context=True)
+	async def pres(self, ctx, playing_type="0", status_type="online", game=None, url=None):
+		"""Changes the bot's presence (owner-only).
+	
+		Playing type options are:
+		
+		0. Playing
+		1. Streaming (requires valid twitch url)
+		2. Listening
+		3. Watching
+		
+		Status type options are:
+		
+		1. Online
+		2. Idle
+		3. DnD
+		4. Invisible
+		
+		If any of the passed entries have spaces, they must be in quotes."""
+		
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		# Check playing type
+		play = None
+		play_string = ""
+		if playing_type.lower() in [ "0", "play", "playing" ]:
+			play = 0
+			play_string = "Playing"
+		elif playing_type.lower() in [ "1", "stream", "streaming" ]:
+			play = 1
+			play_string = "Streaming"
+			if url == None or not "twitch.tv" in url.lower():
+				# Guess what - you failed!! :D
+				await ctx.send("You need a valid twitch.tv url to set a streaming status!")
+				return
+		elif playing_type.lower() in [ "2", "listen", "listening" ]:
+			play = 2
+			play_string = "Listening"
+		elif playing_type.lower() in [ "3", "watch", "watching" ]:
+			play = 3
+			play_string = "Watching"
+		# Verify we got something
+		if play == None:
+			# NOooooooooaooOOooOOooope.
+			await ctx.send("Playing type is invalid!")
+			return
+		
+		# Check status type
+		stat = None
+		stat_string = ""
+		if status_type.lower() in [ "1", "online", "here", "green" ]:
+			stat = "online"
+			stat_string = "Online"
+		elif status_type.lower() in [ "2", "idle", "away", "gone", "yellow" ]:
+			stat = "idle"
+			stat_string = "Idle"
+		elif status_type.lower() in [ "3", "dnd", "do not disturb", "don't disturb", "busy", "red" ]:
+			stat = "dnd"
+			stat_string = "Do Not Disturb"
+		elif status_type.lower() in [ "4", "offline", "invisible", "ghost", "gray", "black" ]:
+			stat = "invisible"
+			stat_string = "Invisible"
+		# Verify we got something
+		if stat == None:
+			# OHMYGODHOWHARDISITTOFOLLOWDIRECTIONS?!?!?
+			await ctx.send("Status type is invalid!")
+			return
+		
+		# Here, we assume that everything is A OK.  Peachy keen.
+		# Set the shiz and move along
+		self.settings.serverDict["Game"]   = game
+		self.settings.serverDict["Stream"] = url
+		self.settings.serverDict["Status"] = stat
+		self.settings.serverDict["Type"]   = play
+		
+		# Let's formulate a sexy little response concoction
+		await Message.Embed(
+			title="Presence Update",
+			color=ctx.author,
+			fields=[
+				{ "name" : "Game",   "value" : str(game),   "inline" : False },
+				{ "name" : "Status", "value" : stat_string, "inline" : False },
+				{ "name" : "Type",   "value" : play_string, "inline" : False },
+				{ "name" : "URL",    "value" : str(url),    "inline" : False}
+			]
+		).send(ctx)
 
 
 	@commands.command(pass_context=True)
