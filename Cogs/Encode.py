@@ -123,18 +123,10 @@ class Encode:
 		# - First split into chunks of 8
 		msg_list = re.findall('........?', msg)
 		# Now we format!
-		count = 1
 		msg = "```\n"
-		for m in msg_list:
-			if count > 4:
-				# New Row
-				msg += "\n"
-				count = 1
-			msg += m + " "
-			count += 1
-		msg += "```"
-				
-		if len(msg) > 1996:
+		msg += " ".join(msg_list)
+		msg += "```"	
+		if len(msg) > 1993:
 			await ctx.send("Well... that was *a lot* of 1s and 0s.  Maybe try a smaller string... Discord won't let me send all that.")
 			return
 		await ctx.send(msg)
