@@ -774,6 +774,7 @@ class Bot:
 		else:
 			# Online when in doubt
 			s = discord.Status.online
+		print(s)
 		dgame = discord.Game(name=game, url=url, type=t) if game else None
 		await self.bot.change_presence(status=s, game=dgame)
 		
