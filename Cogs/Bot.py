@@ -763,7 +763,6 @@ class Bot:
 		url    = self.settings.serverDict.get("Stream", None)
 		t      = self.settings.serverDict.get("Type", 0)
 		status = self.settings.serverDict.get("Status", None)
-		print(status)
 		# Set status
 		if status == "2":
 			s = discord.Status.idle
@@ -774,7 +773,6 @@ class Bot:
 		else:
 			# Online when in doubt
 			s = discord.Status.online
-		print(s)
 		dgame = discord.Game(name=game, url=url, type=t) if game else None
 		await self.bot.change_presence(status=s, game=dgame)
 		
@@ -785,7 +783,7 @@ class Bot:
 	
 		Playing type options are:
 		
-		0. Playing (or None)
+		0. Playing (or None without game)
 		1. Streaming (requires valid twitch url)
 		2. Listening
 		3. Watching
