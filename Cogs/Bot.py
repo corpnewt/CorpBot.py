@@ -843,16 +843,16 @@ class Bot:
 		stat = None
 		stat_string = ""
 		if status_type.lower() in [ "1", "online", "here", "green" ]:
-			stat = 1
+			stat = "1"
 			stat_string = "Online"
 		elif status_type.lower() in [ "2", "idle", "away", "gone", "yellow" ]:
-			stat = 2
+			stat = "2"
 			stat_string = "Idle"
 		elif status_type.lower() in [ "3", "dnd", "do not disturb", "don't disturb", "busy", "red" ]:
-			stat = 3
+			stat = "3"
 			stat_string = "Do Not Disturb"
 		elif status_type.lower() in [ "4", "offline", "invisible", "ghost", "gray", "black" ]:
-			stat = 4
+			stat = "4"
 			stat_string = "Invisible"
 		# Verify we got something
 		if stat == None:
