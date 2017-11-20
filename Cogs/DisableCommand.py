@@ -20,7 +20,8 @@ class DisableCommand:
 		self.settings = settings
 		self.exceptions = [ # Can be a cog or command
 			"Settings",
-			"CogManager"
+			"CogManager",
+			"Help"
 		]
 
 	async def message(self, message):
