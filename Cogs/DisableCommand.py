@@ -107,6 +107,8 @@ class DisableCommand:
 		# Returns a list of all commands - excludes hidden commands
 		command_list = []
 		for cog in self.bot.cogs:
+			if cog in self.exceptions:
+				continue
 			for c in self.bot.get_cog_commands(cog):
 				if not c.hidden and not c in self.exceptions:
 					command_list.append(c.name)
