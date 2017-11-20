@@ -240,13 +240,13 @@ class DisableCommand:
 		# Make sure we're not trying to block anything in this cog
 		if command_or_cog_name in self._get_our_comms():
 			msg = "You can't disable any commands from this cog."
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
+			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 			return
 		# At this point - we should check if we have a command
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
+			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 			return
 		# Build a list of the commands we disable
 		disabled = []
