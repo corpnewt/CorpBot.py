@@ -122,6 +122,10 @@ class Settings:
 				"GifArray"				: [],		# List of roles that can use giphy
 				"LogChannel"			: "",		# ID or blank for no logging
 				"LogVars"				: [],		# List of options to log
+				"DisabledCommands"		: [],		# List of disabled command names
+				"AdminDisabledAccess"	: True,		# Can admins access disabled commands?
+				"BAdminDisabledAccess"	: True,		# Can bot-admins access disabled commands?
+				"DisabledReactions"		: True,		# Does the bot react to disabled commands?
 				"VoteKickChannel"		: None,		# ID or none if not setup
 				"VoteKickMention"		: None,		# ID of role to mention - or none for no mention
 				"VotesToMute"			: 0,		# Positive number - or 0 for disabled

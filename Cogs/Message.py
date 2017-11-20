@@ -104,7 +104,7 @@ class Embed:
         self.force_pm = kwargs.get("force_pm", False)
         self.pm_react = kwargs.get("pm_react", "📬")
         self.title = kwargs.get("title", None)
-        self.page_count = kwargs.get("page_count", True)
+        self.page_count = kwargs.get("page_count", False)
         self.url = kwargs.get("url", None)
         self.description = kwargs.get("description", None)
         self.image = kwargs.get("image", None)
@@ -481,8 +481,8 @@ class EmbedText(Embed):
             m = text_list[i]
             if self.max_pages > 0 and i >= self.max_pages:
                 break
-            # Strip the title if not the first page
-            if i > 0:
+            # Strip the title if not the first page and not counting
+            if i > 0 and not self.page_count:
                 em.title = None
             if i == len(text_list)-1:
                 # Last item - apply footer
