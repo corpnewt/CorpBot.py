@@ -61,6 +61,14 @@ class Help:
 		footer = "\nType `{}help command` for more info on a command. \n".format(prefix)
 		footer += "You can also type `{}help category` for more info on a category.".format(prefix)
 
+		# Get settings - and check them if they exist
+		disabled_list = None
+		settings = self.bot.get_cog("Settings")
+		if settings and ctx.guild:
+			disabled_list = settings.getServerStat(ctx.guild, "DisabledCommands")
+		if disabled_list == None:
+			disabled_list = []
+
 		if com == None:
 			# No command or cog - let's send the coglist
 			embed_list = { "title" : "Current Categories", "fields" : [] }
@@ -70,21 +78,26 @@ class Help:
 					# Skip empty cogs
 					continue
 				# Make sure there are non-hidden commands here
-				cog_commands = self.bot.get_cog_commands(cog)
-				hidden = True
-				for command in cog_commands:
+				visible = []
+				disabled = 0
+				for command in self.bot.get_cog_commands(cog):
 					if not command.hidden:
-						# At least one that's not hidden
-						hidden = False
-						break
-				if hidden:
+						visible.append(command)
+					if command.name in disabled_list:
+						disabled += 1
+				if not len(visible):
 					continue
 				# Add the name of each cog in the list
-				new_dict = { "name" : cog }
-				if len(self.bot.get_cog_commands(cog)) == 1:
+				if disabled == 0:
+					new_dict = { "name" : cog }
+				elif disabled == len(visible):
+					new_dict = { "name" : "~~" + cog + "~~ (Disabled)" }
+				else:
+					new_dict = { "name" : cog + " ({} Disabled)".format(disabled) }
+				if len(visible) == 1:
 					new_dict["value"] = "`└─ 1 command`"
 				else:
-					new_dict["value"] = "`└─ {:,} commands`".format(len(self.bot.get_cog_commands(cog)))
+					new_dict["value"] = "`└─ {:,} commands`".format(len(visible))
 				new_dict["inline"] = True
 				embed_list["fields"].append(new_dict)
 			return embed_list
@@ -102,7 +115,7 @@ class Help:
 					b_ext = self.bot.extensions.get(e)
 					if self._is_submodule(b_ext.__name__, the_cog.__module__):
 						# It's a submodule
-						embed_list = {"title" : "{} - {} Extension". format(cog, e[5:]), "fields" : [] }
+						embed_list = {"title" : "{} Cog - {} Extension". format(cog, e[5:]), "fields" : [] }
 						break
 				if not embed_list:
 					embed_list = {"title" : cog, "fields" : [] }
@@ -111,7 +124,11 @@ class Help:
 					if command.hidden:
 						continue
 					command_help = self._get_help(command, 80)
-					embed_list["fields"].append({ "name" : prefix + command.signature, "value" : "`└─ " + command_help + "`", "inline" : False })
+					if command.name in disabled_list:
+						name = "~~" + prefix + command.signature + "~~ (Disabled)"
+					else:
+						name = prefix + command.signature
+					embed_list["fields"].append({ "name" : name, "value" : "`└─ " + command_help + "`", "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):
 					return None
@@ -130,13 +147,16 @@ class Help:
 						b_ext = self.bot.extensions.get(e)
 						if self._is_submodule(b_ext.__name__, the_cog.__module__):
 							# It's a submodule
-							embed_list = {"title" : "{} - {} Extension". format(cog, e[5:]), "fields" : [] }
+							embed_list = {"title" : "{} Cog - {} Extension". format(cog, e[5:]), "fields" : [] }
 							break
 					if not embed_list:
 						# embed_list = {"title" : cog, "fields" : [] }
 						embed_list = { "title" : cog }
 					# embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
-					embed_list["description"] = "**{}**\n```\n{}```".format(prefix + command.signature, command.help) 
+					if command.name in disabled_list:
+						embed_list["description"] = "~~**{}**~~ (Disabled)\n```\n{}```".format(prefix + command.signature, command.help)
+					else:
+						embed_list["description"] = "**{}**\n```\n{}```".format(prefix + command.signature, command.help) 
 					return embed_list
 		# At this point - we got nothing...
 		return None
