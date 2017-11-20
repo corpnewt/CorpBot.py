@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import dis
 import random
 import math
 import subprocess
@@ -53,6 +54,33 @@ class CogManager:
 		# Load cogs when bot is ready
 		return
 
+	def _get_imports(self, file_name):
+		if not os.path.exists("Cogs/" + file_name):
+			return []
+		file_string = open("Cogs/" + file_name, "rb").read().decode("utf-8")
+		instructions = dis.get_instructions(file_string)
+		imports = [__ for __ in instructions if 'IMPORT' in __.opname]
+		i = []
+		for instr in imports:
+			if not instr.opname is "IMPORT_FROM":
+				continue
+			i.append(instr.argval)
+		cog_imports = []
+		for f in i:
+			if os.path.exists("Cogs/" + f + ".py"):
+				cog_imports.append(f)
+		return cog_imports
+
+	def _get_imported_by(self, file_name):
+		ext_list = []
+		for ext in os.listdir("Cogs"):
+			# Avoid reloading Settings and Mute
+			if not ext.lower().endswith(".py") or ext == file_name:
+				continue
+			if file_name[:-3] in self._get_imports(ext):
+				ext_list.append(ext)
+		return ext_list
+
 	def _load_extension(self, extension = None):
 		# Loads extensions - if no extension passed, loads all
 		# starts with Settings, then Mute
@@ -93,26 +121,34 @@ class CogManager:
 		else:
 			for ext in os.listdir("Cogs"):
 				if ext[:-3].lower() == extension.lower():
-					# Found it - check if loaded
-					# Try unloading
-					try:
-						# Only unload if loaded
-						if "Cogs."+ext[:-3] in self.bot.extensions:
-							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-							self.bot.unload_extension("Cogs."+ext[:-3])
-					except Exception as e:
-						print("{} failed to unload!".format(ext[:-3]))
-						print("    {}".format(e))
-						pass
-					# Try to load
-					try:
-						self.bot.load_extension("Cogs."+ext[:-3])
-						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-					except Exception as e:
-						print("{} failed to load!".format(ext[:-3]))
-						print("    {}".format(e))
-						return ( 0, 1 )
-					return ( 1, 1 )
+					# First - let's get a list of extensions
+					# that imported this one
+					to_reload = self._get_imported_by(ext)
+					# Add our extension first
+					to_reload.insert(0, ext)
+					total = len(to_reload)
+					success = 0
+					# Iterate and reload
+					for e in to_reload:
+						# Try unloading
+						try:
+							# Only unload if loaded
+							if "Cogs."+e[:-3] in self.bot.extensions:
+								self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+e[:-3]))
+								self.bot.unload_extension("Cogs."+e[:-3])
+						except Exception as er:
+							print("{} failed to unload!".format(e[:-3]))
+							print("    {}".format(er))
+							pass
+						# Try to load
+						try:
+							self.bot.load_extension("Cogs."+e[:-3])
+							self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+e[:-3]))
+							success += 1
+						except Exception as er:
+							print("{} failed to load!".format(e[:-3]))
+							print("    {}".format(er))
+					return ( success, total )
 			# Not found
 			return ( 0, 0 )
 
@@ -144,6 +180,27 @@ class CogManager:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 	
+	@commands.command(pass_context=True)
+	async def imports(self, ctx, *, extension = None):
+		"""Outputs the extensions imported by the passed extension."""
+		if extension == None:
+			# run the extensions command
+			await ctx.invoke(self.extensions)
+			return
+		for ext in os.listdir("Cogs"):
+			# Avoid reloading Settings and Mute
+			if not ext.lower().endswith(".py"):
+				continue
+			if ext[:-3].lower() == extension.lower():
+				# Found it
+				import_list = self._get_imports(ext)
+				if not len(import_list):
+					await ctx.send("That extension has no local extensions imported.")
+				else:
+					await ctx.send("Imports:\n\n{}".format(", ".join(import_list)))
+				return
+		await cxt.send("I couldn't find that extension...")
+
 
 	@commands.command(pass_context=True)
 	async def extension(self, ctx, *, extension = None):
@@ -290,10 +347,7 @@ class CogManager:
 		if result[1] == 0:
 			await ctx.send("I couldn't find that extension.")
 		else:
-			if result[0] == 0:
-				await ctx.send("Extension failed to load...")
-			else:
-				await ctx.send("Extension reloaded!")
+			await ctx.send("{}/{} connected extensions reloaded!".format(result[0], result[1]))
 				
 	@commands.command(pass_context=True)
 	async def update(self, ctx):
