@@ -763,6 +763,7 @@ class Bot:
 		url    = self.settings.serverDict.get("Stream", None)
 		t      = self.settings.serverDict.get("Type", 0)
 		status = self.settings.serverDict.get("Status", None)
+		print(status)
 		# Set status
 		if status == "2":
 			s = discord.Status.idle
