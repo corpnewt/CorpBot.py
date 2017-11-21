@@ -27,7 +27,7 @@ class Tags:
 		"""Sets the required role ID to add/remove tags (admin only)."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -78,7 +78,7 @@ class Tags:
 		"""Add a tag to the tag list."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -146,7 +146,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -207,7 +207,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -291,7 +291,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -340,7 +340,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -409,7 +409,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -451,7 +451,7 @@ class Tags:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -493,7 +493,7 @@ class Tags:
 		"""Lists the required role to add tags."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

@@ -135,7 +135,7 @@ class ServerStats:
         """Lists how many servers you share with the bot."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -183,7 +183,7 @@ class ServerStats:
         """Lists the servers I'm connected to - default is 10, max is 50."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -209,7 +209,7 @@ class ServerStats:
     async def topservers(self, ctx, number : int = 10):
         """Lists the top servers I'm connected to ordered by population - default is 10, max is 50."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -253,7 +253,7 @@ class ServerStats:
     async def bottomservers(self, ctx, number : int = 10):
         """Lists the bottom servers I'm connected to ordered by population - default is 10, max is 50."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -342,7 +342,7 @@ class ServerStats:
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -403,7 +403,7 @@ class ServerStats:
     async def firstjoins(self, ctx, number : int = 10):
         """Lists the first users to join - default is 10, max is 25."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -446,7 +446,7 @@ class ServerStats:
     async def recentjoins(self, ctx, number : int = 10):
         """Lists the most recent users to join - default is 10, max is 25."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -489,7 +489,7 @@ class ServerStats:
     async def firstservers(self, ctx, number : int = 10):
         """Lists the first servers I've joined - default is 10, max is 25."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -536,7 +536,7 @@ class ServerStats:
     async def recentservers(self, ctx, number : int = 10):
         """Lists the most recent users to join - default is 10, max is 25."""
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False

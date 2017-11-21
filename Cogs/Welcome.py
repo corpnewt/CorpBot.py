@@ -29,7 +29,7 @@ class Welcome:
 
     def suppressed(self, guild, msg):
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(guild, "SuppressMentions"):
             return Nullify.clean(msg)
         else:
             return msg
@@ -129,7 +129,7 @@ class Welcome:
         """Prints the current welcome message (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -189,7 +189,7 @@ class Welcome:
         """Prints the current welcome message's markdown (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -301,7 +301,7 @@ class Welcome:
         """Prints the current goodbye message (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -362,7 +362,7 @@ class Welcome:
         """Prints the current goodbye message's markdown (bot-admin only)."""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -421,7 +421,7 @@ class Welcome:
 
     async def _welcome(self, member, server, channel = None):
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -466,7 +466,7 @@ class Welcome:
 
     async def _goodbye(self, member, server, channel = None):
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False

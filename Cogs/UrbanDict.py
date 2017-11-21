@@ -30,7 +30,7 @@ class UrbanDict:
 		"""Gives the definition of the word passed."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -67,6 +67,13 @@ class UrbanDict:
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
 		"""Gives a random word and its definition."""
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
 		url = "http://api.urbandictionary.com/v0/random"
 		title = permalink = None
 		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
@@ -84,5 +91,8 @@ class UrbanDict:
 			title = "Urban Dictionary Link"
 		
 		# await ctx.channel.send(msg)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
 		# await Message.Message(message=msg).send(ctx)
 		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)

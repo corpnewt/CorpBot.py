@@ -28,7 +28,7 @@ class Admin:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -56,7 +56,7 @@ class Admin:
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
 
-		if isMute.lower() == "yes":
+		if isMute:
 			ignore = True
 			delete = True
 			checkTime = self.settings.getUserStat(message.author, message.guild, "Cooldown")
@@ -79,7 +79,7 @@ class Admin:
 				delete = False
 				res    = None
 				self.settings.setUserStat(message.author, message.guild, "Cooldown", None)
-				self.settings.setUserStat(message.author, message.guild, "Muted", "No")
+				self.settings.setUserStat(message.author, message.guild, "Muted", False)
 			
 		
 		ignoreList = self.settings.getServerStat(message.guild, "IgnoredUsers")
@@ -90,7 +90,7 @@ class Admin:
 					ignore = True
 
 		adminLock = self.settings.getServerStat(message.guild, "AdminLock")
-		if not isAdmin and adminLock.lower() == "yes":
+		if not isAdmin and adminLock:
 			ignore = True
 
 		if isAdmin:
@@ -101,10 +101,10 @@ class Admin:
 		try:
 			ownerLock = self.settings.serverDict['OwnerLock']
 		except KeyError:
-			ownerLock = "No"
+			ownerLock = False
 		owner = self.settings.isOwner(message.author)
 		# Check if owner exists - and we're in OwnerLock
-		if (not owner) and ownerLock.lower() == "yes":
+		if (not owner) and ownerLock:
 			# Not the owner - ignore
 			ignore = True
 				
@@ -328,7 +328,7 @@ class Admin:
 		usage = 'Usage: `{}setxp [member] [amount]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -397,7 +397,7 @@ class Admin:
 		usage = 'Usage: `{}setxpreserve [member] [amount]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -459,7 +459,7 @@ class Admin:
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -516,7 +516,7 @@ class Admin:
 		usage = 'Usage: `{}addxprole [role] [required xp]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -590,7 +590,7 @@ class Admin:
 		usage = 'Usage: `{}removexprole [role]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -718,7 +718,7 @@ class Admin:
 		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -769,7 +769,7 @@ class Admin:
 		"""Lists the required role to give xp, gamble, or feed the bot."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -801,7 +801,7 @@ class Admin:
 		"""Sets the required role ID to stop the music player (admin only)."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -852,7 +852,7 @@ class Admin:
 		"""Lists the required role to stop the bot from playing music."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -886,7 +886,7 @@ class Admin:
 		"""Sets the required role ID to add/remove links (admin only)."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -938,7 +938,7 @@ class Admin:
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -1043,12 +1043,12 @@ class Admin:
 			return
 		
 		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
-		if isLocked.lower() == "yes":
+		if isLocked:
 			msg = 'Admin lock now *Off*.'
-			self.settings.setServerStat(ctx.message.guild, "AdminLock", "No")
+			self.settings.setServerStat(ctx.message.guild, "AdminLock", False)
 		else:
 			msg = 'Admin lock now *On*.'
-			self.settings.setServerStat(ctx.message.guild, "AdminLock", "Yes")
+			self.settings.setServerStat(ctx.message.guild, "AdminLock", True)
 		await ctx.message.channel.send(msg)
 		
 		
@@ -1059,7 +1059,7 @@ class Admin:
 		usage = 'Usage: `{}addadmin [role]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -1127,7 +1127,7 @@ class Admin:
 		usage = 'Usage: `{}removeadmin [role]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -1203,7 +1203,7 @@ class Admin:
 		usage = 'Usage: `{}broadcast [message]`'.format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

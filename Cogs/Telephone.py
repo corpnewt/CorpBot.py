@@ -25,7 +25,7 @@ class Telephone:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -433,7 +433,7 @@ class Telephone:
 				hidden = True
 			if "*69" in number:
 				target = self.settings.getServerStat(ctx.guild, "LastCall")
-				if self.settings.getServerStat(ctx.guild, "LastCallHidden").lower() == "yes":
+				if self.settings.getServerStat(ctx.guild, "LastCallHidden"):
 					dial_hide = True
 			number = number.replace("*67", "").replace("*69", "")
 			number = re.sub(r'\W+', '', number)
@@ -566,9 +566,9 @@ class Telephone:
 		self.settings.setServerStat(receiver, "LastCall", self.settings.getServerStat(caller, "TeleNumber"))
 		if hidden:
 			caller_number = "UNKNOWN CALLER"
-			self.settings.setServerStat(receiver, "LastCallHidden", "Yes")
+			self.settings.setServerStat(receiver, "LastCallHidden", True)
 		else:
-			self.settings.setServerStat(receiver, "LastCallHidden", "No")
+			self.settings.setServerStat(receiver, "LastCallHidden", False)
 			caller_number = self.settings.getServerStat(caller, "TeleNumber")
 			caller_number = caller_number[:3] + "-" + caller_number[3:]
 		await receiver_chan.send(":telephone: Incoming call from: *{}*\nType *pickup* to answer.".format(caller_number))

@@ -27,7 +27,7 @@ class Channel:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -62,7 +62,7 @@ class Channel:
 				# Got our channel - let's update
 				motd = channelMOTDList[id]['MOTD'] # A markdown message of the day
 				listOnline = channelMOTDList[id]['ListOnline'] # Yes/No - do we list all online members or not?
-				if listOnline.lower() == "yes":
+				if listOnline:
 					if members == 1:
 						msg = '{} - ({:,}/{:,} user online)'.format(motd, int(membersOnline), int(members))
 					else:
@@ -81,7 +81,7 @@ class Channel:
 		"""Says whether the bot only responds to admins."""
 		
 		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
-		if isLocked.lower() == "yes":
+		if isLocked:
 			msg = 'Admin lock is *On*.'
 		else:
 			msg = 'Admin lock is *Off*.'
@@ -102,7 +102,7 @@ class Channel:
 		"""Lists the names of those that are muted."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -134,7 +134,7 @@ class Channel:
 		"""Says whether a member is muted in chat."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -201,7 +201,7 @@ class Channel:
 		"""Lists admin roles and id's."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -240,7 +240,7 @@ class Channel:
 		"""Lists the number of users in a current role."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

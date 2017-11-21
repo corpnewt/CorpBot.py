@@ -23,6 +23,21 @@ class Promote:
         self.bot = bot
         self.settings = settings
 
+    async def _can_run(self, ctx):
+        # Check if we're admin - and if not, check if bot admins can run this
+        # and if we're bot admin
+        if ctx.author.permissions_in(ctx.channel).administrator:
+            return True
+        if not self.settings.getServerStat(ctx.guild, "BotAdminAsAdmin"):
+            return False
+        checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+        for role in ctx.author.roles:
+            for aRole in checkAdmin:
+                # Get the role that corresponds to the id
+                if str(aRole['ID']) == str(role.id):
+                    return True
+        return False
+
     @commands.command(pass_context=True)
     async def promote(self, ctx, *, member = None):
         """Auto-adds the required xp to promote the passed user to the next role (admin only)."""
@@ -31,14 +46,13 @@ class Promote:
         server  = ctx.message.guild
         channel = ctx.message.channel
 
-        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
-        if not isAdmin:
+        if not await self._can_run(ctx):
             await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -99,14 +113,13 @@ class Promote:
         server  = ctx.message.guild
         channel = ctx.message.channel
 
-        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
-        if not isAdmin:
+        if not await self._can_run(ctx):
             await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -224,14 +237,13 @@ class Promote:
         server  = ctx.message.guild
         channel = ctx.message.channel
 
-        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
-        if not isAdmin:
+        if not await self._can_run(ctx):
             await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
@@ -305,14 +317,13 @@ class Promote:
         server  = ctx.message.guild
         channel = ctx.message.channel
 
-        isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
         # Only allow admins to change server stats
-        if not isAdmin:
+        if not await self._can_run(ctx):
             await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False

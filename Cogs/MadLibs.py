@@ -37,7 +37,7 @@ class MadLibs:
 			return
 		# Clear any previous games
 		for guild in self.bot.guilds:
-			self.settings.setServerStat(guild, "PlayingMadLibs", None)
+			self.settings.setServerStat(guild, "PlayingMadLibs", False)
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
@@ -48,7 +48,7 @@ class MadLibs:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -89,7 +89,7 @@ class MadLibs:
 			await channel.send(msg)
 			return
 		
-		self.settings.setServerStat(server, "PlayingMadLibs", "Yes")
+		self.settings.setServerStat(server, "PlayingMadLibs", True)
 
 		# Get a random madlib from those available
 		randnum = random.randint(0, (len(choices)-1))
@@ -138,7 +138,7 @@ class MadLibs:
 				# We timed out - leave the loop
 				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
 				await channel.send(msg)
-				self.settings.setServerStat(server, "PlayingMadLibs", None)
+				self.settings.setServerStat(server, "PlayingMadLibs", False)
 				return
 
 			# Check if the message is to leave
@@ -146,7 +146,7 @@ class MadLibs:
 				if talk.author is author:
 					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await channel.send(msg)
-					self.settings.setServerStat(server, "PlayingMadLibs", None)
+					self.settings.setServerStat(server, "PlayingMadLibs", False)
 					return
 				else:
 					# Not the originator
@@ -177,7 +177,7 @@ class MadLibs:
 			# Only replace the first occurence
 			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
 
-		self.settings.setServerStat(server, "PlayingMadLibs", None)
+		self.settings.setServerStat(server, "PlayingMadLibs", False)
 		
 		# Check for suppress
 		if suppress:
@@ -188,6 +188,6 @@ class MadLibs:
 	@madlibs.error
 	async def madlibs_error(self, ctx, error):
 		# Reset playing status and display error
-		self.settings.setServerStat(error.channel.guild, "PlayingMadLibs", None)
+		self.settings.setServerStat(error.channel.guild, "PlayingMadLibs", False)
 		msg = 'madlibs Error: {}'.format(ctx)
 		await error.send(msg)

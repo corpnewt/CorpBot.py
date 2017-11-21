@@ -1684,9 +1684,9 @@ class CardsAgainstHumanity:
             else:
                 await ctx.channel.send('Idle kick is disabled.')
             return
-        elif setting.lower() == "yes" or setting.lower() == "on" or setting.lower() == "true":
+        elif setting.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
             setting = True
-        elif setting.lower() == "no" or setting.lower() == "off" or setting.lower() == "false":
+        elif setting.lower() in [ "no", "off", "false", "disabled", "disable" ]:
             setting = False
         else:
             setting = None

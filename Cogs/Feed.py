@@ -76,12 +76,12 @@ class Feed:
 		isKill = self.settings.getServerStat(message.guild, "Killed")
 		# Get any commands in the message
 		context = await self.bot.get_context(message)
-		if isKill.lower() == "yes":
+		if isKill:
 			ignore = True
 			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
 				ignore = False
 				
-		if hunger >= 100 and hungerLock.lower() == "yes":
+		if hunger >= 100 and hungerLock:
 			ignore = True
 			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
 				ignore = False
@@ -111,7 +111,7 @@ class Feed:
 				# Iterate through the servers and add them
 				isKill = self.settings.getServerStat(server, "Killed")
 				
-				if isKill.lower() == "no":
+				if not isKill:
 					hunger = int(self.settings.getServerStat(server, "Hunger"))
 					# Check if hunger is 100% and increase by 1 if not
 					hunger += 1
@@ -208,7 +208,7 @@ class Feed:
 		else:
 			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
 			
-		if isKill.lower() == "yes" and hunger > -150:
+		if isKill and hunger > -150:
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
 			
 		await channel.send(msg)
@@ -279,10 +279,10 @@ class Feed:
 			msg = 'You don\'t have the permissions to feed me.'
 
 		# Check bot admin
-		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+		if isBotAdmin and botAdminAsAdmin:
 			# Approve as admin
 			approve = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -298,7 +298,7 @@ class Feed:
 		if isAdmin:
 			# No limit - approve
 			approve = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -330,7 +330,7 @@ class Feed:
 			if decrement:
 				self.settings.incrementStat(author, server, "XPReserve", takeReserve)
 
-			if isKill.lower() == "yes":
+			if isKill:
 				# Bot's dead...
 				msg = '*{}* carelessly shoves *{:,} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
 				await channel.send(msg)
@@ -354,7 +354,7 @@ class Feed:
 		
 			if hunger <= -150:
 				# Kill the bot here
-				self.settings.setServerStat(server, "Killed", "Yes")
+				self.settings.setServerStat(server, "Killed", True)
 				self.settings.setServerStat(server, "KilledBy", author.id)
 				msg = '{}\n\nI am kill...\n\n*{}* did it...'.format(msg, DisplayName.name(author))			
 			elif hunger <= -100:
@@ -407,7 +407,7 @@ class Feed:
 			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 			return
 		
-		self.settings.setServerStat(server, "Killed", "Yes")
+		self.settings.setServerStat(server, "Killed", True)
 		self.settings.setServerStat(server, "KilledBy", author.id)
 		await channel.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
 		
@@ -442,7 +442,7 @@ class Feed:
 			await channel.send('Trying to bring back the *already-alive* - well aren\'t you special!')
 			return
 		
-		self.settings.setServerStat(server, "Killed", "No")
+		self.settings.setServerStat(server, "Killed", False)
 		self.settings.setServerStat(server, "Hunger", "0")
 		killedBy = self.settings.getServerStat(server, "KilledBy")
 		killedBy = DisplayName.memberForID(killedBy, server)
@@ -460,7 +460,7 @@ class Feed:
 		killedBy = self.settings.getServerStat(server, "KilledBy")
 		killedBy = DisplayName.memberForID(killedBy, server)
 		msg = 'I have no idea what you\'re talking about... Should I be worried?'
-		if isKill.lower() == "yes":
+		if isKill:
 			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(DisplayName.name(killedBy))
 		else:
 			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
@@ -477,7 +477,7 @@ class Feed:
 		server  = ctx.message.guild
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -521,7 +521,7 @@ class Feed:
 		"""Lists the required role to kill/resurrect the bot."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

@@ -27,7 +27,7 @@ class Hw:
 	def checkSuppress(self, ctx):
 		if not ctx.guild:
 			return False
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
 			return True
 		else:
 			return False
@@ -97,7 +97,7 @@ class Hw:
 		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

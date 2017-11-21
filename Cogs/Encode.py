@@ -20,7 +20,7 @@ class Encode:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg

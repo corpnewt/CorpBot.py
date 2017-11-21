@@ -149,7 +149,7 @@ class ChatterBot:
 
 	async def _chat(self, channel, server, message):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

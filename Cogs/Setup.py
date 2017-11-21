@@ -21,7 +21,7 @@ class Setup:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -436,10 +436,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "RequireOnline", "Yes")
+					self.settings.setServerStat(server, "RequireOnline", True)
 					await author.send('Require Online set to *Yes.*')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "RequireOnline", "No")
+					self.settings.setServerStat(server, "RequireOnline", False)
 					await author.send('Require Online set to *No.*')
 				else:
 					# Skipping
@@ -575,10 +575,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "AdminUnlimited", "Yes")
+					self.settings.setServerStat(server, "AdminUnlimited", True)
 					await author.send('Unlimited xp reserve for admins set to *Yes.*')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "AdminUnlimited", "No")
+					self.settings.setServerStat(server, "AdminUnlimited", False)
 					await author.send('Unlimited xp reserve for admins set to *No.*')
 				else:
 					# Skipping
@@ -605,10 +605,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "XPPromote", "Yes")
+					self.settings.setServerStat(server, "XPPromote", True)
 					await author.send('XP promote set to *Yes.*')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "XPPromote", "No")
+					self.settings.setServerStat(server, "XPPromote", False)
 					await author.send('XP promote set to *No.*')
 				else:
 					# Skipping
@@ -635,10 +635,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressPromotions", "Yes")
+					self.settings.setServerStat(server, "SuppressPromotions", True)
 					await author.send('I will avoid sending a promotion message.')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressPromotions", "No")
+					self.settings.setServerStat(server, "SuppressPromotions", False)
 					await author.send('I will send a promotion message.')
 				else:
 					# Skipping
@@ -665,10 +665,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "XPDemote", "Yes")
+					self.settings.setServerStat(server, "XPDemote", True)
 					await author.send('XP demote set to *Yes.*')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "XPDemote", "No")
+					self.settings.setServerStat(server, "XPDemote", False)
 					await author.send('XP demote set to *No.*')
 				else:
 					# Skipping
@@ -695,10 +695,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressDemotions", "Yes")
+					self.settings.setServerStat(server, "SuppressDemotions", True)
 					await author.send('I will avoid sending a demotion message.')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressDemotions", "No")
+					self.settings.setServerStat(server, "SuppressDemotions", False)
 					await author.send('I will send a demotion message.')
 				else:
 					# Skipping
@@ -710,7 +710,7 @@ class Setup:
 		# Recheck xpProm and xpDem
 		xpProm = self.settings.getServerStat(server, "XPPromote")
 		xpDem = self.settings.getServerStat(server, "XPDemote")
-		if xpProm.lower() == "yes" or xpDem.lower() == "yes":
+		if xpProm or xpDem:
 			msg = 'To set up your xp promotion/demotion roles - use the `{}addxprole [role] [required xp]` and `{}removexprole [role]` in the main chat.'.format(ctx.prefix, ctx.prefix)
 			await author.send(msg)
 
@@ -777,10 +777,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "HungerLock", "Yes")
+					self.settings.setServerStat(server, "HungerLock", True)
 					await author.send('Hunger lock set to *Yes.*')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "HungerLock", "No")
+					self.settings.setServerStat(server, "HungerLock", False)
 					await author.send('Hunger lock set to *No.*')
 				else:
 					# Skipping
@@ -855,10 +855,10 @@ class Setup:
 			else:
 				# We got something
 				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressMentions", "Yes")
+					self.settings.setServerStat(server, "SuppressMentions", True)
 					await author.send('I *will* suppress @​everyone and @​here mentions.')
 				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressMentions", "No")
+					self.settings.setServerStat(server, "SuppressMentions", False)
 					await author.send('I *will not* suppress @​everyone and @​here mentions.')
 				else:
 					# Skipping

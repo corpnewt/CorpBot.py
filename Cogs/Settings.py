@@ -43,7 +43,7 @@ class Settings:
 				"DefaultRole" 			: "", 		# Auto-assigned role position
 				"DefaultXP"				: 0,		# Default xp given to each new member on join
 				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
-				"AdminLock" 			: "No", 	# Does the bot *only* answer to admins?
+				"AdminLock" 			: False, 	# Does the bot *only* answer to admins?
 				"TableFlipMute"			: False,	# Do we mute people who flip tables?
 				"IgnoreDeath"			: True,		# Does the bot keep talking post-mortem?
 				"DJArray"				: [],		# List of roles that can use music
@@ -59,7 +59,7 @@ class Settings:
 				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
 				"TeleChannel"			: "",		# ID or blank for disabled
 				"TeleConnected"			: False,	# Disconnect any lingering calls
-				"LastCallHidden"		: "no",		# Was the last call with *67?
+				"LastCallHidden"		: False,	# Was the last call with *67?
 				"TeleNumber"			: None,		# The 7-digit number of the server
 				"TeleBlock"				: [],		# List of blocked numbers
 				"MadLibsChannel"        : "",       # ID or blank for any channel
@@ -67,7 +67,7 @@ class Settings:
 				"HardwareChannel"       : "",		# ID or blank for no channel
 				"DefaultChannel"		: "",		# ID or blank for no channel
 				"LastChat"				: 0,		# UTC Timestamp of last chat message
-				"PlayingMadLibs"		: "",		# Yes if currently playing MadLibs
+				"PlayingMadLibs"		: False,	# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
 				"StrikeOut"				: 3,		# Number of strikes needed for consequence
 				"KickList"				: [],		# List of id's that have been kicked
@@ -83,16 +83,16 @@ class Settings:
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
 				"XPRPerMessage"			: 0,		# How much xp reserve per message (typically 0)
-				"RequireOnline" 		: "Yes",	# Must be online for xp?
-				"AdminUnlimited" 		: "Yes",	# Do admins have unlimited xp to give?
-				"BotAdminAsAdmin" 		: "No",		# Do bot-admins count as admins with xp?
-				"JoinPM"				: "Yes",	# Do we pm new users with rules?
-				"XPPromote" 			: "Yes",	# Can xp raise your rank?
-				"XPDemote" 				: "No",		# Can xp lower your rank?
-				"SuppressPromotions"	: "No",		# Do we suppress the promotion message?
-				"SuppressDemotions"		: "No",		# Do we suppress the demotion message?
+				"RequireOnline" 		: True,		# Must be online for xp?
+				"AdminUnlimited" 		: True,		# Do admins have unlimited xp to give?
+				"BotAdminAsAdmin" 		: False,	# Do bot-admins count as admins with xp?
+				"JoinPM"				: True,		# Do we pm new users with rules?
+				"XPPromote" 			: True,		# Can xp raise your rank?
+				"XPDemote" 				: False,	# Can xp lower your rank?
+				"SuppressPromotions"	: False,	# Do we suppress the promotion message?
+				"SuppressDemotions"		: False,	# Do we suppress the demotion message?
 				"TotalMessages"			: 0,		# The total number of messages the bot has witnessed
-				"Killed" 				: "No",		# Is the bot dead?
+				"Killed" 				: False,	# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastShrug"				: "",		# Who shrugged last?
 				"LastLenny"				: "", 		# Who Lenny'ed last?
@@ -106,8 +106,8 @@ class Settings:
 				"PromotionArray" 		: [],		# An array of roles for promotions
 				"OnlyOneRole"			: False,	# Only allow one role from the promo array at a time
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
-				"HungerLock" 			: "No",		# Will the bot stop answering at 100% hunger?
-				"SuppressMentions"		: "Yes",	# Will the bot suppress @here and @everyone in its own output?
+				"HungerLock" 			: False,	# Will the bot stop answering at 100% hunger?
+				"SuppressMentions"		: True,		# Will the bot suppress @here and @everyone in its own output?
 				"Volume"				: "",		# Float volume for music player
 				"DefaultVolume"			: 0.6,		# Default volume for music player
 				"Playlisting"			: None,		# Not adding a playlist
@@ -149,13 +149,64 @@ class Settings:
 				proc.wait()
 				# Reload json
 				self.serverDict = json.load(open(file))
+			# Verify that we're bool-oriented now, instead of string "yes"/"no"
+			changed_global = [
+				"OwnerLock"
+			]
+			changed_settings = [
+				"AdminLock",
+				"LastCallHidden",
+				"RequireOnline",
+				"AdminUnlimited",
+				"BotAdminAsAdmin",
+				"JoinPM",
+				"XPPromote",
+				"XPDemote",
+				"SuppressPromotions",
+				"SuppressDemotions",
+				"Killed",
+				"HungerLock",
+				"SuppressMentions"
+			]
+			changed_user_settings = [
+				"Muted"
+			]
+			checked = False
+			for x in self.serverDict:
+				if not x in changed_global:
+					continue
+				if type(self.serverDict[x]) is bool:
+					# Already done
+					checked = True
+					break
+				self.serverDict[x] = True if self.serverDict[x].lower() == "yes" else False
+			if not checked:
+				# We need to verify all our settings
+				for s_id in self.serverDict["Servers"]:
+					for s in changed_settings:
+						if not s in self.serverDict["Servers"][s_id]:
+							continue
+						if type(self.serverDict["Servers"][s_id][s]) is bool:
+							continue
+						# Set the bool vals
+						self.serverDict["Servers"][s_id][s] = True if self.serverDict["Servers"][s_id][s].lower() == "yes" else False
+					for m in self.serverDict["Servers"][s_id]["Members"]:
+						for ms in changed_user_settings:
+							if not ms in self.serverDict["Servers"][s_id]["Members"][m]:
+								continue
+							if type(self.serverDict["Servers"][s_id]["Members"][m][ms]) is bool:
+								continue
+							# Set the bool vals
+							self.serverDict["Servers"][s_id]["Members"][m][ms] = True if self.serverDict["Servers"][s_id]["Members"][m][ms].lower() == "yes" else False
+				# Flush our changes
+				self.flushSettings()
 		else:
 			# File doesn't exist - create a placeholder
 			self.serverDict = {}
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -401,7 +452,7 @@ class Settings:
 				y["Parts"] = ""
 				needsUpdate = True
 			if not "Muted" in y:
-				y["Muted"] = "No"
+				y["Muted"] = False
 				needsUpdate = True
 			if not "LastOnline" in y:
 				y["LastOnline"] = None
@@ -438,7 +489,7 @@ class Settings:
 			newUser = { "XP" 			: int(self.getServerStat(server, "DefaultXP")),
 						"XPReserve" 	: (self.getServerStat(server, "DefaultXPReserve")),
 						"Parts"			: "",
-						"Muted"			: "No",
+						"Muted"			: False,
 						"LastOnline"	: "Unknown",
 						"Reminders"		: [],
 						"Profiles"		: [] }
@@ -597,14 +648,14 @@ class Settings:
 		try:
 			ownerLock = self.serverDict['OwnerLock']
 		except KeyError:
-			ownerLock = "No"
+			ownerLock = False
 		# OwnerLock defaults to "No"
-		if ownerLock.lower() == "no":
-			self.serverDict['OwnerLock'] = "Yes"
+		if not ownerLock:
+			self.serverDict['OwnerLock'] = True
 			msg = 'Owner lock **Enabled**.'
 			await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
 		else:
-			self.serverDict['OwnerLock'] = "No"
+			self.serverDict['OwnerLock'] = False
 			msg = 'Owner lock **Disabled**.'
 			if self.serverDict["Game"]:
 				# Reset the game if there was one

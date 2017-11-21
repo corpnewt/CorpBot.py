@@ -57,7 +57,7 @@ class Translate:
         """Translate some stuff!"""
 
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False

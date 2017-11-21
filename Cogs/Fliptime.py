@@ -70,7 +70,7 @@ class Fliptime:
 				# Check if we're muted already
 				previousCooldown = self.settings.getUserStat(message.author, message.guild, "Cooldown")
 				if not previousCooldown:
-					if alreadyMuted.lower() == "yes":
+					if alreadyMuted:
 						# We're perma-muted - ignore
 						return { 'Ignore' : False, 'Delete' : False}
 					previousCooldown = 0

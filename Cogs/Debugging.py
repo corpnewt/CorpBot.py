@@ -36,7 +36,7 @@ class Debugging:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -233,7 +233,7 @@ class Debugging:
 	async def _logEvent(self, server, log_message, filename = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

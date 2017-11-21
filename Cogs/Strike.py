@@ -37,7 +37,7 @@ class Strike:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -54,7 +54,7 @@ class Strike:
 			# The user has been kicked before - set their strikeLevel to 3
 			# Also mute them
 			self.settings.setUserStat(member, server, "StrikeLevel", 3)
-			self.settings.setUserStat(member, server, "Muted", "Yes")
+			self.settings.setUserStat(member, server, "Muted", True)
 			self.settings.setUserStat(member, server, "Cooldown", None)
 			await self.mute.mute(member, server)
 
@@ -200,7 +200,7 @@ class Strike:
 					mutemessage = 'You have been muted in *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
 				# Check if already muted
 				alreadyMuted = self.settings.getUserStat(member, ctx.message.guild, "Muted")
-				if alreadyMuted.lower() == "yes":
+				if alreadyMuted:
 					# Find out for how long
 					muteTime = self.settings.getUserStat(member, ctx.message.guild, "Cooldown")
 					if not muteTime == None:
@@ -212,7 +212,7 @@ class Strike:
 							else:
 								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name), timeRemains)
 				else:
-					self.settings.setUserStat(member, ctx.message.guild, "Muted", "Yes")
+					self.settings.setUserStat(member, ctx.message.guild, "Muted", True)
 					self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
 					await self.mute.mute(member, ctx.message.guild, cooldownFinal)
 
@@ -267,7 +267,7 @@ class Strike:
 			member = ctx.message.author
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -377,7 +377,7 @@ class Strike:
 			return
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -437,7 +437,7 @@ class Strike:
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -500,7 +500,7 @@ class Strike:
 			return
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -550,7 +550,7 @@ class Strike:
 			return
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -601,7 +601,7 @@ class Strike:
 			return
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -651,7 +651,7 @@ class Strike:
 			return
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -685,7 +685,7 @@ class Strike:
 			member = ctx.message.author
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -715,7 +715,7 @@ class Strike:
 			member = ctx.message.author
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False

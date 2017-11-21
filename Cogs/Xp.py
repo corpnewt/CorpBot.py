@@ -65,7 +65,7 @@ class Xp:
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(guild, "SuppressMentions"):
 			return Nullify.clean(msg)
 		else:
 			return msg
@@ -94,7 +94,7 @@ class Xp:
 						continue
 
 					bumpXP = False
-					if onlyOnline.lower() == "no":
+					if onlyOnline == False:
 						bumpXP = True
 					else:
 						if user.status == discord.Status.online:
@@ -196,7 +196,7 @@ class Xp:
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -300,11 +300,11 @@ class Xp:
 			approve = False
 
 		# Check bot admin
-		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+		if isBotAdmin and botAdminAsAdmin:
 			# Approve as admin
 			approve = True
 			admin_override = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -321,7 +321,7 @@ class Xp:
 			# No limit - approve
 			approve = True
 			admin_override = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -446,7 +446,7 @@ class Xp:
 		"""Lists the default role that new users are assigned."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -532,10 +532,10 @@ class Xp:
 			msg = 'You don\'t have the permissions to gamble.'
 				
 		# Check bot admin
-		if isBotAdmin and botAdminAsAdmin.lower() == "yes":
+		if isBotAdmin and botAdminAsAdmin:
 			# Approve as admin
 			approve = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -551,7 +551,7 @@ class Xp:
 		if isAdmin:
 			# No limit - approve
 			approve = True
-			if adminUnlim.lower() == "yes":
+			if adminUnlim:
 				# No limit
 				decrement = False
 			else:
@@ -668,7 +668,7 @@ class Xp:
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -726,7 +726,7 @@ class Xp:
 		"""Say the highest rank of a listed member."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -885,7 +885,7 @@ class Xp:
 		"""List the xp and xp reserve of a listed member."""
 		
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -1042,7 +1042,7 @@ class Xp:
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -1065,13 +1065,13 @@ class Xp:
 		xpDem = self.settings.getServerStat(server, "XPDemote")
 		xpStr = None
 
-		if (xpProm.lower() == "yes") and (xpDem.lower() == "yes"):
+		if xpProm and xpDem:
 			# Bot promote and demote
 			xpStr = "This is what I check to handle promotions and demotions.\n"
 		else:
-			if xpProm.lower() == "yes":
+			if xpProm:
 				xpStr = "This is what I check to handle promotions.\n"
-			elif xpDem.lower() == "yes":
+			elif xpDem:
 				xpStr = "This is what I check to handle demotions.\n"
 
 		msg = "__***{}'s*** **XP System**__\n\n__What's What:__\n\n".format(serverName)
@@ -1083,7 +1083,7 @@ class Xp:
 		hourStr = None
 		if hourlyXPReal > 0:
 			hourStr = "Currently, you receive *{} xp* each hour".format(hourlyXPReal)
-			if onlyOnline.lower() == "yes":
+			if onlyOnline:
 				hourStr = "{} (but *only* if your status is *Online*).".format(hourStr)
 			else:
 				hourStr = "{}.".format(hourStr)
@@ -1099,7 +1099,7 @@ class Xp:
 		hourStr = None
 		if hourlyXP > 0:
 			hourStr = "Currently, you receive *{} xp reserve* each hour".format(hourlyXP)
-			if onlyOnline.lower() == "yes":
+			if onlyOnline:
 				hourStr = "{} (but *only* if your status is *Online*).".format(hourStr)
 			else:
 				hourStr = "{}.".format(hourStr)

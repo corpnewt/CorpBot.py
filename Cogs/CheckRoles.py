@@ -29,7 +29,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     onlyOne     = settings.getServerStat(server, "OnlyOneRole")
 
     # Check if we're suppressing @here and @everyone mentions
-    if settings.getServerStat(server, "SuppressMentions").lower() == "yes":
+    if settings.getServerStat(server, "SuppressMentions"):
         suppressed = True
     else:
         suppressed = False
@@ -77,7 +77,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
         else:
             # Demote if needed
             if is_higher:
-                if xpDemote.lower() == "yes":
+                if xpDemote:
                     # We can remove roles above - but keep the last one
                     msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), current_role.name)
                     for role in promoArray:
@@ -95,7 +95,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                             changed = True
             # Promote if needed
             else:
-                if xpPromote.lower() == "yes":
+                if xpPromote:
                     # Remove all roles below
                     msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), target_role.name)
                     for role in promoArray:
@@ -114,7 +114,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
 
     else:
         # Check promotions first
-        if xpPromote.lower() == "yes":
+        if xpPromote:
             # This is, by far, the more functional way
             for role in promoArray:
                 # Iterate through the roles, and add which we have xp for
@@ -124,11 +124,11 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                     if addRole:
                         if not addRole in user.roles:
                             addRoles.append(addRole)
-                            if not suppProm.lower() == "yes":
+                            if not suppProm:
                                 msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), addRole.name)
                             changed = True
         # Allow independent promotion/demotion
-        if xpDemote.lower() == "yes":
+        if xpDemote:
             for role in promoArray:
                 # Iterate through the roles, and add which we have xp for
                 if int(role['XP']) > userXP:
@@ -137,7 +137,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
                     if remRole:
                         if remRole in user.roles:
                             remRoles.append(remRole)
-                            if not suppDem.lower() == "yes":
+                            if not suppDem:
                                 msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
                             changed = True
 

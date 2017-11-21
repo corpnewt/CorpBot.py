@@ -95,14 +95,24 @@ async def on_ready():
 		await message_to.send(random.choice(return_options))
 
 '''@bot.event
-async def on_command_error(ctx, error):
-	if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-		await ctx.send("{}: {}".format(type(error).__name__, error))
-		formatted_help = await bot.formatter.format_help_for(ctx, ctx.command)
-		for page in formatted_help:
-			await ctx.send(page)
+async def on_command_error(context, exception):
+	if type(exception) is commands.CommandInvokeError:
+		print("Command invoke error")
+		print(exception.original)
+		print(type(exception.original))
+		if type(exception.original) is discord.Forbidden:
+			print("Can't do that yo")
+			return
+	cog = context.cog
+	if cog:
+		attr = '_{0.__class__.__name__}__error'.format(cog)
+		if hasattr(cog, attr):
+			return
 
-@bot.event
+	print('Ignoring exception in command {}:'.format(context.command), file=sys.stderr)
+	traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)'''
+
+'''@bot.event
 async def on_error(event_method, *args, **kwargs):
 	exc_str = "Ignoring exception in {}:\n    ".format(event_method)
 	exc_str += "{}: {}".format(sys.exc_info()[0].__name__, sys.exc_info()[1])

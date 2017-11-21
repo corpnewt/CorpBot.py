@@ -57,7 +57,7 @@ class Mute:
         
     def suppressed(self, guild, msg):
         # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(guild, "SuppressMentions").lower() == "yes":
+        if self.settings.getServerStat(guild, "SuppressMentions"):
             return Nullify.clean(msg)
         else:
             return msg
@@ -95,7 +95,7 @@ class Mute:
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
         isMute = self.settings.getUserStat(member, server, "Muted")
-        if isMute.lower() == "yes":
+        if isMute:
             await self.unmute(member, server)
             pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(self.suppressed(server, server.name))
             await member.send(pm)
@@ -118,7 +118,7 @@ class Mute:
                     except Exception:
                         continue
         
-        self.settings.setUserStat(member, server, "Muted", "Yes")
+        self.settings.setUserStat(member, server, "Muted", True)
         self.settings.setUserStat(member, server, "Cooldown", cooldown)
 
         muteList = self.settings.getServerStat(server, "MuteList")
@@ -167,7 +167,7 @@ class Mute:
                                 await channel.set_permissions(member, overwrite=None)
                             except Exception:
                                 continue
-        self.settings.setUserStat(member, server, "Muted", "No")
+        self.settings.setUserStat(member, server, "Muted", False)
         self.settings.setUserStat(member, server, "Cooldown", None)
 
         muteList = self.settings.getServerStat(server, "MuteList")
