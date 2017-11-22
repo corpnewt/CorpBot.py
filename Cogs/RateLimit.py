@@ -46,6 +46,9 @@ class RateLimit:
 		
 		# Check if we can run commands
 		lastTime = int(self.settings.getUserStat(message.author, message.guild, "LastCommand"))
+		# None fix
+		if lastTime == None:
+			lastTime = 0
 		if not self.canRun( lastTime, currDelay ):
 			# We can't run commands yet - ignore
 			ignore = True
