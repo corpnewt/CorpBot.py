@@ -132,7 +132,7 @@ class Humor:
 	async def french(self, ctx):
 		"""Speaking French... probably..."""
 		fr_list = [ "hon", "fromage", "baguette" ]
-		punct   = [ ".", "!", "?" ]
+		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
 		fr_sentence = []
 		for i in range(random.randint(3, 20)):
 			fr_sentence.append(random.choice(fr_list))
