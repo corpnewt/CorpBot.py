@@ -127,6 +127,18 @@ class Humor:
 		randnum = random.randint(0, len(fartList)-1)
 		msg = '{}'.format(fartList[randnum])
 		await ctx.channel.send(msg)
+		
+	@commands.command(pass_context=True)
+	async def french(self, ctx):
+		"""Speaking French... probably..."""
+		fr_list = [ "hon", "fromage", "baguette" ]
+		fr_sentence = []
+		for i in range(random.randint(3, 20)):
+			fr_sentence.append(random.choice(fr_list))
+			if len(fr_sentence) == 1:
+				# Capitalize the first letter of the first word
+				fr_sentence[0] = fr_sentence[0][:1].upper() + fr_sentence[0][1:]
+		await ctx.send(" ".join(fr_sentence))
 
 	def canDisplay(self, server):
 		# Check if we can display images
