@@ -347,7 +347,8 @@ class CogManager:
 		if result[1] == 0:
 			await ctx.send("I couldn't find that extension.")
 		else:
-			await ctx.send("{}/{} connected extensions reloaded!".format(result[0], result[1]))
+			e_string = "extension" if result[1] == 1 else "extensions"
+			await ctx.send("{}/{} connected {} reloaded!".format(result[0], result[1], e_string))
 				
 	@commands.command(pass_context=True)
 	async def update(self, ctx):
