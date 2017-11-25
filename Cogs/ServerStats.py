@@ -101,8 +101,7 @@ class ServerStats:
         emojitext = ""
         emojicount = 0
         for emoji in guild.emojis:
-            # emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
-            emojiMention = emoji.mention
+            emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
             test = emojitext + emojiMention
             if len(test) > 1024:
                 # TOOO BIIIIIIIIG
