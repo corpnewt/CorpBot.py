@@ -189,20 +189,17 @@ class Humor:
 		chosenTemp = None
 		msg = ''
 
-		idMatch = FuzzySearch.search(template_id, templates, 'id', 1)
-		if idMatch[0]['Ratio'] < 1:
-			# Not a perfect match - try name
-			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
-			if nameMatch[0]['Ratio'] > idMatch[0]['Ratio']:
-				# Better match on name than id
-				chosenTemp = nameMatch[0]['Item']['id']
-				if not nameMatch[0]['Ratio'] == 1:
-					# Still not a perfect match...
-					msg = 'I\'ll assume you meant *{}*.'.format(nameMatch[0]['Item']['name'])
-		else:
-			# ID is a perfect match
+		idMatch   = FuzzySearch.search(template_id, templates, 'id', 1)
+		if idMatch[0]['Ratio'] == 1:
+			# Perfect match
 			chosenTemp = idMatch[0]['Item']['id']
-
+		else:
+			# Imperfect match - assume the name
+			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
+			chosenTemp = nameMatch[0]['Item']['id']
+			if nameMatch[0]['Ratio'] < 1:
+				# Less than perfect, still
+				msg = 'I\'ll assume you meant *{}*.'.format(nameMatch[0]['Item']['name'])
 
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
