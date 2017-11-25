@@ -80,9 +80,11 @@ class ServerStats:
                 len(guild.members) - bot_member,
                 round((online_members/(len(guild.members) - bot_member) * 100), 2)
         )
-        user_string += "\n{:,}/{:,} bots online ({:,g}%)".format(
+        b_string = "bot" if bot_member == 1 else "bots"
+        user_string += "\n{:,}/{:,} {} online ({:,g}%)".format(
                 bot_online,
                 bot_member,
+                b_string,
                 round((bot_online/bot_member)*100, 2)
         )
         #server_embed.add_field(name="Members", value="{:,}/{:,} online ({:.2f}%)\n{:,} {} ({}%)".format(online_members, len(guild.members), bot_percent), inline=True)
