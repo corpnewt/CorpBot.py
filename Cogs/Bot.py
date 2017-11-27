@@ -10,6 +10,7 @@ import fnmatch
 import subprocess
 import pyspeedtest
 import json
+import struct
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Settings
@@ -234,6 +235,7 @@ class Bot:
 		pythonMinor   = sys.version_info.minor
 		pythonMicro   = sys.version_info.micro
 		pythonRelease = sys.version_info.releaselevel
+		pyBit         = struct.calcsize("P") * 8
 		process       = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], shell=False, stdout=subprocess.PIPE)
 		git_head_hash = process.communicate()[0].strip()
 
@@ -245,7 +247,7 @@ class Bot:
 		msg += '```\n'
 		msg += 'OS       : {}\n'.format(currentOS)
 		msg += 'Hostname : {}\n'.format(platform.node())
-		msg += 'Language : Python {}.{}.{} {}\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease)
+		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
 		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
 		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
