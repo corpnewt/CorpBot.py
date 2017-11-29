@@ -98,6 +98,28 @@ class ServerStats:
         server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
+	# Find out where in our join position this server is
+	joinedList = []
+        popList    = []
+        for g in self.bot.guilds:
+            joinedList.append({ 'ID' : g.id, 'Joined' : g.me.joined_at })
+            popList.append({ 'ID' : g.id, 'Population' : len(g.members) })
+        
+        # sort the guilds by join date
+        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+        popList = sorted(popList, key=lambda x:x['Population'], reverse=True)
+        
+        check_item = { "ID" : ctx.guild.id, "Joined" : ctx.guild.me.joined_at }
+        total = len(joinedList)
+        position = joinedList.index(check_item) + 1
+        server_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+        
+        # Get our population position
+        check_item = { "ID" : ctx.guild.id, "Population" : len(ctx.guild.members) }
+        total = len(popList)
+        position = popList.index(check_item) + 1
+        server_embed.add_field(name="Population Rank", value="{:,} of {:,}".format(position, total), inline=True)
+        
         emojitext = ""
         emojicount = 0
         for emoji in guild.emojis:
