@@ -1012,10 +1012,17 @@ class Xp:
 		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
 		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
 		
-		if member.game:
-			if member.game.name:
-				# Playing a game!
-				stat_embed.add_field(name="Playing", value=str(member.game.name), inline=True)
+		if member.game and member.game.name:
+			# Playing a game!
+			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
+			try:
+				play_string = play_list[member.game.type]
+			except:
+				play_string = "Playing"
+			stat_embed.add_field(name=play_string, value=str(member.game.name), inline=True)
+			if member.game.type == 1:
+				# Add the URL too
+				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.game.url), inline=True)
 
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at, clock=False)
