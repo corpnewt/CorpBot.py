@@ -175,25 +175,9 @@ class Help:
 			return
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command(pass_context=True, hidden=True)
 	async def dumphelp(self, ctx, tab_indent_count = None):
-		"""Dumps a timpestamped, formatted list of commands and descriptions into the same directory as the bot (owner only)."""
-		
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-		
+		"""Dumps a timpestamped, formatted list of commands and descriptions into the same directory as the bot."""
 		try:
 			tab_indent_count = int(tab_indent_count)
 		except:
