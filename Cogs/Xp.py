@@ -1018,7 +1018,7 @@ class Xp:
 				stat_embed.add_field(name="Playing", value=str(member.game.name), inline=True)
 
 		# Get localized user time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at)
+		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at, clock=False)
 		c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		# add created_at footer
 		created = "Created at " + c_time_str
