@@ -11,11 +11,16 @@ def getClockForTime(time_string):
 	print("Clock called: " + time_string)
 	try:
 		time = time_string.split(" ")
-		time = time[0].split(":")
+		if len(time) == 2:
+			time = time[0].split(":")
+		elif len(time) == 3:
+			time = time[1].split(":")
+		else:
+			return time_string
 		hour = int(time[0])
 		minute = int(time[1])
 	except:
-		return ""
+		return time_string
 	print(hour, minute)
 	clock_string = ""
 	if min > 44:
