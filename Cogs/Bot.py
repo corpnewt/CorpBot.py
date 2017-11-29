@@ -108,12 +108,17 @@ class Bot:
 		cog_amnt  = 0
 		empty_cog = 0
 		for cog in self.bot.cogs:
-			if not len(self.bot.get_cog_commands(cog)):
+			visible = []
+			for c in self.bot.get_cog_commands(cog):
+				if c.hidden:
+					continue
+				visible.append(c)
+			if not len(visible):
 				empty_cog +=1
 				# Skip empty cogs
 				continue
 			cog_amnt += 1
-				
+		
 		cog_count = "{:,} cog".format(cog_amnt)
 		# Easy way to append "s" if needed:
 		if not len(self.bot.cogs) == 1:
@@ -121,7 +126,13 @@ class Bot:
 		if empty_cog:
 			cog_count += " [{:,} without commands]".format(empty_cog)
 
-		command_count = "{:,}".format(len(self.bot.commands))
+		visible = []
+		for command in self.bot.commands:
+			if command.hidden:
+				continue
+			visible.append(command)
+			
+		command_count = "{:,}".format(len(visible))
 		
 		# Get localized created time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.created_at)
