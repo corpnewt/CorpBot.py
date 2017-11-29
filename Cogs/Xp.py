@@ -1028,7 +1028,7 @@ class Xp:
 		await ctx.message.channel.send(embed=stat_embed)
 		
 	@stats.error
-	async def stats_error(self, error, ctx):
+	async def stats_error(self, ctx, error):
 		msg = 'stats Error: {}'.format(error)
 		await ctx.channel.send(msg)
 
