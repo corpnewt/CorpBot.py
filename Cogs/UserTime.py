@@ -23,9 +23,9 @@ def getClockForTime(time_string):
 		return time_string
 	print(hour, minute)
 	clock_string = ""
-	if min > 44:
+	if minute > 44:
 		clock_string = str(hour + 1) if hour < 12 else "1"
-	elif min > 14:
+	elif minute > 14:
 		clock_string = str(hour) + "30"
 	else:
 		clock_string = str(hour)
