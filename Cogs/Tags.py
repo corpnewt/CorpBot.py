@@ -184,7 +184,7 @@ class Tags:
 			if atag['Name'].lower() == name.lower():
 				tagList.remove(atag)
 				self.settings.setServerStat(server, "Tags", tagList)
-				msg = '*{}* removed from tag list!'.format(name)
+				msg = '*{}* removed from tag list!'.format(atag['Name'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
