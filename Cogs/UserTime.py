@@ -8,9 +8,9 @@ def setup(bot):
 
 def getClockForTime(time_string):
 	# Assumes a HH:MM PP format
-	print("Clock called")
+	print("Clock called: " + time_string)
 	try:
-		time = time_string.split()
+		time = time_string.split(" ")
 		time = time[0].split(":")
 		hour = int(time[0])
 		minute = int(time[1])
