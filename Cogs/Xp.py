@@ -1014,6 +1014,7 @@ class Xp:
 		
 		if member.game and member.game.name:
 			# Playing a game!
+			print("Adding a playing status")
 			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
 			try:
 				play_string = play_list[member.game.type]
@@ -1032,7 +1033,7 @@ class Xp:
 		stat_embed.set_footer(text=created)
 
 		#await ctx.message.channel.send(msg)
-		await ctx.message.channel.send(embed=stat_embed)
+		await ctx.send(embed=stat_embed)
 		
 	@stats.error
 	async def stats_error(self, ctx, error):
