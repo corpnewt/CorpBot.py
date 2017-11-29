@@ -99,7 +99,7 @@ class ServerStats:
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
 	# Find out where in our join position this server is
-	joinedList = []
+        joinedList = []
         popList    = []
         for g in self.bot.guilds:
             joinedList.append({ 'ID' : g.id, 'Joined' : g.me.joined_at })
