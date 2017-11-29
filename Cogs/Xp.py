@@ -1026,7 +1026,7 @@ class Xp:
 		# Add joinpos
 		joinedList = []
 		for mem in ctx.message.guild.members:
-		joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
+			joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
 		
 		# sort the users by join date
 		joinedList = sorted(joinedList, key=lambda x:x['Joined'])
