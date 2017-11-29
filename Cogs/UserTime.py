@@ -8,7 +8,6 @@ def setup(bot):
 
 def getClockForTime(time_string):
 	# Assumes a HH:MM PP format
-	print("Clock called: " + time_string)
 	try:
 		t = time_string.split(" ")
 		if len(t) == 2:
@@ -21,7 +20,6 @@ def getClockForTime(time_string):
 		minute = int(t[1])
 	except:
 		return time_string
-	print(hour, minute)
 	clock_string = ""
 	if minute > 44:
 		clock_string = str(hour + 1) if hour < 12 else "1"
@@ -29,7 +27,6 @@ def getClockForTime(time_string):
 		clock_string = str(hour) + "30"
 	else:
 		clock_string = str(hour)
-	print(clock_string)
 	return time_string +" :clock" + clock_string + ":"
 
 def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p", clock = True):
