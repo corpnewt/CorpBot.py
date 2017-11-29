@@ -10,15 +10,15 @@ def getClockForTime(time_string):
 	# Assumes a HH:MM PP format
 	print("Clock called: " + time_string)
 	try:
-		time = time_string.split(" ")
-		if len(time) == 2:
-			time = time[0].split(":")
-		elif len(time) == 3:
-			time = time[1].split(":")
+		t = time_string.split(" ")
+		if len(t) == 2:
+			t = t[0].split(":")
+		elif len(t) == 3:
+			t = t[1].split(":")
 		else:
 			return time_string
-		hour = int(time[0])
-		minute = int(time[1])
+		hour = int(t[0])
+		minute = int(t[1])
 	except:
 		return time_string
 	print(hour, minute)
