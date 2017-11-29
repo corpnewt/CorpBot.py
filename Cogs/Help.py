@@ -2,6 +2,8 @@ import asyncio
 import discord
 import random
 import math
+import os
+from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
@@ -147,7 +149,7 @@ class Help:
 						b_ext = self.bot.extensions.get(e)
 						if self._is_submodule(b_ext.__name__, the_cog.__module__):
 							# It's a submodule
-							embed_list = {"title" : "{} Cog - {} Extension". format(cog, e[5:]), "fields" : [] }
+							embed_list = {"title" : "{} Cog - {} Extension".format(cog, e[5:]), "fields" : [] }
 							break
 					if not embed_list:
 						# embed_list = {"title" : cog, "fields" : [] }
@@ -173,6 +175,65 @@ class Help:
 			return
 		await ctx.send(embed=embed)
 
+	@commands.command(pass_context=True)
+	async def dumphelp(self, ctx, tab_indent_count = None):
+		"""Dumps a timpestamped, formatted list of commands and descriptions into the same directory as the bot (owner only)."""
+		
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+		
+		try:
+			tab_indent_count = int(tab_indent_count)
+		except:
+			tab_indent_count = None
+		if tab_indent_count == None:
+			tab_indent_count = 1
+
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		serverFile = 'HelpList-{}.txt'.format(timeStamp)
+		message = await ctx.send('Saving help list to *{}*...'.format(serverFile))
+		msg = ''
+		prefix = self._get_prefix(ctx)
+		
+		# Get and format the help
+		for cog in sorted(self.bot.cogs):
+			cog_commands = sorted(self.bot.get_cog_commands(cog), key=lambda x:x.name)
+			cog_string = ""
+			# Get the extension
+			the_cog = self.bot.get_cog(cog)
+			for e in self.bot.extensions:
+				b_ext = self.bot.extensions.get(e)
+				if self._is_submodule(b_ext.__name__, the_cog.__module__):
+					# It's a submodule
+					cog_string += "{}{} Cog - {} Extension\n".format("	"*tab_indent_count, cog, e[5:])
+					break
+			if cog_string == "":
+				cog_string += "{}{} Cog\n".format("	"*tab_indent_count, cog)
+			for command in cog_commands:
+				cog_string += "{}	{}\n".format("	"*tab_indent_count, prefix + command.signature)
+				cog_string += "{}	└─{}\n".foramt("	"*tab_indent_count, self._get_help(command, 80))
+			cog_string += "\n"
+			msg += cog_string
+			
+		with open(serverFile, "wb") as myfile:
+			myfile.write(msg)
+
+		await message.edit(content='Uploading *{}*...'.format(serverFile))
+		await ctx.send(file=discord.File(serverFile))
+		await message.edit(content='Uploaded *{}!*'.format(serverFile))
+		os.remove(serverFile)
 
 	@commands.command(pass_context=True)
 	async def help(self, ctx, *, command = None):
