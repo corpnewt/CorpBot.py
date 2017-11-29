@@ -117,7 +117,7 @@ class Help:
 					b_ext = self.bot.extensions.get(e)
 					if self._is_submodule(b_ext.__name__, the_cog.__module__):
 						# It's a submodule
-						embed_list = {"title" : "{} Cog - {} Extension". format(cog, e[5:]), "fields" : [] }
+						embed_list = {"title" : "{} Cog - {}.py Extension". format(cog, e[5:]), "fields" : [] }
 						break
 				if not embed_list:
 					embed_list = {"title" : cog, "fields" : [] }
@@ -149,7 +149,7 @@ class Help:
 						b_ext = self.bot.extensions.get(e)
 						if self._is_submodule(b_ext.__name__, the_cog.__module__):
 							# It's a submodule
-							embed_list = {"title" : "{} Cog - {} Extension".format(cog, e[5:]), "fields" : [] }
+							embed_list = {"title" : "{} Cog - {}.py Extension".format(cog, e[5:]), "fields" : [] }
 							break
 					if not embed_list:
 						# embed_list = {"title" : cog, "fields" : [] }
@@ -201,10 +201,10 @@ class Help:
 				b_ext = self.bot.extensions.get(e)
 				if self._is_submodule(b_ext.__name__, the_cog.__module__):
 					# It's a submodule
-					cog_string += "{}{} Cog - {} Extension\n".format("	"*tab_indent_count, cog, e[5:])
+					cog_string += "{}{} Cog - {}.py Extension:\n".format("	"*tab_indent_count, cog, e[5:])
 					break
 			if cog_string == "":
-				cog_string += "{}{} Cog\n".format("	"*tab_indent_count, cog)
+				cog_string += "{}{} Cog:\n".format("	"*tab_indent_count, cog)
 			for command in cog_commands:
 				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.signature)
 				cog_string += "{}  {}└─ {}\n".format(
