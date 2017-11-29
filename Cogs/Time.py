@@ -8,6 +8,7 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Message
 from   Cogs import Nullify
+from   Cogs import UserTime
 
 def setup(bot):
 	# Add the bot and deps
@@ -248,7 +249,7 @@ class Time:
 			if t == None:
 				await ctx.channel.send("I couldn't find that TimeZone or offset!")
 				return
-
+		t["time"] = UserTime.getClockForTime(t["time"])
 		if member:
 			msg = '{}; where *{}* is, it\'s currently *{}*'.format(t["zone"], DisplayName.name(member), t["time"])
 		else:
