@@ -182,7 +182,7 @@ class Help:
 			tab_indent_count = int(tab_indent_count)
 		except:
 			tab_indent_count = None
-		if tab_indent_count == None:
+		if tab_indent_count == None or tab_indent_count < 0:
 			tab_indent_count = 1
 
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
