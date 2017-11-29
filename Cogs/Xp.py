@@ -1014,7 +1014,6 @@ class Xp:
 		
 		if member.game and member.game.name:
 			# Playing a game!
-			print("Adding a playing status")
 			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
 			try:
 				play_string = play_list[member.game.type]
