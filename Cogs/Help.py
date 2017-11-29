@@ -197,14 +197,32 @@ class Help:
 			cog_string = ""
 			# Get the extension
 			the_cog = self.bot.get_cog(cog)
+			# Make sure there are non-hidden commands here
+			visible = []
+			for command in self.bot.get_cog_commands(cog):
+				if not command.hidden:
+					visible.append(command)
+			if not len(visible):
+				# All hidden - skip
+				continue
+			cog_count = "1 command" if len(visible) == 1 else "{} commands".format(len(visible))
 			for e in self.bot.extensions:
 				b_ext = self.bot.extensions.get(e)
 				if self._is_submodule(b_ext.__name__, the_cog.__module__):
 					# It's a submodule
-					cog_string += "{}{} Cog - {}.py Extension:\n".format("	"*tab_indent_count, cog, e[5:])
+					cog_string += "{}{} Cog ({}) - {}.py Extension:\n".format(
+						"	"*tab_indent_count,
+						cog,
+						cog_count,
+						e[5:]
+					)
 					break
 			if cog_string == "":
-				cog_string += "{}{} Cog:\n".format("	"*tab_indent_count, cog)
+				cog_string += "{}{} Cog ({}):\n".format(
+					"	"*tab_indent_count,
+					cog,
+					cog_count
+				)
 			for command in cog_commands:
 				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.signature)
 				cog_string += "{}  {}└─ {}\n".format(
@@ -216,7 +234,8 @@ class Help:
 			msg += cog_string
 		
 		# Encode to binary
-		msg = msg.encode("utf-8")
+		# Trim the last 2 newlines
+		msg = msg[:-2].encode("utf-8")
 		with open(serverFile, "wb") as myfile:
 			myfile.write(msg)
 
