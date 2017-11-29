@@ -109,13 +109,13 @@ class ServerStats:
         joinedList = sorted(joinedList, key=lambda x:x['Joined'])
         popList = sorted(popList, key=lambda x:x['Population'], reverse=True)
         
-        check_item = { "ID" : ctx.guild.id, "Joined" : ctx.guild.me.joined_at }
+        check_item = { "ID" : guild.id, "Joined" : guild.me.joined_at }
         total = len(joinedList)
         position = joinedList.index(check_item) + 1
         server_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
         
         # Get our population position
-        check_item = { "ID" : ctx.guild.id, "Population" : len(ctx.guild.members) }
+        check_item = { "ID" : guild.id, "Population" : len(guild.members) }
         total = len(popList)
         position = popList.index(check_item) + 1
         server_embed.add_field(name="Population Rank", value="{:,} of {:,}".format(position, total), inline=True)
