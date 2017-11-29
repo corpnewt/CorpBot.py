@@ -1023,7 +1023,19 @@ class Xp:
 			if member.game.type == 1:
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.game.url), inline=True)
-
+		# Add joinpos
+		joinedList = []
+		for mem in ctx.message.guild.members:
+		joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
+		
+		# sort the users by join date
+		joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+		check_item = { "ID" : member.id, "Joined" : member.joined_at }
+		total = len(joinedList)
+		position = joinedList.index(check_item) + 1
+		
+		stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+		
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at, clock=False)
 		c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
