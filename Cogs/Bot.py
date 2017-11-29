@@ -174,7 +174,15 @@ class Bot:
 		server_embed.add_field(name="Prefixes", value=prefix, inline=True)
 		server_embed.add_field(name="Status", value=status_text, inline=True)
 		if bot_member.game and bot_member.game.name:
-			server_embed.add_field(name="Playing", value=str(bot_member.game.name), inline=True)
+			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
+			try:
+				play_string = play_list[bot_member.game.type]
+			except:
+				play_string = "Playing"
+			server_embed.add_field(name=play_string, value=str(bot_member.game.name), inline=True)
+			if bot_member.game.type == 1:
+				# Add the URL too
+				server_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(bot_member.game.url), inline=True)
 		server_embed.set_thumbnail(url=avatar)
 		# Send the embed
 		await ctx.channel.send(embed=server_embed)
