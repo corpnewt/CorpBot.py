@@ -6,24 +6,43 @@ def setup(bot):
 	# This module isn't actually a cog
     return
 
-def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p"):
+def getClockForTime(time_string):
+	# Assumes a HH:MM PP format
+	try:
+		time = time_string.split()
+		time = time[0].split(":")
+		hour = int(time[0])
+		minute = int(time[1])
+	except:
+		return ""
+	clock_string = ""
+	if min > 44:
+		clock_string = str(hour + 1) if hour < 12 else "1"
+	elif min > 14:
+		clock_string = str(hour) + "30"
+	else:
+		clock_string = str(hour)
+	return ":clock" + clock_string + ":"
+
+def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p", clock = True):
 	# Returns a dict representing the time from the passed member's perspective
 	offset = settings.getGlobalUserStat(member, "TimeZone")
 	if offset == None:
 		offset = settings.getGlobalUserStat(member, "UTCOffset")
 	if offset == None:
 		# No offset or tz - return UTC
-		return { "zone" : 'UTC', "time" : time.strftime(strft) }
+		t = getClockForTime(time.strftime(strft)) if clock, else time.strftime(strft)
+		return { "zone" : 'UTC', "time" : t }
 		
 	# At this point - we need to determine if we have an offset - or possibly a timezone passed
-	t = getTimeFromTZ(offset, time)
+	t = getTimeFromTZ(offset, time, clock)
 	if t == None:
 		# We did not get a zone
-		t = getTimeFromOffset(offset, time)
+		t = getTimeFromOffset(offset, time, clock)
 	return t
 
 
-def getTimeFromOffset(offset, t = None, strft = "%Y-%m-%d %I:%M %p"):
+def getTimeFromOffset(offset, t = None, strft = "%Y-%m-%d %I:%M %p", clock = True):
 	offset = offset.replace('+', '')
 	# Split time string by : and get hour/minute values
 	try:
@@ -54,10 +73,11 @@ def getTimeFromOffset(offset, t = None, strft = "%Y-%m-%d %I:%M %p"):
 	else:
 		# No offset
 		newTime = t
-	return { "zone" : msg, "time" : newTime.strftime(strft) }
+	ti = getClockForTime(newTime.strftime(strft)) if clock, else newTime.strftime(strft)
+	return { "zone" : msg, "time" : ti }
 
 
-def getTimeFromTZ(tz, t = None, strft = "%Y-%m-%d %I:%M %p"):
+def getTimeFromTZ(tz, t = None, strft = "%Y-%m-%d %I:%M %p", clock = True):
 	# Assume sanitized zones - as they're pulled from pytz
 	# Let's get the timezone list
 	tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
@@ -70,4 +90,5 @@ def getTimeFromTZ(tz, t = None, strft = "%Y-%m-%d %I:%M %p"):
 	else:
 		zone_now = pytz.utc.localize(t, is_dst=None).astimezone(zone)
 		#zone_now = t.astimezone(zone)
-	return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime(strft) }
+	ti = getClockForTime(zone_now.strftime(strft)) if clock, else zone_now.strftime(strft)
+	return { "zone" : tz_list[0]['Item'], "time" : ti}
