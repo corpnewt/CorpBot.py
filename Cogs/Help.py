@@ -210,7 +210,9 @@ class Help:
 				cog_string += "{}	└─{}\n".format("	"*tab_indent_count, self._get_help(command, 80))
 			cog_string += "\n"
 			msg += cog_string
-			
+		
+		# Encode to binary
+		msg = msg.encode("utf-8")
 		with open(serverFile, "wb") as myfile:
 			myfile.write(msg)
 
