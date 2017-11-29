@@ -111,11 +111,9 @@ class Bot:
 			visible = []
 			for c in self.bot.get_cog_commands(cog):
 				if c.hidden:
-					print(c.name + " is hidden")
 					continue
 				visible.append(c)
 			if not len(visible):
-				print(cog + " has no visible commands")
 				empty_cog +=1
 				# Skip empty cogs
 				continue
@@ -131,7 +129,6 @@ class Bot:
 		visible = []
 		for command in self.bot.commands:
 			if command.hidden:
-				print(command.name + " is hidden")
 				continue
 			visible.append(command)
 			
