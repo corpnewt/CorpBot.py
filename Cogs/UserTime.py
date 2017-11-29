@@ -31,7 +31,10 @@ def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p", cloc
 		offset = settings.getGlobalUserStat(member, "UTCOffset")
 	if offset == None:
 		# No offset or tz - return UTC
-		t = getClockForTime(time.strftime(strft)) if clock == True, else time.strftime(strft)
+		if clock:
+			t = getClockForTime(time.strftime(strft))
+		else:
+			t = time.strftime(strft)
 		return { "zone" : 'UTC', "time" : t }
 		
 	# At this point - we need to determine if we have an offset - or possibly a timezone passed
@@ -73,7 +76,10 @@ def getTimeFromOffset(offset, t = None, strft = "%Y-%m-%d %I:%M %p", clock = Tru
 	else:
 		# No offset
 		newTime = t
-	ti = getClockForTime(newTime.strftime(strft)) if clock == True, else newTime.strftime(strft)
+	if clock:
+		ti = getClockForTime(newTime.strftime(strft))
+	else:
+		ti = newTime.strftime(strft)
 	return { "zone" : msg, "time" : ti }
 
 
@@ -90,5 +96,8 @@ def getTimeFromTZ(tz, t = None, strft = "%Y-%m-%d %I:%M %p", clock = True):
 	else:
 		zone_now = pytz.utc.localize(t, is_dst=None).astimezone(zone)
 		#zone_now = t.astimezone(zone)
-	ti = getClockForTime(zone_now.strftime(strft)) if clock == True, else zone_now.strftime(strft)
+	if clock:
+		ti = getClockForTime(zone_now.strftime(strft))
+	else:
+		ti = zone_now.strftime(strft)
 	return { "zone" : tz_list[0]['Item'], "time" : ti}
