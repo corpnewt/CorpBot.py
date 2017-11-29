@@ -142,7 +142,7 @@ class Lists:
 			if alink['Name'].lower() == name.lower():
 				linkList.remove(alink)
 				self.settings.setServerStat(server, "Links", linkList)
-				msg = '*{}* removed from link list!'.format(name)
+				msg = '*{}* removed from link list!'.format(alink['Name'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -591,7 +591,7 @@ class Lists:
 			if alink['Name'].lower() == name.lower():
 				linkList.remove(alink)
 				self.settings.setServerStat(server, "Hacks", linkList)
-				msg = '*{}* removed from hack list!'.format(name)
+				msg = '*{}* removed from hack list!'.format(alink['Name'])
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
