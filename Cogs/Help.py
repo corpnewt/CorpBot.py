@@ -207,7 +207,11 @@ class Help:
 				cog_string += "{}{} Cog\n".format("	"*tab_indent_count, cog)
 			for command in cog_commands:
 				cog_string += "{}	{}\n".format("	"*tab_indent_count, prefix + command.signature)
-				cog_string += "{}	└─{}\n".format("	"*tab_indent_count, self._get_help(command, 80))
+				cog_string += "{}	{} └─{}\n".format(
+					"	"*tab_indent_count,
+					" "*len(prefix),
+					self._get_help(command, 80)
+				)
 			cog_string += "\n"
 			msg += cog_string
 		
