@@ -237,7 +237,11 @@ class Time:
 				offset = self.settings.getGlobalUserStat(member, "UTCOffset")
 		
 		if offset == None:
-			msg = '*{}* hasn\'t set their TimeZone or offset yet - they can do so with the `{}setoffset [+-offset]` or `{}settz [Region/City]` command.\nThe current UTC time is *{}*.'.format(DisplayName.name(member), ctx.prefix, ctx.prefix, datetime.datetime.utcnow().strftime("%I:%M %p"))
+			msg = '*{}* hasn\'t set their TimeZone or offset yet - they can do so with the `{}setoffset [+-offset]` or `{}settz [Region/City]` command.\nThe current UTC time is *{}*.'.format(
+				DisplayName.name(member),
+				ctx.prefix,
+				ctx.prefix,
+				UserTime.getClockForTime(datetime.datetime.utcnow().strftime("%I:%M %p")))
 			await ctx.channel.send(msg)
 			return
 
