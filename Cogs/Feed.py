@@ -401,7 +401,7 @@ class Feed:
 				return
 
 		iskill = self.settings.getServerStat(server, "Killed")
-		if iskill.lower() == 'yes':
+		if iskill:
 			killedby = self.settings.getServerStat(server, "KilledBy")
 			killedby = DisplayName.memberForID(killedby, server)
 			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
@@ -438,7 +438,7 @@ class Feed:
 				return
 
 		iskill = self.settings.getServerStat(server, "Killed")
-		if iskill.lower() == 'no':
+		if not iskill:
 			await channel.send('Trying to bring back the *already-alive* - well aren\'t you special!')
 			return
 		
