@@ -84,7 +84,13 @@ class Mute:
                         # Still on the server - ignore
                         continue
                     if entry["Cooldown"] == None:
-                        # Perma-muted
+                        # Perma-muted - let's see if we have a rolloff time
+                        if not "Added" in entry:
+                            # Old mute - leave it be
+                            continue
+                        # See if we're over 30 days and remove perma mute
+                        if int(time.time())-int(entry["Added"]) > 3600*24*30:
+                            remove_mute.append(entry)
                         continue
                     if int(entry["Cooldown"])-int(time.time()) > 0:
                         # Still going on
@@ -162,7 +168,7 @@ class Mute:
                 entry['Cooldown'] = cooldown
                 break
         if not found:
-            muteList.append({ 'ID': member.id, 'Cooldown': cooldown })
+            muteList.append({ 'ID': member.id, 'Cooldown': cooldown, 'Added' : time.time() })
         
         if not cooldown == None:
             # We have a cooldown - set a timer
