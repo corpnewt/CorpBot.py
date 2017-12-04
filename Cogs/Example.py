@@ -10,6 +10,7 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import downloader
 from   Cogs import UserTime
+from   Cogs import PickList
 import youtube_dl
 import functools
 
@@ -872,55 +873,28 @@ class Music:
                 # empty list, no data
                 await message.edit(content="No results for that search :(")
                 return
-            song_index = 0
             if len(info['entries']) > 1:
                 # Show a list
-                count = 0
-                list_show = "Please type the number of the video you'd like to add - or type `cancel`:\n\n```\n"
-                for v in info['entries']:
-                    count += 1
-                    list_show += "{}. {}\n".format(count, v['title'])
-                list_show += "```"
-                await message.edit(content=list_show)
-                # Wait for response
-                def littleCheck(c, m):
-                    if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
-                        return False
-                    # Check if we're trying to play something else
-                    if c.command and c.command.name == "play":
-                        return True
-                    # Check for cancellation
-                    if m.content.lower() == "cancel":
-                        return True
-                    try:
-                        m_int = int(m.content)
-                    except:
-                        return False
-                    if m_int < 1 or m_int > count:
-                        return False
-                    return True
+                list_show = "Please select the number of the video you'd like to add:"
+                index, message = await PickList.Picker(
+                    title=list_show,
+                    list=[x['title'] for x in info['entries']],
+                    ctx=ctx,
+                    message=message
+                ).pick()
 
-                try:
-                    song_ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
-                except Exception:
-                    song_ind = None
-
-                if song_ind == None:
-                    await message.edit(content="Times up!  We can search for music another time.")
+                if index < 0:
+                    if index == -3:
+                        await message.edit(content="Something went wrong :(")
+                    elif index == -2:
+                        await message.edit(content="Times up!  We can search for music another time.")
+                    else:
+                        await message.edit(content="Aborting!  We can search for music another time.")
                     return
-                
-                if song_ind[1].content.lower() == "cancel":
-                    await message.edit(content="Aborting!  We can search for music another time.")
-                    return
-                
-                if song_ind[0].command and song_ind[0].command.name == "play":
-                    await message.edit(content="Another song was requested - aborting...")
-                    return
-
-                song_index = int(song_ind[1].content)-1
-
-            song = info['entries'][song_index]['webpage_url']
-            info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+                    
+                # Got a song!
+                song = info['entries'][index]['webpage_url']
+                info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
         if "entries" in info:
             # Multiple songs - let's add what we need

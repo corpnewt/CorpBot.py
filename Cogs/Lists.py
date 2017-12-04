@@ -9,6 +9,7 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 from   Cogs import FuzzySearch
 from   Cogs import Message
+from   Cogs import PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -190,55 +191,37 @@ class Lists:
 				await channel.send(msg)
 				return
 				
-		msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
-		count = 0
-		# No link - let's fuzzy search
+		not_found = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n```\n'
-			for pot in potentialList:
-				count += 1
-				msg+='{}. {}\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))
-			msg += "```"
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		message = await channel.send(msg)
-		if not count:
-			# All done
+			# Setup and display the picker
+			msg = not_found + '\n\nSelect one of the following close matches:'
+			index, message = await PickList.Picker(
+				title=msg,
+				list=[x["Item"]["Name"] for x in potentialList],
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=not_found)
+				return
+			# Display the link
+			for alink in linkList:
+				if alink["Name"] == potentialList[index]["Item"]["Name"]:
+					msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
+					await message.edit(content=msg)
+					return
+			await message.edit(content="Link `{}` no longer exists!".format(
+				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+			)
 			return
-		# Wait for response
-		def littleCheck(c, m):
-			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
-				return False
-			# Check if we're re-running the same command
-			if c.command and (c.command.name == "link" or c.command.name == "links"):
-				return True
-			# Check for cancellation
-			if m.content.lower() == "cancel":
-				return True
-			try:
-				m_int = int(m.content)
-			except:
-				return False
-			if m_int < 1 or m_int > count:
-				return False
-			return True
-		try:
-			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
-		except Exception:
-			ind = None
-		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and (ind[0].command.name == "link" or ind[0].command.name == "links")):
-			# Timed out
-			msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
-			if suppress:
-				msg = Nullify.clean(msg)
-			await message.edit(content=msg)
-			return
-		# Got one
-		await message.edit(content=" ")
-		# Invoke this command again with the right name
-		await ctx.invoke(self.link, name=potentialList[int(ind[1].content)-1]['Item']['Name'])
+		# Here we have no potentials
+		await ctx.send(not_found)
+		return
 		
 	@commands.command(pass_context=True)
 	async def rawlink(self, ctx, *, name : str = None):
@@ -274,20 +257,37 @@ class Lists:
 				await channel.send(msg)
 				return
 				
-		msg = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
-		
-		# No link - let's fuzzy search
+		not_found = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```\n'
-			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
-			msg+='```'
-		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)	
+			# Setup and display the picker
+			msg = not_found + '\n\nSelect one of the following close matches:'
+			index, message = await PickList.Picker(
+				title=msg,
+				list=[x["Item"]["Name"] for x in potentialList],
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=not_found)
+				return
+			# Display the link
+			for alink in linkList:
+				if alink["Name"] == potentialList[index]["Item"]["Name"]:
+					msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
+					await message.edit(content=msg)
+					return
+			await message.edit(content="Link `{}` no longer exists!".format(
+				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+			)
+			return
+		# Here we have no potentials
+		await ctx.send(not_found)
+		return
 
 	@commands.command(pass_context=True)
 	async def linkinfo(self, ctx, *, name : str = None):
@@ -638,55 +638,38 @@ class Lists:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
-		msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
-		count = 0
-		# No hack - let's fuzzy search
+		
+		not_found = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nSelect one of the following close matches - or type `cancel`:\n\n```\n'
-			for pot in potentialList:
-				count += 1
-				msg+='{}. {}\n'.format(count, pot['Item']['Name'].replace('`', '\\`'))
-			msg += "```"
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		message = await channel.send(msg)
-		if not count:
-			# All done
+			# Setup and display the picker
+			msg = not_found + '\n\nSelect one of the following close matches:'
+			index, message = await PickList.Picker(
+				title=msg,
+				list=[x["Item"]["Name"] for x in potentialList],
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=not_found)
+				return
+			# Display the link
+			for alink in linkList:
+				if alink["Name"] == potentialList[index]["Item"]["Name"]:
+					msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
+					await message.edit(content=msg)
+					return
+			await message.edit(content="Hack `{}` no longer exists!".format(
+				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+			)
 			return
-		# Wait for response
-		def littleCheck(c, m):
-			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
-				return False
-			# Check if we're re-running the same command
-			if c.command and (c.command.name == "hack" or c.command.name == "hacks"):
-				return True
-			# Check for cancellation
-			if m.content.lower() == "cancel":
-				return True
-			try:
-				m_int = int(m.content)
-			except:
-				return False
-			if m_int < 1 or m_int > count:
-				return False
-			return True
-		try:
-			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
-		except Exception:
-			ind = None
-		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and (ind[0].command.name == "hack" or ind[0].command.name == "hacks")):
-			# Timed out
-			msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
-			if suppress:
-				msg = Nullify.clean(msg)
-			await message.edit(content=msg)
-			return
-		# Got one
-		await message.edit(content=" ")
-		# Invoke this command again with the right name
-		await ctx.invoke(self.hack, name=potentialList[int(ind[1].content)-1]['Item']['Name'])
+		# Here we have no potentials
+		await ctx.send(not_found)
+		return
 		
 	@commands.command(pass_context=True)
 	async def rawhack(self, ctx, *, name : str = None):
@@ -721,20 +704,38 @@ class Lists:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
-		msg = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
 		
-		# No hack - let's fuzzy search
+		not_found = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
-			msg+='\n\nDid you maybe mean one of the following?\n```\n'
-			for pot in potentialList:
-				msg+='{}\n'.format(pot['Item']['Name'].replace('`', '\\`'))
-			msg+='```'
-		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
+			# Setup and display the picker
+			msg = not_found + '\n\nSelect one of the following close matches:'
+			index, message = await PickList.Picker(
+				title=msg,
+				list=[x["Item"]["Name"] for x in potentialList],
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=not_found)
+				return
+			# Display the link
+			for alink in linkList:
+				if alink["Name"] == potentialList[index]["Item"]["Name"]:
+					msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+					# Check for suppress
+					if suppress:
+						msg = Nullify.clean(msg)
+					await message.edit(content=msg)
+					return
+			await message.edit(content="Hack `{}` no longer exists!".format(
+				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+			)
+			return
+		# Here we have no potentials
+		await ctx.send(not_found)
+		return
 
 	@commands.command(pass_context=True)
 	async def hackinfo(self, ctx, *, name : str = None):
