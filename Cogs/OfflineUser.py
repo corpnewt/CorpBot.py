@@ -32,6 +32,9 @@ class OfflineUser:
 		for mention in message.mentions:
 			if mention.status == discord.Status.offline:
 				name_list.append(DisplayName.name(mention))
+		if not len(name_list):
+			# No one was offline
+			return
 		if len(name_list) == 1:
 			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
 		else:
