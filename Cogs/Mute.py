@@ -53,6 +53,8 @@ class Mute:
                     if cooldown == None:
                         continue
                     self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+        # Add a loop to remove expired mutes in the MuteList
+        self.loop_list.append(self.bot.loop.create_task(self.mute_list_check()))
                     
         
     def suppressed(self, guild, msg):
@@ -69,6 +71,34 @@ class Mute:
             if str(entry['ID']) == str(member.id):
                 # Found them - mute them
                 await self.mute(member, server, entry['Cooldown'])
+                
+    async def mute_list_check(self):
+        while not self.bot.is_closed():
+            # Iterate through the servers and check for roll-off mutes
+            for guild in self.bot.guilds:
+                mute_list = self.settings.getServerStat(guild, "MuteList")
+                # Go through the id's and check for orphaned ones
+                remove_mute = []
+                for entry in mute_list:
+                    if guild.get_member(int(entry["ID"])):
+                        # Still on the server - ignore
+                        continue
+                    if entry["Cooldown"] == None:
+                        # Perma-muted
+                        continue
+                    if int(entry["Cooldown"])-int(time.time()) > 0:
+                        # Still going on
+                        continue
+                    # We can remove them
+                    remove_mute.append(entry)
+                if len(remove_mute) == 0:
+                    # No one to remove
+                    continue
+                for entry in remove_mute:
+                    mute_list.remove(entry)
+                self.settings.setServerStat(guild, "MuteList", mute_list)
+            # Check once per hour
+            await asyncio.sleep(3600)
 
     async def checkMute(self, member, server, cooldown):
         # Check if we have a cooldown left - and unmute accordingly
