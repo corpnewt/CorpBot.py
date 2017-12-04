@@ -29,10 +29,10 @@ class OfflineUser:
 		for mention in message.mentions:
 			name_list.append(DisplayName.name(mention))
 		if len(name_list) == 1:
-			await ctx.send("{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0]))
+			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
 		else:
-			await ctx.send("{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list)))
-		return
+			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
+		return { "Respond" : msg }
 
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
