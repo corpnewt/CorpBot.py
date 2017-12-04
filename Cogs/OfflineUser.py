@@ -21,12 +21,12 @@ class OfflineUser:
 		if pm == True and not ctx.channel == ctx.author.dm_channel:
 			# Try to dm
 			try:
-				await ctx.author.send(embed)
+				await ctx.author.send(msg)
 				await ctx.message.add_reaction("📬")
 			except discord.Forbidden:
-				await ctx.send(embed)
+				await ctx.send(msg)
 			return
-		await ctx.send(embed)
+		await ctx.send(msg)
 
 	@asyncio.coroutine
 	async def on_message(self, message):
@@ -53,6 +53,7 @@ class OfflineUser:
 		else:
 			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
 		await self._send_message(ctx, msg, True)
+		await 
 
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
