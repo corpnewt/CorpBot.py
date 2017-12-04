@@ -89,8 +89,8 @@ class Mute:
                             # Old mute - set "Added" to now
                             entry["Added"] = int(time.time())
                             continue
-                        # See if we're over 30 days and remove perma mute
-                        if int(time.time())-int(entry["Added"]) > 3600*24*30:
+                        # See if we're over 90 days and remove perma mute
+                        if int(time.time())-int(entry["Added"]) > 3600*24*90:
                             remove_mute.append(entry)
                         continue
                     if int(entry["Cooldown"])-int(time.time()) > 0:
