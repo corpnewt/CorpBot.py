@@ -53,7 +53,6 @@ class OfflineUser:
 		else:
 			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
 		await self._send_message(ctx, msg, True)
-		await 
 
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
