@@ -15,8 +15,21 @@ class OfflineUser:
 	def __init__(self, bot):
 		self.bot = bot
 		self.settings = bot.get_cog("Settings")
+		
+	async def _send_message(self, ctx, msg, pm = False):
+		# Helper method to send messages to their proper location
+		if pm == True and not ctx.channel == ctx.author.dm_channel:
+			# Try to dm
+			try:
+				await ctx.author.send(embed)
+				await ctx.message.add_reaction("📬")
+			except discord.Forbidden:
+				await ctx.send(embed)
+			return
+		await ctx.send(embed)
 
-	async def message(self, message):
+	@asyncio.coroutine
+	async def on_message(self, message):
 		if not message.guild:
 			return
 		if not self.settings.getServerStat(message.guild, "RemindOffline"):
@@ -39,7 +52,7 @@ class OfflineUser:
 			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
 		else:
 			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
-		return { "Respond" : msg }
+		await self._send_message(ctx, msg, True)
 
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
