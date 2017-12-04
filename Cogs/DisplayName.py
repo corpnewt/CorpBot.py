@@ -82,6 +82,9 @@ def roleForID(id, server):
 
 def roleForName(name, server):
     name = str(name)
+    # Adjust for "everyone"
+    if name.lower() == "everyone":
+        name = "@everyone"
     for role in server.roles:
         if role.name.lower() == name.lower():
             return role
