@@ -23,11 +23,15 @@ class OfflineUser:
 			return
 		# Valid message
 		ctx = await self.bot.get_context(message)
+		if ctx.command:
+			# Don't check if we're running a command
+			return
 		if not len(message.mentions):
 			return
 		name_list = []
 		for mention in message.mentions:
-			name_list.append(DisplayName.name(mention))
+			if mention.status == discord.Status.offline:
+				name_list.append(DisplayName.name(mention))
 		if len(name_list) == 1:
 			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
 		else:
