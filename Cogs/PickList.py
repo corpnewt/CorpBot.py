@@ -61,7 +61,7 @@ class Picker:
         
         await message.clear_reactions()
         # Get the adjusted index
-        ind = current_reactions.index(str(reaction.emoji))+1
-        if ind == len(current_reactions):
+        ind = current_reactions.index(str(reaction.emoji))
+        if ind == len(current_reactions)-1:
             ind = -1
         return (ind, message)
