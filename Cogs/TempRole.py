@@ -486,6 +486,20 @@ class TempRole:
 			await ctx.send(msg)
 			return
 
+		# Don't allow us to temp admins or bot admins
+		isAdmin = member_from_name.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in member_from_name.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if isAdmin:
+			await ctx.channel.send("You can't apply temp roles to other admins or bot-admins.")
+			return
+
 		if not role_from_name:
 			msg = 'I couldn\'t find *{}*...'.format(role)
 			# Check for suppress
@@ -539,7 +553,7 @@ class TempRole:
 		if not found:
 			# Add it anew
 			temp_role["ID"] = role_from_name.id
-			temp_role["Cooldown"] = cooldown + int(time.time())
+			temp_role["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
 			user_roles.append(temp_role)
 			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
 		if not role_from_name in member_from_name.roles:
