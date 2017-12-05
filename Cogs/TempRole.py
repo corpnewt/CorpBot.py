@@ -365,10 +365,10 @@ class TempRole:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			for arole in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					if str(aRole['ID']) == str(arole.id):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -454,10 +454,10 @@ class TempRole:
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
+			for arole in ctx.message.author.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					if str(aRole['ID']) == str(arole.id):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -490,10 +490,10 @@ class TempRole:
 		isAdmin = member_from_name.permissions_in(ctx.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in member_from_name.roles:
+			for arole in member_from_name.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					if str(aRole['ID']) == str(arole.id):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if isAdmin:
