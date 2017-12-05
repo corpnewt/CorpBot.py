@@ -34,14 +34,14 @@ class Picker:
         # Show our list items
         current = 0
         # current_reactions = [self.reactions[0]]
-	current_reactions = []
+        current_reactions = []
         for item in self.list:
             current += 1
             current_reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(current))
             msg += "{}. {}\n".format(current, item)
         msg += "```"
-	# Add the stop reaction
-	current_reactions.append(self.reactions[0])
+        # Add the stop reaction
+        current_reactions.append(self.reactions[0])
         if self.message:
             message = self.message
             await message.edit(content=msg)
@@ -60,8 +60,8 @@ class Picker:
             return (-2, message)
         
         await message.clear_reactions()
-	# Get the adjusted index
-	ind = current_reactions.index(str(reaction.emoji))+1
-	if ind == len(current_reactions):
-		ind = -1
+        # Get the adjusted index
+        ind = current_reactions.index(str(reaction.emoji))+1
+        if ind == len(current_reactions):
+            ind = -1
         return (ind, message)
