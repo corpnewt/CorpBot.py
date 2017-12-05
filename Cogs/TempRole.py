@@ -172,6 +172,38 @@ class TempRole:
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
+	async def getautotemp(self, ctx):
+		"""Gets the temp role applied to each new user that joins."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		temp_id = self.settings.getServerStat(ctx.guild, "TempRole")
+		if temp_id == None:
+			# No temp setup
+			await ctx.send("There is no default temp role.")
+			return
+
+		temp_role = DisplayName.roleForName(temp_id, ctx.guild)
+		if temp_role == None:
+			# Not a role anymore
+			await ctx.send("The default temp role ({}) no longer exists.".format(temp_id))
+			return
+		role_time = self.settings.getServerStat(ctx.guild, "TempRoleTime")
+		msg = "**{}** is the default temp role - will be active for *{}*.".format(temp_role.name, ReadableTime.getReadableTimeBetween(0, role_time * 60))
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
 	async def temptime(self, ctx, *, minutes = None):
 		"""Sets the number of minutes for the temp role - must be greater than 0 (admin-only)."""
 		# Check if we're suppressing @here and @everyone mentions
@@ -515,6 +547,10 @@ class TempRole:
 			await ctx.send("That role is not in the temp role list!")
 			return
 
+		if cooldown == None:
+			await ctx.send("You must specify a time greater than 0 seconds.")
+			return
+
 		if not cooldown == None:
 			# Get the end time
 			end_time = None
@@ -535,6 +571,10 @@ class TempRole:
 				return
 			# Set the cooldown
 			cooldown = end_time
+
+		if cooldown < 1:
+			await ctx.send("You must specify a time greater than 0 seconds.")
+			return
 
 		message = await ctx.send("Applying...")
 
