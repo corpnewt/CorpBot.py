@@ -1,0 +1,566 @@
+import asyncio
+import discord
+import time
+import parsedatetime
+from   datetime import datetime
+from   operator import itemgetter
+from   discord.ext import commands
+from   Cogs import ReadableTime
+from   Cogs import DisplayName
+from   Cogs import Nullify
+
+def setup(bot):
+	# Add the bot
+	bot.add_cog(TempRole(bot))
+
+class TempRole:
+
+	# Init with the bot reference, and a reference to the settings var
+	def __init__(self, bot):
+		self.bot = bot
+		self.settings = self.bot.get_cog("Settings")
+		self.loop_list = []
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@asyncio.coroutine
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for task in self.loop_list:
+			task.cancel()
+
+	async def onjoin(self, member, server):
+		role   = self.settings.getServerStat(server, "TempRole")
+		role_t = self.settings.getServerStat(server, "TempRoleTime")
+
+		if role == None:
+			# No temp role
+			return
+		if role_t < 1:
+			# No time
+			return
+		role = DisplayName.roleForName(role, server)
+		if not role:
+			# Doesn't exist
+			return
+		
+		# Here we have a member, role, and end time - apply them!
+		user_roles = self.settings.getUserStat(member, server, "TempRoles")
+		# Check and see if we're overriding a current time
+		temp_role = {}
+		# Add it anew
+		temp_role["ID"] = role.id
+		temp_role["Cooldown"] = role_t*60 + int(time.time())
+		user_roles.append(temp_role)
+		self.settings.setUserStat(member, server, "TempRoles", user_roles)
+		try:
+			await member.add_roles(role)
+		except Exception:
+			pass
+		self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		# Check if we need to set any role removal timers
+		for server in self.bot.guilds:
+			for member in server.members:
+				temp_roles = self.settings.getUserStat(member, server, "TempRoles")
+				if len(temp_roles):
+					# We have a list
+					remove_temps = []
+					for temp_role in temp_roles:
+						if temp_role["Cooldown"] == None:
+							# Permanent temp role
+							# Let's see if the role still exists
+							found = False
+							for role in member.roles:
+								if role.id == int(temp_role["ID"]):
+									found = True
+									break
+							if not found:
+								remove_temps.append(temp_role)
+							continue
+						self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
+					# Remove any useless roles now
+					if len(remove_temps):
+						for temp in remove_temps:
+							temp_roles.remove(temp)
+
+	async def check_temp_roles(self, member, temp_role):
+		# Get the cooldown and server id
+		c = int(temp_role["Cooldown"])
+		r_id = int(temp_role["ID"])
+
+		# Wait until we're ready to remove
+		timeleft = c-int(time.time())
+		if timeleft > 0:
+			await asyncio.sleep(timeleft)
+		# Resolve the role
+		role = DisplayName.roleForID(r_id, member.guild)
+		if not role:
+			# Doesn't exist - remove it
+			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
+			temp_roles.remove(temp_role)
+			return
+		# We have a role - let's see if we still need to keep it
+		c = temp_role["Cooldown"]
+		if c == None:
+			# We now have this role forever
+			# One last check to make sure it all makes sense
+			found = False
+			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
+			if not role in member.roles:
+				temp_roles.remove(temp_role)
+			return
+		# We still have a cooldown
+		timeleft = c-int(time.time())
+		if timeleft > 0:
+			# Recalibrate
+			self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
+			return
+		# Here - we're either past our cooldown, or who knows what else
+		if role in member.roles:
+			# We have the role still - remove it
+			try:
+				await member.remove_roles(role)
+			except Exception:
+				pass
+
+	@commands.command(pass_context=True)
+	async def autotemp(self, ctx, *, role = None):
+		"""Sets the temp role to apply to each new user that joins."""
+		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if role == None:
+			self.settings.setServerStat(ctx.guild, "TempRole", None)
+			await ctx.send("Default temp role *removed*.")
+			return
+
+		roleName = role
+		role = DisplayName.roleForName(roleName, ctx.guild)
+		if not role:
+			msg = 'I couldn\'t find *{}*...'.format(roleName)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		self.settings.setServerStat(ctx.guild, "TempRole", role.id)
+		role_time = self.settings.getServerStat(ctx.guild, "TempRoleTime")
+
+		msg = "**{}** is now the default temp role - will be active for *{}*.".format(role.name, ReadableTime.getReadableTimeBetween(0, role_time * 60))
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
+	async def temptime(self, ctx, *, minutes = None):
+		"""Sets the number of minutes for the temp role - must be greater than 0 (admin-only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		try:
+			minutes = int(minutes)
+		except:
+			await ctx.send("That's not a valid integer!")
+			return
+
+		if minutes < 1:
+			await ctx.send("Time must be greater than 0!")
+			return
+
+		self.settings.setServerStat(ctx.guild, "TempRoleTime", minutes)
+
+		msg = "Temp role will last *{}*.".format(ReadableTime.getReadableTimeBetween(0, minutes*60))
+		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
+	async def addtemprole(self, ctx, *, role : str = None):
+		"""Adds a new role to the temp role list (admin only)."""
+		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if role == None:
+			await ctx.message.channel.send(usage)
+			return
+
+		roleName = role
+		role = DisplayName.roleForName(roleName, ctx.guild)
+		if not role:
+			msg = 'I couldn\'t find *{}*...'.format(roleName)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		# Now we see if we already have that role in our list
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+
+		if role.id in [int(x["ID"]) for x in promoArray]:
+			# We found it - throw an error message and return
+			msg = '**{}** is already in the list.'.format(role.name)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		# If we made it this far - then we can add it
+		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
+		self.settings.setServerStat(ctx.guild, "TempRoleList", promoArray)
+
+		msg = '**{}** added to list.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.message.channel.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def removetemprole(self, ctx, *, role : str = None):
+		"""Removes a role from the temp role list (admin only)."""
+		usage = 'Usage: `{}removetemprole [role]`'.format(ctx.prefix)
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if role == None:
+			await ctx.message.channel.send(usage)
+			return
+
+		roleName = role
+		role = DisplayName.roleForName(roleName, ctx.guild)
+		if not role:
+			msg = 'I couldn\'t find *{}*...'.format(roleName)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		# Now we see if we already have that role in our list
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+
+		if role.id in [int(x["ID"]) for x in promoArray]:
+			# We found it - throw an error message and return
+			msg = '**{}** removed successfully.'.format(role.name)
+			self.settings.setServerStat(ctx.guild, "TempRoleList", [x for x in promoArray if role.id != int(x["ID"])])
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		msg = '**{}** not found in list.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def listtemproles(self, ctx):
+		"""Lists all roles for the temp role system."""
+		
+		server  = ctx.message.guild
+		channel = ctx.message.channel
+
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(server, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+		
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(server, "TempRoleList")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+
+
+		if not len(promoArray):
+			msg = "There aren't any roles in the user role list yet.  Add some with the `{}addtemprole` command!".format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
+
+		# Sort by XP first, then by name
+		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+		promoSorted = sorted(promoArray, key=lambda x:x['Name'])
+		
+		roleText = "**__Current Temp Roles:__**\n\n"
+		for arole in promoSorted:
+			# Get current role name based on id
+			foundRole = False
+			for role in server.roles:
+				if str(role.id) == str(arole['ID']):
+					# We found it
+					foundRole = True
+					roleText = '{}**{}**\n'.format(roleText, role.name)
+			if not foundRole:
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
+
+		# Check for suppress
+		if suppress:
+			roleText = Nullify.clean(roleText)
+
+		await channel.send(roleText)
+
+	@commands.command(pass_context=True)
+	async def untemp(self, ctx, member = None, role = None):
+		"""Removes the passed temp role from the passed user (bot-admin only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if member == None or role == None:
+			msg = 'Usage: `{}untemp "[member]" "[role]"`'.format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
+
+		# Get member and role
+		member_from_name = DisplayName.memberForName(member, ctx.guild)
+		role_from_name   = DisplayName.roleForName(role, ctx.guild)
+
+		if not member_from_name and not role_from_name:
+			msg = "I couldn't find either the role or member..."
+			await ctx.send(msg)
+			return
+
+		if not member_from_name:
+			msg = 'I couldn\'t find *{}*...'.format(member)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		if not role_from_name:
+			msg = 'I couldn\'t find *{}*...'.format(role)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		# Make sure our role is in the list
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		if not role_from_name.id in [int(x["ID"]) for x in promoArray]:
+			# No dice
+			await ctx.send("That role is not in the temp role list!")
+			return
+
+		# Check if the user has that role - and remove it
+		if not role_from_name in member_from_name.roles:
+			# Don't have it
+			await ctx.send("That user doesn't have that role!")
+			return
+
+		message = await ctx.send("Applying...")
+		# We should be able to remove it now
+		try:
+			await member_from_name.remove_roles(role_from_name)
+		except Exception:
+			pass
+		
+		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles")
+		for r in user_roles:
+			if int(r["ID"]) == role_from_name.id:
+				user_roles.remove(r)
+				self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
+				break
+		
+		msg = "*{}* was removed from **{}**.".format(
+			DisplayName.name(member_from_name),
+			role_from_name.name
+		)
+		# Announce it
+		if suppress:
+			msg = Nullify.clean(msg)
+		await message.edit(content=msg)
+
+
+	@commands.command(pass_context=True)
+	async def temp(self, ctx, member = None, role = None, *, cooldown = None):
+		"""Gives the passed member the temporary role for the passed amount of time - needs quotes around member and role (bot-admin only)."""
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+		
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+
+		if member == None or role == None:
+			msg = 'Usage: `{}temp "[member]" "[role]" [cooldown]`'.format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
+
+		# Get member and role
+		member_from_name = DisplayName.memberForName(member, ctx.guild)
+		role_from_name   = DisplayName.roleForName(role, ctx.guild)
+
+		if not member_from_name and not role_from_name:
+			msg = "I couldn't find either the role or member..."
+			await ctx.send(msg)
+			return
+
+		if not member_from_name:
+			msg = 'I couldn\'t find *{}*...'.format(member)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		if not role_from_name:
+			msg = 'I couldn\'t find *{}*...'.format(role)
+			# Check for suppress
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.send(msg)
+			return
+
+		# Make sure our role is in the list
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		if not role_from_name.id in [int(x["ID"]) for x in promoArray]:
+			# No dice
+			await ctx.send("That role is not in the temp role list!")
+			return
+
+		if not cooldown == None:
+			# Get the end time
+			end_time = None
+			try:
+				# Get current time - and end time
+				currentTime = int(time.time())
+				cal         = parsedatetime.Calendar()
+				time_struct, parse_status = cal.parse(cooldown)
+				start       = datetime(*time_struct[:6])
+				end         = time.mktime(start.timetuple())
+				# Get the time from now to end time
+				end_time = end-currentTime
+			except:
+				pass
+			if end_time == None:
+				# We didn't get a time
+				await ctx.send("That time value is invalid.")
+				return
+			# Set the cooldown
+			cooldown = end_time
+
+		message = await ctx.send("Applying...")
+
+		# Here we have a member, role, and end time - apply them!
+		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles")
+		# Check and see if we're overriding a current time
+		found = False
+		temp_role = {}
+		for r in user_roles:
+			if int(r["ID"]) == role_from_name.id:
+				# Already have it - update the cooldown
+				r["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
+				temp_role = r
+				found = True
+				break
+		if not found:
+			# Add it anew
+			temp_role["ID"] = role_from_name.id
+			temp_role["Cooldown"] = cooldown + int(time.time())
+			user_roles.append(temp_role)
+			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
+		if not role_from_name in member_from_name.roles:
+			try:
+				await member_from_name.add_roles(role_from_name)
+			except Exception:
+				pass
+		if not cooldown == None:
+			# We have a cooldown
+			msg = "*{}* has been given **{}** for *{}*.".format(
+				DisplayName.name(member_from_name),
+				role_from_name.name,
+				ReadableTime.getReadableTimeBetween(0, cooldown)
+			)
+			self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member_from_name, temp_role)))
+		else:
+			msg = "*{}* has been given **{}** *until further notice*.".format(
+				DisplayName.name(member_from_name),
+				role_from_name.name
+			)
+		# Announce it
+		if suppress:
+			msg = Nullify.clean(msg)
+		await message.edit(content=msg)

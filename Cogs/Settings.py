@@ -41,6 +41,9 @@ class Settings:
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
+				"TempRole"				: None,		# Assign a default temporary role
+				"TempRoleTime"			: 2,		# Number of minutes before temp role expires
+				"TempRoleList"			: [],		# List of temporary roles
 				"DefaultXP"				: 0,		# Default xp given to each new member on join
 				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
 				"AdminLock" 			: False, 	# Does the bot *only* answer to admins?
@@ -472,6 +475,9 @@ class Settings:
 				needsUpdate = True
 			if not "Profiles" in y:
 				y["Profiles"] = []
+				needsUpdate = True
+			if not "TempRoles" in y:
+				y["TempRoles"] = []
 				needsUpdate = True
 			if not "UTCOffset" in y:
 				y["UTCOffset"] = None

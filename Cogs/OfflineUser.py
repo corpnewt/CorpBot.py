@@ -7,7 +7,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(OfflineUser(bot))
 
-# This is the Uptime module. It keeps track of how long the bot's been up
+# This is the OfflineUser module
 
 class OfflineUser:
 

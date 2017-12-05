@@ -1179,7 +1179,7 @@ class Admin:
 				return
 
 		# If we made it this far - then we didn't find it
-		msg = '**{}** not found in list.'.format(aRole['Name'])
+		msg = '**{}** not found in list.'.format(role.name)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)

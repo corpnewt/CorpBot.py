@@ -243,7 +243,7 @@ class UserRole:
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:x['Name'])
 		
-		roleText = "Current Roles:\n"
+		roleText = "**__Current Roles:__**\n\n"
 		for arole in promoSorted:
 			# Get current role name based on id
 			foundRole = False

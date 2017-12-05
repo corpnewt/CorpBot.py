@@ -211,6 +211,9 @@ class BotAdmin:
 			msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
 			pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.message.author), self.suppressed(ctx.guild, ctx.guild.name))
 
+		if suppress:
+			msg = Nullify.clean(msg)
+			
 		await mess.edit(content=msg)
 		try:
 			await member.send(pm)

@@ -657,7 +657,7 @@ class Lists:
 			# Display the link
 			for alink in linkList:
 				if alink["Name"] == potentialList[index]["Item"]["Name"]:
-					msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'])
+					msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'])
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
