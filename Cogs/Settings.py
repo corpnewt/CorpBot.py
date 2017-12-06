@@ -44,6 +44,7 @@ class Settings:
 				"TempRole"				: None,		# Assign a default temporary role
 				"TempRoleTime"			: 2,		# Number of minutes before temp role expires
 				"TempRoleList"			: [],		# List of temporary roles
+				"TempRolePM"			: False,	# Do we pm when a user is given a temp role?
 				"DefaultXP"				: 0,		# Default xp given to each new member on join
 				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
 				"AdminLock" 			: False, 	# Does the bot *only* answer to admins?
