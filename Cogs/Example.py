@@ -855,6 +855,7 @@ class Music:
             return
 
         if info.get('url', '').startswith('ytsearch'):
+            index = 0
             if self.settings.getServerStat(ctx.guild, "YTMultiple"):
                 info['url'] = info['url'].replace("ytsearch:", "ytsearch5:")
             info = await self.downloader.extract_info(
