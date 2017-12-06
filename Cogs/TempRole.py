@@ -132,7 +132,7 @@ class TempRole:
 			except Exception:
 				pass
 		# Check if we pm
-		if self.settings.getServerStat(member.guild, "TempRolePM"):
+		if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in temp_role:
 			try:
 				await member.send("**{}** was removed from your roles in *{}*.".format(role.name, member.guild.name))
 			except:
@@ -644,6 +644,7 @@ class TempRole:
 			if int(r["ID"]) == role_from_name.id:
 				# Already have it - update the cooldown
 				r["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
+				r["AddedBy"] = ctx.author.id
 				temp_role = r
 				found = True
 				break
@@ -651,6 +652,7 @@ class TempRole:
 			# Add it anew
 			temp_role["ID"] = role_from_name.id
 			temp_role["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
+			temp_role["AddedBy"] = ctx.author.id
 			user_roles.append(temp_role)
 			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
 		if not role_from_name in member_from_name.roles:
