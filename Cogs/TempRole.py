@@ -131,6 +131,51 @@ class TempRole:
 				await member.remove_roles(role)
 			except Exception:
 				pass
+			
+	@commands.command(pass_context=True)
+	async def temppm(self, ctx, *, yes_no = None):
+		"""Sets whether to inform users that they've been given a temp role."""
+
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
+			return
+
+		setting_name = "Temp role pm"
+		setting_val  = "TempRolePM"
+
+		current = self.settings.getServerStat(ctx.guild, setting_val)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
+			else:
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
+		else:
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def autotemp(self, ctx, *, role = None):
@@ -472,6 +517,12 @@ class TempRole:
 		if suppress:
 			msg = Nullify.clean(msg)
 		await message.edit(content=msg)
+		# Check if we pm
+		if self.settings.getServerStat(ctx.guild, "TempRolePM"):
+			try:
+				await member_from_name.send("**{}** was removed from your roles in *{}*.".format(role_from_name.name, ctx.guild.name))
+			except:
+				pass
 
 
 	@commands.command(pass_context=True)
@@ -608,13 +659,28 @@ class TempRole:
 				role_from_name.name,
 				ReadableTime.getReadableTimeBetween(0, cooldown)
 			)
+			pm = "You have been given **{}** in *{}* for *{}*".format(
+				role_from_name.name,
+				ctx.guild.name,
+				ReadableTime.getReadableTimeBetween(0, cooldown)
+			)
 			self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member_from_name, temp_role)))
 		else:
 			msg = "*{}* has been given **{}** *until further notice*.".format(
 				DisplayName.name(member_from_name),
 				role_from_name.name
 			)
+			pm = "You have been given **{}** in *{} until further notice*.".format(
+				role_from_name.name,
+				ctx.guild.name
+			)
 		# Announce it
 		if suppress:
 			msg = Nullify.clean(msg)
 		await message.edit(content=msg)
+		# Check if we pm
+		if self.settings.getServerStat(ctx.guild, "TempRolePM"):
+			try:
+				await member_from_name.send(pm)
+			except:
+				pass
