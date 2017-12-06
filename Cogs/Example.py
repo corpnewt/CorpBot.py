@@ -892,9 +892,9 @@ class Music:
                         await message.edit(content="Aborting!  We can search for music another time.")
                     return
                     
-                # Got a song!
-                song = info['entries'][index]['webpage_url']
-                info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
+            # Got a song!
+            song = info['entries'][index]['webpage_url']
+            info = await self.downloader.extract_info(self.bot.loop, song, download=False, process=False)
 
         if "entries" in info:
             # Multiple songs - let's add what we need
