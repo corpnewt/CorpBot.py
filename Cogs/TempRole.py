@@ -131,6 +131,12 @@ class TempRole:
 				await member.remove_roles(role)
 			except Exception:
 				pass
+		# Check if we pm
+		if self.settings.getServerStat(member.guild, "TempRolePM"):
+			try:
+				await member.send("**{}** was removed from your roles in *{}*.".format(role.name, member.guild.name))
+			except:
+				pass
 			
 	@commands.command(pass_context=True)
 	async def temppm(self, ctx, *, yes_no = None):
