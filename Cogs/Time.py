@@ -9,6 +9,7 @@ from   Cogs import DisplayName
 from   Cogs import Message
 from   Cogs import Nullify
 from   Cogs import UserTime
+from   Cogs import PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -32,54 +33,29 @@ class Time:
 			await ctx.channel.send("*{}*, your TimeZone has been removed!".format(DisplayName.name(ctx.author)))
 			return
 		
+		not_found = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
-		count = 0
 		if not tz_list[0]['Ratio'] == 1:
-			# We didn't find a complete match
-			msg = 'TimeZone `{}` not found!\n\n'.format(tz.replace('`', '\\`'))
-			msg += "Select one of the following close matches - or type `cancel`:\n\n```"
-			for t in tz_list:
-				count += 1
-				msg += "{}. {}\n".format(count, t['Item']).replace('`', '\\`')
-			msg += '```'
-		else:
+			# Setup and display the picker
+			msg = not_found + '\nSelect one of the following close matches:'
+			index, message = await PickList.Picker(
+				title=msg,
+				list=[x["Item"] for x in tz_list],
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=not_found)
+				return
 			# We got a time zone
-			self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
-			msg = "TimeZone set to *{}!*".format(tz_list[0]['Item'])
+			self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[index]['Item'])
+			await message.edit(content="TimeZone set to `{}`!".format(tz_list[index]['Item']))
+			return
+		# We got a time zone
+		self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
+		msg = "TimeZone set to `{}`!".format(tz_list[0]['Item'])
 		message = await ctx.send(msg)
-		if not count:
-			return
-		# Wait for response
-		def littleCheck(c, m):
-			if m.author.id != ctx.author.id or m.channel.id != ctx.channel.id:
-				return False
-			# Check if we're re-running the same command
-			if c.command and c.command.name == "settz":
-				return True
-			# Check for cancellation
-			if m.content.lower() == "cancel":
-				return True
-			try:
-				m_int = int(m.content)
-			except:
-				return False
-			if m_int < 1 or m_int > count:
-				return False
-			return True
-		try:
-			ind = await self.bot.wait_for('message_context', check=littleCheck, timeout=60)
-		except Exception:
-			ind = None
-		if ind == None or ind[1].content.lower() == "cancel" or (ind[0].command and ind[0].command.name == "tag"):
-			# Timed out
-			msg = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
-			await message.edit(content=msg)
-			return
-		# Got one
-		await message.edit(content=" ")
-		# Invoke this command again with the right name
-		await ctx.invoke(self.settz, tz=tz_list[int(ind[1].content)-1]['Item'])
 
 	
 	@commands.command(pass_context=True)
@@ -159,7 +135,7 @@ class Time:
 				return
 		off = "{}:{}".format(hours, minutes)
 		self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", off)
-		msg = '*{}*, your UTC offset has been set to *{}!*'.format(DisplayName.name(ctx.message.author), off)
+		msg = '*{}*, your UTC offset has been set to `{}`!'.format(DisplayName.name(ctx.message.author), off)
 		await ctx.channel.send(msg)
 
 
