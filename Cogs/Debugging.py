@@ -126,7 +126,7 @@ class Debugging:
 			return
 		# A new member joined
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, "", title=msg, color=discord.Color.white())
+		await self._logEvent(server, "", title=msg, color=discord.Color.teal())
 		
 	@asyncio.coroutine
 	async def on_member_remove(self, member):
