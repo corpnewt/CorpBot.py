@@ -294,13 +294,21 @@ class Debugging:
 			# Check for suppress
 			if suppress:
 				log_message = Nullify.clean(log_message)
+			# Replace any backticks with single quotes
+			log_backs = log_message.replace("`", "'")
+			if log_backs == log_message:
+				# Nothing changed
+				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC"
+			else:
+				# We nullified some backticks - make a note of it
+				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
 			await Message.EmbedText(
 				title=title,
 				description=log_message,
 				color=color,
 				desc_head="```\n",
 				desc_foot="```",
-				footer=datetime.utcnow().strftime("%I:%M %p") + " UTC"
+				footer=footer
 			).send(logChan)
 			# await logChan.send(log_message)
 
