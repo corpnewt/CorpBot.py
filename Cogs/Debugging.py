@@ -164,7 +164,13 @@ class Debugging:
 				msg += 'URL:\n   {}\n   --->\n   {}\n'.format(before.game.url, after.game.url)
 			if not before.game.type == after.game.type and self.shouldLog('user.game.type', server):
 				# Type changed
-				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(before.game.type, after.game.type)
+				play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
+				try:
+					b_string = play_list[before.game.type]
+					a_string = play_list[after.game.type]
+				except:
+					b_string = a_string = "Playing"
+				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(b_string, a_string)
 			if len(msg):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
