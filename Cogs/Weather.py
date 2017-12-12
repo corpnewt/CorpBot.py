@@ -47,6 +47,10 @@ class Weather:
 			return "️🌫️ "+w_text
 		return w_text
 
+	def _f_to_c(self, f):
+		f = int(f)
+		return int((f-32)*(5/9))
+
 	@commands.command(pass_context=True)
 	async def forecast(self, ctx, *, city_name = None):
 		"""Gets some weather."""
@@ -74,13 +78,13 @@ class Weather:
 		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
 		if index == 0 or index == 2:
 			# Build the public response
-			current = "__**Current Weather**__:\n\n{}, {} °F".format(self._get_output(location.condition().text()), location.condition().temp())
+			current = "__**Current Weather**__:\n\n{}, {} °F ({} °C)".format(self._get_output(location.condition().text()), location.condition().temp(), int(self._f_to_c(location.condition().temp())))
 			await Message.EmbedText(title=title, description=current, color=ctx.author, footer="Powered by Yahoo Weather").edit(ctx, message)
 		if index == 1 or index == 2:
 			current = "__**Future Forecast:**__"
 			fields = []
 			for f in location.forecast():
-				fields.append({ "name" : f.date(), "value" : self._get_output(f.text()) + ", {}/{} °F".format(f.high(), f.low()), "inline" : False })
+				fields.append({ "name" : f.date(), "value" : self._get_output(f.text()) + ", {}/{} °F ({}/{} °C)".format(f.high(), f.low(), self._f_to_c(f.high()), self._f_to_c(f.low())), "inline" : False })
 			mess = await Message.Embed(title=title, description=current, fields=fields, color=ctx.author, pm_after=0, footer="Powered by Yahoo Weather").send(ctx)
 			if mess.channel == ctx.author.dm_channel and not index == 2:
 				await message.edit(content="Forecast sent to you in dm!")
