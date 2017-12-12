@@ -144,7 +144,7 @@ class Debugging:
 		# A member changed something about their user-profile
 		server = before.guild
 		if not before.status == after.status and self.shouldLog('user.status', server):
-			msg = 'Changed Status:\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
+			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.game == after.game:
 			# Something changed
@@ -167,20 +167,20 @@ class Debugging:
 				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(before.game.type, after.game.type)
 			if len(msg):
 				# We saw something tangible change
-				msg = 'Changed Playing Status: \n{}'.format(msg)
+				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
 					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
 			# Avatar changed
-			msg = 'Changed Avatars: \n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
+			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
-			msg = 'Changed Nickname: \n{}\n   --->\n{}'.format(before.nick, after.nick)
+			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.name == after.name and self.shouldLog('user.name', server):
 			# Name changed
-			msg = 'Changed Name: \n{}\n   --->\n{}'.format(before.name, after.name)
+			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		
 	@asyncio.coroutine
@@ -227,7 +227,7 @@ class Debugging:
 			msg += "\n\n--- Attachments ---\n\n"
 			for a in before.attachments:
 				msg += a.url + "\n"
-		msg += '\n\n--- To: ---\n\n{}\n'.format(after.content)
+		msg += '\n\n--- To ---\n\n{}\n'.format(after.content)
 		if len(after.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
