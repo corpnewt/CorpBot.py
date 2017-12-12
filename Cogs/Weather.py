@@ -3,6 +3,8 @@ import discord
 import weather
 from   discord.ext import commands
 from   Cogs import Message
+from   Cogs import PickList
+from   Cogs import Nullify
 
 def setup(bot):
 	# Add the bot
@@ -46,19 +48,41 @@ class Weather:
 		return w_text
 
 	@commands.command(pass_context=True)
-	async def forecast(self, ctx, *, location = None):
+	async def forecast(self, ctx, *, city_name = None):
 		"""Gets some weather."""
-		if location == None:
-			await ctx.send("Usage: `{}forecast [city name]`".format(ctx.prefix))
+		if city_name == None:
+			await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
 			return
-		location = self.weather.lookup_by_location(location)
+		location = self.weather.lookup_by_location(city_name)
 		if not location:
 			await ctx.send("I couldn't find that city...")
 			return
 		location_info = location.location()
+		
+		response_list = ["Current Weather", "10-Day Forecast", "Both"]
+		index, message = await PickList.Picker(
+			list=response_list, 
+			title="Please select an option for `{}`:".format(city_name.replace('`', '\\`')),
+			ctx=ctx
+			).pick()
+
+		if index < 0:
+			# Aborted!
+			await message.edit(content="Forecast cancelled!")
+			return
+
 		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
-		current = "__**Current Weather**__:\n\n{}, {} °F\n\n__**Future Forecast:**__\n\n".format(self._get_output(location.condition().text()), location.condition().temp())
-		fields = []
-		for f in location.forecast():
-			fields.append({ "name" : f.date(), "value" : self._get_output(f.text()) + ", {}/{} °F".format(f.high(), f.low()), "inline" : False })
-		await Message.Embed(title=title, description=current, fields=fields, color=ctx.author).send(ctx)
+		if index == 0 or index == 2:
+			# Build the public response
+			current = "__**Current Weather**__:\n\n{}, {} °F".format(self._get_output(location.condition().text()), location.condition().temp())
+			await Message.EmbedText(title=title, description=current, color=ctx.author, footer="Powered by Yahoo Weather").edit(ctx, message)
+		if index == 1 or index == 2:
+			current = "__**Future Forecast:**__"
+			fields = []
+			for f in location.forecast():
+				fields.append({ "name" : f.date(), "value" : self._get_output(f.text()) + ", {}/{} °F".format(f.high(), f.low()), "inline" : False })
+			mess = await Message.Embed(title=title, description=current, fields=fields, color=ctx.author, pm_after=0, footer="Powered by Yahoo Weather").send(ctx)
+			if mess.channel == ctx.author.dm_channel and not index == 2:
+				await message.edit(content="Forecast sent to you in dm!")
+				return
+		await message.edit(content=" ")
