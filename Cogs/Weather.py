@@ -62,11 +62,12 @@ class Weather:
 			await ctx.send("I couldn't find that city...")
 			return
 		location_info = location.location()
+		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
 		
 		response_list = ["Current Weather", "10-Day Forecast", "Both"]
 		index, message = await PickList.Picker(
 			list=response_list, 
-			title="Please select an option for `{}`:".format(city_name.replace('`', '\\`')),
+			title="Please select an option for `{}`:".format(title.replace('`', '\\`')),
 			ctx=ctx
 			).pick()
 
@@ -74,8 +75,6 @@ class Weather:
 			# Aborted!
 			await message.edit(content="Forecast cancelled!")
 			return
-
-		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
 		if index == 0 or index == 2:
 			# Build the public response
 			current = "__**Current Weather**__:\n\n{}, {} °F ({} °C)".format(self._get_output(location.condition().text()), location.condition().temp(), int(self._f_to_c(location.condition().temp())))
