@@ -199,9 +199,6 @@ class Debugging:
 		# A message was sent
 		title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 		msg = message.content
-		if self.wrap:
-			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg, replace_whitespace=False)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
@@ -226,17 +223,11 @@ class Debugging:
 		# A message was edited
 		title = '✏️ {}#{} ({}), in #{}, edited:'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name)
 		msg = before.content
-		if self.wrap:
-			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg, replace_whitespace=False)
-			af  = textwrap.fill(after.content, replace_whitespace=False)
-		else:
-			af  = after.content
 		if len(before.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in before.attachments:
 				msg += a.url + "\n"
-		msg += '\n--- To: ---\n{}\n'.format(af)
+		msg += '\n--- To: ---\n{}\n'.format(after.content)
 		if len(after.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
@@ -262,9 +253,6 @@ class Debugging:
 		# A message was deleted
 		title = '❌ {}#{} ({}), in #{}, deleted:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 		msg = message.content
-		if self.wrap:
-			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg, replace_whitespace=False)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
@@ -303,6 +291,9 @@ class Debugging:
 				# We nullified some backticks - make a note of it
 				log_message = log_back
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+			if self.wrap:
+				# Wraps the message to lines no longer than 70 chars
+				log_message = textwrap.fill(log_message, replace_whitespace=False)
 			await Message.EmbedText(
 				title=title,
 				description=log_message,
