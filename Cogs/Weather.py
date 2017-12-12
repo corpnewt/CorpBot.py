@@ -49,9 +49,12 @@ class Weather:
 	async def forecast(self, ctx, *, location = None):
 		"""Gets some weather."""
 		if location == None:
-			await ctx.send("You need to pass a city.")
+			await ctx.send("Usage: `{}forecast [city name]`".format(ctx.prefix))
 			return
 		location = self.weather.lookup_by_location(location)
+		if not location:
+			await ctx.send("I couldn't find that city...")
+			return
 		location_info = location.location()
 		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
 		current = "__**Current Weather**__:\n\n{}, {} °F\n\n__**Future Forecast:**__\n\n".format(self._get_output(location.condition().text()), location.condition().temp())
