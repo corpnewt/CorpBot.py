@@ -301,6 +301,7 @@ class Debugging:
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC"
 			else:
 				# We nullified some backticks - make a note of it
+				log_message = log_backs
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
 			await Message.EmbedText(
 				title=title,
