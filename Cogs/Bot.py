@@ -185,7 +185,7 @@ class Bot:
 		server_embed.add_field(name="Prefixes", value=prefix, inline=True)
 		server_embed.add_field(name="Status", value=status_text, inline=True)
 		if bot_member.game and bot_member.game.name:
-			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
+			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
 			try:
 				play_string = play_list[bot_member.game.type]
 			except:
