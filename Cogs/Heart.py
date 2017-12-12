@@ -22,11 +22,12 @@ class Heart:
 		if context.command:
 			return {}
 		# Check for a mention
+		bot_mentions = []
 		try:
-			botMember = discord.utils.get(message.guild.members, id=self.bot.user.id)
+			bot_mentions.append(message.guild.me.mention)
 		except Exception:
-			# Couldn't get a member - just get the user
-			botMember = self.bot.user
+			pass
+		bot_mentions.append(self.bot.user.mention)
 		react_list = []
 		# Get our hug phrases
 		'''hugs = [ "i need a hug", "i wish i had a hug", "i could use a hug", "hug me" ]
@@ -39,9 +40,10 @@ class Heart:
 		if len(list(matches)):
 			# We need a hug, stat!
 			react_list.append("🤗")
-		if botMember.mention in message.content:
-			# We got a mention!
-			react_list.append("❤")
+		for x in bot_mentions:
+			if x in message.content:
+				# We got a mention!
+				react_list.append("❤")
 		# Return our reactions - if any
 		if len(react_list):
 			return { "Reaction" : react_list }

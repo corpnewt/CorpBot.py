@@ -48,7 +48,7 @@ class Message:
             else:
                 # Setup our file
                 send_file = dfile[0]
-        if pm == True and not ctx.channel == ctx.author.dm_channel:
+        if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
             # More than 2 pages - try to dm
             try:
                 message = await ctx.author.send(message, file=send_file)
@@ -182,8 +182,8 @@ class Embed:
                 # Setup our file
                 send_file = dfile[0]
                 embed.set_image(url="attachment://" + str(dfile[1]))
-        if pm == True and not ctx.channel == ctx.author.dm_channel:
-            # More than 2 pages - try to dm
+        if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
+            # More than 2 pages and targeting context - try to dm
             try:
                 if send_file:
                     message = await ctx.author.send(embed=embed, file=send_file)

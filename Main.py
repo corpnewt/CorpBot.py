@@ -33,13 +33,10 @@ async def get_prefix(bot, message):
 		serverPrefix = prefix
 
 	try:
-		botMember = discord.utils.get(message.guild.members, id=bot.user.id)
+		return (serverPrefix, str(messag.guild.me.mention)+" ", bot.user.mention + " ")
 	except Exception:
 		# Couldn't get a member - just get the user
-		botMember = bot.user
-
-	# Allow mentions too
-	return (serverPrefix, str(botMember.mention)+" ")
+		return (serverPrefix, str(bot.user.mention)+" ")
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')

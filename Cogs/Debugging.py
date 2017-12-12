@@ -6,6 +6,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import DisplayName
 from   Cogs import Nullify
+from   Cogs import Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -94,48 +95,55 @@ class Debugging:
 		if not self.shouldLog('xp', server):
 			return
 		if type(to_user) is discord.Role:
-			msg = "*{}#{}* ({}) gave *{} xp* to the *{}* role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
+			msg = "🌟 {}#{} ({}) gave {} xp to the {} role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
 		else:
-			msg = "*{}#{}* ({}) gave *{} xp* to *{}#{}* ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
-		await self._logEvent(server, msg)
+			msg = "🌟 {}#{} ({}) gave {} xp to {}#{} ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
+		await self._logEvent(server, "", title=msg, color=discord.Color.blue())
 
-	async def onban(self, guild, member):
+	@asyncio.coroutine
+	async def on_member_ban(self, guild, member):
 		server = guild
 		if not self.shouldLog('user.ban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* ({}) was **banned** from *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, msg)
+		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
+		await self._logEvent(server, "", title=msg, color=discord.Color.red())
 
-	async def onunban(self, server, member):
+	@asyncio.coroutine
+	async def on_member_unban(self, server, member):
 		if not self.shouldLog('user.unban', server):
 			return
 		# A member was banned
-		msg = '*{}#{}* ({}) was **unbanned** from *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, msg)
-			
-	async def onjoin(self, member, server):
+		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
+		await self._logEvent(server, "", title=msg, color=discord.Color.green())
+
+	@asyncio.coroutine	
+	async def on_member_join(self, member):
+		server = member.guild
 		if not self.shouldLog('user.join', server):
 			return
 		# A new member joined
-		msg = '*{}#{}* ({}) joined *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, msg)
+		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
+		await self._logEvent(server, "", title=msg, color=discord.Color.white())
 		
-	async def onleave(self, member, server):
+	@asyncio.coroutine
+	async def on_member_remove(self, member):
+		server = member.guild
 		if not self.shouldLog('user.leave', server):
 			return
 		# A member left
-		msg = '*{}#{}* ({}) left *{}*.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, msg)
+		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
+		await self._logEvent(server, "", title=msg, color=discord.Color.light_grey())
 		
-	async def member_update(self, before, after):
+	@asyncio.coroutine
+	async def on_member_update(self, before, after):
 		if before.bot:
 			return
 		# A member changed something about their user-profile
 		server = before.guild
-		if not str(before.status).lower() == str(after.status).lower() and self.shouldLog('user.status', server):
-			msg = '*{}#{}* ({)} went from *{}* to *{}*.'.format(before.name, before.discriminator, before.id, str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg)
+		if not before.status == after.status and self.shouldLog('user.status', server):
+			msg = 'Changed Status:\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.game == after.game:
 			# Something changed
 			msg = ''
@@ -150,69 +158,71 @@ class Debugging:
 				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(before.game.type, after.game.type)
 			if len(msg):
 				# We saw something tangible change
-				msg = '*{}#{}* changed playing status: ```\n{}```'.format(before.name, before.discriminator, msg)
+				msg = 'Changed Playing Status: \n{}'.format(before.name, before.discriminator, msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-					await self._logEvent(server, msg)
+					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
 			# Avatar changed
-			msg = '*{}#{}* ({}) changed avatars: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.avatar_url, after.avatar_url)
-			await self._logEvent(server, msg)
+			msg = 'Changed Avatars: \n{}\n   --->\n{}'.format(before.name, before.discriminator, before.id, before.avatar_url, after.avatar_url)
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
-			msg = '*{}#{}* ({}) changed nickname: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.nick, after.nick)
-			await self._logEvent(server, msg)
+			msg = 'Changed Nickname: \n{}\n   --->\n{}'.format(before.name, before.discriminator, before.id, before.nick, after.nick)
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.name == after.name and self.shouldLog('user.name', server):
 			# Name changed
-			msg = '*{}#{}* ({}) changed name: ```\n{}\n   --->\n{}```'.format(before.name, before.discriminator, before.id, before.name, after.name)
-			await self._logEvent(server, msg)
+			msg = 'Changed Name: \n{}\n   --->\n{}'.format(before.name, before.discriminator, before.id, before.name, after.name)
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		
-	async def message(self, message):
+	@asyncio.coroutine
+	async def on_message(self, message):
 		# context = await self.bot.get_context(message)
 		# print(context)
 		# print(context.command)
 		
 		if message.author.bot:
-			return { 'Ignore' : False, 'Delete' : False}
+			return
 		if not self.shouldLog('message.send', message.guild):
-			return { 'Ignore' : False, 'Delete' : False}
+			return
 		# A message was sent
-		msg = '*{}#{}* ({}), in *#{}*, sent: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name, message.content)
+		title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+		msg = message.content
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
-		msg += "```"
 		
-		await self._logEvent(message.guild, msg)
-		return { 'Ignore' : False, 'Delete' : False}
+		await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey())
+		return
 		
-	async def message_edit(self, before, after):
+	@asyncio.coroutine
+	async def on_message_edit(self, before, after):
 		if before.author.bot:
-			return { 'Ignore' : False, 'Delete' : False}
+			return
 		if not self.shouldLog('message.edit', before.guild):
-			return { 'Ignore' : False, 'Delete' : False}
+			return
 		if before.content == after.content:
 			# Edit was likely a preview happening
-			return { 'Ignore' : False, 'Delete' : False}
+			return
 		# A message was edited
-		msg = '*{}#{}* ({}), in *#{}*, edited: ```\n{}\n'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name, before.content)
+		title = '✏️ {}#{} ({}), in #{}, edited:'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name)
+		msg = before.content
 		if len(before.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in before.attachments:
 				msg += a.url + "\n"
-		msg += "```"
-		await self._logEvent(before.guild, msg)
-		msg = 'To: ```\n{}\n'.format(after.content)
+		
+		msg += '\n--- To: ---\n{}\n'.format(after.content)
 		if len(after.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
 				msg += a.url + "\n"
-		msg += "```"
 		
-		await self._logEvent(before.guild, msg)
-		return { 'Ignore' : False, 'Delete' : False}
+		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple())
+		return
 		
-	async def message_delete(self, message):
+	@asyncio.coroutine
+	async def on_message_delete(self, message):
 		if message.author.bot:
 			return
 		if not self.shouldLog('message.delete', message.guild):
@@ -222,17 +232,19 @@ class Debugging:
 			# Don't log these - as they'll spit out a text file later
 			return
 		# A message was deleted
-		msg = '*{}#{}* ({}), in *#{}*, deleted: ```\n{}\n'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name, message.content)
+		title = '❌ {}#{} ({}), in #{}, deleted:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+		msg = message.content
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
-		msg += "```"
-		await self._logEvent(message.guild, msg)
+		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange())
 	
-	async def _logEvent(self, server, log_message, filename = None):
+	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
+		if color == None:
+			color = discord.Color.default()
 		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
@@ -251,7 +263,15 @@ class Debugging:
 			# Check for suppress
 			if suppress:
 				log_message = Nullify.clean(log_message)
-			await logChan.send(log_message)
+			await Message.EmbedText(
+				title=title,
+				description=log_message,
+				color=color,
+				desc_head="```\n",
+				desc_foot="```",
+				footer=datetime.utcnow().strftime("%I:%M %p") + " UTC"
+			).send(logChan)
+			# await logChan.send(log_message)
 
 
 	@commands.command(pass_context=True)
@@ -350,7 +370,7 @@ class Debugging:
 		if self.shouldLog('message.delete', message.guild):
 			# We're logging
 			logmess = '{}#{} cleaned in #{}'.format(ctx.message.author.name, ctx.message.author.discriminator, ctx.channel.name)
-			await self._logEvent(ctx.guild, logmess, filename)
+			await self._logEvent(ctx.guild, logmess, filename=filename)
 		# Delete the remaining file
 		os.remove(filename)
 	
