@@ -295,14 +295,20 @@ class Debugging:
 			if suppress:
 				log_message = Nullify.clean(log_message)
 			# Remove triple backticks and replace any single backticks with single quotes
-			log_backs = log_message.replace("```", "").replace("`", "'")
-			if log_backs == log_message:
+			log_backs = log_message.replace("```", "")
+			log_back  = log_backs.replace("`", "'")
+			if log_back == log_message:
 				# Nothing changed
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC"
 			else:
+				log_str = ""
+				if log_backs != log_message:
+					log_str += " ``` Removed"
+				if log_back != log_backs:
+					log_str += " ` --> '"
 				# We nullified some backticks - make a note of it
 				log_message = log_backs
-				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note:" + log_str
 			await Message.EmbedText(
 				title=title,
 				description=log_message,
