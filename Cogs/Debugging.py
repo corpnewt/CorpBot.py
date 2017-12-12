@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import textwrap
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
@@ -20,6 +21,7 @@ class Debugging:
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, debug = False):
 		self.bot = bot
+		self.wrap = True
 		self.settings = settings
 		self.debug = debug
 		self.logvars = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
@@ -281,6 +283,9 @@ class Debugging:
 			# Check for suppress
 			if suppress:
 				log_message = Nullify.clean(log_message)
+			if self.wrap:
+				# Wraps the message to lines no longer than 70 chars
+				log_message = textwrap.fill(log_message)
 			await Message.EmbedText(
 				title=title,
 				description=log_message,
