@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import weather
+import re
 from   discord.ext import commands
 from   Cogs import Message
 from   Cogs import PickList
@@ -57,6 +58,8 @@ class Weather:
 		if city_name == None:
 			await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
 			return
+		# Strip anything that's non alphanumeric or a space
+		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
 		location = self.weather.lookup_by_location(city_name)
 		if not location:
 			await ctx.send("I couldn't find that city...")
