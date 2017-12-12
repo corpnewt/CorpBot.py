@@ -307,7 +307,7 @@ class Debugging:
 				if log_back != log_backs:
 					log_str += " ` --> '"
 				# We nullified some backticks - make a note of it
-				log_message = log_backs
+				log_message = log_back
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note:" + log_str
 			await Message.EmbedText(
 				title=title,
