@@ -1014,7 +1014,7 @@ class Xp:
 		
 		if member.game and member.game.name:
 			# Playing a game!
-			play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
+			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
 			try:
 				play_string = play_list[member.game.type]
 			except:
