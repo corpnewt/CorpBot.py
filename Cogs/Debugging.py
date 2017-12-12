@@ -201,7 +201,7 @@ class Debugging:
 		msg = message.content
 		if self.wrap:
 			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg)
+			msg = textwrap.fill(msg, replace_whitespace=False)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
@@ -228,8 +228,8 @@ class Debugging:
 		msg = before.content
 		if self.wrap:
 			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg)
-			af  = textwrap.fill(after.content)
+			msg = textwrap.fill(msg, replace_whitespace=False)
+			af  = textwrap.fill(after.content, replace_whitespace=False)
 		else:
 			af  = after.content
 		if len(before.attachments):
@@ -264,7 +264,7 @@ class Debugging:
 		msg = message.content
 		if self.wrap:
 			# Wraps the message to lines no longer than 70 chars
-			msg = textwrap.fill(msg)
+			msg = textwrap.fill(msg, replace_whitespace=False)
 		if len(message.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in message.attachments:
@@ -294,8 +294,8 @@ class Debugging:
 			# Check for suppress
 			if suppress:
 				log_message = Nullify.clean(log_message)
-			# Replace any backticks with single quotes
-			log_backs = log_message.replace("`", "'")
+			# Remove triple backticks and replace any single backticks with single quotes
+			log_backs = log_message.replace("```", "").replace("`", "'")
 			if log_backs == log_message:
 				# Nothing changed
 				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC"
