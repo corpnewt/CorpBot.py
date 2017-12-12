@@ -200,7 +200,7 @@ class Debugging:
 		title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 		msg = message.content
 		if len(message.attachments):
-			msg += "\n--- Attachments ---\n\n"
+			msg += "\n\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
 		
@@ -224,10 +224,10 @@ class Debugging:
 		title = '✏️ {}#{} ({}), in #{}, edited:'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name)
 		msg = before.content
 		if len(before.attachments):
-			msg += "\n--- Attachments ---\n\n"
+			msg += "\n\n--- Attachments ---\n\n"
 			for a in before.attachments:
 				msg += a.url + "\n"
-		msg += '\n--- To: ---\n{}\n'.format(after.content)
+		msg += '\n\n--- To: ---\n\n{}\n'.format(after.content)
 		if len(after.attachments):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
@@ -254,7 +254,7 @@ class Debugging:
 		title = '❌ {}#{} ({}), in #{}, deleted:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 		msg = message.content
 		if len(message.attachments):
-			msg += "\n--- Attachments ---\n\n"
+			msg += "\n\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
 		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange())
