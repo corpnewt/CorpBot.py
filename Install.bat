@@ -126,6 +126,11 @@ echo.
 call :install "numpy"
 echo.
 
+echo Installing Weather
+echo.
+call :install "weather-api"
+echo.
+
 
 REM echo Installing Flask...
 REM echo.

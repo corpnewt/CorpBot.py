@@ -115,7 +115,10 @@ function main () {
     update "numpy"
     echo
 
-    
+    echo Updating Weather
+    echo
+    update "weather-api"
+    echo
 
     #echo Updating Flask...
     #echo
