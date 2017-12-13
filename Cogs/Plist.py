@@ -35,7 +35,7 @@ class Plist:
         except:
             pass
         if not rImage:
-            remove(dirpath)
+            self.remove(dirpath)
             return None
 
         with open(imagePath, 'wb') as f:
@@ -43,7 +43,7 @@ class Plist:
 
         # Check if the file exists
         if not os.path.exists(imagePath):
-            remove(dirpath)
+            self.remove(dirpath)
             return None
 
         return imagePath
