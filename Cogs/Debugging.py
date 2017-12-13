@@ -21,7 +21,7 @@ class Debugging:
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, debug = False):
 		self.bot = bot
-		self.wrap = True
+		self.wrap = False
 		self.settings = settings
 		self.debug = debug
 		self.logvars = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
