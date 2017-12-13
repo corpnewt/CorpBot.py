@@ -66,14 +66,14 @@ class Plist:
         
         path = await self.download(url)
         if not path:
-            await Message.Embed(title="An error occurred!", description="I guess I couldn't get that plist...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
+            await Message.Embed(title="⚠ An error occurred!", description="I guess I couldn't get that plist...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
             return
         
         try:
             plist_data = plistlib.readPlist(path)
         except Exception as e:
-            await Message.Embed(title="Plist format invalid!", description=str(e)).edit(ctx, message)
+            await Message.Embed(title="❌ Plist format invalid!", description=str(e)).edit(ctx, message)
             self.remove(path)
             return
-        await Message.Embed(title="Plist format OK!").edit(ctx, message)
+        await Message.Embed(title="✅ Plist format OK!").edit(ctx, message)
         self.remove(path)
