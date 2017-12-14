@@ -39,7 +39,7 @@ class Example:
         """Adds two numbers together."""
         await ctx.channel.send(left + right)
 
-    def _roll_string(self, total_rolls):
+    def _roll_string(self, roll):
         # Helper function to give comprehensive breakdown of rolls
         total_rolls = roll["roll_list"]
         vantage     = roll["vantage"]
