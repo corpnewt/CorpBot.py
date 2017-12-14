@@ -195,7 +195,7 @@ class Example:
         # Display the table then wait for a reaction
         message = None
         while True:
-            index, message = await PickList.Picker(list=dice_list, title="Pick a roll to show details:", ctx=ctx, timeout=300).pick()
+            index, message = await PickList.Picker(list=dice_list, title="Pick a roll to show details:", ctx=ctx, timeout=300, message=message).pick()
             if index < 0:
                 return
             # Show what we need
