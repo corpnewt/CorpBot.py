@@ -203,7 +203,8 @@ class Example:
                 await message.edit(content=message.content.replace("Pick a roll to show details:", "Roll results:"))
                 return
             # Show what we need
-            await message.edit(content=self._roll_string(final_dice[index]))
+            new_mess = "{}. {}:\n{}".format(index+1, dice_list[index], self._roll_string(final_dice[index]))
+            await message.edit(content=new_mess)
             # Add the stop reaction - then wait for it or the timeout
             await message.add_reaction("🛑")
             # Setup a check function
