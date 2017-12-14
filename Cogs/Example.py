@@ -87,6 +87,7 @@ class Example:
         
         # Format rolls
         dice_string = ""
+        final_total = None
         # Format the initial raw rolls
         dice_string += "```\n= Dice Rolls ========================\n"
         dice_rolls = []
@@ -97,7 +98,7 @@ class Example:
             pre_list.append(r['sum'])
             total_list.append(r['sum']+add)
             
-        dice_string += "\n-------------------------------------".join(dice_rolls) + "\n\n"
+        dice_string += "\n-------------------------------------\n".join(dice_rolls)
         
         # Format modifiers
         if not add == 0:
@@ -112,16 +113,30 @@ class Example:
             if vantage == True:
                 # Advantage
                 dice_string += "\n\n= Advantage =========================\n"
-                total_list = sorted(total_list, reverse=False)
-                dice_string += "*{}* {}".format(total_list[0], " ".join([str(x) for x in total_list[1:]]))
+                total_format = []
+                for t in total_list:
+                    if t == max(total_list):
+                        final_total = t
+                        total_format.append("*{}*".format(t))
+                    else:
+                        total_format.append(str(t))
+                dice_string += "\n-------------------------------------\n".join(total_format)
             else:
                 # Disadvantage
                 dice_string += "\n\n= Disadvantage ======================\n"
-                total_list = sorted(total_list, reverse=True)
-                dice_string += "*{}* {}".format(total_list[0], " ".join([str(x) for x in total_list[1:]]))
+                total_format = []
+                for t in total_list:
+                    if t == min(total_list):
+                        final_total = t
+                        total_format.append("*{}*".format(t))
+                    else:
+                        total_format.append(str(t))
+                dice_string += "\n-------------------------------------\n".join(total_format)
         
         # Format final total
-        dice_string += "\n\n= Final Total =======================\n{}```".format(total_list[0])
+        if final_total == None:
+            final_total = total_list[0]
+        dice_string += "\n\n= Final Total =======================\n{}```".format(final_total)
         await ctx.channel.send(dice_string)
 
     @commands.command(description='For when you wanna settle the score some other way')
