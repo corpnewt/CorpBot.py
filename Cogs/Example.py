@@ -197,6 +197,8 @@ class Example:
         while True:
             index, message = await PickList.Picker(list=dice_list, title="Pick a roll to show details:", ctx=ctx, timeout=300, message=message).pick()
             if index < 0:
+                # Edit message to replace the pick title
+                await message.edit(content=message.content.replace("Pick a roll to show details:", "Roll results:")
                 return
             # Show what we need
             await message.edit(content=self._roll_string(final_dice[index]))
