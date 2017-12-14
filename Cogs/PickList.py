@@ -37,7 +37,8 @@ class Picker:
         current_reactions = []
         for item in self.list:
             current += 1
-            current_reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(current))
+            current_number = current if current < 10 else 0
+            current_reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(current_number))
             msg += "{}. {}\n".format(current, item)
         msg += "```"
         # Add the stop reaction
