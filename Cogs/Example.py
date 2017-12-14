@@ -202,15 +202,16 @@ class Example:
             await message.edit(content=self._roll_string(final_dice[index]))
             # Add the stop reaction - then wait for it or the timeout
             await message.add_reaction("🛑")
-            # Now we wait...
+            # Setup a check function
             def check(reaction, user):
-                return user == self.ctx.author and str(reaction.emoji) == "🛑"
+                return user == ctx.author and str(reaction.emoji) == "🛑"
+            # Attempt to wait for a response
             try:
-                reaction, user = await self.ctx.bot.wait_for('reaction_add', timeout=30, check=check)
+                reaction, user = await ctx.bot.wait_for('reaction_add', timeout=30, check=check)
             except:
                 # Didn't get a reaction
                 pass
-            # Reset
+            # Reset back to our totals
             continue
 
         
