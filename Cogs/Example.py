@@ -101,8 +101,22 @@ class Example:
         dice_string += "\n\n= Final Total =======================\n{}```".format(final_total)
         return dice_string
     
-    #def _get_roll_total(self, roll):
-        
+    def _get_roll_total(self, roll):
+        # Helper function to get the final total of a roll
+        total_rolls = roll["roll_list"]
+        vantage     = roll["vantage"]
+        add         = roll["add"]
+        total_list = []
+        for r in total_rolls:
+            total_list.append(r['sum']+add)
+        if vantage != None:
+            if vantage == True:
+                # Advantage
+                return max(total_list)
+            else:
+                # Disadvantage
+                return min(total_list)
+        return total_list[0]
         
     @commands.command()
     async def roll(self, ctx, *, dice : str = "1d20"):
@@ -112,6 +126,7 @@ class Example:
         for dice in dice_list:
             try:
                 vantage = None
+                d = dice
                 if dice.lower().endswith("a"):
                     # Advantage
                     vantage = True
@@ -134,7 +149,7 @@ class Example:
                     add = int(parts[1])
                 else:
                     limit = int(limit)
-                dice_setup.append({ "vantage" : vantage, "rolls" : rolls, "limit" : limit, "add" : add })
+                dice_setup.append({ "vantage" : vantage, "rolls" : rolls, "limit" : limit, "add" : add, "original" : d })
             except Exception:
                 pass
         if not len(dice_setup):
@@ -166,8 +181,37 @@ class Example:
                     numbers.append(str(roll))
                 total_rolls.append({ "rolls" : numbers, "sum" : number_sum })
                 
-            final_dice.append({ "roll_list" : total_rolls, "add" : add, "vantage" : vantage })
-        await ctx.send(self._roll_string(final_dice[0]))
+            dice_dict = {
+                "roll_list" : total_rolls,
+                "add" : add,
+                "vantage" : vantage,
+                "original" : d["original"]
+            }
+            dice_dict["total"] = self._get_roll_total(dice_dict)
+            final_dice.append(dice_dict)
+            
+        # Get a stripped list of items
+        dice_list = ["{} - {}".format(x["original"], x["total"]) for x in final_dice]
+        # Display the table then wait for a reaction
+        message = None
+        while True:
+            index, message = await PickList.Picker(list=dice_list, title="Pick a roll to show details:", ctx=ctx, timeout=300).pick()
+            if index < 0:
+                return
+            # Show what we need
+            await message.edit(content=self._roll_string(final_dice[index]))
+            # Add the stop reaction - then wait for it or the timeout
+            await message.add_reaction["🛑"]
+            # Now we wait...
+            def check(reaction, user):
+                return user == self.ctx.author and str(reaction.emoji) == "🛑"
+            try:
+                reaction, user = await self.ctx.bot.wait_for('reaction_add', timeout=30, check=check)
+            except:
+                # Didn't get a reaction
+                pass
+            # Reset
+            continue
 
         
 
