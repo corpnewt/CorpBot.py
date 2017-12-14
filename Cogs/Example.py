@@ -41,11 +41,20 @@ class Example:
 
     @commands.command()
     async def roll(self, ctx, dice : str):
-        """Rolls a dice in NdN±N format."""
+        """Rolls a dice in NdN±Na/d format."""
         try:
             parts = dice.split('d')
             rolls = int(parts[0])
             limit = parts[1]
+            vantage = None
+            if limit.lower().endswith("a"):
+                # Advantage
+                vantage = True
+                limit = limit[:-1]
+            elif limit.lower().endswith("d"):
+                # Disadvantage
+                vantage = False
+                limit = limit[:-1]
             add   = 0
             if "-" in limit:
                 parts = limit.split('-')
@@ -58,26 +67,59 @@ class Example:
             else:
                 limit = int(limit)
         except Exception:
-            await ctx.channel.send('Format has to be in NdN±N!')
+            await ctx.channel.send('Format has to be in NdN±Na/d!')
             return
-        numbers = []
-        number_sum = 0
-        for r in range(rolls):
-            roll = random.randint(1, limit)
-            number_sum += roll
-            numbers.append(str(roll))
-
-        number_string = ", ".join(numbers)
-        number_string = "```\n= Dice Rolls ========================\n" + number_string
+        if vantage != None:
+            attempts = 2
+        else:
+            attempts = 1
+        total_rolls = []
+        
+        # Roll for however many attempts we need
+        for i in range(attempts):
+            numbers = []
+            number_sum = 0
+            for r in range(rolls):
+                roll = random.randint(1, limit)
+                number_sum += roll
+                numbers.append(str(roll))
+            total_rolls.append({ "rolls" : numbers, "sum" : number_sum })
+        
+        # Format rolls
+        dice_string = ""
+        # Format the initial raw rolls
+        dice_string += "```\n= Dice Rolls ========================\n"
+        dice_rolls = pre_list = total_list = []
+        for r in total_rolls:
+            dice_rolls.append(", ".join(r['rolls']))
+            pre_list.append(r['sum'])
+            total_list.append(r['sum']+add)
+        dice_string += "\n-------------------------------------".join(dice_rolls) + "\n\n"
+        
+        # Format modifiers
         if not add == 0:
             sign = "+"
             if add < 0:
                 sign = ""
-            number_string += "\n\n= Pre-Total =========================\n{}".format(number_sum)
-            number_string += "\n\n= Modifier ==========================\n{}{}".format(sign, add)
+            dice_string += "\n\n= Pre-Total =========================\n{}".format(" ".join([str(x) for x in pre_list]))
+            dice_string += "\n\n= Modifier ==========================\n{}{}".format(sign, add)
+            
+        # Format advantage/disadvantage
+        if vantage != None:
+            if vantage == True:
+                # Advantage
+                dice_string += "\n\n= Advantage =========================\n"
+                total_list = sorted(total_list, reverse=False)
+                dice_string += "*{}* {}".format(total_list[0], " ".join([str(x) for x in total_list[1:]]))
+            else:
+                # Disadvantage
+                dice_string += "\n\n= Disadvantage ======================\n"
+                total_list = sorted(total_list, reverse=True)
+                dice_string += "*{}* {}".format(total_list[0], " ".join([str(x) for x in total_list[1:]]))
         
-        number_string += "\n\n= Final Total =======================\n{}```".format(number_sum + add)
-        await ctx.channel.send(number_string)
+        # Format final total
+        dice_string += "\n\n= Final Total =======================\n{}```".format(total_list[0])
+        await ctx.channel.send(dice_string)
 
     @commands.command(description='For when you wanna settle the score some other way')
     async def choose(self, ctx, *choices : str):
