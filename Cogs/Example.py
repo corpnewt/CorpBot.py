@@ -94,6 +94,7 @@ class Example:
             dice_rolls.append(", ".join(r['rolls']))
             pre_list.append(r['sum'])
             total_list.append(r['sum']+add)
+        print(dice_rolls)
         dice_string += "\n-------------------------------------".join(dice_rolls) + "\n\n"
         
         # Format modifiers
