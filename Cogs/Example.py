@@ -105,7 +105,9 @@ class Example:
             sign = "+"
             if add < 0:
                 sign = ""
-            dice_string += "\n\n= Pre-Total =========================\n{}".format(" ".join([str(x) for x in pre_list]))
+            dice_string += "\n\n= Pre-Total =========================\n{}".format(
+                "\n-------------------------------------\n".join([str(x) for x in pre_list])
+            )
             dice_string += "\n\n= Modifier ==========================\n{}{}".format(sign, add)
             
         # Format advantage/disadvantage
