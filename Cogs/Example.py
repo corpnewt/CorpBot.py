@@ -43,18 +43,18 @@ class Example:
     async def roll(self, ctx, dice : str):
         """Rolls a dice in NdN±Na/d format."""
         try:
+            if dice.lower().endswith("a"):
+                # Advantage
+                vantage = True
+                dice = dice[:-1]
+            elif dice.lower().endswith("d"):
+                # Disadvantage
+                vantage = False
+                dice = dice[:-1]
             parts = dice.split('d')
             rolls = int(parts[0])
             limit = parts[1]
             vantage = None
-            if limit.lower().endswith("a"):
-                # Advantage
-                vantage = True
-                limit = limit[:-1]
-            elif limit.lower().endswith("d"):
-                # Disadvantage
-                vantage = False
-                limit = limit[:-1]
             add   = 0
             if "-" in limit:
                 parts = limit.split('-')
