@@ -99,6 +99,8 @@ class Example:
         if final_total == None:
             final_total = total_list[0]
         dice_string += "\n\n= Final Total =======================\n{}```".format(final_total)
+        if len(dice_string) > 2000:
+            dice_string = "```\nThe details of this roll are longer than 2,000 characters```"
         return dice_string
     
     def _get_roll_total(self, roll):
