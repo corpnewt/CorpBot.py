@@ -40,7 +40,7 @@ class Example:
         await ctx.channel.send(left + right)
 
     @commands.command()
-    async def roll(self, ctx, dice : str):
+    async def roll(self, ctx, dice : str = "1d20"):
         """Rolls a dice in NdN±Na/d format."""
         try:
             if dice.lower().endswith("a"):
