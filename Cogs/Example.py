@@ -89,12 +89,14 @@ class Example:
         dice_string = ""
         # Format the initial raw rolls
         dice_string += "```\n= Dice Rolls ========================\n"
-        dice_rolls = pre_list = total_list = []
+        dice_rolls = []
+        pre_list = []
+        total_list = []
         for r in total_rolls:
             dice_rolls.append(", ".join(r['rolls']))
             pre_list.append(r['sum'])
             total_list.append(r['sum']+add)
-        print(dice_rolls)
+            
         dice_string += "\n-------------------------------------".join(dice_rolls) + "\n\n"
         
         # Format modifiers
