@@ -39,51 +39,11 @@ class Example:
         """Adds two numbers together."""
         await ctx.channel.send(left + right)
 
-    @commands.command()
-    async def roll(self, ctx, dice : str = "1d20"):
-        """Rolls a dice in NdN±Na/d format."""
-        try:
-            vantage = None
-            if dice.lower().endswith("a"):
-                # Advantage
-                vantage = True
-                dice = dice[:-1]
-            elif dice.lower().endswith("d"):
-                # Disadvantage
-                vantage = False
-                dice = dice[:-1]
-            parts = dice.split('d')
-            rolls = int(parts[0])
-            limit = parts[1]
-            add   = 0
-            if "-" in limit:
-                parts = limit.split('-')
-                limit = int(parts[0])
-                add = int(parts[1])*-1
-            elif "+" in limit:
-                parts = limit.split('+')
-                limit = int(parts[0])
-                add = int(parts[1])
-            else:
-                limit = int(limit)
-        except Exception:
-            await ctx.channel.send('Format has to be in NdN±Na/d!')
-            return
-        if vantage != None:
-            attempts = 2
-        else:
-            attempts = 1
-        total_rolls = []
-        
-        # Roll for however many attempts we need
-        for i in range(attempts):
-            numbers = []
-            number_sum = 0
-            for r in range(rolls):
-                roll = random.randint(1, limit)
-                number_sum += roll
-                numbers.append(str(roll))
-            total_rolls.append({ "rolls" : numbers, "sum" : number_sum })
+    def _roll_string(self, total_rolls):
+        # Helper function to give comprehensive breakdown of rolls
+        total_rolls = roll["roll_list"]
+        vantage     = roll["vantage"]
+        add         = roll["add"]
         
         # Format rolls
         dice_string = ""
@@ -139,7 +99,77 @@ class Example:
         if final_total == None:
             final_total = total_list[0]
         dice_string += "\n\n= Final Total =======================\n{}```".format(final_total)
-        await ctx.channel.send(dice_string)
+        return dice_string
+    
+    #def _get_roll_total(self, roll):
+        
+        
+    @commands.command()
+    async def roll(self, ctx, *, dice : str = "1d20"):
+        """Rolls a dice in NdN±Na/d format."""
+        dice_list = dice.split()
+        dice_setup = []
+        for dice in dice_list:
+            try:
+                vantage = None
+                if dice.lower().endswith("a"):
+                    # Advantage
+                    vantage = True
+                    dice = dice[:-1]
+                elif dice.lower().endswith("d"):
+                    # Disadvantage
+                    vantage = False
+                    dice = dice[:-1]
+                parts = dice.split('d')
+                rolls = int(parts[0])
+                limit = parts[1]
+                add   = 0
+                if "-" in limit:
+                    parts = limit.split('-')
+                    limit = int(parts[0])
+                    add = int(parts[1])*-1
+                elif "+" in limit:
+                    parts = limit.split('+')
+                    limit = int(parts[0])
+                    add = int(parts[1])
+                else:
+                    limit = int(limit)
+                dice_setup.append({ "vantage" : vantage, "rolls" : rolls, "limit" : limit, "add" : add })
+            except Exception:
+                pass
+        if not len(dice_setup):
+            await ctx.send('Format has to be in NdN±Na/d!')
+            return
+        if len(dice_setup) > 10:
+            await ctx.send("I can only process up to 10 dice rolls at once :(")
+            return
+        # Got valid dice - let's roll them!
+        final_dice = []
+        for d in dice_setup:
+            vantage = d["vantage"]
+            add     = d["add"]
+            limit   = d["limit"]
+            rolls   = d["rolls"]
+            if vantage != None:
+                attempts = 2
+            else:
+                attempts = 1
+            total_rolls = []
+
+            # Roll for however many attempts we need
+            for i in range(attempts):
+                numbers = []
+                number_sum = 0
+                for r in range(rolls):
+                    roll = random.randint(1, limit)
+                    number_sum += roll
+                    numbers.append(str(roll))
+                total_rolls.append({ "rolls" : numbers, "sum" : number_sum })
+                
+            final_dice.append({ "roll_list" : total_rolls, "add" : add, "vantage" : vantage })
+        await ctx.send(self._roll_string(final_dice[0]))
+
+        
 
     @commands.command(description='For when you wanna settle the score some other way')
     async def choose(self, ctx, *choices : str):
