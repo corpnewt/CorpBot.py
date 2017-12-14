@@ -211,6 +211,8 @@ class Example:
             except:
                 # Didn't get a reaction
                 pass
+            # Clear our our reactions
+            await message.clear_reactions()
             # Reset back to our totals
             continue
 
