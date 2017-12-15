@@ -91,8 +91,14 @@ class TempRole:
 					if len(remove_temps):
 						for temp in remove_temps:
 							temp_roles.remove(temp)
+							
+	def _remove_task(self, task):
+		if task in self.loop_list:
+			self.loop_list.remove(task)
 
 	async def check_temp_roles(self, member, temp_role):
+		# Get the current task
+		task = asyncio.Task.current_task()
 		# Get the cooldown and server id
 		c = int(temp_role["Cooldown"])
 		r_id = int(temp_role["ID"])
@@ -107,6 +113,7 @@ class TempRole:
 			# Doesn't exist - remove it
 			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
 			temp_roles.remove(temp_role)
+			self._remove_task(task)
 			return
 		# We have a role - let's see if we still need to keep it
 		c = temp_role["Cooldown"]
@@ -117,12 +124,14 @@ class TempRole:
 			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
 			if not role in member.roles:
 				temp_roles.remove(temp_role)
+			self._remove_task(task)
 			return
 		# We still have a cooldown
 		timeleft = c-int(time.time())
 		if timeleft > 0:
 			# Recalibrate
 			self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
+			self._remove_task(task)
 			return
 		# Here - we're either past our cooldown, or who knows what else
 		if role in member.roles:
@@ -137,6 +146,7 @@ class TempRole:
 				await member.send("**{}** was removed from your roles in *{}*.".format(role.name, member.guild.name))
 			except:
 				pass
+		self._remove_task(task)
 			
 	@commands.command(pass_context=True)
 	async def temppm(self, ctx, *, yes_no = None):
