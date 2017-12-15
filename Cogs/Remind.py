@@ -71,6 +71,8 @@ class Remind:
 
 
 	async def checkRemind(self, member, reminder):
+		# Get our current task
+		task = asyncio.Task.current_task()
 		# Start our countdown
 		countDown = int(reminder['End'])-int(time.time())
 		if countDown > 0:
@@ -96,6 +98,7 @@ class Remind:
 				pass
 			reminders.remove(reminder)
 			self.settings.setUserStat(member, member.guild, "Reminders", reminders)
+		self._remove_task(task)
 					
 	async def member_update(self, before, member):
 		# Not sure why I was using this "status" method before... seems to only show up here
@@ -162,7 +165,7 @@ class Remind:
 		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "Reminders", reminders)
 
 		# Start timer for reminder
-		self.bot.loop.create_task(self.checkRemind(ctx.message.author, reminder))
+		self.loop_list.append(self.bot.loop.create_task(self.checkRemind(ctx.message.author, reminder)))
 		
 		# Confirm the reminder
 		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.format(DisplayName.name(ctx.message.author), readableTime)
