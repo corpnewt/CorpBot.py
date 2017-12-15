@@ -71,7 +71,7 @@ class Mute:
             if str(entry['ID']) == str(member.id):
                 # Found them - mute them
                 await self.mute(member, server, entry['Cooldown'])
-                
+            
     async def mute_list_check(self):
         while not self.bot.is_closed():
             # Iterate through the servers and check for roll-off mutes
@@ -106,8 +106,14 @@ class Mute:
                 self.settings.setServerStat(guild, "MuteList", mute_list)
             # Check once per hour
             await asyncio.sleep(3600)
+            
+    def _remove_task(self, task):
+        if task in self.loop_list:
+            self.loop_list.remove(task)
 
     async def checkMute(self, member, server, cooldown):
+        # Get the current task
+        task = asyncio.Task.current_task()
         # Check if we have a cooldown left - and unmute accordingly
         timeleft = int(cooldown)-int(time.time())
         if timeleft > 0:
@@ -122,12 +128,14 @@ class Mute:
         if cd == None:
             if isMute.lower() == 'yes':
                 # We're now muted permanently
+                self._remove_task(task)
                 return
         else:
             timeleft = int(cd)-int(time.time())
             if timeleft > 0:
                 # Our cooldown changed - rework
-                self.bot.loop.create_task(self.checkMute(member, server, cd))
+                self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cd)))
+                self._remove_task(task)
                 return
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
@@ -136,6 +144,7 @@ class Mute:
             await self.unmute(member, server)
             pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(self.suppressed(server, server.name))
             await member.send(pm)
+        self._remove_task(task)
 
 
     async def mute(self, member, server, cooldown = None):
@@ -173,7 +182,7 @@ class Mute:
         
         if not cooldown == None:
             # We have a cooldown - set a timer
-            self.bot.loop.create_task(self.checkMute(member, server, cooldown))
+            self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
 
 
     async def unmute(self, member, server):
