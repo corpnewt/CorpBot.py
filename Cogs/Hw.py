@@ -639,9 +639,9 @@ class Hw:
 			if not memFromName:
 				# Okay - *this* time is the last - check for index
 				try:
-					user = int(user)-1
-					if user >= 0 and user < len(buildList):
-						buildParts = buildList[user]
+					user_as_build = int(user)-1
+					if user_as_build >= 0 and user_as_build < len(buildList):
+						buildParts = buildList[user_as_build]
 						memFromName = ctx.author
 				except Exception:
 					pass
@@ -765,9 +765,9 @@ class Hw:
 			if not memFromName:
 				# Okay - *this* time is the last - check for index
 				try:
-					user = int(user)-1
-					if user >= 0 and user < len(buildList):
-						buildParts = buildList[user]
+					user_as_build = int(user)-1
+					if user_as_build >= 0 and user_as_build < len(buildList):
+						buildParts = buildList[user_as_build]
 						memFromName = ctx.author
 				except Exception:
 					pass
