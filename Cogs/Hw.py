@@ -560,7 +560,7 @@ class Hw:
 
 
 	@commands.command(pass_context=True)
-	async def hw(self, ctx, *, user = None, build = None):
+	async def hw(self, ctx, *, user : str = None, build = None):
 		"""Lists the hardware for either the user's default build - or the passed build."""
 		if not user:
 			user = "{}".format(ctx.author.mention)
@@ -687,7 +687,7 @@ class Hw:
 
 
 	@commands.command(pass_context=True)
-	async def rawhw(self, ctx, *, user = None, build = None):
+	async def rawhw(self, ctx, *, user : str = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
 		if not user:
 			user = ctx.author.name
