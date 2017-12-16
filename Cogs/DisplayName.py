@@ -26,11 +26,9 @@ def name(member : discord.Member):
     return None
 
 def memberForID(checkid, server):
-    print('"' + str(checkid) + '"')
     try:
         checkid = int(checkid)
     except:
-        print('"' + str(checkid) + '"')
         return None
     for member in server.members:
         if member.id == checkid:
@@ -48,7 +46,9 @@ def memberForName(name, server):
         if member.name.lower() == name.lower():
             return member
     memID = re.sub(r'\W+', '', name)
+    print('"{}"'.format(memID))
     newMem = memberForID(memID, server)
+    print(newMem)
     if newMem:
         return newMem
     return None
