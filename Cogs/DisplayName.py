@@ -26,6 +26,7 @@ def name(member : discord.Member):
     return None
 
 def memberForID(checkid, server):
+    print('"' + str(checkid) + '"')
     try:
         checkid = int(checkid)
     except:
