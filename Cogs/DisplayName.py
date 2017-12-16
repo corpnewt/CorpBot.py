@@ -26,8 +26,12 @@ def name(member : discord.Member):
     return None
 
 def memberForID(checkid, server):
+    try:
+        checkid = int(checkid)
+    except:
+        return None
     for member in server.members:
-        if str(member.id) == str(checkid):
+        if member.id == checkid:
             return member
     return None
 
@@ -47,14 +51,18 @@ def memberForName(name, server):
         return newMem
     return None
 
-def channelForID(id, server, typeCheck = None):
+def channelForID(checkid, server, typeCheck = None):
+    try:
+        checkid = int(checkid)
+    except:
+        return None
     for channel in server.channels:
         if typeCheck:
             if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
                 continue
             if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
                 continue
-        if str(channel.id) == str(id):
+        if channel.id == checkid:
             return channel
     return None
 
@@ -74,9 +82,13 @@ def channelForName(name, server, typeCheck = None):
         return newChan
     return None
 
-def roleForID(id, server):
+def roleForID(checkid, server):
+    try:
+        checkid = int(checkid)
+    except:
+        return None
     for role in server.roles:
-        if str(role.id) == str(id):
+        if role.id == checkid:
             return role
     return None
 
