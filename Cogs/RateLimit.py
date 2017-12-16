@@ -47,7 +47,7 @@ class RateLimit:
 		# Check if we can run commands
 		try:
 			lastTime = int(self.settings.getUserStat(message.author, message.guild, "LastCommand"))
-		else:
+		except:
 			# Not set - or incorrectly set - default to 0
 			lastTime = 0
 		# None fix
