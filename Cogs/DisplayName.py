@@ -46,9 +46,7 @@ def memberForName(name, server):
         if member.name.lower() == name.lower():
             return member
     memID = re.sub(r'\W+', '', name)
-    print('"{}"'.format(memID))
     newMem = memberForID(memID, server)
-    print(newMem)
     if newMem:
         return newMem
     return None
