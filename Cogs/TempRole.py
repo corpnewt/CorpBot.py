@@ -136,10 +136,11 @@ class TempRole:
 		# Here - we're either past our cooldown, or who knows what else
 		if role in member.roles:
 			# We have the role still - remove it
-			try:
-				await member.remove_roles(role)
-			except Exception:
-				pass
+			#try:
+			print("Removing role")
+			await member.remove_roles(role)
+			#except Exception:
+			#	pass
 		# Check if we pm
 		if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in temp_role:
 			try:
