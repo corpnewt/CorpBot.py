@@ -52,7 +52,7 @@ class Picker:
         await self._add_reactions(message, current_reactions)
         # Now we would wait...
         def check(reaction, user):
-            return user == self.ctx.author and str(reaction.emoji) in current_reactions
+            return reaction.message.id == message.id and user == self.ctx.author and str(reaction.emoji) in current_reactions
         try:
             reaction, user = await self.ctx.bot.wait_for('reaction_add', timeout=self.timeout, check=check)
         except:

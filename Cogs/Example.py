@@ -109,16 +109,25 @@ class Example:
         vantage     = roll["vantage"]
         add         = roll["add"]
         total_list = []
+        total_crit = []
+        total_fail = []
         for r in total_rolls:
             total_list.append(r['sum']+add)
+            total_crit.append(r['crit'])
+            total_fail.append(r['fail'])
+
         if vantage != None:
             if vantage == True:
                 # Advantage
-                return max(total_list)
+                highest = max(total_list)
+                i = total_list.index(highest)
+                return { "total" : highest, "crit" : total_crit[i], "fail" : total_fail[i] }
             else:
                 # Disadvantage
-                return min(total_list)
-        return total_list[0]
+                lowest = min(total_list)
+                i = total_list.index(lowest)
+                return { "total" : highest, "crit" : total_crit[i], "fail" : total_fail[i] }
+        return { "total" : total_list[0], "crit" : total_crit[0], "fail" : total_fail[0] }
         
     @commands.command()
     async def roll(self, ctx, *, dice : str = "1d20"):
@@ -177,11 +186,17 @@ class Example:
             for i in range(attempts):
                 numbers = []
                 number_sum = 0
+                crit = False
+                crit_fail = False
                 for r in range(rolls):
                     roll = random.randint(1, limit)
+                    if roll == 1:
+                        crit_fail = True
+                    if roll == limit:
+                        crit = True
                     number_sum += roll
                     numbers.append(str(roll))
-                total_rolls.append({ "rolls" : numbers, "sum" : number_sum })
+                total_rolls.append({ "rolls" : numbers, "sum" : number_sum, "crit" : crit, "fail" : crit_fail })
                 
             dice_dict = {
                 "roll_list" : total_rolls,
@@ -189,11 +204,24 @@ class Example:
                 "vantage" : vantage,
                 "original" : d["original"]
             }
-            dice_dict["total"] = self._get_roll_total(dice_dict)
+            roll_total = self._get_roll_total(dice_dict)
+            dice_dict["total"] = roll_total["total"]
+            dice_dict["crit"] = roll_total["crit"]
+            dice_dict["fail"] = roll_total["fail"]
             final_dice.append(dice_dict)
             
         # Get a stripped list of items
-        dice_list = ["{} - {}".format(x["original"], x["total"]) for x in final_dice]
+        dice_list = []
+        for d in final_dice:
+            d_string = "{} - {}".format(d["original"], d["total"])
+            extra = ""
+            if d["crit"]:
+                extra += "C"
+            if d["fail"]:
+                extra += "F"
+            if len(extra):
+                d_string += " (" + extra + ")"
+            dice_list.append(d_string)
         # Display the table then wait for a reaction
         message = None
         while True:
@@ -209,7 +237,7 @@ class Example:
             await message.add_reaction("🛑")
             # Setup a check function
             def check(reaction, user):
-                return user == ctx.author and str(reaction.emoji) == "🛑"
+                return user == ctx.author and reaction.message.id == message.id and str(reaction.emoji) == "🛑"
             # Attempt to wait for a response
             try:
                 reaction, user = await ctx.bot.wait_for('reaction_add', timeout=30, check=check)
