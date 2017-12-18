@@ -361,6 +361,9 @@ class Embed:
             )
             # 25 field max - send the embed if we get there
             if len(em.fields) >= self.field_max:
+                if page_count > 1 and not self.page_count:
+                    # Clear the title
+                    em.title = None
                 if page_total == page_count:
                     em.set_footer(
                         text=self._truncate_string(footer_text, self.foot_max),
