@@ -328,8 +328,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Chooses between multiple choices.
 	  $joined [member]
 	   └─ Says when a member joined.
-	  $roll <dice>
-	   └─ Rolls a dice in NdN±N format.
+	  $roll [dice=1d20]
+	   └─ Rolls a dice in NdN±Na/d format.
 
 	Face Cog (4 commands) - Face.py Extension:
 	  $lastlenny
@@ -544,6 +544,14 @@ A list of cogs, commands, and descriptions:
 	   └─ Help not available...
 	  $willrepeat
 	   └─ Displays whether or not repeat is active.
+
+	OfflineUser Cog (1 command) - OfflineUser.py Extension:
+	  $remindoffline [yes_no]
+	   └─ Sets whether to inform users that pinged members are offline or not.
+
+	Plist Cog (1 command) - Plist.py Extension:
+	  $plist [url]
+	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
 
 	Printer Cog (2 commands) - Printer.py Extension:
 	  $print [url]
@@ -805,6 +813,26 @@ A list of cogs, commands, and descriptions:
 	  $teleunblock [guild_name]
 	   └─ Unblocks all tele-numbers associated with the passed guild (bot-admin only).
 
+	TempRole Cog (9 commands) - TempRole.py Extension:
+	  $addtemprole [role]
+	   └─ Adds a new role to the temp role list (admin only).
+	  $autotemp [role]
+	   └─ Sets the temp role to apply to each new user that joins.
+	  $getautotemp
+	   └─ Gets the temp role applied to each new user that joins.
+	  $listtemproles
+	   └─ Lists all roles for the temp role system.
+	  $removetemprole [role]
+	   └─ Removes a role from the temp role list (admin only).
+	  $temp [member] [role] [cooldown]
+	   └─ Gives the passed member the temporary role for the passed amount of time - ne...
+	  $temppm [yes_no]
+	   └─ Sets whether to inform users that they've been given a temp role.
+	  $temptime [minutes]
+	   └─ Sets the number of minutes for the temp role - must be greater than 0 (admin-...
+	  $untemp [member] [role]
+	   └─ Removes the passed temp role from the passed user (bot-admin only).
+
 	Time Cog (6 commands) - Time.py Extension:
 	  $listtz [tz_search]
 	   └─ List all the supported TimeZones in PM.
@@ -878,6 +906,10 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the number of votes before the selected role or user is mentioned.  Anyt...
 	  $vktomute [number_of_votes]
 	   └─ Sets the number of votes before a user is muted.  Anything less than 1 will d...
+
+	Weather Cog (1 command) - Weather.py Extension:
+	  $forecast [city_name]
+	   └─ Gets some weather.
 
 	Welcome Cog (7 commands) - Welcome.py Extension:
 	  $rawgoodbye [member]
