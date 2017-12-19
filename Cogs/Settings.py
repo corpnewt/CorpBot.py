@@ -61,7 +61,8 @@ class RoleManager:
 			try:
 				await r.member.add_roles(*r.add_roles)
 			except:
-				print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
+				if r.member.guild.id == 186648463541272576:
+					print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
 				pass
 		if len(r.add_roles) and len(r.rem_roles):
 			# Pause for a sec before continuing
@@ -70,7 +71,8 @@ class RoleManager:
 			try:
 				await r.member.remove_roles(*r.rem_roles)
 			except:
-				print("Failed to remove to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
+				if r.member.guild.id == 186648463541272576:
+					print("Failed to remove to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
 				pass
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
