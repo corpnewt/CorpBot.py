@@ -204,17 +204,15 @@ class Tags:
 		"""Retrieve a tag from the tag list."""
 		
 		alt_lists = [ { 
-			"cog" : self.bot.get_cog("Lists"),
 			"command" : self.bot.get_cog("Lists").link,
 			"list" : "Links"
 		}, {
-			"cog" : self.bot.get_cog("Lists"),
 			"command" : self.bot.get_cog("Lists").hack,
 			"list" : "Hacks"
 		} ]
 		
 		# Try to invoke another command
-		await alt_lists[0]["cog"].invoke(alt_lists[0]["command"](name))
+		await ctx.invoke(alt_lists[0]["command"](name))
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
