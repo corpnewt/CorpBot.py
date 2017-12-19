@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import time
-from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
@@ -439,7 +438,7 @@ class Lists:
 			return
 			
 		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
 		for alink in linkList:
 			linkText = '{}*{}*, '.format(linkText, alink['Name'])
@@ -485,7 +484,7 @@ class Lists:
 			return
 			
 		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
 		for alink in linkList:
 			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
@@ -928,7 +927,7 @@ class Lists:
 			return
 
 		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
 
 		for alink in linkList:
@@ -975,7 +974,7 @@ class Lists:
 			return
 
 		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
+		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
 
 		for alink in linkList:
