@@ -23,14 +23,14 @@ class Tags:
 		self.bot = bot
 		self.settings = settings
 		self.alt_lists = [ { 
-			"command" : self.bot.all_commands.get("tag"),
-			"list" : "Tags"
+			"command" : "hack",
+			"list" : "Hacks"
 		}, { 
-			"command" : self.bot.all_commands.get("link"),
+			"command" : "link",
 			"list" : "Links"
 		}, { 
-			"command" : self.bot.all_commands.get("hack"),
-			"list" : "Hacks"
+			"command" : "tag",
+			"list" : "Tags"
 		} ]
 			
 
@@ -248,7 +248,7 @@ class Tags:
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"].name + " " + name)
+				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
 				
 		if not tagList or tagList == []:
 			no_tags = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
@@ -269,7 +269,7 @@ class Tags:
 			# Got something
 			await message.edit(content=" ")
 			# Invoke
-			await ctx.invoke(other_commands[index]["command"], name=name)
+			await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 			return
 
 		for atag in tagList:
@@ -302,7 +302,7 @@ class Tags:
 				# We're into our other list
 				await message.edit(content=" ")
 				# Invoke
-				await ctx.invoke(other_commands[index - len(potentialList)]["command"], name=name)
+				await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 				return
 			# Display the tag
 			for atag in tagList:
