@@ -204,10 +204,10 @@ class Tags:
 		"""Retrieve a tag from the tag list."""
 		
 		alt_lists = [ { 
-			"command" : self.bot.get_cog("Lists").link,
+			"command" : self.bot.all_commands.get("link"),
 			"list" : "Links"
 		}, {
-			"command" : self.bot.get_cog("Lists").hack,
+			"command" : self.bot.all_commands.get("hack"),
 			"list" : "Hacks"
 		} ]
 		
