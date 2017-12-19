@@ -215,8 +215,10 @@ class Tags:
 		"""Retrieve a tag from the tag list."""
 		
 		# Try to invoke another command
-		await ctx.invoke(self.alt_lists[1]["command"], name=name)
-		return
+		# await ctx.invoke(self.alt_lists[1]["command"], name=name)
+		# return
+		
+		our_list = "Tags"
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
@@ -233,10 +235,41 @@ class Tags:
 			await channel.send(msg)
 			return
 
-		tagList = self.settings.getServerStat(server, "Tags")
+		tagList = self.settings.getServerStat(server, our_list)
+		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
+		# Check others
+		other_commands = []
+		other_names    = []
+		for i in self.alt_lists:
+			if i["list"] == our_list:
+				# Our list - skip
+				continue
+			check_list = self.settings.getServerStat(server, i["list"])
+			if any(x["Name"].lower() == name.lower() for j in check_list):
+				# Add the list
+				other_commands.append(i)
+				other_names.append(ctx.prefix + i["command"].name + " " + name)
+				
 		if not tagList or tagList == []:
-			msg = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
-			await channel.send(msg)
+			no_tags = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
+			if not len(other_commands):
+				# No other matches
+				await ctx.send(no_tags)
+				return
+			msg = no_tags + "\n\nMaybe you meant:"
+			index, message = await PickList.Picker(
+				title=msg,
+				list=other_names,
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=no_tags)
+				return
+			# Got something
+			await message.edit(content=" ")
+			# Invoke
+			await ctx.invoke(other_commands[index]["command"], name=name)
 			return
 
 		for atag in tagList:
@@ -248,7 +281,6 @@ class Tags:
 				await channel.send(msg)
 				return
 		
-		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):
