@@ -218,7 +218,7 @@ class Lists:
 				await message.edit(content=no_links)
 				return
 			# Got something
-			await message.edit(content=" ")
+			await message.edit(content="`{}`".format(other_names[index]))
 			# Invoke
 			await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 			return
@@ -252,7 +252,7 @@ class Lists:
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content=" ")
+				await message.edit(content="`{}`".format(other_names[index - len(potentialList)]))
 				# Invoke
 				await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 				return
@@ -707,7 +707,7 @@ class Lists:
 				await message.edit(content=no_links)
 				return
 			# Got something
-			await message.edit(content=" ")
+			await message.edit(content="`{}`".format(other_names[index]))
 			# Invoke
 			await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 			return
@@ -741,7 +741,7 @@ class Lists:
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content=" ")
+				await message.edit(content="`{}`".format(other_names[index - len(potentialList)]))
 				# Invoke
 				await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 				return
