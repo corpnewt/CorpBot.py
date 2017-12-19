@@ -263,10 +263,10 @@ class Tags:
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
-				await message.edit(content="`{}`".format(other_names[index]))
+				await message.edit(content=no_tags)
 				return
 			# Got something
-			await message.edit(content=" ")
+			await message.edit(content="`{}`".format(other_names[index]))
 			# Invoke
 			await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 			return
