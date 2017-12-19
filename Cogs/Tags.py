@@ -215,7 +215,7 @@ class Tags:
 		"""Retrieve a tag from the tag list."""
 		
 		# Try to invoke another command
-		await ctx.invoke(alt_lists[1]["command"], name)
+		await ctx.invoke(self.alt_lists[1]["command"], name)
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
