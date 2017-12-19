@@ -245,7 +245,7 @@ class Tags:
 				# Our list - skip
 				continue
 			check_list = self.settings.getServerStat(server, i["list"])
-			if any(x["Name"].lower() == name.lower() for j in check_list):
+			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
 				other_names.append(ctx.prefix + i["command"].name + " " + name)
