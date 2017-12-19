@@ -25,14 +25,14 @@ class Lists:
 		self.bot = bot
 		self.settings = settings
 		self.alt_lists = [ { 
-			"command" : "tag",
-			"list" : "Tags"
+			"command" : "hack",
+			"list" : "Hacks"
 		}, { 
 			"command" : "link",
 			"list" : "Links"
 		}, { 
-			"command" : "hack",
-			"list" : "Hacks"
+			"command" : "tag",
+			"list" : "Tags"
 		} ]
 		
 		
