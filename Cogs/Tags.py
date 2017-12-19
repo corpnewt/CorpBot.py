@@ -288,12 +288,19 @@ class Tags:
 			msg = not_found + '\n\nSelect one of the following close matches:'
 			index, message = await PickList.Picker(
 				title=msg,
-				list=[x["Item"]["Name"] for x in potentialList],
+				list=[x["Item"]["Name"] for x in potentialList].extend(other_names),
 				ctx=ctx
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
 				await message.edit(content=not_found)
+				return
+			# Check if we have another command
+			if index - len(potentialList) + 1 >= 0:
+				# We're into our other list
+				await message.edit(content=" ")
+				# Invoke
+				await ctx.invoke(other_commands[index - len(potentialList) + 1]["command"], name=name)
 				return
 			# Display the tag
 			for atag in tagList:
