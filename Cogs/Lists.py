@@ -201,6 +201,7 @@ class Lists:
 				# Add the list
 				other_commands.append(i)
 				other_names.append(ctx.prefix + i["command"].name + " " + name)
+				
 		if not linkList or linkList == []:
 			no_links = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
 			if not len(other_commands):
@@ -659,6 +660,8 @@ class Lists:
 	async def hack(self, ctx, *, name : str = None):
 		"""Retrieve a hack from the hack list."""
 		
+		our_list = "Hacks"
+		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
@@ -675,9 +678,39 @@ class Lists:
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
+		# Check others
+		other_commands = []
+		other_names    = []
+		for i in self.alt_lists:
+			if i["list"] == our_list:
+				# Our list - skip
+				continue
+			check_list = self.settings.getServerStat(server, i["list"])
+			if any(x["Name"].lower() == name.lower() for x in check_list):
+				# Add the list
+				other_commands.append(i)
+				other_names.append(ctx.prefix + i["command"].name + " " + name)
+				
 		if not linkList or linkList == []:
-			msg = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
-			await channel.send(msg)
+			no_links = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
+			if not len(other_commands):
+				# No other matches
+				await ctx.send(no_links)
+				return
+			msg = no_links + "\n\nMaybe you meant:"
+			index, message = await PickList.Picker(
+				title=msg,
+				list=other_names,
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content=no_links)
+				return
+			# Got something
+			await message.edit(content=" ")
+			# Invoke
+			await ctx.invoke(other_commands[index]["command"], name=name)
 			return
 
 		for alink in linkList:
@@ -695,14 +728,23 @@ class Lists:
 		if len(potentialList):
 			# Setup and display the picker
 			msg = not_found + '\n\nSelect one of the following close matches:'
+			p_list = [x["Item"]["Name"] for x in potentialList]
+			p_list.extend(other_names)
 			index, message = await PickList.Picker(
 				title=msg,
-				list=[x["Item"]["Name"] for x in potentialList],
+				list=p_list,
 				ctx=ctx
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
 				await message.edit(content=not_found)
+				return
+			# Check if we have another command
+			if index >= len(potentialList):
+				# We're into our other list
+				await message.edit(content=" ")
+				# Invoke
+				await ctx.invoke(other_commands[index - len(potentialList)]["command"], name=name)
 				return
 			# Display the link
 			for alink in linkList:
