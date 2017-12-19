@@ -22,6 +22,17 @@ class Tags:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.alt_lists = [ { 
+			"command" : self.bot.all_commands.get("tag"),
+			"list" : "Tags"
+		}, { 
+			"command" : self.bot.all_commands.get("link"),
+			"list" : "Links"
+		}, { 
+			"command" : self.bot.all_commands.get("hack"),
+			"list" : "Hacks"
+		} ]
+			
 
 	@commands.command(pass_context=True)
 	async def settagrole(self, ctx, *, role : str = None):
@@ -203,16 +214,8 @@ class Tags:
 	async def tag(self, ctx, *, name : str = None):
 		"""Retrieve a tag from the tag list."""
 		
-		alt_lists = [ { 
-			"command" : self.bot.all_commands.get("link"),
-			"list" : "Links"
-		}, {
-			"command" : self.bot.all_commands.get("hack"),
-			"list" : "Hacks"
-		} ]
-		
 		# Try to invoke another command
-		await ctx.invoke(alt_lists[0]["command"](name))
+		await ctx.invoke(alt_lists[1]["command"], name)
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
