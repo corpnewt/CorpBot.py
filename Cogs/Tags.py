@@ -233,8 +233,6 @@ class Tags:
 
 		tagList = self.settings.getServerStat(server, "Tags")
 		if not tagList or tagList == []:
-			# Check if we meant any of the other lists
-			for 
 			msg = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
 			await channel.send(msg)
 			return
