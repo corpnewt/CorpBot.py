@@ -203,6 +203,19 @@ class Tags:
 	async def tag(self, ctx, *, name : str = None):
 		"""Retrieve a tag from the tag list."""
 		
+		alt_lists = [ { 
+			"cog" : self.bot.get_cog("Lists"),
+			"command" : self.bot.get_cog("Lists").link,
+			"list" : "Links"
+		}, {
+			"cog" : self.bot.get_cog("Lists"),
+			"command" : self.bot.get_cog("Lists").hack,
+			"list" : "Hacks"
+		} ]
+		
+		# Try to invoke another command
+		await alt_lists[0]["cog"].invoke(alt_lists[0]["command"](name))
+		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
@@ -220,6 +233,8 @@ class Tags:
 
 		tagList = self.settings.getServerStat(server, "Tags")
 		if not tagList or tagList == []:
+			# Check if we meant any of the other lists
+			for 
 			msg = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
 			await channel.send(msg)
 			return
