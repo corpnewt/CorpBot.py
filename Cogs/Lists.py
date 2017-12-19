@@ -689,6 +689,7 @@ class Lists:
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
+				print(i["list"])
 				other_names.append(ctx.prefix + i["command"].name + " " + name)
 				
 		if not linkList or linkList == []:
