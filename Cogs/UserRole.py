@@ -262,7 +262,7 @@ class UserRole:
 		await channel.send(roleText)
 
 	@commands.command(pass_context=True)
-	async def oneuserrole(self, ctx, *, on_off = None):
+	async def oneuserrole(self, ctx, *, yes_no = None):
 		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
 
 		# Check for admin status
@@ -305,6 +305,36 @@ class UserRole:
 		if not yes_no == None and not yes_no == current:
 			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
+
+	@commands.command(pass_context=True)
+	async def clearroles(self, ctx):
+		"""Removes all user roles from your roles."""
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(ctx.guild, "UserRoles")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+		
+		remRole = []
+		for arole in promoArray:
+			roleTest = DisplayName.roleForID(arole['ID'], ctx.guild)
+			if not roleTest:
+				# Not a real role - skip
+				continue
+			if roleTest in ctx.author.roles:
+				# We have it
+				remRole.append(roleTest)
+
+		if not len(remRole):
+			await ctx.send("You have no roles from the user role list.")
+			return		
+		self.settings.role.rem_roles(ctx.author, remRole)
+		if len(remRole) == 1:
+			await ctx.send("1 user role removed from your roles.")
+		else:
+			await ctx.send("{} user roles removed from your roles.".format(len(remRole)))
 
 
 	@commands.command(pass_context=True)
@@ -377,10 +407,7 @@ class UserRole:
 			return
 
 		if len(remRole):
-			try:
-				await ctx.author.remove_roles(*remRole)
-			except Exception:
-				pass
+			self.settings.role.rem_roles(ctx.author, remRole)
 
 		msg = '*{}* has been removed from **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
 		if suppress:
@@ -456,10 +483,7 @@ class UserRole:
 			return
 
 		if len(addRole):
-			try:
-				await ctx.author.add_roles(*addRole)
-			except Exception:
-				pass
+			self.settings.role.add_roles(ctx.author, addRole)
 
 		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
 		if suppress:
@@ -503,10 +527,7 @@ class UserRole:
 					# We have this in our roles - remove it
 					remRole.append(roleTest)
 			if len(remRole):
-				try:
-					await ctx.author.remove_roles(*remRole)
-				except Exception:
-					pass
+				self.settings.role.rem_roles(ctx.author, remRole)
 			# Give a quick status
 			msg = '*{}* has been moved out of all roles in the list!'.format(DisplayName.name(ctx.message.author))
 			if suppress:
@@ -551,21 +572,8 @@ class UserRole:
 			await channel.send(msg)
 			return
 
-		if len(remRole):
-			try:
-				await ctx.author.remove_roles(*remRole)
-			except Exception:
-				pass
-		
-		# Pause if we're adding *and* removing
-		if len(remRole) and len(addRole):
-			await asyncio.sleep(0.2)
-
-		if len(addRole):
-			try:
-				await ctx.author.add_roles(*addRole)
-			except Exception:
-				pass
+		if len(remRole) or len(addRole):
+			self.settings.role.change_roles(ctx.author, add_roles=addRole, rem_roles=remRole)
 
 		msg = '*{}* has been moved to **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
 		if suppress:

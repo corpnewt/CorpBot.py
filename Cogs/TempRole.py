@@ -56,10 +56,7 @@ class TempRole:
 		temp_role["Cooldown"] = role_t*60 + int(time.time())
 		user_roles.append(temp_role)
 		self.settings.setUserStat(member, server, "TempRoles", user_roles)
-		try:
-			await member.add_roles(role)
-		except Exception:
-			pass
+		self.settings.role.add_roles(member, [role])
 		self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
 
 	@asyncio.coroutine
@@ -136,11 +133,7 @@ class TempRole:
 		# Here - we're either past our cooldown, or who knows what else
 		if role in member.roles:
 			# We have the role still - remove it
-			#try:
-			print("Removing role")
-			await member.remove_roles(role)
-			#except Exception:
-			#	pass
+			self.settings.role.rem_roles(member, [role])
 		# Check if we pm
 		if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in temp_role:
 			try:
@@ -514,10 +507,7 @@ class TempRole:
 
 		message = await ctx.send("Applying...")
 		# We should be able to remove it now
-		try:
-			await member_from_name.remove_roles(role_from_name)
-		except Exception:
-			pass
+		self.settings.role.rem_roles(member_from_name, [role_from_name])
 		
 		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles")
 		for r in user_roles:
@@ -667,10 +657,7 @@ class TempRole:
 			user_roles.append(temp_role)
 			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
 		if not role_from_name in member_from_name.roles:
-			try:
-				await member_from_name.add_roles(role_from_name)
-			except Exception:
-				pass
+			self.settings.role.add_roles(member_from_name, [role_from_name])
 		if not cooldown == None:
 			# We have a cooldown
 			msg = "*{}* has been given **{}** for *{}*.".format(

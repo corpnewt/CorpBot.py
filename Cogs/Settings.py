@@ -16,6 +16,82 @@ def setup(bot):
 	# Add the cog
 	bot.add_cog(Settings(bot))
 
+class MemberRole:
+
+	def __init__(self, **kwargs):
+		self.member = kwargs.get("member", None)
+		self.add_roles = kwargs.get("add_roles", [])
+		self.rem_roles = kwargs.get("rem_roles", [])
+		if type(self.member) == discord.Member:
+			self.guild = self.member.guild
+		else:
+			self.guild = None
+
+class RoleManager:
+
+	# Init with the bot reference
+	def __init__(self, bot):
+		self.bot = bot
+		self.roles = []
+		self.sleep = 1
+		self.delay = 0.2
+		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
+
+	def clean_up(self):
+		for task in self.loop_list:
+			task.cancel()
+
+	async def check_roles(self):
+		while not self.bot.is_closed():
+			# Sleep, then check for roles
+			await asyncio.sleep(self.sleep)
+			if not len(self.roles):
+				# Nothing to check - continue
+				continue
+			while len(self.roles):
+				current_role = self.roles.pop()
+				await self.check_member_role(current_role)
+
+	async def check_member_role(self, r):
+		if not r.guild or not r.member:
+			# Not applicable
+			return
+		# Let's add roles
+		if len(r.add_roles):
+			try:
+				await r.member.add_roles(*r.add_roles)
+			except:
+				pass
+		if len(r.add_roles) and len(r.rem_roles):
+			# Pause for a sec before continuing
+			await asyncio.sleep(self.delay)
+		if len(r.rem_roles):
+			try:
+				await r.member.remove_roles(*r.rem_roles)
+			except:
+				pass
+
+	def _update(self, member, *, add_roles = [], rem_roles = []):
+		# Updates an existing record - or adds a new one
+		for i in self.roles:
+			if i.member == member:
+				# Found it
+				i.add_roles.extend(add_roles)
+				i.rem_roles.extend(rem_roles)
+				return
+		self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+
+	def add_roles(self, member, role_list):
+		# Adds the member and roles as a MemberRole object to the heap
+		self._update(member, add_roles=role_list)
+
+	def rem_roles(self, member, role_list):
+		# Adds the member and roles as a MemberRole object to the heap
+		self._update(member, rem_roles=role_list)
+
+	def change_roles(self, member, *, add_roles = [], rem_roles = []):
+		# Adds the member and both role types as a MemberRole object to the heap
+		self._update(member, add_roles=add_roles, rem_roles=rem_roles)
 
 # This is the settings module - it allows the other modules to work with
 # a global settings variable and to make changes
@@ -38,6 +114,7 @@ class Settings:
 		self.serverDict = {}
 		self.prefix = prefix
 		self.loop_list = []
+		self.role = RoleManager(bot)
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
@@ -231,6 +308,8 @@ class Settings:
 			return
 		# Flush settings
 		self.flushSettings()
+		# Shutdown role manager loop
+		self.role.cleanup()
 		for task in self.loop_list:
 			task.cancel()
 
@@ -265,10 +344,11 @@ class Settings:
 							foundRole = True
 					if not foundRole:
 						# We don't have the role - set a timer
-						self.bot.loop.create_task(self.giveRole(member, server))
+						self.loop_list.append(self.bot.loop.create_task(self.giveRole(member, server)))
 
 	async def giveRole(self, member, server):
 		# Start the countdown
+		task = asyncio.Task.current_task()
 		verifiedAt  = self.getUserStat(member, server, "VerificationTime")
 		try:
 			verifiedAt = int(verifiedAt)
@@ -292,11 +372,13 @@ class Settings:
 					foundRole = True
 			if not foundRole:
 				try:
-					await member.add_roles(defRole)
+					self.role.add_roles(member, [defRole])
 					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, self.suppressed(server, server.name))
 					await member.send(fmt)
 				except Exception:
 					pass
+		if task in self.loop_list:
+			self.loop_list.remove(task)
 
 	async def backup(self):
 		# Wait initial time - then start loop

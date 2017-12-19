@@ -94,7 +94,9 @@ class Promote:
                 if addRole:
                     if not addRole in member.roles:
                         addRoles.append(addRole)
-            await member.add_roles(*addRoles)
+            # await member.add_roles(*addRoles)
+            # Use role manager instead
+            self.settings.role.add_roles(member, addRoles)
             if not newRole:
                 # Promotion role doesn't exist
                 msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
@@ -218,7 +220,9 @@ class Promote:
                 if addRole:
                     if not addRole in member.roles:
                         addRoles.append(addRole)
-            await member.add_roles(*addRoles)
+            # await member.add_roles(*addRoles)
+            # Use role manager instead
+            self.settings.role.add_roles(member, addRoles)
             if not newRole:
                 # Promotion role doesn't exist
                 msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
@@ -282,7 +286,9 @@ class Promote:
                 if remRole:
                     if remRole in member.roles:
                         remRoles.append(remRole)
-            await member.remove_roles(*remRoles)
+            # await member.remove_roles(*remRoles)
+            # Use role manager instead
+            self.settings.role.rem_roles(member, remRoles)
             msg = '*{} xp* was taken from *{}* and they were demoted out of the xp system!'.format(neededXp*-1, DisplayName.name(member))
         elif nextRole < -1:
             msg = 'There are no lower roles to demote *{}* into.'.format(DisplayName.name(member))
@@ -297,7 +303,9 @@ class Promote:
                 if remRole:
                     if remRole in member.roles:
                         remRoles.append(remRole)
-            await member.remove_roles(*remRoles)
+            # await member.remove_roles(*remRoles)
+            # Use role manager instead
+            self.settings.role.rem_roles(member, remRoles)
             if not newRole:
                 # Promotion role doesn't exist
                 msg = 'It looks like **{}** is no longer on this server.  *{} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
@@ -420,7 +428,9 @@ class Promote:
                 if remRole in member.roles:
                     # Only add the ones we have
                     remRoles.append(remRole)
-        await member.remove_roles(*remRoles)
+        # await member.remove_roles(*remRoles)
+        # Use role manager instead
+        self.settings.role.rem_roles(member, remRoles)
         if not newRole:
             # Promotion role doesn't exist
             msg = 'It looks like **{}** is no longer on this server.  *{} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
