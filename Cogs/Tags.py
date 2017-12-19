@@ -286,9 +286,11 @@ class Tags:
 		if len(potentialList):
 			# Setup and display the picker
 			msg = not_found + '\n\nSelect one of the following close matches:'
+			p_list = [x["Item"]["Name"] for x in potentialList]
+			p_list.extend(other_names)
 			index, message = await PickList.Picker(
 				title=msg,
-				list=[x["Item"]["Name"] for x in potentialList].extend(other_names),
+				list=p_list,
 				ctx=ctx
 			).pick()
 			# Check if we errored/cancelled
