@@ -298,11 +298,11 @@ class Tags:
 				await message.edit(content=not_found)
 				return
 			# Check if we have another command
-			if index - len(potentialList) + 1 >= 0:
+			if index >= len(potentialList):
 				# We're into our other list
 				await message.edit(content=" ")
 				# Invoke
-				await ctx.invoke(other_commands[index - len(potentialList) + 1]["command"], name=name)
+				await ctx.invoke(other_commands[index - len(potentialList)]["command"], name=name)
 				return
 			# Display the tag
 			for atag in tagList:
