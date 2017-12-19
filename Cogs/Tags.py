@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import time
-from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import ReadableTime
@@ -486,7 +485,7 @@ class Tags:
 			return
 			
 		# Sort by tag name
-		tagList = sorted(tagList, key=itemgetter('Name'))
+		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
 		for atag in tagList:
 			tagText = '{}*{}*, '.format(tagText, atag['Name'])
@@ -532,7 +531,7 @@ class Tags:
 			return
 			
 		# Sort by tag name
-		tagList = sorted(tagList, key=itemgetter('Name'))
+		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
 		for atag in tagList:
 			tagText +='`{}`, '.format(atag['Name'].replace('`', '\\`'))
