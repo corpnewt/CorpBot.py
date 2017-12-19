@@ -200,7 +200,7 @@ class Lists:
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"].name + " " + name)
+				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
 				
 		if not linkList or linkList == []:
 			no_links = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
@@ -221,7 +221,7 @@ class Lists:
 			# Got something
 			await message.edit(content=" ")
 			# Invoke
-			await ctx.invoke(other_commands[index]["command"], name=name)
+			await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 			return
 
 		for alink in linkList:
@@ -255,7 +255,7 @@ class Lists:
 				# We're into our other list
 				await message.edit(content=" ")
 				# Invoke
-				await ctx.invoke(other_commands[index - len(potentialList)]["command"], name=name)
+				await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 				return
 			# Display the link
 			for alink in linkList:
@@ -689,7 +689,7 @@ class Lists:
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"] + " " + name)
+				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
 				
 		if not linkList or linkList == []:
 			no_links = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
