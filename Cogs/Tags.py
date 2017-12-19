@@ -263,7 +263,7 @@ class Tags:
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
-				await message.edit(content=no_tags)
+				await message.edit(content="`{}`".format(other_names[index]))
 				return
 			# Got something
 			await message.edit(content=" ")
@@ -299,7 +299,7 @@ class Tags:
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content=" ")
+				await message.edit(content=await message.edit(content="`{}`".format(other_names[index - len(potentialList)])))
 				# Invoke
 				await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 				return
