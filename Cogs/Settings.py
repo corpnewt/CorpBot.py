@@ -35,6 +35,7 @@ class RoleManager:
 		self.roles = []
 		self.sleep = 1
 		self.delay = 0.2
+		self.next_member_delay = 1
 		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
 
 	def clean_up(self):
@@ -51,6 +52,8 @@ class RoleManager:
 			while len(self.roles):
 				current_role = self.roles.pop()
 				await self.check_member_role(current_role)
+				if len(self.roles):
+					await asyncio.sleep(self.next_member_delay)
 
 	async def check_member_role(self, r):
 		if not r.guild or not r.member:
@@ -60,9 +63,12 @@ class RoleManager:
 		if len(r.add_roles):
 			try:
 				await r.member.add_roles(*r.add_roles)
-			except:
-				if r.member.guild.id == 186648463541272576:
-					print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
+			except Exception as e:
+				#print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
+				#try:
+				#	print(e)
+				#except:
+				#	pass
 				pass
 		if len(r.add_roles) and len(r.rem_roles):
 			# Pause for a sec before continuing
@@ -70,9 +76,12 @@ class RoleManager:
 		if len(r.rem_roles):
 			try:
 				await r.member.remove_roles(*r.rem_roles)
-			except:
-				if r.member.guild.id == 186648463541272576:
-					print("Failed to remove to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
+			except Exception as e:
+				#print("Failed to remove from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
+				#try:
+				#	print(e)
+				#except:
+				#	pass
 				pass
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
