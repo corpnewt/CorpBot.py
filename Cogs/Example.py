@@ -1042,7 +1042,7 @@ class Music:
             if not info:
                 await message.edit(content="No results for that search :(")
                 return
-            if not all(info.get('entries', [])):
+            if not len(info.get('entries', [])):
                 # empty list, no data
                 await message.edit(content="No results for that search :(")
                 return
