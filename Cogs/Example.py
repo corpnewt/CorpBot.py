@@ -126,7 +126,7 @@ class Example:
                 # Disadvantage
                 lowest = min(total_list)
                 i = total_list.index(lowest)
-                return { "total" : highest, "crit" : total_crit[i], "fail" : total_fail[i] }
+                return { "total" : lowest, "crit" : total_crit[i], "fail" : total_fail[i] }
         return { "total" : total_list[0], "crit" : total_crit[0], "fail" : total_fail[0] }
         
     @commands.command()
@@ -160,6 +160,8 @@ class Example:
                     add = int(parts[1])
                 else:
                     limit = int(limit)
+                if limit < 1:
+                    continue
                 dice_setup.append({ "vantage" : vantage, "rolls" : rolls, "limit" : limit, "add" : add, "original" : d })
             except Exception:
                 pass
