@@ -30,11 +30,11 @@ class Debugging:
 				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.join', 'user.leave' ]
 		self.normal = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
-			       'message.edit', 'message.delete' ]
+			       'message.edit', 'message.delete', "xp" ]
 		self.verbose = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
-				'message.edit' ]
+				'message.edit', "xp" ]
 		self.cleanChannels = []
 
 	def suppressed(self, guild, msg):
@@ -414,7 +414,7 @@ class Debugging:
 	
 	@commands.command(pass_context=True)
 	async def logpreset(self, ctx, *, preset = None):
-		"""Can select one of 3 available presets - quiet, normal, verbose (bot-admin only)."""
+		"""Can select one of 4 available presets - off, quiet, normal, verbose (bot-admin only)."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
@@ -433,29 +433,30 @@ class Debugging:
 			return
 		
 		if preset == None:
-			await ctx.channel.send('Usage: `{}logpreset [quiet/normal/verbose]`'.format(ctx.prefix))
+			await ctx.channel.send('Usage: `{}logpreset [off/quiet/normal/verbose]`'.format(ctx.prefix))
 			return
 		currentVars = self.settings.getServerStat(server, "LogVars")
-		if preset.lower() == 'quiet' or preset == '0':
+		if preset.lower() in ["0", "off"]:
 			currentVars = []
-			for var in self.quiet:
-				currentVars.append(var)
+			self.settings.setServerStat(server, "LogVars", currentVars)
+			await ctx.channel.send('Removed *all* logging options.')
+		elif preset.lower() in ['quiet', '1']:
+			currentVars = []
+			currentVars.extend(self.quiet)
 			self.settings.setServerStat(server, "LogVars", currentVars)
 			await ctx.channel.send('Logging with *quiet* preset.')
-		elif preset.lower() == 'normal' or preset == '1':
+		elif preset.lower() in ['normal', '2']:
 			currentVars = []
-			for var in self.normal:
-				currentVars.append(var)
+			currentVars.extend(self.normal)
 			self.settings.setServerStat(server, "LogVars", currentVars)
 			await ctx.channel.send('Logging with *normal* preset.')
-		elif preset.lower() == 'verbose' or preset == '2':
+		elif preset.lower() in ['verbose', '3']:
 			currentVars = []
-			for var in self.verbose:
-				currentVars.append(var)
+			currentVars.extend(self.verbose)
 			self.settings.setServerStat(server, "LogVars", currentVars)
 			await ctx.channel.send('Logging with *verbose* preset.')
 		else:
-			await ctx.channel.send('Usage: `{}logpreset [quiet/normal/verbose]`'.format(ctx.prefix))
+			await ctx.channel.send('Usage: `{}logpreset [off/quiet/normal/verbose]`'.format(ctx.prefix))
 		
 	
 	@commands.command(pass_context=True)

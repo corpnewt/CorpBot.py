@@ -229,6 +229,9 @@ class Settings:
 				"VotesResetTime"		: 0,		# Number of seconds to roll off - or 0 for disabled
 				"VoteKickArray"			: [],		# Contains a list of users who were voted to kick - and who voted against them
 				"VoteKickAnon"			: False,	# Are vk messages deleted after sending?
+				"QuoteReaction"			: None,		# Trigger reaction for quoting messages
+				"QuoteChannel"			: None,		# Channel id for quotes
+				"QuoteAdminOnly"		: True,		# Only admins/bot-admins can quote?
 				"MuteList"				: []}		# List of muted members
 				# Removed for spam
 				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
