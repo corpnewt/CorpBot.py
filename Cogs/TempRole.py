@@ -33,6 +33,11 @@ class TempRole:
 			task.cancel()
 
 	async def onjoin(self, member, server):
+		# Let the api settle
+		# Add 2 second delay to hopefully prevent the api from hating us :(
+		await asyncio.sleep(2)
+		# Pls no hate
+
 		role   = self.settings.getServerStat(server, "TempRole")
 		role_t = self.settings.getServerStat(server, "TempRoleTime")
 
@@ -54,9 +59,6 @@ class TempRole:
 		# Add it anew
 		temp_role["ID"] = role.id
 		temp_role["Cooldown"] = role_t*60 + int(time.time())
-		# Add 2 second delay to hopefully prevent the api from hating us :(
-		await asyncio.sleep(2)
-		# Pls no hate
 		user_roles.append(temp_role)
 		self.settings.setUserStat(member, server, "TempRoles", user_roles)
 		self.settings.role.add_roles(member, [role])
