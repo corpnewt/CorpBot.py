@@ -23,6 +23,10 @@ class Quote:
 			# Not in a server
 			return
 
+		if reaction.message.author.bot:
+			# Is a bot
+			return
+
 		r =         self.settings.getServerStat(member.guild, "QuoteReaction")
 		r_channel = self.settings.getServerStat(member.guild, "QuoteChannel")
 		r_admin   = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
