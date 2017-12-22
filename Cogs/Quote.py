@@ -59,10 +59,11 @@ class Quote:
 		if r_channel == None:
 			# Not a valid channel
 			return
-
-		if reaction.message.channel.id == r_channel.id:
-			# We can't quote in our quote channel
-			return
+		
+		# Removed as we're not quoting attachments or embeds
+		#if reaction.message.channel.id == r_channel.id:
+		#	# We can't quote in our quote channel
+		#	return
 
 		if not len(reaction.message.content):
 			# Only quote actual text - no embeds/uploads
