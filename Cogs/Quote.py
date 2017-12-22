@@ -23,10 +23,6 @@ class Quote:
 			# Not in a server
 			return
 
-		if reaction.message.author.bot:
-			# Is a bot
-			return
-
 		r =         self.settings.getServerStat(member.guild, "QuoteReaction")
 		r_channel = self.settings.getServerStat(member.guild, "QuoteChannel")
 		r_admin   = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
@@ -40,7 +36,16 @@ class Quote:
 			# Our reaction isn't in there
 			return
 
-		if r_admin:
+		em = discord.utils.get(reaction.message.reactions, emoji=r)
+		if not em:
+			# Broken for no reason?
+			return
+
+		if em.count > 1:
+			# Our reaction is already here
+			if not r_admin:
+				# We're not worried about admin stuffs 
+				return
 			# Check for admin/bot-admin
 			isAdmin = member.permissions_in(reaction.message.channel).administrator
 			if not isAdmin:
@@ -52,22 +57,25 @@ class Quote:
 							isAdmin = True
 			if not isAdmin:
 				return
-		else:
-			for re in reaction.message.reactions:
-				if str(re.emoji) == r:
-					if re.count > 1:
-						# Already has this reaction
-						return
+			# Iterate through those that reacted and see if any are admin
+			r_users = await reaction.users().flatten()
+			for r_user in r_users:
+				isAdmin = r_user.permissions_in(reaction.message.channel).administrator
+				if isAdmin:
+					# Admin
+					return
+				checkAdmin = self.settings.getServerStat(member.guild, "AdminArray")
+				for role in r_user.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if str(aRole['ID']) == str(role.id):
+							# Bot admin
+							return
 
 		r_channel = member.guild.get_channel(int(r_channel))
 		if r_channel == None:
 			# Not a valid channel
 			return
-		
-		# Removed as we're not quoting attachments or embeds
-		#if reaction.message.channel.id == r_channel.id:
-		#	# We can't quote in our quote channel
-		#	return
 
 		if not len(reaction.message.content):
 			# Only quote actual text - no embeds/uploads
@@ -184,6 +192,18 @@ class Quote:
 		self.settings.setServerStat(ctx.message.guild, "QuoteReaction", str(reaction.emoji))
 
 		await message.edit(content="Quote reaction set to {}".format(str(reaction.emoji)))
+
+
+	@commands.command(pass_context=True)
+	async def getquotereaction(self, ctx):
+		"""Displays the quote reaction if there is one."""
+		r = self.settings.getServerStat(ctx.message.guild, "QuoteReaction")
+
+		if r:
+			await ctx.send("Current quote reaction is {}".format(r))
+			return
+		else:
+			await ctx.send("No quote reaction set.")
 
 
 	@commands.command(pass_context=True)
