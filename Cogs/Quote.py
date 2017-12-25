@@ -36,7 +36,11 @@ class Quote:
 			# Our reaction isn't in there
 			return
 
-		em = discord.utils.get(reaction.message.reactions, emoji=r)
+		em = None
+		for reac in reaction.message.reactions:
+			if str(reac) == str(r):
+				em = reac
+
 		if not em:
 			# Broken for no reason?
 			return
