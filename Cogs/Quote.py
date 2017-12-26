@@ -19,7 +19,7 @@ class Quote:
 	@asyncio.coroutine
 	async def on_reaction_add(self, reaction, member):
 		# Catch reactions and see if they match our list
-		if not member.guild:
+		if not type(member) is discord.Member:
 			# Not in a server
 			return
 
