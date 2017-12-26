@@ -98,19 +98,39 @@ class TempRole:
 		if task in self.loop_list:
 			self.loop_list.remove(task)
 
+	def _log(self, message, *, value = None, member = None):
+		print(" ")
+		if not member == None:
+			print(member)
+		print(message)
+		if not value == None:
+			print(value)
+		print(" ")
+
 	async def check_temp_roles(self, member, temp_role):
 		# Get the current task
 		task = asyncio.Task.current_task()
+		
+		self._log("Temp Role Object:", value=temp_role, member=member)
+
 		# Get the cooldown and server id
 		c = int(temp_role["Cooldown"])
 		r_id = int(temp_role["ID"])
 
 		# Wait until we're ready to remove
 		timeleft = c-int(time.time())
+		
+		self._log("Time left check 1 - do we have time left?", value=timeleft, member=member)
+		
 		if timeleft > 0:
 			await asyncio.sleep(timeleft)
 		# Resolve the role
 		role = DisplayName.roleForID(r_id, member.guild)
+
+		print(role)
+		print(type(role))
+		self._log("Role check - is role?", value=role, member=member)
+		
 		if not role:
 			# Doesn't exist - remove it
 			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
@@ -119,6 +139,9 @@ class TempRole:
 			return
 		# We have a role - let's see if we still need to keep it
 		c = temp_role["Cooldown"]
+
+		self._log("Cooldown check - do we have a cooldown?", value=c, member=member)
+
 		if c == None:
 			# We now have this role forever
 			# One last check to make sure it all makes sense
@@ -126,19 +149,35 @@ class TempRole:
 			temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
 			if not role in member.roles:
 				temp_roles.remove(temp_role)
+				self.settings.setUserStat(member, member.guild, "TempRoles", temp_roles)
 			self._remove_task(task)
 			return
 		# We still have a cooldown
 		timeleft = c-int(time.time())
+
+		self._log("Time left:", value=timeleft, member=member)
+
 		if timeleft > 0:
 			# Recalibrate
 			self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
 			self._remove_task(task)
 			return
 		# Here - we're either past our cooldown, or who knows what else
+
+		self._log("Past the cooldown - no time left - do we have the role?", value=(role in member.roles), member=member)
+
 		if role in member.roles:
+			self._log("Removing the role now - on time (supposedly)", member=member, value=role)
 			# We have the role still - remove it
 			self.settings.role.rem_roles(member, [role])
+
+		# Remove the entry from our user settings
+		temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
+		if temp_role in temp_roles:
+			self._log("Temp Role was in user settings - removing", member=member)
+			temp_roles.remove(temp_role)
+			self.settings.setUserStat(member, member.guild, "TempRoles", temp_roles)
+
 		# Check if we pm
 		if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in temp_role:
 			try:
