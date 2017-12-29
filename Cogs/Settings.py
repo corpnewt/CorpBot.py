@@ -61,27 +61,29 @@ class RoleManager:
 			return
 		# Let's add roles
 		if len(r.add_roles):
+			print("Adding Roles to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
 			try:
 				await r.member.add_roles(*r.add_roles)
 			except Exception as e:
-				#print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
-				#try:
-				#	print(e)
-				#except:
-				#	pass
+				print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
+				try:
+					print(e)
+				except:
+					pass
 				pass
 		if len(r.add_roles) and len(r.rem_roles):
 			# Pause for a sec before continuing
 			await asyncio.sleep(self.delay)
 		if len(r.rem_roles):
+			print("Removing Roles from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
 			try:
 				await r.member.remove_roles(*r.rem_roles)
 			except Exception as e:
-				#print("Failed to remove from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
-				#try:
-				#	print(e)
-				#except:
-				#	pass
+				print("Failed to remove from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
+				try:
+					print(e)
+				except:
+					pass
 				pass
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
