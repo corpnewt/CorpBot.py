@@ -85,7 +85,7 @@ class RoleManager:
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
-		if not type(self.member) == discord.Member:
+		if not type(member) == discord.Member:
 			# Can't change roles without a guild
 			return
 		# Check first if any of the add_roles are above our own
