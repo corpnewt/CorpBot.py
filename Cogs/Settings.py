@@ -36,6 +36,7 @@ class RoleManager:
 		self.sleep = 1
 		self.delay = 0.2
 		self.next_member_delay = 1
+		print("Initializing RoleManager...")
 		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
 
 	def clean_up(self):
