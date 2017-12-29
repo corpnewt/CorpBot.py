@@ -127,8 +127,6 @@ class TempRole:
 		# Resolve the role
 		role = DisplayName.roleForID(r_id, member.guild)
 
-		print(role)
-		print(type(role))
 		#self._log("Role check - is role?", value=role, member=member)
 		
 		if not role:
