@@ -37,6 +37,7 @@ class RoleManager:
 		self.delay = 0.2
 		self.next_member_delay = 1
 		self.running = True
+		self.q = asyncio.Queue()
 		print("Initializing RoleManager...")
 		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
 
@@ -48,7 +49,11 @@ class RoleManager:
 	async def check_roles(self):
 		print("Starting role check loop")
 		while self.running:
-			# Sleep, then check for roles
+			# Try with a queue I suppose
+			current_role = await self.q.get()
+			await self.check_member_role(current_role)
+			
+			"""# Sleep, then check for roles
 			await asyncio.sleep(self.sleep)
 			print(len(self.roles))
 			if not len(self.roles):
@@ -59,7 +64,7 @@ class RoleManager:
 				print(len(self.roles))
 				await self.check_member_role(current_role)
 				if len(self.roles):
-					await asyncio.sleep(self.next_member_delay)
+					await asyncio.sleep(self.next_member_delay)"""
 		print("End of role check loop")
 
 	async def check_member_role(self, r):
@@ -116,7 +121,8 @@ class RoleManager:
 		#		i.rem_roles.extend(rem_roles)
 		#		return
 		print("Role updates - {}:\n+: {}\n-: {}".format(member, add_roles, rem_roles))
-		self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+		self.q.put_nowait(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+		#self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
 
 	def add_roles(self, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
