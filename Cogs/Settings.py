@@ -52,6 +52,7 @@ class RoleManager:
 			# Try with a queue I suppose
 			current_role = await self.q.get()
 			await self.check_member_role(current_role)
+			self.q.task_done()
 			
 			"""# Sleep, then check for roles
 			await asyncio.sleep(self.sleep)
