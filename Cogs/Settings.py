@@ -57,10 +57,6 @@ class RoleManager:
 		if r.guild == None or r.member == None:
 			# Not applicable
 			return
-		# Check if we *can* manage roles
-		if not r.guild.me.guild_permissions.manage_roles:
-			print("No manage_roles perms via guild")
-			return
 		# Let's add roles
 		if len(r.add_roles):
 			print("Adding Roles to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
