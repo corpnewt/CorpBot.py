@@ -57,6 +57,7 @@ class RoleManager:
 		if r.guild == None or r.member == None:
 			# Not applicable
 			return
+		print("Have a guild and member")
 		# Let's add roles
 		if len(r.add_roles):
 			print("Adding Roles to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
