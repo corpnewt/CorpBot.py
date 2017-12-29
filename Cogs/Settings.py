@@ -88,12 +88,13 @@ class RoleManager:
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
-		for i in self.roles:
-			if i.member == member:
-				# Found it
-				i.add_roles.extend(add_roles)
-				i.rem_roles.extend(rem_roles)
-				return
+		# Temporarily *just* add new records
+		#for i in self.roles:
+		#	if i.member == member:
+		#		# Found it
+		#		i.add_roles.extend(add_roles)
+		#		i.rem_roles.extend(rem_roles)
+		#		return
 		self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
 
 	def add_roles(self, member, role_list):
