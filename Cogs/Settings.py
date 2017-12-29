@@ -84,10 +84,10 @@ class RoleManager:
 		if not r.guild.me.guild_permissions.manage_roles:
 			print("No manage_roles perms via guild")
 			return
-		if not any(x.manage_roles for x in r.guild.me.roles):
-			print("No manage_roles perms via roles")
-			# Missing perms
-			return
+		#if not any(x.manage_roles for x in r.guild.me.roles):
+		#	print("No manage_roles perms via roles")
+		#	# Missing perms
+		#	return
 		print("-----------------\n+: {}\n-: {}".format(r.add_roles, r.rem_roles))
 		# Let's add roles
 		if len(r.add_roles):
