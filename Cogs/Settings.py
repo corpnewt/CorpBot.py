@@ -55,8 +55,9 @@ class RoleManager:
 		if r.guild == None or r.member == None:
 			# Not applicable
 			return
-		us = r.guild.me
-		print(us.guild_permissions.manage_roles)
+		if not r.guild.me.guild_permissions.manage_roles:
+			# Missing permissions to manage roles
+			return
 		# Let's add roles
 		if len(r.add_roles):
 			try:
@@ -84,7 +85,28 @@ class RoleManager:
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
-		self.q.put_nowait(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+		if not type(self.member) == discord.Member:
+			# Can't change roles without a guild
+			return
+		# Check first if any of the add_roles are above our own
+		top_index = member.guild.me.top_role.position
+		new_add = []
+		new_rem = []
+		print("Us {}".format(top_index))
+		for a in add_roles:
+			print("Add: {}".format(a.position))
+			if a.position < top_index:
+				# Can add this one
+				new_add.append(a)
+		for r in rem_roles:
+			print("Rem: {}".format(r.position))
+			if r.position < top_index:
+				# Can remove this one
+				new_rem.append(r)
+		if len(new_add) == 0 and len(new_rem) == 0:
+			# Nothing to do here
+			return
+		self.q.put_nowait(MemberRole(member=member, add_roles=new_add, rem_roles=new_rem))
 
 	def add_roles(self, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
