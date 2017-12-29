@@ -49,6 +49,7 @@ class RoleManager:
 			# Try with a queue I suppose
 			current_role = await self.q.get()
 			await self.check_member_role(current_role)
+			self.q.task_done()
 
 	async def check_member_role(self, r):
 		if r.guild == None or r.member == None:
@@ -90,6 +91,7 @@ class RoleManager:
 	def _update(self, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
 		self.q.put_nowait(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+		print(self.q.qsize())
 
 	def add_roles(self, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
