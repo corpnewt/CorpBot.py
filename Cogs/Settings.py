@@ -56,6 +56,7 @@ class RoleManager:
 				continue
 			while len(self.roles) > 0:
 				current_role = self.roles.pop()
+				print(len(self.roles))
 				await self.check_member_role(current_role)
 				if len(self.roles):
 					await asyncio.sleep(self.next_member_delay)
