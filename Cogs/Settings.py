@@ -44,6 +44,7 @@ class RoleManager:
 			task.cancel()
 
 	async def check_roles(self):
+		print("Starting role check loop")
 		while not self.bot.is_closed():
 			# Sleep, then check for roles
 			await asyncio.sleep(self.sleep)
@@ -55,6 +56,7 @@ class RoleManager:
 				await self.check_member_role(current_role)
 				if len(self.roles):
 					await asyncio.sleep(self.next_member_delay)
+		print("End of role check loop")
 
 	async def check_member_role(self, r):
 		if not r.guild or not r.member:
