@@ -58,6 +58,10 @@ class RoleManager:
 	async def check_member_role(self, r):
 		if not r.guild or not r.member:
 			# Not applicable
+			if not r.guild:
+				print("No guild")
+			if not r.member:
+				print("No member")
 			return
 		# Check if we *can* manage roles
 		if not r.guild.me.guild_permissions.manage_roles:
