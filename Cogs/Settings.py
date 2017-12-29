@@ -122,6 +122,7 @@ class RoleManager:
 		#		return
 		print("Role updates - {}:\n+: {}\n-: {}".format(member, add_roles, rem_roles))
 		self.q.put_nowait(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
+		print(self.q.qsize())
 		#self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
 
 	def add_roles(self, member, role_list):
