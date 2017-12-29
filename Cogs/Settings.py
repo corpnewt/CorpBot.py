@@ -51,7 +51,9 @@ class RoleManager:
 		while self.running:
 			# Try with a queue I suppose
 			current_role = await self.q.get()
+			print("Before task")
 			await self.check_member_role(current_role)
+			print("After task")
 			self.q.task_done()
 			
 			"""# Sleep, then check for roles
