@@ -55,6 +55,8 @@ class RoleManager:
 		if r.guild == None or r.member == None:
 			# Not applicable
 			return
+		us = r.guild.me
+		print(us.guild_permissions)
 		# Let's add roles
 		if len(r.add_roles):
 			try:
