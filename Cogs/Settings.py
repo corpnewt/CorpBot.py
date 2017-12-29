@@ -376,7 +376,7 @@ class Settings:
 	async def giveRole(self, member, server):
 		# Let the api settle
 		# Add 2 second delay to hopefully prevent the api from hating us :(
-		await asyncio.sleep(2)
+		# await asyncio.sleep(2)
 		# Pls no hate
 		
 		# Start the countdown
