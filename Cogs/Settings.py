@@ -56,7 +56,7 @@ class RoleManager:
 			# Not applicable
 			return
 		us = r.guild.me
-		print(us.guild_permissions)
+		print(us.guild_permissions.manage_roles)
 		# Let's add roles
 		if len(r.add_roles):
 			try:
