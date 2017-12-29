@@ -59,8 +59,9 @@ class RoleManager:
 			return
 		print("Have a guild and member")
 		# Let's add roles
-		print(len(r.add_roles))
-		print(len(r.rem_roles))
+		print(r.add_roles)
+		print(r.rem_roles)
+		print(r.member)
 		if len(r.add_roles):
 			print("Adding Roles to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
 			try:
