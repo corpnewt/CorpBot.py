@@ -59,6 +59,7 @@ class RoleManager:
 		print("End of role check loop")
 
 	async def check_member_role(self, r):
+		print("Checking member role:\n{}".format(r))
 		if not r.guild or not r.member:
 			# Not applicable
 			if not r.guild:
