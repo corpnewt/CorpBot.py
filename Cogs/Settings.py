@@ -32,13 +32,11 @@ class RoleManager:
 	# Init with the bot reference
 	def __init__(self, bot):
 		self.bot = bot
-		self.roles = []
 		self.sleep = 1
 		self.delay = 0.2
 		self.next_member_delay = 1
 		self.running = True
 		self.q = asyncio.Queue()
-		print("Initializing RoleManager...")
 		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
 
 	def clean_up(self):
@@ -47,60 +45,32 @@ class RoleManager:
 			task.cancel()
 
 	async def check_roles(self):
-		print("Starting role check loop")
 		while self.running:
 			# Try with a queue I suppose
 			current_role = await self.q.get()
-			print("Before task")
 			await self.check_member_role(current_role)
-			print("After task")
-			self.q.task_done()
-			
-			"""# Sleep, then check for roles
-			await asyncio.sleep(self.sleep)
-			print(len(self.roles))
-			if not len(self.roles):
-				# Nothing to check - continue
-				continue
-			while len(self.roles) > 0:
-				current_role = self.roles.pop()
-				print(len(self.roles))
-				await self.check_member_role(current_role)
-				if len(self.roles):
-					await asyncio.sleep(self.next_member_delay)"""
-		print("End of role check loop")
 
 	async def check_member_role(self, r):
-		print("Checking member role:\n{}".format(r))
 		if r.guild == None or r.member == None:
 			# Not applicable
-			if r.guild == None:
-				print("No guild")
-			if r.member == None:
-				print("No member")
 			return
-		print("We have a member and guild")
 		# Check if we *can* manage roles
 		if not r.guild.me.guild_permissions.manage_roles:
 			print("No manage_roles perms via guild")
 			return
-		#if not any(x.manage_roles for x in r.guild.me.roles):
-		#	print("No manage_roles perms via roles")
-		#	# Missing perms
-		#	return
-		print("-----------------\n+: {}\n-: {}".format(r.add_roles, r.rem_roles))
 		# Let's add roles
 		if len(r.add_roles):
 			print("Adding Roles to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
 			try:
 				await r.member.add_roles(*r.add_roles)
 			except Exception as e:
-				print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
-				try:
-					print(e)
-				except:
+				if not type(e) is discord.Forbidden:
+					print("Failed to add to {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.add_roles))
+					try:
+						print(e)
+					except:
+						pass
 					pass
-				pass
 		if len(r.add_roles) and len(r.rem_roles):
 			# Pause for a sec before continuing
 			await asyncio.sleep(self.delay)
@@ -109,26 +79,17 @@ class RoleManager:
 			try:
 				await r.member.remove_roles(*r.rem_roles)
 			except Exception as e:
-				print("Failed to remove from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
-				try:
-					print(e)
-				except:
+				if not type(e) is discord.Forbidden:
+					print("Failed to remove from {}#{}:\n{}".format(r.member.name, r.member.discriminator, r.rem_roles))
+					try:
+						print(e)
+					except:
+						pass
 					pass
-				pass
 
 	def _update(self, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
-		# Temporarily *just* add new records
-		#for i in self.roles:
-		#	if i.member == member:
-		#		# Found it
-		#		i.add_roles.extend(add_roles)
-		#		i.rem_roles.extend(rem_roles)
-		#		return
-		print("Role updates - {}:\n+: {}\n-: {}".format(member, add_roles, rem_roles))
 		self.q.put_nowait(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
-		print(self.q.qsize())
-		#self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
 
 	def add_roles(self, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
