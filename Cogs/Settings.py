@@ -92,14 +92,11 @@ class RoleManager:
 		top_index = member.guild.me.top_role.position
 		new_add = []
 		new_rem = []
-		print("Us {}".format(top_index))
 		for a in add_roles:
-			print("Add: {}".format(a.position))
 			if a.position < top_index:
 				# Can add this one
 				new_add.append(a)
 		for r in rem_roles:
-			print("Rem: {}".format(r.position))
 			if r.position < top_index:
 				# Can remove this one
 				new_rem.append(r)
