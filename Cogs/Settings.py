@@ -95,6 +95,7 @@ class RoleManager:
 		#		i.add_roles.extend(add_roles)
 		#		i.rem_roles.extend(rem_roles)
 		#		return
+		print("Role updates - {}:\n+: {}\n-: {}".format(member, add_roles, rem_roles))
 		self.roles.append(MemberRole(member=member, add_roles=add_roles, rem_roles=rem_roles))
 
 	def add_roles(self, member, role_list):
