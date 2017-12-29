@@ -48,6 +48,7 @@ class RoleManager:
 		while not self.bot.is_closed():
 			# Sleep, then check for roles
 			await asyncio.sleep(self.sleep)
+			print(len(self.roles))
 			if not len(self.roles):
 				# Nothing to check - continue
 				continue
