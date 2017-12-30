@@ -336,7 +336,7 @@ class Settings:
 		# Flush settings
 		self.flushSettings()
 		# Shutdown role manager loop
-		self.role.cleanup()
+		self.role.clean_up()
 		for task in self.loop_list:
 			task.cancel()
 

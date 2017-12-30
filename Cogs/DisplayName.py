@@ -8,6 +8,39 @@ def setup(bot):
 	# This module isn't actually a cog
     return
 
+def clean_message(message, *, bot = None, server = None, nullify = True):
+    # Searches for <@ > and <!@ > and gets the ids between
+    # then resolves them to their user name if it can be determined
+    
+    if nullify:
+        # Strip out @here and @everyone first
+        zerospace = "​"
+        message = message.replace("@everyone", "@{}everyone".format(zerospace)).replace("@here", "@{}here".format(zerospace))
+    if bot == None and server == None:
+        # Not enough info
+        return message
+    matches_re = re.finditer(r"\<!?\@[^\<\@]+\>", message)
+    matches = []
+    matches = [x.group(0) for x in matches_re]
+    if not len(matches):
+        return message
+    for match in matches:
+        if server:
+            # Have the server, bot doesn't matter
+            mem = memberForName(match, server)
+            if mem == None:
+                continue
+            mem_name = name(mem)
+        else:
+            # Must have bot then
+            memID = re.sub(r'\W+', '', match)
+            mem = bot.get_user(int(memID))
+            if mem == None:
+                continue
+            mem_name = mem.name
+        message = message.replace(match, mem_name)
+    return message
+
 def name(member : discord.Member):
     # A helper function to return the member's display name
     nick = name = None

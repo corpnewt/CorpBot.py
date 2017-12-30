@@ -8,6 +8,7 @@ from discord.ext import commands
 from Cogs import Nullify
 from pyquery import PyQuery as pq
 from Cogs import FuzzySearch
+from Cogs import DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -149,6 +150,9 @@ class ChatterBot:
 
 	async def _chat(self, channel, server, message):
 		# Check if we're suppressing @here and @everyone mentions
+
+		message = DisplayName.clean_message(message, bot=self.bot, server=server)
+
 		if self.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
