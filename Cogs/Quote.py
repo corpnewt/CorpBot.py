@@ -16,6 +16,18 @@ class Quote:
 		self.bot = bot
 		self.settings = settings
 
+	def _is_admin(self, member, channel):
+		# Check for admin/bot-admin
+			isAdmin = member.permissions_in(channel).administrator
+			if not isAdmin:
+				checkAdmin = self.settings.getServerStat(member.guild, "AdminArray")
+				for role in member.roles:
+					for aRole in checkAdmin:
+						# Get the role that corresponds to the id
+						if str(aRole['ID']) == str(role.id):
+							isAdmin = True
+			return isAdmin
+
 	@asyncio.coroutine
 	async def on_reaction_add(self, reaction, member):
 		# Catch reactions and see if they match our list
@@ -48,33 +60,26 @@ class Quote:
 		if em.count > 1:
 			# Our reaction is already here
 			if not r_admin:
-				# We're not worried about admin stuffs 
+				# We're not worried about admin stuffs
+				# and someone already quoted
 				return
 			# Check for admin/bot-admin
-			isAdmin = member.permissions_in(reaction.message.channel).administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(member.guild, "AdminArray")
-				for role in member.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if str(aRole['ID']) == str(role.id):
-							isAdmin = True
-			if not isAdmin:
+			if not self._is_admin(member, reaction.message.channel):
+				# We ARE worried about admin - and we're not admin... skip
 				return
 			# Iterate through those that reacted and see if any are admin
 			r_users = await reaction.users().flatten()
 			for r_user in r_users:
-				isAdmin = r_user.permissions_in(reaction.message.channel).administrator
-				if isAdmin:
-					# Admin
+				if r_user == member:
+					continue
+				if self._is_admin(r_user, reaction.message.channel):
+					# An admin already quoted - skip
 					return
-				checkAdmin = self.settings.getServerStat(member.guild, "AdminArray")
-				for role in r_user.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if str(aRole['ID']) == str(role.id):
-							# Bot admin
-							return
+		else:
+			# This is the first reaction
+			# Check for admin/bot-admin
+			if r_admin and not self._is_admin(member, reaction.message.channel):
+				return
 
 		r_channel = member.guild.get_channel(int(r_channel))
 		if r_channel == None:
