@@ -10,14 +10,12 @@ echo.
 set "botFile=WatchDog.py"
 set "pyPath=python"
 
-for /f %%i in ('where python 2^>nul') do (
+for /f "tokens=*" %%i in ('where python 2^>nul') do (
     set "p=%%i"
     if /i NOT "!p:~0,5!"=="INFO:" (
         set "pyPath=%%i"
     )
 )
-
-
 
 set "thisDir=%~dp0"
 
