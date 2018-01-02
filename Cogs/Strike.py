@@ -153,7 +153,10 @@ class Strike:
 			days = int(days)
 		except Exception:
 			if not days == None:
-				message = days + ' ' + message
+				if message == None:
+					message = days
+				else:
+					message = days + ' ' + message
 			days = 0
 
 		# If it's not at least a day, it's forever
