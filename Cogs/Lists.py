@@ -438,16 +438,17 @@ class Lists:
 			return
 			
 		# Sort by link name
+		sep = ",    "
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
 		for alink in linkList:
-			linkText = '{}*{}*, '.format(linkText, alink['Name'])
+			linkText = '{}*{}*{}'.format(linkText, alink['Name'], sep)
 
 		# Speak the link list while cutting off the end ", "
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText[:-len(sep)]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -927,17 +928,18 @@ class Lists:
 			return
 
 		# Sort by link name
+		sep = ",    "
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
 
 		for alink in linkList:
-			linkText = '{}*{}*, '.format(linkText, alink['Name'])
+			linkText = '{}*{}*{}'.format(linkText, alink['Name'], sep)
 
 		# Speak the hack list while cutting off the end ", "
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText[:-len(sep)]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
