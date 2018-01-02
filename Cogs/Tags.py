@@ -485,16 +485,17 @@ class Tags:
 			return
 			
 		# Sort by tag name
+		sep = "\n"
 		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
 		for atag in tagList:
-			tagText = '{}*{}*, '.format(tagText, atag['Name'])
+			tagText = '{}*{}*{}'.format(tagText, atag['Name'], sep)
 
 		# Speak the tag list while cutting off the end ", "
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		await Message.Message(message=tagText[:-2]).send(ctx)
+		await Message.Message(message=tagText[:-len(sep)]).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -531,16 +532,17 @@ class Tags:
 			return
 			
 		# Sort by tag name
+		sep = "\n"
 		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
 		for atag in tagList:
-			tagText +='`{}`, '.format(atag['Name'].replace('`', '\\`'))
+			tagText +='`{}`{}'.format(atag['Name'].replace('`', '\\`'), sep)
 
 		# Speak the tag list while cutting off the end ", "
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		await Message.Message(message=tagText[:-2]).send(ctx)
+		await Message.Message(message=tagText[:-len(sep)]).send(ctx)
 
 
 	@commands.command(pass_context=True)
