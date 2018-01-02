@@ -438,7 +438,7 @@ class Lists:
 			return
 			
 		# Sort by link name
-		sep = ",    "
+		sep = ",	"
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
 		for alink in linkList:
@@ -928,7 +928,7 @@ class Lists:
 			return
 
 		# Sort by link name
-		sep = ",    "
+		sep = ",	"
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
 
