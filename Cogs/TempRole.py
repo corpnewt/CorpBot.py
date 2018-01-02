@@ -171,6 +171,8 @@ class TempRole:
 
 		# Remove the entry from our user settings
 		temp_roles = self.settings.getUserStat(member, member.guild, "TempRoles")
+		if not temp_roles:
+			temp_roles = []
 		if temp_role in temp_roles:
 			#self._log("Temp Role was in user settings - removing", member=member)
 			temp_roles.remove(temp_role)
