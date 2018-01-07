@@ -890,7 +890,16 @@ class Hw:
 		else:
 			msg += 'You currently have *{} builds* on file.\n\nLet\'s get started!'.format(len(buildList))
 
-		await hwChannel.send(msg)
+		try:
+			await hwChannel.send(msg)
+		except:
+			# Can't send to the destination
+			self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			if hwChannel == ctx.author:
+				# Must not accept pms
+				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
+			return
+
 		if hwChannel == ctx.author:
 			await ctx.message.add_reaction("📬")
 		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
