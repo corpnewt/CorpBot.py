@@ -35,8 +35,8 @@ class Wiki:
 		# We got results - let's list if we have more than 1
 		if len(results) > 1:
 			# List
-			if len(results) > 10:
-				results = results[:10]
+			if len(results) > 5:
+				results = results[:5]
 			index, message = await PickList.Picker(
 				title="There were multiple results for that search, please pick from the following list:",
 				list=results,
