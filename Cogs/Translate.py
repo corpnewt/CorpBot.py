@@ -71,13 +71,13 @@ class Translate:
         from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else "auto"
 
         # Get the from language
-        from_lang_code = [ x for x in self.languages if x["code"].lower() == from_lang.lower() ]
-        from_lang_code = from_lang_code[0]["code"] if len(from_lang_code) else "auto"
-        from_lang_name = from_lang_name[0]["name"] if len(from_lang_name) else "Auto"
+        from_lang_back = [ x for x in self.languages if x["code"].lower() == from_lang.lower() ]
+        from_lang_code = from_lang_back[0]["code"] if len(from_lang_back) else "auto"
+        from_lang_name = from_lang_back[0]["name"] if len(from_lang_back) else "Auto"
         # Get the to language
-        lang_code = [ x for x in self.languages if x["code"].lower() == lang.lower() ]
-        lang_code = lang_code[0]["code"] if len(lang_code) else None
-        lang_name = lang_name[0]["name"] if len(lang_name) else None
+        lang_back = [ x for x in self.languages if x["code"].lower() == lang.lower() ]
+        lang_code = lang_back[0]["code"] if len(lang_back) else None
+        lang_name = lang_back[0]["name"] if len(lang_back) else None
 
         # Translate all but our language codes
         if len(word_list) > 2 and word_list[len(word_list)-2].lower() == from_lang_code.lower():
