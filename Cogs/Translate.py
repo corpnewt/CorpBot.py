@@ -71,11 +71,13 @@ class Translate:
         from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else "auto"
 
         # Get the from language
-        from_lang_code = [ x["code"] for x in self.languages if x["code"].lower() == from_lang.lower() ]
-        from_lang_code = from_lang_code[0] if len(from_lang_code) else "auto"
+        from_lang_code = [ x for x in self.languages if x["code"].lower() == from_lang.lower() ]
+        from_lang_code = from_lang_code[0]["code"] if len(from_lang_code) else "auto"
+        from_lang_name = from_lang_name[0]["name"] if len(from_lang_name) else "Auto"
         # Get the to language
-        lang_code = [ x["code"] for x in self.languages if x["code"].lower() == lang.lower() ]
-        lang_code = lang_code[0] if len(lang_code) else None
+        lang_code = [ x for x in self.languages if x["code"].lower() == lang.lower() ]
+        lang_code = lang_code[0]["code"] if len(lang_code) else None
+        lang_name = lang_name[0]["name"] if len(lang_name) else None
 
         # Translate all but our language codes
         if len(word_list) > 2 and word_list[len(word_list)-2].lower() == from_lang_code.lower():
@@ -114,6 +116,9 @@ class Translate:
         if suppress:
             result = Nullify.clean(result)
 
+        # Show our translation details
+        result += "\n\nTranslated from {} ---> {}".format(from_lang_name, lang_name)
+
         await Message.EmbedText(
                 title="{}, your translation is:".format(DisplayName.name(ctx.author)),
                 force_pm=True,
@@ -121,4 +126,3 @@ class Translate:
                 description=result,
                 footer="Powered by Google Translate"
         ).send(ctx)
-        # await ctx.send("*{}*, your translation is:\n\n{}".format(DisplayName.name(ctx.author), result))
