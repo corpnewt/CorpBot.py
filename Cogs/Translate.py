@@ -56,7 +56,7 @@ class Translate:
         else:
             suppress = False
 
-        usage = "Usage: `{}tr [words] [language code]`".format(ctx.prefix)
+        usage = "Usage: `{}tr [words] [from code (optional)] [to code]`".format(ctx.prefix)
         if translate == None:
             await ctx.send(usage)
             return
@@ -116,13 +116,10 @@ class Translate:
         if suppress:
             result = Nullify.clean(result)
 
-        # Show our translation details
-        result += "\n\nTranslated from {} ---> {}".format(from_lang_name, lang_name)
-
         await Message.EmbedText(
                 title="{}, your translation is:".format(DisplayName.name(ctx.author)),
                 force_pm=True,
                 color=ctx.author,
                 description=result,
-                footer="Powered by Google Translate"
+                footer="{} --> {}; Powered by Google Translate".format(from_lang_name, lang_name)
         ).send(ctx)
