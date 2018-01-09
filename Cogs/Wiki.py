@@ -4,6 +4,7 @@ import wikipedia
 import textwrap
 from   discord.ext import commands
 from   Cogs import Settings
+from   Cogs import PickList
 
 def setup(bot):
 	# Add the bot
@@ -29,9 +30,27 @@ class Wiki:
 		if not len(results):
 			await ctx.channel.send("No results :(")
 			return
-
-		# Assume the first result
-		newSearch = results[0]
+		
+		message = None
+		# We got results - let's list if we have more than 1
+		if len(results) > 1:
+			# List
+			if len(results) > 10:
+				results = results[:10]
+			index, message = await PickList.Picker(
+				title="There were multiple results for that search, please pick from the following list:",
+				list=results,
+				ctx=ctx
+			).pick()
+			# Check if we errored/cancelled
+			if index < 0:
+				await message.edit(content="Wiki results canceled.")
+				return
+			newSearch = results[index]
+		else:
+			# Only one result
+			newSearch = results[0]
+		
 		# Try to get a hit
 		try:
 			wik = wikipedia.page(newSearch)
