@@ -74,14 +74,26 @@ class Translate:
             return
 
         lang = word_list[len(word_list)-1]
+        from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else "auto"
         trans = " ".join(word_list[:-1])
 
-        lang_code = None
-
+        # Get the from language
+        from_lang_code = [ x["code"] for x in self.languages if x["code"].lower() == from_lang.lower() ]
+        from_lang_code = from_lang_code[0] if len(from_lang_code) else "auto"
+        # Get the to language
+        lang_code = [ x["code"] for x in self.languages if x["code"].lower() == lang.lower() ]
+        lang_code = lang_code[0] if len(lang_code) else None
+        
+        """if not from_lang.lower() == "auto":
+            for item in self.languages:
+                if item["code"].lower() == from_lang.lower():
+                    from_lang_code = item["code"]
+                    break
+        # Get the to language
         for item in self.languages:
             if item["code"].lower() == lang.lower():
                 lang_code = item["code"]
-                break
+                break"""
         
         if not lang_code:
             await Message.EmbedText(
@@ -91,7 +103,7 @@ class Translate:
                 ).send(ctx)
             return
 
-        result = mtranslate.translate(trans, lang_code, "auto")
+        result = mtranslate.translate(trans, lang_code, from_lang_code)
         
         if not result:
             await Message.EmbedText(
