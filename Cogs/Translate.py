@@ -45,12 +45,6 @@ class Translate:
                 color=ctx.author,
                 footer="Note - some languages may not be supported."
         ).send(ctx)
-        '''# Pm languages to author
-        await ctx.send("I'll pm them to you.")
-        msg = "Languages:\n\n"
-        for lang in self.languages:
-            msg += lang["Name"] + "\n"
-        await ctx.author.send(msg)'''
 
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate = None):
@@ -75,7 +69,6 @@ class Translate:
 
         lang = word_list[len(word_list)-1]
         from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else "auto"
-        trans = " ".join(word_list[:-1])
 
         # Get the from language
         from_lang_code = [ x["code"] for x in self.languages if x["code"].lower() == from_lang.lower() ]
@@ -83,17 +76,12 @@ class Translate:
         # Get the to language
         lang_code = [ x["code"] for x in self.languages if x["code"].lower() == lang.lower() ]
         lang_code = lang_code[0] if len(lang_code) else None
-        
-        """if not from_lang.lower() == "auto":
-            for item in self.languages:
-                if item["code"].lower() == from_lang.lower():
-                    from_lang_code = item["code"]
-                    break
-        # Get the to language
-        for item in self.languages:
-            if item["code"].lower() == lang.lower():
-                lang_code = item["code"]
-                break"""
+
+        # Translate all but our language codes
+        if len(word_list) > 2 and word_list[len(word_list)-2].lower() == from_lang_code.lower():
+            trans = " ".join(word_list[:-2])
+        else:
+            trans = " ".join(word_list[:-1])
         
         if not lang_code:
             await Message.EmbedText(
