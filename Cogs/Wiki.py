@@ -22,13 +22,13 @@ class Wiki:
 	async def wiki(self, ctx, *, search : str = None):
 		"""Search Wikipedia!"""
 		if search == None:
-			await ctx.channel.send("Usage: `{}wiki [search terms]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}wiki [search terms]`".format(ctx.prefix))
 			return
 		
 		results = wikipedia.search(search)
 
 		if not len(results):
-			await ctx.channel.send("No results :(")
+			await ctx.send("No results :(")
 			return
 		
 		message = None
@@ -55,7 +55,7 @@ class Wiki:
 		try:
 			wik = wikipedia.page(newSearch)
 		except wikipedia.DisambiguationError:
-			await ctx.channel.send("That search wasn't specific enough - try again with more detail.")
+			await ctx.send("That search wasn't specific enough - try again with more detail.")
 			return
 
 		# Create our embed
@@ -65,4 +65,8 @@ class Wiki:
 		textList = textwrap.wrap(wik.content, 500, break_long_words=True, replace_whitespace=False)
 		wiki_embed.add_field(name="Wikipedia Results", value=textList[0]+"...")
 
-		await ctx.channel.send(embed=wiki_embed)
+		# Check if we sent a message earlier and edit - otherwise send new
+		if message:
+			await message.edit(content=" ", embed=wiki_embed)
+		else:
+			await ctx.send(embed=wiki_embed)
