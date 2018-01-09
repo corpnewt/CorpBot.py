@@ -121,5 +121,5 @@ class Translate:
                 force_pm=True,
                 color=ctx.author,
                 description=result,
-                footer="{} --> {}; Powered by Google Translate".format(from_lang_name, lang_name)
+                footer="{} --> {} - Powered by Google Translate".format(from_lang_name, lang_name)
         ).send(ctx)
