@@ -28,7 +28,7 @@ class Wiki:
 		results = wikipedia.search(search)
 
 		if not len(results):
-			await ctx.send("No results :(")
+			await ctx.send("No results for `{}` :(".format(search.replace('`', '\\`')))
 			return
 		
 		message = None
@@ -38,13 +38,13 @@ class Wiki:
 			if len(results) > 5:
 				results = results[:5]
 			index, message = await PickList.Picker(
-				title="There were multiple results for that search, please pick from the following list:",
+				title="There were multiple results for `{}`, please pick from the following list:".format(search.replace('`', '\\`')),
 				list=results,
 				ctx=ctx
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
-				await message.edit(content="Wiki results canceled.")
+				await message.edit(content="Wiki results for `{}` canceled.".format(search.replace('`', '\\`')))
 				return
 			newSearch = results[index]
 		else:
