@@ -93,10 +93,14 @@ class RoleManager:
 		new_add = []
 		new_rem = []
 		for a in add_roles:
+			if not a:
+				continue
 			if a.position < top_index:
 				# Can add this one
 				new_add.append(a)
 		for r in rem_roles:
+			if not r:
+				continue
 			if r.position < top_index:
 				# Can remove this one
 				new_rem.append(r)
