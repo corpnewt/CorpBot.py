@@ -55,7 +55,11 @@ class Wiki:
 		try:
 			wik = wikipedia.page(newSearch)
 		except wikipedia.DisambiguationError:
-			await ctx.send("That search wasn't specific enough - try again with more detail.")
+			msg = "That search wasn't specific enough - try again with more detail."
+			if message:
+				await message.edit(content=msg)
+			else:
+				await ctx.send(msg)
 			return
 
 		# Create our embed
