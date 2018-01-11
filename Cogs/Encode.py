@@ -77,6 +77,29 @@ class Encode:
 		return self._to_string(hex_bytes)
 
 	@commands.command(pass_context=True)
+	async def slide(self, ctx, input_hex = None):
+		"""Calculates your slide value for Clover based on an input address (in hex)."""
+		try:
+			# We're accepting strings here - convert
+			start_addr = int(start_addr, 16)
+		except:
+			await ctx.send("Malformed input hex - try again.")
+			return
+		# Setup our temp vars
+		first_str = "0x100000"
+		first = int(first_str, 16)
+		secon_str = "0x200000"
+		secon = int(secon_str, 16)
+		
+		slide_float = ( start_addr - first ) / secon
+		
+		if slide_float > int(slide_float):
+			# has a > 0 decimal - round up
+			slide_float = int(slide_float) + 1
+			
+		await ctx.send("```\nslide={}\n```".format(slide_float))
+	
+	@commands.command(pass_context=True)
 	async def hexdec(self, ctx, *, input_hex = None):
 		"""Converts hex to decimal."""
 		if input_hex == None:
