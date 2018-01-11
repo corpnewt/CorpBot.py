@@ -236,10 +236,10 @@ class Example:
             new_mess = "{}. {}:\n{}".format(index+1, dice_list[index], self._roll_string(final_dice[index]))
             await message.edit(content=new_mess)
             # Add the stop reaction - then wait for it or the timeout
-            await message.add_reaction("🛑")
+            await message.add_reaction("◀")
             # Setup a check function
             def check(reaction, user):
-                return user == ctx.author and reaction.message.id == message.id and str(reaction.emoji) == "🛑"
+                return user == ctx.author and reaction.message.id == message.id and str(reaction.emoji) == "◀"
             # Attempt to wait for a response
             try:
                 reaction, user = await ctx.bot.wait_for('reaction_add', timeout=30, check=check)
