@@ -81,7 +81,7 @@ class Encode:
 		"""Calculates your slide value for Clover based on an input address (in hex)."""
 		try:
 			# We're accepting strings here - convert
-			start_addr = int(start_addr, 16)
+			start_addr = int(input_hex, 16)
 		except:
 			await ctx.send("Malformed input hex - try again.")
 			return
