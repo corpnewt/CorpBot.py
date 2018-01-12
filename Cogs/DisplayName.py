@@ -79,6 +79,7 @@ def memberForName(name, server):
         if member.name.lower() == name.lower():
             return member
     mem_parts = name.split("#")
+    print(mem_parts)
     if len(mem_parts) == 2:
         # We likely have a name#descriminator
         try:
