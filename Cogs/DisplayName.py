@@ -79,7 +79,6 @@ def memberForName(name, server):
         if member.name.lower() == name.lower():
             return member
     mem_parts = name.split("#")
-    print(mem_parts)
     if len(mem_parts) == 2:
         # We likely have a name#descriminator
         try:
@@ -89,7 +88,7 @@ def memberForName(name, server):
             mem_name = mem_disc = None
         if mem_name:
             for member in server.members:
-                if member.name.lower() == mem_name.lower() and member.discriminator == mem_disc:
+                if member.name.lower() == mem_name.lower() and int(member.discriminator) == mem_disc:
                     return member
     mem_id = re.sub(r'\W+', '', name)
     new_mem = memberForID(mem_id, server)
