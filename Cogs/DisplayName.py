@@ -78,10 +78,23 @@ def memberForName(name, server):
     for member in server.members:
         if member.name.lower() == name.lower():
             return member
-    memID = re.sub(r'\W+', '', name)
-    newMem = memberForID(memID, server)
-    if newMem:
-        return newMem
+    mem_parts = name.split("#")
+    if len(mem_parts) == 2:
+        # We likely have a name#descriminator
+        try:
+            mem_name = mem_parts[0]
+            mem_disc = int(mem_parts[1])
+        except:
+            mem_name = mem_disc = None
+        if mem_name:
+            for member in server.members:
+                if member.name.lower() == mem_name.lower() and member.discriminator == mem_disc:
+                    return member
+    mem_id = re.sub(r'\W+', '', name)
+    new_mem = memberForID(mem_id, server)
+    if new_mem:
+        return new_mem
+    
     return None
 
 def channelForID(checkid, server, typeCheck = None):
