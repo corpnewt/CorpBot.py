@@ -95,7 +95,7 @@ class Quote:
 		
 		if len(reaction.message.attachments):
 			# We have some attachments to work through
-			attatch_text = ""
+			attach_text = ""
 			for a in reaction.message.attachments:
 				# Add each attachment by name as a link to its own url
 				attach_text += "[{}]({}), ".format(a.filename, a.url)
