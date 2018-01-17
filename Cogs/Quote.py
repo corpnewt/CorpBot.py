@@ -86,15 +86,28 @@ class Quote:
 			# Not a valid channel
 			return
 
-		if not len(reaction.message.content):
-			# Only quote actual text - no embeds/uploads
+		if not len(reaction.message.content) and not len(reaction.message.attachments):
+			# Only quote actual text or attachments - no embeds
 			return
+		
+		# Initialize our message
+		msg = reaction.message.content if len(reaction.message.content) else ""
+		
+		if len(reaction.message.attachments):
+			# We have some attachments to work through
+			attatch_text = ""
+			for a in reaction.message.attachments:
+				# Add each attachment by name as a link to its own url
+				attach_text += "[{}]({}), ".format(a.filename, a.url)
+			# Remove the last ", "
+			attach_text = attach_text[:-2]
+			msg += "\n\n" + attach_text
 
 		# Build an embed!
 		e = {
 			"author" : reaction.message.author,
 			"pm_after" : -1, # Don't pm quotes
-			"description" : reaction.message.content,
+			"description" : msg,
 			"image" : reaction.message.author.avatar_url,
 			"color" : reaction.message.author,
 			"footer" : "Quoted by {}#{} | #{} | {} UTC".format(member.name, member.discriminator, reaction.message.channel.name, reaction.message.created_at.strftime("%I:%M %p"))
