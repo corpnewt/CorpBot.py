@@ -31,12 +31,7 @@ async def get_prefix(bot, message):
 	if not serverPrefix:
 		# No custom prefix - use the default
 		serverPrefix = prefix
-
-	try:
-		return (serverPrefix, str(messag.guild.me.mention)+" ", bot.user.mention + " ")
-	except Exception:
-		# Couldn't get a member - just get the user
-		return (serverPrefix, str(bot.user.mention)+" ")
+	return (serverPrefix, "<@!{}> ".format(bot.user.id), "<@{}> ".format(bot.user.id))
 
 # This should be the main soul of the bot - everything should load from here
 bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')

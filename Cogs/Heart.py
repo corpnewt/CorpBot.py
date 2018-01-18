@@ -22,20 +22,9 @@ class Heart:
 		if context.command:
 			return {}
 		# Check for a mention
-		bot_mentions = []
-		try:
-			bot_mentions.append(message.guild.me.mention)
-		except Exception:
-			pass
-		bot_mentions.append(self.bot.user.mention)
+		bot_mentions = ["<@!{}>".format(self.bot.user.id), "<@{}>".format(self.bot.user.id)]
 		react_list = []
 		# Get our hug phrases
-		'''hugs = [ "i need a hug", "i wish i had a hug", "i could use a hug", "hug me" ]
-		for hug in hugs:
-			if hug in message.content.lower():
-				# We need a hug, stat!
-				react_list.append("🤗")
-				break'''
 		matches = re.finditer(self.regex, message.content.lower())
 		if len(list(matches)):
 			# We need a hug, stat!
