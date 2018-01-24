@@ -235,6 +235,8 @@ def getXKCDImageText ( html ):
 		return None
 	
 	imageText = find_last_between( comicBlock, 'title="', '" ' )
+	parser = HTMLParser()
+	imageText = parser.unescape(imageText)
 	return unquote(imageText)
 
 # Garfield Minus Garfield Methods
