@@ -281,10 +281,11 @@ class Comic:
 		# Got a comic link
 		imageURL = ComicHelper.getXKCDImageURL(imageHTML)
 		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
+		imageText = ComicHelper.getXKCDImageText(imageHTML)
 		title = '{} *({})*'.format(imageDisplayName, date)
 
 		# Download Image
-		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=title, image=imageURL, url=imageURL, description=imageText, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, title)
 
 
