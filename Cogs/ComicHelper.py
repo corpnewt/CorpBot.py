@@ -3,6 +3,7 @@ import math
 import datetime as dt
 from   pyquery import PyQuery as pq
 from   Cogs import DL
+from   urllib.parse import unquote
 
 try:
     # Python 2.6-2.7
@@ -234,7 +235,7 @@ def getXKCDImageText ( html ):
 		return None
 	
 	imageText = find_last_between( comicBlock, 'title="', '" ' )
-	return imageText
+	return unquote(imageText)
 
 # Garfield Minus Garfield Methods
 
