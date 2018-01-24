@@ -227,6 +227,15 @@ def getXKCDImageTitle ( html ):
 	imageTitle = imageTitle.replace('/', '').strip()
 	return imageTitle
 
+def getXKCDImageText ( html ):
+	comicBlock = find_last_between( html, 'div id="comic"', "</div>")
+	
+	if not comicBlock:
+		return None
+	
+	imageText = find_last_between( comicBlock, 'title="', '" ' )
+	return imageText
+
 # Garfield Minus Garfield Methods
 
 def getGMGImageURL ( html ):
