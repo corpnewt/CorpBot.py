@@ -350,10 +350,11 @@ class Comic:
 		# now we get the actual comic info
 		imageHTML = await ComicHelper.getImageHTML(comicURL)
 		imageURL = ComicHelper.getXKCDImageURL(imageHTML)
+		imageText = ComicHelper.getXKCDImageText(imageHTML)
 		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
 		title = '{} *({})*'.format(imageDisplayName, comicNumber)
 		# Download Image
-		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
+		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author, description=imageText).send(ctx)
 		# await GetImage.get(ctx, imageURL, title)
 		
 		
