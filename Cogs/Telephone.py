@@ -240,16 +240,14 @@ class Telephone:
 					# Get the role that corresponds to the id
 					if str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
 		
 		target = self.settings.getServerStat(ctx.guild, "LastCall")
 		if target == None:
 			await ctx.send(":telephone: No prior calls recorded.")
 		else:
-			await ctx.send(":telephone: Last number recorded was {}".format(target))
+			if self.settings.getServerStat(ctx.guild, "LastCallHidden") and not isAdmin:
+				target = "UNKNOWN CALLER (bot-admins and admins can reveal this)"
+			await ctx.send(":telephone: Last number recorded: {}".format(target[:3] + "-" + target[3:]))
 
 	@commands.command(pass_context=True)
 	async def settelechannel(self, ctx, *, channel = None):
