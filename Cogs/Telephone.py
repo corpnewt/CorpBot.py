@@ -228,6 +228,28 @@ class Telephone:
 			return
 		teleNumFormat = teleNum[:3] + "-" + teleNum[3:]
 		await ctx.send("Your :telephone: number is: *{}*".format(teleNumFormat))
+		
+	@commands.command(pass_context=True)
+	async def callerid(self, ctx):
+		"""Reveals the last number to call regardless of *67 settings (bot-admin only)."""
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			for role in ctx.message.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		# Only allow admins to change server stats
+		if not isAdmin:
+			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+			return
+		
+		target = self.settings.getServerStat(ctx.guild, "LastCall")
+		if target == None:
+			await ctx.send(":telephone: No prior calls recorded.")
+		else:
+			await ctx.send(":telephone: Last number recorded was {}".format(target))
 
 	@commands.command(pass_context=True)
 	async def settelechannel(self, ctx, *, channel = None):
