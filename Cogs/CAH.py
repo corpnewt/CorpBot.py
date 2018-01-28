@@ -17,9 +17,9 @@ from   Cogs import Nullify
 
 def setup(bot):
     # Add the bot
-    bot.add_cog(CardsAgainstHumanity(bot))
+    bot.add_cog(CAH(bot))
 
-class CardsAgainstHumanity:
+class CAH:
 
     # Init with the bot reference, and a reference to the deck file
     def __init__(self, bot, prefix = "$", file = None):
