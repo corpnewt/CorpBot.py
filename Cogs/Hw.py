@@ -307,7 +307,7 @@ class Hw:
 		
 		msg = '"{}"\'s current parts:'.format(bname)
 		await hwChannel.send(msg)
-		if hwChannel == ctx.author:
+		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
 
@@ -432,7 +432,7 @@ class Hw:
 		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
 
 		# Post the dm reaction
-		if hwChannel == ctx.author:
+		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 
 		# Here, we have a build
@@ -900,7 +900,7 @@ class Hw:
 				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
 			return
 
-		if hwChannel == ctx.author:
+		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
 		
