@@ -562,6 +562,9 @@ class Settings:
 			if not "XP" in y:
 				y["XP"] = int(self.getServerStat(server, "DefaultXP"))
 				needsUpdate = True
+			# XP needs to be an int - and uh... got messed up once so we check it here
+			if type(y["XP"]) is float:
+				y["XP"] = int(y["XP"])
 			if not "XPLeftover" in y:
 				y["XPLeftover"] = 0
 				needsUpdate = True
