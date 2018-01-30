@@ -59,17 +59,6 @@ class Remind:
 					for reminder in reminders:
 						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))
 
-	'''async def onready(self):
-		# Check all reminders - and start timers
-		for server in self.bot.guilds:
-			for member in server.members:
-				reminders = self.settings.getUserStat(member, server, "Reminders")
-				if len(reminders):
-					# We have a list
-					for reminder in reminders:
-						self.bot.loop.create_task(self.checkRemind(member, reminder))'''
-
-
 	async def checkRemind(self, member, reminder):
 		# Get our current task
 		task = asyncio.Task.current_task()
@@ -133,7 +122,7 @@ class Remind:
 
 	@commands.command(pass_context=True)
 	async def remindme(self, ctx, message : str = None, *, endtime : str = None):
-		"""Set a reminder."""
+		"""Set a reminder.  If the message contains spaces, it must be wrapped in quotes."""
 
 		if not endtime or not message:
 			msg = 'Usage: `{}remindme "[message]" [endtime]`'.format(ctx.prefix)
