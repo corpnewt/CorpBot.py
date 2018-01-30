@@ -189,8 +189,8 @@ class Reddit:
 			theJSON = await DL.async_json(url, {'User-agent': self.ua})
 		except:
 			# Assume that we couldn't find that user
-			error = theJSON.get("error", "An error has occurred.")
-			await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
+			error = "Make sure you're passing a valid reddit username."
+			await Message.EmbedText(title="An error occurred!", description=error, color=ctx.author).send(ctx)
 			return
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
