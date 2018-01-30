@@ -107,9 +107,9 @@ class Quote:
 		e = {
 			"author" : reaction.message.author,
 			"pm_after" : -1, # Don't pm quotes
-			"description" : msg + "\n\nSent by {} | #{} | {} UTC".format(
+			"description" : msg + "\n\nSent by {} | {} | {} UTC".format(
 				reaction.message.author.mention,
-				reaction.message.channel.name,
+				reaction.message.channel.mention,
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"image" : reaction.message.author.avatar_url,
