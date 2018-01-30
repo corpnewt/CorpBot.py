@@ -184,7 +184,14 @@ class Reddit:
 			user_name = ctx.author.nick if ctx.author.nick else ctx.author.name
 		# Get the info
 		url = "https://www.reddit.com/user/{}/about.json?raw_json=1".format(quote(user_name))
-		theJSON = await DL.async_json(url, {'User-agent': self.ua})
+		# Giving a 200 response for some things that aren't found
+		try:
+			theJSON = await DL.async_json(url, {'User-agent': self.ua})
+		except:
+			# Assume that we couldn't find that user
+			error = theJSON.get("error", "An error has occurred.")
+			await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
+			return
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
 			error = theJSON.get("error", "An error has occurred.")
