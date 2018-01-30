@@ -105,12 +105,16 @@ class Quote:
 
 		# Build an embed!
 		e = {
-			#"author" : reaction.message.author,
+			"author" : reaction.message.author,
 			"pm_after" : -1, # Don't pm quotes
-			"description" : msg + "\n\nSent by {}".format(reaction.message.author.mention),
+			"description" : msg + "\n\nSent by {} | #{} | {} UTC".format(
+				reaction.message.author.mention,
+				reaction.message.channel.name,
+				reaction.message.created_at.strftime("%I:%M %p")
+			),
 			"image" : reaction.message.author.avatar_url,
 			"color" : reaction.message.author,
-			"footer" : "Quoted by {}#{} | #{} | {} UTC".format(member.name, member.discriminator, reaction.message.channel.name, reaction.message.created_at.strftime("%I:%M %p"))
+			"footer" : "Quoted by {}#{}".format(member.name, member.discriminator)
 		}
 		await Message.EmbedText(**e).send(r_channel)
 
