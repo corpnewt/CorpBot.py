@@ -175,6 +175,7 @@ class Settings:
 				"ChatChannel"			: "", 		# ID or blank for no channel
 				"HardwareChannel"       : "",		# ID or blank for no channel
 				"DefaultChannel"		: "",		# ID or blank for no channel
+				"WelcomeChannel"		: None,		# ID or None for no channel
 				"LastChat"				: 0,		# UTC Timestamp of last chat message
 				"PlayingMadLibs"		: False,	# Yes if currently playing MadLibs
 				"LastAnswer" 			: "",		# URL to last {prefix}question post
