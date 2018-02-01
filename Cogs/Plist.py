@@ -118,13 +118,12 @@ class Plist:
                     wd = x
                     break
             if not wd:
-                if not len(sorted_list):
-                    await Message.Embed(
-                        title="⚠ An error occurred!", 
-                        description="There were no web drivers found for \"{}\".".format(os_build),
-                        color=ctx.author
-                    ).send(ctx)
-                    return
+                await Message.Embed(
+                    title="⚠ An error occurred!", 
+                    description="There were no web drivers found for \"{}\".".format(os_build),
+                    color=ctx.author
+                ).send(ctx)
+                return
         await Message.Embed(
             title="Web Driver For {} ({})".format(self.get_os(wd["OS"]), wd["OS"]),
             description="[{}]({})".format(wd["version"], wd["downloadURL"]),
