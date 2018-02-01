@@ -62,8 +62,9 @@ class Plist:
         try:
             # Formula looks like this:  AAB; AA - 4 = 10.## version
             # B index in "ABCDEFGHIJKLMNOPQRSTUVXYZ" = 10.##.## version
-            major = int(build_number[:2])-4
-            minor = alpha.index(build_number[2:3].lower())
+            split = re.findall(r"[^\W\d_]+|\d+", build_number)
+            major = int(split[0])-4
+            minor = alpha.index(split[1].lower())
             os_version = "10.{}.{}".format(major, minor)
         except:
             pass
@@ -72,7 +73,7 @@ class Plist:
     def get_value(self, build_number):
         alpha = "abcdefghijklmnopqrstuvwxyz"
         # Split them up
-        split = re.findall(r"[^\W\d_]+|\d+", i)
+        split = re.findall(r"[^\W\d_]+|\d+", build_number)
         start = split[0].rjust(4, "0")
         alph  = split[1]
         end   = split[2].rjust(6, "0")
