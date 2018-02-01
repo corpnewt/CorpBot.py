@@ -2,6 +2,7 @@ import asyncio
 import discord
 from   discord.ext import commands
 import os
+import re
 import tempfile
 import shutil
 import plistlib
@@ -19,6 +20,7 @@ class Plist:
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        self.nv_link = "https://gfe.nvidia.com/mac-update"
 
     async def download(self, url):
         url = url.strip("<>")
@@ -51,6 +53,82 @@ class Plist:
     def remove(self, path):
         if not path == None and os.path.exists(path):
             shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+            
+    def get_os(self, build_number):
+        # Returns the best-guess OS version for the build number
+        alpha = "abcdefghijklmnopqrstuvwxyz"
+        os_version = "Unknown"
+        major = minor = ""
+        try:
+            # Formula looks like this:  AAB; AA - 4 = 10.## version
+            # B index in "ABCDEFGHIJKLMNOPQRSTUVXYZ" = 10.##.## version
+            major = int(build_number[:2])-4
+            minor = alpha.index(build_number[2:3].lower())
+            os_version = "10.{}.{}".format(major, minor)
+        except:
+            pass
+        return os_version
+    
+    def get_value(self, build_number):
+        alpha = "abcdefghijklmnopqrstuvwxyz"
+        # Split them up
+        split = re.findall(r"[^\W\d_]+|\d+", i)
+        start = split[0].rjust(4, "0")
+        alph  = split[1]
+        end   = split[2].rjust(6, "0")
+        alpha_num = str(alpha.index(alph.lower())).rjust(2, "0")
+        return int(start + alpha_num + end)
+            
+    @commands.command(pass_context=True)
+    async def nvweb(self, ctx, os_build = None):
+        """Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
+        # Get the current manifest
+        try:
+            plist_data = plistlib.loads(await DL.async_text(self.nv_link))
+        except:
+            await Message.Embed(
+                title="⚠ An error occurred!", 
+                description="I guess I couldn't get the manifest...\n\"{}\" may no longer be valid.".format(self.nv_link),
+                color=ctx.author
+            ).send(ctx)
+            return
+        # We have the plist data
+        wd = None
+        if os_build == None:
+            # We just need the newest - let's give everything a numeric value
+            alpha = "abcdefghijklmnopqrstuvwxyz"
+            new_items = []
+            for x in plist_data.get("updates", []):
+                new_items.append({"update" : x, "value" : self.get_value(x["OS"])})
+            sorted_list = sorted(new_items, key=lambda x:x["value"], reverse=True)
+            if not len(sorted_list):
+                await Message.Embed(
+                    title="⚠ An error occurred!", 
+                    description="There were no updates found at \"{}\".".format(self.nv_link),
+                    color=ctx.author
+                ).send(ctx)
+                return
+            wd = sorted_list[0]["update"]
+        else:
+            # We need to find it
+            for x in plist_data.get("updates", []):
+                if x["OS"].lower() == os_build.lower():
+                    wd = x
+                    break
+            if not wd:
+                if not len(sorted_list):
+                    await Message.Embed(
+                        title="⚠ An error occurred!", 
+                        description="There were no web drivers found for \"{}\".".format(os_build),
+                        color=ctx.author
+                    ).send(ctx)
+                    return
+        await Message.Embed(
+            title="Web Driver For {} ({})".format(self.get_os(wd["OS"]), wd["OS"]),
+            description="[{}]({})".format(wd["version"], wd["downloadURL"]),
+            color=ctx.author
+        ).send(ctx)
+
             
     @commands.command(pass_context=True)
     async def plist(self, ctx, *, url = None):
