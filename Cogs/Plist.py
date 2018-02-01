@@ -84,7 +84,7 @@ class Plist:
         """Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
         # Get the current manifest
         try:
-            data = await DL.async_text(self.nv_link)
+            data = await DL.async_dl(self.nv_link)
             plist_data = plistlib.loads(data)
         except:
             await Message.Embed(
