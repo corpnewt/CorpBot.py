@@ -136,7 +136,12 @@ class Plist:
                 p = [x for x in p if x != ""]
                 if len(p) > 1 and len(p) < 4:
                     # We have . separated stuffs
-                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
+                    wd_list = []
+                    # wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
+                    for x in plist_data.get("updates", []):
+                        osv = self.get_os(x["OS"])
+                        if osv == os_build or osv.startswith(os_build):
+                            wd_list.append(x)
                     if len(wd_list):
                         # We got some matches
                         wd = []
