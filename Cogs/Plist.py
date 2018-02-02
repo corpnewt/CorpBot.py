@@ -136,14 +136,7 @@ class Plist:
                 p = [x for x in p if x != ""]
                 if len(p) > 1 and len(p) < 4:
                     # We have . separated stuffs
-                    wd_list = []
-                    # wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
-                    for x in plist_data.get("updates", []):
-                        osv = self.get_os(x["OS"])
-                        print("\"{}\" -- \"{}\"".format(osv, os_build))
-                        print(osv == os_build, osv.startswith(os_build))
-                        if osv == os_build or osv.startswith(os_build):
-                            wd_list.append(x)
+                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
                     if len(wd_list):
                         # We got some matches
                         wd = []
@@ -153,7 +146,6 @@ class Plist:
                                 "value": "└─ [{}]({})".format(i["version"], i["downloadURL"]),
                                 "inline": False
                             })
-                        wd = wd[:-1]
             if not wd:
                 await Message.EmbedText(
                     title="⚠ An error occurred!", 
