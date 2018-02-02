@@ -24,7 +24,7 @@ class Stream:
         self.regexEveryone = re.compile(r"\[\[[everyone]+\]\]", re.IGNORECASE)
         
     @commands.command(pass_context=True)
-    async def streamchannel(self, ctx, *, channel : discord.TextChannel = None):
+    async def streamchannel(self, ctx):
         """Displays the channel for the stream announcements - if any."""
         
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
