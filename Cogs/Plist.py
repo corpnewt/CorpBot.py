@@ -136,7 +136,7 @@ class Plist:
                 p = [x for x in p if x != ""]
                 if len(p) > 1 and len(p) < 4:
                     # We have . separated stuffs
-                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).lower().startswith(os_build.lower())]
+                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
                     if len(wd_list):
                         # We got some matches
                         wd = []
@@ -155,10 +155,11 @@ class Plist:
                 ).send(ctx)
                 return
         await Message.Embed(
-            title="NVIDIA Web Driver Results For \"{}\"".format(os_build if os_build != None else "Latest"),
+            title="NVIDIA Web Driver Results For \"{}\" ({} total)".format(os_build if os_build != None else "Latest", len(wd)),
             fields=wd,
             color=ctx.author,
-            pm_after=25
+            pm_after=25,
+            footer="All links pulled from {}".format(self.nv_link)
         ).send(ctx)
 
             
