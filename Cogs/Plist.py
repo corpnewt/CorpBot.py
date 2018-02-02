@@ -143,7 +143,7 @@ class Plist:
                 ).send(ctx)
                 return
         await Message.Embed(
-            title="NVIDIA Web Driver Results For \"{}\"".format(os_build),
+            title="NVIDIA Web Driver Results For \"{}\"".format(os_build if os_build != None else "Latest"),
             description=wd,
             color=ctx.author
         ).send(ctx)
