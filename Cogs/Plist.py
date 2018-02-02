@@ -110,17 +110,25 @@ class Plist:
                     color=ctx.author
                 ).send(ctx)
                 return
-            wd = "{} ({}) - [{}]({})".format(
-                self.get_os(sorted_list[0]["update"]["OS"]),
-                sorted_list[0]["update"]["OS"],
-                sorted_list[0]["update"]["version"],
-                sorted_list[0]["update"]["downloadURL"]
-                )
+            wd = [{
+                    "name": "{} ({})".format(
+                        self.get_os(sorted_list[0]["update"]["OS"]),
+                        sorted_list[0]["update"]["OS"]),
+                    "value": "[{}]({})".format(
+                        sorted_list[0]["update"]["version"],
+                        sorted_list[0]["update"]["downloadURL"]
+                    ),
+                    "inline": True
+                }]
         else:
             # We need to find it
             mwd = next((x for x in plist_data.get("updates", []) if x["OS"].lower() == os_build.lower()), None)
             if mwd:
-                wd = "{} ({}) - [{}]({})".format(self.get_os(mwd["OS"]), mwd["OS"], mwd["version"], mwd["downloadURL"])
+                wd = [{
+                    "name": "{} ({})".format(self.get_os(mwd["OS"]), mwd["OS"]),
+                    "value": "[{}]({})".format(mwd["version"], mwd["downloadURL"]),
+                    "inline": True
+                }]
             else:
                 # We didn't get an exact match, let's try to determine what's up
                 # First check if it's a build number (##N####) or OS number (10.##.##)
@@ -131,9 +139,13 @@ class Plist:
                     wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).lower().startswith(os_build.lower())]
                     if len(wd_list):
                         # We got some matches
-                        wd = ""
+                        wd = []
                         for i in wd_list:
-                            wd += "{} ({}) - [{}]({})\n".format(self.get_os(i["OS"]), i["OS"], i["version"], i["downloadURL"])
+                            wd.append({
+                                "name": "{} ({})".format(self.get_os(i["OS"]), i["OS"]),
+                                "value": "[{}]({})".format(i["version"], i["downloadURL"]),
+                                "inline": True
+                            })
                         wd = wd[:-1]
             if not wd:
                 await Message.EmbedText(
@@ -142,9 +154,9 @@ class Plist:
                     color=ctx.author
                 ).send(ctx)
                 return
-        await Message.EmbedText(
+        await Message.Embed(
             title="NVIDIA Web Driver Results For \"{}\"".format(os_build if os_build != None else "Latest"),
-            description=wd,
+            fields=wd,
             color=ctx.author
         ).send(ctx)
 
