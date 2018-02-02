@@ -110,13 +110,31 @@ class Plist:
                     color=ctx.author
                 ).send(ctx)
                 return
-            wd = sorted_list[0]["update"]
+            wd = "{} ({}) - [{}]({})".format(
+                self.get_os(sorted_list[0]["update"]["OS"]),
+                sorted_list[0]["update"]["OS"],
+                sorted_list[0]["update"]["version"],
+                sorted_list[0]["update"]["downloadURL"]
+                )
         else:
             # We need to find it
-            for x in plist_data.get("updates", []):
-                if x["OS"].lower() == os_build.lower():
-                    wd = x
-                    break
+            mwd = next((x for x in plist_data.get("updates", []) if x["OS"].lower() == os_build.lower()), None)
+            if mwd:
+                wd = "{} ({}) - [{}]({})".format(self.get_os(mwd["OS"]), mwd["OS"], mwd["version"], mwd["downloadURL"])
+            else:
+                # We didn't get an exact match, let's try to determine what's up
+                # First check if it's a build number (##N####) or OS number (10.##.##)
+                p = os_build.split(".")
+                p = [x for x in p if x != ""]
+                if len(p) > 1 and len(p) < 4:
+                    # We have . separated stuffs
+                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).lower().startswith(os_build.lower())]
+                    if len(wd_list):
+                        # We got some matches
+                        wd = ""
+                        for i in wd_list:
+                            wd += "{} ({}) - [{}]({})\n".format(self.get_os(i["OS"]), i["OS"], i["version"], i["downloadURL"])
+                        wd = wd[:-1]
             if not wd:
                 await Message.Embed(
                     title="⚠ An error occurred!", 
@@ -125,8 +143,8 @@ class Plist:
                 ).send(ctx)
                 return
         await Message.Embed(
-            title="Web Driver For {} ({})".format(self.get_os(wd["OS"]), wd["OS"]),
-            description="[{}]({})".format(wd["version"], wd["downloadURL"]),
+            title="NVIDIA Web Driver Results For \"{}\"".format(os_build),
+            description=wd,
             color=ctx.author
         ).send(ctx)
 
