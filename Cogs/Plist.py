@@ -88,7 +88,7 @@ class Plist:
             data = await DL.async_dl(self.nv_link)
             plist_data = plistlib.loads(data)
         except:
-            await Message.Embed(
+            await Message.EmbedText(
                 title="⚠ An error occurred!", 
                 description="I guess I couldn't get the manifest...\n\"{}\" may no longer be valid.".format(self.nv_link),
                 color=ctx.author
@@ -104,7 +104,7 @@ class Plist:
                 new_items.append({"update" : x, "value" : self.get_value(x["OS"])})
             sorted_list = sorted(new_items, key=lambda x:x["value"], reverse=True)
             if not len(sorted_list):
-                await Message.Embed(
+                await Message.EmbedText(
                     title="⚠ An error occurred!", 
                     description="There were no updates found at \"{}\".".format(self.nv_link),
                     color=ctx.author
@@ -136,13 +136,13 @@ class Plist:
                             wd += "{} ({}) - [{}]({})\n".format(self.get_os(i["OS"]), i["OS"], i["version"], i["downloadURL"])
                         wd = wd[:-1]
             if not wd:
-                await Message.Embed(
+                await Message.EmbedText(
                     title="⚠ An error occurred!", 
                     description="There were no web drivers found for \"{}\".".format(os_build),
                     color=ctx.author
                 ).send(ctx)
                 return
-        await Message.Embed(
+        await Message.EmbedText(
             title="NVIDIA Web Driver Results For \"{}\"".format(os_build if os_build != None else "Latest"),
             description=wd,
             color=ctx.author
