@@ -141,6 +141,7 @@ class Plist:
                     for x in plist_data.get("updates", []):
                         osv = self.get_os(x["OS"])
                         print("\"{}\" -- \"{}\"".format(osv, os_build))
+                        print(osv == os_build, osv.startswith(os_build))
                         if osv == os_build or osv.startswith(os_build):
                             wd_list.append(x)
                     if len(wd_list):
