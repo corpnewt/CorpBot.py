@@ -114,7 +114,7 @@ class Plist:
                     "name": "{} ({})".format(
                         self.get_os(sorted_list[0]["update"]["OS"]),
                         sorted_list[0]["update"]["OS"]),
-                    "value": "[{}]({})".format(
+                    "value": "└─ [{}]({})".format(
                         sorted_list[0]["update"]["version"],
                         sorted_list[0]["update"]["downloadURL"]
                     ),
@@ -126,7 +126,7 @@ class Plist:
             if mwd:
                 wd = [{
                     "name": "{} ({})".format(self.get_os(mwd["OS"]), mwd["OS"]),
-                    "value": "[{}]({})".format(mwd["version"], mwd["downloadURL"]),
+                    "value": "└─ [{}]({})".format(mwd["version"], mwd["downloadURL"]),
                     "inline": False
                 }]
             else:
@@ -143,7 +143,7 @@ class Plist:
                         for i in wd_list:
                             wd.append({
                                 "name": "{} ({})".format(self.get_os(i["OS"]), i["OS"]),
-                                "value": "[{}]({})".format(i["version"], i["downloadURL"]),
+                                "value": "└─ [{}]({})".format(i["version"], i["downloadURL"]),
                                 "inline": False
                             })
                         wd = wd[:-1]
