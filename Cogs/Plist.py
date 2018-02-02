@@ -118,7 +118,7 @@ class Plist:
                         sorted_list[0]["update"]["version"],
                         sorted_list[0]["update"]["downloadURL"]
                     ),
-                    "inline": True
+                    "inline": False
                 }]
         else:
             # We need to find it
@@ -127,7 +127,7 @@ class Plist:
                 wd = [{
                     "name": "{} ({})".format(self.get_os(mwd["OS"]), mwd["OS"]),
                     "value": "[{}]({})".format(mwd["version"], mwd["downloadURL"]),
-                    "inline": True
+                    "inline": False
                 }]
             else:
                 # We didn't get an exact match, let's try to determine what's up
@@ -144,7 +144,7 @@ class Plist:
                             wd.append({
                                 "name": "{} ({})".format(self.get_os(i["OS"]), i["OS"]),
                                 "value": "[{}]({})".format(i["version"], i["downloadURL"]),
-                                "inline": True
+                                "inline": False
                             })
                         wd = wd[:-1]
             if not wd:
@@ -157,7 +157,8 @@ class Plist:
         await Message.Embed(
             title="NVIDIA Web Driver Results For \"{}\"".format(os_build if os_build != None else "Latest"),
             fields=wd,
-            color=ctx.author
+            color=ctx.author,
+            pm_after=25
         ).send(ctx)
 
             
