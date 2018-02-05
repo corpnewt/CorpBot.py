@@ -32,6 +32,10 @@ class Admin:
 			return Nullify.clean(msg)
 		else:
 			return msg
+	
+	async def test_message(self, message):
+		# Implemented to bypass having this called twice
+		return { "Ignore" : False, "Delete" : False }
 
 	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed
