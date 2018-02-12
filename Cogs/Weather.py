@@ -111,7 +111,7 @@ class Weather:
 				else:
 					out_val = self._k_to_f(m)
 			output = "{} {} is {} {}".format(m, f, out_val, t)
-		else:
+		except:
 			pass
 		await ctx.send(output)
 	
