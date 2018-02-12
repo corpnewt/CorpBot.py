@@ -62,25 +62,25 @@ class Weather:
 		return self._c_to_f(self._k_to_c(k))
 
 	@commands.command(pass_context=True)
-	async def tconvert(self, ctx, *, from_type = None, to_type = None, temp = None):
+	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
 		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 		(F)ahrenheit
 		(C)elsius
 		(K)elvin"""
 		
 		types = [ "Fahrenheit", "Celsius", "Kelvin" ]
-		usage = "Usage: `{}tconvert [from_type] [to_type] [temp]`".format(ctx.prefix)
-		if not from_type:
+		usage = "Usage: `{}tconvert [temp] [from_type] [to_type]`".format(ctx.prefix)
+		if not temp:
 			await ctx.send(usage)
 			return
-		args = from_type.split()
+		args = temp.split()
 		if not len(args) == 3:
 			await ctx.send(usage)
 			return
 		try:
-			f = next((x for x in types if x.lower() == args[0].lower() or x.lower()[:1] == args[0][:1].lower()), None)
-			t = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
-			m = int(args[2])
+			f = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
+			t = next((x for x in types if x.lower() == args[2].lower() or x.lower()[:1] == args[2][:1].lower()), None)
+			m = int(args[0])
 		except:
 			await ctx.send(usage)
 			return
