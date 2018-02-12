@@ -49,9 +49,72 @@ class Weather:
 		return w_text
 
 	def _f_to_c(self, f):
-		f = int(f)
-		return int((f-32)*(5/9))
+		return int((f-32)/1.8)
+	def _c_to_f(self, c):
+		return int((c*1.8)+32)
+	def _c_to_k(self, c):
+		return int(c+273)
+	def _k_to_c(self, k):
+		return int(k-273)
+	def _f_to_k(self, f):
+		return self._c_to_k(self._f_to_c(f))
+	def _k_to_f(self, k):
+		return self._c_to_f(self._k_to_c(k))
 
+	@commands.command(pass_context=True)
+	async def tconvert(self, ctx, *, from_type = None, to_type = None, temp = None):
+		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
+		(F)ahrenheit
+		(C)elsius
+		(K)elvin"""
+		
+		types = [ "Fahrenheit", "Celsius", "Kelvin" ]
+		usage = "Usage: `{}tconvert [from_type] [to_type] [temp]`".format(ctx.prefix)
+		if not from_type:
+			await ctx.send(usage)
+			return
+		args = from_type.split()
+		if not len(args) == 3:
+			await ctx.send(usage)
+			return
+		try:
+			f = next((x for x in types if x.lower() == args[0].lower() or x.lower()[:1] == args[0][:1].lower()), None)
+			t = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
+			m = int(args[2])
+		except:
+			await ctx.send(usage)
+			return
+		if not(f) or not(t):
+			# No valid types
+			await ctx.send("Current temp types are: {}".format(", ".join(types)))
+			return
+		if f == t:
+			# Same in as out
+			await ctx.send("No change when converting {} ---> {}.".format(f, t))
+			return
+		output = "I guess I couldn't make that conversion..."
+		try:
+			out_val = None
+			if f == "Fahrenheit":
+				if t == "Celsius":
+					out_val = self._f_to_c(m)
+				else:
+					out_val = self._f_to_K(m)
+			elif f == "Celsius":
+				if t == "Fahrenheit":
+					out_val = self._c_to_f(m)
+				else:
+					out_val = self._c_to_k(m)
+			else:
+				if t == "Celsius":
+					out_val = self._k_to_c(m)
+				else:
+					out_val = self._k_to_f(m)
+			output = "{} {} is {} {}".format(m, f, out_val, t)
+		else:
+			pass
+		await ctx.send(output)
+	
 	@commands.command(pass_context=True)
 	async def forecast(self, ctx, *, city_name = None):
 		"""Gets some weather."""
