@@ -99,7 +99,7 @@ class Weather:
 				if t == "Celsius":
 					out_val = self._f_to_c(m)
 				else:
-					out_val = self._f_to_K(m)
+					out_val = self._f_to_k(m)
 			elif f == "Celsius":
 				if t == "Fahrenheit":
 					out_val = self._c_to_f(m)
@@ -110,7 +110,7 @@ class Weather:
 					out_val = self._k_to_c(m)
 				else:
 					out_val = self._k_to_f(m)
-			output = "{} {} is {} {}".format(m, f, out_val, t)
+			output = "{:,} {} {} is {:,} {} {}".format(m, "degree" if m==1 else "degrees", f, out_val, "degree" if out_val==1 else "degrees", t)
 		except:
 			pass
 		await ctx.send(output)
