@@ -110,7 +110,7 @@ class Weather:
 					out_val = self._k_to_c(m)
 				else:
 					out_val = self._k_to_f(m)
-			output = "{:,} {} {} is {:,} {} {}".format(m, "degree" if m==1 else "degrees", f, out_val, "degree" if out_val==1 else "degrees", t)
+			output = "{:,} {} {} is {:,} {} {}".format(m, "degree" if (m==1 or m==-1) else "degrees", f, out_val, "degree" if (out_val==1 or out_val==-1) else "degrees", t)
 		except:
 			pass
 		await ctx.send(output)
