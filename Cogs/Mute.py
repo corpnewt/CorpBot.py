@@ -152,17 +152,17 @@ class Mute:
         for channel in server.channels:
             if not type(channel) is discord.TextChannel:
                 continue
-            perms = member.permissions_in(channel)
-            if perms.read_messages:
-                overs = channel.overwrites_for(member)
-                if not overs.send_messages == False:
-                    # We haven't been muted here yet
-                    overs.send_messages = False
-                    overs.add_reactions = False
-                    try:
-                        await channel.set_permissions(member, overwrite=overs)
-                    except Exception:
-                        continue
+            # perms = member.permissions_in(channel)
+            # if perms.read_messages:
+            overs = channel.overwrites_for(member)
+            if not overs.send_messages == False:
+                # We haven't been muted here yet
+                overs.send_messages = False
+                overs.add_reactions = False
+                try:
+                    await channel.set_permissions(member, overwrite=overs)
+                except Exception:
+                    continue
         
         self.settings.setUserStat(member, server, "Muted", True)
         self.settings.setUserStat(member, server, "Cooldown", cooldown)
@@ -188,31 +188,31 @@ class Mute:
     async def unmute(self, member, server):
         # Unmutes the specified user on the specified server
         for channel in server.channels:
-                if not type(channel) is discord.TextChannel:
-                    continue
-                perms = member.permissions_in(channel)
-                if perms.read_messages:
-                    overs = channel.overwrites_for(member)
-                    otherPerms = False
-                    for perm in overs:
-                        if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
-                            otherPerms = True
-                    if overs.send_messages == False:
-                        # We haven't been muted here yet
-                        if otherPerms:
-                            # We have other overwrites - preserve those
-                            overs.send_messages = None
-                            overs.add_reactions = None
-                            try:
-                                await channel.set_permissions(member, overwrite=overs)
-                            except Exception:
-                                continue
-                        else:
-                            # No other overwrites - delete custom perms
-                            try:
-                                await channel.set_permissions(member, overwrite=None)
-                            except Exception:
-                                continue
+            if not type(channel) is discord.TextChannel:
+                continue
+            # perms = member.permissions_in(channel)
+            # if perms.read_messages:
+            overs = channel.overwrites_for(member)
+            otherPerms = False
+            for perm in overs:
+                if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
+                    otherPerms = True
+            if overs.send_messages == False:
+                # We haven't been muted here yet
+                if otherPerms:
+                    # We have other overwrites - preserve those
+                    overs.send_messages = None
+                    overs.add_reactions = None
+                    try:
+                        await channel.set_permissions(member, overwrite=overs)
+                    except Exception:
+                        continue
+                else:
+                    # No other overwrites - delete custom perms
+                    try:
+                        await channel.set_permissions(member, overwrite=None)
+                    except Exception:
+                        continue
         self.settings.setUserStat(member, server, "Muted", False)
         self.settings.setUserStat(member, server, "Cooldown", None)
 

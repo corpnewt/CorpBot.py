@@ -181,11 +181,22 @@ class Channel:
 			if not cd == None:
 				ct = int(time.time())
 				checkRead = ReadableTime.getReadableTimeBetween(ct, cd)
-				msg = '*{}* is **muted** in *{}*\n*{}* remain'.format(DisplayName.name(member), ', '.join(channelList), checkRead)
+				msg = '*{}* is **muted** in {} {},\n*{}* remain.'.format(
+					DisplayName.name(member),
+					len(channelList),
+					"channel" if len(channelList) is 1 else "channels",
+					checkRead
+				)
 			else:
-				msg = '*{}* is **muted** in *{}*.'.format(DisplayName.name(member), ', '.join(channelList))	
+				msg = '*{}* is **muted** in {} {}.'.format(
+					DisplayName.name(member),
+					len(channelList),
+					"channel" if len(channelList) is 1 else "channels"
+				)	
 		else:
-			msg = '{} is **unmuted**.'.format(DisplayName.name(member))
+			msg = '{} is **unmuted**.'.format(
+				DisplayName.name(member)
+			)
 			
 		await ctx.channel.send(msg)
 		
