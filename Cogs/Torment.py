@@ -154,7 +154,10 @@ class Torment:
 		for i in range(0, times):
 			# Do this over time
 			try:
-				await channel.send('*{}*'.format(member.mention))
+				if member.name == "@everyone":
+					await channel.send("{}".format(member.name))
+				else:
+					await channel.send('{}'.format(member.mention))
 			except Exception:
 				pass
 			for j in range(0, self.waitBetween):
@@ -235,7 +238,10 @@ class Torment:
 		for i in range(0, times):
 			# Do this over time
 			try:
-				tmessage = await ctx.channel.send('*{}*'.format(member.mention))
+				if member.name == "@everyone":
+					tmessage = await ctx.channel.send("{}".format(member.name))
+				else:
+					tmessage = await ctx.channel.send('{}'.format(member.mention))
 				await tmessage.delete()
 			except Exception:
 				pass
@@ -318,10 +324,13 @@ class Torment:
 			# Do this over time
 			for channel in server.channels:
 				# Get user's permissions
-				if channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						await channel.send('*{}*'.format(member.mention))
+						if member.name == "@everyone":
+							await channel.send("{}".format(member.name))
+						else:
+							await channel.send('{}'.format(member.mention))
 					except Exception:
 						pass
 			for j in range(0, self.waitBetween):
@@ -403,10 +412,13 @@ class Torment:
 			# Do this over time
 			for channel in server.channels:
 				# Get user's permissions
-				if channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						tmessage = await channel.send('*{}*'.format(member.mention))
+						if member.name == "@everyone":
+							tmessage = await channel.send("{}".format(member.name))
+						else:
+							tmessage = await channel.send('{}'.format(member.mention))
 						await tmessage.delete()
 					except Exception:
 						pass
