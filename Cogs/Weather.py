@@ -49,17 +49,17 @@ class Weather:
 		return w_text
 
 	def _f_to_c(self, f):
-		return int((f-32)/1.8)
+		return int((int(f)-32)/1.8)
 	def _c_to_f(self, c):
-		return int((c*1.8)+32)
+		return int((int(c)*1.8)+32)
 	def _c_to_k(self, c):
-		return int(c+273)
+		return int(int(c)+273)
 	def _k_to_c(self, k):
-		return int(k-273)
+		return int(int(k)-273)
 	def _f_to_k(self, f):
-		return self._c_to_k(self._f_to_c(f))
+		return self._c_to_k(self._f_to_c(int(f)))
 	def _k_to_f(self, k):
-		return self._c_to_f(self._k_to_c(k))
+		return self._c_to_f(self._k_to_c(int(k)))
 
 	@commands.command(pass_context=True)
 	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
