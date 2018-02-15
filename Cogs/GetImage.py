@@ -48,8 +48,8 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	rImage = None
 	
 	try:
-		rImage = await DL.async_dl(url)
-		#print("Got {} bytes".format(len(rImage)))
+		rImage = await DL.async_dl(url, headers={ "user-agent" : ua })
+		# print("Got {} bytes".format(len(rImage)))
 	except:
 		pass
 	if not rImage:
@@ -102,7 +102,7 @@ async def get(ctx, url, title = None, ua : str = 'CorpNewt DeepThoughtBot'):
 	message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 	afile = await download(url)
 	if not afile:
-		return await Message.Embed(title="An error occurred!", description="Oh *shoot* - I couldn't get that image...")
+		return await Message.Embed(title="An error occurred!", description="Oh *shoot* - I couldn't get that image...").edit(ctx, message)
 	message = await Message.Embed(description="Uploading...").edit(ctx, message)
 	message = await Message.Embed(title=title, file=afile).edit(ctx, message)
 	remove(afile)

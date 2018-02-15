@@ -16,7 +16,12 @@ from   Cogs import ReadableTime
 from   Cogs import UserTime
 from   Cogs import DL
 from   pyquery import PyQuery as pq
-
+try:
+    # Python 2.6-2.7
+    from HTMLParser import HTMLParser
+except ImportError:
+    # Python 3
+    from html.parser import HTMLParser
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -155,11 +160,10 @@ class Reddit:
 							theURL = imageURL
 						elif await self.getImageHEAD(imageURL).lower() in self.headList:
 							# Check header as a last resort
-							theURL = imageURL
-							
+							theURL = imageURL				
 				if not theURL:
 					continue
-				returnDict = { 'title': theJSON['title'], 'url': theURL, 'over_18': theJSON['over_18'] }
+				returnDict = { 'title': theJSON['title'], 'url': HTMLParser().unescape(theURL), 'over_18': theJSON['over_18'] }
 				break
 			except Exception:
 				continue
