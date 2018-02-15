@@ -154,7 +154,7 @@ class Torment:
 		for i in range(0, times):
 			# Do this over time
 			try:
-				if member.name == "@everyone":
+				if member.name == "@everyone" and type(member) is discord.Role:
 					await channel.send("{}".format(member.name))
 				else:
 					await channel.send('{}'.format(member.mention))
@@ -238,7 +238,7 @@ class Torment:
 		for i in range(0, times):
 			# Do this over time
 			try:
-				if member.name == "@everyone":
+				if member.name == "@everyone" and type(member) is discord.Role:
 					tmessage = await ctx.channel.send("{}".format(member.name))
 				else:
 					tmessage = await ctx.channel.send('{}'.format(member.mention))
@@ -327,7 +327,7 @@ class Torment:
 				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						if member.name == "@everyone":
+						if member.name == "@everyone" and type(member) is discord.Role:
 							await channel.send("{}".format(member.name))
 						else:
 							await channel.send('{}'.format(member.mention))
@@ -415,7 +415,7 @@ class Torment:
 				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						if member.name == "@everyone":
+						if member.name == "@everyone" and type(member) is discord.Role:
 							tmessage = await channel.send("{}".format(member.name))
 						else:
 							tmessage = await channel.send('{}'.format(member.mention))
