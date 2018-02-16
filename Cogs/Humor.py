@@ -170,7 +170,7 @@ class Humor:
 
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
-		"""Generate Meme"""
+		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
 
 		if not self.canDisplay(ctx.message.guild):
 			return
