@@ -102,7 +102,7 @@ class Promote:
                 msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{:,} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
             else:
                 msg = '*{}* was given *{:,} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
-	self.bot.dispatch("xp", member, ctx.author, neededXp)
+        self.bot.dispatch("xp", member, ctx.author, neededXp)
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
