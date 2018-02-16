@@ -99,9 +99,10 @@ class Promote:
             self.settings.role.add_roles(member, addRoles)
             if not newRole:
                 # Promotion role doesn't exist
-                msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
+                msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{:,} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
             else:
-                msg = '*{}* was given *{} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
+                msg = '*{}* was given *{:,} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
+	self.bot.dispatch("xp", member, ctx.author, neededXp)
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
@@ -225,10 +226,11 @@ class Promote:
             self.settings.role.add_roles(member, addRoles)
             if not newRole:
                 # Promotion role doesn't exist
-                msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
+                msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{:,} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
             else:
-                msg = '*{}* was given *{} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
-        # Check for suppress
+                msg = '*{}* was given *{:,} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
+        self.bot.dispatch("xp", member, ctx.author, neededXp)
+	# Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
         await channel.send(msg)
@@ -308,10 +310,11 @@ class Promote:
             self.settings.role.rem_roles(member, remRoles)
             if not newRole:
                 # Promotion role doesn't exist
-                msg = 'It looks like **{}** is no longer on this server.  *{} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
+                msg = 'It looks like **{}** is no longer on this server.  *{:,} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
             else:
-                msg = '*{} xp* was taken from *{}* and they were demoted to **{}**!'.format(neededXp*-1, DisplayName.name(member), newRole.name)
-        # Check for suppress
+                msg = '*{:,} xp* was taken from *{}* and they were demoted to **{}**!'.format(neededXp*-1, DisplayName.name(member), newRole.name)
+        self.bot.dispatch("xp", member, ctx.author, neededXp)
+	# Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
         await channel.send(msg)
@@ -433,10 +436,11 @@ class Promote:
         self.settings.role.rem_roles(member, remRoles)
         if not newRole:
             # Promotion role doesn't exist
-            msg = 'It looks like **{}** is no longer on this server.  *{} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
+            msg = 'It looks like **{}** is no longer on this server.  *{:,} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
         else:
-            msg = '*{} xp* was taken from *{}* and they were demoted to **{}**!'.format(neededXp*-1, DisplayName.name(member), newRole.name)
-        # Check for suppress
+            msg = '*{:,} xp* was taken from *{}* and they were demoted to **{}**!'.format(neededXp*-1, DisplayName.name(member), newRole.name)
+        self.bot.dispatch("xp", member, ctx.author, neededXp)
+	# Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
         await channel.send(msg)
