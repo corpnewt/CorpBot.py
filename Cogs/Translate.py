@@ -48,7 +48,16 @@ class Translate:
 
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate = None):
-        """Translate some stuff!"""
+        """Translate some stuff!  Takes a phrase, the from language identifier (optional), and the to language identifier.
+        To see a number of potential language identifiers, use the langlist command.
+        
+        Example Translation:
+        $tr Hello there, how are you? en es
+        
+        Would translate from English to Spanish resulting in:
+        ¿Hola como estás?
+        
+        If you do not specify the from language, Google translate will attempt to automatically determine it."""
 
         # Check if we're suppressing @here and @everyone mentions
         if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
