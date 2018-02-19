@@ -140,7 +140,7 @@ class Hw:
 		"""Sets a new main build from your build list."""
 
 		if not build:
-			await ctx.channel.send("Usage: `{}mainhw [build name or index]`".format(ctx.prefix))
+			await ctx.channel.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
@@ -150,7 +150,7 @@ class Hw:
 
 		mainBuild = None
 
-		# Get build by name first - then by index
+		# Get build by name first - then by number
 		for b in buildList:
 			if b['Name'].lower() == build.lower():
 				# Found it
@@ -189,7 +189,7 @@ class Hw:
 			await ctx.channel.send(msg)
 			return
 
-		msg = "I couldn't find that build or index."
+		msg = "I couldn't find that build or number."
 		await ctx.channel.send(msg)
 
 	
@@ -198,7 +198,7 @@ class Hw:
 		"""Removes a build from your build list."""
 
 		if not build:
-			await ctx.channel.send("Usage: `{}delhw [build name or index]`".format(ctx.prefix))
+			await ctx.channel.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
@@ -206,7 +206,7 @@ class Hw:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
-		# Get build by name first - then by index
+		# Get build by name first - then by number
 		for b in buildList:
 			if b['Name'].lower() == build.lower():
 				# Found it
@@ -234,7 +234,7 @@ class Hw:
 		except:
 			pass
 
-		msg = "I couldn't find that build or index."
+		msg = "I couldn't find that build or number."
 		await ctx.channel.send(msg)
 
 
@@ -242,7 +242,7 @@ class Hw:
 	async def edithw(self, ctx, *, build = None):
 		"""Edits a build from your build list."""
 		if not build:
-			await ctx.channel.send("Usage: `{}edithw [build name or index]`".format(ctx.prefix))
+			await ctx.channel.send("Usage: `{}edithw [build name or number]`".format(ctx.prefix))
 			return
 
 		hwChannel = None
@@ -276,7 +276,7 @@ class Hw:
 
 		mainBuild = None
 
-		# Get build by name first - then by index
+		# Get build by name first - then by number
 		for b in buildList:
 			if b['Name'].lower() == build.lower():
 				# Found it
@@ -291,7 +291,7 @@ class Hw:
 				pass
 
 		if not mainBuild:
-			msg = "I couldn't find that build or index."
+			msg = "I couldn't find that build or number."
 			await ctx.channel.send(msg)
 			return
 
@@ -375,7 +375,7 @@ class Hw:
 	async def renhw(self, ctx, *, build = None):
 		"""Renames a build from your build list."""
 		if not build:
-			await ctx.channel.send("Usage: `{}renhw [build name or index]`".format(ctx.prefix))
+			await ctx.channel.send("Usage: `{}renhw [build name or number]`".format(ctx.prefix))
 			return
 
 		hwChannel = None
@@ -409,7 +409,7 @@ class Hw:
 
 		mainBuild = None
 
-		# Get build by name first - then by index
+		# Get build by name first - then by number
 		for b in buildList:
 			if b['Name'].lower() == build.lower():
 				# Found it
@@ -424,7 +424,7 @@ class Hw:
 				pass
 
 		if not mainBuild:
-			msg = "I couldn't find that build or index."
+			msg = "I couldn't find that build or number."
 			await ctx.channel.send(msg)
 			return
 
@@ -597,7 +597,7 @@ class Hw:
 					memFromName = None
 
 		if not memFromName:
-			# Try again with indexes
+			# Try again with numbers
 			for j in range(len(parts)):
 				# Reverse search direction
 				i = len(parts)-1-j
@@ -637,7 +637,7 @@ class Hw:
 					buildParts = build
 					break
 			if not memFromName:
-				# Okay - *this* time is the last - check for index
+				# Okay - *this* time is the last - check for number
 				try:
 					user_as_build = int(user)-1
 					if user_as_build >= 0 and user_as_build < len(buildList):
@@ -723,7 +723,7 @@ class Hw:
 					memFromName = None
 
 		if not memFromName:
-			# Try again with indexes
+			# Try again with numbers
 			for j in range(len(parts)):
 				# Reverse search direction
 				i = len(parts)-1-j
@@ -763,7 +763,7 @@ class Hw:
 					buildParts = build
 					break
 			if not memFromName:
-				# Okay - *this* time is the last - check for index
+				# Okay - *this* time is the last - check for number
 				try:
 					user_as_build = int(user)-1
 					if user_as_build >= 0 and user_as_build < len(buildList):
