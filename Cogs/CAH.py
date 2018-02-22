@@ -148,7 +148,7 @@ class SenCheck:
                 # Not valid
                 continue
             avg[key] = (sent[key]/sent["total"])
-        return total
+        return avg
         
     def check(self, sent, pers = None):
         # Checks the passed analyzed sentence against the personality
