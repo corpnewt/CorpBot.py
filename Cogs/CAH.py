@@ -481,8 +481,9 @@ class CAH:
         weighted = sorted(weighted, key=lambda x: x[0], reverse=True)
         cards = []
         while len(cards) < blackNum:
-            randCard = weighted.pop(0)
-            index = bot['Hand'].index(randCard[1])
+            # Get a list of the top-level picks (ties) and choose a random one
+            toppick = random.choice([ x[1] for x in weighted if x[0] >= weighted[0][0] ])
+            index = bot['Hand'].index(toppick)
             cards.append(bot['Hand'].pop(index)['Text'])
         await self.typing(game)
 
@@ -508,8 +509,9 @@ class CAH:
             # Judge is a bot - and all cards are in!
             await self.typing(game)
             # Pick a winner
-            # winner = random.randint(0, totalUsers-1)
-            winner = game['Submitted'].index(weighted[0][1])
+            # Get a list of the top-level picks (ties) and choose a random one
+            toppick = random.choice([ x[1] for x in weighted if x[0] >= weighted[0][0] ])
+            winner = game['Submitted'].index(toppick)
             await self.winningCard(ctx, game, winner)
 
 
