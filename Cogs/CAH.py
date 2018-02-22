@@ -47,9 +47,34 @@ class SenCheck:
             ch+"y",
             ch[:-1]+"y",
             ch+"'s",
-            ch+"'"
+            ch+"'",
+            ch+ch[-1:]+"ed",
+            ch+ch[-1:]+"ily",
+            ch+ch[-1:]+"y",
+            ch+ch[-1:]+"ies",
+            ch+ch[-1:]+"iest",
+            ch+ch[-1:]+"ied",
+            ch+ch[-1:]+"ing"
         ]
         
+    '''
+    Json formatted like so:
+    {
+        "reverse" : [ "list", "of", "reverse", "words" ],
+        "lists"   : [
+            {
+                "name"    : "positive",
+                "reverse" : "negative",
+                "min"     : 0.0,
+                "max"     : 1.0,
+                "words"   : [
+                    "list", "of", "words", "in", "category"
+                ]
+            }
+        ]
+    }
+    '''
+    
     def analyze(self, sentence):
         # Break sentence into words
         # words = sentence.split()
@@ -57,44 +82,44 @@ class SenCheck:
         last_invert = False
         total = 0
         count = {}
-        for key in self.dict:
-            count[key.lower()] = 0
+        for key in self.dict["lists"]:
+            count[key["name"].lower()] = 0
         for word in words:
-            ch = word.lower().replace(".", "").replace("?", "").replace("!", "").replace(",", "")
+            ch = word.lower()
             if ch in self.dict.get("reverse", []):
                 last_invert ^= True
                 continue
-            for key in self.dict:
-                if not any(x for x in self.dict[key] if ch in self.get_opts(x)):
+            for key in self.dict["lists"]:
+                if key["name"].lower() in ["total", "reverse"]:
+                    # Not valid names - skip
+                    continue
+                if not any(x for x in key["words"] if ch in self.get_opts(x)):
                     continue
                 total += 1
-                if key.lower() == "positive" and last_invert:
+                if last_invert and key.get("reverse", None):
                     # Reversed
-                    count["negative"] += 1
-                elif key.lower() == "negative" and last_invert:
-                    # Reversed
-                    count["positive"] += 1
+                    count[key["reverse"].lower()] += 1
                 else:
                     # Normal
-                    count[key.lower()] += 1
+                    count[key["name"].lower()] += 1
         count["total"] = total
         return count
         
     def gen_personality(self):
         # Generates a personality matrix based on fields
         pers = {}
-        for key in self.dict:
-            pers[key.lower()] = random.uniform(0, 1.0)
+        for list in self.dict["lists"]:
+            pers[list["name"].lower()] = random.uniform(list["min"], list["max"])
         return pers
 
     def def_personality(self, pers):
         # Returns a string semi describing the personality
         name = "Rando"
         highest = 0
-        for key in self.dict:
-            if pers[key.lower()] > highest:
-                highest = pers[key.lower()]
-                name = key.capitalize()
+        for key in self.dict["lists"]:
+            if pers[key["name"].lower()] > highest:
+                highest = pers[key["name"].lower()]
+                name = key["name"].capitalize()
         return name + " Cardrissian"
         
     def check(self, sent, pers = None):
@@ -107,7 +132,8 @@ class SenCheck:
             pers = self.gen_personality()
         total = 0.0
         for key in sent:
-            if key == "total":
+            if key.lower() in ["total", "reverse"]:
+                # Not valid
                 continue
             total += (sent[key]/sent["total"]) * pers.get(key)
         return total
