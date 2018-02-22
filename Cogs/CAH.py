@@ -114,15 +114,12 @@ class SenCheck:
     
     def avg_personality(self, win_list, pers):
         # Returns a weighted personality based on a list of wins
-        print(win_list)
         wins = {}
         for win in win_list:
             for val in pers:
-                print(val)
                 wins[val] = wins.get(val, 0.0) + win.get(val, 0.0)
         for val in pers:
             wins[val] = (wins.get(val, 0.0) + pers.get(val, 0.0))/(len(win_list)+1)
-        print("Original:\n{}\nAdjusted Pers:\n{}".format(pers, wins))
         return wins
 
     def def_personality(self, pers):
@@ -622,7 +619,6 @@ class CAH:
 
     def add_win(self, game, cards):
         # Adds up to 20 winning values to be averaged
-        print("Adding:\n{}".format(cards))
         result = self.sencheck.avg_check(cards)
         game_wins = game.get("WinVals", [])
         game_wins.append(result)
