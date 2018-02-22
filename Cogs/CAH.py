@@ -117,8 +117,8 @@ class SenCheck:
         print(win_list)
         wins = {}
         for win in win_list:
-            for val in win:
-                wins[val] = wins.get(val, 0.0) + win[val]
+            for val in pers:
+                wins[val] = wins.get(val, 0.0) + win.get(val, 0.0)
         for val in pers:
             wins[val] = (wins.get(val, 0.0) + pers.get(val, 0.0))/len(win_list)+1
         print("Original:\n{}\nAdjusted Pers:\n{}".format(pers, wins))
