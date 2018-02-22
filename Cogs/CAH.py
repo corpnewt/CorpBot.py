@@ -119,7 +119,8 @@ class SenCheck:
             for val in pers:
                 wins[val] = wins.get(val, 0.0) + win.get(val, 0.0)
         for val in pers:
-            wins[val] = (wins.get(val, 0.0) + pers.get(val, 0.0))/(len(win_list)+1)
+            # pers.get(val, 0.0) twice to increase the weight of the bot's original personality
+            wins[val] = (wins.get(val, 0.0) + pers.get(val, 0.0) + pers.get(val, 0.0))/(len(win_list)+2)
         return wins
 
     def def_personality(self, pers):
