@@ -482,8 +482,11 @@ class CAH:
         cards = []
         while len(cards) < blackNum:
             # Get a list of the top-level picks (ties) and choose a random one
-            toppick = random.choice([ x[1] for x in weighted if x[0] >= weighted[0][0] ])
-            index = bot['Hand'].index(toppick)
+            toppick = random.choice([ x for x in weighted if x[0] >= weighted[0][0] ])
+            # Remove from our weighted hand
+            weighted.remove(toppick)
+            # Get the index in the normal hand
+            index = bot['Hand'].index(toppick[1])
             cards.append(bot['Hand'].pop(index)['Text'])
         await self.typing(game)
 
