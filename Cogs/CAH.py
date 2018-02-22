@@ -121,7 +121,7 @@ class SenCheck:
                 wins[val] = wins.get(val, 0.0) + win[val]
         for val in wins:
             wins[val] = (wins[val] + pers.get(val, 0.0))/len(win_list)+1
-        print("Adjusted Pers:\n{}".format(wins))
+        print("Original:\n{}\nAdjusted Pers:\n{}".format(pers, wins))
         return wins
 
     def def_personality(self, pers):
@@ -621,6 +621,7 @@ class CAH:
 
     def add_win(self, game, cards):
         # Adds up to 20 winning values to be averaged
+        print("Adding:\n{}".format(cards))
         result = self.sencheck.avg_check(cards)
         game_wins = game.get("WinVals", [])
         game_wins.append(result)
