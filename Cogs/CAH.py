@@ -111,6 +111,18 @@ class SenCheck:
         for list in self.dict["lists"]:
             pers[list["name"].lower()] = random.uniform(list["min"], list["max"])
         return pers
+    
+    def avg_personality(self, win_list, pers):
+        # Returns a weighted personality based on a list of wins
+        print(win_list)
+        wins = {}
+        for win in win_list:
+            for val in win:
+                wins[val] = wins.get(val, 0.0) + win[val]
+        for val in wins:
+            wins[val] = (wins[val] + pers.get(val, 0.0))/len(win_list)+1
+        print("Adjusted Pers:\n{}".format(wins))
+        return wins
 
     def def_personality(self, pers):
         # Returns a string semi describing the personality
@@ -121,6 +133,21 @@ class SenCheck:
                 highest = pers[key["name"].lower()]
                 name = key["name"].capitalize()
         return name + " Cardrissian"
+    
+    def avg_check(self, sent):
+        # Checks the passed analyzed sentence
+        # Can take a string or list of strings which will be joined by a space
+        if type(sent) is list:
+            sent = " ".join(sent)
+        if type(sent) is str:
+            sent = self.analyze(sent)
+        avg = {}
+        for key in sent:
+            if key.lower() in ["total", "reverse"]:
+                # Not valid
+                continue
+            avg[key] = (sent[key]/sent["total"])
+        return total
         
     def check(self, sent, pers = None):
         # Checks the passed analyzed sentence against the personality
@@ -503,7 +530,11 @@ class CAH:
         else:
             cardSpeak = 'cards'
         # Sort our hand here by weight
-        weighted = [ [ self.sencheck.check(x['Text'], bot['Personality']), x ] for x in bot['Hand'] ]
+        # avg_personality(self, win_list, pers):
+        weighted = [ [ self.sencheck.check(
+            x['Text'], 
+            self.sencheck.avg_personality(game.get("WinVals", []), bot['Personality'])
+        ), x ] for x in bot['Hand'] ]
         weighted = sorted(weighted, key=lambda x: x[0], reverse=True)
         cards = []
         while len(cards) < blackNum:
@@ -588,7 +619,16 @@ class CAH:
                 await member['User'].send(msg)
                 await asyncio.sleep(self.loopsleep)
 
-
+    def add_win(self, game, cards):
+        # Adds up to 20 winning values to be averaged
+        result = self.sencheck.avg_check(cards)
+        game_wins = game.get("WinVals", [])
+        game_wins.append(result)
+        if len(game_wins) > 20:
+            # Ditch the oldest value
+            game_wins.pop(0)
+        game["WinVals"] = game_wins
+        
     async def checkCards(self, ctx, game):
         while not self.bot.is_closed():
             if not game['Running']:
@@ -625,11 +665,11 @@ class CAH:
                 task = asyncio.ensure_future(self.botPickWin(ctx, game))
                 judge['Task'] = task
 
-        
-
     async def winningCard(self, ctx, game, card):
         # Let's pick our card and alert everyone
         winner = game['Submitted'][card]
+        # Add to the win list
+        self.add_win(game, winner['Cards'])
         if winner['By']['IsBot']:
             winnerName = '{} ({})'.format(winner['By'].get("Name", self.botName), winner['By']['ID'])
             winner['By']['Points'] += 1
