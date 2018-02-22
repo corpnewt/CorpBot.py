@@ -14,10 +14,111 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
 from   Cogs import Nullify
+try:
+    # Python 2.6-2.7
+    from HTMLParser import HTMLParser
+except ImportError:
+    # Python 3
+    from html.parser import HTMLParser
 
 def setup(bot):
     # Add the bot
     bot.add_cog(CAH(bot))
+
+class SenCheck:
+
+    def __init__(self, word_dict):
+        self.dict = word_dict
+        
+    def get_opts(self, ch):
+        return [
+            ch,
+            ch+"s", 
+            ch+"d", 
+            ch+"ed",
+            ch[:-1]+"ied",
+            ch[:-1]+"ies", 
+            ch+"ing", 
+            ch[:-1]+"ing",
+            ch+"er",
+            ch+"est",
+            ch[:-1]+"ier",
+            ch[:-1]+"iest",
+            ch+"y",
+            ch[:-1]+"y",
+            ch+"'s",
+            ch+"'"
+        ]
+        
+    def analyze(self, sentence):
+        # Break sentence into words
+        # words = sentence.split()
+        words = re.split('\W+', sentence)
+        last_invert = False
+        total = 0
+        count = {}
+        for key in self.dict:
+            count[key.lower()] = 0
+        for word in words:
+            ch = word.lower().replace(".", "").replace("?", "").replace("!", "").replace(",", "")
+            if ch in self.dict.get("reverse", []):
+                last_invert ^= True
+                continue
+            for key in self.dict:
+                if not any(x for x in self.dict[key] if ch in self.get_opts(x)):
+                    continue
+                total += 1
+                if key.lower() == "good" and last_invert:
+                    # Reversed
+                    count["bad"] += 1
+                elif key.lower() == "bad" and last_invert:
+                    # Reversed
+                    count["good"] += 1
+                else:
+                    # Normal
+                    count[key.lower()] += 1
+        count["total"] = total
+        return count
+        
+    def gen_personality(self):
+        # Generates a personality matrix based on fields
+        pers = {}
+        for key in self.dict:
+            pers[key.lower()] = random.uniform(0, 1.0)
+        return pers
+
+    def def_personality(self, pers):
+        # Returns a string semi describing the personality
+        name = "Rando"
+        highest = 0
+        for key in self.dict:
+            if pers[key.lower()] > highest:
+                highest = pers[key.lower()]
+                name = key.capitalize()
+        return name + " Cardrissian"
+        
+    def check(self, sent, pers = None):
+        # Checks the passed analyzed sentence against the personality
+        if type(sent) is str:
+            sent = self.analyze(sent)
+        if sent.get("total", 0) == 0:
+            return 0
+        if not pers:
+            pers = self.gen_personality()
+        total = 0.0
+        for key in sent:
+            if key == "total":
+                continue
+            total += (sent[key]/sent["total"]) * pers.get(key)
+        return total
+
+    def sum_check(self, sent, pers = None):
+        if type(sent) is str:
+            return self.check(sent, pers)
+        total = 0
+        for s in sent:
+            total += self.check(s, pers)
+        return total
 
 class CAH:
 
@@ -54,6 +155,14 @@ class CAH:
         else:
             # File doesn't exist - create a placeholder
             self.deck = {}
+        # Get our bot personalities setup
+        words = "cah_words.json"
+        word_dict = {}
+        if os.path.exists(words):
+            word_dict = json.load(open(words))
+        self.sencheck = SenCheck(word_dict)
+        self.parser = HTMLParser()
+        self.debug = False
 
     # Proof of concept stuff for reloading cog/extension
     def _is_submodule(self, parent, child):
@@ -300,7 +409,7 @@ class CAH:
             if member['IsBot']:
                 continue
             if removed['IsBot']:
-                msg = '***{} ({})*** **left the game - reorganizing...**'.format(self.botName, removed['ID'])
+                msg = '***{} ({})*** **left the game - reorganizing...**'.format(removed.get("Name", self.botName), removed['ID'])
             else:
                 msg = '***{}*** **left the game - reorganizing...**'.format(DisplayName.name(removed['User']))
             # Check if the judge changed
@@ -308,7 +417,7 @@ class CAH:
                 # Judge changed
                 newJudge = game['Members'][game['Judge']] 
                 if newJudge['IsBot']:
-                    msg += '\n\n***{} ({})*** **is now judging!**'.format(self.botName, newJudge['ID'])
+                    msg += '\n\n***{} ({})*** **is now judging!**'.format(newJudge.get("Name", self.botName), newJudge['ID'])
                     # Schedule judging task
                 else:
                     if newJudge == member:
@@ -367,13 +476,14 @@ class CAH:
             cardSpeak = 'card'
         else:
             cardSpeak = 'cards'
-        i = 0
+        # Sort our hand here by weight
+        weighted = [ [ self.sencheck.check(x['Text'], bot['Personality']), x ] for x in bot['Hand'] ]
+        weighted = sorted(weighted, key=lambda x: x[0], reverse=True)
         cards = []
-        while i < blackNum:
-            randCard = random.randint(0, len(bot['Hand'])-1)
-            cards.append(bot['Hand'].pop(randCard)['Text'])
-            i += 1
-        
+        while len(cards) < blackNum:
+            randCard = weighted.pop(0)
+            index = bot['Hand'].index(randCard[1])
+            cards.append(bot['Hand'].pop(index)['Text'])
         await self.typing(game)
 
         # Make sure we haven't laid any cards
@@ -390,11 +500,16 @@ class CAH:
     async def botPickWin(self, ctx, game):
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
+        bot = game['Members'][game['Judge']]
+        # Sort our hand here by weight
+        weighted = [ [ self.sencheck.sum_check(x['Cards'], bot['Personality']), x ] for x in game['Submitted'] ]
+        weighted = sorted(weighted, key=lambda x: x[0], reverse=True)
         if submitted >= totalUsers:
             # Judge is a bot - and all cards are in!
             await self.typing(game)
             # Pick a winner
-            winner = random.randint(0, totalUsers-1)
+            # winner = random.randint(0, totalUsers-1)
+            winner = game['Submitted'].index(weighted[0][1])
             await self.winningCard(ctx, game, winner)
 
 
@@ -430,7 +545,7 @@ class CAH:
                 else:
                     card = 'cards'
                 if user['IsBot']:
-                    msg = '*{} ({})* submitted their {}! '.format(self.botName, user['ID'], card)
+                    msg = '*{} ({})* submitted their {}! '.format(user.get("Name", self.botName), user['ID'], card)
                 else:
                     if not member == user:
                         # Don't say this to the submitting user
@@ -485,7 +600,7 @@ class CAH:
         # Let's pick our card and alert everyone
         winner = game['Submitted'][card]
         if winner['By']['IsBot']:
-            winnerName = '{} ({})'.format(self.botName, winner['By']['ID'])
+            winnerName = '{} ({})'.format(winner['By'].get("Name", self.botName), winner['By']['ID'])
             winner['By']['Points'] += 1
             winner['By']['Won'].append(game['BlackCard']['Text'])
         else:
@@ -559,7 +674,7 @@ class CAH:
         else:
             if game['Members'][game['Judge']]['IsBot']:
                 # Bot
-                judge = '*{} ({})* is'.format(self.botName, game['Members'][game['Judge']]['ID'])
+                judge = '*{} ({})* is'.format(game['Members'][game['Judge']].get("Name", self.botName), game['Members'][game['Judge']]['ID'])
             else:
                 judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
         
@@ -572,7 +687,7 @@ class CAH:
             blackNum  = 0
 
         # msg = '{} the judge.\n\n'.format(judge)
-        msg = '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.parser.unescape(blackCard))
         
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
@@ -616,10 +731,10 @@ class CAH:
                     points = '{} points'.format(member['Points'])
                 for card in member['Hand']:
                     i += 1
-                    msg += '{}. {}\n'.format(i, card['Text'])
+                    msg += '{}. {}\n'.format(i, self.parser.unescape(card['Text']))
 
         try:
-            blackCard = '**{}**'.format(game['BlackCard']['Text'])
+            blackCard = '**{}**'.format(self.parser.unescape(game['BlackCard']['Text']))
         except Exception:
             blackCard = '**None.**'
         stat_embed.add_field(name="Your Hand - {}".format(points), value=msg)
@@ -643,12 +758,12 @@ class CAH:
         else:
             if game['Members'][game['Judge']]['IsBot']:
                 # Bot
-                judge = '*{} ({})* is'.format(self.botName, game['Members'][game['Judge']]['ID'])
+                judge = '*{} ({})* is'.format(game['Members'][game['Judge']].get("Name", self.botName), game['Members'][game['Judge']]['ID'])
             else:
                 judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
         blackCard = game['BlackCard']['Text']
 
-        msg = '__Black Card:__\n\n**{}**\n\n'.format(blackCard)
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.parser.unescape(blackCard))
         msg += '__Submitted White Cards:__\n\n'
 
         i = 0
@@ -766,7 +881,7 @@ class CAH:
                 # We have a winner!
                 winner = True
                 if member['IsBot']:
-                    stat_embed.set_author(name='{} ({}) is the WINNER!!'.format(self.botName, member['ID']))
+                    stat_embed.set_author(name='{} ({}) is the WINNER!!'.format(member.get("Name", self.botName), member['ID']))
                 else:
                     stat_embed.set_author(name='{} is the WINNER!!'.format(DisplayName.name(member['User'])))
                 stat_embed.set_footer(text='Congratulations!'.format(game['ID']))
@@ -1260,10 +1375,14 @@ class CAH:
             return
         # We can get another bot!
         botID = self.randomBotID(userGame)
-        lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': True, 'Creator': False, 'Task': None }
+        lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': True, 'Creator': False, 'Task': None,
+            "Personality" : self.sencheck.gen_personality()
+        }
+        if self.debug:
+            lobot['Name'] = self.sencheck.def_personality(lobot['Personality'])
         userGame['Members'].append(lobot)
         await self.drawCards(lobot['ID'])
-        msg = '***{} ({})*** **joined the game!**'.format(self.botName, botID)
+        msg = '***{} ({})*** **joined the game!**'.format(lobot.get("Name", self.botName), botID)
         for member in userGame['Members']:
             if member['IsBot']:
                 continue
@@ -1341,11 +1460,15 @@ class CAH:
         for i in range(0, number):
             # We can get another bot!
             botID = self.randomBotID(userGame)
-            lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': True, 'Creator': False, 'Task': None }
+            lobot = { 'ID': botID, 'User': None, 'Points': 0, 'Won': [], 'Hand': [], 'Laid': False, 'Refreshed': False, 'IsBot': True, 'Creator': False, 'Task': None,
+                "Personality" : self.sencheck.gen_personality()
+            }
+            if self.debug:
+                lobot['Name'] = self.sencheck.def_personality(lobot['Personality'])
             userGame['Members'].append(lobot)
             newBots.append(lobot)
             await self.drawCards(lobot['ID'])
-            msg += '***{} ({})*** **joined the game!**\n'.format(self.botName, botID)
+            msg += '***{} ({})*** **joined the game!**\n'.format(lobot.get("Name", self.botName), botID)
             # await self.nextPlay(ctx, userGame)
         
         for member in userGame['Members']:
@@ -1493,14 +1616,14 @@ class CAH:
                     msg += '{}. *{}* - 1 point\n'.format(i, DisplayName.name(user['User']))
                 else:
                     # Bot
-                    msg += '{}. *{} ({})* - 1 point\n'.format(i, self.botName, user['ID'])
+                    msg += '{}. *{} ({})* - 1 point\n'.format(i, user.get("Name", self.botName), user['ID'])
             else:
                 if user['User']:
                     # Person
                     msg += '{}. *{}* - {} points\n'.format(i, DisplayName.name(user['User']), user['Points'])
                 else:
                     # Bot
-                    msg += '{}. *{} ({})* - {} points\n'.format(i, self.botName, user['ID'], user['Points'])
+                    msg += '{}. *{} ({})* - {} points\n'.format(i, user.get("Name", self.botName), user['ID'], user['Points'])
         stat_embed.add_field(name="Current Score", value=msg)
         await ctx.author.send(embed=stat_embed)
         # await ctx.author.send(msg)
@@ -1542,14 +1665,14 @@ class CAH:
                     msg += '{}. *{}* - Cards are in.\n'.format(i, DisplayName.name(user['User']))
                 else:
                     # Bot
-                    msg += '{}. *{} ({})* - Cards are in.\n'.format(i, self.botName, user['ID'])
+                    msg += '{}. *{} ({})* - Cards are in.\n'.format(i, user.get("Name", self.botName), user['ID'])
             else:
                 if user['User']:
                     # Person
                     msg += '{}. *{}* - Waiting for cards...\n'.format(i, DisplayName.name(user['User']))
                 else:
                     # Bot
-                    msg += '{}. *{} ({})* - Waiting for cards...\n'.format(i, self.botName, user['ID'])
+                    msg += '{}. *{} ({})* - Waiting for cards...\n'.format(i, user.get("Name", self.botName), user['ID'])
         await ctx.author.send(msg)
 
     @commands.command(pass_context=True)
