@@ -68,12 +68,12 @@ class SenCheck:
                 if not any(x for x in self.dict[key] if ch in self.get_opts(x)):
                     continue
                 total += 1
-                if key.lower() == "good" and last_invert:
+                if key.lower() == "positive" and last_invert:
                     # Reversed
-                    count["bad"] += 1
-                elif key.lower() == "bad" and last_invert:
+                    count["negative"] += 1
+                elif key.lower() == "negative" and last_invert:
                     # Reversed
-                    count["good"] += 1
+                    count["positive"] += 1
                 else:
                     # Normal
                     count[key.lower()] += 1
