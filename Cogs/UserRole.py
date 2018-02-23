@@ -115,7 +115,7 @@ class UserRole:
 		if len(remRole):
 			# Only remove if we have roles to remove
 			self.settings.role.rem_roles(mem, remRole)
-		m += "\n{} {} removed.".format(len(remRole), "role" if len(remRole) == 1 else "roles")
+		m += "\n\n*{} {}* removed.".format(len(remRole), "role" if len(remRole) == 1 else "roles")
 		await ctx.send(m)
 	
 	@commands.command(pass_context=True)
