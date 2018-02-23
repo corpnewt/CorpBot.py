@@ -569,7 +569,10 @@ class CAH:
             await self.typing(game)
             # Pick a winner
             # Get a list of the top-level picks (ties) and choose a random one
-            toppick = random.choice([ x[1] for x in weighted if x[0] >= weighted[0][0] ])
+            if not len(weighted):
+                toppick = random.choice(game["Submitted"])
+            else:
+                toppick = random.choice([ x[1] for x in weighted if x[0] >= weighted[0][0] ])
             winner = game['Submitted'].index(toppick)
             await self.winningCard(ctx, game, winner)
 
