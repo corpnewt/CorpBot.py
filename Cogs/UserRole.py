@@ -16,9 +16,42 @@ class UserRole:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.loop_list = []
+		
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+		
+	@asyncio.coroutine
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for task in self.loop_list:
+			task.cancel()
 
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		# Add a loop to remove expired user blocks in the UserRoleBlock list
+		self.loop_list.append(self.bot.loop.create_task(self.block_check_list()))
+		
+	async def block_check_list(self):
+		while not self.bot.is_closed():
+			# Iterate through the ids in the UserRoleBlock list and 
+			# remove any for members who aren't here
+			for guild in self.bot.guilds:
+				block_list = self.settings.getServerStat(guild, "UserRoleBlock")
+				rem_list = [ x for x in block_list if not guild.get_member(x) ]
+				if len(rem_list):
+					block_list = [ x for x in block_list if x not in rem_list ]
+					self.settings.setServerStat(guild, "UserRoleBlock", block_list)
+				# Check once per hour
+				await asyncio.sleep(3600)
+	
 	@commands.command(pass_context=True)
-	async def userroleblock(self, ctx, *, member = None):
+	async def urblock(self, ctx, *, member = None):
 		"""Blocks a user from using the UserRole system (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
@@ -83,7 +116,7 @@ class UserRole:
 		await ctx.send("`{}` has been blocked from the UserRole module and any applicable roles removed.".format(DisplayName.name(mem).replace("`", "\\`")))
 	
 	@commands.command(pass_context=True)
-	async def userroleunblock(self, ctx, *, member = None):
+	async def urunblock(self, ctx, *, member = None):
 		"""Unblocks a user from the UserRole system (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
@@ -113,7 +146,7 @@ class UserRole:
 		await ctx.send("`{}` has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
 	
 	@commands.command(pass_context=True)
-	async def userroleisblocked(self, ctx, *, member = None):
+	async def isurblocked(self, ctx, *, member = None):
 		"""Outputs whether or not the passed user is blocked from the UserRole module."""
 		if member == None:
 			member = "{}".format(ctx.author.mention)
