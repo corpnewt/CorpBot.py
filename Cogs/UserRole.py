@@ -59,7 +59,28 @@ class UserRole:
 			return
 		block_list.append(mem.id)
 		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-		await ctx.send("`{}` has been blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+		# Remove any roles
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(ctx.guild, "UserRoles")
+		except Exception:
+			promoArray = []
+		if promoArray == None:
+			promoArray = []
+		# Populate the roles that need to be removed
+		remRole = []
+		for arole in promoArray:
+			roleTest = DisplayName.roleForID(arole['ID'], ctx.guild)
+			if not roleTest:
+				# Not a real role - skip
+				continue
+			if roleTest in ctx.author.roles:
+				# We have it
+				remRole.append(roleTest)
+		if len(remRole):
+			# Only remove if we have roles to remove
+			self.settings.role.rem_roles(ctx.author, remRole)
+		await ctx.send("`{}` has been blocked from the UserRole module and any applicable roles removed.".format(DisplayName.name(mem).replace("`", "\\`")))
 	
 	@commands.command(pass_context=True)
 	async def userroleunblock(self, ctx, *, member = None):
@@ -102,7 +123,7 @@ class UserRole:
 			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
 			return
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		name = "You are" if mem.id == ctx.author.id else DisplayName.name(mem).replace("`", "\\`") + " is"
+		name = "You are" if mem.id == ctx.author.id else "`"+DisplayName.name(mem).replace("`", "\\`") + "` is"
 		if mem.id in block_list:
 			await ctx.send(name + " blocked from the UserRole module.")
 		else:
@@ -400,6 +421,10 @@ class UserRole:
 	@commands.command(pass_context=True)
 	async def clearroles(self, ctx):
 		"""Removes all user roles from your roles."""
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if ctx.author.id in block_list:
+			await ctx.send("You are currently blocked from using this command.")
+			return
 		# Get the array
 		try:
 			promoArray = self.settings.getServerStat(ctx.guild, "UserRoles")
@@ -431,6 +456,10 @@ class UserRole:
 	@commands.command(pass_context=True)
 	async def remrole(self, ctx, *, role = None):
 		"""Removes a role from the user role list from your roles."""
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if ctx.author.id in block_list:
+			await ctx.send("You are currently blocked from using this command.")
+			return
 
 		if role == None:
 			await ctx.send("Usage: `{}remrole [role name]`".format(ctx.prefix))
@@ -509,7 +538,11 @@ class UserRole:
 	@commands.command(pass_context=True)
 	async def addrole(self, ctx, *, role = None):
 		"""Adds a role from the user role list to your roles.  You can have multiples at a time."""
-
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if ctx.author.id in block_list:
+			await ctx.send("You are currently blocked from using this command.")
+			return
+		
 		if role == None:
 			await ctx.send("Usage: `{}addrole [role name]`".format(ctx.prefix))
 			return
@@ -584,7 +617,11 @@ class UserRole:
 	@commands.command(pass_context=True)
 	async def setrole(self, ctx, *, role = None):
 		"""Sets your role from the user role list.  You can only have one at a time."""
-
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if ctx.author.id in block_list:
+			await ctx.send("You are currently blocked from using this command.")
+			return
+		
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
