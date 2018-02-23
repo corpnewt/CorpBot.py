@@ -18,6 +18,97 @@ class UserRole:
 		self.settings = settings
 
 	@commands.command(pass_context=True)
+	async def userroleblock(self, ctx, *, member = None):
+		"""Blocks a user from using the UserRole system (bot-admin only)."""
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+						break
+		# Only allow bot-admins to change server stats
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+		# Get the target user
+		mem = DisplayName.memberForName(member, ctx.guild)
+		if not mem:
+			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			return
+		# Check if we're trying to block a bot-admin
+		isAdmin = mem.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in mem.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+						break
+		# Only allow bot-admins to change server stats
+		if isAdmin:
+			await ctx.send("You can't block other admins or bot-admins from the UserRole module.")
+			return
+		# At this point - we have someone to block - see if they're already blocked
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if mem.id in block_list:
+			await ctx.send("`{}` is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+			return
+		block_list.append(mem.id)
+		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+		await ctx.send("`{}` has been blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+	
+	@commands.command(pass_context=True)
+	async def userroleunblock(self, ctx, *, member = None):
+		"""Unblocks a user from the UserRole system (bot-admin only)."""
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+						break
+		# Only allow bot-admins to change server stats
+		if not isAdmin:
+			await ctx.send('You do not have sufficient privileges to access this command.')
+			return
+		# Get the target user
+		mem = DisplayName.memberForName(member, ctx.guild)
+		if not mem:
+			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			return
+		# At this point - we have someone to unblock - see if they're blocked
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		if not mem.id in block_list:
+			await ctx.send("`{}` is not blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+			return
+		block_list.remove(mem.id)
+		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+		await ctx.send("`{}` has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+	
+	@commands.command(pass_context=True)
+	async def userroleisblocked(self, ctx, *, member = None):
+		"""Outputs whether or not the passed user is blocked from the UserRole module."""
+		if member == None:
+			member = "{}".format(ctx.author.mention)
+		# Get the target user
+		mem = DisplayName.memberForName(member, ctx.guild)
+		if not mem:
+			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			return
+		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		name = "You are" if mem.id == ctx.author.id else DisplayName.name(mem).replace("`", "\\`") + " is"
+		if mem.id in block_list:
+			await ctx.send(name + " blocked from the UserRole module.")
+		else:
+			await ctx.send(name + " not blocked from the UserRole module.")
+	
+	@commands.command(pass_context=True)
 	async def adduserrole(self, ctx, *, role = None):
 		"""Adds a new role to the user role system (admin only)."""
 		
