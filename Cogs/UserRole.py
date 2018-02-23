@@ -78,6 +78,7 @@ class UserRole:
 				# We have it
 				remRole.append(roleTest)
 		if len(remRole):
+			print("Removing: {}".format(remRole))
 			# Only remove if we have roles to remove
 			self.settings.role.rem_roles(ctx.author, remRole)
 		await ctx.send("`{}` has been blocked from the UserRole module and any applicable roles removed.".format(DisplayName.name(mem).replace("`", "\\`")))
