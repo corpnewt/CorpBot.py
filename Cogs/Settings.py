@@ -158,6 +158,7 @@ class Settings:
 				"DJArray"				: [],		# List of roles that can use music
 				"FilteredWords"			: [],		# List of words to filter out of user messages
 				"UserRoles"				: [],		# List of roles users can self-select
+				"UserRoleBlock"			: [],		# List of users blocked from UserRoles
 				"OnlyOneUserRole"		: True,		# Limits user role selection to one at a time
 				"YTMultiple"			: False,	# Shows a list of 5 videos per yt search with play
 				"RequiredXPRole"		: "",		# ID or blank for Everyone
