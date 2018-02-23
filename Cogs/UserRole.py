@@ -52,7 +52,7 @@ class UserRole:
 	
 	@commands.command(pass_context=True)
 	async def urblock(self, ctx, *, member = None):
-		"""Blocks a user from using the UserRole system (bot-admin only)."""
+		"""Blocks a user from using the UserRole system and removes applicable roles (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
 			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
@@ -87,11 +87,13 @@ class UserRole:
 			return
 		# At this point - we have someone to block - see if they're already blocked
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		m = ""
 		if mem.id in block_list:
-			await ctx.send("`{}` is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
-			return
-		block_list.append(mem.id)
-		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+			m += "`{}` is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+		else:
+			block_list.append(mem.id)
+			self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+			m += "`{}` now blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
 		# Remove any roles
 		# Get the array
 		try:
@@ -113,7 +115,8 @@ class UserRole:
 		if len(remRole):
 			# Only remove if we have roles to remove
 			self.settings.role.rem_roles(mem, remRole)
-		await ctx.send("`{}` has been blocked from the UserRole module and any applicable roles removed.".format(DisplayName.name(mem).replace("`", "\\`")))
+		m += "\n{} {} removed.".format(len(remRole), "role" if len(remRole) == 1 else "roles")
+		await ctx.send(m)
 	
 	@commands.command(pass_context=True)
 	async def urunblock(self, ctx, *, member = None):
