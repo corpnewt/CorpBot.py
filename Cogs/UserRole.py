@@ -74,7 +74,7 @@ class UserRole:
 			if not roleTest:
 				# Not a real role - skip
 				continue
-			if roleTest in ctx.author.roles:
+			if roleTest in mem.roles:
 				# We have it
 				remRole.append(roleTest)
 		if len(remRole):
