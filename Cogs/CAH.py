@@ -145,7 +145,10 @@ class SenCheck:
             if key.lower() in ["total", "reverse"]:
                 # Not valid
                 continue
-            avg[key] = (sent[key]/sent["total"])
+            if sent["total"] == 0:
+                avg[key] = 0
+            else:
+                avg[key] = (sent[key]/sent["total"])
         return avg
         
     def check(self, sent, pers = None):
