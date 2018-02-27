@@ -128,6 +128,7 @@ class Weather:
 			await ctx.send("I couldn't find that city...")
 			return
 		location_info = location.location()
+		print(location_info)
 		title = "{}, {} ({})".format(location_info['city'], location_info['country'], location_info['region'][1:])
 		
 		response_list = ["Current Weather", "10-Day Forecast", "Both"]
