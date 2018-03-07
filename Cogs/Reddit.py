@@ -749,3 +749,23 @@ class Reddit:
 			return
 		
 		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+		
+	@commands.command(pass_context=True)
+	async def randomcat(self, ctx):
+		"""Meow."""
+		
+		channel = ctx.message.channel
+		author  = ctx.message.author
+		server  = ctx.message.guild
+		
+		if not self.canDisplay(server):
+			return
+		
+		# Grab our image title and url
+		infoDict = await self.getInfo('https://www.reddit.com/r/cats/top.json?sort=top&t=week&limit=100')
+		
+		if not infoDict:
+			await ctx.channel.send("Whoops! I couldn't find a working link.")
+			return
+		
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
