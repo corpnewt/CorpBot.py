@@ -49,11 +49,11 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	
 	try:
 		rImage = await DL.async_dl(url, headers={ "user-agent" : ua })
-		# print("Got {} bytes".format(len(rImage)))
+		print("Got {} bytes".format(len(rImage)))
 	except:
 		pass
 	if not rImage:
-		#print("'{}'\n - Returned no data.".format(url))
+		print("'{}'\n - Returned no data.".format(url))
 		remove(dirpath)
 		return None
 
@@ -62,7 +62,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 
 	# Check if the file exists
 	if not os.path.exists(imagePath):
-		#print("'{}'\n - Doesn't exist.".format(imagePath))
+		print("'{}'\n - Doesn't exist.".format(imagePath))
 		remove(dirpath)
 		return None
 
@@ -73,7 +73,7 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 		img.close()
 	except Exception:
 		# Not something we understand - error out
-		#print("'{}'\n - Couldn't get extension.".format(imagePath))
+		print("'{}'\n - Couldn't get extension.".format(imagePath))
 		remove(dirpath)
 		return None
 	
