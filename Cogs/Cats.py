@@ -9,6 +9,8 @@ from   Cogs import GetImage
 from   Cogs import DL
 
 def setup(bot):
+	# Currently the api is broken - picked up in the Reddit cog
+	return
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Cats(bot, settings))
