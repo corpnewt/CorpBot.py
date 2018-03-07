@@ -102,7 +102,7 @@ async def get(ctx, url, title = None, ua : str = 'CorpNewt DeepThoughtBot', **kw
 	downl = kwargs.get("download", False)
 	if not downl:
 		# Just show the embed?
-		await Message.Embed(title=title, url=url, image=url).send(ctx)
+		await Message.Embed(title=title, url=url, image=url, color=ctx.author).send(ctx)
 		return
 	message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 	afile = await download(url)
