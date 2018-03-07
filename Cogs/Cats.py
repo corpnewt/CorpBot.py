@@ -59,4 +59,4 @@ class Cats:
 
 		catURL = r['file']
 		
-		await GetImage.get(ctx, catURL, 'A cat for you!', self.ua)
+		await GetImage.get(ctx, catURL.replace("\\", ""), 'A cat for you!', self.ua)
