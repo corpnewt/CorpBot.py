@@ -32,7 +32,7 @@ class Stream:
         if not before.id in stream_list:
             # We're not watching for them
             return
-        if after.game == None or after.game.type != 1:
+        if after.activity == None or after.activity.type != 1:
             return
 
         # We're STREAMING
@@ -144,8 +144,8 @@ class Stream:
             message = re.sub(self.regexHere,     "@​here", message)
             message = re.sub(self.regexEveryone, "@​everyone", message)
         else:
-            message = re.sub(self.regexUrl,      "{}".format(member.game.url), message)
-            message = re.sub(self.regexGame,     "{}".format(member.game.name), message)
+            message = re.sub(self.regexUrl,      "{}".format(member.activity.url), message)
+            message = re.sub(self.regexGame,     "{}".format(member.activity.name), message)
             message = re.sub(self.regexHere,     "@here", message)
             message = re.sub(self.regexEveryone, "@everyone", message)
         await dest.send(message)

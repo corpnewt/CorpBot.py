@@ -146,28 +146,37 @@ class Debugging:
 		if not before.status == after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
-		if not before.game == after.game:
+		if not before.activity == after.activity:
 			# Something changed
 			msg = ''
 
-			if before.game == None:
-				before.game = discord.Game(name=None, url=None, type=0)
+			if before.activity == None:
+				before.activity = discord.Activity(name=None, url=None, type=0)
 
-			if after.game == None:
-				after.game = discord.Game(name=None, url=None, type=0)
+			if after.activity == None:
+				after.activity = discord.Activity(name=None, url=None, type=0)
 
-			if not before.game.name == after.game.name and self.shouldLog('user.game.name', server):
+			# Setup some prelim vars
+			bname = before.activity.name if hasattr(before.activity, "name") else None
+			burl  = before.activity.url  if hasattr(before.activity, "url")  else None
+			btype = before.activity.type if hasattr(before.activity, "type") else 0
+
+			aname = after.activity.name if hasattr(after.activity, "name") else None
+			aurl  = after.activity.url  if hasattr(after.activity, "url")  else None
+			atype = after.activity.type if hasattr(after.activity, "type") else 0
+
+			if not bname == aname and self.shouldLog('user.game.name', server):
 				# Name change
-				msg += 'Name:\n   {}\n   --->\n   {}\n'.format(before.game.name, after.game.name)
-			if not before.game.url == after.game.url and self.shouldLog('user.game.url', server):
+				msg += 'Name:\n   {}\n   --->\n   {}\n'.format(bname, aname)
+			if not burl == aurl and self.shouldLog('user.game.url', server):
 				# URL changed
-				msg += 'URL:\n   {}\n   --->\n   {}\n'.format(before.game.url, after.game.url)
-			if not before.game.type == after.game.type and self.shouldLog('user.game.type', server):
+				msg += 'URL:\n   {}\n   --->\n   {}\n'.format(burl, aurl)
+			if not btype == atype and self.shouldLog('user.game.type', server):
 				# Type changed
 				play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
 				try:
-					b_string = play_list[before.game.type]
-					a_string = play_list[after.game.type]
+					b_string = play_list[btype]
+					a_string = play_list[atype]
 				except:
 					b_string = a_string = "Playing"
 				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(b_string, a_string)

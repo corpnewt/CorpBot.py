@@ -184,16 +184,16 @@ class Bot:
 		server_embed.add_field(name="Owners", value=owners, inline=True)
 		server_embed.add_field(name="Prefixes", value=prefix, inline=True)
 		server_embed.add_field(name="Status", value=status_text, inline=True)
-		if bot_member.game and bot_member.game.name:
+		if bot_member.activity and bot_member.activity.name:
 			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
 			try:
-				play_string = play_list[bot_member.game.type]
+				play_string = play_list[bot_member.activity.type]
 			except:
 				play_string = "Playing"
-			server_embed.add_field(name=play_string, value=str(bot_member.game.name), inline=True)
-			if bot_member.game.type == 1:
+			server_embed.add_field(name=play_string, value=str(bot_member.activity.name), inline=True)
+			if bot_member.activity.type == 1:
 				# Add the URL too
-				server_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(bot_member.game.url), inline=True)
+				server_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(bot_member.activity.url), inline=True)
 		server_embed.set_thumbnail(url=avatar)
 		# Send the embed
 		await ctx.channel.send(embed=server_embed)
@@ -794,8 +794,8 @@ class Bot:
 		else:
 			# Online when in doubt
 			s = discord.Status.online
-		dgame = discord.Game(name=game, url=url, type=t) if game else None
-		await self.bot.change_presence(status=s, game=dgame)
+		dgame = discord.Activity(name=game, url=url, type=t) if game else None
+		await self.bot.change_presence(status=s, activity=dgame)
 		
 		
 	@commands.command(pass_context=True)
