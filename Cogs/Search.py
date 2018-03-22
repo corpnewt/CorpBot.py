@@ -147,8 +147,8 @@ class Search:
 		r = await DL.async_text(convert_url)
 		
 		try:
+			print("Source:\n\n" + r)
 			r = r.split('uccResultAmount">')[1]
-			print(r)
 			r = r.split('<')[0]
 			results = [r, to]
 		except:
