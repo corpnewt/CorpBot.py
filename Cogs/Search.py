@@ -148,7 +148,10 @@ class Search:
 		
 		try:
 			r = r.split('uccResultAmount">')[1]
+			if len(r) > 2:
+				print(r[:2])
 			r = r.split('<')[0]
+			print(r)
 			results = [r, to]
 		except:
 			await ctx.send("Error getting currency conversion results :(")
