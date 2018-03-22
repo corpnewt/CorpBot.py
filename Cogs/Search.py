@@ -147,8 +147,8 @@ class Search:
 		r = await DL.async_text(convert_url)
 		try:
 			r = r.split("uccResultAmount\">")[1]
+			print(len(r))
 			r = r.split("<")[0]
-			await ctx.send(r)
 			results = [r, to]
 		except:
 			await ctx.send("Error getting currency conversion results :(")
