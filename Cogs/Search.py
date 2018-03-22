@@ -145,7 +145,7 @@ class Search:
 		# convert_url = "https://finance.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
 		convert_url = "http://www.xe.com/currencyconverter/convert/?Amount={}&From={}&To={}".format(amount,frm,to)
 		r = await DL.async_text(convert_url)
-		
+		print(r)
 		try:
 			print("Source:\n\n" + r)
 			r = r.split('uccResultAmount">')[1]
