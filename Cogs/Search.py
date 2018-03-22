@@ -147,6 +147,9 @@ class Search:
 		r = await DL.async_text(convert_url)
 		
 		try:
+			if not "uccResultAmount" in r:
+				await ctx.send("Search value not found...")
+				return
 			r = r.split('uccResultAmount">')[1]
 			r = r.split('</span>')[0]
 			results = [r, to.upper()]
