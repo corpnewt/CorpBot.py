@@ -485,7 +485,8 @@ class Promote:
     def getSortedRoles(self, server):
         # Get the role list
         promoArray = self.settings.getServerStat(server, "PromotionArray")
-        promoArray = [] if promoArray == None else promoArray
+        if not type(promoArray) is list:
+            promoArray = []
         # promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
         promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
         if len(promoSorted):
