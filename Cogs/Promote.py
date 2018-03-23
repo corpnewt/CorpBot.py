@@ -453,8 +453,6 @@ class Promote:
         # Get user's xp
         xp = int(self.settings.getUserStat(member, server, "XP"))
         promoSorted = self.getSortedRoles(server)
-        if not len(promoSorted):
-            return 0
         index = 0
         topIndex = -1
         for role in promoSorted:
@@ -467,8 +465,6 @@ class Promote:
         # Helper method to get the sorted index for an xp role
         # Returns None if not found
         promoSorted = self.getSortedRoles(server)
-        if not len(promoSorted):
-            return 0
         index = 0
         found = False
         for arole in promoSorted:
