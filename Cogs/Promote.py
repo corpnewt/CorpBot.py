@@ -489,7 +489,4 @@ class Promote:
             promoArray = []
         # promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
         promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
-        if len(promoSorted):
-            return promoSorted
-        else:
-            return None
+        return promoSorted
