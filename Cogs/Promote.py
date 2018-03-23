@@ -81,6 +81,7 @@ class Promote:
         promoArray = self.getSortedRoles(server)
         currentRole = self.getCurrentRoleIndex(member, server)
         nextRole = currentRole + 1
+        neededXp = 0
         if nextRole >= len(promoArray):
             msg = 'There are no higher roles to promote *{}* into.'.format(DisplayName.name(member))
         else:
@@ -102,7 +103,7 @@ class Promote:
                 msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{:,} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
             else:
                 msg = '*{}* was given *{:,} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
-        self.bot.dispatch("xp", member, ctx.author, neededXp)
+            self.bot.dispatch("xp", member, ctx.author, neededXp)
         # Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
@@ -229,7 +230,7 @@ class Promote:
                 msg = 'It looks like **{}** is no longer on this server.  *{}* was still given *{:,} xp* - but I am unable to promote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], DisplayName.name(member), neededXp)
             else:
                 msg = '*{}* was given *{:,} xp* and promoted to **{}**!'.format(DisplayName.name(member), neededXp, newRole.name)
-        self.bot.dispatch("xp", member, ctx.author, neededXp)
+            self.bot.dispatch("xp", member, ctx.author, neededXp)
 	# Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
@@ -292,6 +293,7 @@ class Promote:
             # Use role manager instead
             self.settings.role.rem_roles(member, remRoles)
             msg = '*{} xp* was taken from *{}* and they were demoted out of the xp system!'.format(neededXp*-1, DisplayName.name(member))
+            self.bot.dispatch("xp", member, ctx.author, neededXp)
         elif nextRole < -1:
             msg = 'There are no lower roles to demote *{}* into.'.format(DisplayName.name(member))
         else:
@@ -313,7 +315,7 @@ class Promote:
                 msg = 'It looks like **{}** is no longer on this server.  *{:,} xp* was still taken from *{}* - but I am unable to demote them to a non-existent role.  Consider revising your xp roles.'.format(promoArray[nextRole]['Name'], neededXp*-1, DisplayName.name(member))
             else:
                 msg = '*{:,} xp* was taken from *{}* and they were demoted to **{}**!'.format(neededXp*-1, DisplayName.name(member), newRole.name)
-        self.bot.dispatch("xp", member, ctx.author, neededXp)
+            self.bot.dispatch("xp", member, ctx.author, neededXp)
 	# Check for suppress
         if suppress:
             msg = Nullify.clean(msg)
