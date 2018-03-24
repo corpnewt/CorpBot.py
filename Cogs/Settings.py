@@ -274,7 +274,7 @@ class Settings:
 		print("Connecting to database on {}:{}...".format(self.ip, self.port))
 		client = pymongo.MongoClient(self.ip, self.port, serverSelectionTimeoutMS=100)
 
-		# See whether we actually connected to the database, this will throw an exception if not
+		# See whether we actually connected to the database, this will throw an exception if not and if it does let's fall back on the JSON
 		try:
 			client.server_info()
 			print("Established connection!")
@@ -474,10 +474,6 @@ class Settings:
 			else:
 				print("Settings Backed Up: {}".format(timeStamp))
 			await asyncio.sleep(self.backupTime)
-
-	@commands.command()
-	async def test(self, ctx):
-		print(self.serverDict)
 
 	def isOwner(self, member):
 		# This method converts prior, string-only ownership to a list,
