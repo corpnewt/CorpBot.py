@@ -148,7 +148,6 @@ class Settings:
 		self.settingsDump = 3600 # runs every hour
 		self.databaseDump = 300 # runs every 5 minutes
 		self.bot = bot
-		self.serverDict = {}
 		self.prefix = prefix
 		self.loop_list = []
 		self.role = RoleManager(bot)
