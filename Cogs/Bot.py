@@ -692,7 +692,7 @@ class Bot:
 		
 		# Save the return channel and flush settings
 		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
-		self.settings.flushSettings()
+		self.settings.flushSettings(self.settings.file)
 
 		quiet = False
 		if force and force.lower() == 'force':
@@ -735,7 +735,7 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 		
-		self.settings.flushSettings()
+		self.settings.flushSettings(self.settings.file)
 
 		quiet = False
 		if force and force.lower() == 'force':
