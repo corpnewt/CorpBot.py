@@ -321,7 +321,7 @@ class Debugging:
 
 
 	@commands.command(pass_context=True)
-	async def clean(self, ctx, messages : int = 100, *, chan : discord.TextChannel = None):
+	async def clean(self, ctx, messages : int = 0, *, chan : discord.TextChannel = None):
 		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
 
 		author  = ctx.message.author
@@ -347,6 +347,18 @@ class Debugging:
 
 		if chan in self.cleanChannels:
 			# Don't clean messages from a channel that's being cleaned
+			return
+		
+		# Try to get the number of messages to clean so you don't "accidentally" clean
+		# any...
+		try:
+			messages = int(messages)
+		except:
+			await ctx.send("You need to specify how many messages to clean!")
+			return
+		# Make sure we're actually trying to clean something
+		if messages < 1:
+			await ctx.send("Can't clean less than 1 message!")
 			return
 
 		# Add channel to list
