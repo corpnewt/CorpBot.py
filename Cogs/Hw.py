@@ -680,7 +680,10 @@ class Hw:
 				return
 		
 		# At this point - we *should* have a user and a build
-		msg = "__**{}'s {}:**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], buildParts['Hardware'])
+		msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
+		msg = msg_head + buildParts['Hardware']
+		if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
+			msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
