@@ -335,6 +335,23 @@ class TempRole:
 	@commands.command(pass_context=True)
 	async def hastemp(self, ctx, *, member = None):
 		"""Displays any temp roles the passed user has, and the remaining time."""
+		# Check for admin status
+		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					# Get the role that corresponds to the id
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+		if not isAdmin:
+			await ctx.send("You do not have permission to use this command.")
+			return
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
 		# Get the array
 		try:
 			promoArray = self.settings.getServerStat(server, "TempRoleList")
