@@ -355,7 +355,7 @@ class TempRole:
 		# Got the member - let's check for roles
 		temp_roles = self.settings.getUserStat(member, ctx.guild, "TempRoles")
 		if not len(temp_roles):
-			await.ctx.send("*{}* has no logged temp roles!".format(DisplayName.name(member)))
+			await ctx.send("*{}* has no logged temp roles!".format(DisplayName.name(member)))
 			return
 		roleText = "**__Current Temp Roles For {}:__**\n\n".format(DisplayName.name(member))
 		c = time.time()
