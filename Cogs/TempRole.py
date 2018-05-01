@@ -331,6 +331,49 @@ class TempRole:
 
 		msg = "Temp role will last *{}*.".format(ReadableTime.getReadableTimeBetween(0, minutes*60))
 		await ctx.send(msg)
+		
+	@commands.command(pass_context=True)
+	async def hastemp(self, ctx, *, member = None):
+		"""Displays any temp roles the passed user has, and the remaining time."""
+		# Get the array
+		try:
+			promoArray = self.settings.getServerStat(server, "TempRoleList")
+		except Exception:
+			promoArray = []
+		if member == None:
+			member = ctx.author
+		else:
+			member_name = member
+			member = DisplayName.memberForName(member, ctx.guild)
+			if not member:
+				msg = 'I couldn\'t find *{}*...'.format(member_name)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.send(msg)
+				return
+		# Got the member - let's check for roles
+		temp_roles = self.settings.getUserStat(member, ctx.guild, "TempRoles")
+		if not len(temp_roles):
+			await.ctx.send("*{}* has no logged temp roles!".format(DisplayName.name(member)))
+			return
+		roleText = "**__Current Temp Roles For {}:__**\n\n".format(DisplayName.name(member))
+		c = time.time()
+		for arole in temp_roles:
+			# Get current role name based on id
+			foundRole = False
+			timeleft = arole["Cooldown"]-int(time.time())
+			for role in server.roles:
+				if str(role.id) == str(arole['ID']):
+					# We found it
+					foundRole = True
+					roleText = '{}**{}** - *{}* remain\n'.format(roleText, role.name, ReadableTime.getReadableTimeBetween(0, timeleft))
+			if not foundRole:
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
+		# Check for suppress
+		if suppress:
+			roleText = Nullify.clean(roleText)
+		await ctx.send(roleText)
 
 	@commands.command(pass_context=True)
 	async def addtemprole(self, ctx, *, role : str = None):
