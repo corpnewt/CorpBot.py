@@ -363,7 +363,7 @@ class TempRole:
 			# Get current role name based on id
 			foundRole = False
 			timeleft = arole["Cooldown"]-int(time.time())
-			for role in server.roles:
+			for role in ctx.guild.roles:
 				if str(role.id) == str(arole['ID']):
 					# We found it
 					foundRole = True
