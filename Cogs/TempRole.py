@@ -387,7 +387,7 @@ class TempRole:
 					if not "AddedBy" in arole:
 						added = "automatically"
 					else:
-						add_user = DisplayName.name(DisplayName.memberForID(arole["AddedBy"]))
+						add_user = DisplayName.name(DisplayName.memberForID(arole["AddedBy"], ctx.guild))
 						if not add_user:
 							add_user = str(arole["AddedBy"])
 						added = "by {}".format(add_user)
