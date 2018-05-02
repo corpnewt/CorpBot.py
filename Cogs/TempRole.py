@@ -384,7 +384,14 @@ class TempRole:
 				if str(role.id) == str(arole['ID']):
 					# We found it
 					foundRole = True
-					roleText = '{}**{}** - *{}* remain\n'.format(roleText, role.name, ReadableTime.getReadableTimeBetween(0, timeleft))
+					if not "AddedBy" in arole:
+						added = "automatically"
+					else:
+						add_user = DisplayName.name(DisplayName.memberForID(arole["AddedBy"]))
+						if not add_user:
+							add_user = str(arole["AddedBy"])
+						added = "by {}".format(add_user)
+					roleText = '{}**{}** - added {} - *{}* remain\n'.format(roleText, role.name, added, ReadableTime.getReadableTimeBetween(0, timeleft))
 			if not foundRole:
 				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
 		# Check for suppress
