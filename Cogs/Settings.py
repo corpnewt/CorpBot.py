@@ -271,10 +271,13 @@ class Settings:
 
 		self.ip = "localhost"
 		self.port = 27017
-
-		print("Connecting to database on {}:{}...".format(self.ip, self.port))
-		client = pymongo.MongoClient(self.ip, self.port, serverSelectionTimeoutMS=100)
-
+		try:
+			# Will likely fail if we don't have pymongo
+			print("Connecting to database on {}:{}...".format(self.ip, self.port))
+			client = pymongo.MongoClient(self.ip, self.port, serverSelectionTimeoutMS=100)
+		except:
+			client = None
+			
 		# See whether we actually connected to the database, this will throw an exception if not and if it does let's fall back on the JSON
 		try:
 			client.server_info()
