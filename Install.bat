@@ -131,6 +131,10 @@ echo.
 call :install "weather-api"
 echo.
 
+echo Installing PyMongo
+echo.
+call :install "pymongo"
+echo.
 
 REM echo Installing Flask...
 REM echo.
