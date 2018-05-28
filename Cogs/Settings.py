@@ -147,6 +147,7 @@ class Settings:
 		self.backupWait = 10 # initial wait time before first backup
 		self.settingsDump = 3600 # runs every hour
 		self.databaseDump = 300 # runs every 5 minutes
+		self.jsonOnlyDump = 300 # runs every 5 minutes if no database
 		self.bot = bot
 		self.prefix = prefix
 		self.loop_list = []
@@ -293,6 +294,8 @@ class Settings:
 			# Load the database into the serverDict variable
 			self.load_local()
 		else:
+			# Fix the flush time to the jsonOnlyDump
+			self.settingsDump = self.jsonOnlyDump
 			self.load_json(file)
 
 
