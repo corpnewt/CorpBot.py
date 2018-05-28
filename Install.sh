@@ -119,6 +119,11 @@ function main () {
     echo
     update "weather-api"
     echo
+    
+    echo Updating PyMongo
+    echo
+    update "pymongo"
+    echo
 
     #echo Updating Flask...
     #echo
