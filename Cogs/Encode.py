@@ -76,6 +76,118 @@ class Encode:
 		hex_bytes    = binascii.hexlify(base64_bytes)
 		return self._to_string(hex_bytes)
 
+	def _rgb_to_hex(self, r, g, b):
+		return '#%02x%02x%02x' % (r, g, b)
+
+	def _hex_to_rgb(self, _hex):
+		_hex = _hex.replace("#", "")
+		l_hex = len(_hex)
+		return tuple(int(_hex[i:i + l_hex // 3], 16) for i in range(0, l_hex, l_hex // 3))
+
+	def _cmyk_to_rgb(self, c, m, y, k):
+		c, m, y, k = [float(x)/100.0 for x in tuple([c, m, y, k])]
+		return tuple([round(255.0 - ((min(1.0, x * (1.0 - k) + k)) * 255.0)) for x in tuple([c, m, y])])
+
+	def _rgb_to_cmyk(self, r, g, b):
+		c, m, y = [1 - x/255 for x in tuple([r, g, b])]
+		min_cmy = min(c, m, y)
+		return tuple([0,0,0,100]) if all(x == 0 for x in [r, g, b]) else tuple([round(x*100) for x in [(x - min_cmy) / (1 - min_cmy) for x in tuple([c, m, y])] + [min_cmy]])
+
+
+	@commands.command()
+	async def color(self, ctx, *, value = None):
+		"""
+		View info on a rgb, hex or cmyk color their
+		values in other formats
+
+		Example usage:
+		color #3399cc
+		color rgb(3, 4, 5)
+		"""
+		if not value:
+			await ctx.send("Usage: `{}color [value] [to]`".format(ctx.prefix))
+			return
+
+		if not any(value.startswith(x) for x in ["#", "rgb", "cmyk"]):
+			await ctx.send("Invalid value color format, please choose from rgb, cmyk or hex")
+			return
+
+		error = False
+
+		if value.startswith('rgb'):
+			count = value.count('(') + value.count(')') + value.count(',')
+			if count != 4:
+				error = True
+
+			number_list = value.lower().replace("rgb", "").replace("(", "").replace(")", "").replace(" ", "")
+			try:
+				r, g, b = map(int, number_list.split(','))
+			except:
+				error = True
+
+			if (r < 0 or r > 255) or (g < 0 or g > 255) or (b < 0 or b > 255):
+				error = True
+
+			if error:
+				await ctx.send("Invalid RGB color format!")
+				return
+			
+			_hex = self._rgb_to_hex(r,g,b)
+			c, m, y, k = self._rgb_to_cmyk(r, g, b)
+			
+			embed_color = int("0x{}".format(_hex.replace("#", '')), 16)
+			embed = discord.Embed(color=embed_color)
+
+			embed.title = "Color {}".format(value.replace(" ", ""))
+			embed.add_field(name="Hex", value=_hex)
+			embed.add_field(name="CMYK", value="cmyk({}, {}, {}, {})".format(c, m, y, k))
+				
+		elif value.startswith('#'):
+			match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value)
+			if not match:
+				await ctx.send("Invalid Hex color format!")
+				return
+
+			embed_color = int("0x{}".format(value.replace('#', '')), 16)
+			embed = discord.Embed(color=embed_color)
+			r, g, b = self._hex_to_rgb(value)
+			c, m, y, k = self._rgb_to_cmyk(r, g, b)
+
+			embed.title = "Color {}".format(value.replace(" ", ""))
+			embed.add_field(name="RGB", value="rgb({}, {}, {})".format(r, g, b))
+			embed.add_field(name="CMYK", value="cmyk({}, {}, {}, {})".format(c, m, y, k))
+
+		elif value.startswith('cmyk'):
+			count = value.count('(') + value.count(')') + value.count(',')
+			if count != 5:
+				error = True
+
+			number_list = value.lower().replace("cmyk", "").replace("(", "").replace(")", "").replace(" ", "")
+
+			try:
+				c, m, y, k = map(int, number_list.split(','))
+			except:
+				error = True
+
+			if (c < 0 or c > 255) or (m < 0 or m > 255) or (y < 0 or y > 255) or (k < 0 or k > 255):
+				error = True
+			
+			if error:
+				await ctx.send("Invalid CMYK color format!")
+				return
+	
+			r, g, b = self._cmyk_to_rgb(c, m, y, k)
+			_hex = self._rgb_to_hex(r, g, b)
+
+			embed_color = int("0x{}".format(_hex.replace("#", '')), 16)
+			embed = discord.Embed(color=embed_color)
+
+			embed.title = "Color {}".format(value.replace(" ", ""))
+			embed.add_field(name="Hex", value=_hex)
+			embed.add_field(name="RGB", value="rgb({}, {}, {})".format(r, g, b))
+
+		await ctx.send(embed=embed)
+
 	@commands.command(pass_context=True)
 	async def slide(self, ctx, input_hex = None):
 		"""Calculates your slide value for Clover based on an input address (in hex)."""

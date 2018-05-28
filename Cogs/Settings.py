@@ -285,6 +285,8 @@ class Settings:
 			self.using_db = False
 			pass
 
+		self.migrated = False
+
 		if self.using_db:
 			self.db = client['pooter']
 			
@@ -308,10 +310,16 @@ class Settings:
 
 	def migrate(self, _file):
 		if os.path.exists(_file):
-			print("Settings.json file found, migrating it to database....")
 			try:
-				self.serverDict = json.load(open(_file))
-				self.flushSettings()
+				settings_json = json.load(open(_file))
+				if "migrated" not in settings_json:
+					print("Settings.json file found, migrating it to database....")
+					self.serverDict = settings_json
+					self.migrated = True
+					self.flushSettings(both=True)
+				else:
+					print("Settings.json file found, not migrating, because it has already been done!")
+
 			except Exception:
 				print("Migrating failed... Rip")
 				self.serverDict = {}
@@ -1138,6 +1146,7 @@ class Settings:
 			# Get a pymongo object out of the dict
 			json_ready = self.serverDict
 			json_ready.pop("_id", None)
+			json_ready["migrated"] = True
 
 			json.dump(json_ready, open(_file, 'w'), indent=2)
 
