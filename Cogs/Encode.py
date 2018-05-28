@@ -104,11 +104,12 @@ class Encode:
 		color #3399cc
 		color rgb(3, 4, 5)
 		"""
-		value = value.lower()
 		if not value:
 			await ctx.send("Usage: `{}color [value]`".format(ctx.prefix))
 			return
 
+		value = value.lower()
+		
 		if not any(value.startswith(x) for x in ["#", "rgb", "cmyk"]):
 			await ctx.send("Invalid value color format, please choose from rgb, cmyk or hex")
 			return
