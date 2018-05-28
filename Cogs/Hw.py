@@ -680,7 +680,10 @@ class Hw:
 				return
 		
 		# At this point - we *should* have a user and a build
-		msg = "__**{}'s {}:**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], buildParts['Hardware'])
+		msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
+		msg = msg_head + buildParts['Hardware']
+		if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
+			msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
@@ -690,7 +693,7 @@ class Hw:
 	async def rawhw(self, ctx, *, user : str = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
 		if not user:
-			user = ctx.author.name
+			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
 	
 		# Let's check for username and build name
 		parts = user.split()
@@ -822,7 +825,7 @@ class Hw:
 		"""Lists the builds for the specified user - or yourself if no user passed."""
 		usage = 'Usage: `{}listhw [user]`'.format(ctx.prefix)
 		if not user:
-			user = ctx.author.name
+			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
 		member = DisplayName.memberForName(user, ctx.guild)
 		if not member:
 			await ctx.channel.send(usage)

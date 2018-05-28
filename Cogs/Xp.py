@@ -395,6 +395,10 @@ class Xp:
 						leftover = xpAmount % len(memSorted)
 						eachXP = (xpAmount-leftover)/len(memSorted)
 						for i in range(0, len(memSorted)):
+							# Make sure we have anything to give
+							if leftover <= 0 and eachXP <= 0:
+								break
+							# Carry on with our xp distribution
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							if leftover>0:
 								self.settings.incrementStat(cMember, server, "XP", eachXP+1)

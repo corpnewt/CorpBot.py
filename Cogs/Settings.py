@@ -298,7 +298,6 @@ class Settings:
 		else:
 			# Fix the flush time to the jsonOnlyDump
 			self.settingsDump = self.jsonOnlyDump
-
 			self.load_json(file)
 
 
