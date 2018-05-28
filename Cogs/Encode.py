@@ -97,24 +97,23 @@ class Encode:
 	@commands.command()
 	async def color(self, ctx, *, value = None):
 		"""
-		View info on a rgb, hex or cmyk color their
-		values in other formats
+		View a RGB, hex or CMYK color and their values in other formats
 
 		Example usage:
-		color #3399cc
-		color rgb(3, 4, 5)
+		$color #3399cc
+		$color rgb(3, 4, 5)
 		"""
 		if not value:
 			await ctx.send("Usage: `{}color [value] [to]`".format(ctx.prefix))
 			return
 
 		if not any(value.startswith(x) for x in ["#", "rgb", "cmyk"]):
-			await ctx.send("Invalid value color format, please choose from rgb, cmyk or hex")
+			await ctx.send("Invalid value color format, please choose from RGB, CMYK or hex")
 			return
 
 		error = False
 
-		if value.startswith('rgb'):
+		if value.lower().startswith('rgb'):
 			count = value.count('(') + value.count(')') + value.count(',')
 			if count != 4:
 				error = True
@@ -145,7 +144,7 @@ class Encode:
 		elif value.startswith('#'):
 			match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value)
 			if not match:
-				await ctx.send("Invalid Hex color format!")
+				await ctx.send("Invalid hex color format!")
 				return
 
 			embed_color = int("0x{}".format(value.replace('#', '')), 16)
@@ -157,7 +156,7 @@ class Encode:
 			embed.add_field(name="RGB", value="rgb({}, {}, {})".format(r, g, b))
 			embed.add_field(name="CMYK", value="cmyk({}, {}, {}, {})".format(c, m, y, k))
 
-		elif value.startswith('cmyk'):
+		elif value.lower().startswith('cmyk'):
 			count = value.count('(') + value.count(')') + value.count(',')
 			if count != 5:
 				error = True
