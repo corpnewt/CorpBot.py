@@ -147,6 +147,7 @@ class Settings:
 		self.backupWait = 10 # initial wait time before first backup
 		self.settingsDump = 3600 # runs every hour
 		self.databaseDump = 300 # runs every 5 minutes
+		self.jsonOnlyDump = 300 # runs every 5 minutes if no database
 		self.bot = bot
 		self.prefix = prefix
 		self.loop_list = []
@@ -284,6 +285,8 @@ class Settings:
 			self.using_db = False
 			pass
 
+		self.migrated = False
+
 		if self.using_db:
 			self.db = client['pooter']
 			
@@ -293,6 +296,9 @@ class Settings:
 			# Load the database into the serverDict variable
 			self.load_local()
 		else:
+			# Fix the flush time to the jsonOnlyDump
+			self.settingsDump = self.jsonOnlyDump
+
 			self.load_json(file)
 
 
@@ -305,10 +311,16 @@ class Settings:
 
 	def migrate(self, _file):
 		if os.path.exists(_file):
-			print("Settings.json file found, migrating it to database....")
 			try:
-				self.serverDict = json.load(open(_file))
-				self.flushSettings()
+				settings_json = json.load(open(_file))
+				if "migrated" not in settings_json:
+					print("Settings.json file found, migrating it to database....")
+					self.serverDict = settings_json
+					self.migrated = True
+					self.flushSettings(both=True)
+				else:
+					print("Settings.json file found, not migrating, because it has already been done!")
+
 			except Exception:
 				print("Migrating failed... Rip")
 				self.serverDict = {}
@@ -1135,6 +1147,7 @@ class Settings:
 			# Get a pymongo object out of the dict
 			json_ready = self.serverDict
 			json_ready.pop("_id", None)
+			json_ready["migrated"] = True
 
 			json.dump(json_ready, open(_file, 'w'), indent=2)
 
