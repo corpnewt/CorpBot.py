@@ -312,7 +312,7 @@ class Settings:
 		if os.path.exists(_file):
 			try:
 				settings_json = json.load(open(_file))
-				if "migrated" not in settings_json:
+				if "mongodb_migrated" not in settings_json:
 					print("Settings.json file found, migrating it to database....")
 					self.serverDict = settings_json
 					self.migrated = True
@@ -1146,7 +1146,7 @@ class Settings:
 			# Get a pymongo object out of the dict
 			json_ready = self.serverDict
 			json_ready.pop("_id", None)
-			json_ready["migrated"] = True
+			json_ready["mongodb_migrated"] = True
 
 			json.dump(json_ready, open(_file, 'w'), indent=2)
 
