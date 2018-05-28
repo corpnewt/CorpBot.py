@@ -97,7 +97,7 @@ class Encode:
 	@commands.command()
 	async def color(self, ctx, *, value = None):
 		"""
-		View info on a rgb, hex or cmyk color their
+		View info on a rgb, hex or cmyk color and their
 		values in other formats
 
 		Example usage:
@@ -105,9 +105,11 @@ class Encode:
 		color rgb(3, 4, 5)
 		"""
 		if not value:
-			await ctx.send("Usage: `{}color [value] [to]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}color [value]`".format(ctx.prefix))
 			return
 
+		value = value.lower()
+		
 		if not any(value.startswith(x) for x in ["#", "rgb", "cmyk"]):
 			await ctx.send("Invalid value color format, please choose from rgb, cmyk or hex")
 			return
@@ -122,10 +124,11 @@ class Encode:
 			number_list = value.lower().replace("rgb", "").replace("(", "").replace(")", "").replace(" ", "")
 			try:
 				r, g, b = map(int, number_list.split(','))
-			except:
-				error = True
 
-			if (r < 0 or r > 255) or (g < 0 or g > 255) or (b < 0 or b > 255):
+				if (r < 0 or r > 255) or (g < 0 or g > 255) or (b < 0 or b > 255):
+					error = True
+
+			except:
 				error = True
 
 			if error:
@@ -166,10 +169,11 @@ class Encode:
 
 			try:
 				c, m, y, k = map(int, number_list.split(','))
-			except:
-				error = True
 
-			if (c < 0 or c > 255) or (m < 0 or m > 255) or (y < 0 or y > 255) or (k < 0 or k > 255):
+				if (c < 0 or c > 255) or (m < 0 or m > 255) or (y < 0 or y > 255) or (k < 0 or k > 255):
+					error = True
+
+			except:
 				error = True
 			
 			if error:
