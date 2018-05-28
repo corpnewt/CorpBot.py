@@ -8,6 +8,14 @@ import json
 import os
 import copy
 import subprocess
+
+try:
+	import pymongo
+except ImportError:
+	# I mean, it doesn't really matter as it can still revert to JSON
+	print("pymongo not installed, preparing to use JSON")
+	pass
+
 from   Cogs        import DisplayName
 from   Cogs        import Nullify
 
@@ -137,9 +145,9 @@ class Settings:
 		self.backupMax = 100
 		self.backupTime = 7200 # runs every 2 hours
 		self.backupWait = 10 # initial wait time before first backup
-		self.settingsDump = 300 # runs every 5 minutes
+		self.settingsDump = 3600 # runs every hour
+		self.databaseDump = 300 # runs every 5 minutes
 		self.bot = bot
-		self.serverDict = {}
 		self.prefix = prefix
 		self.loop_list = []
 		self.role = RoleManager(bot)
@@ -256,71 +264,78 @@ class Settings:
 				# Removed for spam
 				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
 
-		# Let's load our settings file
-		if os.path.exists(file):
-			self.serverDict = json.load(open(file))
-			if "Servers" in self.serverDict and type(self.serverDict["Servers"]) is list and os.path.exists("MigrateSettings.py"):
-				# Wrong type!  Update
-				print("Updating settings...\n")
-				sub_args = ['python', 'MigrateSettings.py', file ]
-				proc = subprocess.Popen(sub_args)
-				proc.wait()
-				# Reload json
-				self.serverDict = json.load(open(file))
-			# Verify that we're bool-oriented now, instead of string "yes"/"no"
-			changed_global = [
-				"OwnerLock"
-			]
-			changed_settings = [
-				"AdminLock",
-				"LastCallHidden",
-				"RequireOnline",
-				"AdminUnlimited",
-				"BotAdminAsAdmin",
-				"JoinPM",
-				"XPPromote",
-				"XPDemote",
-				"SuppressPromotions",
-				"SuppressDemotions",
-				"Killed",
-				"HungerLock",
-				"SuppressMentions"
-			]
-			changed_user_settings = [
-				"Muted"
-			]
-			checked = False
-			for x in self.serverDict:
-				if not x in changed_global:
-					continue
-				if type(self.serverDict[x]) is bool:
-					# Already done
-					checked = True
-					break
-				self.serverDict[x] = True if self.serverDict[x].lower() == "yes" else False
-			if not checked:
-				# We need to verify all our settings
-				for s_id in self.serverDict["Servers"]:
-					for s in changed_settings:
-						if not s in self.serverDict["Servers"][s_id]:
-							continue
-						if type(self.serverDict["Servers"][s_id][s]) is bool:
-							continue
-						# Set the bool vals
-						self.serverDict["Servers"][s_id][s] = True if self.serverDict["Servers"][s_id][s].lower() == "yes" else False
-					for m in self.serverDict["Servers"][s_id]["Members"]:
-						for ms in changed_user_settings:
-							if not ms in self.serverDict["Servers"][s_id]["Members"][m]:
-								continue
-							if type(self.serverDict["Servers"][s_id]["Members"][m][ms]) is bool:
-								continue
-							# Set the bool vals
-							self.serverDict["Servers"][s_id]["Members"][m][ms] = True if self.serverDict["Servers"][s_id]["Members"][m][ms].lower() == "yes" else False
-				# Flush our changes
-				self.flushSettings()
+		self.serverDict = {
+			"Servers"		:	{}
+		}
+
+		self.ip = "localhost"
+		self.port = 27017
+
+		print("Connecting to database on {}:{}...".format(self.ip, self.port))
+		client = pymongo.MongoClient(self.ip, self.port, serverSelectionTimeoutMS=100)
+
+		# See whether we actually connected to the database, this will throw an exception if not and if it does let's fall back on the JSON
+		try:
+			client.server_info()
+			print("Established connection!")
+			self.using_db = True
+		except Exception:
+			print("Connection failed, trying JSON")
+			self.using_db = False
+			pass
+
+		if self.using_db:
+			self.db = client['pooter']
+			
+			# Check if we need to migrate some things
+			self.migrate(file)
+
+			# Load the database into the serverDict variable
+			self.load_local()
 		else:
-			# File doesn't exist - create a placeholder
+			self.load_json(file)
+
+
+	def load_json(self, file):
+		if os.path.exists(file):
+			print("Since no mongoDB instance was running, I'm reverting back to the Settings.json")
+			self.serverDict = json.load(open(file))
+		else:
 			self.serverDict = {}
+
+	def migrate(self, _file):
+		if os.path.exists(_file):
+			print("Settings.json file found, migrating it to database....")
+			try:
+				self.serverDict = json.load(open(_file))
+				self.flushSettings()
+			except Exception:
+				print("Migrating failed... Rip")
+				self.serverDict = {}
+
+
+	def load_local(self):
+		# Load the database to the serverDict dictionary
+		print("Loading database to RAM...")
+		
+		# For some sharding I guess?
+		server_ids = [str(guild.id) for guild in self.bot.guilds]
+		
+		for collection_name in self.db.collection_names():
+			if collection_name == "Global":
+				global_collection = self.db.get_collection("Global").find_one()
+					
+				if global_collection:
+					for key, value in global_collection.items():
+						self.serverDict[key] = value
+				continue
+
+			# Sharding... only if the guild is accessible append it.
+			if collection_name in server_ids:
+				collection = self.db.get_collection(collection_name).find_one()
+				self.serverDict["Servers"][collection_name] = collection
+
+		print("Loaded database to RAM.")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -343,7 +358,7 @@ class Settings:
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		# Flush settings
-		self.flushSettings()
+		self.flushSettings(self.file, True)
 		# Shutdown role manager loop
 		self.role.clean_up()
 		for task in self.loop_list:
@@ -360,6 +375,8 @@ class Settings:
 		self.loop_list.append(self.bot.loop.create_task(self.backup()))
 		# Start the settings loop
 		self.loop_list.append(self.bot.loop.create_task(self.flushLoop()))
+		# Start the database loop
+		self.loop_list.append(self.bot.loop.create_task(self.flushLoopDB()))
 
 	async def checkAll(self):
 		# Check all verifications - and start timers if needed
@@ -422,6 +439,10 @@ class Settings:
 			self.loop_list.remove(task)
 
 	async def backup(self):
+		# Works only for JSON files, not for database yet... :(
+		# Works only for JSON files, not for database yet... :(
+		# Works only for JSON files, not for database yet... :(
+
 		# Wait initial time - then start loop
 		await asyncio.sleep(self.backupWait)
 		while not self.bot.is_closed():
@@ -453,7 +474,6 @@ class Settings:
 			else:
 				print("Settings Backed Up: {}".format(timeStamp))
 			await asyncio.sleep(self.backupTime)
-
 
 	def isOwner(self, member):
 		# This method converts prior, string-only ownership to a list,
@@ -798,7 +818,7 @@ class Settings:
 				# Set to nothing - no game prior
 				await self.bot.change_presence(game=None)
 		await channel.send(msg)
-		#self.flushSettings()
+
 
 
 	@commands.command(pass_context=True)
@@ -1051,28 +1071,81 @@ class Settings:
 			await ctx.channel.send(msg)
 			return
 		# Flush settings
-		self.flushSettings()
+		self.flushSettings(self.file, True)
 		msg = 'Flushed settings to disk.'
 		await ctx.channel.send(msg)
 				
 
 	# Flush loop - run every 10 minutes
-	async def flushLoop(self, file = None):
-		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
-		if not file:
-			file = self.file
+	async def flushLoopDB(self):
+		if not self.using_db:
+			return
+		print('Starting flush loop for database - runs every {} seconds.'.format(self.databaseDump))
 		while not self.bot.is_closed():
-			await asyncio.sleep(self.settingsDump)
+			await asyncio.sleep(self.databaseDump)
 			self.flushSettings()
 				
+	# Flush loop database - run every 10 minutes
+	async def flushLoop(self):
+		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
+		while not self.bot.is_closed():
+			await asyncio.sleep(self.settingsDump)
+			self.flushSettings(self.file)
+				
 	# Flush settings to disk
-	def flushSettings(self, file = None):
-		if not file:
-			file = self.file
-		if os.path.exists(file):
-			# Delete file - then flush new settings
-			os.remove(file)
-		json.dump(self.serverDict, open(file, 'w'), indent=2)
+	def flushSettings(self, _file = None, both = False):
+		def flush_db():
+			global_collection = self.db.get_collection("Global").find_one()
+			old_data = copy.deepcopy(global_collection)
+
+			for key, value in self.serverDict.items():
+				if key == "Servers":
+					continue
+
+				if not global_collection:
+					self.db["Global"].insert_one({key:value})
+					return
+
+				global_collection[key] = value
+
+			self.db["Global"].replace_one(old_data, global_collection)
+			
+			for key, value in self.serverDict["Servers"].items():
+				collection = self.db.get_collection(key).find_one()
+				if not collection:
+					self.db[key].insert_one(value)
+				else:
+					new_data = self.serverDict["Servers"][key]
+					self.db[key].delete_many({})
+					self.db[key].insert_one(new_data)
+
+		if not _file:
+			if not self.using_db:
+				# Not using a database, so we can't flush ;)
+				return
+
+			# We *are* using a database, let's flush
+			flush_db()
+			print("Flushed to DB!")
+		elif both and _file:
+			if os.path.exists(_file):
+				# Delete file - then flush new settings
+				os.remove(_file)
+
+			# Get a pymongo object out of the dict
+			json_ready = self.serverDict
+			json_ready.pop("_id", None)
+
+			json.dump(json_ready, open(_file, 'w'), indent=2)
+
+			# Not using a database, so we can't flush ;)
+			if not self.using_db:
+				print("Flushed to {}!".format(_file))
+				return
+
+			# We *are* using a database, let's flush!
+			flush_db()
+			print("Flushed to DB and {}!".format(_file))
 
 	@commands.command(pass_context=True)
 	async def prunelocalsettings(self, ctx):
@@ -1112,8 +1185,7 @@ class Settings:
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
 		await ctx.channel.send(msg)
 		# Flush settings
-		self.flushSettings()
-
+		self.flushSettings(self.file, True)
 
 	def _prune_servers(self):
 		# Remove any orphaned servers
@@ -1227,8 +1299,7 @@ class Settings:
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
 		await ctx.channel.send(msg)
 		# Flush settings
-		self.flushSettings()
-
+		self.flushSettings(self.file, True)
 
 	@commands.command(pass_context=True)
 	async def prune(self, ctx):
@@ -1276,4 +1347,4 @@ class Settings:
 		await ctx.channel.send(msg)
 
 		# Flush settings
-		self.flushSettings()
+		self.flushSettings(self.file, True)		
