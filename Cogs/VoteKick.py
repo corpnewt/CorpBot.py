@@ -490,33 +490,62 @@ class VoteKick:
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
-	async def vk(self, ctx, *, user = None):
+	async def vk(self, ctx, user = None, *, server = None):
 		"""Places your vote to have the passed user kicked."""
 		# Should be a dict like this:
 		# { "ID" : 123456789, "Kicks" : [ { "ID" : 123456789, "Added" : 123456789 } ] }
 		if user == None:
-			await ctx.send("Usage:  `{}vk [user]`".format(ctx.prefix))
+			await ctx.send('Usage:  `{}vk "[user]" [server]`'.format(ctx.prefix))
 			return
 
-		mute_votes = self.settings.getServerStat(ctx.guild, "VotesToMute")
-		ment_votes = self.settings.getServerStat(ctx.guild, "VotesToMention")
-		mute_time  = self.settings.getServerStat(ctx.guild, "VotesMuteTime")
-		ment_chan  = self.settings.getServerStat(ctx.guild, "VoteKickChannel")
-		vote_ment  = self.settings.getServerStat(ctx.guild, "VoteKickMention")
-		vote_anon  = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
+		if server == None:
+			guild = ctx.guild
+
+		else:
+			found = False
+			for guild in self.bot.guilds:
+				if not server.lower() in [guild.name.lower(), str(guild.id)]:
+					continue
+				found = True
+				break
+
+			if not found:
+				guild = ctx.guild
+				user = user + " " + server
+
+		if not guild and not server:
+			await ctx.send("Specify what server the user that you are vote kicking is in.")
+			return
+
+		elif not guild and server:
+			await ctx.send("I couldn't find that server.")
+			return
+
+		if ctx.author not in guild.members:
+			await ctx.send("You're not a member of that server!")
+			return
+
+		server_msg = " in **{}**".format(guild.name) if guild != ctx.guild else ""
+
+		check_user = DisplayName.memberForName(user, guild)
+		if not check_user:
+			await ctx.send("I couldn't find *{}*{}...".format(Nullify.clean(user), server_msg))
+
+			return
+
+		mute_votes = self.settings.getServerStat(guild, "VotesToMute")
+		ment_votes = self.settings.getServerStat(guild, "VotesToMention")
+		mute_time  = self.settings.getServerStat(guild, "VotesMuteTime")
+		ment_chan  = self.settings.getServerStat(guild, "VoteKickChannel")
+		vote_ment  = self.settings.getServerStat(guild, "VoteKickMention")
+		vote_anon  = self.settings.getServerStat(guild, "VoteKickAnon")
 		
 		if vote_anon:
 			await ctx.message.delete()
 
 		# Check if mention and mute are disabled
 		if (ment_votes == 0 or ment_chan == None or ment_chan == None) and (mute_votes == 0 or mute_time == 0):
-			await ctx.send('This function is not setup yet.')
-			return
-		
-
-		check_user = DisplayName.memberForName(user, ctx.guild)
-		if not check_user:
-			await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user)))
+			await ctx.send('This function is not setup{} yet.'.format(server_msg))
 			return
 		
 		# Check if we're trying to kick ourselves
@@ -527,7 +556,7 @@ class VoteKick:
 		# Check if we're trying to kick an admin
 		isAdmin = check_user.permissions_in(ctx.message.channel).administrator
 		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			checkAdmin = self.settings.getServerStat(guild, "AdminArray")
 			for role in check_user.roles:
 				for aRole in checkAdmin:
 					# Get the role that corresponds to the id
@@ -537,7 +566,7 @@ class VoteKick:
 			await ctx.channel.send('You cannot vote to kick the admins.  Please work out any issues you may have with them in a civil manner.')
 			return
 
-		vote_list = self.settings.getServerStat(ctx.guild, "VoteKickArray")
+		vote_list = self.settings.getServerStat(guild, "VoteKickArray")
 		for member in vote_list:
 			if member["ID"] == check_user.id:
 				# They're in the list - let's see if you've already voted for them
@@ -557,7 +586,7 @@ class VoteKick:
 			"Mentioned" : False,
 			"Kicks" : [ { "ID" : ctx.author.id, "Added" : time.time() } ]
 			})
-		await ctx.send("Vote kick added for *{}!*".format(DisplayName.name(check_user)))
+		await ctx.send("Vote kick added for *{}*{}!".format(DisplayName.name(check_user), server_msg))
 		await self._check_votes(ctx, check_user)
 
 	@commands.command(pass_context=True)
