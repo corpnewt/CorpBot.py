@@ -127,6 +127,8 @@ class Weather:
 		if not location:
 			await ctx.send("I couldn't find that city...")
 			return
+		print(type(location))
+		print(location)
 		location_info = location.location()
 		title = "{}, {} ({})".format(location_info.city(), location_info.country(), location_info.region()[1:])
 		
