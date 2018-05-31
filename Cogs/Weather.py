@@ -148,7 +148,7 @@ class Weather:
 		if index == 1 or index == 2:
 			current = "__**Future Forecast:**__"
 			fields = []
-			for f in location.forecast():
+			for f in location.forecast:
 				fields.append({ "name" : f.date, "value" : self._get_output(f.text) + ", {}/{} °F ({}/{} °C)".format(self._c_to_f(f.high), self._c_to_f(f.low), f.high, f.low), "inline" : False })
 			mess = await Message.Embed(title=title, description=current, fields=fields, color=ctx.author, pm_after=0, footer="Powered by Yahoo Weather").send(ctx)
 			if mess.channel == ctx.author.dm_channel and not index == 2:
