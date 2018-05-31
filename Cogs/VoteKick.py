@@ -495,7 +495,7 @@ class VoteKick:
 		# Should be a dict like this:
 		# { "ID" : 123456789, "Kicks" : [ { "ID" : 123456789, "Added" : 123456789 } ] }
 		if user == None:
-			await ctx.send("Usage:  `{}vk [user]`".format(ctx.prefix))
+			await ctx.send('Usage:  `{}vk "[user]" [server]`'.format(ctx.prefix))
 			return
 
 		if server == None:
@@ -504,7 +504,7 @@ class VoteKick:
 		else:
 			found = False
 			for guild in self.bot.guilds:
-				if guild.name.lower() != server.lower():
+				if not server.lower() in [guild.name.lower(), str(guild.id)]:
 					continue
 				found = True
 				break
@@ -525,9 +525,12 @@ class VoteKick:
 			await ctx.send("You're not a member of that server!")
 			return
 
+		server_msg = " in **{}**".format(guild.name) if guild != ctx.guild else ""
+
 		check_user = DisplayName.memberForName(user, guild)
 		if not check_user:
-			await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user)))
+			await ctx.send("I couldn't find *{}*{}...".format(Nullify.clean(user), server_msg))
+
 			return
 
 		mute_votes = self.settings.getServerStat(guild, "VotesToMute")
@@ -542,7 +545,7 @@ class VoteKick:
 
 		# Check if mention and mute are disabled
 		if (ment_votes == 0 or ment_chan == None or ment_chan == None) and (mute_votes == 0 or mute_time == 0):
-			await ctx.send('This function is not setup yet.')
+			await ctx.send('This function is not setup{} yet.'.format(server_msg))
 			return
 		
 		# Check if we're trying to kick ourselves
@@ -583,7 +586,7 @@ class VoteKick:
 			"Mentioned" : False,
 			"Kicks" : [ { "ID" : ctx.author.id, "Added" : time.time() } ]
 			})
-		await ctx.send("Vote kick added for *{}!*".format(DisplayName.name(check_user)))
+		await ctx.send("Vote kick added for *{}*{}!".format(DisplayName.name(check_user), server_msg))
 		await self._check_votes(ctx, check_user)
 
 	@commands.command(pass_context=True)
