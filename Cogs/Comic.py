@@ -395,12 +395,16 @@ class Comic:
 			# Retrieve html and info
 			imageHTML = await ComicHelper.getImageHTML(getURL)
 			if imageHTML:
+				print("Got HTML")
 				imagePage = ComicHelper.getCHURL(imageHTML, date['Year'] + "." + date['Month'] + "." + date['Day'])
 				if imagePage:
+					print("Got Image Page")
 					comicHTML = await ComicHelper.getImageHTML(imagePage)
 					if comicHTML:
+						print("Got Comic HTML")
 						imageURL  = ComicHelper.getCHImageURL( comicHTML )
 						if imageURL:
+							print("Got Comic")
 							gotComic = True
 				
 			tries += 1
