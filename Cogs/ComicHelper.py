@@ -138,9 +138,18 @@ def getImageTitle ( html ):
 
 def getCHURL ( html, date ):
 	# YYYY.MM.DD format
-	# <a href="[comic url]">2005.01.31</a>
-	comicBlock = find_last_between( html, '<a href="', "\">" + date + "</a>")
+
+	# <div class="small-3 medium-3 larg-3 columns">
+	#   ... <a href="/comics/4951">
+	# <div id="comic-author">
+	#   ... "\n2018.06.05"
 	
+	comicBlock = find_last_between( html, "<a href=", date)
+	if comicBlock:
+		comicBlock = comicBlock.split(">")[0]
+	if not "http" in comicBlock.lower():
+		comicBlock = "http://explosm.net" + comicBlock
+
 	if not comicBlock:
 		return None
 	else:
