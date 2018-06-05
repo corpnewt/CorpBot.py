@@ -467,7 +467,7 @@ class Comic:
 			await channel.send(msg)
 			return
 		
-		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Cyanide & Happiness Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), url=imageURL.strip(), color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
@@ -569,7 +569,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Calvin & Hobbes Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=getURL, url=getURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, getURL, imageDisplayName)
@@ -679,7 +679,7 @@ class Comic:
 			await channel.send(msg)
 			return
 
-		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
+		imageDisplayName = "Garfield Minus Garfield Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
 		# Download Image
 		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
