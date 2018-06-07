@@ -25,7 +25,6 @@ def get_years(timeBetween, year, reverse):
     return timeBetween, years, year
 
 def get_months(timeBetween, year, month, reverse):
-    total = 0
     months = 0
 
     while True:
@@ -37,7 +36,6 @@ def get_months(timeBetween, year, month, reverse):
 
         months += 1
         timeBetween -= month_seconds
-        total += month_seconds
 
         if reverse:
             if month > 1:
@@ -52,7 +50,7 @@ def get_months(timeBetween, year, month, reverse):
                 month = 1
                 year += 1
 
-    return months, total
+    return timeBetween, months
 
 def getReadableTimeBetween(first, last, reverse=False):
     # A helper function to make a readable string between two times
@@ -62,8 +60,7 @@ def getReadableTimeBetween(first, last, reverse=False):
     month = now.month
 
     timeBetween, years, year = get_years(timeBetween, year, reverse)
-    months, total = get_months(timeBetween, year, month, reverse)
-    timeBetween -= total
+    timeBetween, months = get_months(timeBetween, year, month, reverse)
     
     weeks   = int(timeBetween/604800)
     days    = int((timeBetween-(weeks*604800))/86400)
