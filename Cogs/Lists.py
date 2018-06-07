@@ -381,7 +381,7 @@ class Lists:
 						msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
 				try:
 					createdTime = int(alink['Created'])
-					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 					msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
 				except KeyError as e:
 					pass
@@ -392,7 +392,7 @@ class Lists:
 				try:
 					createdTime = alink['Updated']
 					createdTime = int(createdTime)
-					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 					msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
 				except:
 					pass
@@ -871,7 +871,7 @@ class Lists:
 						msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
 				try:
 					createdTime = int(alink['Created'])
-					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 					msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
 				except KeyError as e:
 					pass
@@ -1222,7 +1222,7 @@ class Lists:
 				lastOnline = None
 			if lastOnline:
 				currentTime = int(time.time())
-				timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime)
+				timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime, True)
 				msg = 'The last time I saw *{}* was *{} ago*.'.format(name, timeString)
 			else:
 				msg = 'I don\'t know when *{}* was last online.  Sorry.'.format(name)

@@ -346,14 +346,14 @@ class Profile:
 		msg = '**{}:**'.format(profile['Name'])
 		try:
 			createdTime = int(profile['Created'])
-			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 			msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
 		except KeyError as e:
 			msg = '{}\nCreated : `UNKNOWN`'.format(msg)
 		try:
 			createdTime = profile['Updated']
 			createdTime = int(createdTime)
-			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 			msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
 		except:
 			pass
