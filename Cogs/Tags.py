@@ -428,7 +428,7 @@ class Tags:
 						msg = '{}\nCreated By: `UNKNOWN`'.format(msg)
 				try:
 					createdTime = int(atag['Created'])
-					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 					msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
 				except KeyError as e:
 					pass
@@ -439,7 +439,7 @@ class Tags:
 				try:
 					createdTime = atag['Updated']
 					createdTime = int(createdTime)
-					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime)
+					timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
 					msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
 				except:
 					pass
