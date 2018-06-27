@@ -540,7 +540,7 @@ class VoteKick:
 		vote_ment  = self.settings.getServerStat(guild, "VoteKickMention")
 		vote_anon  = self.settings.getServerStat(guild, "VoteKickAnon")
 		
-		if vote_anon:
+		if vote_anon and not isinstance(ctx.channel, discord.DMChannel):
 			await ctx.message.delete()
 
 		# Check if mention and mute are disabled
