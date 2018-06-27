@@ -463,7 +463,7 @@ class Settings:
 				os.makedirs(self.backupDir)
 			# Flush backup
 			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-			self.flushSettings("./{}/Backup-{}.json".format(self.backupDir, timeStamp))
+			self.flushSettings("./{}/Backup-{}.json".format(self.backupDir, timeStamp), True)
 
 			# Get curr dir and change curr dir
 			retval = os.getcwd()
