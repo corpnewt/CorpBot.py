@@ -1141,7 +1141,7 @@ class Settings:
 			# We *are* using a database, let's flush
 			flush_db()
 			print("Flushed to DB!")
-		elif both and _file:
+		elif (both or not self.using_db) and _file:
 			if os.path.exists(_file):
 				# Delete file - then flush new settings
 				os.remove(_file)
