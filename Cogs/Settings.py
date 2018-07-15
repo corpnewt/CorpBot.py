@@ -821,7 +821,7 @@ class Settings:
 		if not ownerLock:
 			self.serverDict['OwnerLock'] = True
 			msg = 'Owner lock **Enabled**.'
-			await self.bot.change_presence(activity=discord.Activity(name="OwnerLocked", type=0)
+			await self.bot.change_presence(activity=discord.Activity(name="OwnerLocked", type=0))
 			# await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
 		else:
 			self.serverDict['OwnerLock'] = False
@@ -832,7 +832,7 @@ class Settings:
 			else:
 				# Set to nothing - no game prior
 				await self.bot.change_presence(game=None)'''
-			await self.bot.change_presence(activity=discord.Activity(status=self.serverDict.get("Status", None), name=self.serverDict.get("Game", None), url=self.serverDict.get("Stream", None), type=self.serverDict.get("Type", 0))
+			await self.bot.change_presence(activity=discord.Activity(status=self.serverDict.get("Status", None), name=self.serverDict.get("Game", None), url=self.serverDict.get("Stream", None), type=self.serverDict.get("Type", 0)))
 		await channel.send(msg)
 
 
