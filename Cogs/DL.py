@@ -5,23 +5,23 @@ def setup(bot):
 	pass
 
 async def async_post_json(url, data = None, headers = None):
-    with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
             return await response.json()
 
 async def async_post_text(url, data = None, headers = None):
-    with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
             res = await response.read()
             return res.decode("utf-8", "replace")
 
 async def async_post_bytes(url, data = None, headers = None):
-    with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
             return await response.read()
 
 async def async_head_json(url, headers = None):
-    with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.head(url) as response:
             return await response.json()
 
