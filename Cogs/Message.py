@@ -250,7 +250,7 @@ class Embed:
         if self.image:
             em.set_image(url=self.image)
         if self.thumbnail:
-            em.set_thumbnail(self.thumbnail)
+            em.set_thumbnail(url=self.thumbnail)
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
