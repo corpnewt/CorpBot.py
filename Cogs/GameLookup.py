@@ -2,15 +2,20 @@ import asyncio
 import discord
 import time
 import parsedatetime
-from igdb_api_python.igdb import igdb
+import os
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Settings
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import CheckRoles
+from   Cogs import Message
+from   Cogs import UserTime
+
+try:
+    from igdb_api_python.igdb import igdb
+    LOADED = True
+except:
+    # Missing the api
+    LOADED = False
 
 Platform_Lookup ={3:'Linux',
         4:'Nintendo 64',
@@ -168,25 +173,28 @@ Platform_Lookup ={3:'Linux',
         165:'PlayStation VR'}
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Lookup(bot, settings))
+    if not LOADED:
+        print("Missing IGDB API - skipping")
+        return
+    # Do some simple setup
+    if not os.path.exists("igdbKey.txt"):
+        print("Missing igdbKey.txt - skipping")
+        return
+    with open("igdbKey.txt", "r") as f:
+        key = f.read().strip()
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(GameLookup(bot, settings, key))
 
-class Lookup:
-    def __init__(self, bot, settings):
+class GameLookup:
+    def __init__(self, bot, settings, key):
         self.bot = bot
         self.settings = settings
-
-    def suppressed(self, guild, msg):
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(guild, "SuppressMentions"):
-            return Nullify.clean(msg)
-        else:
-            return msg
+        self.key = key
 
     @commands.command()
     async def gamelookup(self, ctx, *,game: str):
-        igdb1 = igdb("YourKeyHere")
+        igdb1 = igdb(self.key)
         result = igdb1.games({
             'search': "{}".format(game),
             'fields': ['name','game',
@@ -199,15 +207,21 @@ class Lookup:
         platformconvert = GameInfo['platforms']
         gameurl = GameInfo['url']
         platformconvert.sort()
-        plat = ''
-        for i in platformconvert:
-            plat += Platform_Lookup[i] + '\n'
-        date = time.strftime("%a, %b %d %Y", time.localtime(GameInfo['first_release_date']/1000.))
-        summary = GameInfo['summary'] if len(GameInfo['summary']) <= 1024 else GameInfo['summary'][:1021]+'...'
-        embed=discord.Embed(title=GameInfo['name'], url=gameurl, color=0xed)
-        embed.add_field(name="Summary", value=summary, inline=False)
-        embed.add_field(name="Release Date", value=date, inline=True)
-        embed.add_field(name="Platforms", value=plat, inline=True)
-        embed.set_thumbnail(url="http:{}".format(cover['url']))
-        await ctx.send(embed=embed)
-
+        plat = "\n".join([Platform_Lookup[x] for x in platformconvert])
+        gt_dict = UserTime.getUserTime(
+                        ctx.author,
+                        self.settings,
+                        datetime.fromtimestamp(time.mktime(time.localtime(GameInfo["first_release_date"]/1000.)))
+                    )
+        game_time = "{} {}".format(gt_dict['time'], gt_dict['zone'])
+        await Message.Embed(
+            title=GameInfo["name"],
+            thumbnail="http:{}".format(cover["url"]),
+            url=gameurl,
+            color=ctx.author,
+            fields=[
+                {"name":"Summary", "value":GameInfo['summary'] if len(GameInfo['summary']) <= 1024 else GameInfo['summary'][:1021]+'...'},
+                {"name":"Release Date", "value":game_time},
+                {"name":"Platforms", "value":plat}
+            ]
+        ).send(ctx)
