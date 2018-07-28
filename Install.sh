@@ -125,6 +125,11 @@ function main () {
     update "pymongo"
     echo
 
+    echo Updating IGDB API
+    echo
+    update "igdb_api_python"
+    echo
+
     #echo Updating Flask...
     #echo
     #update "Flask"
