@@ -136,6 +136,11 @@ echo.
 call :install "pymongo"
 echo.
 
+echo Installing IGDB API
+echo.
+call :install "igdb_api_python"
+echo.
+
 REM echo Installing Flask...
 REM echo.
 REM call :install "Flask"
