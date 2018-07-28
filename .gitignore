@@ -1,3 +1,6 @@
+# IGDB api key
+igdbKey*.txt
+
 # Token file
 token*.txt
 
