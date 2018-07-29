@@ -8,7 +8,7 @@ import time
 import sys
 import fnmatch
 import subprocess
-import pyspeedtest
+import speedtest
 import json
 import struct
 from   PIL         import Image
@@ -407,13 +407,18 @@ class Bot:
 			return
 
 		message = await channel.send('Running speed test...')
-		st = pyspeedtest.SpeedTest()
-		msg = '**Speed Test Results:**\n'
-		msg += '```\n'
-		msg += '    Ping: {}\n'.format(round(st.ping(), 2))
-		msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
-		msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
-		await message.edit(content=msg)
+		try:
+			st = speedtest.Speedtest()
+			st.get_best_server()
+			msg = '**Speed Test Results:**\n'
+			msg += '```\n'
+			await message.edit(content="Running speed test...\n- Downloading...")
+			msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
+			await message.edit(content="Running speed test...\n- Downloading...\n- Uploading...")
+			msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
+			await message.edit(content=msg)
+		except Exception as e:
+			await message.edit(content="Speedtest Error: {}".format(str(e)))
 		
 		
 	@commands.command(pass_context=True)
