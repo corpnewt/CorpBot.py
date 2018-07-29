@@ -410,12 +410,17 @@ class Bot:
 		try:
 			st = speedtest.Speedtest()
 			st.get_best_server()
+			l = asyncio.get_event_loop()
 			msg = '**Speed Test Results:**\n'
 			msg += '```\n'
 			await message.edit(content="Running speed test...\n- Downloading...")
-			msg += 'Download: {}MB/s\n'.format(round(st.download()/1024/1024, 2))
+			a = self.bot.loop.run_in_executor(None, st.download)
+			d = await a
+			msg += 'Download: {}MB/s\n'.format(round(d/1024/1024, 2))
 			await message.edit(content="Running speed test...\n- Downloading...\n- Uploading...")
-			msg += '  Upload: {}MB/s```'.format(round(st.upload()/1024/1024, 2))
+			a = self.bot.loop.run_in_executor(None, st.upload)
+			u = await a
+			msg += '  Upload: {}MB/s```'.format(round(u/1024/1024, 2))
 			await message.edit(content=msg)
 		except Exception as e:
 			await message.edit(content="Speedtest Error: {}".format(str(e)))
