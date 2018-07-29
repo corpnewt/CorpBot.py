@@ -161,7 +161,7 @@ if __name__ == '__main__':
         {"name":"pyparsing"},
         {"name":"pyquery"},
         {"name":"pyaiml", "item":"git+https://github.com/paulovn/python-aiml"},
-        {"name":"pyspeedtest"},
+        {"name":"speedtest-cli"},
         {"name":"pytz"},
         {"name":"wikipedia"},
         {"name":"mtranslate"},
