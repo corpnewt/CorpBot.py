@@ -1,3 +1,6 @@
+# Anythings starting with .
+.*
+
 # IGDB api key
 igdbKey*.txt
 
