@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
+from Cogs import DisplayName
 
 def setup(bot):
     bot.add_cog(Clippy(bot))
@@ -43,6 +44,8 @@ class Clippy:
         image_height = image.size[1]
         image_width = image.size[0]
         draw = ImageDraw.Draw(image)
+
+        text = DisplayName.clean_message(text, bot=self.bot, server=ctx.guild)
 
         font = ImageFont.truetype('fonts/comic.ttf', size=20)
         #340 is the width we want to set the image width to
