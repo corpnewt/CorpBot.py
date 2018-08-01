@@ -1,4 +1,4 @@
-import discord
+import discord, os
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 from Cogs import DisplayName
@@ -62,3 +62,6 @@ class Clippy:
 
         image.save('images/clippynow.png')
         await ctx.send(file=discord.File(fp='images/clippynow.png'))
+
+        # Remove the png
+        os.remove("images/clippynow.png")
