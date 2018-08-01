@@ -12,6 +12,10 @@ class Clippy:
         self.bot = bot
 
     def text_wrap(self, text, font, max_width):
+        # Replace \n, \r, and \t with a space
+        text = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+        # Let's ensure the text is only single-spaced
+        text = " ".join([x for x in text.split(" ") if len(x)])
         lines = []
         # If the width of the text is smaller than image width
         # we don't need to split it, just add it to the lines array
