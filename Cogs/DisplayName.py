@@ -19,7 +19,8 @@ def clean_message(message, *, bot = None, server = None, nullify = True):
     if bot == None and server == None:
         # Not enough info
         return message
-    matches_re = re.finditer(r"\<!?\@[^\<\@]+\>", message)
+    # Check for matches
+    matches_re = re.finditer(r"\<[!&#\@]*[^<\@!&#]+[0-9]\>", message)
     matches = []
     matches = [x.group(0) for x in matches_re]
     if not len(matches):
@@ -28,8 +29,14 @@ def clean_message(message, *, bot = None, server = None, nullify = True):
         if server:
             # Have the server, bot doesn't matter
             mem = memberForName(match, server)
-            if mem == None:
-                continue
+            if not mem:
+                # Check for role
+                mem = roleForName(match, server)
+                if not mem:
+                    # Check for channel
+                    mem = channelForName(match, server)
+                    if not mem:
+                        continue
             mem_name = name(mem)
         else:
             # Must have bot then
