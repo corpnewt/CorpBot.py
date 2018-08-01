@@ -28,15 +28,18 @@ def clean_message(message, *, bot = None, server = None, nullify = True):
     for match in matches:
         if server:
             # Have the server, bot doesn't matter
-            mem = memberForName(match, server)
-            if not mem:
-                # Check for role
+            # Let's do this right
+            if "#" in match:
+                # It should be a channel
+                mem = channelForName(match, server)
+            elif "&" in match:
+                # It should be a role
                 mem = roleForName(match, server)
-                if not mem:
-                    # Check for channel
-                    mem = channelForName(match, server)
-                    if not mem:
-                        continue
+            else:
+                # Guess it's a user
+                mem = memberForName(match, server)
+            if not mem:
+                continue
             mem_name = name(mem)
         else:
             # Must have bot then
