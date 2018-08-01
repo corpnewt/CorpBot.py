@@ -1,4 +1,4 @@
-import discord, os
+import discord, os, random
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 from Cogs import DisplayName
@@ -37,7 +37,7 @@ class Clippy:
         return lines
     
     @commands.command()
-    async def clippy(self, ctx, *,text: str):
+    async def clippy(self, ctx, *,text: str = ""):
         """I *know* you wanted some help with something - what was it?"""
         image = Image.open('images/clippy.png')
         image_size = image.size
@@ -46,6 +46,20 @@ class Clippy:
         draw = ImageDraw.Draw(image)
 
         text = DisplayName.clean_message(text, bot=self.bot, server=ctx.guild)
+        # Remove any non-ascii chars
+        text = ''.join([i for i in text if ord(i) < 128])
+
+        clippy_errors = [
+            "I guess I couldn't print that... whatever it was.",
+            "It looks like you're trying to break things!  Maybe I can help.",
+            "Whoops, I guess I wasn't coded to understand that.",
+            "After filtering your input, I've come up with... well... nothing.",
+            "Nope.",
+            "y u du dis to clippy :("
+        ]
+
+        if not len(text):
+            text = random.choice(clippy_errors)
 
         font = ImageFont.truetype('fonts/comic.ttf', size=20)
         #340 is the width we want to set the image width to
