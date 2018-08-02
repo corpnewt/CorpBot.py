@@ -72,10 +72,11 @@ class Clippy:
         (x, y) = (25, 20)
         color = 'rgb(0, 0, 0)' # black color
         text_size = draw.textsize(text, font=font)
-        image_x = (image_width / 2) - (text_size[0] / 2)
 
         for line in lines:
-            draw.text((x, y), line, fill=color, font=font)
+            text_size = draw.textsize(line, font=font)
+            image_x = (image_width /2 ) - (text_size[0]/2)
+            draw.text((image_x, y), line, fill=color, font=font)
             y = y + line_height
 
         image.save('images/clippynow.png')
