@@ -57,19 +57,19 @@ class Lists:
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredLinkRole")
+		isAdmin = author.permissions_in(channel).administrator
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
-			hasPerms = False
+			hasPerms = isAdmin
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 				
@@ -121,19 +121,19 @@ class Lists:
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredLinkRole")
+		isAdmin = author.permissions_in(channel).administrator
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
-			hasPerms = False
+			hasPerms = isAdmin
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		
@@ -546,19 +546,19 @@ class Lists:
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredHackRole")
+		isAdmin = author.permissions_in(channel).administrator
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
-			hasPerms = False
+			hasPerms = isAdmin
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 				
@@ -611,19 +611,19 @@ class Lists:
 		
 		# Check for role requirements
 		requiredRole = self.settings.getServerStat(server, "RequiredHackRole")
+		isAdmin = author.permissions_in(channel).administrator
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
 			if not isAdmin:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		else:
 			#role requirement
-			hasPerms = False
+			hasPerms = isAdmin
 			for role in author.roles:
 				if str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+			if not hasPerms:
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
 		
