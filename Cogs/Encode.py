@@ -230,7 +230,7 @@ class Encode:
 		hex_pairs = [input_hex[i:i + 2] for i in range(0, len(input_hex), 2)]
 		hex_rev = hex_pairs[::-1]
 		hex_str = "".join(["".join(x) for x in hex_rev])
-		await ctx.send("0x" + hex_str.upper())
+		await ctx.send(hex_str.upper())
 		
 	@commands.command(pass_context=True)
 	async def hexdec(self, ctx, *, input_hex = None):
