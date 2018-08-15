@@ -34,8 +34,8 @@ class Encode:
 
 	# Check hex value
 	def _check_hex(self, hex_string):
-		if hex_string.lower().startswith("0x"):
-			hex_string = hex_string[2:]
+		# Remove 0x/0X
+		hex_string = hex_string.replace("0x", "").replace("0X", "")
 		hex_string = re.sub(r'[^0-9A-Fa-f]+', '', hex_string)
 		return hex_string
 
