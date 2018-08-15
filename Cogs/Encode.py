@@ -250,7 +250,7 @@ class Encode:
 		min_length = 2
 		hex_str = "{:x}".format(input_dec).upper()
 		hex_str = "0"*(len(hex_str)%min_length)+hex_str
-		await ctx.send(hex_str)
+		await ctx.send("0x"+hex_str)
 
 
 	@commands.command(pass_context=True)
