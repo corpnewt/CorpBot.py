@@ -216,6 +216,23 @@ class Encode:
 		await ctx.send("```\nslide={}\n```".format(slide_float))
 	
 	@commands.command(pass_context=True)
+	async def hexswap(self, ctx, *, input_hex = None):
+		"""Byte swaps the passed hex value."""
+		if input_hex == None:
+			await ctx.send("Usage: `{}hexswap [input_hex]`".format(ctx.prefix))
+			return
+		input_hex = self._check_hex(input_hex)
+		if not len(input_hex):
+			await ctx.send("Malformed hex - try again.")
+			return
+		# Normalize hex into pairs
+		input_hex = list("0"*(len(input_hex)%2)+input_hex)
+		hex_pairs = [input_hex[i:i + 2] for i in range(0, len(input_hex), 2)]
+		hex_rev = hex_pairs[::-1]
+		hex_str = "".join(hex_rev)
+		await ctx.send("0x" + hex_str.upper())
+		
+	@commands.command(pass_context=True)
 	async def hexdec(self, ctx, *, input_hex = None):
 		"""Converts hex to decimal."""
 		if input_hex == None:
