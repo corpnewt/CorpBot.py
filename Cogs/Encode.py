@@ -318,11 +318,11 @@ class Encode:
 	
 
 	@commands.command(pass_context=True)
-	async def encode(self, ctx, value = None , from_type = None, *, to_type = None):
+	async def encode(self, ctx, from_type = None , to_type = None, *, value = None):
 		"""Data converter from ascii <--> hex <--> base64."""
 
 		if value == None or from_type == None or to_type == None:
-			msg = 'Usage: `{}encode "[value]" [from_type] [to_type]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
+			msg = 'Usage: `{}encode [from_type] [to_type] [value]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
 			await ctx.send(msg)
 			return
 
