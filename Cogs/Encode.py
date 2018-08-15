@@ -249,6 +249,7 @@ class Encode:
 			return
 		min_length = 2
 		hex_str = "{:x}".format(input_dec).upper()
+		print(len(hex_str)%min_length)
 		hex_str = ("0"*(len(hex_str)%min_length))+hex_str
 		await ctx.send("0x" + "{:x}".format(input_dec).upper())
 
