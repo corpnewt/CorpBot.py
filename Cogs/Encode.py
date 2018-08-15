@@ -248,7 +248,8 @@ class Encode:
 			await ctx.send("Input must be an integer.")
 			return
 		min_length = 2
-		hex_str = ("0"*(len(hex_str)%min_length))+"{:x}".format(input_dec).upper()
+		hex_str = "{:x}".format(input_dec).upper()
+		hex_str = ("0"*(len(hex_str)%min_length))+hex_str
 		await ctx.send("0x" + "{:x}".format(input_dec).upper())
 
 
