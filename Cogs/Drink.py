@@ -25,7 +25,10 @@ class Drink:
 		if member == None:
 			nothingList = [ 'you stare at your glass full of *nothing*...',
 							'that cup must\'ve had something in it, so you drink *nothing*...',
-							'you should probably just go get a drink.']
+							'you should probably just go get a drink.',
+							'that desk looks pretty empty',
+							'are you sure you know what drinking is?',
+							'you desperatly search for something to drink']
 
 			randnum = random.randint(0, len(nothingList)-1)
 			msg = '*{}*, {}'.format(authorName, nothingList[randnum])
@@ -43,21 +46,28 @@ class Drink:
 								'You search for me, only to realise that *I* am already drinking you!',
 								'I\'m a bot.  You can\'t drink me.',
 								'you stick a straw in... wait... in nothing, because I\'m *digital!*.',
-								'what do you think I am to let you drink me?']
+								'what do you think I am to let you drink me?',
+								'I don\'t think you would like the taste of me.',
+								'you can\'t drink me, I\'m a machine!']
 			elif memberCheck.id == ctx.message.author.id:
 				# We're drinking... ourselves?
 				memberList = [  'you stab yourself with a straw - not surprisingly, it hurts.',
 								'you fit yourself in to a cup, but you just can\'t do it.',
 								'you happily drink away, but you are now very floppy.',
 								'wait - you\'re not a drink!',
-								'you might not be the smartest...']
+								'you might not be the smartest...',
+								'you might have some issues.',
+								'you try to drink yourself.',
+								'why would you drink yourself?']
 			else:
 				memName = DisplayName.name(memberCheck)
 				memberList = [ 'you grab your lucky straw and empty *{}* in one sip.'.format(memName),
 								'you try to drink *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...'.format(memName),
 								'you drink a small sip of *{}*.  They probably didn\'t even notice.'.format(memName),
 								'you stab your straw into *{}\'s* shoulder - You run away as they run after you.'.format(memName),
-								'you happily drink away - *{}* starts to look like an empty Capri Sun package.'.format(memName)]
+								'you happily drink away - *{}* starts to look like an empty Capri Sun package.'.format(memName),
+								'you are thirsty - *{}* sacrifices themself involuntarily.'.format(memName),
+								'somehow you end up emptying *{}*.'.format(memName)]
 			randnum = random.randint(0, len(memberList)-1)
 			msg = '*{}*, {}'.format(authorName, memberList[randnum])
 			msg = Nullify.clean(msg)				
@@ -68,8 +78,11 @@ class Drink:
 		itemList = [ 	'you take a big sip of *{}*. *Delicious.*'.format(member),
 						'your straw sinks into *{}* - it tastes satisfying.'.format(member),
 						'you thirstly guzzle *{}*, it\'s lovely!'.format(member),
-						'you just can\'t bring yourself to drimk *{}* - so you just hold it for awhile...'.format(member),
-						'you attempt to drain *{}*, but you\'re clumsier than you remember - and fail...'.format(member),]
+						'you just can\'t bring yourself to drink *{}* - so you just hold it for awhile...'.format(member),
+						'you attempt to drain *{}*, but you\'re clumsier than you remember - and fail...'.format(member),
+						'you drink *{}*.'.format(member),
+						'*{}* dries up from your drinking.'.format(member),
+						'*{}* starts resembling the Aral Sea.'.format(member)]
 
 		randnum = random.randint(0, len(itemList)-1)
 		msg = '*{}*, {}'.format(authorName, itemList[randnum])
