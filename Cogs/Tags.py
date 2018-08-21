@@ -98,23 +98,24 @@ class Tags:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredTagRole")
-		if requiredRole == "":
-			#admin only
-			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
+		# Check if we're admin/bot admin first - then check for a required role
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			if any(x for x in checkAdmin for y in ctx.author.roles if str(x["ID"]) == str(y.id)):
+				isAdmin = True
+		if not isAdmin:
+			# Check for role requirements
+			requiredRole = self.settings.getServerStat(server, "RequiredTagRole")
+			if requiredRole == "":
+				#admin only
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
-		else:
-			#role requirement
-			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
-					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			else:
+				#role requirement
+				if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)):
+					await channel.send('You do not have sufficient privileges to access this command.')
+					return
 				
 		# Passed role requirements!
 		if name == None or tag == None:
@@ -162,23 +163,24 @@ class Tags:
 		else:
 			suppress = False
 		
-		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredTagRole")
-		if requiredRole == "":
-			#admin only
-			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
+		# Check if we're admin/bot admin first - then check for a required role
+		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+			if any(x for x in checkAdmin for y in ctx.author.roles if str(x["ID"]) == str(y.id)):
+				isAdmin = True
+		if not isAdmin:
+			# Check for role requirements
+			requiredRole = self.settings.getServerStat(server, "RequiredTagRole")
+			if requiredRole == "":
+				#admin only
 				await channel.send('You do not have sufficient privileges to access this command.')
 				return
-		else:
-			#role requirement
-			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
-					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			else:
+				#role requirement
+				if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)):
+					await channel.send('You do not have sufficient privileges to access this command.')
+					return
 		
 		if name == None:
 			msg = 'Usage: `{}removetag "[tag name]"`'.format(ctx.prefix)
