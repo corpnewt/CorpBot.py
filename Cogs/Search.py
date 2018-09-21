@@ -127,21 +127,18 @@ class Search:
 
 		if frm == None or to == None or amount <= 0:
 			hasError = True
-		
-		if hasError == True:
-			r = await DL.async_text("http://www.xe.com/currency/")
+
+		# Get the list of currencies
+		r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies")
+
+		if hasError:
+			# Gather our currency list
 			curr_list = []
-			try:
-				lst = r.split("search-text'>")
-				for l in lst:
-					curr_list.append(l.split("<")[0])
-				if not "XBT - Bitcoin" in curr_list:
-					curr_list.append("XBT - Bitcoin")
-				curr_list = sorted(curr_list)
-			except:
-				curr_list = []
-			await ctx.send("Usage: `{}convert [amount] [from_currency] [to_currency]`".format(ctx.prefix))
+			for l in r.get("results",{}):
+				# l is the key - let's format a list
+				curr_list.append("{} - {}".format(r["results"][l]["id"], r["results"][l]["currencyName"]))
 			if len(curr_list):
+				curr_list = sorted(curr_list)
 				await Message.EmbedText(
 					title="Currency List",
 					description="\n".join(curr_list),
@@ -150,35 +147,29 @@ class Search:
 					pm_after=0,
 					color=ctx.author
 				).send(ctx)
+				return
+
+		# Verify we have a proper from/to type
+		if not frm.upper() in r.get("results",{}):
+			await ctx.send("Invalid from currency!")
+			return
+		if not to.upper() in r.get("results",{}):
+			await ctx.send("Invalid to currency!")
 			return
 
-		if"to" in to:
-			to = to.replace("to","")
-			to = to.strip()
+		# At this point, we should be able to convert
+		o = await DL.async_json("http://free.currencyconverterapi.com/api/v5/convert?q={}_{}&compact=y".format(frm.upper(), to.upper()))
 
-		# convert_url = "https://finance.google.com/finance/converter?a={}&from={}&to={}".format(amount,frm,to)
-		convert_url = "http://www.xe.com/currencyconverter/convert/?Amount={}&From={}&To={}".format(amount,frm,to)
-		r = await DL.async_text(convert_url)
-
-		try:
-			amt = r.split("uccResultAmount'>")[1].split("<")[0]
-			to  = r.split("uccToCurrencyCode'>")[1].split("<")[0]
-			results = [amt, to]
-		except:
-			await ctx.send("Error getting currency conversion results :(")
+		if not o:
+			await ctx.send("Whoops!  I couldn't get that :(")
 			return
 		
-		'''doc = pq(r)
-		result = str(doc('#uccResultAmount span').text())
-		results = result.split(" ")'''
-		
-		if len(results):
-			amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
-			results[0] = float(results[0].replace(",", ""))
-			results[0] = "{:,}".format(int(results[0])) if int(results[0]) == float(results[0]) else "{:,f}".format(results[0]).rstrip("0")
-			await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(),results[0], results[1]))
-		else:
-			await ctx.channel.send("Whoops!  I couldn't make that conversion.")
+		# Format the numbers
+		val = o[list(o)[0]]["val"]
+		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
+		output = float(amount)*float(val)
+		output = "{:,}".format(int(output)) if int(output) == float(output) else "{:,f}".format(output).rstrip("0")
+		await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(), output, str(to).upper()))
 
 	async def find_category(self, categories, category_to_search):
 		"""recurse through the categories and sub categories to find the correct category"""
