@@ -1405,7 +1405,7 @@ class Bot:
 		# Set up some lists
 		extensions = []
 		code_count = []
-		include = ['py','bat','sh']
+		include = ['py','bat','sh','command']
 		
 		# Get the extensions - include our include list
 		extensions = self.get_extensions(path, include)
