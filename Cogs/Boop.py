@@ -17,11 +17,11 @@ class Boop:
 
 	@commands.command(pass_context=True)
 	async def boop(self, ctx, *, member : str = None):
-		"""Drink like a boss."""
+		"""Boop da snoot."""
 
 		authorName = DisplayName.name(ctx.message.author)
 
-		# Check if we're drinking nothing
+		# Check if we're booping nothing
 		if member == None:
 			nothingList = [ 'you stretch out your hand in the air, but there\'s nothing there...',
 							'you try and find someone to boop, but there\'s no one there.',
@@ -36,11 +36,11 @@ class Boop:
 			await ctx.channel.send(msg)
 			return
 		
-		# Check if we're drinking a member
+		# Check if we're booping a member
 		memberCheck = DisplayName.memberForName(member, ctx.message.guild)
 		if memberCheck:
 			if memberCheck.id == ctx.message.author.id:
-				# We're drinking... ourselves?
+				# We're booping... ourselves?
 				memberList = [  'you boop yourself on the nose with your finger.',
 								'you try to boop your head, but your hand gets lost along the way.',
 								'you happily boop yourself, but you are now very giddy.',
@@ -65,7 +65,7 @@ class Boop:
 			await ctx.channel.send(msg)
 			return
 
-		# Assume we're drinking something else
+		# Assume we're booping something else
 		itemList = [ 	'you put your hand onto *{}*\'s head. *Bliss.*'.format(member),
 						'your hand touches *{}*\'s snoot - it feels satisfying.'.format(member),
 						'you happily boop *{}*, it\'s lovely!'.format(member),
