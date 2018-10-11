@@ -7,7 +7,7 @@ from   Cogs import Nullify
 
 def setup(bot):
 	# Add the bot
-	bot.add_cog(Drink(bot))
+	bot.add_cog(Boop(bot))
 
 class Boop:
 
