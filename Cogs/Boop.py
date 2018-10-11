@@ -9,7 +9,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(Drink(bot))
 
-class Drink:
+class Boop:
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
@@ -58,7 +58,7 @@ class Drink:
 								'you happily drum your fingers away - *{}* starts to look annoyed.'.format(memName),
 								'you\'re feeling boopy - *{}* sacrifices themself involuntarily.'.format(memName),
 								'somehow you end up booping *{}*.'.format(memName),
-								'you climb *{}*\'s head and jump on it... they feel amused.']
+								'you climb *{}*\'s head and  use it as a bouncy castle... they feel amused.'.format(memName)]
 			randnum = random.randint(0, len(memberList)-1)
 			msg = '*{}*, {}'.format(authorName, memberList[randnum])
 			msg = Nullify.clean(msg)				
