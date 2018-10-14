@@ -85,8 +85,10 @@ class Bot:
 	async def botinfo(self, ctx):
 		"""Lists some general stats about the bot."""
 		bot_member = ctx.guild.get_member(self.bot.user.id)
-		server_embed = discord.Embed(color=bot_member.color)
-		server_embed.title = DisplayName.name(bot_member) + " Info"
+		'''server_embed = discord.Embed(color=bot_member.color)
+		server_embed.title = DisplayName.name(bot_member) + " Info"'''
+		
+		message = await Message.EmbedText(title="Gathering info...", color=bot_member).send(ctx)
 		
 		# Get guild count
 		guild_count = "{:,}".format(len(self.bot.guilds))
@@ -174,9 +176,9 @@ class Bot:
 			status_text = ":heart:"
 		elif bot_member.status == discord.Status.idle:
 			status_text = ":yellow_heart:"
-			
+		
 		# Build the embed
-		server_embed.add_field(name="Members", value=member_count, inline=True)
+		'''server_embed.add_field(name="Members", value=member_count, inline=True)
 		server_embed.add_field(name="Servers", value=guild_count, inline=True)
 		server_embed.add_field(name="Commands", value=command_count + " (in {})".format(cog_count), inline=True)
 		server_embed.add_field(name="Created", value=created_at, inline=True)
@@ -194,9 +196,38 @@ class Bot:
 			if bot_member.activity.type == 1:
 				# Add the URL too
 				server_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(bot_member.activity.url), inline=True)
-		server_embed.set_thumbnail(url=avatar)
+		server_embed.set_thumbnail(url=avatar)'''
+		# Edit and update the embed
+		fields = [
+			{"name":"Members","value":member_count,"inline":True},
+			{"name":"Servers","value":guild_count,"inline":True},
+			{"name":"Commands","value":command_count + " (in {})".format(cog_count),"inline":True},
+			{"name":"Created","value":created_at,"inline":True},
+			{"name":"Joined","value":joined_at,"inline":True},
+			{"name":"Owners","value":owners,"inline":True},
+			{"name":"Prefixes","value":prefix,"inline":True},
+			{"name":"Status","value":status_text,"inline":True}
+		]
+		if bot_member.activity and bot_member.activity.name:
+			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
+			try:
+				play_string = play_list[bot_member.activity.type]
+			except:
+				play_string = "Playing"
+			fields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
+			if bot_member.activity.type == 1:
+				# Add the URL too
+				fields.append({"name":"Stream URL","value":"[Watch Now]({})".format(bot_member.activity.url),"inline":True})
+		# Update the embed
+		await Message.Embed(
+			title=DisplayName.name(bot_member) + " Info",
+			color=bot_member,
+			description="Current Bot Information",
+			fields=fields,
+			thumbnail=avatar
+		).edit(ctx, message)
 		# Send the embed
-		await ctx.channel.send(embed=server_embed)
+		# await ctx.channel.send(embed=server_embed)
 		
 
 	@commands.command(pass_context=True)
