@@ -59,9 +59,9 @@ class Spooktober:
             elif memberCheck.id == ctx.author.id:
                 # we sp00p ourselves
                 spookMe = [
-                    'go watch a scary movie to be absolutely sp00ped',
+                    'go watch a scary movie to be absolutely sp00ped!',
                     'boo! Did you scare you?',
-                    'you look yourself in the mirror and get a little scared',
+                    'you look yourself in the mirror and get a little scared...',
                     'get spooked by... yourself?',
                     'sp00py, but why spook yourself?'
                 ]
@@ -69,11 +69,11 @@ class Spooktober:
                 # we're spoopin' a member
                 memName = DisplayName.name(memberCheck)
                 spookMe = [
-                    'you sp00p *{}* so hard that they start screaming'.format(memName),
-                    'you tried to sneak up on *{}*, but they heard you sneakin\' and fail'.format(memName),
+                    'you sp00p *{}* so hard that they start screaming!'.format(memName),
+                    'you tried to sneak up on *{}*, but they heard you sneakin\' and fail...'.format(memName),
                     'it is sp00py time! Hey *{}*, boo!'.format(memName),
                     'congrats, *{}* dun sp00ked.'.format(memName),
-                    'get spook3d *{}*'.format(memName)
+                    'get spook3d *{}*!'.format(memName)
                 ]
 
             randnum = random.randint(0, len(spookMe)-1)
@@ -84,11 +84,11 @@ class Spooktober:
 
         # so we're not sp00pin' anyone, let's spook an object then
         spookThing = [
-            'you spook *{}* with no reaction, leaving you looking weird',
-            '*{}* got sp00p3d so hard, it ran away',
-            'you trick or treat *{}* without any reaction',
-            'you do your best to sp00p *{}*, but fail',
-            'sp00py time! *{}* gets sp00ped harder than you thought and starts crying'
+            'you spook *{}* with no reaction, leaving you looking weird...'.format(memName),
+            '*{}* got sp00p3d so hard, it ran away!'.format(memName),
+            'you trick or treat *{}* without any reaction...'.format(memName),
+            'you do your best to sp00p *{}*, but fail...'.format(memName),
+            'sp00py time! *{}* gets sp00ped harder than you thought and starts crying!'.format(memName)
         ]
 
         randnum = random.randint(0, len(spookThing)-1)
