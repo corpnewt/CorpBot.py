@@ -111,9 +111,10 @@ class Quote:
 		e = {
 			"author" : reaction.message.author,
 			"pm_after" : -1, # Don't pm quotes
-			"description" : msg + "\n\nSent by {} | {} | {} UTC".format(
+			"description" : msg + "\n\nSent by {} in {} | {} | {} UTC".format(
 				reaction.message.author.mention,
 				reaction.message.channel.mention,
+				"[Link](https://discordapp.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"image" : reaction.message.author.avatar_url,
