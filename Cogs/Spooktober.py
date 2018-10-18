@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import random
-import re
 from   datetime    import datetime
 from   discord.ext import commands
 from   Cogs        import DisplayName
@@ -24,7 +23,7 @@ class Spooktober:
 
         if datetime.today().month == 10:
             # make it extra sp00py because it is spooktober
-            await ctx.message.add_reaction(":jack_o_lantern:")
+            await ctx.message.add_reaction("🎃")
 
         authorName = DisplayName.name(ctx.author)
 
@@ -98,32 +97,53 @@ class Spooktober:
         await ctx.send(msg)
         return
 
-    def message(self, message):
+    async def message(self, message):
         if datetime.today().month == 10 and datetime.today().day == 31:
+            if not self.settings.getServerStat(message.guild, "Spooking"):
+                # We have this turned off - bail
+                return
             # it is the day of ultimate sp00p, sp00p all the messages
-            if re.search('spook', message.content):
-                await message.add_reaction(':jack_o_lantern:')
+            if "spook" in message.content.lower():
+                await message.add_reaction("🎃")
     
     @commands.command(pass_context=True)
-    async def spooking(self, ctx, setting):
-        """Enables/Disables reacting :spook: to every message on Halloween"""
-        # Check if we're the server owner
+    async def spooking(self, ctx, *, yes_no = None):
+        """Enables/Disables reacting 🎃 to every message on Halloween"""
+        # Only allow owner
         isOwner = self.settings.isOwner(ctx.author)
         if isOwner == None:
             msg = 'I have not been claimed, *yet*.'
             await ctx.channel.send(msg)
             return
         elif isOwner == False:
-            msg = 'You are not the *true* owner of me. Only the rightful owner can use this command.'
+            msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
             await ctx.channel.send(msg)
             return
 
-        if setting not in ['on', 'off']:
-            await ctx.send("usage: `{}spooking on/off`".format(ctx.prefix))
-            return
+        setting_name = "Spooking"
+        setting_val  = "Spooking"
 
-        s = True if setting == 'on' else 'off'
-        
-        self.settings.setServerStat(ctx.guild, "Spooking", s)
-
-        await ctx.send("Spooking set to " + setting + "!")
+        current = self.settings.getServerStat(ctx.guild, setting_val)
+        if yes_no == None:
+            if current:
+                msg = "{} currently *enabled.*".format(setting_name)
+            else:
+                msg = "{} currently *disabled.*".format(setting_name)
+        elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+            yes_no = True
+            if current == True:
+                msg = '{} remains *enabled*.'.format(setting_name)
+            else:
+                msg = '{} is now *enabled*.'.format(setting_name)
+        elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+            yes_no = False
+            if current == False:
+                msg = '{} remains *disabled*.'.format(setting_name)
+            else:
+                msg = '{} is now *disabled*.'.format(setting_name)
+        else:
+            msg = "That's not a valid setting."
+            yes_no = current
+        if not yes_no == None and not yes_no == current:
+            self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+        await ctx.send(msg)
