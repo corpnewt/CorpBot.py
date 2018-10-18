@@ -84,11 +84,11 @@ class Spooktober:
 
         # so we're not sp00pin' anyone, let's spook an object then
         spookThing = [
-            'you spook *{}* with no reaction, leaving you looking weird...'.format(memName),
-            '*{}* got sp00p3d so hard, it ran away!'.format(memName),
-            'you trick or treat *{}* without any reaction...'.format(memName),
-            'you do your best to sp00p *{}*, but fail...'.format(memName),
-            'sp00py time! *{}* gets sp00ped harder than you thought and starts crying!'.format(memName)
+            'you spook *{}* with no reaction, leaving you looking weird...'.format(member),
+            '*{}* got sp00p3d so hard, it ran away!'.format(member),
+            'you trick or treat *{}* without any reaction...'.format(member),
+            'you do your best to sp00p *{}*, but fail...'.format(member),
+            'sp00py time! *{}* gets sp00ped harder than you thought and starts crying!'.format(member)
         ]
 
         randnum = random.randint(0, len(spookThing)-1)
