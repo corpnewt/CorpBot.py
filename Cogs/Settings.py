@@ -261,7 +261,9 @@ class Settings:
 				"StreamChannel"			: None, 	# None or channel id
 				"StreamList"			: [],		# List of user id's to watch for
 				"StreamMessage"			: "Hey everyone! *[[user]]* started streaming *[[game]]!* Check it out here: [[url]]",
-				"MuteList"				: []}		# List of muted members
+				"MuteList"				: [],
+				"NvUpdateChannel"		: None 		# Channel to send Nvidia Webdrivers updates to
+				}		# List of muted members
 				# Removed for spam
 				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
 
