@@ -258,8 +258,8 @@ class Plist:
 
 
     @commands.command(pass_context=True)
-    async def nvupdate(self, channel = None):
-        """Set the channel Nvidia Webdriver updates should be sent in. Usage: `{}nvupdate [channel]`. Will clear if channel is not set.""".format(ctx.prefix)
+    async def nvupdate(self, ctx, channel = None):
+        """Set the channel Nvidia Webdriver updates should be sent in. Will clear if channel is not set."""
         isAdmin = ctx.author.permissions_in(ctx.channel).administrator
         # Only allow admins to change server stats
         if not isAdmin:
@@ -267,15 +267,16 @@ class Plist:
             return
 
         if not channel:
-            self.settings.setServerStat(guild, "NvUpdateChannel", None)
+            self.settings.setServerStat(ctx.guild, "NvUpdateChannel", None)
             await ctx.send("NvUpdate channel cleared!")
             return
 
-        chan = DisplayName.channelForName(channel, guild)
+        chan = DisplayName.channelForName(channel, ctx.guild)
 
         if not chan:
             await ctx.send("Could not find channel *{}*".format(channel))
             return
 
-        self.settings.setServerStat(guild, "NvUpdateChannel", str(chan.id))
-        await ctx.send("NvUpdate channel set to {}".format(channel.name))
+        self.settings.setServerStat(ctx.guild, "NvUpdateChannel", str(chan.id))
+        print(chan)
+        await ctx.send("NvUpdate channel set to {}!".format(chan.name))
