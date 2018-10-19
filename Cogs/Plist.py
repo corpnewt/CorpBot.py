@@ -22,6 +22,9 @@ class Plist:
         self.bot = bot
         self.settings = settings
         self.nv_link = "https://gfe.nvidia.com/mac-update"
+        self.NVloop = None # Loop used for the Nvidia Webdriver update check, 
+        #                    gets closed and opened on extension load/unload
+        self.NVsec = 300 # 5 minute time-out per Nvdia Webdriver update check
 
     async def download(self, url):
         url = url.strip("<>")
@@ -189,72 +192,65 @@ class Plist:
         await Message.Embed(title="✅ Plist format OK!").edit(ctx, message)
         self.remove(path)
 
-    async def checkLoop(self):
-        # Save the contents of the plits to a var
-        checkFirst = DL.async_post_text(self.nv_link)
-
-        while not self.bot_is_closed():
-            # Check the page every 5 mins
-            await asyncio.sleep(300)
-
-            checkSecond = DL.async_post_text(self.nv_link)
-
-            if checkFirst != checkSecond:
-                # There's been a change
-                plistOne = plistlib.readPlistFromBytes(checkFirst.encode('utf-8'))
-                plistTwo = plistlib.readPlistFromBytes(checkSecond.encode('utf-8'))
-
-                if plistOne[0] == plistTwo[0]:
-                    # Something has changed, but it's not a new webdriver. Abort
-                    return
-
-                info = {
-                    "version"   : checkSecond["updates"][0]["version"],
-                    "OS"        : checkSecond["updates"][0]["OS"],
-                    "URL"       : checkSecond["updates"][0]["downloadURL"],
-                    "size"      : int(checkSecond["updates"][0]["size"])
-                }
-
-                # Swap the check so the one we just did is the first check
-                checkFirst = checkSecond
-
-                # Push the new Webdriver
-                pusbWebdriver(info)
-
-    async def pushWebdriver(self, info: dict = None):
-        if not info:
+    @asyncio.coroutine
+    async def on_unloaded_extension(self, ext):
+        # Check if we were unloaded
+        if not self.settings._is_submodule(ext.__name__, self.__module__):
+            # We weren't, return
             return
 
-        # Make an embed
-        updateEmbed = discord.Embed(title="New Nvidia WebDriver available!", url=info["link"])
-        updateEmbed.add_field(name="Webdriver version", value=info["version"], inline=True)
-        updateEmbed.add_field(name="MacOS build number", value=info["OS"], inline=True)
-        new_size = info["size"]/1000000
-        new_size = str(new_size)[:4]
-        updateEmbed.add_field(name="Size (Mb)", value="{} Mb".format(new_size), inline=True)
+        # Stop our loop
+        self.NVloop.cancel()
 
+    @asyncio.coroutine
+    async def on_loaded_extension(self, ext):
+        # Check if we were loaded
+        if not self.settings._is_submodule(ext.__name__, self.__module__):
+            # We weren't, return
+            return
 
-        # Send the embed to all servers with an NvUpdateChannel
-        for guild in self.bot.guilds:
-            channel = self.settings.getServerStat(guild, "NvUpdateChannel")
-            if channel == None:
-                # No channel set, continue
-                continue
+        self.NVloop = self.bot.loop.create_task(self.checkLoop())
 
-            try:
-                # Check if "channel" is an ID, which is an integer
-                channel = int(channel)
-            except:
-                continue
+    async def checkLoop(self):
+        print("Starting NvUpdate loop - runs every {} seconds".format(self.NVsec))
+        originalFile = await DL.async_dl(self.nv_link)
 
-            # Check for a channal by it's ID
-            channel = DisplayName.channelForID(channel, guild, "text")
-            if not channel:
-                # Channel isn't valid
-                continue
+        while not self.bot.is_closed():
+            checkFile = await DL.async_dl(self.nv_link)
 
-            # Send the embed
-            await channel.send(embed=embed)
+            if checkFile != originalFile:
+                # There's a new webdriver, load the plist and read the info we want from it
+                plist = plistlib.readPlistFromBytes(checkFile)
+
+                # Set the file to check to the file we *just* pulled so we don't get spammed with updates
+                originalFile = checkFile
+
+                # BUILD AN EMBED
+                updateEmbed = discord.Embed(title="New Nvidia WebDriver available!", url=plist["updates"][0]["downloadURL"])    # Webdriver URL
+                updateEmbed.add_field(name="Webdriver version", value=plist["updates"][0]["version"], inline=True)              # Webdriver version
+                updateEmbed.add_field(name="MacOS build number", value=plist["updates"][0]["OS"], inline=True)                  # macOS build number
+                new_size = int(plist["updates"][0]["size"])/1000000
+                new_size = str(new_size)[:4]
+                updateEmbed.add_field(name="Size (Mb)", value="{} Mb".format(new_size), inline=True)                            # Webdriver size
+
+                # Send the embed to all the people *subscribed* to the Webdriver updates
+                for guild in self.bot.guilds:
+                    # Get the channel ID
+                    c = self.settings.getServerStat(guild, "NvUpdateChannel")
+                    if not c:
+                        # No ID, not subscribed to Webdriver updates
+                        continue
+                    # Try to get a discord.Channel object for the channel ID
+                    chan = DisplayName.channelForName(c, guild)
+                    if not chan:
+                        # There's none, inform the owner and continue
+                        await guild.owner.send("Hi! The channel for Nvidia Webdriver updates is currently set to ID {}. Unfortunaly, this channel does not exist anymore. Please use {}nvupdate [channel] to either clear or set a channel.").format(c, ctx.prefix)
+                        continue
+
+                    await chan.send(embed=updateEmbed)
+
+            # Sleep, then check for updates
+            await asyncio.sleep(self.NVsec)
 
 
     @commands.command(pass_context=True)
@@ -262,21 +258,30 @@ class Plist:
         """Set the channel Nvidia Webdriver updates should be sent in. Will clear if channel is not set."""
         isAdmin = ctx.author.permissions_in(ctx.channel).administrator
         # Only allow admins to change server stats
-        if not isAdmin:
+        if not isAdmin: 
             await ctx.channel.send('You do not have sufficient privileges to access this command.')
             return
 
+        # Clear the nvupdatechannel if no channel passed, disabling updates to the channel
         if not channel:
             self.settings.setServerStat(ctx.guild, "NvUpdateChannel", None)
             await ctx.send("NvUpdate channel cleared!")
             return
 
+        # Try and find a channel for the string passed
         chan = DisplayName.channelForName(channel, ctx.guild)
 
         if not chan:
-            await ctx.send("Could not find channel *{}*".format(channel))
+            # We couldn't find anything
+            await ctx.send("I couldn't find that channel...".format(channel))
             return
 
+        # Check if the new channel is already the thing we want to set
+        updateChannel = self.settings.getServerStat(ctx.guild, "NvUpdateChannel")
+        if str(updateChannel) == str(chan.id):
+            await ctx.send("NvUpdate channel is already set to {}!".format(chan.mention))
+            return
+
+        # Set the new channel ID as the NvUpdate channel
         self.settings.setServerStat(ctx.guild, "NvUpdateChannel", str(chan.id))
-        print(chan)
-        await ctx.send("NvUpdate channel set to {}!".format(chan.name))
+        await ctx.send("NvUpdate channel set to {}!".format(chan.mention))
