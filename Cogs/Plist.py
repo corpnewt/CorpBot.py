@@ -244,7 +244,10 @@ class Plist:
                     chan = DisplayName.channelForName(c, guild)
                     if not chan:
                         # There's none, inform the owner and continue
-                        await guild.owner.send("Hi! The channel for Nvidia Webdriver updates is currently set to ID {}. Unfortunaly, this channel does not exist anymore. Please use {}nvupdate [channel] to either clear or set a channel.").format(c, ctx.prefix)
+                        prefix = self.settings.getServerStat(guild, "Prefix")
+                        if not prefix:
+                            prefix = self.bot.command_prefix
+                        await guild.owner.send("Hi! The channel for Nvidia Webdriver updates is currently set to ID {}. Unfortunaly, this channel does not exist anymore. Please use {}nvupdate [channel] to either clear or set a channel.").format(c, prefix)
                         continue
 
                     await chan.send(embed=updateEmbed)
