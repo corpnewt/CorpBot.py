@@ -36,6 +36,23 @@ class Debugging:
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
 		self.cleanChannels = []
+		self.invite_list = {}
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@asyncio.coroutine
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		print("Gathering invites...")
+		for guild in self.bot.guilds:
+			try:
+				self.invite_list[str(guild.id)] = await guild.invites()
+			except:
+				pass
+		print("Invites gathered.")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -75,7 +92,6 @@ class Debugging:
 				msg = msg.encode("utf-8")
 				with open("debug.txt", "wb") as myfile:
 					myfile.write(msg)
-
 
 	def shouldLog(self, logVar, server):
 		serverLogVars = self.settings.getServerStat(server, "LogVars")
@@ -122,11 +138,30 @@ class Debugging:
 	@asyncio.coroutine	
 	async def on_member_join(self, member):
 		server = member.guild
+		# Try and determine which invite was used
+		invite = None
+		invite_list = self.invite_list.get(str(server.id),[])
+		try:
+			new_invites = await server.invites()
+		except:
+			new_invites = []
+		changed = [x for x in invite_list for y in new_invites if x.code == y.code and x.uses != y.uses]
+		if len(changed) == 1:
+			# We have only one changed invite - this is the one!
+			invite = changed[0]
+		self.invite_list[str(server.id)] = new_invites
 		if not self.shouldLog('user.join', server):
 			return
 		# A new member joined
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
-		await self._logEvent(server, "", title=msg, color=discord.Color.teal())
+		log_msg = "Account Created: {}".format(member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
+		if invite:
+			log_msg += "\nInvite Used: {}".format(invite.url)
+			log_msg += "\nTotal Uses: {}".format(invite.uses)
+			log_msg += "\nInvite Created By: {}#{}".format(invite.inviter.name, invite.inviter.discriminator)
+			await self._logEvent(server, log_msg, title=msg, color=discord.Color.teal())
+		else:
+			await self._logEvent(server, "", title=msg, color=discord.Color.teal())
 		
 	@asyncio.coroutine
 	async def on_member_remove(self, member):
@@ -301,11 +336,11 @@ class Debugging:
 			log_back  = log_message.replace("`", "'")
 			if log_back == log_message:
 				# Nothing changed
-				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC"
+				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
 			else:
 				# We nullified some backticks - make a note of it
 				log_message = log_back
-				footer = datetime.utcnow().strftime("%I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
 			if self.wrap:
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
