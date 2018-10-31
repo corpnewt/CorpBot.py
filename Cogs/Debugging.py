@@ -159,9 +159,7 @@ class Debugging:
 			log_msg += "\nInvite Used: {}".format(invite.url)
 			log_msg += "\nTotal Uses: {}".format(invite.uses)
 			log_msg += "\nInvite Created By: {}#{}".format(invite.inviter.name, invite.inviter.discriminator)
-			await self._logEvent(server, log_msg, title=msg, color=discord.Color.teal())
-		else:
-			await self._logEvent(server, "", title=msg, color=discord.Color.teal())
+		await self._logEvent(server, log_msg, title=msg, color=discord.Color.teal())
 		
 	@asyncio.coroutine
 	async def on_member_remove(self, member):
