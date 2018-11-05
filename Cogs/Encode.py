@@ -344,7 +344,13 @@ class Encode:
 			return
 
 		types = [ "base64", "hex", "ascii" ]
-
+		
+		# Allow first letters as well
+		from_check = [x for x in types if x[0] == from_type.lower()]
+		from_type = from_type if not len(from_check) else from_check[0]
+		to_check = [x for x in types if x[0] == to_type.lower()]
+		to_type = to_type if not len(to_check) else to_check[0]
+		
 		if not from_type.lower() in types:
 			await ctx.send("Invalid *from* type!")
 			return
