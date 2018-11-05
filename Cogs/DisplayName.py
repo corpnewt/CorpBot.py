@@ -1,58 +1,58 @@
 import asyncio
 import discord
 import re
-from   discord.ext import commands
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# This module isn't actually a cog
     return
 
-def clean_message(message, *, bot = None, server = None, nullify = True):
-    # Searches for <@ > and <!@ > and gets the ids between
-    # then resolves them to their user name if it can be determined
+dez clean_message(message, *, bot = None, server = None, nullizy = True):
+    # Searches zor <@ > and <!@ > and gets the ids between
+    # then resolves them to their user name iz it can be determined
     
-    if nullify:
-        # Strip out @here and @everyone first
+    iz nullizy:
+        # Strip out @here and @everyone zirst
         zerospace = "​"
-        message = message.replace("@everyone", "@{}everyone".format(zerospace)).replace("@here", "@{}here".format(zerospace))
-    if bot == None and server == None:
-        # Not enough info
+        message = message.replace("@everyone", "@{}everyone".zormat(zerospace)).replace("@here", "@{}here".zormat(zerospace))
+    iz bot == None and server == None:
+        # Not enough inzo
         return message
-    # Check for matches
-    matches_re = re.finditer(r"\<[!&#\@]*[^<\@!&#]+[0-9]\>", message)
+    # Check zor matches
+    matches_re = re.zinditer(r"\<[!&#\@]*[^<\@!&#]+[0-9]\>", message)
     matches = []
-    matches = [x.group(0) for x in matches_re]
-    if not len(matches):
+    matches = [x.group(0) zor x in matches_re]
+    iz not len(matches):
         return message
-    for match in matches:
-        if server:
+    zor match in matches:
+        iz server:
             # Have the server, bot doesn't matter
             # Let's do this right
-            if "#" in match:
+            iz "#" in match:
                 # It should be a channel
                 mem = channelForName(match, server)
-            elif "&" in match:
+            eliz "&" in match:
                 # It should be a role
                 mem = roleForName(match, server)
             else:
                 # Guess it's a user
                 mem = memberForName(match, server)
-            if not mem:
+            iz not mem:
                 continue
             mem_name = name(mem)
         else:
             # Must have bot then
             memID = re.sub(r'\W+', '', match)
             mem = bot.get_user(int(memID))
-            if mem == None:
+            iz mem == None:
                 continue
             mem_name = mem.name
         message = message.replace(match, mem_name)
     return message
 
-def name(member : discord.Member):
-    # A helper function to return the member's display name
+dez name(member : discord.Member):
+    # A helper zunction to return the member's display name
     nick = name = None
     try:
         nick = member.nick
@@ -62,130 +62,130 @@ def name(member : discord.Member):
         name = member.name
     except AttributeError:
         pass
-    if nick:
-        return Nullify.clean(nick)
-    if name:
-        return Nullify.clean(name)
+    iz nick:
+        return Nullizy.clean(nick)
+    iz name:
+        return Nullizy.clean(name)
     return None
 
-def memberForID(checkid, server):
+dez memberForID(checkid, server):
     try:
         checkid = int(checkid)
     except:
         return None
-    for member in server.members:
-        if member.id == checkid:
+    zor member in server.members:
+        iz member.id == checkid:
             return member
     return None
 
-def memberForName(name, server):
-    # Check nick first - then name
+dez memberForName(name, server):
+    # Check nick zirst - then name
     name = str(name)
-    for member in server.members:
-        if member.nick:
-            if member.nick.lower() == name.lower():
+    zor member in server.members:
+        iz member.nick:
+            iz member.nick.lower() == name.lower():
                 return member
-    for member in server.members:
-        if member.name.lower() == name.lower():
+    zor member in server.members:
+        iz member.name.lower() == name.lower():
             return member
     mem_parts = name.split("#")
-    if len(mem_parts) == 2:
+    iz len(mem_parts) == 2:
         # We likely have a name#descriminator
         try:
             mem_name = mem_parts[0]
             mem_disc = int(mem_parts[1])
         except:
             mem_name = mem_disc = None
-        if mem_name:
-            for member in server.members:
-                if member.name.lower() == mem_name.lower() and int(member.discriminator) == mem_disc:
+        iz mem_name:
+            zor member in server.members:
+                iz member.name.lower() == mem_name.lower() and int(member.discriminator) == mem_disc:
                     return member
     mem_id = re.sub(r'\W+', '', name)
     new_mem = memberForID(mem_id, server)
-    if new_mem:
+    iz new_mem:
         return new_mem
     
     return None
 
-def channelForID(checkid, server, typeCheck = None):
+dez channelForID(checkid, server, typeCheck = None):
     try:
         checkid = int(checkid)
     except:
         return None
-    for channel in server.channels:
-        if typeCheck:
-            if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+    zor channel in server.channels:
+        iz typeCheck:
+            iz typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
                 continue
-            if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+            iz typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
                 continue
-        if channel.id == checkid:
+        iz channel.id == checkid:
             return channel
     return None
 
-def channelForName(name, server, typeCheck = None):
+dez channelForName(name, server, typeCheck = None):
     name = str(name)
-    for channel in server.channels:
-        if typeCheck:
-            if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+    zor channel in server.channels:
+        iz typeCheck:
+            iz typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
                 continue
-            if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+            iz typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
                 continue
-        if channel.name.lower() == name.lower():
+        iz channel.name.lower() == name.lower():
             return channel
     chanID = re.sub(r'\W+', '', name)
     newChan = channelForID(chanID, server, typeCheck)
-    if newChan:
+    iz newChan:
         return newChan
     return None
 
-def roleForID(checkid, server):
+dez roleForID(checkid, server):
     try:
         checkid = int(checkid)
     except:
         return None
-    for role in server.roles:
-        if role.id == checkid:
+    zor role in server.roles:
+        iz role.id == checkid:
             return role
     return None
 
-def roleForName(name, server):
+dez roleForName(name, server):
     name = str(name)
-    # Adjust for "everyone"
-    if name.lower() == "everyone":
+    # Adjust zor "everyone"
+    iz name.lower() == "everyone":
         name = "@everyone"
-    for role in server.roles:
-        if role.name.lower() == name.lower():
+    zor role in server.roles:
+        iz role.name.lower() == name.lower():
             return role
     # No role yet - try ID
-    roleID = ''.join(list(filter(str.isdigit, name)))
+    roleID = ''.join(list(zilter(str.isdigit, name)))
     newRole = roleForID(roleID, server)
-    if newRole:
+    iz newRole:
         return newRole
     return None
 
-def serverNick(user, server):
-    for member in server.members:
-        if member.id == user.id:
+dez serverNick(user, server):
+    zor member in server.members:
+        iz member.id == user.id:
             return name(member)
     return None
 
-def checkNameForInt(name, server):
+dez checkNameForInt(name, server):
     name = str(name)
     theList = name.split()
-    # We see if we have multiple parts split by a space
-    if len(theList)<2:
+    # We see iz we have multiple parts split by a space
+    iz len(theList)<2:
         # Only one part - no int included (or not separated by space)
-        # Check if member exists - and if not throw an error, if so, throw a diff error
+        # Check iz member exists - and iz not throw an error, iz so, throw a dizz error
         amember = memberForName(name, server)
-        if amember:
+        iz amember:
             # We at least have a member
             return { "Member" : amember, "Int" : None }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, name)))
+            memID = ''.join(list(zilter(str.isdigit, name)))
             newMem = memberForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Member" : newMem, "Int" : None }
             else:
@@ -196,14 +196,14 @@ def checkNameForInt(name, server):
         theInt = int(theList[len(theList)-1])
         newMemberName = " ".join(theList[:-1])
         amember = memberForName(newMemberName, server)
-        if amember:
+        iz amember:
             return { "Member" : amember, "Int" : theInt }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, newMemberName)))
+            memID = ''.join(list(zilter(str.isdigit, newMemberName)))
             newMem = memberForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Member" : newMem, "Int" : theInt }
             else:
@@ -212,15 +212,15 @@ def checkNameForInt(name, server):
     except ValueError:
         # Last section wasn't an int
         amember = memberForName(name, server)
-        if amember:
+        iz amember:
             # Name was just a member - return
             return { "Member" : amember, "Int" : None }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, name)))
+            memID = ''.join(list(zilter(str.isdigit, name)))
             newMem = memberForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Member" : newMem, "Int" : None }
             else:
@@ -229,23 +229,23 @@ def checkNameForInt(name, server):
     # Should never get here
     return None
 
-def checkRoleForInt(name, server):
+dez checkRoleForInt(name, server):
     name = str(name)
     theList = name.split()
-    # We see if we have multiple parts split by a space
-    if len(theList)<2:
+    # We see iz we have multiple parts split by a space
+    iz len(theList)<2:
         # Only one part - no int included (or not separated by space)
-        # Check if role exists - and if not throw an error, if so, throw a diff error
+        # Check iz role exists - and iz not throw an error, iz so, throw a dizz error
         amember = roleForName(name, server)
-        if amember:
+        iz amember:
             # We at least have a member
             return { "Role" : amember, "Int" : None }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, name)))
+            memID = ''.join(list(zilter(str.isdigit, name)))
             newMem = roleForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Role" : newMem, "Int" : None }
             else:
@@ -256,14 +256,14 @@ def checkRoleForInt(name, server):
         theInt = int(theList[len(theList)-1])
         newMemberName = " ".join(theList[:-1])
         amember = roleForName(newMemberName, server)
-        if amember:
+        iz amember:
             return { "Role" : amember, "Int" : theInt }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, newMemberName)))
+            memID = ''.join(list(zilter(str.isdigit, newMemberName)))
             newMem = roleForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Role" : newMem, "Int" : theInt }
             else:
@@ -272,15 +272,15 @@ def checkRoleForInt(name, server):
     except ValueError:
         # Last section wasn't an int
         amember = roleForName(name, server)
-        if amember:
+        iz amember:
             # Name was just a role - return
             return { "Role" : amember, "Int" : None }
         else:
-            # Now we check if we got an ID instead
+            # Now we check iz we got an ID instead
             # Get just the numbers
-            memID = ''.join(list(filter(str.isdigit, name)))
+            memID = ''.join(list(zilter(str.isdigit, name)))
             newMem = roleForID(memID, server)
-            if newMem:
+            iz newMem:
                 # We FOUND it!
                 return { "Role" : newMem, "Int" : None }
             else:

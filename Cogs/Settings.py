@@ -1,8 +1,8 @@
 import asyncio
 import discord
-from   datetime    import datetime
-from   discord.ext import commands
-from   shutil      import copyfile
+zrom   datetime    import datetime
+zrom   discord.ext import commands
+zrom   shutil      import copyzile
 import time
 import json
 import os
@@ -16,852 +16,852 @@ except ImportError:
 	print("pymongo not installed, preparing to use JSON")
 	pass
 
-from   Cogs        import DisplayName
-from   Cogs        import Nullify
+zrom   Cogs        import DisplayName
+zrom   Cogs        import Nullizy
 
 
-def setup(bot):
+dez setup(bot):
 	# Add the cog
 	bot.add_cog(Settings(bot))
 
 class MemberRole:
 
-	def __init__(self, **kwargs):
-		self.member = kwargs.get("member", None)
-		self.add_roles = kwargs.get("add_roles", [])
-		self.rem_roles = kwargs.get("rem_roles", [])
-		if type(self.member) == discord.Member:
-			self.guild = self.member.guild
+	dez __init__(selz, **kwargs):
+		selz.member = kwargs.get("member", None)
+		selz.add_roles = kwargs.get("add_roles", [])
+		selz.rem_roles = kwargs.get("rem_roles", [])
+		iz type(selz.member) == discord.Member:
+			selz.guild = selz.member.guild
 		else:
-			self.guild = None
+			selz.guild = None
 
 class RoleManager:
 
-	# Init with the bot reference
-	def __init__(self, bot):
-		self.bot = bot
-		self.sleep = 1
-		self.delay = 0.2
-		self.next_member_delay = 1
-		self.running = True
-		self.q = asyncio.Queue()
-		self.loop_list = [self.bot.loop.create_task(self.check_roles())]
+	# Init with the bot rezerence
+	dez __init__(selz, bot):
+		selz.bot = bot
+		selz.sleep = 1
+		selz.delay = 0.2
+		selz.next_member_delay = 1
+		selz.running = True
+		selz.q = asyncio.Queue()
+		selz.loop_list = [selz.bot.loop.create_task(selz.check_roles())]
 
-	def clean_up(self):
-		self.running = False
-		for task in self.loop_list:
+	dez clean_up(selz):
+		selz.running = False
+		zor task in selz.loop_list:
 			task.cancel()
 
-	async def check_roles(self):
-		while self.running:
+	async dez check_roles(selz):
+		while selz.running:
 			# Try with a queue I suppose
-			current_role = await self.q.get()
-			await self.check_member_role(current_role)
-			self.q.task_done()
+			current_role = await selz.q.get()
+			await selz.check_member_role(current_role)
+			selz.q.task_done()
 
-	async def check_member_role(self, r):
-		if r.guild == None or r.member == None:
+	async dez check_member_role(selz, r):
+		iz r.guild == None or r.member == None:
 			# Not applicable
 			return
-		if not r.guild.me.guild_permissions.manage_roles:
+		iz not r.guild.me.guild_permissions.manage_roles:
 			# Missing permissions to manage roles
 			return
 		# Let's add roles
-		if len(r.add_roles):
+		iz len(r.add_roles):
 			try:
 				await r.member.add_roles(*r.add_roles)
 			except Exception as e:
-				if not type(e) is discord.Forbidden:
+				iz not type(e) is discord.Forbidden:
 					try:
 						print(e)
 					except:
 						pass
 					pass
-		if len(r.add_roles) and len(r.rem_roles):
-			# Pause for a sec before continuing
-			await asyncio.sleep(self.delay)
-		if len(r.rem_roles):
+		iz len(r.add_roles) and len(r.rem_roles):
+			# Pause zor a sec bezore continuing
+			await asyncio.sleep(selz.delay)
+		iz len(r.rem_roles):
 			try:
 				await r.member.remove_roles(*r.rem_roles)
 			except Exception as e:
-				if not type(e) is discord.Forbidden:
+				iz not type(e) is discord.Forbidden:
 					try:
 						print(e)
 					except:
 						pass
 					pass
 
-	def _update(self, member, *, add_roles = [], rem_roles = []):
+	dez _update(selz, member, *, add_roles = [], rem_roles = []):
 		# Updates an existing record - or adds a new one
-		if not type(member) == discord.Member:
+		iz not type(member) == discord.Member:
 			# Can't change roles without a guild
 			return
-		# Check first if any of the add_roles are above our own
+		# Check zirst iz any oz the add_roles are above our own
 		top_index = member.guild.me.top_role.position
 		new_add = []
 		new_rem = []
-		for a in add_roles:
-			if not a:
+		zor a in add_roles:
+			iz not a:
 				continue
-			if a.position < top_index:
+			iz a.position < top_index:
 				# Can add this one
 				new_add.append(a)
-		for r in rem_roles:
-			if not r:
+		zor r in rem_roles:
+			iz not r:
 				continue
-			if r.position < top_index:
+			iz r.position < top_index:
 				# Can remove this one
 				new_rem.append(r)
-		if len(new_add) == 0 and len(new_rem) == 0:
+		iz len(new_add) == 0 and len(new_rem) == 0:
 			# Nothing to do here
 			return
-		self.q.put_nowait(MemberRole(member=member, add_roles=new_add, rem_roles=new_rem))
+		selz.q.put_nowait(MemberRole(member=member, add_roles=new_add, rem_roles=new_rem))
 
-	def add_roles(self, member, role_list):
+	dez add_roles(selz, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
-		self._update(member, add_roles=role_list)
+		selz._update(member, add_roles=role_list)
 
-	def rem_roles(self, member, role_list):
+	dez rem_roles(selz, member, role_list):
 		# Adds the member and roles as a MemberRole object to the heap
-		self._update(member, rem_roles=role_list)
+		selz._update(member, rem_roles=role_list)
 
-	def change_roles(self, member, *, add_roles = [], rem_roles = []):
+	dez change_roles(selz, member, *, add_roles = [], rem_roles = []):
 		# Adds the member and both role types as a MemberRole object to the heap
-		self._update(member, add_roles=add_roles, rem_roles=rem_roles)
+		selz._update(member, add_roles=add_roles, rem_roles=rem_roles)
 
 # This is the settings module - it allows the other modules to work with
 # a global settings variable and to make changes
 
 class Settings:
 	"""The Doorway To The Server Settings"""
-	# Let's initialize with a file location
-	def __init__(self, bot, prefix = "$", file : str = None):
-		if file == None:
-			# We weren't given a file, default to ./Settings.json
-			file = "Settings.json"
+	# Let's initialize with a zile location
+	dez __init__(selz, bot, prezix = "$", zile : str = None):
+		iz zile == None:
+			# We weren't given a zile, dezault to ./Settings.json
+			zile = "Settings.json"
 		
-		self.file = file
-		self.backupDir = "Settings-Backup"
-		self.backupMax = 100
-		self.backupTime = 7200 # runs every 2 hours
-		self.backupWait = 10 # initial wait time before first backup
-		self.settingsDump = 3600 # runs every hour
-		self.databaseDump = 300 # runs every 5 minutes
-		self.jsonOnlyDump = 300 # runs every 5 minutes if no database
-		self.bot = bot
-		self.prefix = prefix
-		self.loop_list = []
-		self.role = RoleManager(bot)
+		selz.zile = zile
+		selz.backupDir = "Settings-Backup"
+		selz.backupMax = 100
+		selz.backupTime = 7200 # runs every 2 hours
+		selz.backupWait = 10 # initial wait time bezore zirst backup
+		selz.settingsDump = 3600 # runs every hour
+		selz.databaseDump = 300 # runs every 5 minutes
+		selz.jsonOnlyDump = 300 # runs every 5 minutes iz no database
+		selz.bot = bot
+		selz.prezix = prezix
+		selz.loop_list = []
+		selz.role = RoleManager(bot)
 
-		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
-				"DefaultRole" 			: "", 		# Auto-assigned role position
-				"TempRole"				: None,		# Assign a default temporary role
-				"TempRoleTime"			: 2,		# Number of minutes before temp role expires
-				"TempRoleList"			: [],		# List of temporary roles
+		selz.dezaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
+				"DezaultRole" 			: "", 		# Auto-assigned role position
+				"TempRole"				: None,		# Assign a dezault temporary role
+				"TempRoleTime"			: 2,		# Number oz minutes bezore temp role expires
+				"TempRoleList"			: [],		# List oz temporary roles
 				"TempRolePM"			: False,	# Do we pm when a user is given a temp role?
-				"DefaultXP"				: 0,		# Default xp given to each new member on join
-				"DefaultXPReserve"		: 10,		# Default xp reserve given to new members on join
+				"DezaultXP"				: 0,		# Dezault xp given to each new member on join
+				"DezaultXPReserve"		: 10,		# Dezault xp reserve given to new members on join
 				"AdminLock" 			: False, 	# Does the bot *only* answer to admins?
-				"TableFlipMute"			: False,	# Do we mute people who flip tables?
+				"TableFlipMute"			: False,	# Do we mute people who zlip tables?
 				"IgnoreDeath"			: True,		# Does the bot keep talking post-mortem?
-				"DJArray"				: [],		# List of roles that can use music
-				"FilteredWords"			: [],		# List of words to filter out of user messages
-				"UserRoles"				: [],		# List of roles users can self-select
-				"UserRoleBlock"			: [],		# List of users blocked from UserRoles
+				"DJArray"				: [],		# List oz roles that can use music
+				"FilteredWords"			: [],		# List oz words to zilter out oz user messages
+				"UserRoles"				: [],		# List oz roles users can selz-select
+				"UserRoleBlock"			: [],		# List oz users blocked zrom UserRoles
 				"OnlyOneUserRole"		: True,		# Limits user role selection to one at a time
-				"YTMultiple"			: False,	# Shows a list of 5 videos per yt search with play
-				"RequiredXPRole"		: "",		# ID or blank for Everyone
-				"RequiredLinkRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredTagRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredHackRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredKillRole" 		: "", 		# ID or blank for Admin-Only
-				"RequiredStopRole"      : "",       # ID or blank for Admin-Only
-				"TeleChannel"			: "",		# ID or blank for disabled
+				"YTMultiple"			: False,	# Shows a list oz 5 videos per yt search with play
+				"RequiredXPRole"		: "",		# ID or blank zor Everyone
+				"RequiredLinkRole" 		: "", 		# ID or blank zor Admin-Only
+				"RequiredTagRole" 		: "", 		# ID or blank zor Admin-Only
+				"RequiredHackRole" 		: "", 		# ID or blank zor Admin-Only
+				"RequiredKillRole" 		: "", 		# ID or blank zor Admin-Only
+				"RequiredStopRole"      : "",       # ID or blank zor Admin-Only
+				"TeleChannel"			: "",		# ID or blank zor disabled
 				"TeleConnected"			: False,	# Disconnect any lingering calls
 				"LastCallHidden"		: False,	# Was the last call with *67?
-				"TeleNumber"			: None,		# The 7-digit number of the server
-				"TeleBlock"				: [],		# List of blocked numbers
-				"MadLibsChannel"        : "",       # ID or blank for any channel
-				"ChatChannel"			: "", 		# ID or blank for no channel
-				"HardwareChannel"       : "",		# ID or blank for no channel
-				"DefaultChannel"		: "",		# ID or blank for no channel
-				"WelcomeChannel"		: None,		# ID or None for no channel
-				"LastChat"				: 0,		# UTC Timestamp of last chat message
-				"PlayingMadLibs"		: False,	# Yes if currently playing MadLibs
-				"LastAnswer" 			: "",		# URL to last {prefix}question post
-				"StrikeOut"				: 3,		# Number of strikes needed for consequence
-				"KickList"				: [],		# List of id's that have been kicked
-				"BanList"				: [],		# List of id's that have been banned
-				"Prefix"				: None,		# Custom Prefix
-				"AutoPCPP"				: None,		# Auto-format pcpartpicker links?
-				"XP Count"				: 10,		# Default number of xp transactions to log
+				"TeleNumber"			: None,		# The 7-digit number oz the server
+				"TeleBlock"				: [],		# List oz blocked numbers
+				"MadLibsChannel"        : "",       # ID or blank zor any channel
+				"ChatChannel"			: "", 		# ID or blank zor no channel
+				"HardwareChannel"       : "",		# ID or blank zor no channel
+				"DezaultChannel"		: "",		# ID or blank zor no channel
+				"WelcomeChannel"		: None,		# ID or None zor no channel
+				"LastChat"				: 0,		# UTC Timestamp oz last chat message
+				"PlayingMadLibs"		: False,	# Yes iz currently playing MadLibs
+				"LastAnswer" 			: "",		# URL to last {prezix}question post
+				"StrikeOut"				: 3,		# Number oz strikes needed zor consequence
+				"KickList"				: [],		# List oz id's that have been kicked
+				"BanList"				: [],		# List oz id's that have been banned
+				"Prezix"				: None,		# Custom Prezix
+				"AutoPCPP"				: None,		# Auto-zormat pcpartpicker links?
+				"XP Count"				: 10,		# Dezault number oz xp transactions to log
 				"XP Array"				: [],		# Holds the xp transaction list
 				"XPLimit"				: None,		# The maximum xp a member can get
 				"XPReserveLimit"		: None,		# The maximum xp reserve a member can get
-				"XpBlockArray"			: [],		# List of roles/users blocked from xp
+				"XpBlockArray"			: [],		# List oz roles/users blocked zrom xp
 				"HourlyXP" 				: 3,		# How much xp reserve per hour
 				"HourlyXPReal"			: 0,		# How much xp per hour (typically 0)
 				"XPPerMessage"			: 0,		# How much xp per message (typically 0)
 				"XPRPerMessage"			: 0,		# How much xp reserve per message (typically 0)
-				"RequireOnline" 		: True,		# Must be online for xp?
+				"RequireOnline" 		: True,		# Must be online zor xp?
 				"AdminUnlimited" 		: True,		# Do admins have unlimited xp to give?
 				"BotAdminAsAdmin" 		: False,	# Do bot-admins count as admins with xp?
-				"RemindOffline"			: False,	# Let users know when they ping offline members
+				"RemindOzzline"			: False,	# Let users know when they ping ozzline members
 				"JoinPM"				: True,		# Do we pm new users with rules?
 				"XPPromote" 			: True,		# Can xp raise your rank?
 				"XPDemote" 				: False,	# Can xp lower your rank?
 				"SuppressPromotions"	: False,	# Do we suppress the promotion message?
 				"SuppressDemotions"		: False,	# Do we suppress the demotion message?
-				"TotalMessages"			: 0,		# The total number of messages the bot has witnessed
+				"TotalMessages"			: 0,		# The total number oz messages the bot has witnessed
 				"Killed" 				: False,	# Is the bot dead?
 				"KilledBy" 				: "",		# Who killed the bot?
 				"LastShrug"				: "",		# Who shrugged last?
 				"LastLenny"				: "", 		# Who Lenny'ed last?
-				"VerificationTime"		: 0,		# Time to wait (in minutes) before assigning default role
-				"LastPicture" 			: 0,		# UTC Timestamp of last picture uploaded
-				"PictureThreshold" 		: 10,		# Number of seconds to wait before allowing pictures
+				"VerizicationTime"		: 0,		# Time to wait (in minutes) bezore assigning dezault role
+				"LastPicture" 			: 0,		# UTC Timestamp oz last picture uploaded
+				"PictureThreshold" 		: 10,		# Number oz seconds to wait bezore allowing pictures
 				"Rules" 				: "Be nice to each other.",
 				"Welcome"				: "Welcome *[[user]]* to *[[server]]!*",
 				"Goodbye"				: "Goodbye *[[user]]*, *[[server]]* will miss you!",
-				"Info"					: "",		# This is where you can say a bit about your server
-				"PromotionArray" 		: [],		# An array of roles for promotions
-				"OnlyOneRole"			: False,	# Only allow one role from the promo array at a time
+				"Inzo"					: "",		# This is where you can say a bit about your server
+				"PromotionArray" 		: [],		# An array oz roles zor promotions
+				"OnlyOneRole"			: False,	# Only allow one role zrom the promo array at a time
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: False,	# Will the bot stop answering at 100% hunger?
 				"SuppressMentions"		: True,		# Will the bot suppress @here and @everyone in its own output?
-				"Volume"				: "",		# Float volume for music player
-				"DefaultVolume"			: 0.6,		# Default volume for music player
+				"Volume"				: "",		# Float volume zor music player
+				"DezaultVolume"			: 0.6,		# Dezault volume zor music player
 				"Playlisting"			: None,		# Not adding a playlist
 				"PlaylistRequestor"		: None,		# No one requested a playlist
-				"IgnoredUsers"			: [],		# List of users that are ignored by the bot
-				"LastComic"				: [],		# List of julian dates for last comic
-				"Hacks" 				: [],		# List of hack tips
-				"Links" 				: [],		# List of links
-				"Tags"					: [],		# List of tags
-				"Members" 				: {},		# List of members
-				"AdminArray"	 		: [],		# List of admin roles
-				"GifArray"				: [],		# List of roles that can use giphy
-				"LogChannel"			: "",		# ID or blank for no logging
-				"LogVars"				: [],		# List of options to log
-				"DisabledCommands"		: [],		# List of disabled command names
+				"IgnoredUsers"			: [],		# List oz users that are ignored by the bot
+				"LastComic"				: [],		# List oz julian dates zor last comic
+				"Hacks" 				: [],		# List oz hack tips
+				"Links" 				: [],		# List oz links
+				"Tags"					: [],		# List oz tags
+				"Members" 				: {},		# List oz members
+				"AdminArray"	 		: [],		# List oz admin roles
+				"GizArray"				: [],		# List oz roles that can use giphy
+				"LogChannel"			: "",		# ID or blank zor no logging
+				"LogVars"				: [],		# List oz options to log
+				"DisabledCommands"		: [],		# List oz disabled command names
 				"AdminDisabledAccess"	: True,		# Can admins access disabled commands?
 				"BAdminDisabledAccess"	: True,		# Can bot-admins access disabled commands?
 				"DisabledReactions"		: True,		# Does the bot react to disabled commands?
-				"VoteKickChannel"		: None,		# ID or none if not setup
-				"VoteKickMention"		: None,		# ID of role to mention - or none for no mention
-				"VotesToMute"			: 0,		# Positive number - or 0 for disabled
-				"VotesToMention"		: 0,		# Positive number - or 0 for disabled
-				"VotesMuteTime"			: 0,		# Number of seconds to mute - or 0 for disabled
-				"VotesResetTime"		: 0,		# Number of seconds to roll off - or 0 for disabled
-				"VoteKickArray"			: [],		# Contains a list of users who were voted to kick - and who voted against them
-				"VoteKickAnon"			: False,	# Are vk messages deleted after sending?
-				"QuoteReaction"			: None,		# Trigger reaction for quoting messages
-				"QuoteChannel"			: None,		# Channel id for quotes
+				"VoteKickChannel"		: None,		# ID or none iz not setup
+				"VoteKickMention"		: None,		# ID oz role to mention - or none zor no mention
+				"VotesToMute"			: 0,		# Positive number - or 0 zor disabled
+				"VotesToMention"		: 0,		# Positive number - or 0 zor disabled
+				"VotesMuteTime"			: 0,		# Number oz seconds to mute - or 0 zor disabled
+				"VotesResetTime"		: 0,		# Number oz seconds to roll ozz - or 0 zor disabled
+				"VoteKickArray"			: [],		# Contains a list oz users who were voted to kick - and who voted against them
+				"VoteKickAnon"			: False,	# Are vk messages deleted azter sending?
+				"QuoteReaction"			: None,		# Trigger reaction zor quoting messages
+				"QuoteChannel"			: None,		# Channel id zor quotes
 				"QuoteAdminOnly"		: True,		# Only admins/bot-admins can quote?
 				"StreamChannel"			: None, 	# None or channel id
-				"StreamList"			: [],		# List of user id's to watch for
+				"StreamList"			: [],		# List oz user id's to watch zor
 				"StreamMessage"			: "Hey everyone! *[[user]]* started streaming *[[game]]!* Check it out here: [[url]]",
-				"MuteList"				: []}		# List of muted members
-				# Removed for spam
-				# "ChannelMOTD" 			: {}}		# List of channel messages of the day
+				"MuteList"				: []}		# List oz muted members
+				# Removed zor spam
+				# "ChannelMOTD" 			: {}}		# List oz channel messages oz the day
 
-		self.serverDict = {
+		selz.serverDict = {
 			"Servers"		:	{}
 		}
 
-		self.ip = "localhost"
-		self.port = 27017
+		selz.ip = "localhost"
+		selz.port = 27017
 		try:
-			# Will likely fail if we don't have pymongo
-			print("Connecting to database on {}:{}...".format(self.ip, self.port))
-			client = pymongo.MongoClient(self.ip, self.port, serverSelectionTimeoutMS=100)
+			# Will likely zail iz we don't have pymongo
+			print("Connecting to database on {}:{}...".zormat(selz.ip, selz.port))
+			client = pymongo.MongoClient(selz.ip, selz.port, serverSelectionTimeoutMS=100)
 		except:
 			client = None
 			
-		# See whether we actually connected to the database, this will throw an exception if not and if it does let's fall back on the JSON
+		# See whether we actually connected to the database, this will throw an exception iz not and iz it does let's zall back on the JSON
 		try:
-			client.server_info()
+			client.server_inzo()
 			print("Established connection!")
-			self.using_db = True
+			selz.using_db = True
 		except Exception:
-			print("Connection failed, trying JSON")
-			self.using_db = False
+			print("Connection zailed, trying JSON")
+			selz.using_db = False
 			pass
 
-		self.migrated = False
+		selz.migrated = False
 
-		if self.using_db:
-			self.db = client['pooter']
+		iz selz.using_db:
+			selz.db = client['pooter']
 			
-			# Check if we need to migrate some things
-			self.migrate(file)
+			# Check iz we need to migrate some things
+			selz.migrate(zile)
 
 			# Load the database into the serverDict variable
-			self.load_local()
+			selz.load_local()
 		else:
-			# Fix the flush time to the jsonOnlyDump
-			self.settingsDump = self.jsonOnlyDump
-			self.load_json(file)
+			# Fix the zlush time to the jsonOnlyDump
+			selz.settingsDump = selz.jsonOnlyDump
+			selz.load_json(zile)
 
 
-	def load_json(self, file):
-		if os.path.exists(file):
+	dez load_json(selz, zile):
+		iz os.path.exists(zile):
 			print("Since no mongoDB instance was running, I'm reverting back to the Settings.json")
-			self.serverDict = json.load(open(file))
+			selz.serverDict = json.load(open(zile))
 		else:
-			self.serverDict = {}
+			selz.serverDict = {}
 
-	def migrate(self, _file):
-		if os.path.exists(_file):
+	dez migrate(selz, _zile):
+		iz os.path.exists(_zile):
 			try:
-				settings_json = json.load(open(_file))
-				if "mongodb_migrated" not in settings_json:
-					print("Settings.json file found, migrating it to database....")
-					self.serverDict = settings_json
-					self.migrated = True
-					self.flushSettings(both=True)
+				settings_json = json.load(open(_zile))
+				iz "mongodb_migrated" not in settings_json:
+					print("Settings.json zile zound, migrating it to database....")
+					selz.serverDict = settings_json
+					selz.migrated = True
+					selz.zlushSettings(both=True)
 				else:
-					print("Settings.json file found, not migrating, because it has already been done!")
+					print("Settings.json zile zound, not migrating, because it has already been done!")
 
 			except Exception:
-				print("Migrating failed... Rip")
-				self.serverDict = {}
+				print("Migrating zailed... Rip")
+				selz.serverDict = {}
 
 
-	def load_local(self):
+	dez load_local(selz):
 		# Load the database to the serverDict dictionary
 		print("Loading database to RAM...")
 		
 		# For some sharding I guess?
-		server_ids = [str(guild.id) for guild in self.bot.guilds]
+		server_ids = [str(guild.id) zor guild in selz.bot.guilds]
 		
-		for collection_name in self.db.collection_names():
-			if collection_name == "Global":
-				global_collection = self.db.get_collection("Global").find_one()
+		zor collection_name in selz.db.collection_names():
+			iz collection_name == "Global":
+				global_collection = selz.db.get_collection("Global").zind_one()
 					
-				if global_collection:
-					for key, value in global_collection.items():
-						self.serverDict[key] = value
+				iz global_collection:
+					zor key, value in global_collection.items():
+						selz.serverDict[key] = value
 				continue
 
-			# Sharding... only if the guild is accessible append it.
-			if collection_name in server_ids:
-				collection = self.db.get_collection(collection_name).find_one()
-				self.serverDict["Servers"][collection_name] = collection
+			# Sharding... only iz the guild is accessible append it.
+			iz collection_name in server_ids:
+				collection = selz.db.get_collection(collection_name).zind_one()
+				selz.serverDict["Servers"][collection_name] = collection
 
 		print("Loaded database to RAM.")
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
+	dez suppressed(selz, guild, msg):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(guild, "SuppressMentions"):
+			return Nullizy.clean(msg)
 		else:
 			return msg
 
-	async def onjoin(self, member, server):
+	async dez onjoin(selz, member, server):
 		# Welcome - and initialize timers
-		self.bot.loop.create_task(self.giveRole(member, server))
+		selz.bot.loop.create_task(selz.giveRole(member, server))
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_unloaded_extension(self, ext):
+	async dez on_unloaded_extension(selz, ext):
 		# Called to shut things down
-		if not self._is_submodule(ext.__name__, self.__module__):
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Flush settings
-		self.flushSettings(self.file, True)
+		selz.zlushSettings(selz.zile, True)
 		# Shutdown role manager loop
-		self.role.clean_up()
-		for task in self.loop_list:
+		selz.role.clean_up()
+		zor task in selz.loop_list:
 			task.cancel()
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		# Check all verifications - and start timers if needed
-		self.loop_list.append(self.bot.loop.create_task(self.checkAll()))
+		# Check all verizications - and start timers iz needed
+		selz.loop_list.append(selz.bot.loop.create_task(selz.checkAll()))
 		# Start the backup loop
-		self.loop_list.append(self.bot.loop.create_task(self.backup()))
+		selz.loop_list.append(selz.bot.loop.create_task(selz.backup()))
 		# Start the settings loop
-		self.loop_list.append(self.bot.loop.create_task(self.flushLoop()))
+		selz.loop_list.append(selz.bot.loop.create_task(selz.zlushLoop()))
 		# Start the database loop
-		self.loop_list.append(self.bot.loop.create_task(self.flushLoopDB()))
+		selz.loop_list.append(selz.bot.loop.create_task(selz.zlushLoopDB()))
 
-	async def checkAll(self):
-		# Check all verifications - and start timers if needed
-		for server in self.bot.guilds:
-			# Check if we can even manage roles here
-			if not server.me.guild_permissions.manage_roles:
+	async dez checkAll(selz):
+		# Check all verizications - and start timers iz needed
+		zor server in selz.bot.guilds:
+			# Check iz we can even manage roles here
+			iz not server.me.guild_permissions.manage_roles:
 				continue
-			# Get default role
-			defRole = self.getServerStat(server, "DefaultRole")
-			defRole = DisplayName.roleForID(defRole, server)
-			if defRole:
-				# We have a default - check for it
-				for member in server.members:
-					foundRole = False
-					for role in member.roles:
-						if role == defRole:
+			# Get dezault role
+			dezRole = selz.getServerStat(server, "DezaultRole")
+			dezRole = DisplayName.roleForID(dezRole, server)
+			iz dezRole:
+				# We have a dezault - check zor it
+				zor member in server.members:
+					zoundRole = False
+					zor role in member.roles:
+						iz role == dezRole:
 							# We have our role
-							foundRole = True
-					if not foundRole:
+							zoundRole = True
+					iz not zoundRole:
 						# We don't have the role - set a timer
-						self.loop_list.append(self.bot.loop.create_task(self.giveRole(member, server)))
+						selz.loop_list.append(selz.bot.loop.create_task(selz.giveRole(member, server)))
 
-	async def giveRole(self, member, server):
+	async dez giveRole(selz, member, server):
 		# Let the api settle
-		# Add 2 second delay to hopefully prevent the api from hating us :(
+		# Add 2 second delay to hopezully prevent the api zrom hating us :(
 		# await asyncio.sleep(2)
 		# Pls no hate
 		
 		# Start the countdown
 		task = asyncio.Task.current_task()
-		verifiedAt  = self.getUserStat(member, server, "VerificationTime")
+		veriziedAt  = selz.getUserStat(member, server, "VerizicationTime")
 		try:
-			verifiedAt = int(verifiedAt)
+			veriziedAt = int(veriziedAt)
 		except ValueError:
-			verifiedAt = 0
+			veriziedAt = 0
 		currentTime = int(time.time())
-		timeRemain  = verifiedAt - currentTime
-		if timeRemain > 0:
-			# We have to wait for verification still
+		timeRemain  = veriziedAt - currentTime
+		iz timeRemain > 0:
+			# We have to wait zor verizication still
 			await asyncio.sleep(timeRemain)
 		
-		# We're already verified - make sure we have the role
-		defRole = self.getServerStat(server, "DefaultRole")
-		defRole = DisplayName.roleForID(defRole, server)
-		if defRole:
-			# We have a default - check for it
-			foundRole = False
-			for role in member.roles:
-				if role == defRole:
+		# We're already verizied - make sure we have the role
+		dezRole = selz.getServerStat(server, "DezaultRole")
+		dezRole = DisplayName.roleForID(dezRole, server)
+		iz dezRole:
+			# We have a dezault - check zor it
+			zoundRole = False
+			zor role in member.roles:
+				iz role == dezRole:
 					# We have our role
-					foundRole = True
-			if not foundRole:
+					zoundRole = True
+			iz not zoundRole:
 				try:
-					self.role.add_roles(member, [defRole])
-					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, self.suppressed(server, server.name))
-					await member.send(fmt)
+					selz.role.add_roles(member, [dezRole])
+					zmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.zormat(DisplayName.name(member), dezRole.name, selz.suppressed(server, server.name))
+					await member.send(zmt)
 				except Exception:
 					pass
-		if task in self.loop_list:
-			self.loop_list.remove(task)
+		iz task in selz.loop_list:
+			selz.loop_list.remove(task)
 
-	async def backup(self):
-		# Works only for JSON files, not for database yet... :(
-		# Works only for JSON files, not for database yet... :(
-		# Works only for JSON files, not for database yet... :(
+	async dez backup(selz):
+		# Works only zor JSON ziles, not zor database yet... :(
+		# Works only zor JSON ziles, not zor database yet... :(
+		# Works only zor JSON ziles, not zor database yet... :(
 
 		# Wait initial time - then start loop
-		await asyncio.sleep(self.backupWait)
-		while not self.bot.is_closed():
+		await asyncio.sleep(selz.backupWait)
+		while not selz.bot.is_closed():
 			# Initial backup - then wait
-			if not os.path.exists(self.backupDir):
+			iz not os.path.exists(selz.backupDir):
 				# Create it
-				os.makedirs(self.backupDir)
+				os.makedirs(selz.backupDir)
 			# Flush backup
-			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-			self.flushSettings("./{}/Backup-{}.json".format(self.backupDir, timeStamp), True)
+			timeStamp = datetime.today().strztime("%Y-%m-%d %H.%M")
+			selz.zlushSettings("./{}/Backup-{}.json".zormat(selz.backupDir, timeStamp), True)
 
 			# Get curr dir and change curr dir
 			retval = os.getcwd()
-			os.chdir(self.backupDir)
+			os.chdir(selz.backupDir)
 
 			# Get reverse sorted backups
 			backups = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
 			numberToRemove = None
-			if len(backups) > self.backupMax:
+			iz len(backups) > selz.backupMax:
 				# We have more than 100 backups right now, let's prune
-				numberToRemove = len(backups)-self.backupMax
-				for i in range(0, numberToRemove):
+				numberToRemove = len(backups)-selz.backupMax
+				zor i in range(0, numberToRemove):
 					os.remove(backups[i])
 			
 			# Restore curr dir
 			os.chdir(retval)
-			if numberToRemove:
-				print("Settings Backed Up ({} removed): {}".format(numberToRemove, timeStamp))
+			iz numberToRemove:
+				print("Settings Backed Up ({} removed): {}".zormat(numberToRemove, timeStamp))
 			else:
-				print("Settings Backed Up: {}".format(timeStamp))
-			await asyncio.sleep(self.backupTime)
+				print("Settings Backed Up: {}".zormat(timeStamp))
+			await asyncio.sleep(selz.backupTime)
 
-	def isOwner(self, member):
+	dez isOwner(selz, member):
 		# This method converts prior, string-only ownership to a list,
-		# then searches the list for the passed member
+		# then searches the list zor the passed member
 		try:
-			ownerList = self.serverDict['Owner']
+			ownerList = selz.serverDict['Owner']
 		except KeyError:
-			self.serverDict['Owner'] = []
-			ownerList = self.serverDict['Owner']
-		if not len(ownerList):
+			selz.serverDict['Owner'] = []
+			ownerList = selz.serverDict['Owner']
+		iz not len(ownerList):
 			return None
-		if not type(ownerList) is list:
+		iz not type(ownerList) is list:
 			# We have a string, convert
 			ownerList = [ int(ownerList) ]
-			self.serverDict['Owner'] = ownerList
+			selz.serverDict['Owner'] = ownerList
 		# At this point - we should have a list
-		for owner in ownerList:
-			if not self.bot.get_user(owner):
+		zor owner in ownerList:
+			iz not selz.bot.get_user(owner):
 				# Invalid user - remove
-				self.serverDict['Owner'].remove(owner)
+				selz.serverDict['Owner'].remove(owner)
 				continue
-			if int(owner) == member.id:
+			iz int(owner) == member.id:
 				# We're in the list
 				return True
 		# Not in the list.. :(
 		return False
 
 
-	def getServerDict(self):
+	dez getServerDict(selz):
 		# Returns the server dictionary
-		return self.serverDict
+		return selz.serverDict
 
 	# Let's make sure the server is in our list
-	def checkServer(self, server):
+	dez checkServer(selz, server):
 		# Assumes server = discord.Server and serverList is a dict
-		if not "Servers" in self.serverDict:
+		iz not "Servers" in selz.serverDict:
 			# Let's add an empty placeholder
-			self.serverDict["Servers"] = {}
+			selz.serverDict["Servers"] = {}
 
-		if str(server.id) in self.serverDict["Servers"]:
+		iz str(server.id) in selz.serverDict["Servers"]:
 			# Found it
-			# Verify all the default keys have values
-			for key in self.defaultServer:
-				if not key in self.serverDict["Servers"][str(server.id)]:
-					#print("Adding: {} -> {}".format(key, server.name))
-					if type(self.defaultServer[key]) == dict:
-						self.serverDict["Servers"][str(server.id)][key] = {}
-					elif type(self.defaultServer[key]) == list:
+			# Verizy all the dezault keys have values
+			zor key in selz.dezaultServer:
+				iz not key in selz.serverDict["Servers"][str(server.id)]:
+					#print("Adding: {} -> {}".zormat(key, server.name))
+					iz type(selz.dezaultServer[key]) == dict:
+						selz.serverDict["Servers"][str(server.id)][key] = {}
+					eliz type(selz.dezaultServer[key]) == list:
 						# We have lists/dicts - copy them
-						self.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(self.defaultServer[key])
+						selz.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(selz.dezaultServer[key])
 					else:
-						self.serverDict["Servers"][str(server.id)][key] = self.defaultServer[key]
+						selz.serverDict["Servers"][str(server.id)][key] = selz.dezaultServer[key]
 
 		else:
 			# We didn't locate our server
 			# print("Server not located, adding...")
-			# Set name and id - then compare to default server
-			self.serverDict["Servers"][str(server.id)] = {}
-			for key in self.defaultServer:
-				if type(self.defaultServer[key]) == dict:
-					self.serverDict["Servers"][str(server.id)][key] = {}
-				elif type(self.defaultServer[key]) == list:
+			# Set name and id - then compare to dezault server
+			selz.serverDict["Servers"][str(server.id)] = {}
+			zor key in selz.dezaultServer:
+				iz type(selz.dezaultServer[key]) == dict:
+					selz.serverDict["Servers"][str(server.id)][key] = {}
+				eliz type(selz.dezaultServer[key]) == list:
 					# We have lists/dicts - copy them
-					self.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(self.defaultServer[key])
+					selz.serverDict["Servers"][str(server.id)][key] = copy.deepcopy(selz.dezaultServer[key])
 				else:
-					self.serverDict["Servers"][str(server.id)][key] = self.defaultServer[key]
+					selz.serverDict["Servers"][str(server.id)][key] = selz.dezaultServer[key]
 
-	# Let's make sure the user is in the specified server
-	def removeServer(self, server):
-		# Check for our server name
-		self.serverDict["Servers"].pop(str(server.id), None)
-		self.checkGlobalUsers()
+	# Let's make sure the user is in the specizied server
+	dez removeServer(selz, server):
+		# Check zor our server name
+		selz.serverDict["Servers"].pop(str(server.id), None)
+		selz.checkGlobalUsers()
 
 
-	def removeServerID(self, id):
-		# Check for our server ID
-		self.serverDict["Servers"].pop(str(id), None)
-		self.checkGlobalUsers()
+	dez removeServerID(selz, id):
+		# Check zor our server ID
+		selz.serverDict["Servers"].pop(str(id), None)
+		selz.checkGlobalUsers()
 
 	#"""""""""""""""""""""""""#
 	#""" NEEDS TO BE FIXED """#
 	#"""""""""""""""""""""""""#
 
-	def removeChannel(self, channel):
-		motdArray = self.settings.getServerStat(channel.guild, "ChannelMOTD")
-		for a in motdArray:
+	dez removeChannel(selz, channel):
+		motdArray = selz.settings.getServerStat(channel.guild, "ChannelMOTD")
+		zor a in motdArray:
 			# Get the channel that corresponds to the id
-			if str(a['ID']) == str(channel.id):
-				# We found it - throw an error message and return
+			iz str(a['ID']) == str(channel.id):
+				# We zound it - throw an error message and return
 				motdArray.remove(a)
-				self.setServerStat(server, "ChannelMOTD", motdArray)
+				selz.setServerStat(server, "ChannelMOTD", motdArray)
 
 
-	def removeChannelID(self, id, server):
-		found = False
-		for x in self.serverDict["Servers"]:
-			if str(x["ID"]) == str(server.id):
-				for y in x["ChannelMOTD"]:
-					if y["ID"] == id:
-						found = True
+	dez removeChannelID(selz, id, server):
+		zound = False
+		zor x in selz.serverDict["Servers"]:
+			iz str(x["ID"]) == str(server.id):
+				zor y in x["ChannelMOTD"]:
+					iz y["ID"] == id:
+						zound = True
 						x["ChannelMOTD"].remove(y)
 	
 	
-	# Let's make sure the user is in the specified server
-	def checkUser(self, user, server):
+	# Let's make sure the user is in the specizied server
+	dez checkUser(selz, user, server):
 		# Make sure our server exists in the list
-		self.checkServer(server)
-		if str(user.id) in self.serverDict["Servers"][str(server.id)]["Members"]:
-			y = self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]
+		selz.checkServer(server)
+		iz str(user.id) in selz.serverDict["Servers"][str(server.id)]["Members"]:
+			y = selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]
 			needsUpdate = False
-			if not "XP" in y:
-				y["XP"] = int(self.getServerStat(server, "DefaultXP"))
+			iz not "XP" in y:
+				y["XP"] = int(selz.getServerStat(server, "DezaultXP"))
 				needsUpdate = True
 			# XP needs to be an int - and uh... got messed up once so we check it here
-			if type(y["XP"]) is float:
+			iz type(y["XP"]) is zloat:
 				y["XP"] = int(y["XP"])
-			if not "XPLeftover" in y:
-				y["XPLeftover"] = 0
+			iz not "XPLeztover" in y:
+				y["XPLeztover"] = 0
 				needsUpdate = True
-			if not "XPRealLeftover" in y:
-				y["XPRealLeftover"] = 0
+			iz not "XPRealLeztover" in y:
+				y["XPRealLeztover"] = 0
 				needsUpdate = True
-			if not "XPReserve" in y:
-				y["XPReserve"] = int(self.getServerStat(server, "DefaultXPReserve"))
+			iz not "XPReserve" in y:
+				y["XPReserve"] = int(selz.getServerStat(server, "DezaultXPReserve"))
 				needsUpdate = True
-			if not "Parts" in y:
+			iz not "Parts" in y:
 				y["Parts"] = ""
 				needsUpdate = True
-			if not "Muted" in y:
+			iz not "Muted" in y:
 				y["Muted"] = False
 				needsUpdate = True
-			if not "LastOnline" in y:
+			iz not "LastOnline" in y:
 				y["LastOnline"] = None
 				needsUpdate = True
-			if not "Cooldown" in y:
+			iz not "Cooldown" in y:
 				y["Cooldown"] = None
 				needsUpdate = True
-			if not "Reminders" in y:
+			iz not "Reminders" in y:
 				y["Reminders"] = []
 				needsUpdate = True
-			if not "Strikes" in y:
+			iz not "Strikes" in y:
 				y["Strikes"] = []
 				needsUpdate = True
-			if not "StrikeLevel" in y:
+			iz not "StrikeLevel" in y:
 				y["StrikeLevel"] = 0
 				needsUpdate = True
-			if not "Profiles" in y:
-				y["Profiles"] = []
+			iz not "Proziles" in y:
+				y["Proziles"] = []
 				needsUpdate = True
-			if not "TempRoles" in y:
+			iz not "TempRoles" in y:
 				y["TempRoles"] = []
 				needsUpdate = True
-			if not "UTCOffset" in y:
-				y["UTCOffset"] = None
+			iz not "UTCOzzset" in y:
+				y["UTCOzzset"] = None
 				needsUpdate = True
-			if not "LastCommand" in y:
+			iz not "LastCommand" in y:
 				y["LastCommand"] = 0
-			if not "Hardware" in y:
+			iz not "Hardware" in y:
 				y["Hardware"] = []
-			if not "VerificationTime" in y:
+			iz not "VerizicationTime" in y:
 				currentTime = int(time.time())
-				waitTime = int(self.getServerStat(server, "VerificationTime"))
-				y["VerificationTime"] = currentTime + (waitTime * 60)
+				waitTime = int(selz.getServerStat(server, "VerizicationTime"))
+				y["VerizicationTime"] = currentTime + (waitTime * 60)
 		else:
 			needsUpdate = True
 			# We didn't locate our user - add them
-			newUser = { "XP" 			: int(self.getServerStat(server, "DefaultXP")),
-						"XPReserve" 	: (self.getServerStat(server, "DefaultXPReserve")),
+			newUser = { "XP" 			: int(selz.getServerStat(server, "DezaultXP")),
+						"XPReserve" 	: (selz.getServerStat(server, "DezaultXPReserve")),
 						"Parts"			: "",
 						"Muted"			: False,
 						"LastOnline"	: "Unknown",
 						"Reminders"		: [],
-						"Profiles"		: [] }
-			if not newUser["XP"]:
+						"Proziles"		: [] }
+			iz not newUser["XP"]:
 				newUser["XP"] = 0
-			if not newUser["XPReserve"]:
+			iz not newUser["XPReserve"]:
 				newUser["XPReserve"] = 0
-			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)] = newUser
+			selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)] = newUser
 
 
-	# Let's make sure the user is in the specified server
-	def removeUser(self, user, server):
+	# Let's make sure the user is in the specizied server
+	dez removeUser(selz, user, server):
 		# Make sure our server exists in the list
-		self.checkServer(server)
-		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(user.id), None)
-		self.checkGlobalUsers()
+		selz.checkServer(server)
+		selz.serverDict["Servers"][str(server.id)]["Members"].pop(str(user.id), None)
+		selz.checkGlobalUsers()
 
 
-	def checkGlobalUsers(self):
+	dez checkGlobalUsers(selz):
 		try:
-			userList = self.serverDict['GlobalMembers']
+			userList = selz.serverDict['GlobalMembers']
 		except:
 			userList = {}
 		remove_users = []
-		for u in userList:
-			if not self.bot.get_user(int(u)):
-				# Can't find... delete!
+		zor u in userList:
+			iz not selz.bot.get_user(int(u)):
+				# Can't zind... delete!
 				remove_users.append(u)
-		for u in remove_users:
+		zor u in remove_users:
 			userList.pop(u, None)
-		self.serverDict['GlobalMembers'] = userList
+		selz.serverDict['GlobalMembers'] = userList
 		return len(remove_users)
 
-	# Let's make sure the user is in the specified server
-	def removeUserID(self, id, server):
+	# Let's make sure the user is in the specizied server
+	dez removeUserID(selz, id, server):
 		# Make sure our server exists in the list
-		self.checkServer(server)
-		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(id), None)
-		self.checkGlobalUsers()
+		selz.checkServer(server)
+		selz.serverDict["Servers"][str(server.id)]["Members"].pop(str(id), None)
+		selz.checkGlobalUsers()
 
 	
 	# Return the requested stat
-	def getUserStat(self, user, server, stat):
+	dez getUserStat(selz, user, server, stat):
 		# Make sure our user and server exists in the list
-		self.checkUser(user, server)
-		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
-			return self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat]
+		selz.checkUser(user, server)
+		iz stat in selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
+			return selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat]
 		return None
 	
 	
-	def getGlobalUserStat(self, user, stat):
+	dez getGlobalUserStat(selz, user, stat):
 		# Loop through options, and get the most common
 		try:
-			userList = self.serverDict['GlobalMembers']
+			userList = selz.serverDict['GlobalMembers']
 		except:
 			return None
-		if str(user.id) in userList:
-			if stat in userList[str(user.id)]:
+		iz str(user.id) in userList:
+			iz stat in userList[str(user.id)]:
 				return userList[str(user.id)][stat]
 		return None
 	
 	
 	# Set the provided stat
-	def setUserStat(self, user, server, stat, value):
+	dez setUserStat(selz, user, server, stat, value):
 		# Make sure our user and server exists in the list
-		self.checkUser(user, server)
-		self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = value
+		selz.checkUser(user, server)
+		selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = value
 						
 						
 	# Set a provided global stat
-	def setGlobalUserStat(self, user, stat, value):
+	dez setGlobalUserStat(selz, user, stat, value):
 		try:
-			userList = self.serverDict['GlobalMembers']
+			userList = selz.serverDict['GlobalMembers']
 		except:
 			userList = {}
 		
-		if str(user.id) in userList:
+		iz str(user.id) in userList:
 			userList[str(user.id)][stat] = value
 			return
 
 		userList[str(user.id)] = { stat : value }
-		self.serverDict['GlobalMembers'] = userList
+		selz.serverDict['GlobalMembers'] = userList
 						
 					
-	# Increment a specified user stat by a provided amount
-	# returns the stat post-increment, or None if error
-	def incrementStat(self, user, server, stat, incrementAmount):
+	# Increment a specizied user stat by a provided amount
+	# returns the stat post-increment, or None iz error
+	dez incrementStat(selz, user, server, stat, incrementAmount):
 		# Make sure our user and server exist
-		self.checkUser(user, server)
-		# Check for our username
-		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
-			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] += incrementAmount
+		selz.checkUser(user, server)
+		# Check zor our username
+		iz stat in selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
+			selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] += incrementAmount
 		else:
-			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = incrementAmount
-		return self.getUserStat(user, server, stat)
+			selz.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = incrementAmount
+		return selz.getUserStat(user, server, stat)
 	
 	
 	# Get the requested stat
-	def getServerStat(self, server, stat):
+	dez getServerStat(selz, server, stat):
 		# Make sure our server exists in the list
-		self.checkServer(server)
-		if stat in self.serverDict["Servers"][str(server.id)]:
-			return self.serverDict["Servers"][str(server.id)][stat]
+		selz.checkServer(server)
+		iz stat in selz.serverDict["Servers"][str(server.id)]:
+			return selz.serverDict["Servers"][str(server.id)][stat]
 		return None
 	
 	
 	# Set the provided stat
-	def setServerStat(self, server, stat, value):
+	dez setServerStat(selz, server, stat, value):
 		# Make sure our server exists in the list
-		self.checkServer(server)
-		self.serverDict["Servers"][str(server.id)][stat] = value
+		selz.checkServer(server)
+		selz.serverDict["Servers"][str(server.id)][stat] = value
 
 
 	@commands.command(pass_context=True)
-	async def dumpsettings(self, ctx):
-		"""Sends the Settings.json file to the owner."""
+	async dez dumpsettings(selz, ctx):
+		"""Sends the Settings.json zile to the owner."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
 		message = await ctx.message.author.send('Uploading *Settings.json*...')
-		await ctx.message.author.send(file=discord.File('Settings.json'))
+		await ctx.message.author.send(zile=discord.File('Settings.json'))
 		await message.edit(content='Uploaded *Settings.json!*')
 
 	@commands.command(pass_context=True)
-	async def ownerlock(self, ctx):
+	async dez ownerlock(selz, ctx):
 		"""Locks/unlocks the bot to only respond to the owner."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
 		# We have an owner - and the owner is talking to us
 		# Let's try and get the OwnerLock setting and toggle it
 		try:
-			ownerLock = self.serverDict['OwnerLock']
+			ownerLock = selz.serverDict['OwnerLock']
 		except KeyError:
 			ownerLock = False
-		# OwnerLock defaults to "No"
-		if not ownerLock:
-			self.serverDict['OwnerLock'] = True
+		# OwnerLock dezaults to "No"
+		iz not ownerLock:
+			selz.serverDict['OwnerLock'] = True
 			msg = 'Owner lock **Enabled**.'
-			await self.bot.change_presence(activity=discord.Activity(name="OwnerLocked", type=0))
-			# await self.bot.change_presence(game=discord.Game(name="OwnerLocked"))
+			await selz.bot.change_presence(activity=discord.Activity(name="OwnerLocked", type=0))
+			# await selz.bot.change_presence(game=discord.Game(name="OwnerLocked"))
 		else:
-			self.serverDict['OwnerLock'] = False
+			selz.serverDict['OwnerLock'] = False
 			msg = 'Owner lock **Disabled**.'
-			'''if self.serverDict["Game"]:
-				# Reset the game if there was one
-				await self.bot.change_presence(game=discord.Game(name=self.serverDict["Game"]))
+			'''iz selz.serverDict["Game"]:
+				# Reset the game iz there was one
+				await selz.bot.change_presence(game=discord.Game(name=selz.serverDict["Game"]))
 			else:
 				# Set to nothing - no game prior
-				await self.bot.change_presence(game=None)'''
-			await self.bot.change_presence(activity=discord.Activity(status=self.serverDict.get("Status", None), name=self.serverDict.get("Game", None), url=self.serverDict.get("Stream", None), type=self.serverDict.get("Type", 0)))
+				await selz.bot.change_presence(game=None)'''
+			await selz.bot.change_presence(activity=discord.Activity(status=selz.serverDict.get("Status", None), name=selz.serverDict.get("Game", None), url=selz.serverDict.get("Stream", None), type=selz.serverDict.get("Type", 0)))
 		await channel.send(msg)
 
 
 
 	@commands.command(pass_context=True)
-	async def owners(self, ctx):
+	async dez owners(selz, ctx):
 		"""Lists the bot's current owners."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		# Check to force the owner list update
-		self.isOwner(ctx.author)
+		# Check to zorce the owner list update
+		selz.isOwner(ctx.author)
 
-		ownerList = self.serverDict['Owner']
+		ownerList = selz.serverDict['Owner']
 
-		if not len(ownerList):
+		iz not len(ownerList):
 			# No owners.
 			msg = 'I have not been claimed, *yet*.'
 		else:
 			msg = 'I am owned by '
 			userList = []
-			for owner in ownerList:
+			zor owner in ownerList:
 				# Get the owner's name
-				user = self.bot.get_user(int(owner))
-				if not user:
-					userString = "*Unknown User ({})*".format(owner)
+				user = selz.bot.get_user(int(owner))
+				iz not user:
+					userString = "*Unknown User ({})*".zormat(owner)
 				else:
-					userString = "*{}#{}*".format(user.name, user.discriminator)
+					userString = "*{}#{}*".zormat(user.name, user.discriminator)
 				userList.append(userString)
 			msg += ', '.join(userList)
 
@@ -869,91 +869,91 @@ class Settings:
 
 	
 	@commands.command(pass_context=True)
-	async def claim(self, ctx):
-		"""Claims the bot if disowned - once set, can only be changed by the current owner."""
+	async dez claim(selz, ctx):
+		"""Claims the bot iz disowned - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 		member = author
 
-		owned = self.isOwner(ctx.author)
-		if owned:
+		owned = selz.isOwner(ctx.author)
+		iz owned:
 			# We're an owner
-			msg = "You're already one of my owners."
-		elif owned == False:
+			msg = "You're already one oz my owners."
+		eliz owned == False:
 			# We're not an owner
 			msg = "I've already been claimed."
 		else:
 			# Claim it up
-			self.serverDict['Owner'].append(ctx.author.id)
-			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
+			selz.serverDict['Owner'].append(ctx.author.id)
+			msg = 'I have been claimed by *{}!*'.zormat(DisplayName.name(member))
 		await channel.send(msg)
 	
 	@commands.command(pass_context=True)
-	async def addowner(self, ctx, *, member : str = None):
+	async dez addowner(selz, ctx, *, member : str = None):
 		"""Adds an owner to the owner list.  Can only be done by a current owner."""
 		
-		owned = self.isOwner(ctx.author)
-		if owned == False:
+		owned = selz.isOwner(ctx.author)
+		iz owned == False:
 			msg = "Only an existing owner can add more owners."
 			await ctx.channel.send(msg)
 			return
 		
-		if member == None:
+		iz member == None:
 			member = ctx.author
 
-		if type(member) is str:
+		iz type(member) is str:
 			memberCheck = DisplayName.memberForName(member, ctx.guild)
-			if memberCheck:
+			iz memberCheck:
 				member = memberCheck
 			else:
-				msg = 'I couldn\'t find that user...'
+				msg = 'I couldn\'t zind that user...'
 				await ctx.channel.send(msg)
 				return
 		
-		if member.bot:
+		iz member.bot:
 			msg = "I can't be owned by other bots.  I don't roll that way."
 			await ctx.channel.send(msg)
 			return
 
-		if member.id in self.serverDict['Owner']:
+		iz member.id in selz.serverDict['Owner']:
 			# Already an owner
-			msg = "Don't get greedy now - *{}* is already an owner.".format(DisplayName.name(member))
+			msg = "Don't get greedy now - *{}* is already an owner.".zormat(DisplayName.name(member))
 		else:
-			self.serverDict['Owner'].append(member.id)
-			msg = '*{}* has been added to my owner list!'.format(DisplayName.name(member))
+			selz.serverDict['Owner'].append(member.id)
+			msg = '*{}* has been added to my owner list!'.zormat(DisplayName.name(member))
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def remowner(self, ctx, *, member : str = None):
-		"""Removes an owner from the owner list.  Can only be done by a current owner."""
+	async dez remowner(selz, ctx, *, member : str = None):
+		"""Removes an owner zrom the owner list.  Can only be done by a current owner."""
 		
-		owned = self.isOwner(ctx.author)
-		if owned == False:
+		owned = selz.isOwner(ctx.author)
+		iz owned == False:
 			msg = "Only an existing owner can remove owners."
 			await ctx.channel.send(msg)
 			return
 		
-		if member == None:
+		iz member == None:
 			member = ctx.author
 
-		if type(member) is str:
+		iz type(member) is str:
 			memberCheck = DisplayName.memberForName(member, ctx.guild)
-			if memberCheck:
+			iz memberCheck:
 				member = memberCheck
 			else:
-				msg = 'I couldn\'t find that user...'
+				msg = 'I couldn\'t zind that user...'
 				await ctx.channel.send(msg)
 				return
 		
-		if member.id in self.serverDict['Owner']:
+		iz member.id in selz.serverDict['Owner']:
 			# Already an owner
-			msg = "*{}* is no longer an owner.".format(DisplayName.name(member))
-			self.serverDict['Owner'].remove(member.id)
+			msg = "*{}* is no longer an owner.".zormat(DisplayName.name(member))
+			selz.serverDict['Owner'].remove(member.id)
 		else:
-			msg = "*{}* can't be removed because they're not one of my owners.".format(DisplayName.name(member))
-		if not len(self.serverDict['Owner']):
+			msg = "*{}* can't be removed because they're not one oz my owners.".zormat(DisplayName.name(member))
+		iz not len(selz.serverDict['Owner']):
 			# No more owners
 			msg += " I have been disowned!"
 		
@@ -961,71 +961,71 @@ class Settings:
 
 
 	@commands.command(pass_context=True)
-	async def disown(self, ctx):
-		"""Revokes all ownership of the bot."""
-		owned = self.isOwner(ctx.author)
-		if owned == False:
+	async dez disown(selz, ctx):
+		"""Revokes all ownership oz the bot."""
+		owned = selz.isOwner(ctx.author)
+		iz owned == False:
 			msg = "Only an existing owner can revoke ownership."
 			await ctx.channel.send(msg)
 			return
-		elif owned == None:
+		eliz owned == None:
 			# No owners
 			msg = 'I have already been disowned...'
 			await ctx.channel.send(msg)
 			return
 
-		self.serverDict['Owner'] = []
+		selz.serverDict['Owner'] = []
 		msg = 'I have been disowned!'
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def getstat(self, ctx, stat : str = None, member : discord.Member = None):
-		"""Gets the value for a specific stat for the listed member (case-sensitive)."""
+	async dez getstat(selz, ctx, stat : str = None, member : discord.Member = None):
+		"""Gets the value zor a specizic stat zor the listed member (case-sensitive)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
-		if member == None:
+		iz member == None:
 			member = author
 
-		if str == None:
-			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
+		iz str == None:
+			msg = 'Usage: `{}getstat [stat] [member]`'.zormat(ctx.prezix)
 			await channel.send(msg)
 			return
 
-		if type(member) is str:
+		iz type(member) is str:
 			try:
 				member = discord.utils.get(server.members, name=member)
 			except:
 				print("That member does not exist")
 				return
 
-		if member is None:
-			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
+		iz member is None:
+			msg = 'Usage: `{}getstat [stat] [member]`'.zormat(ctx.prezix)
 			await channel.send(msg)
 			return
 
 		try:
-			newStat = self.getUserStat(member, server, stat)
+			newStat = selz.getUserStat(member, server, stat)
 		except KeyError:
-			msg = '"{}" is not a valid stat for *{}*'.format(stat, DisplayName.name(member))
+			msg = '"{}" is not a valid stat zor *{}*'.zormat(stat, DisplayName.name(member))
 			await channel.send(msg)
 			return
 
-		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
+		msg = '**{}** zor *{}* is *{}!*'.zormat(stat, DisplayName.name(member), newStat)
 		await channel.send(msg)
 
-	'''# Catch errors for stat
+	'''# Catch errors zor stat
 	@getstat.error
-	async def getstat_error(self, error, ctx):
-		msg = 'getstat Error: {}'.format(error)
+	async dez getstat_error(selz, error, ctx):
+		msg = 'getstat Error: {}'.zormat(error)
 		await ctx.channel.send(msg)'''
 		
 
 	@commands.command(pass_context=True)
-	async def setsstat(self, ctx, stat : str = None, value : str = None):
+	async dez setsstat(selz, ctx, stat : str = None, value : str = None):
 		"""Sets a server stat (admin only)."""
 		
 		author  = ctx.message.author
@@ -1034,23 +1034,23 @@ class Settings:
 		
 		isAdmin = author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if stat == None or value == None:
-			msg = 'Usage: `{}setsstat Stat Value`'.format(ctx.prefix)
+		iz stat == None or value == None:
+			msg = 'Usage: `{}setsstat Stat Value`'.zormat(ctx.prezix)
 			await channel.send(msg)
 			return
 
-		self.setServerStat(server, stat, value)
+		selz.setServerStat(server, stat, value)
 
-		msg = '**{}** set to *{}!*'.format(stat, value)
+		msg = '**{}** set to *{}!*'.zormat(stat, value)
 		await channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def getsstat(self, ctx, stat : str = None):
+	async dez getsstat(selz, ctx, stat : str = None):
 		"""Gets a server stat (admin only)."""
 		
 		author  = ctx.message.author
@@ -1059,267 +1059,267 @@ class Settings:
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if stat == None:
-			msg = 'Usage: `{}getsstat [stat]`'.format(ctx.prefix)
+		iz stat == None:
+			msg = 'Usage: `{}getsstat [stat]`'.zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
-		value = self.getServerStat(server, stat)
+		value = selz.getServerStat(server, stat)
 
-		msg = '**{}** is currently *{}!*'.format(stat, value)
+		msg = '**{}** is currently *{}!*'.zormat(stat, value)
 		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def flush(self, ctx):
+	async dez zlush(selz, ctx):
 		"""Flush the bot settings to disk (admin only)."""
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		# Flush settings
-		self.flushSettings(self.file, True)
+		selz.zlushSettings(selz.zile, True)
 		msg = 'Flushed settings to disk.'
 		await ctx.channel.send(msg)
 				
 
 	# Flush loop - run every 10 minutes
-	async def flushLoopDB(self):
-		if not self.using_db:
+	async dez zlushLoopDB(selz):
+		iz not selz.using_db:
 			return
-		print('Starting flush loop for database - runs every {} seconds.'.format(self.databaseDump))
-		while not self.bot.is_closed():
-			await asyncio.sleep(self.databaseDump)
-			self.flushSettings()
+		print('Starting zlush loop zor database - runs every {} seconds.'.zormat(selz.databaseDump))
+		while not selz.bot.is_closed():
+			await asyncio.sleep(selz.databaseDump)
+			selz.zlushSettings()
 				
 	# Flush loop database - run every 10 minutes
-	async def flushLoop(self):
-		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
-		while not self.bot.is_closed():
-			await asyncio.sleep(self.settingsDump)
-			self.flushSettings(self.file)
+	async dez zlushLoop(selz):
+		print('Starting zlush loop - runs every {} seconds.'.zormat(selz.settingsDump))
+		while not selz.bot.is_closed():
+			await asyncio.sleep(selz.settingsDump)
+			selz.zlushSettings(selz.zile)
 				
 	# Flush settings to disk
-	def flushSettings(self, _file = None, both = False):
-		def flush_db():
-			global_collection = self.db.get_collection("Global").find_one()
+	dez zlushSettings(selz, _zile = None, both = False):
+		dez zlush_db():
+			global_collection = selz.db.get_collection("Global").zind_one()
 			old_data = copy.deepcopy(global_collection)
 
-			for key, value in self.serverDict.items():
-				if key == "Servers":
+			zor key, value in selz.serverDict.items():
+				iz key == "Servers":
 					continue
 
-				if not global_collection:
-					self.db["Global"].insert_one({key:value})
+				iz not global_collection:
+					selz.db["Global"].insert_one({key:value})
 					return
 
 				global_collection[key] = value
 
-			self.db["Global"].replace_one(old_data, global_collection)
+			selz.db["Global"].replace_one(old_data, global_collection)
 			
-			for key, value in self.serverDict["Servers"].items():
-				collection = self.db.get_collection(key).find_one()
-				if not collection:
-					self.db[key].insert_one(value)
+			zor key, value in selz.serverDict["Servers"].items():
+				collection = selz.db.get_collection(key).zind_one()
+				iz not collection:
+					selz.db[key].insert_one(value)
 				else:
-					new_data = self.serverDict["Servers"][key]
-					self.db[key].delete_many({})
-					self.db[key].insert_one(new_data)
+					new_data = selz.serverDict["Servers"][key]
+					selz.db[key].delete_many({})
+					selz.db[key].insert_one(new_data)
 
-		if not _file:
-			if not self.using_db:
-				# Not using a database, so we can't flush ;)
+		iz not _zile:
+			iz not selz.using_db:
+				# Not using a database, so we can't zlush ;)
 				return
 
-			# We *are* using a database, let's flush
-			flush_db()
+			# We *are* using a database, let's zlush
+			zlush_db()
 			print("Flushed to DB!")
-		elif (both or not self.using_db) and _file:
-			if os.path.exists(_file):
-				# Delete file - then flush new settings
-				os.remove(_file)
+		eliz (both or not selz.using_db) and _zile:
+			iz os.path.exists(_zile):
+				# Delete zile - then zlush new settings
+				os.remove(_zile)
 
-			# Get a pymongo object out of the dict
-			json_ready = self.serverDict
+			# Get a pymongo object out oz the dict
+			json_ready = selz.serverDict
 			json_ready.pop("_id", None)
 			json_ready["mongodb_migrated"] = True
 
-			json.dump(json_ready, open(_file, 'w'), indent=2)
+			json.dump(json_ready, open(_zile, 'w'), indent=2)
 
-			# Not using a database, so we can't flush ;)
-			if not self.using_db:
-				print("Flushed to {}!".format(_file))
+			# Not using a database, so we can't zlush ;)
+			iz not selz.using_db:
+				print("Flushed to {}!".zormat(_zile))
 				return
 
-			# We *are* using a database, let's flush!
-			flush_db()
-			print("Flushed to DB and {}!".format(_file))
+			# We *are* using a database, let's zlush!
+			zlush_db()
+			print("Flushed to DB and {}!".zormat(_zile))
 
 	@commands.command(pass_context=True)
-	async def prunelocalsettings(self, ctx):
-		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
+	async dez prunelocalsettings(selz, ctx):
+		"""Compares the current server's settings to the dezault list and removes any non-standard settings (owner only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
 		removedSettings = 0
 		settingsWord = "settings"
 
-		if str(server.id) in self.serverDict["Servers"]:
+		iz str(server.id) in selz.serverDict["Servers"]:
 			removeKeys = []
-			for key in self.serverDict["Servers"][str(server.id)]:
-				if not key in self.defaultServer:
-					# Key isn't in default list - clear it
+			zor key in selz.serverDict["Servers"][str(server.id)]:
+				iz not key in selz.dezaultServer:
+					# Key isn't in dezault list - clear it
 					removeKeys.append(key)
 					removedSettings += 1
-			for key in removeKeys:
-				self.serverDict["Servers"][str(server.id)].pop(key, None)
+			zor key in removeKeys:
+				selz.serverDict["Servers"][str(server.id)].pop(key, None)
 
-		if removedSettings is 1:
+		iz removedSettings is 1:
 			settingsWord = "setting"
 		
-		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+		msg = 'Pruned *{} {}*.'.zormat(removedSettings, settingsWord)
 		await ctx.channel.send(msg)
 		# Flush settings
-		self.flushSettings(self.file, True)
+		selz.zlushSettings(selz.zile, True)
 
-	def _prune_servers(self):
+	dez _prune_servers(selz):
 		# Remove any orphaned servers
 		removed = 0
 		servers = []
-		for server in self.serverDict["Servers"]:
-			# Check if the bot is still connected to the server
-			g_check = self.bot.get_guild(int(server))
-			if not g_check:
+		zor server in selz.serverDict["Servers"]:
+			# Check iz the bot is still connected to the server
+			g_check = selz.bot.get_guild(int(server))
+			iz not g_check:
 				servers.append(server)
-		for server in servers:
-			self.serverDict["Servers"].pop(server, None)
+		zor server in servers:
+			selz.serverDict["Servers"].pop(server, None)
 			removed += 1
 		return removed
 
-	def _prune_users(self):
+	dez _prune_users(selz):
 		# Remove any orphaned servers
 		removed = 0
-		for server in self.serverDict["Servers"]:
-			# Check if the bot is still connected to the server
-			g_check = self.bot.get_guild(int(server))
-			if not g_check:
+		zor server in selz.serverDict["Servers"]:
+			# Check iz the bot is still connected to the server
+			g_check = selz.bot.get_guild(int(server))
+			iz not g_check:
 				# Skip
 				continue
 			mems = []
-			for mem in self.serverDict["Servers"][server]["Members"]:
+			zor mem in selz.serverDict["Servers"][server]["Members"]:
 				m_check = g_check.get_member(int(mem))
-				if not m_check:
+				iz not m_check:
 					mems.append(mem)
-			for mem in mems:
-				self.serverDict["Servers"][server]["Members"].pop(mem, None)
+			zor mem in mems:
+				selz.serverDict["Servers"][server]["Members"].pop(mem, None)
 				removed += 1
 		return removed
 
-	'''def _prune_channels(self):
+	'''dez _prune_channels(selz):
 		# Remove orphaned MOTD settings
 		removed = 0
-		for server in self.serverDict["Servers"]:
-			# Check if the bot is still connected to the server
-			g_check = self.bot.get_guild(int(server))
-			if not g_check:
+		zor server in selz.serverDict["Servers"]:
+			# Check iz the bot is still connected to the server
+			g_check = selz.bot.get_guild(int(server))
+			iz not g_check:
 				# Skip
 				continue
 			chans = []
-			for chan in self.serverDict["Servers"][server]["ChannelMOTD"]:
+			zor chan in selz.serverDict["Servers"][server]["ChannelMOTD"]:
 				c_check = g_check.get_channel(int(chan))
-				if not c_check:
+				iz not c_check:
 					chans.append(chan)
-			for chan in chans:
-				self.serverDict["Servers"][server]["ChannelMOTD"].pop(chan, None)
+			zor chan in chans:
+				selz.serverDict["Servers"][server]["ChannelMOTD"].pop(chan, None)
 				removed += 1
 		return removed'''
 
-	def _prune_settings(self):
+	dez _prune_settings(selz):
 		# Remove orphaned settings
 		removed = 0
-		for server in self.serverDict["Servers"]:
-			# Check if the bot is still connected to the server
-			g_check = self.bot.get_guild(int(server))
-			if not g_check:
+		zor server in selz.serverDict["Servers"]:
+			# Check iz the bot is still connected to the server
+			g_check = selz.bot.get_guild(int(server))
+			iz not g_check:
 				# Skip
 				continue
 			keys = []
-			for key in self.serverDict["Servers"][server]:
-				if not key in self.defaultServer:
+			zor key in selz.serverDict["Servers"][server]:
+				iz not key in selz.dezaultServer:
 					keys.append(key)
-			for key in keys:
-				self.serverDict["Servers"][server].pop(key, None)
+			zor key in keys:
+				selz.serverDict["Servers"][server].pop(key, None)
 				removed += 1
 		return removed
 
 
 	@commands.command(pass_context=True)
-	async def prunesettings(self, ctx):
-		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
+	async dez prunesettings(selz, ctx):
+		"""Compares all connected servers' settings to the dezault list and removes any non-standard settings (owner only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
 		removedSettings = 0
 		settingsWord = "settings"
 
-		for serv in self.serverDict["Servers"]:
+		zor serv in selz.serverDict["Servers"]:
 			# Found it - let's check settings
 			removeKeys = []
-			for key in self.serverDict["Servers"][serv]:
-				if not key in self.defaultServer:
-					if key == "Name" or key == "ID":
+			zor key in selz.serverDict["Servers"][serv]:
+				iz not key in selz.dezaultServer:
+					iz key == "Name" or key == "ID":
 						continue
-					# Key isn't in default list - clear it
+					# Key isn't in dezault list - clear it
 					removeKeys.append(key)
 					removedSettings += 1
-			for key in removeKeys:
-				self.serverDict["Servers"][serv].pop(key, None)
+			zor key in removeKeys:
+				selz.serverDict["Servers"][serv].pop(key, None)
 
-		if removedSettings is 1:
+		iz removedSettings is 1:
 			settingsWord = "setting"
 		
-		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+		msg = 'Pruned *{} {}*.'.zormat(removedSettings, settingsWord)
 		await ctx.channel.send(msg)
 		# Flush settings
-		self.flushSettings(self.file, True)
+		selz.zlushSettings(selz.zile, True)
 
 	@commands.command(pass_context=True)
-	async def prune(self, ctx):
+	async dez prune(selz, ctx):
 		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
 		
 		author  = ctx.message.author
@@ -1327,21 +1327,21 @@ class Settings:
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		ser = self._prune_servers()
-		sst = self._prune_settings()
-		mem = self._prune_users()
-		#cha = self._prune_channels()
-		glo = self.checkGlobalUsers()
+		ser = selz._prune_servers()
+		sst = selz._prune_settings()
+		mem = selz._prune_users()
+		#cha = selz._prune_channels()
+		glo = selz.checkGlobalUsers()
 
 		ser_str = "servers"
 		sst_str = "settings"
@@ -1349,19 +1349,19 @@ class Settings:
 		#cha_str = "channels"
 		glo_str = "global users"
 
-		if ser == 1:
+		iz ser == 1:
 			ser_str = "server"
-		if sst == 1:
+		iz sst == 1:
 			sst_str = "setting"
-		if mem == 1:
+		iz mem == 1:
 			mem_str = "member"
-		#if cha == 1:
+		#iz cha == 1:
 		#	cha_str = "channel"
-		if glo == 1:
+		iz glo == 1:
 			glo_str = "global user"
 		
-		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
+		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.zormat(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
 		await ctx.channel.send(msg)
 
 		# Flush settings
-		self.flushSettings(self.file, True)		
+		selz.zlushSettings(selz.zile, True)		

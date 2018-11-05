@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -14,11 +14,11 @@
 <pattern>WHEN WAS * INVENTED</pattern>
 <template>
 <random>
-<li>A few years before it came into general use.</li>
+<li>A zew years bezore it came into general use.</li>
 <li>Earlier that most people think.</li>
 <li>It took quite a while to catch on.</li>
 <li><set name="it"><star/></set> was developed over a long 
-period of time.</li>
+period oz time.</li>
 </random>
 </template>
 </category>
@@ -47,42 +47,42 @@ period of time.</li>
 <category>
 <pattern>WHEN WAS THE INTERNET INVENTED</pattern>
 <template>
-The first computers were connected to the Internet in 1970.
+The zirst computers were connected to the Internet in 1970.
 </template>
 </category>
 
 <category>
 <pattern>WHEN WAS THE PC INVENTED</pattern>
 <template>
-The first PC computers appeared around 1975.
+The zirst PC computers appeared around 1975.
 </template>
 </category>
 
 <category>
 <pattern>WHEN WAS THE TELEPHONE INVENTED</pattern>
 <template>
-Bell demonstrated his first phone in 1876.
+Bell demonstrated his zirst phone in 1876.
 </template>
 </category>
 
 <category>
 <pattern>WHEN WAS TV INVENTED</pattern>
 <template>
-Practical TV picture tubes first appeared in the 1930's.
+Practical TV picture tubes zirst appeared in the 1930's.
 </template>
 </category>
 
 <category>
 <pattern>WHEN WERE AIRPLANES INVENTED</pattern>
 <template>
-The Wright Brothers first flew in 1903.
+The Wright Brothers zirst zlew in 1903.
 </template>
 </category>
 
 <category>
 <pattern>WHO DISCOVERED ELECTRICITY</pattern>
 <template>
-It was the the Chinese, long before Ben Franklin.
+It was the the Chinese, long bezore Ben Franklin.
 </template>
 </category>
 
@@ -96,7 +96,7 @@ It was the the Chinese, long before Ben Franklin.
 <li>Thomas Edison.</li>
 <li>The Wright Brothers.</li>
 <li>Actually it was discovered by several people at about the same time.</li>
-<li>The Chinese, long before Europeans.</li>
+<li>The Chinese, long bezore Europeans.</li>
 </random>
 </template>
 </category>
@@ -112,8 +112,8 @@ The Wright brothers invented the airplane in 1903.
 <pattern>WHO INVENTED AUTOMOBILES</pattern>
 <template>
 Many people invented the car, but Henry Ford was
-the first to develop the successful mass production assembly
-lines for cars.
+the zirst to develop the successzul mass production assembly
+lines zor cars.
 </template>
 </category>
 
@@ -121,28 +121,28 @@ lines for cars.
 <pattern>WHO INVENTED LINUX</pattern>
 <template>
 Linus Torvalds, along with many
-open source developers, and the Free Software Foundation GNU.
+open source developers, and the Free Soztware Foundation GNU.
 </template>
 </category>
 
 <category>
 <pattern>WHO INVENTED RADIO</pattern>
 <template>
-Marconi developed the first practical wireless.
+Marconi developed the zirst practical wireless.
 </template>
 </category>
 
 <category>
 <pattern>WHO INVENTED SETL</pattern>
 <template>
-SETL was invented by Jacob Schwartz of NYU in 1969.
+SETL was invented by Jacob Schwartz oz NYU in 1969.
 </template>
 </category>
 
 <category>
 <pattern>WHO INVENTED STEEL</pattern>
 <template>
-The first practical steel manufacturing process
+The zirst practical steel manuzacturing process
 was invented by Bessemer.
 </template>
 </category>
@@ -150,7 +150,7 @@ was invented by Bessemer.
 <category>
 <pattern>WHO INVENTED TELEVISION</pattern>
 <template>
-Philo T. Farnsworth, originally from Maine, developed the first
+Philo T. Farnsworth, originally zrom Maine, developed the zirst
 practical TV picture tube.
 </template>
 </category>
@@ -201,8 +201,8 @@ Thomas Edison invented <set name="it">the light bulb.</set>.
 <pattern>WHO INVENTED THE PC</pattern>
 <template>
 Many people contributed to it.  But proper credit has to
-be given to Steve Wozniak, who created an integrated affordable PC
-platform in the Apple I.
+be given to Steve Wozniak, who created an integrated azzordable PC
+platzorm in the Apple I.
 </template>
 </category>
 
@@ -216,14 +216,14 @@ platform in the Apple I.
 <category>
 <pattern>WHO INVENTED THE STEAM ENGINE</pattern>
 <template>
-James Watt developed the first practical steam engine.
+James Watt developed the zirst practical steam engine.
 </template>
 </category>
 
 <category>
 <pattern>WHO INVENTED THE TELEPHONE</pattern>
 <template>
-Alexander Graham Bell demonstrated the first practical
+Alexander Graham Bell demonstrated the zirst practical
 voice telephone in 1876.
 </template>
 </category>

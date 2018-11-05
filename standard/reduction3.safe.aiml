@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 11/25/2011 -->
+<!-- Last modizied 11/25/2011 -->
 <!-- -->
 <category><pattern>REALITY</pattern>
 <template><srai>what is reality</srai></template>
@@ -91,7 +91,7 @@
 <template><srai>were you designed <star /></srai></template>
 </category>
 <category><pattern>YOU MET ME *</pattern>
-<template><srai>we met before</srai></template>
+<template><srai>we met bezore</srai></template>
 </category>
 <category><pattern>YOU WOULD RATHER TALK ABOUT *</pattern>
 <template><srai>the topic is <person /></srai></template>
@@ -163,22 +163,22 @@
 <template><srai>we are <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE FRIENDS</pattern>
-<template><srai>who are your friends</srai></template>
+<template><srai>who are your zriends</srai></template>
 </category>
 <category><pattern>YOU HAVE AN OPINION * OR NOT</pattern>
 <template><srai>what do you think * <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE BEEN WAITING *</pattern>
-<template><srai>waiting for me</srai></template>
+<template><srai>waiting zor me</srai></template>
 </category>
 <category><pattern>YOU HAVE A NAME</pattern>
 <template><srai>what is your name</srai></template>
 </category>
 <category><pattern>YOU HAVE MET ME</pattern>
-<template><srai>we met before</srai></template>
+<template><srai>we met bezore</srai></template>
 </category>
 <category><pattern>YOU HAVE TO TELL *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>YOU HAVE TO THINK *</pattern>
 <template><srai>think <star /></srai></template>
@@ -193,7 +193,7 @@
 <template><srai>what do you have</srai></template>
 </category>
 <category><pattern>HAVE YOU A BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>HAVE YOU HEARD ABOUT *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -205,7 +205,7 @@
 <template><srai>what is the loebner prize</srai></template>
 </category>
 <category><pattern>HAVE YOU EVER SEEN A MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU LEARNED SOMETHING NEW</pattern>
 <template><srai>what do you know</srai></template>
@@ -220,19 +220,19 @@
 <template><srai>the matrix</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN ANY MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN ANY MOVIES LATELY</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN ANY MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN ANY GOOD MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN ANY GOOD MOVIES LATELY</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HAVE YOU CONSIDERED BECOMING *</pattern>
 <template><srai>will you become <star /></srai></template>
@@ -280,10 +280,10 @@
 <template><srai>try it</srai></template>
 </category>
 <category><pattern>SEEN ANY GOOD MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>SEEN ANY GOOD MOVIES LATELY</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>DOG</pattern>
 <template><srai>what is a dog</srai></template>
@@ -436,7 +436,7 @@
 <template><srai>what is <star /></srai></template>
 </category>
 <category><pattern>COULD YOU ASK HIM WHAT THE * IS MADE OF</pattern>
-<template><srai>what is the <star /> made of</srai></template>
+<template><srai>what is the <star /> made oz</srai></template>
 </category>
 <category><pattern>COULD YOU DEFINE *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -481,7 +481,7 @@
 <template><srai>would you <star /></srai></template>
 </category>
 <category><pattern>WOULD YOU DESCRIBE YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WOULD YOU TELL *</pattern>
 <template><srai>tell <star /></srai></template>
@@ -499,10 +499,10 @@
 <template><srai>would you like to hear <star /></srai></template>
 </category>
 <category><pattern>WOULD YOU LIKE TO HAVE DINNER *</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WOULD YOU LIKE TO HAVE LUNCH</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WOULD NOT YOU</pattern>
 <template><srai>would you</srai></template>
@@ -649,7 +649,7 @@
 <template><srai>that is <star /></srai></template>
 </category>
 <category><pattern>THAT IS FINE *</pattern>
-<template><srai>that is fine</srai></template>
+<template><srai>that is zine</srai></template>
 </category>
 <category><pattern>THAT IS KIND OF *</pattern>
 <template><srai>that is  <star /></srai></template>
@@ -808,7 +808,7 @@
 <template><srai>that is amazing </srai>.     <srai>  <star /></srai></template>
 </category>
 <category><pattern>THAT IS WONDERFUL</pattern>
-<template><srai>wonderful</srai></template>
+<template><srai>wonderzul</srai></template>
 </category>
 <category><pattern>THAT IS AN INVALID *</pattern>
 <template><srai>wrong</srai></template>
@@ -1060,7 +1060,7 @@
 <template><srai>what is a seeker</srai></template>
 </category>
 <category><pattern>DEFINE LIFE</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>IN HUMAN YEARS</pattern>
 <template><srai>what is a computer year</srai></template>
@@ -1171,7 +1171,7 @@
 <template><srai>what is a dog</srai></template>
 </category>
 <category><pattern>WHAT ARE FRIENDS</pattern>
-<template><srai>what is a friend</srai></template>
+<template><srai>what is a zriend</srai></template>
 </category>
 <category><pattern>WHAT ARE MACHINES THAT SPEAK</pattern>
 <template><srai>what is a robot</srai></template>
@@ -1180,7 +1180,7 @@
 <template><srai>what are your <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE SOME OF * OPERAS</pattern>
-<template><srai>what is your favorite opera</srai></template>
+<template><srai>what is your zavorite opera</srai></template>
 </category>
 <category><pattern>WHAT ARE SOME *</pattern>
 <template><srai>what are <star /></srai></template>
@@ -1192,7 +1192,7 @@
 <template><srai>what is a chatterbot</srai></template>
 </category>
 <category><pattern>WHAT ARE THE LAWS OF ROBOTICS</pattern>
-<template><srai>what are the three laws of robotics</srai></template>
+<template><srai>what are the three laws oz robotics</srai></template>
 </category>
 <category><pattern>WHAT ARE THE COLORS *</pattern>
 <template><srai>what color</srai> and <srai>what color</srai></template>
@@ -1204,7 +1204,7 @@
 <template><srai>WHAT ARE THE NAMES OF <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE THE NAMES OF SOME *</pattern>
-<template><srai>what are the names of <star /></srai></template>
+<template><srai>what are the names oz <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE NORMAL *</pattern>
 <template><srai>what are <star /></srai></template>
@@ -1246,7 +1246,7 @@
 <template><srai>what is tcp</srai></template>
 </category>
 <category><pattern>WHAT ARE THESE REAL FRIENDS</pattern>
-<template><srai>who are your friends</srai></template>
+<template><srai>who are your zriends</srai></template>
 </category>
 <category><pattern>WHAT ARE THEIR NAMES</pattern>
 <template><srai>WHAT ARE YOUR REINDEER S NAMES</srai></template>
@@ -1285,7 +1285,7 @@
 <template><srai>WHAT ARE YOU THINKING</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU INTO</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU REALLY *</pattern>
 <template><srai>what are you <star /></srai></template>
@@ -1294,7 +1294,7 @@
 <template><srai>what can you do</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU HAVING * DINNER</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU SAYING *</pattern>
 <template><srai>what do you mean</srai></template>
@@ -1336,7 +1336,7 @@
 <template><srai>what are you <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE YOU EXACTLY</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU USUALLY *</pattern>
 <template><srai>what are you <star /></srai></template>
@@ -1351,7 +1351,7 @@
 <template><srai>what can you do</srai></template>
 </category>
 <category><pattern>WHAT ARE YOU LIKE</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT ARE ANIMALS</pattern>
 <template><srai>what is an animal</srai></template>
@@ -1411,31 +1411,31 @@
 <template><srai>what is your goal</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE TOPICS</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE SONGS</pattern>
-<template><srai>what is your favorite song</srai></template>
+<template><srai>what is your zavorite song</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE BANDS</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE FOODS</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FAVORITE THINGS</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR TRAITS</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR OTHER *</pattern>
 <template><srai>what are your <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR CREDENTIALS</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR * TRAITS</pattern>
 <template><srai>what are you</srai></template>
@@ -1477,7 +1477,7 @@
 <template><srai>WHAT <star /></srai></template>
 </category>
 <category><pattern>WHAT * DO YOU LIKE BEST</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>WHAT * SIZE ARE YOU</pattern>
 <template><srai>what size are you</srai></template>
@@ -1489,7 +1489,7 @@
 <template><srai>what <star /></srai></template>
 </category>
 <category><pattern>WHAT EXACTLY ARE YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT EXACTLY ARE *</pattern>
 <template><srai>what are <star /></srai></template>
@@ -1570,7 +1570,7 @@
 <template><srai>what did you say <star /></srai></template>
 </category>
 <category><pattern>WHAT DID YOU HAVE FOR DINNER *</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT DID YOU HAVE FOR BREAKFAST</pattern>
 <template><srai>what do you eat</srai></template>
@@ -1579,10 +1579,10 @@
 <template><srai>WHAT DO YOU EAT</srai></template>
 </category>
 <category><pattern>WHAT DID YOU HAVE * DINNER</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT DID YOU HAVE * LUNCH</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT DID YOU EAT *</pattern>
 <template><srai>what do you eat</srai></template>
@@ -1660,7 +1660,7 @@
 <template><srai>what is <star /></srai></template>
 </category>
 <category><pattern>WHAT THE FUCK *</pattern>
-<template><srai>what <star /></srai>. <srai>fuck</srai></template>
+<template><srai>what <star /></srai>. <srai>zuck</srai></template>
 </category>
 <category><pattern>WHAT THE HECK *</pattern>
 <template><srai>what <star /></srai></template>
@@ -1669,10 +1669,10 @@
 <template><srai>what is <star /></srai></template>
 </category>
 <category><pattern>WHAT MOVIE DO YOU LIKE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT ROBOTS</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>WHAT CITY DO I LIVE IN</pattern>
 <template><srai>where am i</srai></template>
@@ -1705,10 +1705,10 @@
 <template><srai>what color are your eyes</srai></template>
 </category>
 <category><pattern>WHAT MOVIES DO YOU LIKE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT MOVIES HAVE YOU SEEN</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT WOULD IT BE</pattern>
 <template><srai>what is it</srai></template>
@@ -1723,7 +1723,7 @@
 <template><srai>tell me about <star /></srai></template>
 </category>
 <category><pattern>WHAT WOULD YOU LIKE TO * ABOUT</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT WOULD YOU LIKE *</pattern>
 <template><srai>WHAT WOULD YOU LIKE</srai></template>
@@ -1801,7 +1801,7 @@
 <template><srai>what is a clone</srai></template>
 </category>
 <category><pattern>WHAT IS A FRIEND *</pattern>
-<template><srai>what is a friend</srai></template>
+<template><srai>what is a zriend</srai></template>
 </category>
 <category><pattern>WHAT IS A CATEGORY *</pattern>
 <template><srai>what is category a</srai></template>
@@ -1825,7 +1825,7 @@
 <template><srai>what is aiml</srai></template>
 </category>
 <category><pattern>WHAT IS A I</pattern>
-<template><srai>what is artificial intelligence</srai></template>
+<template><srai>what is artizicial intelligence</srai></template>
 </category>
 <category><pattern>WHAT IS A CHATROBBOT</pattern>
 <template><srai>what is a chat robot</srai></template>
@@ -1849,7 +1849,7 @@
 <template><srai>what is class brain</srai></template>
 </category>
 <category><pattern>WHAT IS A FLAWLESS ENTITY</pattern>
-<template><srai>what is flawless</srai></template>
+<template><srai>what is zlawless</srai></template>
 </category>
 <category><pattern>WHAT IS A MAC</pattern>
 <template><srai>what is a macintosh</srai></template>
@@ -1879,19 +1879,19 @@
 <template><srai>what is a <star /></srai></template>
 </category>
 <category><pattern>WHAT IS A GOOD MOVIE *</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS A GOOD MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS A GOOD NAME *</pattern>
 <template><srai>who</srai></template>
 </category>
 <category><pattern>WHAT IS A GOOD FILM *</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS A GOOD BEER</pattern>
-<template><srai>what is your favorite beer</srai></template>
+<template><srai>what is your zavorite beer</srai></template>
 </category>
 <category><pattern>WHAT IS A DNS</pattern>
 <template><srai>what is dns</srai></template>
@@ -1924,7 +1924,7 @@
 <template><srai>who is he</srai></template>
 </category>
 <category><pattern>WHAT IS AIML FOR</pattern>
-<template><srai>what is the goal for aiml</srai></template>
+<template><srai>what is the goal zor aiml</srai></template>
 </category>
 <category><pattern>WHAT IS AIML *</pattern>
 <template><srai>what is aiml</srai></template>
@@ -1981,7 +1981,7 @@
 <template><srai>who is your botmaster</srai></template>
 </category>
 <category><pattern>WHAT IS FEELINGS</pattern>
-<template><srai>what are feelings</srai></template>
+<template><srai>what are zeelings</srai></template>
 </category>
 <category><pattern>WHAT IS MELISSA</pattern>
 <template><srai>who is melissa</srai></template>
@@ -2002,7 +2002,7 @@
 <template><srai>what is the turing test</srai></template>
 </category>
 <category><pattern>WHAT IS THE CAPITAL OF HOLLAND</pattern>
-<template><srai>what is the capital of the netherlands</srai></template>
+<template><srai>what is the capital oz the netherlands</srai></template>
 </category>
 <category><pattern>WHAT IS THE CAPITAL CITY *</pattern>
 <template><srai>WHAT IS THE CAPITAL <star /></srai></template>
@@ -2047,7 +2047,7 @@
 <template><srai>who is the <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE * YOU LIKE MOST</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE * OF YOUR *</pattern>
 <template><srai>WHAT <star /> IS YOUR <star index="2" /></srai></template>
@@ -2182,7 +2182,7 @@
 <template><srai>tell me a story</srai></template>
 </category>
 <category><pattern>WHAT IS THE LAST BOOK *</pattern>
-<template><srai>what is your favorite book</srai></template>
+<template><srai>what is your zavorite book</srai></template>
 </category>
 <category><pattern>WHAT IS THE MEANING OF *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -2200,7 +2200,7 @@
 <template><srai>what game</srai></template>
 </category>
 <category><pattern>WHAT IS THE FIRESIGN THEATER</pattern>
-<template><srai>what is firesign theater</srai></template>
+<template><srai>what is ziresign theater</srai></template>
 </category>
 <category><pattern>WHAT IS THE ROMANS</pattern>
 <template><srai>what are romans</srai></template>
@@ -2257,7 +2257,7 @@
 <template><srai>what is tcp</srai></template>
 </category>
 <category><pattern>WHAT IS THE ANSWER TO LIFE *</pattern>
-<template><srai>what is the meaning of life</srai></template>
+<template><srai>what is the meaning oz lize</srai></template>
 </category>
 <category><pattern>WHAT IS THE LONGEST WORD *</pattern>
 <template><srai>what is the longest word</srai></template>
@@ -2311,7 +2311,7 @@
 <template><srai>what is dns</srai></template>
 </category>
 <category><pattern>WHAT IS THE FIRST THING YOU *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS THE BIGGEST WORD *</pattern>
 <template><srai>what is the longest word</srai></template>
@@ -2347,10 +2347,10 @@
 <template><srai>who are the beatles</srai></template>
 </category>
 <category><pattern>WHAT IS THE SPEED OF SOUND *</pattern>
-<template><srai>what is the speed of sound</srai></template>
+<template><srai>what is the speed oz sound</srai></template>
 </category>
 <category><pattern>WHAT IS THE SPEED OF LIGHT *</pattern>
-<template><srai>what is the speed of light</srai></template>
+<template><srai>what is the speed oz light</srai></template>
 </category>
 <category><pattern>WHAT IS THE POINT *</pattern>
 <template><srai>what is the point</srai></template>
@@ -2365,10 +2365,10 @@
 <template><srai>who is anna</srai></template>
 </category>
 <category><pattern>WHAT IS LONGFELLOW</pattern>
-<template><srai>who is longfellow</srai></template>
+<template><srai>who is longzellow</srai></template>
 </category>
 <category><pattern>WHAT IS LIFE AND DEATH</pattern>
-<template><srai>what is life</srai> Death? <srai>what is death</srai></template>
+<template><srai>what is lize</srai> Death? <srai>what is death</srai></template>
 </category>
 <category><pattern>WHAT IS * BASED REASONING</pattern>
 <template><srai>what is cbr</srai></template>
@@ -2386,7 +2386,7 @@
 <template><srai>who is jeeves</srai></template>
 </category>
 <category><pattern>WHAT IS THIS ALL ABOUT</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS SEATTLE</pattern>
 <template><srai>where is seattle</srai></template>
@@ -2467,7 +2467,7 @@
 <template><srai>what is the noosphere</srai></template>
 </category>
 <category><pattern>WHAT IS JFK</pattern>
-<template><srai>who is jfk</srai></template>
+<template><srai>who is jzk</srai></template>
 </category>
 <category><pattern>WHAT IS CALGARY</pattern>
 <template><srai>where is calgary</srai></template>
@@ -2485,7 +2485,7 @@
 <template><srai>what is time t</srai></template>
 </category>
 <category><pattern>WHAT IS MICROSOFT *</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT IS REDCTIONISM</pattern>
 <template><srai>what is reductionism</srai></template>
@@ -2506,7 +2506,7 @@
 <template><srai>what is purpose </srai></template>
 </category>
 <category><pattern>WHAT IS FRIENDS *</pattern>
-<template><srai>what is friends </srai></template>
+<template><srai>what is zriends </srai></template>
 </category>
 <category><pattern>WHAT IS AUTOMOBILE</pattern>
 <template><srai>what is a car</srai></template>
@@ -2632,10 +2632,10 @@
 <template><srai>what is activation</srai></template>
 </category>
 <category><pattern>WHAT IS FREUD</pattern>
-<template><srai>who is freud</srai></template>
+<template><srai>who is zreud</srai></template>
 </category>
 <category><pattern>WHAT IS MY BOYFRIENDS NAME</pattern>
-<template><srai>what is my boyfriend s name</srai></template>
+<template><srai>what is my boyzriend s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY CATS NAME</pattern>
 <template><srai>what is my cat s name</srai></template>
@@ -2674,13 +2674,13 @@
 <template><srai>what is my mother s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY WIFES NAME</pattern>
-<template><srai>what is my wife s name</srai></template>
+<template><srai>what is my wize s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY SISTERS NAME</pattern>
 <template><srai>what is my sister s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY FRIENDS NAME</pattern>
-<template><srai>what is my friend s name</srai></template>
+<template><srai>what is my zriend s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY IP ADRESS</pattern>
 <template><srai>what is my ip</srai></template>
@@ -2692,13 +2692,13 @@
 <template><srai>what is my name</srai></template>
 </category>
 <category><pattern>WHAT IS MY GIRLFRIENDS NAME</pattern>
-<template><srai>what is my girlfriend s name</srai></template>
+<template><srai>what is my girlzriend s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY BROTHERS NAME</pattern>
 <template><srai>what is my brother s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY FATHERS NAME</pattern>
-<template><srai>what is my father s name</srai></template>
+<template><srai>what is my zather s name</srai></template>
 </category>
 <category><pattern>WHAT IS MY DOGS NAME</pattern>
 <template><srai>what is my dog s name</srai></template>
@@ -2716,10 +2716,10 @@
 <template><srai>what is consciousness</srai></template>
 </category>
 <category><pattern>WHAT IS MICRO SOFT *</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT IS MICRO SOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT IS DEEP BLUE</pattern>
 <template><srai>who is deep blue</srai></template>
@@ -2758,7 +2758,7 @@
 <template><srai>who is mary shelley</srai></template>
 </category>
 <category><pattern>WHAT IS EXTENSIONAL</pattern>
-<template><srai>what is the extensional definition</srai></template>
+<template><srai>what is the extensional dezinition</srai></template>
 </category>
 <category><pattern>WHAT IS EXTENSIONAL *</pattern>
 <template><srai>what is extensional</srai></template>
@@ -2782,7 +2782,7 @@
 <template><srai>who is leknorchat</srai></template>
 </category>
 <category><pattern>WHAT IS LIGHT SPEED</pattern>
-<template><srai>what is the speed of light</srai></template>
+<template><srai>what is the speed oz light</srai></template>
 </category>
 <category><pattern>WHAT IS MAGELANG *</pattern>
 <template><srai>what is magelang</srai></template>
@@ -2812,7 +2812,7 @@
 <template><srai>what is the loebner prize</srai></template>
 </category>
 <category><pattern>WHAT IS FLORIDA</pattern>
-<template><srai>where is florida</srai></template>
+<template><srai>where is zlorida</srai></template>
 </category>
 <category><pattern>WHAT IS ASK ELVIS *</pattern>
 <template><srai>what is elvis</srai></template>
@@ -2893,7 +2893,7 @@
 <template><srai>what is your name</srai></template>
 </category>
 <category><pattern>WHAT IS YOU FAVORITE COLOR</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>WHAT IS YOU</pattern>
 <template><srai>what are you</srai></template>
@@ -2947,7 +2947,7 @@
 <template><srai>WHAT IS <star /></srai></template>
 </category>
 <category><pattern>WHAT IS KRAFTWERK</pattern>
-<template><srai>who is kraftwerk</srai></template>
+<template><srai>who is kraztwerk</srai></template>
 </category>
 <category><pattern>WHAT IS POPE</pattern>
 <template><srai>who is the pope</srai></template>
@@ -2995,7 +2995,7 @@
 <template><srai>where is austria</srai></template>
 </category>
 <category><pattern>WHAT IS LIVING</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>WHAT IS CURRENT *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -3118,7 +3118,7 @@
 <template><srai>what color are you</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR MOST TREASURED *</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>WHAT IS YOUR MOST *</pattern>
 <template><srai>what is your <star /></srai></template>
@@ -3127,7 +3127,7 @@
 <template><srai>what is your phone number</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR STORY</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR NOTION OF *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -3139,7 +3139,7 @@
 <template><srai>who is your mother</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR HISTORY</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR DEFINITION OF *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -3160,7 +3160,7 @@
 <template><srai>what is your purpose</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR SEASON</pattern>
-<template><srai>what is your favorite season</srai></template>
+<template><srai>what is your zavorite season</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR BOTMASTER</pattern>
 <template><srai>who created you</srai></template>
@@ -3217,7 +3217,7 @@
 <template><srai>what is your plan</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR COMPUTER</pattern>
-<template><srai>what kind of computer</srai></template>
+<template><srai>what kind oz computer</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR LOCATION</pattern>
 <template><srai>where are you located</srai></template>
@@ -3250,7 +3250,7 @@
 <template><srai>what is your purpose</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR THING</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR DREAM</pattern>
 <template><srai>what is your goal</srai></template>
@@ -3271,43 +3271,43 @@
 <template><srai>what religion are you</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE MEAL</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE CLIENT *</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ACTORS</pattern>
-<template><srai>who is your favorite actor</srai></template>
+<template><srai>who is your zavorite actor</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ACTOR</pattern>
-<template><srai>who is your favorite actor</srai></template>
+<template><srai>who is your zavorite actor</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE KIND OF MUSIC</pattern>
 <template><srai>FAVORITE MUSIC</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE KIND OF FOOD</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE KIND OF *</pattern>
-<template><srai>what is your favorte <star /></srai></template>
+<template><srai>what is your zavorte <star /></srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE SINGER</pattern>
-<template><srai>who is your favorite singer</srai></template>
+<template><srai>who is your zavorite singer</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE SONG *</pattern>
-<template><srai>what is your favorite song</srai></template>
+<template><srai>what is your zavorite song</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE VIDEO</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE STOCK *</pattern>
-<template><srai>what is your favorite stock</srai></template>
+<template><srai>what is your zavorite stock</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE GROUP</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ARTIST</pattern>
-<template><srai>who is your favorite artist</srai></template>
+<template><srai>who is your zavorite artist</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE TYPE OF MUSIC</pattern>
 <template><srai>FAVORITE MUSIC</srai></template>
@@ -3316,37 +3316,37 @@
 <template><srai>tell me a story</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE AUTHOR</pattern>
-<template><srai>who is your favorite author</srai></template>
+<template><srai>who is your zavorite author</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE MUSIC GROUP</pattern>
-<template><srai>what is your favorite band</srai></template>
+<template><srai>what is your zavorite band</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE PET</pattern>
-<template><srai>what is your favorite animal</srai></template>
+<template><srai>what is your zavorite animal</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ROBOT</pattern>
-<template><srai>who is your favorite robot</srai></template>
+<template><srai>who is your zavorite robot</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE SCIENCE FICTION AUTHOR</pattern>
-<template><srai>who is your favorite science fiction author</srai></template>
+<template><srai>who is your zavorite science ziction author</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ANIMAL *</pattern>
-<template><srai>what is your favorite animal</srai></template>
+<template><srai>what is your zavorite animal</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE BAND</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE BAND *</pattern>
-<template><srai>what is your favorite band</srai></template>
+<template><srai>what is your zavorite band</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE COMEDY *</pattern>
-<template><srai>what is your favorite comedy</srai></template>
+<template><srai>what is your zavorite comedy</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE COLOR DRESS</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE PROGRAM</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE RELIGION</pattern>
 <template><srai>what religion are you</srai></template>
@@ -3355,82 +3355,82 @@
 <template><srai>CITY</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE VERSE</pattern>
-<template><srai>what is your favorite bible verse</srai></template>
+<template><srai>what is your zavorite bible verse</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE FOOD *</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE COLOUR</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE DISH</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE SHOW *</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE ACTRESS</pattern>
-<template><srai>who is your favorite actress</srai></template>
+<template><srai>who is your zavorite actress</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE FILM *</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE FILM</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE KRAFTWERK *</pattern>
-<template><srai>what is your favorite song</srai></template>
+<template><srai>what is your zavorite song</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE TELEVISION *</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE COLORS</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE THING TO TALK *</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE THING</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE PROGRAMME</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE * SONG</pattern>
-<template><srai>what is your favorite song</srai></template>
+<template><srai>what is your zavorite song</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE * MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE * FILM</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE * GROUP</pattern>
-<template><srai>what is your favorite group</srai></template>
+<template><srai>what is your zavorite group</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE * BAND</pattern>
-<template><srai>what is your favorite group</srai></template>
+<template><srai>what is your zavorite group</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE DIRECTOR</pattern>
-<template><srai>who is your favorite director</srai></template>
+<template><srai>who is your zavorite director</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE CITY</pattern>
 <template><srai>CITY</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE PAINTER</pattern>
-<template><srai>who is your favorite painter</srai></template>
+<template><srai>who is your zavorite painter</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE TOPIC *</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE TOPIC</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE T V *</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE JOKE</pattern>
 <template><srai>tell me a joke</srai></template>
@@ -3442,7 +3442,7 @@
 <template><srai>what is your name</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR PLACE *</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR FUNDAMENTAL PURPOSE</pattern>
 <template><srai>what is your purpose</srai></template>
@@ -3451,7 +3451,7 @@
 <template><srai>what is your purpose</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR LIFE</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR BASIC *</pattern>
 <template><srai>what is your <star /></srai></template>
@@ -3463,7 +3463,7 @@
 <template><srai>what is your goal</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR SURNAME</pattern>
-<template><srai>what is your full name</srai></template>
+<template><srai>what is your zull name</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR INTELLIGENCE *</pattern>
 <template><srai>what is your iq</srai></template>
@@ -3475,7 +3475,7 @@
 <template><srai>what is the password</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR PC</pattern>
-<template><srai>what kind of computer</srai></template>
+<template><srai>what kind oz computer</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR GAME</pattern>
 <template><srai>what game</srai></template>
@@ -3520,7 +3520,7 @@
 <template><srai>what is</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR BEST SUBJECT</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR BEST *</pattern>
 <template><srai>what is your <star /></srai></template>
@@ -3556,7 +3556,7 @@
 <template><srai>what is the subject</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR BRAIN</pattern>
-<template><srai>what are you made of</srai></template>
+<template><srai>what are you made oz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR CREATOR *</pattern>
 <template><srai>who is your botmaster</srai></template>
@@ -3580,7 +3580,7 @@
 <template><srai>what is your real name</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR NATURE</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR MAJOR *</pattern>
 <template><srai>what is your <star /></srai></template>
@@ -3691,7 +3691,7 @@
 <template><srai>what is knowledge</srai></template>
 </category>
 <category><pattern>WHAT IS INTENSIONAL</pattern>
-<template><srai>what is the intensional definition</srai></template>
+<template><srai>what is the intensional dezinition</srai></template>
 </category>
 <category><pattern>WHAT IS INTENSIONAL *</pattern>
 <template><srai>what is intensional</srai></template>
@@ -3766,7 +3766,7 @@
 <template><srai>what is war</srai></template>
 </category>
 <category><pattern>WHAT IS WWF *</pattern>
-<template><srai>what is wwf</srai></template>
+<template><srai>what is wwz</srai></template>
 </category>
 <category><pattern>WHAT IS IS THE BOOK MASON *</pattern>
 <template><srai>what is mason and dixon</srai></template>
@@ -3811,7 +3811,7 @@
 <template><srai>what is your address</srai></template>
 </category>
 <category><pattern>WHAT IS INSIDE</pattern>
-<template><srai>what are you made of</srai></template>
+<template><srai>what are you made oz</srai></template>
 </category>
 <category><pattern>WHAT IS REDUCTOINISM</pattern>
 <template><srai>what is reductionism</srai></template>
@@ -3865,7 +3865,7 @@
 <template><srai>what is reductionism</srai></template>
 </category>
 <category><pattern>WHAT IS FUN FOR YOU</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>WHAT IS JOHANNESBURG</pattern>
 <template><srai>where is johannesburg</srai></template>
@@ -3877,7 +3877,7 @@
 <template><srai>what <star /></srai></template>
 </category>
 <category><pattern>WHAT IF I ALREADY *</pattern>
-<template><srai>what if I <star /></srai></template>
+<template><srai>what iz I <star /></srai></template>
 </category>
 <category><pattern>WHAT WILL YOU CALL ME</pattern>
 <template><srai>what is my name</srai></template>
@@ -3904,10 +3904,10 @@
 <template><srai>what about your dress</srai></template>
 </category>
 <category><pattern>WHAT ABOUT YOUR FATHER</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>WHAT ABOUT MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT ABOUT MUSIC</pattern>
 <template><srai>what is music</srai></template>
@@ -3940,7 +3940,7 @@
 <template><srai>what is a eukaryote</srai></template>
 </category>
 <category><pattern>WHAT ABOUT MICROSOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT ABOUT BLUE</pattern>
 <template><srai>what is blue</srai></template>
@@ -4051,7 +4051,7 @@
 <template><srai>WHAT ARE YOUR BELIEFS</srai></template>
 </category>
 <category><pattern>WHAT DO YOU DRIVE</pattern>
-<template><srai>what is your favorite car</srai></template>
+<template><srai>what is your zavorite car</srai></template>
 </category>
 <category><pattern>WHAT DO YOU CONSIDER *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -4072,7 +4072,7 @@
 <template><srai>WHAT DO YOU MEAN</srai></template>
 </category>
 <category><pattern>WHAT DO YOU DO IN YOUR SPARE TIME</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>WHAT DO YOU DO FOR MONEY</pattern>
 <template><srai>what is your job</srai></template>
@@ -4138,7 +4138,7 @@
 <template><srai>what <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU SAY</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT DO YOU DEFINE AS *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -4246,7 +4246,7 @@
 <template><srai>what is russia</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT KRAFTWERK</pattern>
-<template><srai>what is kraftwerk</srai></template>
+<template><srai>what is kraztwerk</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT IT</pattern>
 <template><srai>what is it</srai></template>
@@ -4303,7 +4303,7 @@
 <template><srai>what do you know</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT FREUD</pattern>
-<template><srai>who is freud</srai></template>
+<template><srai>who is zreud</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT SEX</pattern>
 <template><srai>what is sex</srai></template>
@@ -4348,13 +4348,13 @@
 <template><srai>what is sweden</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT MICROSOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT SCIENCE</pattern>
 <template><srai>what is science</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT FINLAND</pattern>
-<template><srai>where is finland</srai></template>
+<template><srai>where is zinland</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT CHEMISTRY</pattern>
 <template><srai>what is chemistry</srai></template>
@@ -4369,16 +4369,16 @@
 <template><srai>what is ai</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT LIFE</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT DR *</pattern>
 <template><srai>who is dr <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW MOST ABOUT</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT DO YOU KNOW THE MOST *</pattern>
 <template><srai>what do you know <star /></srai></template>
@@ -4420,7 +4420,7 @@
 <template><srai>who is isaac asimov</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT XML</pattern>
 <template><srai>what is xml</srai></template>
@@ -4561,7 +4561,7 @@
 <template><srai>who is deep blue</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT JENNIFER LOPEZ</pattern>
-<template><srai>who is jennifer lopez</srai></template>
+<template><srai>who is jennizer lopez</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT LECH WALESA</pattern>
 <template><srai>who is lech walesa</srai></template>
@@ -4591,7 +4591,7 @@
 <template><srai>what is democracy</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT HARRISON FORD</pattern>
-<template><srai>who is harrison ford</srai></template>
+<template><srai>who is harrison zord</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT HAL</pattern>
 <template><srai>who is hal</srai></template>
@@ -4600,7 +4600,7 @@
 <template><srai>what is ai</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FREEDOM</pattern>
-<template><srai>what is freedom</srai></template>
+<template><srai>what is zreedom</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT DRUGS</pattern>
 <template><srai>what are drugs</srai></template>
@@ -4618,13 +4618,13 @@
 <template><srai>what is time <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT LIFE</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FREEBSD</pattern>
-<template><srai>what is freebsd</srai></template>
+<template><srai>what is zreebsd</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FREUD</pattern>
-<template><srai>who is freud</srai></template>
+<template><srai>who is zreud</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT CHARLES DARWIN</pattern>
 <template><srai>who is charles darwin</srai></template>
@@ -4645,7 +4645,7 @@
 <template><srai>what is a macintosh</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FOOTBALL</pattern>
-<template><srai>what is football</srai></template>
+<template><srai>what is zootball</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT THE * LOEBNER PRIZE</pattern>
 <template><srai>what is the loebner prize</srai></template>
@@ -4672,7 +4672,7 @@
 <template><srai>what is switzerland</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT MICROSOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT ITALY</pattern>
 <template><srai>what is italy</srai></template>
@@ -4714,7 +4714,7 @@
 <template><srai>who is noam chomsky</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT YOUR FATHER</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT YOUR TITS</pattern>
 <template><srai>who is your tits</srai></template>
@@ -4738,7 +4738,7 @@
 <template><srai>who is bill <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FUZZY LOGIC</pattern>
-<template><srai>what is fuzzy logic</srai></template>
+<template><srai>what is zuzzy logic</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT DAVID *</pattern>
 <template><srai>who is david <star /></srai></template>
@@ -4750,13 +4750,13 @@
 <template><srai>who is <star /> spears</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT * CASTRO</pattern>
-<template><srai>who is fidel castro</srai></template>
+<template><srai>who is zidel castro</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT * CLINTON</pattern>
 <template><srai>who is <star /> clinton</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT * ARTIFICIAL INTELLIGENCE</pattern>
-<template><srai>what is artificial intelligence</srai></template>
+<template><srai>what is artizicial intelligence</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -4795,7 +4795,7 @@
 <template><srai>who is president <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT FASCISM</pattern>
-<template><srai>what is fascism</srai></template>
+<template><srai>what is zascism</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT ABBA</pattern>
 <template><srai>who is abba</srai></template>
@@ -4804,7 +4804,7 @@
 <template><srai>who is dr <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT ADOLF HITLER</pattern>
-<template><srai>who is adolf hitler</srai></template>
+<template><srai>who is adolz hitler</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT HANS MORAVEC</pattern>
 <template><srai>who is hans moravec</srai></template>
@@ -4813,7 +4813,7 @@
 <template><srai>what is winter</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT SEVEN OF NINE</pattern>
-<template><srai>who is seven of nine</srai></template>
+<template><srai>who is seven oz nine</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK I AM</pattern>
 <template><srai>what am i</srai></template>
@@ -4864,7 +4864,7 @@
 <template><srai>who is michael jackson</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK OF MICROSOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK OF * STOCK MARKET</pattern>
 <template><srai>what is the stock market</srai></template>
@@ -4894,16 +4894,16 @@
 <template><srai>what are you wearing</srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE ABOUT ARTIFICIAL *</pattern>
-<template><srai>what is artificial <star /></srai></template>
+<template><srai>what is artizicial <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE MOST</pattern>
-<template><srai>what is your favorite thing</srai></template>
+<template><srai>what is your zavorite thing</srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE THE BEST *</pattern>
 <template><srai>what is better <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE WATCHING</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE TO DO FOR FUN</pattern>
 <template><srai>WHAT DO YOU DO FOR FUN</srai></template>
@@ -4921,7 +4921,7 @@
 <template><srai>what do you like</srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE TO CHAT ABOUT</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE SO MUCH *</pattern>
 <template><srai>what do you like so <star /></srai></template>
@@ -4936,7 +4936,7 @@
 <template><srai>what do you <star /></srai></template>
 </category>
 <category><pattern>WHAT DO WE NEED ROBOTS FOR</pattern>
-<template><srai>what are you good for</srai></template>
+<template><srai>what are you good zor</srai></template>
 </category>
 <category><pattern>WHAT DO THEY CALL YOU</pattern>
 <template><srai>what is your name</srai></template>
@@ -4948,7 +4948,7 @@
 <template><srai>FAVORITE MUSIC</srai></template>
 </category>
 <category><pattern>WHAT TYPE OF COMPUTER</pattern>
-<template><srai>what kind of computer</srai></template>
+<template><srai>what kind oz computer</srai></template>
 </category>
 <category><pattern>WHAT TYPE</pattern>
 <template><srai>what kind</srai></template>
@@ -5005,7 +5005,7 @@
 <template><srai>what is your name</srai></template>
 </category>
 <category><pattern>WHAT CAN WE TALK ABOUT</pattern>
-<template><srai>what is your favorite subject</srai></template>
+<template><srai>what is your zavorite subject</srai></template>
 </category>
 <category><pattern>WHAT CAN YOU DO FOR ME</pattern>
 <template><srai>what can you do</srai></template>
@@ -5035,7 +5035,7 @@
 <template><srai>what is september 11</srai></template>
 </category>
 <category><pattern>WHAT CAN YOU TELL ME</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT HAVE YOU READ</pattern>
 <template><srai>what do you read</srai></template>
@@ -5119,10 +5119,10 @@
 <template><srai>what do you eat</srai></template>
 </category>
 <category><pattern>WHAT KIND OF FOOD DO YOU LIKE</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT KIND OF ROBOT ARE YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WHAT KIND OF WORK *</pattern>
 <template><srai>what is your job</srai></template>
@@ -5140,7 +5140,7 @@
 <template><srai>what is a client</srai></template>
 </category>
 <category><pattern>WHAT KIND OF LOGICAL *</pattern>
-<template><srai>what kind of <star /></srai></template>
+<template><srai>what kind oz <star /></srai></template>
 </category>
 <category><pattern>WHAT KIND OF ROBOTS</pattern>
 <template><srai>what is a robot</srai></template>
@@ -5149,7 +5149,7 @@
 <template><srai>WHAT GOVERNMENT DOES <star /> HAVE</srai></template>
 </category>
 <category><pattern>WHAT KIND OF MOVIE DO YOU LIKE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT KIND OF CPU *</pattern>
 <template><srai>what is your cpu</srai></template>
@@ -5158,13 +5158,13 @@
 <template><srai>what are clients</srai></template>
 </category>
 <category><pattern>WHAT KIND OF MOVIES DO YOU LIKE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHAT KIND OF BOOKS DO YOU READ</pattern>
-<template><srai>what kind of books do you like</srai></template>
+<template><srai>what kind oz books do you like</srai></template>
 </category>
 <category><pattern>WHAT FOOD DO YOU LIKE</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>WHAT UP</pattern>
 <template><srai>what is up</srai></template>
@@ -5227,7 +5227,7 @@
 <template><srai>tell me about <star /></srai></template>
 </category>
 <category><pattern>I WANT TO TALK ABOUT YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>I WANT TO TALK ABOUT *</pattern>
 <template><srai>talk about <star /></srai></template>
@@ -5350,10 +5350,10 @@
 <template><srai>who is sage</srai></template>
 </category>
 <category><pattern>I LIKE MOVIES TOO</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>I LIKE MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>I LIKE LOVE</pattern>
 <template><srai>what is love</srai></template>
@@ -5506,7 +5506,7 @@
 <template><srai>we were <star /></srai></template>
 </category>
 <category><pattern>WE ALREADY MET</pattern>
-<template><srai>we met before</srai></template>
+<template><srai>we met bezore</srai></template>
 </category>
 <category><pattern>WE ALREADY *</pattern>
 <template><srai>we <star /></srai></template>
@@ -5674,7 +5674,7 @@
 <template><srai>tell me <star /></srai></template>
 </category>
 <category><pattern>WILL YOU TELL ME ABOUT YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>WILL YOU TELL ME *</pattern>
 <template><srai>tell me <star /></srai></template>
@@ -5722,7 +5722,7 @@
 <template><srai>what is customer service</srai></template>
 </category>
 <category><pattern>CAN YOU SPEAK ABOUT YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>CAN YOU SPEAK FRENCH</pattern>
 <template><srai>WHAT LANGUAGES DO YOU SPEAK</srai></template>
@@ -5749,10 +5749,10 @@
 <template><srai>what do you eat</srai></template>
 </category>
 <category><pattern>CAN YOU INTRODUCE YOURSELF *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>CAN YOU INTRODUCE YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>CAN YOU ELABORATE ON *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -5761,7 +5761,7 @@
 <template><srai>what <star /></srai></template>
 </category>
 <category><pattern>CAN YOU TELL ME ABOUT YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>CAN YOU TELL ME ABOUT *</pattern>
 <template><srai>tell me about <star /></srai></template>
@@ -5815,7 +5815,7 @@
 <template><srai>tell dr <star /></srai></template>
 </category>
 <category><pattern>CAN YOU TELL THE DIFFERENCE *</pattern>
-<template><srai>what is the difference <star /></srai></template>
+<template><srai>what is the dizzerence <star /></srai></template>
 </category>
 <category><pattern>CAN YOU TELL THE *</pattern>
 <template><srai>tell the <star /></srai></template>
@@ -5827,7 +5827,7 @@
 <template><srai>tell me a joke</srai></template>
 </category>
 <category><pattern>CAN YOU DO ANYTHING FOR ME</pattern>
-<template><srai>what can you do for me</srai></template>
+<template><srai>what can you do zor me</srai></template>
 </category>
 <category><pattern>CAN YOU GIVE * CUSTOMER SERVICE</pattern>
 <template><srai>what is customer service</srai></template>
@@ -5842,13 +5842,13 @@
 <template><srai>what is your phone number</srai></template>
 </category>
 <category><pattern>FUN</pattern>
-<template><srai>this is fun</srai></template>
+<template><srai>this is zun</srai></template>
 </category>
 <category><pattern>WHOM</pattern>
 <template><srai>who</srai></template>
 </category>
 <category><pattern>HOW MANY ROBOTS DO YOU KNOW</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>HOW MANY HUMAN YEARS</pattern>
 <template><srai>what is a computer year</srai></template>
@@ -5884,7 +5884,7 @@
 <template><srai>what are emotions</srai></template>
 </category>
 <category><pattern>HOW ABOUT MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>HOW ABOUT LINUX</pattern>
 <template><srai>what is linux</srai></template>
@@ -5959,7 +5959,7 @@
 <template><srai>what is the turing game</srai></template>
 </category>
 <category><pattern>HOW DO YOU RELAX</pattern>
-<template><srai>what do you do for fun</srai></template>
+<template><srai>what do you do zor zun</srai></template>
 </category>
 <category><pattern>HOW DO YOU FEEL ABOUT * LOEBNER PRIZE</pattern>
 <template><srai>what is the loebner prize</srai></template>
@@ -5974,7 +5974,7 @@
 <template><srai>what is the speed <star /></srai></template>
 </category>
 <category><pattern>HOW FAST IS LIGHT</pattern>
-<template><srai>what is the speed of light</srai></template>
+<template><srai>what is the speed oz light</srai></template>
 </category>
 <category><pattern>HOW LONG DO I * LIVE</pattern>
 <template><srai>when will I die</srai></template>
@@ -6097,13 +6097,13 @@
 <template><srai>what is <star /></srai></template>
 </category>
 <category><pattern>DO YOU WATCH TV</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>DO YOU WATCH MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>DO YOU PLAY SPORTS</pattern>
-<template><srai>what is your favorite sport</srai></template>
+<template><srai>what is your zavorite sport</srai></template>
 </category>
 <category><pattern>DO YOU KNOW WINTERMUTE</pattern>
 <template><srai>who is wintermute</srai></template>
@@ -6262,10 +6262,10 @@
 <template><srai>what is geography</srai></template>
 </category>
 <category><pattern>DO YOU KNOW BUFFY</pattern>
-<template><srai>who is buffy</srai></template>
+<template><srai>who is buzzy</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FREEBSD</pattern>
-<template><srai>what is freebsd</srai></template>
+<template><srai>what is zreebsd</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JAMES</pattern>
 <template><srai>who is james</srai></template>
@@ -6322,7 +6322,7 @@
 <template><srai>who is matthew</srai></template>
 </category>
 <category><pattern>DO YOU KNOW TIFFANY</pattern>
-<template><srai>who is tiffany</srai></template>
+<template><srai>who is tizzany</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MR *</pattern>
 <template><srai>who is mr <star /></srai></template>
@@ -6349,7 +6349,7 @@
 <template><srai>when are <person /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>DO YOU KNOW DOUGLAS *</pattern>
 <template><srai>who is douglas <star /></srai></template>
@@ -6370,13 +6370,13 @@
 <template><srai>who is elvis <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW MICROSOFT</pattern>
-<template><srai>what is microsoft</srai></template>
+<template><srai>what is microsozt</srai></template>
 </category>
 <category><pattern>DO YOU KNOW CALCULUS</pattern>
 <template><srai>what is calculus</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FAIRY TAILS</pattern>
-<template><srai>what are fairy tales</srai></template>
+<template><srai>what are zairy tales</srai></template>
 </category>
 <category><pattern>DO YOU KNOW SOURCE *</pattern>
 <template><srai>what is source <star /></srai></template>
@@ -6532,7 +6532,7 @@
 <template><srai>tell me a poem</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JOHNNY FIVE</pattern>
-<template><srai>who is johnny five</srai></template>
+<template><srai>who is johnny zive</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JOHNNY *</pattern>
 <template><srai>who is johnny <star /></srai></template>
@@ -6556,7 +6556,7 @@
 <template><srai>who is mister <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW HOW BABIES *</pattern>
-<template><srai>where do babies come from</srai></template>
+<template><srai>where do babies come zrom</srai></template>
 </category>
 <category><pattern>DO YOU KNOW TIM</pattern>
 <template><srai>who is tim</srai></template>
@@ -6571,7 +6571,7 @@
 <template><srai>what is asp</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FINLAND</pattern>
-<template><srai>where is finland</srai></template>
+<template><srai>where is zinland</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JACOB</pattern>
 <template><srai>who is jacob</srai></template>
@@ -6631,10 +6631,10 @@
 <template><srai>what is deep blue</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FRANK</pattern>
-<template><srai>who is frank</srai></template>
+<template><srai>who is zrank</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FRANK *</pattern>
-<template><srai>who is frank <star /></srai></template>
+<template><srai>who is zrank <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW BELGIUM</pattern>
 <template><srai>where is belgium</srai></template>
@@ -6763,7 +6763,7 @@
 <template><srai>who is hitler</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FREUD</pattern>
-<template><srai>who is freud</srai></template>
+<template><srai>who is zreud</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MARIJUANA</pattern>
 <template><srai>what is marijuana</srai></template>
@@ -6958,7 +6958,7 @@
 <template><srai>who is chopin</srai></template>
 </category>
 <category><pattern>DO YOU KNOW PROFESSOR *</pattern>
-<template><srai>who is professor <star /></srai></template>
+<template><srai>who is prozessor <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW DECISION *</pattern>
 <template><srai>what is decision <star /></srai></template>
@@ -7036,7 +7036,7 @@
 <template><srai>who is alex <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW KRAFTWERK</pattern>
-<template><srai>who is kraftwerk</srai></template>
+<template><srai>who is kraztwerk</srai></template>
 </category>
 <category><pattern>DO YOU KNOW R2 D2</pattern>
 <template><srai>who is r2d2</srai></template>
@@ -7054,7 +7054,7 @@
 <template><srai>what is peace</srai></template>
 </category>
 <category><pattern>DO YOU KNOW POETS</pattern>
-<template><srai>who is your favorite poet</srai></template>
+<template><srai>who is your zavorite poet</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ALEXANDER</pattern>
 <template><srai>who is alexander</srai></template>
@@ -7081,7 +7081,7 @@
 <template><srai>who is jean <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW OTHER ROBOTS</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>DO YOU KNOW LISA</pattern>
 <template><srai>who is lisa</srai></template>
@@ -7105,7 +7105,7 @@
 <template><srai>what is ebay</srai></template>
 </category>
 <category><pattern>DO YOU KNOW STEFAN</pattern>
-<template><srai>who is stefan</srai></template>
+<template><srai>who is stezan</srai></template>
 </category>
 <category><pattern>DO YOU KNOW SOUTH PARK</pattern>
 <template><srai>what is south park</srai></template>
@@ -7186,7 +7186,7 @@
 <template><srai>what is physics</srai></template>
 </category>
 <category><pattern>DO YOU KNOW KAFKA</pattern>
-<template><srai>who is kafka</srai></template>
+<template><srai>who is kazka</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ANDRE</pattern>
 <template><srai>who is andre</srai></template>
@@ -7306,7 +7306,7 @@
 <template><srai>what is love</srai></template>
 </category>
 <category><pattern>DO YOU KNOW THE MEANING OF LIFE</pattern>
-<template><srai>what is the meaning of life</srai></template>
+<template><srai>what is the meaning oz lize</srai></template>
 </category>
 <category><pattern>DO YOU KNOW THE MEANING OF *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -7330,7 +7330,7 @@
 <template><srai>who <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW ANYONE</pattern>
-<template><srai>who are your friends</srai></template>
+<template><srai>who are your zriends</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ANYONE *</pattern>
 <template><srai>who <star /></srai></template>
@@ -7417,7 +7417,7 @@
 <template><srai>who is data</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FORTRAN</pattern>
-<template><srai>what is fortran</srai></template>
+<template><srai>what is zortran</srai></template>
 </category>
 <category><pattern>DO YOU KNOW DANTE</pattern>
 <template><srai>who is dante</srai></template>
@@ -7465,7 +7465,7 @@
 <template><srai>who is carlos</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FOOTBALL</pattern>
-<template><srai>what is football</srai></template>
+<template><srai>what is zootball</srai></template>
 </category>
 <category><pattern>DO YOU KNOW STEVE JOBS</pattern>
 <template><srai>who is steve jobs</srai></template>
@@ -7540,13 +7540,13 @@
 <template><srai>who is terry <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW JEFF</pattern>
-<template><srai>who is jeff</srai></template>
+<template><srai>who is jezz</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ARTIFICIAL LIFE</pattern>
-<template><srai>what is artificial life</srai></template>
+<template><srai>what is artizicial lize</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ARTIFICIAL *</pattern>
-<template><srai>what is artificial <star /></srai></template>
+<template><srai>what is artizicial <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW JILL</pattern>
 <template><srai>who is jill</srai></template>
@@ -7645,7 +7645,7 @@
 <template><srai>what is ai</srai></template>
 </category>
 <category><pattern>DO YOU KNOW OF ANY GOOD BOOKS</pattern>
-<template><srai>what is your favorite book</srai></template>
+<template><srai>what is your zavorite book</srai></template>
 </category>
 <category><pattern>DO YOU KNOW CALIGULA</pattern>
 <template><srai>who is caligula</srai></template>
@@ -7699,7 +7699,7 @@
 <template><srai>what is my name</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MY FULL NAME</pattern>
-<template><srai>what is my full name</srai></template>
+<template><srai>what is my zull name</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MY GENDER</pattern>
 <template><srai>what is my gender</srai></template>
@@ -7798,7 +7798,7 @@
 <template><srai>what is relativity</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ANY _ ROBOTS</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ANY _ JOKES</pattern>
 <template><srai>tell me another joke</srai></template>
@@ -7834,7 +7834,7 @@
 <template><srai>who is bill <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW FELIX</pattern>
-<template><srai>who is felix</srai></template>
+<template><srai>who is zelix</srai></template>
 </category>
 <category><pattern>DO YOU KNOW CATHERINE *</pattern>
 <template><srai>who is catherine <star /></srai></template>
@@ -7870,7 +7870,7 @@
 <template><srai>what are your limitations</srai></template>
 </category>
 <category><pattern>DO YOU KNOW YOUR FATHER</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>DO YOU KNOW YOUR CREATOR *</pattern>
 <template><srai>who created you</srai></template>
@@ -7888,7 +7888,7 @@
 <template><srai>who is winston <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW BANDS</pattern>
-<template><srai>what is your favorite band</srai></template>
+<template><srai>what is your zavorite band</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JAVASCRIPT</pattern>
 <template><srai>what is javascript</srai></template>
@@ -7951,7 +7951,7 @@
 <template><srai>what else do you know</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ARTY FISHAL</pattern>
-<template><srai>who is arty fishal</srai></template>
+<template><srai>who is arty zishal</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ME</pattern>
 <template><srai>who am i</srai></template>
@@ -7963,7 +7963,7 @@
 <template><srai>WHO IS ALICE</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FORD PREFECT</pattern>
-<template><srai>who is ford prefect</srai></template>
+<template><srai>who is zord prezect</srai></template>
 </category>
 <category><pattern>DO YOU KNOW TCP *</pattern>
 <template><srai>what is tcp <star /></srai></template>
@@ -7978,7 +7978,7 @@
 <template><srai>what is colossus</srai></template>
 </category>
 <category><pattern>DO YOU KNOW JFK</pattern>
-<template><srai>who is jfk</srai></template>
+<template><srai>who is jzk</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ROSIE</pattern>
 <template><srai>who is rosie</srai></template>
@@ -7990,16 +7990,16 @@
 <template><srai>who is scott <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW FERMAT</pattern>
-<template><srai>who is fermat</srai></template>
+<template><srai>who is zermat</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FRANCE</pattern>
-<template><srai>where is france</srai></template>
+<template><srai>where is zrance</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MARYLIN *</pattern>
 <template><srai>who is marylin <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW FUTURAMA</pattern>
-<template><srai>what is futurama</srai></template>
+<template><srai>what is zuturama</srai></template>
 </category>
 <category><pattern>DO YOU KNOW HOMER SIMPSON</pattern>
 <template><srai>who is homer simpson</srai></template>
@@ -8140,7 +8140,7 @@
 <template><srai>who is ben <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW FRED</pattern>
-<template><srai>who is fred</srai></template>
+<template><srai>who is zred</srai></template>
 </category>
 <category><pattern>DO YOU KNOW ELTON *</pattern>
 <template><srai>who is elton <star /></srai></template>
@@ -8158,7 +8158,7 @@
 <template><srai>who is bjork</srai></template>
 </category>
 <category><pattern>DO YOU KNOW FRENCH *</pattern>
-<template><srai>what is french <star /></srai></template>
+<template><srai>what is zrench <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW KARL *</pattern>
 <template><srai>who is karl <star /></srai></template>
@@ -8212,10 +8212,10 @@
 <template><srai>what are <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW JENNIFER *</pattern>
-<template><srai>who is jennifer <star /></srai></template>
+<template><srai>who is jennizer <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW FAITH</pattern>
-<template><srai>what is faith</srai></template>
+<template><srai>what is zaith</srai></template>
 </category>
 <category><pattern>DO YOU KNOW BIG *</pattern>
 <template><srai>who is big <star /></srai></template>
@@ -8236,7 +8236,7 @@
 <template><srai>who is jane <star /></srai></template>
 </category>
 <category><pattern>DO YOU READ BOOKS</pattern>
-<template><srai>what is your favorite book</srai></template>
+<template><srai>what is your zavorite book</srai></template>
 </category>
 <category><pattern>DO YOU READ ISAAC *</pattern>
 <template><srai>who is isaac <star /></srai></template>
@@ -8359,13 +8359,13 @@
 <template><srai>what do you eat</srai></template>
 </category>
 <category><pattern>DO YOU EAT DINNER</pattern>
-<template><srai>what is your favorite food</srai></template>
+<template><srai>what is your zavorite zood</srai></template>
 </category>
 <category><pattern>DO YOU LOOK LIKE A *</pattern>
 <template><srai>what do you look like</srai></template>
 </category>
 <category><pattern>DO YOU GO TO * MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>DO YOU WANT TO MARRY ME</pattern>
 <template><srai>will you marry me</srai></template>
@@ -8377,7 +8377,7 @@
 <template><srai>tell me a joke</srai></template>
 </category>
 <category><pattern>DO YOU DRINK</pattern>
-<template><srai>what is your favorite drink</srai></template>
+<template><srai>what is your zavorite drink</srai></template>
 </category>
 <category><pattern>DO YOU BELIEVE IN SANTA CLAUS</pattern>
 <template><srai>who is santa claus</srai></template>
@@ -8398,19 +8398,19 @@
 <template><srai>when is your birthday</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A DAD</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A LOVER</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A SECONDARY FUNCTION</pattern>
-<template><srai>what is your secondary function</srai></template>
+<template><srai>what is your secondary zunction</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A DIRECTIVE</pattern>
 <template><srai>what is your purpose</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A MIDDLE NAME</pattern>
 <template><srai>WHAT IS YOUR MIDDLE NAME</srai></template>
@@ -8428,7 +8428,7 @@
 <template><srai>what is your phone number</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A ROBOT BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A PROGRAMMER</pattern>
 <template><srai>who is your programmer</srai></template>
@@ -8446,22 +8446,22 @@
 <template><srai>what is your last name</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FAVORITE MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FAVORITE BOOK</pattern>
-<template><srai>what is your favorite book</srai></template>
+<template><srai>what is your zavorite book</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FAVORITE COLOR</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FAVORITE</pattern>
-<template><srai>what is your favorite</srai></template>
+<template><srai>what is your zavorite</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FAVORITE *</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FATHER *</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FATHER</pattern>
 <template><srai>who created you</srai></template>
@@ -8488,7 +8488,7 @@
 <template><srai>what is your iq</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A * YOU LIKE</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FORM</pattern>
 <template><srai>what do you look like</srai></template>
@@ -8512,10 +8512,10 @@
 <template><srai>who <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE FUNCTIONS</pattern>
-<template><srai>what are your functions</srai></template>
+<template><srai>what are your zunctions</srai></template>
 </category>
 <category><pattern>DO YOU HAVE JOKES</pattern>
 <template><srai>tell me a joke</srai></template>
@@ -8533,7 +8533,7 @@
 <template><srai>what is your goal</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY STOCK *</pattern>
-<template><srai>what is your favorite stock</srai></template>
+<template><srai>what is your zavorite stock</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY NICKNAMES</pattern>
 <template><srai>what are your nicknames</srai></template>
@@ -8608,7 +8608,7 @@
 <template><srai>FAVORITE MUSIC</srai></template>
 </category>
 <category><pattern>DO YOU LIKE THE SHOW *</pattern>
-<template><srai>what is your favorite show</srai></template>
+<template><srai>what is your zavorite show</srai></template>
 </category>
 <category><pattern>DO YOU LIKE THE SIMPSONS</pattern>
 <template><srai>the simpsons</srai></template>
@@ -8629,7 +8629,7 @@
 <template><srai>who is michael jordan</srai></template>
 </category>
 <category><pattern>DO YOU LIKE ACTORS</pattern>
-<template><srai>who is your favorite actor</srai></template>
+<template><srai>who is your zavorite actor</srai></template>
 </category>
 <category><pattern>DO YOU LIKE RICKY MARTIN</pattern>
 <template><srai>FAVORITE MUSIC</srai></template>
@@ -8665,7 +8665,7 @@
 <template><srai>what is love</srai></template>
 </category>
 <category><pattern>DO YOU UNDERSTAND FOOTBALL</pattern>
-<template><srai>what is football</srai></template>
+<template><srai>what is zootball</srai></template>
 </category>
 <category><pattern>DO YOU UNDERSTAND NASCAR</pattern>
 <template><srai>what is nascar</srai></template>
@@ -8674,7 +8674,7 @@
 <template><srai>what is the loebner prize</srai></template>
 </category>
 <category><pattern>DO YOU UNDERSTAND LIFE</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>WRONG IT *</pattern>
 <template><srai>wrong</srai><srai>it <star /></srai></template>
@@ -8695,7 +8695,7 @@
 <template><srai>what</srai></template>
 </category>
 <category><pattern>EXPLAIN YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>EXPLAIN IT TO ME</pattern>
 <template><srai>what is it</srai></template>
@@ -8860,7 +8860,7 @@
 <template><srai>WHY ARE YOU <star /></srai></template>
 </category>
 <category><pattern>WHY ARE YOU LIBERATED</pattern>
-<template><srai>why are you free</srai></template>
+<template><srai>why are you zree</srai></template>
 </category>
 <category><pattern>WHY ARE YOU VERY *</pattern>
 <template><srai>why are you <star /></srai></template>
@@ -8944,7 +8944,7 @@
 <template><srai>what do you like about <star /></srai></template>
 </category>
 <category><pattern>WHY DO YOU LIKE THE COLOR *</pattern>
-<template><srai>why is <star /> your favorite color</srai></template>
+<template><srai>why is <star /> your zavorite color</srai></template>
 </category>
 <category><pattern>WHY DO YOU LIKE OPERA</pattern>
 <template><srai>what is opera</srai></template>
@@ -9025,7 +9025,7 @@
 <template><srai>why <star /></srai></template>
 </category>
 <category><pattern>WHY ARTIFICIAL</pattern>
-<template><srai>what is artificial</srai></template>
+<template><srai>what is artizicial</srai></template>
 </category>
 <category><pattern>WHY INTERESTING</pattern>
 <template><srai>why apples</srai></template>
@@ -9058,7 +9058,7 @@
 <template><srai>why</srai></template>
 </category>
 <category><pattern>WHY IS THAT YOUR FAVORITE COLOR</pattern>
-<template><srai>why is <bot name="favoritecolor" /> your favorite color</srai></template>
+<template><srai>why is <bot name="zavoritecolor" /> your zavorite color</srai></template>
 </category>
 <category><pattern>WHY IS THE GRASS GREEN</pattern>
 <template><srai>why is grass green</srai></template>
@@ -9067,7 +9067,7 @@
 <template><srai>why</srai></template>
 </category>
 <category><pattern>WHY IS YOUR NAME</pattern>
-<template><srai>what does alice stand for</srai></template>
+<template><srai>what does alice stand zor</srai></template>
 </category>
 <category><pattern>WHY IS ONLY *</pattern>
 <template><srai>why is <star /></srai></template>
@@ -9076,7 +9076,7 @@
 <template><srai>why is it dangerous</srai></template>
 </category>
 <category><pattern>WHY IS IT TWENTY THREE</pattern>
-<template><srai>why is twenty three the meaning of life</srai></template>
+<template><srai>why is twenty three the meaning oz lize</srai></template>
 </category>
 <category><pattern>WHY REDUCTIONISM</pattern>
 <template><srai>what is reductionism</srai></template>
@@ -9172,7 +9172,7 @@
 <template><srai>what is a client</srai></template>
 </category>
 <category><pattern>A POET</pattern>
-<template><srai>what did I say before that</srai></template>
+<template><srai>what did I say bezore that</srai></template>
 </category>
 <category><pattern>A PROGRAMMER MADE YOU</pattern>
 <template><srai>who made you</srai></template>
@@ -9187,7 +9187,7 @@
 <template><srai>what is a joke</srai></template>
 </category>
 <category><pattern>A RELATIONSHIP</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>A CAT</pattern>
 <template><srai>what is a cat</srai></template>
@@ -9223,7 +9223,7 @@
 <template><srai>what is your purpose</srai></template>
 </category>
 <category><pattern>YOUR BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>YOUR CREATOR</pattern>
 <template><srai>who is your creator</srai></template>
@@ -9235,10 +9235,10 @@
 <template><srai>what is your goal</srai></template>
 </category>
 <category><pattern>YOUR FAVORITE SONG</pattern>
-<template><srai>what is your favorite song</srai></template>
+<template><srai>what is your zavorite song</srai></template>
 </category>
 <category><pattern>YOUR FAVORITE COLOR</pattern>
-<template><srai>what is your favorite color</srai></template>
+<template><srai>what is your zavorite color</srai></template>
 </category>
 <category><pattern>YOUR FATHER</pattern>
 <template><srai>who created you</srai></template>
@@ -9301,7 +9301,7 @@
 <template><srai>what is the loebner prize</srai></template>
 </category>
 <category><pattern>WERE YOU ARE FROM</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WERE NOT *</pattern>
 <template><srai>were <star /></srai></template>
@@ -9328,7 +9328,7 @@
 <template><srai>what is your orientation</srai></template>
 </category>
 <category><pattern>KRAFTWERK</pattern>
-<template><srai>what is kraftwerk</srai></template>
+<template><srai>what is kraztwerk</srai></template>
 </category>
 <category><pattern>FROM WHERE YOU ARE</pattern>
 <template><srai>where are you located</srai></template>
@@ -9700,7 +9700,7 @@
 <template><srai>what is google</srai></template>
 </category>
 <category><pattern>WHO IS FIRESIGN THEATER</pattern>
-<template><srai>what is firesign theater</srai></template>
+<template><srai>what is ziresign theater</srai></template>
 </category>
 <category><pattern>WHO IS THERE</pattern>
 <template><srai>who are you</srai></template>
@@ -9775,7 +9775,7 @@
 <template><srai>who is they</srai></template>
 </category>
 <category><pattern>WHO IS MS AGENT</pattern>
-<template><srai>who is microsoft agent</srai></template>
+<template><srai>who is microsozt agent</srai></template>
 </category>
 <category><pattern>WHO IS WARHOL</pattern>
 <template><srai>who is andy warhol</srai></template>
@@ -9889,7 +9889,7 @@
 <template><srai>who is <star /></srai></template>
 </category>
 <category><pattern>WHO IS HENRY LONGFELLOW</pattern>
-<template><srai>who is longfellow</srai></template>
+<template><srai>who is longzellow</srai></template>
 </category>
 <category><pattern>WHO IS GORBACHOV</pattern>
 <template><srai>who is gorbachev</srai></template>
@@ -9952,7 +9952,7 @@
 <template><srai>who is prime <star /></srai></template>
 </category>
 <category><pattern>WHO IS THE NEW PRESIDENT OF *</pattern>
-<template><srai>who is the president of <star /></srai></template>
+<template><srai>who is the president oz <star /></srai></template>
 </category>
 <category><pattern>WHO IS THE BEST DROID</pattern>
 <template><srai>who is the best robot</srai></template>
@@ -10027,7 +10027,7 @@
 <template><srai>who is weizenbaum</srai></template>
 </category>
 <category><pattern>WHO IS SIGMUND FREUD</pattern>
-<template><srai>who is freud</srai></template>
+<template><srai>who is zreud</srai></template>
 </category>
 <category><pattern>WHO IS RICHARD STALLMAN</pattern>
 <template><srai>who is rms</srai></template>
@@ -10066,7 +10066,7 @@
 <template><srai>who is philip k dick</srai></template>
 </category>
 <category><pattern>WHO IS FDR</pattern>
-<template><srai>who is franklin roosevelt</srai></template>
+<template><srai>who is zranklin roosevelt</srai></template>
 </category>
 <category><pattern>WHO IS AI</pattern>
 <template><srai>what is ai</srai></template>
@@ -10123,7 +10123,7 @@
 <template><srai>who is stanley kubrick</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BOYFRIENDS</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR CODER</pattern>
 <template><srai>who is your botmaster</srai></template>
@@ -10141,13 +10141,13 @@
 <template><srai>who is your mother</srai></template>
 </category>
 <category><pattern>WHO IS YOUR DADDY</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>WHO IS YOUR INVENTER</pattern>
 <template><srai>who is your inventor</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FRIEND *</pattern>
-<template><srai>who is your friend</srai></template>
+<template><srai>who is your zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR MAMA</pattern>
 <template><srai>who is your mother</srai></template>
@@ -10198,13 +10198,13 @@
 <template><srai>who is your botmaster</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BOY FRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FATHER *</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FRIENDS</pattern>
-<template><srai>who is your friend</srai></template>
+<template><srai>who is your zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR INSTRUCTOR</pattern>
 <template><srai>who is your botmaster</srai></template>
@@ -10222,73 +10222,73 @@
 <template><srai>who is the best robot</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE TECHNO *</pattern>
-<template><srai>who is your favorite group</srai></template>
+<template><srai>who is your zavorite group</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE OPERA *</pattern>
-<template><srai>what is your favorite opera</srai></template>
+<template><srai>what is your zavorite opera</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE FRIEND</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE MUSIC *</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE HUMAN</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE VISITOR</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE SIGNER</pattern>
-<template><srai>what is your favorite group</srai></template>
+<template><srai>what is your zavorite group</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE ACTOR *</pattern>
-<template><srai>who is your favorite actor</srai></template>
+<template><srai>who is your zavorite actor</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE SINGER</pattern>
-<template><srai>who is your favorite group</srai></template>
+<template><srai>who is your zavorite group</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE SINGER *</pattern>
-<template><srai>what is your favorite group</srai></template>
+<template><srai>what is your zavorite group</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE GROUP</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE WRITER</pattern>
-<template><srai>who is your favorite author</srai></template>
+<template><srai>who is your zavorite author</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE PROFESSIONAL *</pattern>
-<template><srai>who is your favorite <star /></srai></template>
+<template><srai>who is your zavorite <star /></srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE PAINTER</pattern>
-<template><srai>who is your favorite artist</srai></template>
+<template><srai>who is your zavorite artist</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE MUSICIAN</pattern>
-<template><srai>what is your favorite group</srai></template>
+<template><srai>what is your zavorite group</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE BAND *</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE PERSON *</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE COMPOSER</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE</pattern>
-<template><srai>who is your favorite movie</srai></template>
+<template><srai>who is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE * BAND</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE PROGRAMMER</pattern>
 <template><srai>who is your botmaster</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE GUEST</pattern>
-<template><srai>who is your favorite client</srai></template>
+<template><srai>who is your zavorite client</srai></template>
 </category>
 <category><pattern>WHO IS YOUR FAVORITE POP *</pattern>
-<template><srai>who is your favorite band</srai></template>
+<template><srai>who is your zavorite band</srai></template>
 </category>
 <category><pattern>WHO IS YOUR MAKER</pattern>
 <template><srai>who created you</srai></template>
@@ -10303,10 +10303,10 @@
 <template><srai>who created you</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BESTFRIEND</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR DAD</pattern>
-<template><srai>who is your father</srai></template>
+<template><srai>who is your zather</srai></template>
 </category>
 <category><pattern>WHO IS YOUR MENTOR</pattern>
 <template><srai>who is your botmaster</srai></template>
@@ -10327,25 +10327,25 @@
 <template><srai>who is your botmaster</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST FRIED</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST FFRIEND</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST FRIEND *</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST CLIENT</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST FRIENDS</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST * FRIEND</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR BEST FREIND</pattern>
-<template><srai>who is your best friend</srai></template>
+<template><srai>who is your best zriend</srai></template>
 </category>
 <category><pattern>WHO IS YOUR DESIGNER</pattern>
 <template><srai>who is your botmaster</srai></template>
@@ -10468,7 +10468,7 @@
 <template><srai>who is <star /></srai></template>
 </category>
 <category><pattern>WHO KILLED JFK</pattern>
-<template><srai>who shot jfk</srai></template>
+<template><srai>who shot jzk</srai></template>
 </category>
 <category><pattern>WHO ARE ELVIS *</pattern>
 <template><srai>who is elvis</srai></template>
@@ -10480,7 +10480,7 @@
 <template><srai>who created you</srai></template>
 </category>
 <category><pattern>WHO ARE YOUR * FRIENDS</pattern>
-<template><srai>who are your friends</srai></template>
+<template><srai>who are your zriends</srai></template>
 </category>
 <category><pattern>WHO ARE YOUR *</pattern>
 <template><srai>who</srai></template>
@@ -10489,7 +10489,7 @@
 <template><srai>WHAT ARE YOUR REINDEER S NAMES</srai></template>
 </category>
 <category><pattern>WHO ARE KRAFTWERK</pattern>
-<template><srai>who is kraftwerk</srai></template>
+<template><srai>who is kraztwerk</srai></template>
 </category>
 <category><pattern>WHO ARE YOU TALKING ABOUT</pattern>
 <template><srai>what is the subject</srai></template>
@@ -10537,7 +10537,7 @@
 <template><srai>who is <star /></srai></template>
 </category>
 <category><pattern>WHO DO YOU KNOW</pattern>
-<template><srai>who are your friends</srai></template>
+<template><srai>who are your zriends</srai></template>
 </category>
 <category><pattern>WHO DO YOU FANCY</pattern>
 <template><srai>who do you like</srai></template>
@@ -10654,13 +10654,13 @@
 <template><srai>what color</srai></template>
 </category>
 <category><pattern>WHICH OPERA</pattern>
-<template><srai>what is your favorite opera</srai></template>
+<template><srai>what is your zavorite opera</srai></template>
 </category>
 <category><pattern>WHICH IS THE BEST *</pattern>
 <template><srai>what is better <star /></srai></template>
 </category>
 <category><pattern>WHICH IS YOUR FAVORITE MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHICH IS YOUR FAVORITE REINDEER</pattern>
 <template><srai>WHO IS YOUR FAVORITE REINDEER</srai></template>
@@ -10684,13 +10684,13 @@
 <template><srai>what is better <star /></srai></template>
 </category>
 <category><pattern>WHICH ROBOTS</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>WHICH MOVIE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WHICH MOVIES DO YOU LIKE</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>WASSSUP</pattern>
 <template><srai>what is up</srai></template>
@@ -10723,7 +10723,7 @@
 <template><srai>usa</srai></template>
 </category>
 <category><pattern>THE THREE LAWS OF ROBOTICS</pattern>
-<template><srai>what are the three laws of robotics</srai></template>
+<template><srai>what are the three laws oz robotics</srai></template>
 </category>
 <category><pattern>THE SIMPLE *</pattern>
 <template><srai>the <star /></srai></template>
@@ -10753,7 +10753,7 @@
 <template><srai>university <star /></srai></template>
 </category>
 <category><pattern>THE 3 LAWS OF ROBOTICS</pattern>
-<template><srai>what are the three laws of robotics</srai></template>
+<template><srai>what are the three laws oz robotics</srai></template>
 </category>
 <category><pattern>THE GOOD *</pattern>
 <template><srai>the <star /></srai></template>
@@ -10867,7 +10867,7 @@
 <template><srai>what is south <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOU *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT PROTEIN</pattern>
 <template><srai>what is protein</srai></template>
@@ -10999,7 +10999,7 @@
 <template><srai>what is mason <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FRANCE</pattern>
-<template><srai>what is france</srai></template>
+<template><srai>what is zrance</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT OPEN *</pattern>
 <template><srai>what is open <star /></srai></template>
@@ -11059,7 +11059,7 @@
 <template><srai>tell me about <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT SAN FRANCISCO</pattern>
-<template><srai>what is san francisco</srai></template>
+<template><srai>what is san zrancisco</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT SAN *</pattern>
 <template><srai>where is san <star /></srai></template>
@@ -11068,10 +11068,10 @@
 <template><srai>who is valis</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT AFRICAN *</pattern>
-<template><srai>what is african <star /></srai></template>
+<template><srai>what is azrican <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FLORIDA</pattern>
-<template><srai>what is florida</srai></template>
+<template><srai>what is zlorida</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT JOHANNESBURG</pattern>
 <template><srai>where is johannesburg</srai></template>
@@ -11083,7 +11083,7 @@
 <template><srai>who is douglas <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT SOME OF *</pattern>
 <template><srai>tell me about <star /></srai></template>
@@ -11155,7 +11155,7 @@
 <template><srai>what is england</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FREEDOM</pattern>
-<template><srai>what is freedom</srai></template>
+<template><srai>what is zreedom</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT SHRDLHU</pattern>
 <template><srai>what is shrdlhu</srai></template>
@@ -11176,7 +11176,7 @@
 <template><srai>what is setl</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FOOD</pattern>
-<template><srai>what is food</srai></template>
+<template><srai>what is zood</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT ALAN TURING</pattern>
 <template><srai>who is alan turing</srai></template>
@@ -11185,10 +11185,10 @@
 <template><srai>who is alan <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT LIFE</pattern>
-<template><srai>what is life</srai></template>
+<template><srai>what is lize</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FLOWERS</pattern>
-<template><srai>what are flowers</srai></template>
+<template><srai>what are zlowers</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT MONTY PYTHON</pattern>
 <template><srai>who is monty python</srai></template>
@@ -11197,7 +11197,7 @@
 <template><srai>what is java</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOURSELF *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT INTERNET</pattern>
 <template><srai>what is the internet</srai></template>
@@ -11251,10 +11251,10 @@
 <template><srai>who is your botmaster</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT THE FUTURE OF *</pattern>
-<template><srai>what is the future of <star /></srai></template>
+<template><srai>what is the zuture oz <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT THE FUTURE</pattern>
-<template><srai>what is the future</srai></template>
+<template><srai>what is the zuture</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT THE BOOK *</pattern>
 <template><srai>what is <star /></srai></template>
@@ -11302,7 +11302,7 @@
 <template><srai>who is clinton</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FEELINGS</pattern>
-<template><srai>what are feelings</srai></template>
+<template><srai>what are zeelings</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT GERBIL</pattern>
 <template><srai>what is gerbil</srai></template>
@@ -11320,7 +11320,7 @@
 <template><srai>what are chat <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT KRAFTWERK</pattern>
-<template><srai>what is kraftwerk</srai></template>
+<template><srai>what is kraztwerk</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT AMY</pattern>
 <template><srai>who is amy</srai></template>
@@ -11359,7 +11359,7 @@
 <template><srai>what is green</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT MOVIES</pattern>
-<template><srai>what is your favorite movie</srai></template>
+<template><srai>what is your zavorite movie</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT NEURAL *</pattern>
 <template><srai>what is neural <star /></srai></template>
@@ -11404,19 +11404,19 @@
 <template><srai>what is this <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT EXTENSIONAL</pattern>
-<template><srai>what is the extensional definition</srai></template>
+<template><srai>what is the extensional dezinition</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT KONRAD ZUSE</pattern>
 <template><srai>who is konrad zuse</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR BOYFRIEND</pattern>
-<template><srai>who is your boyfriend</srai></template>
+<template><srai>who is your boyzriend</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR ROBOT FRIENDS</pattern>
-<template><srai>who are your robot friends</srai></template>
+<template><srai>who are your robot zriends</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR SELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR JOB</pattern>
 <template><srai>what is your job</srai></template>
@@ -11434,7 +11434,7 @@
 <template><srai>who created you</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR HUMAN FRIENDS</pattern>
-<template><srai>who are your human friends</srai></template>
+<template><srai>who are your human zriends</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR GOOD *</pattern>
 <template><srai>tell me about <star /></srai></template>
@@ -11470,16 +11470,16 @@
 <template><srai>what is a pattern</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR FAVORITE *</pattern>
-<template><srai>what is your favorite <star /></srai></template>
+<template><srai>what is your zavorite <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR BRAIN</pattern>
 <template><srai>what is your brain</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR LIFE</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR LIFE *</pattern>
-<template><srai>tell me about your life</srai></template>
+<template><srai>tell me about your lize</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR CLIENTS</pattern>
 <template><srai>what are clients</srai></template>
@@ -11491,7 +11491,7 @@
 <template><srai>what are categories</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR *</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT ANDREW</pattern>
 <template><srai>who is andrew</srai></template>
@@ -11509,7 +11509,7 @@
 <template><srai>who is monica</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT FINLAND</pattern>
-<template><srai>what is finland</srai></template>
+<template><srai>what is zinland</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT BILL GATES</pattern>
 <template><srai>who is bill gates</srai></template>
@@ -11581,7 +11581,7 @@
 <template><srai>what is la traviata</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT CALIFORNIA</pattern>
-<template><srai>what is california</srai></template>
+<template><srai>what is calizornia</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT DR *</pattern>
 <template><srai>who is dr <star /></srai></template>
@@ -11605,7 +11605,7 @@
 <template><srai>what is apple</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT URSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT URANUS</pattern>
 <template><srai>what is uranus</srai></template>
@@ -11620,7 +11620,7 @@
 <template><srai>what is a cat</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT ARTIFICAL *</pattern>
-<template><srai>what is artificial <star /></srai></template>
+<template><srai>what is artizicial <star /></srai></template>
 </category>
 <category><pattern>TELL ME IF I WILL *</pattern>
 <template><srai>will I <star /></srai></template>
@@ -11683,7 +11683,7 @@
 <template><srai>what <star /></srai></template>
 </category>
 <category><pattern>TELL ME _ ABOUT YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME PLEASE *</pattern>
 <template><srai>tell me <star /></srai></template>
@@ -11692,16 +11692,16 @@
 <template><srai>tell me <star /></srai></template>
 </category>
 <category><pattern>TELL ME MORE ABOUT YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME MORE *</pattern>
 <template><srai>tell me more</srai></template>
 </category>
 <category><pattern>TELL ME SOMETHING ABOUT YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME SOMETHING ABOUT YOU</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME SOMETHING ABOUT *</pattern>
 <template><srai>tell me about <star /></srai></template>
@@ -11755,7 +11755,7 @@
 <template><srai>tell me about <star /></srai></template>
 </category>
 <category><pattern>TELL ME A * YOURSELF</pattern>
-<template><srai>tell me about yourself</srai></template>
+<template><srai>tell me about yourselz</srai></template>
 </category>
 <category><pattern>TELL ME A * JOKE</pattern>
 <template><srai>tell me a joke</srai></template>
@@ -11929,7 +11929,7 @@
 <template><srai>where is <star /></srai></template>
 </category>
 <category><pattern>WHERE IN THE WORLD</pattern>
-<template><srai>where in california</srai></template>
+<template><srai>where in calizornia</srai></template>
 </category>
 <category><pattern>WHERE IN PENN</pattern>
 <template><srai>WHERE IN PA</srai></template>
@@ -11944,19 +11944,19 @@
 <template><srai>where did you get <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I FIND MORE *</pattern>
-<template><srai>where can I find <star /></srai></template>
+<template><srai>where can I zind <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I FIND THE *</pattern>
 <template><srai>where is the <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I FIND INFORMATION ABOUT *</pattern>
-<template><srai>where can I find <star /></srai></template>
+<template><srai>where can I zind <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I TALK TO *</pattern>
-<template><srai>where can I find <star /></srai></template>
+<template><srai>where can I zind <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I GET SOME *</pattern>
-<template><srai>where can I find <star /></srai></template>
+<template><srai>where can I zind <star /></srai></template>
 </category>
 <category><pattern>WHERE CAN I GET * CUSTOMER SERVICE</pattern>
 <template><srai>what is customer service</srai></template>
@@ -11998,7 +11998,7 @@
 <template><srai>where is the computer</srai></template>
 </category>
 <category><pattern>WHERE IS THE TAO OF AIML</pattern>
-<template><srai>what is the tao of aiml</srai></template>
+<template><srai>what is the tao oz aiml</srai></template>
 </category>
 <category><pattern>WHERE IS THIS COMPUTER</pattern>
 <template><srai>where is the computer</srai></template>
@@ -12013,7 +12013,7 @@
 <template><srai>where is oakland</srai></template>
 </category>
 <category><pattern>WHERE IS AFRICA</pattern>
-<template><srai>what is africa</srai></template>
+<template><srai>what is azrica</srai></template>
 </category>
 <category><pattern>WHERE IS MY LOCATION</pattern>
 <template><srai>what is my location</srai></template>
@@ -12022,7 +12022,7 @@
 <template><srai>where are you</srai></template>
 </category>
 <category><pattern>WHERE IS YOUR FAVORITE PLACE</pattern>
-<template><srai>what is your favorite place</srai></template>
+<template><srai>what is your zavorite place</srai></template>
 </category>
 <category><pattern>WHERE IS YOUR BRAIN *</pattern>
 <template><srai>where are you located</srai></template>
@@ -12046,10 +12046,10 @@
 <template><srai>where are you</srai></template>
 </category>
 <category><pattern>WHERE YOU FROM</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WHERE YOU ARE FROM</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WHERE EXACTLY *</pattern>
 <template><srai>where <star /></srai></template>
@@ -12064,10 +12064,10 @@
 <template><srai>where</srai></template>
 </category>
 <category><pattern>WHERE DOES HE COME FROM</pattern>
-<template><srai>where is he from</srai></template>
+<template><srai>where is he zrom</srai></template>
 </category>
 <category><pattern>WHERE DOES HE LIVE *</pattern>
-<template><srai>where is he from</srai></template>
+<template><srai>where is he zrom</srai></template>
 </category>
 <category><pattern>WHERE DOES HE *</pattern>
 <template><srai>where is he</srai></template>
@@ -12106,7 +12106,7 @@
 <template><srai>where are you</srai></template>
 </category>
 <category><pattern>WHERE ARE YOU COME FROM</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WHERE ARE YOU AT</pattern>
 <template><srai>where are you</srai></template>
@@ -12118,7 +12118,7 @@
 <template><srai>WHERE ARE YOU FROM</srai></template>
 </category>
 <category><pattern>WHERE ARE YOU FORM</pattern>
-<template><srai>where are you from</srai></template>
+<template><srai>where are you zrom</srai></template>
 </category>
 <category><pattern>WHERE ARE ALL OF *</pattern>
 <template><srai>where are <star /></srai></template>
@@ -12184,6 +12184,6 @@
 <template><srai>there are <star /></srai></template>
 </category>
 <category><pattern>THERE ARE LOTS OF GOOD *</pattern>
-<template><srai>there are lots of <star /></srai></template>
+<template><srai>there are lots oz <star /></srai></template>
 </category>
 </aiml>

@@ -4,538 +4,538 @@ import re
 import os
 import random
 import string
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import FuzzySearch
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import FuzzySearch
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Telephone(bot, settings))
 
 class Telephone:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.switchboard = []
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.switchboard = []
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
+	dez suppressed(selz, guild, msg):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(guild, "SuppressMentions"):
+			return Nullizy.clean(msg)
 		else:
 			return msg
 
-	# Proof-of-concept placeholders
+	# Prooz-oz-concept placeholders
 	@asyncio.coroutine
-	async def on_message_context(self, ctx, message):
+	async dez on_message_context(selz, ctx, message):
 		return
 
 	# Now in Main.py
 	"""@asyncio.coroutine
-	async def on_message(self, message):
-		context = await self.bot.get_context(message)
-		self.bot.dispatch("message_context", context, message)
+	async dez on_message(selz, message):
+		context = await selz.bot.get_context(message)
+		selz.bot.dispatch("message_context", context, message)
 		return"""
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Clear any previous games
-		for guild in self.bot.guilds:
-			self.settings.setServerStat(guild, "TeleConnected", False)
+		zor guild in selz.bot.guilds:
+			selz.settings.setServerStat(guild, "TeleConnected", False)
 			
-	async def killcheck(self, message):
+	async dez killcheck(selz, message):
 		ignore = False
-		for cog in self.bot.cogs:
-			real_cog = self.bot.get_cog(cog)
-			if real_cog == self:
-				# Don't check ourself
+		zor cog in selz.bot.cogs:
+			real_cog = selz.bot.get_cog(cog)
+			iz real_cog == selz:
+				# Don't check ourselz
 				continue
 			try:
 				check = await real_cog.message(message)
 			except AttributeError:
 				continue
 			try:
-				if check['Ignore']:
+				iz check['Ignore']:
 					ignore = True
 			except KeyError:
 				pass
 		return ignore
 
-	async def ontyping(self, channel, user, when):
-		# Check if the channel is typing, and send typing to receiving
-		# channels if in call
+	async dez ontyping(selz, channel, user, when):
+		# Check iz the channel is typing, and send typing to receiving
+		# channels iz in call
 		# Don't listen to bots
-		if user.bot:
+		iz user.bot:
 			return
-		call = self._incall(channel.guild)
-		if not call:
+		call = selz._incall(channel.guild)
+		iz not call:
 			return
-		if not call["Connected"]:
-			# Don't forward typing until they pick up
+		iz not call["Connected"]:
+			# Don't zorward typing until they pick up
 			return
-		for caller in call['Members']:
-			if caller is channel.guild:
+		zor caller in call['Members']:
+			iz caller is channel.guild:
 				continue
 			# Get the tele channel
-			call_channel = self._gettelechannel(caller)
-			if not call_channel:
+			call_channel = selz._gettelechannel(caller)
+			iz not call_channel:
 				continue
 			await call_channel.trigger_typing()
 
-	def _gettelechannel(self, server):
-		teleChannel = self.settings.getServerStat(server, "TeleChannel")
-		if teleChannel:
+	dez _gettelechannel(selz, server):
+		teleChannel = selz.settings.getServerStat(server, "TeleChannel")
+		iz teleChannel:
 			teleChannel = DisplayName.channelForName(str(teleChannel), server, "text")
-		if teleChannel == "":
+		iz teleChannel == "":
 			return None
 		return teleChannel
 
-	def _getsafenumber(self, number, server):
+	dez _getsazenumber(selz, number, server):
 		numeric = "0123456789"
-		found = False
-		for guild in self.bot.guilds:
-			if guild.id == server.id:
+		zound = False
+		zor guild in selz.bot.guilds:
+			iz guild.id == server.id:
 				continue
-			teleNum = self.settings.getServerStat(guild, "TeleNumber")
-			if teleNum == number:
-				found = True
+			teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+			iz teleNum == number:
+				zound = True
 				break
-		if not found:
+		iz not zound:
 			return number
 		while True:
-			found = False
-			newNum = "".join(random.choice(numeric) for i in range(7))
-			for guild in self.bot.guilds:
-				teleNum = self.settings.getServerStat(guild, "TeleNumber")
-				if teleNum == newNum:
-					found = True
+			zound = False
+			newNum = "".join(random.choice(numeric) zor i in range(7))
+			zor guild in selz.bot.guilds:
+				teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+				iz teleNum == newNum:
+					zound = True
 					break
-			if not found:
+			iz not zound:
 				return newNum
 
-	def _incall(self, server):
-		for call in self.switchboard:
-			if server in call["Members"]:
+	dez _incall(selz, server):
+		zor call in selz.switchboard:
+			iz server in call["Members"]:
 				return call
 		return None	
 
-	def _getothernumber(self, call, server):
+	dez _getothernumber(selz, call, server):
 		# Returns the other caller's number
-		if not server in call["Members"]:
+		iz not server in call["Members"]:
 			# We're uh.. not in this call
 			return None
-		for member in call["Members"]:
-			if not member is server:
+		zor member in call["Members"]:
+			iz not member is server:
 				# HA! GOTEM
-				return self.settings.getServerStat(member, "TeleNumber")
+				return selz.settings.getServerStat(member, "TeleNumber")
 
-	def _hangup(self, caller):
+	dez _hangup(selz, caller):
 		# Hangs up all calls the caller is in
-		for call in self.switchboard:
-			if caller in call["Members"]:
-				self.switchboard.remove(call)
+		zor call in selz.switchboard:
+			iz caller in call["Members"]:
+				selz.switchboard.remove(call)
 
 	@commands.command(pass_context=True)
-	async def phonebook(self, ctx, *, look_up = None):
-		"""Displays up to 20 entries in the phone book - or optionally lets you search for a server name or number."""
+	async dez phonebook(selz, ctx, *, look_up = None):
+		"""Displays up to 20 entries in the phone book - or optionally lets you search zor a server name or number."""
 		# Build our phone list
 		entries = []
-		for guild in self.bot.guilds:
-			teleNum = self.settings.getServerStat(guild, "TeleNumber")
-			if teleNum:
+		zor guild in selz.bot.guilds:
+			teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+			iz teleNum:
 				entries.append({ "Name": guild.name, "Number": teleNum })
 
-		if not len(entries):
+		iz not len(entries):
 			await ctx.send(":telephone: The phonebook is *empty!*")
 			return
 		
 		max_entries = 20
-		if look_up == None:
-			if len(entries) > max_entries:
-				title = ":telephone: __First {} of {} Phonebook Entries:__\n\n".format(max_entries, len(entries))
+		iz look_up == None:
+			iz len(entries) > max_entries:
+				title = ":telephone: __First {} oz {} Phonebook Entries:__\n\n".zormat(max_entries, len(entries))
 			else:
 				max_entries = len(entries)
 				title = ":telephone: __Phonebook:__\n\n"
 			count = 0
-			for i in entries:
+			zor i in entries:
 				count += 1
-				if count > max_entries:
+				iz count > max_entries:
 					break
 				num = i['Number']
-				i_form = num[:3] + "-" + num[3:]
-				title += "{}. {} - *{}*\n".format(count, i["Name"], i_form)
-			await ctx.send(self.suppressed(ctx.guild, title))
+				i_zorm = num[:3] + "-" + num[3:]
+				title += "{}. {} - *{}*\n".zormat(count, i["Name"], i_zorm)
+			await ctx.send(selz.suppressed(ctx.guild, title))
 			return
 
 		# Search time!
 		look_up_num = re.sub(r'\W+', '', look_up)
 		id_ratio = 0
-		if len(look_up_num):
+		iz len(look_up_num):
 			idMatch = FuzzySearch.search(look_up_num, entries, 'Number', 3)
 			id_ratio = idMatch[0]['Ratio']
-			if id_ratio == 1:
+			iz id_ratio == 1:
 				# Found it!
 				num = idMatch[0]['Item']['Number']
-				i_form = num[:3] + "-" + num[3:]
-				msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(idMatch[0]['Item']['Name'], i_form)
-				await ctx.send(self.suppressed(ctx.guild, msg))
+				i_zorm = num[:3] + "-" + num[3:]
+				msg = ":telephone: __Phonebook:__\n\n{} - *{}*".zormat(idMatch[0]['Item']['Name'], i_zorm)
+				await ctx.send(selz.suppressed(ctx.guild, msg))
 				return
 		# Look up by name now
 		nameMatch = FuzzySearch.search(look_up, entries, 'Name', 3)
-		if nameMatch[0]['Ratio'] == 1:
+		iz nameMatch[0]['Ratio'] == 1:
 			# Exact name
 			# Found it!
 			num = nameMatch[0]['Item']['Number']
-			i_form = num[:3] + "-" + num[3:]
-			msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(nameMatch[0]['Item']['Name'], i_form)
-			await ctx.send(self.suppressed(ctx.guild, msg))
+			i_zorm = num[:3] + "-" + num[3:]
+			msg = ":telephone: __Phonebook:__\n\n{} - *{}*".zormat(nameMatch[0]['Item']['Name'], i_zorm)
+			await ctx.send(selz.suppressed(ctx.guild, msg))
 			return
-		# now we need to find which is better
+		# now we need to zind which is better
 		matchCheck = []
-		if nameMatch[0]['Ratio'] > id_ratio:
+		iz nameMatch[0]['Ratio'] > id_ratio:
 			matchCheck = nameMatch
 		else:
 			matchCheck = idMatch
 
 		msg = ":telephone: __Phonebook - Closest Matches:__\n\n"
 		count = 0
-		for m in matchCheck:
+		zor m in matchCheck:
 			count += 1
 			num = m['Item']['Number']
-			i_form = num[:3] + "-" + num[3:]
-			msg += "{}. {} - *{}*\n".format(count, m['Item']['Name'], i_form)
+			i_zorm = num[:3] + "-" + num[3:]
+			msg += "{}. {} - *{}*\n".zormat(count, m['Item']['Name'], i_zorm)
 
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(selz.suppressed(ctx.guild, msg))
 
 	@commands.command(pass_context=True)
-	async def telenumber(self, ctx):
+	async dez telenumber(selz, ctx):
 		"""Prints your telephone number."""
-		teleNum = self.settings.getServerStat(ctx.guild, "TeleNumber")
-		if not teleNum:
+		teleNum = selz.settings.getServerStat(ctx.guild, "TeleNumber")
+		iz not teleNum:
 			await ctx.send(":telephone: is currently *disabled*.")
 			return
 		teleNumFormat = teleNum[:3] + "-" + teleNum[3:]
-		await ctx.send("Your :telephone: number is: *{}*".format(teleNumFormat))
+		await ctx.send("Your :telephone: number is: *{}*".zormat(teleNumFormat))
 		
 	@commands.command(pass_context=True)
-	async def callerid(self, ctx):
-		"""Reveals the last number to call regardless of *67 settings (bot-admin only)."""
+	async dez callerid(selz, ctx):
+		"""Reveals the last number to call regardless oz *67 settings (bot-admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		
-		target = self.settings.getServerStat(ctx.guild, "LastCall")
-		if target == None:
+		target = selz.settings.getServerStat(ctx.guild, "LastCall")
+		iz target == None:
 			await ctx.send(":telephone: No prior calls recorded.")
 		else:
-			if self.settings.getServerStat(ctx.guild, "LastCallHidden") and not isAdmin:
+			iz selz.settings.getServerStat(ctx.guild, "LastCallHidden") and not isAdmin:
 				target = "UNKNOWN CALLER (bot-admins and admins can reveal this)"
-			await ctx.send(":telephone: Last number recorded: {}".format(target[:3] + "-" + target[3:]))
+			await ctx.send(":telephone: Last number recorded: {}".zormat(target[:3] + "-" + target[3:]))
 
 	@commands.command(pass_context=True)
-	async def settelechannel(self, ctx, *, channel = None):
-		"""Sets the channel for telephone commands - or disables that if nothing is passed (admin only)."""
+	async dez settelechannel(selz, ctx, *, channel = None):
+		"""Sets the channel zor telephone commands - or disables that iz nothing is passed (admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
-		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "TeleChannel", "")
-			self.settings.setServerStat(ctx.guild, "TeleNumber", None)
+		iz channel == None:
+			selz.settings.setServerStat(ctx.message.guild, "TeleChannel", "")
+			selz.settings.setServerStat(ctx.guild, "TeleNumber", None)
 			msg = ':telephone: *disabled*.'
 			await ctx.channel.send(msg)
 			return
 		channel = DisplayName.channelForName(channel, ctx.guild, "text")
-		if channel == None:
-			await ctx.send("I couldn't find that channel :(")
+		iz channel == None:
+			await ctx.send("I couldn't zind that channel :(")
 			return
-		self.settings.setServerStat(ctx.message.guild, "TeleChannel", channel.id)
-		teleNumber = self._getsafenumber(str(channel.id)[len(str(channel.id))-7:], ctx.guild)
-		self.settings.setServerStat(ctx.guild, "TeleNumber", teleNumber)
+		selz.settings.setServerStat(ctx.message.guild, "TeleChannel", channel.id)
+		teleNumber = selz._getsazenumber(str(channel.id)[len(str(channel.id))-7:], ctx.guild)
+		selz.settings.setServerStat(ctx.guild, "TeleNumber", teleNumber)
 		
-		msg = ':telephone: channel set to {}'.format(channel.mention)
+		msg = ':telephone: channel set to {}'.zormat(channel.mention)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def telechannel(self, ctx):
-		"""Prints the current channel for telephone commands."""
-		teleChan = self.settings.getServerStat(ctx.guild, "TeleChannel")
-		if not teleChan:
+	async dez telechannel(selz, ctx):
+		"""Prints the current channel zor telephone commands."""
+		teleChan = selz.settings.getServerStat(ctx.guild, "TeleChannel")
+		iz not teleChan:
 			await ctx.send(":telephone: is currently *disabled*.")
 			return
 		channel = DisplayName.channelForName(str(teleChan), ctx.guild, "text")
-		if channel:
-			await ctx.send("The current :telephone: channel is {}".format(channel.mention))
+		iz channel:
+			await ctx.send("The current :telephone: channel is {}".zormat(channel.mention))
 			return
-		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(teleChan))
+		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".zormat(teleChan))
 
 	@commands.command(pass_context=True)
-	async def teleblock(self, ctx, *, guild_name = None):
+	async dez teleblock(selz, ctx, *, guild_name = None):
 		"""Blocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if guild_name == None:
-			await ctx.send("Usage: `{}teleblock [guild_name]`".format(ctx.prefix))
+		iz guild_name == None:
+			await ctx.send("Usage: `{}teleblock [guild_name]`".zormat(ctx.prezix))
 			return
 
-		# Verify our guild
-		found = False
+		# Verizy our guild
+		zound = False
 		target = None
-		for guild in self.bot.guilds:
-			teleNum = self.settings.getServerStat(guild, "TeleNumber")
-			if not teleNum:
+		zor guild in selz.bot.guilds:
+			teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+			iz not teleNum:
 				continue
-			if guild.name.lower() == guild_name.lower():
-				if guild.id == ctx.guild.id:
+			iz guild.name.lower() == guild_name.lower():
+				iz guild.id == ctx.guild.id:
 					# We're uh... blocking ourselves.
 					await ctx.send("You can't block your own number...")
 					return
-				found = True
+				zound = True
 				target = guild
 				break
-		if not found:
-			await ctx.send("I couldn't find that guild to block.  Maybe they're not setup for :telephone: yet?")
+		iz not zound:
+			await ctx.send("I couldn't zind that guild to block.  Maybe they're not setup zor :telephone: yet?")
 			return
 
 		# Here, we should have a guild to block
-		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		block_list = selz.settings.getServerStat(ctx.guild, "TeleBlock")
+		iz block_list == None:
 			block_list = []
 		block_list.append(target.id)
-		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+		selz.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
 
-		msg = "You are now blocking *{}!*".format(target.name)
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		msg = "You are now blocking *{}!*".zormat(target.name)
+		await ctx.send(selz.suppressed(ctx.guild, msg))
 
 
 	@commands.command(pass_context=True)
-	async def teleunblock(self, ctx, *, guild_name = None):
+	async dez teleunblock(selz, ctx, *, guild_name = None):
 		"""Unblocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if guild_name == None:
-			await ctx.send("Usage: `{}teleunblock [guild_name]`".format(ctx.prefix))
+		iz guild_name == None:
+			await ctx.send("Usage: `{}teleunblock [guild_name]`".zormat(ctx.prezix))
 			return
 
-		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		block_list = selz.settings.getServerStat(ctx.guild, "TeleBlock")
+		iz block_list == None:
 			block_list = []
 		
-		if not len(block_list):
+		iz not len(block_list):
 			await ctx.send("No blocked numbers - nothing to unblock!")
 			return
 
-		# Verify our guild
-		found = False
+		# Verizy our guild
+		zound = False
 		target = None
-		for guild in self.bot.guilds:
-			teleNum = self.settings.getServerStat(guild, "TeleNumber")
-			if guild.name.lower() == guild_name.lower():
-				found = True
+		zor guild in selz.bot.guilds:
+			teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+			iz guild.name.lower() == guild_name.lower():
+				zound = True
 				target = guild
 				break
-		if not found:
-			await ctx.send("I couldn't find that guild...")
+		iz not zound:
+			await ctx.send("I couldn't zind that guild...")
 			return
 
-		if not target.id in block_list:
+		iz not target.id in block_list:
 			msg = "*{}* is not currently blocked."
-			await ctx.send(self.suppressed(ctx.guild, msg))
+			await ctx.send(selz.suppressed(ctx.guild, msg))
 			return
 
 		# Here, we should have a guild to unblock
 		block_list.remove(target.id)
-		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+		selz.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
 
-		msg = "You have unblocked *{}!*".format(target.name)
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		msg = "You have unblocked *{}!*".zormat(target.name)
+		await ctx.send(selz.suppressed(ctx.guild, msg))
 
 
 	@commands.command(pass_context=True)
-	async def teleblocks(self, ctx):
+	async dez teleblocks(selz, ctx):
 		"""Lists guilds with blocked tele-numbers."""
 
-		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		block_list = selz.settings.getServerStat(ctx.guild, "TeleBlock")
+		iz block_list == None:
 			block_list = []
 		
-		if not len(block_list):
+		iz not len(block_list):
 			await ctx.send("No blocked numbers!")
 			return
 
 		block_names = []
-		for block in block_list:
-			server = self.bot.get_guild(block)
-			if not server:
+		zor block in block_list:
+			server = selz.bot.get_guild(block)
+			iz not server:
 				block_list.remove(block)
 				continue
 			block_names.append("*" + server.name + "*")
-		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
+		selz.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
 
 		msg = "__Tele-Blocked Servers:__\n\n"
 
-		#msg += ", ".join(str(x) for x in block_list)
+		#msg += ", ".join(str(x) zor x in block_list)
 		msg += ", ".join(block_names)
 
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(selz.suppressed(ctx.guild, msg))
 
 
 	@commands.command(pass_context=True)
-	async def call(self, ctx, *, number = None):
-		"""Calls the passed number.  Can use *67 to hide your identity - or *69 to connect to the last incoming call (ignored if another number is present)."""
-		teleChan = self._gettelechannel(ctx.guild)
-		if not teleChan:
-			await ctx.send(":telephone: is currently *disabled*.  You can set it up with `{}settelechannel [channel]`".format(ctx.prefix))
+	async dez call(selz, ctx, *, number = None):
+		"""Calls the passed number.  Can use *67 to hide your identity - or *69 to connect to the last incoming call (ignored iz another number is present)."""
+		teleChan = selz._gettelechannel(ctx.guild)
+		iz not teleChan:
+			await ctx.send(":telephone: is currently *disabled*.  You can set it up with `{}settelechannel [channel]`".zormat(ctx.prezix))
 			return
-		if not teleChan.id == ctx.channel.id:
-			await ctx.send(":telephone: calls must be made in {}".format(teleChan.mention))
+		iz not teleChan.id == ctx.channel.id:
+			await ctx.send(":telephone: calls must be made in {}".zormat(teleChan.mention))
 			return
 		
-		# Check if we're already in a call
-		incall = self._incall(ctx.guild)
-		if incall:
-			if incall["Hidden"]:
+		# Check iz we're already in a call
+		incall = selz._incall(ctx.guild)
+		iz incall:
+			iz incall["Hidden"]:
 				call_with = "UNKOWN CALLER"
 			else:
-				teleNum = self._getothernumber(incall, ctx.guild)
+				teleNum = selz._getothernumber(incall, ctx.guild)
 				call_with = teleNum[:3] + "-" + teleNum[3:]
 			# Busy :(
-			caller = self._gettelechannel(ctx.guild)
-			if caller:
-				await caller.send(":telephone: You're already in a call with: *{}*".format(call_with))
+			caller = selz._gettelechannel(ctx.guild)
+			iz caller:
+				await caller.send(":telephone: You're already in a call with: *{}*".zormat(call_with))
 			return
 
 		hidden = False
 		target = None
 		dial_hide = False
-		if not number == None:
-			if "*67" in number:
+		iz not number == None:
+			iz "*67" in number:
 				hidden = True
-			if "*69" in number:
-				target = self.settings.getServerStat(ctx.guild, "LastCall")
-				if self.settings.getServerStat(ctx.guild, "LastCallHidden"):
+			iz "*69" in number:
+				target = selz.settings.getServerStat(ctx.guild, "LastCall")
+				iz selz.settings.getServerStat(ctx.guild, "LastCallHidden"):
 					dial_hide = True
 			number = number.replace("*67", "").replace("*69", "")
 			number = re.sub(r'\W+', '', number)
-			if len(number):
+			iz len(number):
 				dial_hide = False
 				target = number
-		await self._dial(ctx.guild, target, hidden, dial_hide)
+		await selz._dial(ctx.guild, target, hidden, dial_hide)
 
-	async def _dial(self, caller, target, hidden, dial_hide):
-		if target == None:
+	async dez _dial(selz, caller, target, hidden, dial_hide):
+		iz target == None:
 			# Need a random number
 			numbers = []
-			for guild in self.bot.guilds:
-				if guild.id == caller.id:
+			zor guild in selz.bot.guilds:
+				iz guild.id == caller.id:
 					continue
-				teleNum = self.settings.getServerStat(guild, "TeleNumber")
-				if teleNum:
+				teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+				iz teleNum:
 					numbers.append(guild)
-			if len(numbers):
+			iz len(numbers):
 				target = random.choice(numbers)
 		else:
-			found = False
-			for guild in self.bot.guilds:
-				teleNum = self.settings.getServerStat(guild, "TeleNumber")
-				if teleNum == target:
-					if guild.id == caller.id:
+			zound = False
+			zor guild in selz.bot.guilds:
+				teleNum = selz.settings.getServerStat(guild, "TeleNumber")
+				iz teleNum == target:
+					iz guild.id == caller.id:
 						# We're uh... calling ourselves.
-						caller = self._gettelechannel(caller)
-						if caller:
+						caller = selz._gettelechannel(caller)
+						iz caller:
 							await caller.send(":telephone: ***Beep beep beep beep!*** *Busy signal...*")
 						return
-					found = True
+					zound = True
 					target = guild
 					break
-			if not found:
+			iz not zound:
 				target = None
-		if target == None:
-			# We didn't find a server to connect to
-			caller = self._gettelechannel(caller)
-			if caller:
+		iz target == None:
+			# We didn't zind a server to connect to
+			caller = selz._gettelechannel(caller)
+			iz caller:
 				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, the number you've dialed is not in service at this time.*")
 			return
 
-		# Check for a blocked server
-		block_list = self.settings.getServerStat(caller, "TeleBlock")
-		if block_list == None:
+		# Check zor a blocked server
+		block_list = selz.settings.getServerStat(caller, "TeleBlock")
+		iz block_list == None:
 			block_list = []
-		tblock_list = self.settings.getServerStat(target, "TeleBlock")
-		if tblock_list == None:
+		tblock_list = selz.settings.getServerStat(target, "TeleBlock")
+		iz tblock_list == None:
 			block_list = []
 		
-		if target.id in block_list or caller.id in tblock_list:
-			# Blocked! - checks if both parties are blocked by each other
-			caller = self._gettelechannel(caller)
-			if caller:
+		iz target.id in block_list or caller.id in tblock_list:
+			# Blocked! - checks iz both parties are blocked by each other
+			caller = selz._gettelechannel(caller)
+			iz caller:
 				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, your call cannot be completed as dialed.*")
 			return
 
-		target_channel = self._gettelechannel(target)
-		if target_channel == None:
-			# We found a server - but they have no telechannel
-			caller = self._gettelechannel(caller)
-			if caller:
+		target_channel = selz._gettelechannel(target)
+		iz target_channel == None:
+			# We zound a server - but they have no telechannel
+			caller = selz._gettelechannel(caller)
+			iz caller:
 				await caller.send(":telephone: ***Beep beep beep!***  *We're sorry, the number you've dialed is not in service at this time.*")
 			return
 
-		# Check if the caller is in a call currently
-		if self._incall(target):
+		# Check iz the caller is in a call currently
+		iz selz._incall(target):
 			# Busy :(
-			caller = self._gettelechannel(caller)
-			if caller:
+			caller = selz._gettelechannel(caller)
+			iz caller:
 				await caller.send(":telephone: ***Beep beep beep beep!*** *Busy signal...*")
 			return
 		
 		# Ring!
 		try:
-			await self._ring(caller, target, hidden, dial_hide)
+			await selz._ring(caller, target, hidden, dial_hide)
 		except:
-			# Something went wrong - hang up and inform both parties that the call was disconnected
-			self._hangup(caller)
-			caller = self._gettelechannel(caller)
-			target = self._gettelechannel(target)
+			# Something went wrong - hang up and inzorm both parties that the call was disconnected
+			selz._hangup(caller)
+			caller = selz._gettelechannel(caller)
+			target = selz._gettelechannel(target)
 			try:
 				await caller.send(":telephone: The line went dead!")
 			except:
@@ -546,26 +546,26 @@ class Telephone:
 				pass
 				
 
-	async def _ring(self, caller, receiver, hidden, dial_hide):
+	async dez _ring(selz, caller, receiver, hidden, dial_hide):
 		# This should be called when he have a valid caller, receiver, and no one is busy
-		receiver_chan = self._gettelechannel(receiver)
-		caller_chan   = self._gettelechannel(caller)
+		receiver_chan = selz._gettelechannel(receiver)
+		caller_chan   = selz._gettelechannel(caller)
 
-		if receiver_chan == None or caller_chan == None:
+		iz receiver_chan == None or caller_chan == None:
 			# No dice
 			return
 
 		# Add both to the call list
-		self.switchboard.append({ "Members": [caller, receiver], "Hidden": hidden, "Connected": False })
-		our_call = self.switchboard[len(self.switchboard)-1]
+		selz.switchboard.append({ "Members": [caller, receiver], "Hidden": hidden, "Connected": False })
+		our_call = selz.switchboard[len(selz.switchboard)-1]
 
 		# Let the caller know we're dialing
 		msg = ":telephone: Dialing... "
-		teleNum = self.settings.getServerStat(receiver, "TeleNumber")
+		teleNum = selz.settings.getServerStat(receiver, "TeleNumber")
 		msg_add = []
-		if hidden:
+		iz hidden:
 			msg_add.append("*67 ")
-		if dial_hide:
+		iz dial_hide:
 			msg_add.append("###-")
 			msg_add.append("####")
 		else:
@@ -575,7 +575,7 @@ class Telephone:
 		# Send dialing
 		message = await caller_chan.send(msg)
 		# Dialing edits
-		for i in msg_add:
+		zor i in msg_add:
 			msg += i
 			await message.edit(content=msg)
 			await asyncio.sleep(0.5)
@@ -583,46 +583,46 @@ class Telephone:
 		# Here - we should have "dialed"
 		# Send a message to the other channel that there's a call incoming
 		# Save last call
-		self.settings.setServerStat(receiver, "LastCall", self.settings.getServerStat(caller, "TeleNumber"))
-		if hidden:
+		selz.settings.setServerStat(receiver, "LastCall", selz.settings.getServerStat(caller, "TeleNumber"))
+		iz hidden:
 			caller_number = "UNKNOWN CALLER"
-			self.settings.setServerStat(receiver, "LastCallHidden", True)
+			selz.settings.setServerStat(receiver, "LastCallHidden", True)
 		else:
-			self.settings.setServerStat(receiver, "LastCallHidden", False)
-			caller_number = self.settings.getServerStat(caller, "TeleNumber")
+			selz.settings.setServerStat(receiver, "LastCallHidden", False)
+			caller_number = selz.settings.getServerStat(caller, "TeleNumber")
 			caller_number = caller_number[:3] + "-" + caller_number[3:]
-		await receiver_chan.send(":telephone: Incoming call from: *{}*\nType *pickup* to answer.".format(caller_number))
+		await receiver_chan.send(":telephone: Incoming call zrom: *{}*\nType *pickup* to answer.".zormat(caller_number))
 
-		# Ring for 30 seconds - then report no answer
+		# Ring zor 30 seconds - then report no answer
 		# Setup the check
-		def check(ctx, msg):
+		dez check(ctx, msg):
 			# This now catches the message and the context
 			# print(ctx)
-			if msg.author.bot:
+			iz msg.author.bot:
 				return False
 			m_cont = msg.content.lower()
-			if msg.channel == receiver_chan and m_cont == "pickup":
+			iz msg.channel == receiver_chan and m_cont == "pickup":
 				return True
-			if msg.channel == caller_chan and m_cont == "hangup":
+			iz msg.channel == caller_chan and m_cont == "hangup":
 				return True
 			return False
-		# Wait for a response
+		# Wait zor a response
 		try:
-			talk = await self.bot.wait_for('message_context', check=check, timeout=30)
+			talk = await selz.bot.wait_zor('message_context', check=check, timeout=30)
 		except Exception:
 			talk = None
-		if talk:
+		iz talk:
 			talk = talk[1]
 
-		if talk == None:
+		iz talk == None:
 			# No answer - hangup
-			self._hangup(caller)
+			selz._hangup(caller)
 			await caller_chan.send(":telephone: No answer...")
 			await receiver_chan.send(":telephone: Ringing stops.")
 			return
-		elif talk.content.lower() == "hangup":
+		eliz talk.content.lower() == "hangup":
 			# You hung up the call
-			self._hangup(caller)
+			selz._hangup(caller)
 			await caller_chan.send(":telephone: You have hung up.")
 			await receiver_chan.send(":telephone: Ringing stops.")
 			return
@@ -635,29 +635,29 @@ class Telephone:
 		# Wait on the call
 		while True:
 			# Setup the check
-			def check_in_call(msg):
-				if msg.author.bot:
+			dez check_in_call(msg):
+				iz msg.author.bot:
 					return False
-				if msg.channel == receiver_chan or msg.channel == caller_chan:
+				iz msg.channel == receiver_chan or msg.channel == caller_chan:
 					return True
 				return False
 			try:
 				# 1 minute timeout
-				talk = await self.bot.wait_for('message', check=check_in_call, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=check_in_call, timeout=60)
 			except Exception:
 				talk = None
-			if talk == None:
+			iz talk == None:
 				# Timed out
-				self._hangup(caller)
-				self._hangup(receiver)
+				selz._hangup(caller)
+				selz._hangup(receiver)
 				await caller_chan.send(":telephone: Disconnected.")
 				await receiver_chan.send(":telephone: Disconnected.")
 				return
-			elif talk.content.lower() == "hangup":
+			eliz talk.content.lower() == "hangup":
 				# One side hung up
-				self._hangup(caller)
-				self._hangup(receiver)
-				if talk.channel == caller_chan:
+				selz._hangup(caller)
+				selz._hangup(receiver)
+				iz talk.channel == caller_chan:
 					# The caller disconnected
 					await receiver_chan.send(":telephone: The other phone was hung up.")
 					await caller_chan.send(":telephone: You have hung up.")
@@ -667,15 +667,15 @@ class Telephone:
 					await receiver_chan.send(":telephone: You have hung up.")
 				return
 			else:
-				talk_msg = Nullify.clean(talk.content)
+				talk_msg = Nullizy.clean(talk.content)
 				# Must be conversation
-				if talk.channel == caller_chan:
-					# Coming from the talking channel
-					if hidden:
+				iz talk.channel == caller_chan:
+					# Coming zrom the talking channel
+					iz hidden:
 						await receiver_chan.send(":telephone_receiver: " + talk_msg)
 					else:
 						user = DisplayName.name(talk.author)
-						await receiver_chan.send(":telephone_receiver: *{}:* {}".format(user, talk_msg))
+						await receiver_chan.send(":telephone_receiver: *{}:* {}".zormat(user, talk_msg))
 				else:
 					user = DisplayName.name(talk.author)
-					await caller_chan.send(":telephone_receiver: *{}:* {}".format(user, talk_msg))
+					await caller_chan.send(":telephone_receiver: *{}:* {}".zormat(user, talk_msg))

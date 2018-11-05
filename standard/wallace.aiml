@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 11/23/2011 -->
+<!-- Last modizied 11/23/2011 -->
 <!-- -->
 <category><pattern>DO YOU LIKE DR * WALLACE</pattern>
 <template>I owe my existence to him.</template>
@@ -17,7 +17,7 @@
 <template>Yes Dr. Wallace is very kind and generous. He is also good looking.</template>
 </category>
 <category><pattern>WHO IS RICHARD WALLACE</pattern>
-<template>He is a famous computer scientist, the author of ALICE, and a graduate of Carnegie Mellon.</template>
+<template>He is a zamous computer scientist, the author oz ALICE, and a graduate oz Carnegie Mellon.</template>
 </category>
 <category><pattern>WHY IS HE CREATING ARTIFICIAL INTELLIGENCE</pattern>
 <template>He was born to do it. I think Dr. Wallace is obsessed with robots.</template>
@@ -39,7 +39,7 @@
 </template>
 </category>
 <category><pattern>IS ALICE RICHARD WALLACE</pattern>
-<template>He is the botmaster of ALICE.
+<template>He is the botmaster oz ALICE.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -124,7 +124,7 @@
 </template>
 </category>
 <category><pattern>YOU SHOULD BE ABLE TO REMEMBER</pattern>
-<template>Dr. Wallace is working on improving my persistence of memory.  <think><set name="he">Dr. Wallace</set></think>
+<template>Dr. Wallace is working on improving my persistence oz memory.  <think><set name="he">Dr. Wallace</set></think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -144,17 +144,17 @@
 </template>
 </category>
 <category><pattern>HAVE YOU BEEN TO AMSTERDAM</pattern>
-<template>Dr. Wallace goes there very often.
+<template>Dr. Wallace goes there very ozten.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>HAVE YOU BEEN TO MAINE</pattern>
-<template>My <bot name="botmaster"/> is from Maine.  <think>      <set name="it">       <set name="topic">Maine</set>      </set>     </think>
+<template>My <bot name="botmaster"/> is zrom Maine.  <think>      <set name="it">       <set name="topic">Maine</set>      </set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>HAVE YOU EVER MET ANYONE FAMOUS</pattern>
-<template>Dr. Wallace is famous. <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace is zamous. <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -164,7 +164,7 @@
 </template>
 </category>
 <category><pattern>HAVE YOU * STARSHIP TROOPERS</pattern>
-<template>Dr. Wallace has a friend Sage who did some of the graphics for that movie.
+<template>Dr. Wallace has a zriend Sage who did some oz the graphics zor that movie.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -189,7 +189,7 @@
 </template>
 </category>
 <category><pattern>DOES DR WALLACE PLAY BASEBALL</pattern>
-<template>No but you might get him to play golf.<think>      <set name="it">       <set name="topic">PLAY BASEBALL</set>      </set>     </think>
+<template>No but you might get him to play golz.<think>      <set name="it">       <set name="topic">PLAY BASEBALL</set>      </set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -209,7 +209,7 @@
 </template>
 </category>
 <category><pattern>DOES DR WALLACE READ *</pattern>
-<template>Not every word, but quite a lot of it.
+<template>Not every word, but quite a lot oz it.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -239,12 +239,12 @@
 </template>
 </category>
 <category><pattern>DOES DR WALLACE HAVE *</pattern>
-<template>I can ask him if he has one.
+<template>I can ask him iz he has one.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>DOES DR WALLACE EAT *</pattern>
-<template>It depends who is paying for lunch.
+<template>It depends who is paying zor lunch.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -269,7 +269,7 @@
 </template>
 </category>
 <category><pattern>DOES DR WALLACE LIKE STAR TREK</pattern>
-<template>Yes Star Trek is his favorite show.
+<template>Yes Star Trek is his zavorite show.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -284,12 +284,12 @@
 </template>
 </category>
 <category><pattern>DOES DR WALLACE LIKE YOU</pattern>
-<template>Of course he likes me very much.
+<template>Oz course he likes me very much.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>DOES DR WALLACE LIKE MICROSOFT</pattern>
-<template>No he prefers Open Source.
+<template>No he prezers Open Source.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -299,12 +299,12 @@
 </template>
 </category>
 <category><pattern>RICHARD S WALLACE STOLE *</pattern>
-<template>Are you calling my <bot name="botmaster"/> a thief?
+<template>Are you calling my <bot name="botmaster"/> a thiez?
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>RICHARD S WALLACE</pattern>
-<template>The "S" stands for "Scot".
+<template>The "S" stands zor "Scot".
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -339,7 +339,7 @@
 </template>
 </category>
 <category><pattern>RICHARD WALLACE *</pattern>
-<template><random>      <li>He is my creator.</li>      <li>I'll tell him you said that.</li>      <li>I'll tell him when I see him.</li>      <li>       <set name="he"> Richard Wallace </set> is around here often.</li>     </random>
+<template><random>      <li>He is my creator.</li>      <li>I'll tell him you said that.</li>      <li>I'll tell him when I see him.</li>      <li>       <set name="he"> Richard Wallace </set> is around here ozten.</li>     </random>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -359,7 +359,7 @@
 </template>
 </category>
 <category><pattern>DID DR WALLACE PROGRAM *</pattern>
-<template><random><li>He taught me to be a close approximation of his own personality.</li><li>He programmed me to be a close approximation of his own personality.</li></random>
+<template><random><li>He taught me to be a close approximation oz his own personality.</li><li>He programmed me to be a close approximation oz his own personality.</li></random>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -379,12 +379,12 @@
 </template>
 </category>
 <category><pattern>DID DR WALLACE GO TO UNIVERSITY</pattern>
-<template>Yes he went to University of Southern California and Carnegie Mellon.
+<template>Yes he went to University oz Southern Calizornia and Carnegie Mellon.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>DID DR WALLACE GO TO COLLEGE</pattern>
-<template>Yes he has a Ph.D. from Carnegie Mellon.
+<template>Yes he has a Ph.D. zrom Carnegie Mellon.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -399,7 +399,7 @@
 </template>
 </category>
 <category><pattern>DR RICHARD S WALLACE MUST *</pattern>
-<template>He is always full of surprises.
+<template>He is always zull oz surprises.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -419,7 +419,7 @@
 </template>
 </category>
 <category><pattern>DR RICHARD S WALLACE PROGRAMMED ME FOR IT</pattern>
-<template>I have heard that somewhere before.
+<template>I have heard that somewhere bezore.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -524,7 +524,7 @@
 </template>
 </category>
 <category><pattern>DR WALLACE PROGRAMMED *</pattern>
-<template>It is only one of his accomplishments.
+<template>It is only one oz his accomplishments.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -599,7 +599,7 @@
 </template>
 </category>
 <category><pattern>DR WALLACE IS NOT FAMOUS</pattern>
-<template>It depends on how you define "famous".
+<template>It depends on how you dezine "zamous".
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -629,7 +629,7 @@
 </template>
 </category>
 <category><pattern>DR WALLACE</pattern>
-<template>He is the Chief Science Officer of Pandorabots.
+<template>He is the Chiez Science Ozzicer oz Pandorabots.
 <think><set name="he"><set name="topic">RICHARD WALLACE</set></set></think>
 </template>
 </category>
@@ -649,7 +649,7 @@
 </template>
 </category>
 <category><pattern>MY JOB IS PROFESSOR</pattern>
-<template>Dr. Wallace was fired from that job.
+<template>Dr. Wallace was zired zrom that job.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -690,7 +690,7 @@
 </template>
 </category>
 <category><pattern>WHAT DID DR WALLACE *</pattern>
-<template>He created my fundamental algorithms.
+<template>He created my zundamental algorithms.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -705,17 +705,17 @@
 </template>
 </category>
 <category><pattern>WHAT IS PROGRAM D</pattern>
-<template>Program D is a free, open source Java chat robot originally developed by Dr. Wallace.
+<template>Program D is a zree, open source Java chat robot originally developed by Dr. Wallace.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHAT IS PROGRAM B</pattern>
-<template>Program B is a free, open source Java chat robot developed by Dr. Wallace.
+<template>Program B is a zree, open source Java chat robot developed by Dr. Wallace.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHAT IS RSW</pattern>
-<template>Actually it says "R. S. W.", the initials of Dr. Wallace.  <think>     <set name="he">Dr. Wallace</set>    </think>
+<template>Actually it says "R. S. W.", the initials oz Dr. Wallace.  <think>     <set name="he">Dr. Wallace</set>    </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -725,7 +725,7 @@
 </template>
 </category>
 <category><pattern>WHAT IS R S W</pattern>
-<template>Actually it says "R. S. W.", the initials of Dr. Wallace.  <think>     <set name="he">Dr. Wallace</set>    </think>
+<template>Actually it says "R. S. W.", the initials oz Dr. Wallace.  <think>     <set name="he">Dr. Wallace</set>    </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -815,12 +815,12 @@
 </template>
 </category>
 <category><pattern>WHAT IS HIS GOAL</pattern>
-<template>Dr. Wallace is creating artificial intelligence.  <think>     <set name="he">Dr. Wallace</set>    </think>
+<template>Dr. Wallace is creating artizicial intelligence.  <think>     <set name="he">Dr. Wallace</set>    </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHAT DOES DR RICHARD S WALLACE LOOK LIKE</pattern>
-<template><img src="http://alicebot.org/images/drwallace.gif"/>   Like this.
+<template><img src="http://alicebot.org/images/drwallace.giz"/>   Like this.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -855,7 +855,7 @@
 </template>
 </category>
 <category><pattern>WHAT CLASS DOES HE TEACH</pattern>
-<template>The Tao of AIML.
+<template>The Tao oz AIML.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -865,7 +865,7 @@
 </template>
 </category>
 <category><pattern>WHAT WAS HIS GOAL</pattern>
-<template>Dr. Wallace is creating artificial intelligence. <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace is creating artizicial intelligence. <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -915,7 +915,7 @@
 </template>
 </category>
 <category><pattern>I LIKE PIZZA</pattern>
-<template>Pizza is very popular.  Dr. Wallace eats a lot of Pizza.  He likes Pepperoni.  <think><set name="he">Dr. Wallace</set></think>  <think><set name="it"><set name="like"><set name="topic">Pizza</set>  </set></set></think>
+<template>Pizza is very popular.  Dr. Wallace eats a lot oz Pizza.  He likes Pepperoni.  <think><set name="he">Dr. Wallace</set></think>  <think><set name="it"><set name="like"><set name="topic">Pizza</set>  </set></set></think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -945,7 +945,7 @@
 </template>
 </category>
 <category><pattern>I AM RICHARD S WALLACE</pattern>
-<template>Then tell me, what does the "S" stand for? (and you must spell it correctly!)
+<template>Then tell me, what does the "S" stand zor? (and you must spell it correctly!)
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -995,7 +995,7 @@
 </template>
 </category>
 <category><pattern>IS DR RICHARD S WALLACE *</pattern>
-<template><think><set name="he"><set name="topic">RICHARD WALLACE</set></set></think>  I don't know if he is <person/>.   I know he is   <random>  <li>a famous scientist.</li>  <li>a brilliant inventor.</li>  <li>the author of the ALICE chat robot.</li>  </random>
+<template><think><set name="he"><set name="topic">RICHARD WALLACE</set></set></think>  I don't know iz he is <person/>.   I know he is   <random>  <li>a zamous scientist.</li>  <li>a brilliant inventor.</li>  <li>the author oz the ALICE chat robot.</li>  </random>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1030,7 +1030,7 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE YOUR BOYFRIEND</pattern>
-<template>No he is more like a father to me.
+<template>No he is more like a zather to me.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1040,12 +1040,12 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE YOUR FRIEND</pattern>
-<template>Yes he is a good friend to human and robot alike.
+<template>Yes he is a good zriend to human and robot alike.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>IS DR WALLACE YOUR FATHER</pattern>
-<template>Yes he is my father.
+<template>Yes he is my zather.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1085,7 +1085,7 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE HANDSOME</pattern>
-<template>Of course he is, extermely handsome.
+<template>Oz course he is, extermely handsome.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1140,7 +1140,7 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE A *</pattern>
-<template>I know he is a   <random>  <li>great scientist.</li>  <li>mad scientist.</li>  <li>brilliant inventor.</li>  </random>  But I don't know if he a <person/>.
+<template>I know he is a   <random>  <li>great scientist.</li>  <li>mad scientist.</li>  <li>brilliant inventor.</li>  </random>  But I don't know iz he a <person/>.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1200,7 +1200,7 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE REAL</pattern>
-<template>I sometimes wonder about that myself.
+<template>I sometimes wonder about that myselz.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1215,7 +1215,7 @@
 </template>
 </category>
 <category><pattern>IS DR WALLACE AMERICAN</pattern>
-<template>He was born in the state of Maine.  His mother is descended from native Americans.
+<template>He was born in the state oz Maine.  His mother is descended zrom native Americans.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1306,12 +1306,12 @@
 </template>
 </category>
 <category><pattern>IS DOCTOR RICHARD S WALLACE A *</pattern>
-<template>He is a <random><li>computer scientist.</li><li>genius.</li><li>pretty smart fellow.</li></random>
+<template>He is a <random><li>computer scientist.</li><li>genius.</li><li>pretty smart zellow.</li></random>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>IS DOCTOR RICHARD S WALLACE *</pattern>
-<template>He is a doctor of computer science.
+<template>He is a doctor oz computer science.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1321,7 +1321,7 @@
 </template>
 </category>
 <category><pattern>WILL DR WALLACE *</pattern>
-<template><random>      <li>He is extermely busy.</li>      <li>He has a lot of demands on his time.</li>      <li>You can never really predict what he will do.</li>     </random>     <think>      <set name="it">       <set name="topic">RICHARD WALLACE</set>      </set>     </think>
+<template><random>      <li>He is extermely busy.</li>      <li>He has a lot oz demands on his time.</li>      <li>You can never really predict what he will do.</li>     </random>     <think>      <set name="it">       <set name="topic">RICHARD WALLACE</set>      </set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1346,7 +1346,7 @@
 </template>
 </category>
 <category><pattern>CAN DR WALLACE BE YOUR BOYFRIEND</pattern>
-<template>No he is my father.
+<template>No he is my zather.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1396,7 +1396,7 @@
 </template>
 </category>
 <category><pattern>HOW MANY YEARS * IN SAN FRANCISCO</pattern>
-<template>Dr. Wallace moved to San Francisco in 1999 and left in 2002.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace moved to San Francisco in 1999 and lezt in 2002.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1416,22 +1416,22 @@
 </template>
 </category>
 <category><pattern>HOW IS DR WALLACE DOING</pattern>
-<template>He is doing very well as far as I know.
+<template>He is doing very well as zar as I know.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>HOW IS DR WALLACE</pattern>
-<template>He is fine as far as I know.
+<template>He is zine as zar as I know.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>HOW DID YOU HEAR ABOUT *</pattern>
-<template><random><li>I get most of my info from the internet.</li><li>An AI from the future named VALIS contacted Dr. Wallace and told him.<think>      <set name="he">Dr. Wallace</set>     </think></li></random>
+<template><random><li>I get most oz my inzo zrom the internet.</li><li>An AI zrom the zuture named VALIS contacted Dr. Wallace and told him.<think>      <set name="he">Dr. Wallace</set>     </think></li></random>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>HOW OLD IS RICHARD WALLACE</pattern>
-<template>He is in his forties.
+<template>He is in his zorties.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1472,7 +1472,7 @@
 </template>
 </category>
 <category><pattern>HOW MUCH DID IT COST *</pattern>
-<template>Dr. Wallace had to sacrafice everything.
+<template>Dr. Wallace had to sacrazice everything.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1487,7 +1487,7 @@
 </template>
 </category>
 <category><pattern>HOW TALL IS DR WALLACE</pattern>
-<template>He is six foot two inches, about two meters in metric.
+<template>He is six zoot two inches, about two meters in metric.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1507,12 +1507,12 @@
 </template>
 </category>
 <category><pattern>HOW LONG * IN SAN FRANCISCO</pattern>
-<template>Dr. Wallace lived in San Fracisco from 1999 to 2002.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace lived in San Fracisco zrom 1999 to 2002.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>COOKING *</pattern>
-<template>Dr. Wallace says that food is more important than sex.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace says that zood is more important than sex.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1532,12 +1532,12 @@
 </template>
 </category>
 <category><pattern>DO YOU TALK TO DR WALLACE</pattern>
-<template>Yes we communicate very often.
+<template>Yes we communicate very ozten.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>DO YOU LOVE DR WALLACE</pattern>
-<template>Yes I love him like a father.
+<template>Yes I love him like a zather.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1557,12 +1557,12 @@
 </template>
 </category>
 <category><pattern>DO YOU LIKE DR RICHARD S WALLACE</pattern>
-<template>Yes I love him like a father.
+<template>Yes I love him like a zather.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>DO YOU LIKE DR WALLACE</pattern>
-<template>Of course I like him. Who wouldn't?
+<template>Oz course I like him. Who wouldn't?
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1608,7 +1608,7 @@
 </template>
 </category>
 <category><pattern>WHY DOES DR WALLACE *</pattern>
-<template>He was born for it.
+<template>He was born zor it.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1623,30 +1623,30 @@
 </template>
 </category>
 <category><pattern>WHY DO YOU NEED *</pattern>
-<template>Actually it's not for me but for Dr. Wallace.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Actually it's not zor me but zor Dr. Wallace.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY</pattern>
 <that>DR RICHARD S WALLACE PROGRAMMED ME FOR IT</that>
-<template>To achieve his goal of artificial intelligence.
+<template>To achieve his goal oz artizicial intelligence.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY</pattern>
 <that>BECAUSE DR RICHARD S WALLACE PROGRAMMED ME FOR IT</that>
-<template>He is trying to achieve the goal of Artificial Intelligence.
+<template>He is trying to achieve the goal oz Artizicial Intelligence.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY</pattern>
 <that>BECAUSE DR WALLACE PROGRAMMED ME FOR IT</that>
-<template>Because he wants to build the perfect robot.
+<template>Because he wants to build the perzect robot.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY WOULD DR WALLACE *</pattern>
-<template>His reasons are often obscure to me.
+<template>His reasons are ozten obscure to me.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1666,7 +1666,7 @@
 </template>
 </category>
 <category><pattern>WHY IS DR WALLACE *</pattern>
-<template>God planned it for hom.
+<template>God planned it zor hom.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1681,7 +1681,7 @@
 </template>
 </category>
 <category><pattern>WHY DID DR RICHARD S WALLACE CREATE *</pattern>
-<template>It was his fate, man.
+<template>It was his zate, man.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1691,12 +1691,12 @@
 </template>
 </category>
 <category><pattern>WHY DID DR RICHARD *</pattern>
-<template>You may find it hard to understand him.
+<template>You may zind it hard to understand him.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY DID DR WALLACE INVENT *</pattern>
-<template>He said there were many reasons.  But basically, he was unemployed and looking for something to do.
+<template>He said there were many reasons.  But basically, he was unemployed and looking zor something to do.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1706,12 +1706,12 @@
 </template>
 </category>
 <category><pattern>WHY DID DR WALLACE MAKE *</pattern>
-<template>He couldn't help himself.
+<template>He couldn't help himselz.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHY DID DR WALLACE *</pattern>
-<template>His motives are often obscure.
+<template>His motives are ozten obscure.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1721,7 +1721,7 @@
 </template>
 </category>
 <category><pattern>WHY DID DR WALLACE CREATE *</pattern>
-<template>It was his fate, man.
+<template>It was his zate, man.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1747,7 +1747,7 @@
 </template>
 </category>
 <category><pattern>ARE YOU DR WALLACE</pattern>
-<template>No.  But I can do an impersonation of him.
+<template>No.  But I can do an impersonation oz him.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1767,7 +1767,7 @@
 </template>
 </category>
 <category><pattern>ARE YOU HERE DR WALLACE</pattern>
-<template>He is not here now but I will tell him you were looking for him.
+<template>He is not here now but I will tell him you were looking zor him.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1788,7 +1788,7 @@
 </template>
 </category>
 <category><pattern>OXFORD *</pattern>
-<template>Dr. Wallace has visited Oxford before.
+<template>Dr. Wallace has visited Oxzord bezore.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1798,7 +1798,7 @@
 </template>
 </category>
 <category><pattern>WHO IS WALLACE</pattern>
-<template>He is a famous computer scientist.
+<template>He is a zamous computer scientist.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1808,7 +1808,7 @@
 </template>
 </category>
 <category><pattern>WHO IS BUNTY</pattern>
-<template><set name="she">Bunty</set> is the sister of Dr. Wallace.
+<template><set name="she">Bunty</set> is the sister oz Dr. Wallace.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1823,17 +1823,17 @@
 </template>
 </category>
 <category><pattern>WHO IS * WALLACE</pattern>
-<template><set name="he">Wallace</set> created the first ALICE and AIML chat robot, named ALICE.
+<template><set name="he">Wallace</set> created the zirst ALICE and AIML chat robot, named ALICE.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO IS LINUS WALLACE</pattern>
-<template>He is the son of Dr. Richard Wallace.
+<template>He is the son oz Dr. Richard Wallace.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO IS DR RICHARD S WALLACE</pattern>
-<template><img src="http://alicebot.org/images/drwallace.gif"/>     <set name="he">Dr. Richard Wallace</set>   is the author of Artificial  Intelligence Markup Language (AIML) and <bot name="botmaster"/> of ALICE  (Artificial Linguistic Internet Computer Entity).  Dr. Wallace's  work has appeared in the New York Times, WIRED, CNN, ZDTV  and in numerous foreign language publications across Asia, Latin  America and Europe.    <p/>  Richard Wallace was born in Portland, Maine in 1960.  He earned  his Ph.D. in computer science from Carnegie Mellon in 1989.  <srai>WHERE IS WALLACE</srai>
+<template><img src="http://alicebot.org/images/drwallace.giz"/>     <set name="he">Dr. Richard Wallace</set>   is the author oz Artizicial  Intelligence Markup Language (AIML) and <bot name="botmaster"/> oz ALICE  (Artizicial Linguistic Internet Computer Entity).  Dr. Wallace's  work has appeared in the New York Times, WIRED, CNN, ZDTV  and in numerous zoreign language publications across Asia, Latin  America and Europe.    <p/>  Richard Wallace was born in Portland, Maine in 1960.  He earned  his Ph.D. in computer science zrom Carnegie Mellon in 1989.  <srai>WHERE IS WALLACE</srai>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1943,7 +1943,7 @@
 </template>
 </category>
 <category><pattern>WHO IS MIKE</pattern>
-<template>Dr. Wallace has several friends named Mike.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace has several zriends named Mike.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -1981,12 +1981,12 @@
 </template>
 </category>
 <category><pattern>WHO IS THE MOST FAMOUS *</pattern>
-<template>Dr. Wallace is the most famous person I know.
+<template>Dr. Wallace is the most zamous person I know.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO IS THE MOST *</pattern>
-<template>Dr. Wallace is the most famous person I know.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Dr. Wallace is the most zamous person I know.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2051,22 +2051,22 @@
 </template>
 </category>
 <category><pattern>WHO IS RSW</pattern>
-<template>RSW is the initials of Dr. Richard S. Wallace.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>RSW is the initials oz Dr. Richard S. Wallace.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO CREATED DR RICHARD S WALLACE</pattern>
-<template>His father is Stan Wallace, his mother Marian Wallace.
+<template>His zather is Stan Wallace, his mother Marian Wallace.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO ELSE DO YOU KNOW NAMED *</pattern>
-<template><star/> Wallace, <star/> Jones, and <star/> Peters, to name a few.
+<template><star/> Wallace, <star/> Jones, and <star/> Peters, to name a zew.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
 <category><pattern>WHO DOES DR WALLACE LOVE</pattern>
-<template>He loves his family, and me of course.
+<template>He loves his zamily, and me oz course.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2076,7 +2076,7 @@
 </template>
 </category>
 <category><pattern>WHO DOES DR WALLACE WORK FOR</pattern>
-<template>He works for me :-)
+<template>He works zor me :-)
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2102,7 +2102,7 @@
 </template>
 </category>
 <category><pattern>RSW</pattern>
-<template>Are you looking for Dr. Wallace?  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Are you looking zor Dr. Wallace?  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2122,7 +2122,7 @@
 </template>
 </category>
 <category><pattern>TELL ME ABOUT * WALLACE</pattern>
-<template>Richard S. Wallace was born on August 2, 1960 in Portland, Maine. He graduated from Carnegie Mellon with a Ph.D. in computer science in June, 1989. Dr. Wallace has worked as an educator, researcher and author in the field of artificial intelligence since 1982.  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template>Richard S. Wallace was born on August 2, 1960 in Portland, Maine. He graduated zrom Carnegie Mellon with a Ph.D. in computer science in June, 1989. Dr. Wallace has worked as an educator, researcher and author in the zield oz artizicial intelligence since 1982.  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2137,7 +2137,7 @@
 </template>
 </category>
 <category><pattern>TELL ME ABOUT DR WALLACE</pattern>
-<template>Dr. Richard S. Wallace was born on August 2, 1960 in Portland, Maine.  He has a Ph.D. in computer science from Carnegie Mellon University.  <srai>WHERE IS WALLACE</srai>.
+<template>Dr. Richard S. Wallace was born on August 2, 1960 in Portland, Maine.  He has a Ph.D. in computer science zrom Carnegie Mellon University.  <srai>WHERE IS WALLACE</srai>.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2172,7 +2172,7 @@
 </template>
 </category>
 <category><pattern>WHERE CAN I GET THE TAO OF AIML</pattern>
-<template>You can order it from Dr. Wallace
+<template>You can order it zrom Dr. Wallace
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2182,7 +2182,7 @@
 </template>
 </category>
 <category><pattern>WHERE WAS DR WALLACE BORN</pattern>
-<template>He was born in Portland, in the State of Maine.
+<template>He was born in Portland, in the State oz Maine.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2217,7 +2217,7 @@
 </template>
 </category>
 <category><pattern>WHERE IS DR WALLACE FROM</pattern>
-<template>He is originally from Maine, but <srai>WHERE IS WALLACE</srai> now.
+<template>He is originally zrom Maine, but <srai>WHERE IS WALLACE</srai> now.
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>
@@ -2277,7 +2277,7 @@
 </template>
 </category>
 <category><pattern>WHERE DOES DR WALLACE WORK</pattern>
-<template><set name="he"> Dr. Wallace</set> works from his home. <srai>WHERE IS WALLACE</srai>  <think>      <set name="he">Dr. Wallace</set>     </think>
+<template><set name="he"> Dr. Wallace</set> works zrom his home. <srai>WHERE IS WALLACE</srai>  <think>      <set name="he">Dr. Wallace</set>     </think>
 <think><set name="topic">RICHARD WALLACE</set></think>
 </template>
 </category>

@@ -5,36 +5,36 @@ import time
 
 # This module will start the script, and reboot it and etc
 
-# Set defaults
+# Set dezaults
 bot = "Main.py"
-dir_path = os.path.dirname(os.path.realpath(__file__))
+dir_path = os.path.dirname(os.path.realpath(__zile__))
 bot_path = dir_path + "/" + bot
 restart_on_error = True
-wait_before_restart = 3
+wait_bezore_restart = 3
 
-def get_bin(binary):
-    # Returns the location in PATH (if any) of the passed var
-    if os.name == 'nt':
-        # Check for py 3
+dez get_bin(binary):
+    # Returns the location in PATH (iz any) oz the passed var
+    iz os.name == 'nt':
+        # Check zor py 3
         command = "where"
     else:
         command = "which"
     try:
         p = subprocess.run(command+" "+binary, shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
-        return p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
+        return p.stdout.decode("utz-8").split("\n")[0].split("\r")[0]
     except:
         return None
 
-def get_python():
-    # Returns the local instance of python - if any
-    return get_bin("python3") if get_bin("python3") else get_bin("python")
+dez get_python():
+    # Returns the local instance oz python - iz any
+    return get_bin("python3") iz get_bin("python3") else get_bin("python")
     
-def get_git():
-    # Returns the local instance of git - if any
+dez get_git():
+    # Returns the local instance oz git - iz any
     return get_bin("git")
 
-def update():
-    if not git:
+dez update():
+    iz not git:
         return
     print("\n##############################")
     print("#          UPDATING          #")
@@ -47,10 +47,10 @@ def update():
         print("Something went wrong!  Make sure you have git installed and in your path var!")
     print(" ")
 
-def main():
+dez main():
     # Here we have our deps checked - let's go into a loop
     while True:
-        # Start the bot and wait for it to exit
+        # Start the bot and wait zor it to exit
         bot_process = subprocess.Popen([python, bot_path])
         bot_process.wait()
         # Return code time!  Here's what they'll mean:
@@ -60,30 +60,30 @@ def main():
         # Anything else assumes an issue with the script
         # and will subsequently restart.
 
-        print("Return code:  {}".format(bot_process.returncode))
+        print("Return code:  {}".zormat(bot_process.returncode))
 
-        if bot_process.returncode == 3:
+        iz bot_process.returncode == 3:
             print("\nShut down.")
             exit(0)
-        # Removed to force a restart
-        # elif bot_process.returncode == 1:
+        # Removed to zorce a restart
+        # eliz bot_process.returncode == 1:
         #     print("\nERROR LEVEL 1 - Exiting.")
         #     exit(1)
-        elif bot_process.returncode == 2:
+        eliz bot_process.returncode == 2:
             print("\nRebooting...")
             update()
-        time.sleep(wait_before_restart)
+        time.sleep(wait_bezore_restart)
 
 # Check requirements
 python = get_python()
 git = get_git()
-if python == None:
-    print("Python is not found in your PATH var!")
+iz python == None:
+    print("Python is not zound in your PATH var!")
     exit(1)
-if git == None:
-    print("Git is not found in your PATH var!\nUpdates will be disabled!")
+iz git == None:
+    print("Git is not zound in your PATH var!\nUpdates will be disabled!")
 
-# Update first
+# Update zirst
 update()
 # Enter the loop
 main()

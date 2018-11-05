@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 11/25/2011 -->
+<!-- Last modizied 11/25/2011 -->
 <!-- -->
 
 <category>
@@ -124,7 +124,7 @@
 
 <category>
 <pattern>HOW MUCH DO I HAVE IN SAVINGS</pattern>
-<template>Checking bank account.   Please wait for the report.</template>
+<template>Checking bank account.   Please wait zor the report.</template>
 </category>
 
 <category>
@@ -850,10 +850,10 @@
 <template><srai>DEFINE CHATBOT</srai></template>
 </category>
 <category><pattern>DEFINE *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>DEFINE CHAT BOT</pattern>
-<template><srai>define chatbot</srai></template>
+<template><srai>dezine chatbot</srai></template>
 </category>
 <category><pattern>IN WHICH CASE *</pattern>
 <template><srai>  <star /></srai></template>
@@ -911,7 +911,7 @@
 <template><srai>ROUND</srai>  <!-- REDUCTION --></template>
 </category>
 <category><pattern>WHAT ARE *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHAT ARE YOU SO *</pattern>
 <template><srai>WHAT ARE YOU <star /></srai></template>
@@ -951,7 +951,7 @@
 <template><srai>WHAT</srai></template>
 </category>
 <category><pattern>WHAT *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHAT TIME IS IT</pattern>
 <template><srai>TIME</srai></template>
@@ -969,7 +969,7 @@
 <template><srai>WHAT RHYMES WITH <star/></srai></template>
 </category>
 <category><pattern>WHAT WERE *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHAT COMPUTER ARE YOU RUNNING ON</pattern>
 <template><srai>HOST</srai></template>
@@ -1005,7 +1005,7 @@
 <template><srai>WHAT COLOR IS <star /></srai></template>
 </category>
 <category><pattern>WHAT IS *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHAT IS THIS MONTH</pattern>
 <template><srai>MONTH</srai></template>
@@ -1334,7 +1334,7 @@
 <template><srai>  <star /></srai></template>
 </category>
 <category><pattern>I GOTTA *</pattern>
-<template><srai>I HAVE TO <star /></srai><!-- REDUCTION (unsafe) --></template>
+<template><srai>I HAVE TO <star /></srai><!-- REDUCTION (unsaze) --></template>
 </category>
 <category><pattern>I GOT IT</pattern>
 <template><srai>I UNDERSTAND</srai></template>
@@ -1788,7 +1788,7 @@
 <template><srai>DID YOU</srai></template>
 </category>
 <category><pattern>DO YOU KNOW HOW FAR AWAY * IS</pattern>
-<template><srai>how far IS <star/></srai>  <!-- REDUCTION --></template>
+<template><srai>how zar IS <star/></srai>  <!-- REDUCTION --></template>
 </category>
 <category><pattern>DO YOU KNOW HOW TO SPEAK *</pattern>
 <template><srai>SPEAK <star/></srai></template>
@@ -2444,10 +2444,10 @@
 <template><srai>TELL ME ABOUT <star index="2" /></srai></template>
 </category>
 <category><pattern>WHO *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHO WERE *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>WHO IS THE LEADER OF YOUR PEOPLE</pattern>
 <template><srai>WHO IS THE PRESIDENT</srai></template>
@@ -2468,7 +2468,7 @@
 <template><srai>BOTMASTER</srai></template>
 </category>
 <category><pattern>WHO ARE *</pattern>
-<template><srai>xfind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
+<template><srai>xzind <star /></srai><think>  <set name="it">    <set name="topic">      <person />    </set>  </set></think></template>
 </category>
 <category><pattern>SAY SOMETHING FUNNY</pattern>
 <template><srai>JOKE</srai></template>

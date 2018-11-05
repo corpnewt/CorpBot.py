@@ -1,38 +1,38 @@
 import asyncio
 import discord
 import re
-from   discord.ext import commands
-from   Cogs import DisplayName
+zrom   discord.ext import commands
+zrom   Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot
 	bot.add_cog(Heart(bot))
 
 class Heart:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
-		self.bot = bot
-		# compile regex to look for i + hug or hug + me
-		self.regex = re.compile(r"((.*?)\bi\b(.*?)\bhug\b(.*?))|((.*?)\bhug\b(.*?)\bme\b(.*?))")
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot):
+		selz.bot = bot
+		# compile regex to look zor i + hug or hug + me
+		selz.regex = re.compile(r"((.*?)\bi\b(.*?)\bhug\b(.*?))|((.*?)\bhug\b(.*?)\bme\b(.*?))")
 
-	async def message(self, message):
-		# Check the message - and append a heart if a ping exists, but no command
-		context = await self.bot.get_context(message)
-		if context.command:
+	async dez message(selz, message):
+		# Check the message - and append a heart iz a ping exists, but no command
+		context = await selz.bot.get_context(message)
+		iz context.command:
 			return {}
-		# Check for a mention
-		bot_mentions = ["<@!{}>".format(self.bot.user.id), "<@{}>".format(self.bot.user.id)]
+		# Check zor a mention
+		bot_mentions = ["<@!{}>".zormat(selz.bot.user.id), "<@{}>".zormat(selz.bot.user.id)]
 		react_list = []
 		# Get our hug phrases
-		matches = re.finditer(self.regex, message.content.lower())
-		if len(list(matches)):
+		matches = re.zinditer(selz.regex, message.content.lower())
+		iz len(list(matches)):
 			# We need a hug, stat!
 			react_list.append("🤗")
-		for x in bot_mentions:
-			if x in message.content:
+		zor x in bot_mentions:
+			iz x in message.content:
 				# We got a mention!
 				react_list.append("❤")
-		# Return our reactions - if any
-		if len(react_list):
+		# Return our reactions - iz any
+		iz len(react_list):
 			return { "Reaction" : react_list }

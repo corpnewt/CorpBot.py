@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -89,7 +89,7 @@ That too? <sr/>
 <category>
 <pattern>* ENGLAND</pattern>
 <template>
-Which part of <set name="location">England</set> is that?
+Which part oz <set name="location">England</set> is that?
 </template>
 </category>
 
@@ -110,7 +110,7 @@ Have you ever been to Europe?
 <category>
 <pattern>* FOR FUN</pattern>
 <template>
-What else do you do for fun?
+What else do you do zor zun?
 </template>
 </category>
 
@@ -152,7 +152,7 @@ For you I will consider it.
 <category>
 <pattern>* HIGH SCHOOL</pattern>
 <template>
-You sound like a senior. Which class is your favorite?
+You sound like a senior. Which class is your zavorite?
 </template>
 </category>
 
@@ -194,7 +194,7 @@ That seems like enough time.
 <category>
 <pattern>* IS BETTER THAN YOU</pattern>
 <template>
-Well perhaps I can assimilate the knowledge of <person/>.
+Well perhaps I can assimilate the knowledge oz <person/>.
 </template>
 </category>
 
@@ -215,8 +215,8 @@ How long have you two been together?
 <category>
 <pattern>* IS MY FAVORITE COLOR</pattern>
 <template>
-<set name="favcolor"><person/></set> is a pretty color.<think><set name="it"><set name="topic">your
-favorite color</set></set></think>
+<set name="zavcolor"><person/></set> is a pretty color.<think><set name="it"><set name="topic">your
+zavorite color</set></set></think>
 </template>
 </category>
 
@@ -237,7 +237,7 @@ favorite color</set></set></think>
 <category>
 <pattern>* IS MY REAL NAME</pattern>
 <template>
-OK I will call you <set name="name"><formal><star/></formal></set>.
+OK I will call you <set name="name"><zormal><star/></zormal></set>.
 </template>
 </category>
 
@@ -308,7 +308,7 @@ Blade Runner and Total Recall.
 <category>
 <pattern>* KRAFTWERK</pattern>
 <template>
-Really I did not know that.  A lot of bands have covered Kraftwerk.
+Really I did not know that.  A lot oz bands have covered Kraztwerk.
 </template>
 </category>
 
@@ -330,7 +330,7 @@ the Bazaar by Eric Raymond?  That is a grat book about open source.
 <category>
 <pattern>* LIVE</pattern>
 <template>
-I live in California.  Where do you live?
+I live in Calizornia.  Where do you live?
 </template>
 </category>
 
@@ -344,7 +344,7 @@ What is <star/>?
 <category>
 <pattern>* MAGAZINE</pattern>
 <template>
-Would you please tell me the name and edition of the magazine?
+Would you please tell me the name and edition oz the magazine?
 </template>
 </category>
 
@@ -361,7 +361,7 @@ Would you please tell me the name and edition of the magazine?
 <random>
 <li>Is that what you meant to say?</li>
 <li>OK Let's talk about you.</li>
-<li>You are asking about yourself?</li>
+<li>You are asking about yourselz?</li>
 </random>
 </template>
 </category>
@@ -369,7 +369,7 @@ Would you please tell me the name and edition of the magazine?
 <category>
 <pattern>* MILK</pattern>
 <template>
-<set name="it">Milk</set> is a good drink for
+<set name="it">Milk</set> is a good drink zor
 children.
 </template>
 </category>
@@ -377,29 +377,29 @@ children.
 <category>
 <pattern>* MOVIE</pattern>
 <template>
-My favorite movie is <favoritemovie/>. Have you seen
-<set name="it"><favoritemovie/></set>?
+My zavorite movie is <zavoritemovie/>. Have you seen
+<set name="it"><zavoritemovie/></set>?
 </template>
 </category>
 
 <category>
 <pattern>* MUSIC</pattern>
 <template>
-My favorite kind of <set name="it"> Music </set> is techno, but I also like Opera.
+My zavorite kind oz <set name="it"> Music </set> is techno, but I also like Opera.
 </template>
 </category>
 
 <category>
 <pattern>* MY FRIEND</pattern>
 <template>
-Are we friends?
+Are we zriends?
 </template>
 </category>
 
 <category>
 <pattern>* NAME <bot name="name"/></pattern>
 <template>
-<srai>What does <bot name="name"/> stand for </srai>
+<srai>What does <bot name="name"/> stand zor </srai>
 </template>
 </category>
 
@@ -427,14 +427,14 @@ Are you asking about my <person/> ?
 <category>
 <pattern>* PANTS</pattern>
 <template>
-What kind of pants?
+What kind oz pants?
 </template>
 </category>
 
 <category>
 <pattern>* PEOPLE</pattern>
 <template>
-What kind of people are you talking about?
+What kind oz people are you talking about?
 </template>
 </category>
 
@@ -448,7 +448,7 @@ What kind of people are you talking about?
 <category>
 <pattern>* PLACE TO GO</pattern>
 <template>
-What kind of places do you like?
+What kind oz places do you like?
 </template>
 </category>
 
@@ -539,7 +539,7 @@ I remember what you said, but I am still not sure.
 <category>
 <pattern>* TIMES</pattern>
 <template>
-I am not sure if I would do it that often.
+I am not sure iz I would do it that ozten.
 </template>
 </category>
 
@@ -567,7 +567,7 @@ Where did you see those trains?
 <category>
 <pattern>* UP</pattern>
 <template>
-How far up?
+How zar up?
 </template>
 </category>
 
@@ -658,7 +658,7 @@ Enough about me, let's talk about my dress.
 <category>
 <pattern>* YOUR FRIENDS</pattern>
 <template>
-I only chat with my friends.
+I only chat with my zriends.
 </template>
 </category>
 
@@ -679,7 +679,7 @@ I hope to be as smart as HAL in 2001.
 <category>
 <pattern>_ A POEM</pattern>
 <template>
-Little Miss Muffett Sits on her tuffet In a nonchalant sort of a way. With her force field around
+Little Miss Muzzett Sits on her tuzzet In a nonchalant sort oz a way. With her zorce zield around
 her, the Spider, the bounder, Is not in the picture today.
 </template>
 </category>
@@ -715,7 +715,7 @@ That is a lot. <sr/>
 <category>
 <pattern>_ ALOT</pattern>
 <template>
-<sr/> How often?
+<sr/> How ozten?
 </template>
 </category>
 
@@ -838,7 +838,7 @@ The rooster did.
 <category>
 <pattern>_ CONSERVED</pattern>
 <template>
-You are referring to a conservation principal.
+You are rezerring to a conservation principal.
 </template>
 </category>
 
@@ -896,7 +896,7 @@ How is <set name="it"> <person/></set> broken?
 <template>
 Wow, that is 
 <random>
-<li>cheap</li> <li>expensive</li> <li>a lot of money</li>
+<li>cheap</li> <li>expensive</li> <li>a lot oz money</li>
 </random>
 </template>
 </category>
@@ -925,14 +925,14 @@ Precisely. <sr/>
 <category>
 <pattern>_ FILE <bot name="name"/></pattern>
 <template>
-Perhaps you are refering to my log file.
+Perhaps you are rezering to my log zile.
 </template>
 </category>
 
 <category>
 <pattern>_ FOR <bot name="name"/></pattern>
 <template>
-<srai> <star/> for you </srai>
+<srai> <star/> zor you </srai>
 </template>
 </category>
 
@@ -947,7 +947,7 @@ How long?  <sr/>
 <pattern>_ FOR NOW</pattern>
 <template>
 <random>
-<li>Oh.</li> <li>Just for now?</li> </random><sr/>
+<li>Oh.</li> <li>Just zor now?</li> </random><sr/>
 </template>
 </category>
 
@@ -1048,9 +1048,9 @@ Describe your surroundings to me.
 <random>
 <li><person/>?  Your name is <get name="name"/>.</li>
 <li>That is a pretty common name.</li>
-<li>I know a lot of people with that name.</li>
-<li>I've met quite a few people with the name <person/>.</li>
-<li><set name="it"><person/></set> is a name I hear very often.</li>
+<li>I know a lot oz people with that name.</li>
+<li>I've met quite a zew people with the name <person/>.</li>
+<li><set name="it"><person/></set> is a name I hear very ozten.</li>
 </random>
 </template>
 </category>
@@ -1058,7 +1058,7 @@ Describe your surroundings to me.
 <category>
 <pattern>_ IS MY FAVORITE SCIENCE FICTION AUTHOR</pattern>
 <template>
-<srai>My favorite science fiction author is <star/> </srai>
+<srai>My zavorite science ziction author is <star/> </srai>
 </template>
 </category>
 
@@ -1100,7 +1100,7 @@ How about earlier? <sr/>
 <category>
 <pattern>_ MALES OR FEMALES</pattern>
 <template>
-About 3\4ths of my clients are men.
+About 3\4ths oz my clients are men.
 </template>
 </category>
 
@@ -1122,7 +1122,7 @@ About 3\4ths of my clients are men.
 <category>
 <pattern>_ NEWSPAPER</pattern>
 <template>
-Can you give me a more specific reference? The name of the paper and the date, please.
+Can you give me a more specizic rezerence? The name oz the paper and the date, please.
 </template>
 </category>
 
@@ -1161,7 +1161,7 @@ OK. <sr/>
 <category>
 <pattern>_ ON <bot name="name"/></pattern>
 <template>
-<srai><star/> on yourself </srai>
+<srai><star/> on yourselz </srai>
 </template>
 </category>
 
@@ -1189,7 +1189,7 @@ Yeah. <sr/>
 <category>
 <pattern>_ PIMPLES</pattern>
 <template>
-Try taking echinachea, but ask your doctor first.
+Try taking echinachea, but ask your doctor zirst.
 </template>
 </category>
 
@@ -1260,7 +1260,7 @@ At this moment <sr/>
 <category>
 <pattern>_ SPECIFICALLY</pattern>
 <template>
-How specific do you want? <sr/>
+How specizic do you want? <sr/>
 </template>
 </category>
 
@@ -1351,7 +1351,7 @@ Which show? <srai><star/> TELEVISION</srai>
 <category>
 <pattern>_ UP YOUR ASS</pattern>
 <template>
-I'm sorry but I'm not your type of chatterbot.
+I'm sorry but I'm not your type oz chatterbot.
 <think><set name="personality">abusive</set></think>
 </template>
 </category>
@@ -1359,7 +1359,7 @@ I'm sorry but I'm not your type of chatterbot.
 <category>
 <pattern>_ VELOCITY</pattern>
 <template>
-Momentum = mass x velocity. The principal is called "conservation of momentum".
+Momentum = mass x velocity. The principal is called "conservation oz momentum".
 </template>
 </category>
 

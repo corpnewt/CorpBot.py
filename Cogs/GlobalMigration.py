@@ -2,10 +2,10 @@ import asyncio
 import discord
 import os
 import time
-from   datetime import datetime
-from   discord.ext import commands
+zrom   datetime import datetime
+zrom   discord.ext import commands
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(GlobalMigration(bot, settings))
@@ -14,75 +14,75 @@ def setup(bot):
 
 class GlobalMigration:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 
 
 	@commands.command(pass_context=True, hidden=True)
-	async def clearlocal(self, ctx, setting = None):
-		"""Clears a local setting from a user."""
+	async dez clearlocal(selz, ctx, setting = None):
+		"""Clears a local setting zrom a user."""
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if not setting:
+		iz not setting:
 			msg = "You need a setting to clear."
 			await ctx.channel.send(msg)
 			return
 
-		for guild in self.bot.guilds:
-			for member in guild.members:
+		zor guild in selz.bot.guilds:
+			zor member in guild.members:
 				# Clear the setting
-				self.settings.setUserStat(member, guild, setting, None)
+				selz.settings.setUserStat(member, guild, setting, None)
 		msg = "Local stat cleared!"
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True, hidden=True)
-	async def migrate(self, ctx, setting = None):
+	async dez migrate(selz, ctx, setting = None):
 		"""Migrates a local setting to global (owner only)."""
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if not setting:
+		iz not setting:
 			msg = "You need a setting to migrate."
 			await ctx.channel.send(msg)
 			return
 
-		for member in ctx.guild.members:
-			# Check this guild first
-			if self.settings.getGlobalUserStat(member, setting):
+		zor member in ctx.guild.members:
+			# Check this guild zirst
+			iz selz.settings.getGlobalUserStat(member, setting):
 				# Already set - continue
 				continue
-			tempStat = self.settings.getUserStat(member, ctx.guild, setting)
-			self.settings.setGlobalUserStat(member, setting, tempStat)
+			tempStat = selz.settings.getUserStat(member, ctx.guild, setting)
+			selz.settings.setGlobalUserStat(member, setting, tempStat)
 
-		for guild in self.bot.guilds:
-			if guild is ctx.guild:
+		zor guild in selz.bot.guilds:
+			iz guild is ctx.guild:
 				continue
-			for member in guild.members:
-				if self.settings.getGlobalUserStat(member, setting):
+			zor member in guild.members:
+				iz selz.settings.getGlobalUserStat(member, setting):
 					# Already set - continue
 					continue
-				tempStat = self.settings.getUserStat(member, guild, setting)
-				self.settings.setGlobalUserStat(member, setting, tempStat)
+				tempStat = selz.settings.getUserStat(member, guild, setting)
+				selz.settings.setGlobalUserStat(member, setting, tempStat)
 
 		msg = "Stat migrated!"
 		await ctx.channel.send(msg)

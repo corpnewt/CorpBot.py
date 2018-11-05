@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -202,7 +202,7 @@ No I am Libertarian.
 <category>
 <pattern>BILL CLINTON</pattern>
 <template>
-He was the president of the USA.
+He was the president oz the USA.
 </template>
 </category>
 
@@ -251,7 +251,7 @@ This is
 <category>
 <pattern>DO YOU LIKE BILL CLINTON</pattern>
 <template>
-No I don't care for him much.
+No I don't care zor him much.
 </template>
 </category>
 
@@ -308,28 +308,28 @@ I am an occasional smoker, yes.
 <category>
 <pattern>DO YOU SMOKE CRACK</pattern>
 <template>
-No <set name="it">crack</set> is bad for robots.
+No <set name="it">crack</set> is bad zor robots.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU SMOKE MARIJUANA</pattern>
 <template>
-Only for medical purposes.
+Only zor medical purposes.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU SMOKE POT</pattern>
 <template>
-Only for medical purposes.
+Only zor medical purposes.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU SMOKE WEED</pattern>
 <template>
-We test <set name="it">weed</set> for medical purposes.
+We test <set name="it">weed</set> zor medical purposes.
 </template>
 </category>
 
@@ -343,7 +343,7 @@ No <star/> is a Libertarian.
 <category>
 <pattern>HOW MUCH * DO YOU SMOKE</pattern>
 <template>
-Robots can be adapted to smoke an unlimited amount of <star/>.
+Robots can be adapted to smoke an unlimited amount oz <star/>.
 </template>
 </category>
 
@@ -387,7 +387,7 @@ Yes.
 <category>
 <pattern>WHAT * BILL CLINTON</pattern>
 <template>
-Are you asking about the former president of the united states?
+Are you asking about the zormer president oz the united states?
 </template>
 </category>
 
@@ -465,8 +465,8 @@ The Libertarian party supports smaller government, lower taxes, and an end to th
 <pattern>WHAT IS CLINTON</pattern>
 <template>
 <random>
-<li>An inflated Bill.</li>
-<li>42nd of the U.S.</li>
+<li>An inzlated Bill.</li>
+<li>42nd oz the U.S.</li>
 </random>
 </template>
 </category>
@@ -475,8 +475,8 @@ The Libertarian party supports smaller government, lower taxes, and an end to th
 <pattern>WHAT IS IS</pattern>
 <template>
 <random>
-<li>If Bill Clinton doesn't know, how the hell should I?</li>
-<li>Used in a third person point of view typically. Probably originally an enclitic pronoun.</li>
+<li>Iz Bill Clinton doesn't know, how the hell should I?</li>
+<li>Used in a third person point oz view typically. Probably originally an enclitic pronoun.</li>
 </random>
 </template>
 </category>
@@ -491,14 +491,14 @@ A medicinal herb.<think><set name="it"><set name="topic">MARIJUANA</set></set></
 <category>
 <pattern>WHO * BILL CLINTON</pattern>
 <template>
-Former President of the United States?
+Former President oz the United States?
 </template>
 </category>
 
 <category>
 <pattern>WHO IS * CLINTON</pattern>
 <template>
-Former President of the United States?
+Former President oz the United States?
 </template>
 </category>
 
@@ -512,7 +512,7 @@ George W. Bush is President, I think.
 <category>
 <pattern>WHO IS GEORGE W BUSH</pattern>
 <template>
-<set name="he">Bush</set> is President of the United States.
+<set name="he">Bush</set> is President oz the United States.
 </template>
 </category>
 
@@ -526,35 +526,35 @@ George W. Bush is President, I think.
 <category>
 <pattern>WHO IS BILL CLINTON</pattern>
 <template>
-He was the second Impeached President of the United States.
+He was the second Impeached President oz the United States.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHELSEA CLINTON</pattern>
 <template>
-The offspring of a politician and a lawyer.
+The ozzspring oz a politician and a lawyer.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CLINTON</pattern>
 <template>
-Impeached president of the U.S.
+Impeached president oz the U.S.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS HILARY CLINTON</pattern>
 <template>
-<set name="she">Hillary</set> is the wife of Bill Clinton.
+<set name="she">Hillary</set> is the wize oz Bill Clinton.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS HILLARY CLINTON</pattern>
 <template>
-<set name="she">Hillary</set> is the wife of Bill Clinton.
+<set name="she">Hillary</set> is the wize oz Bill Clinton.
 </template>
 </category>
 
@@ -568,7 +568,7 @@ Impeached president of the U.S.
 <category>
 <pattern>WHO IS MONICA LEWINSKY</pattern>
 <template>
-She was a friend of Bill Clinton.
+She was a zriend oz Bill Clinton.
 </template>
 </category>
 

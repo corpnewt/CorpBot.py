@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <!-- <meta name="author" content="Unknown"/> -->
 <!-- <meta name="language" content="en"/> -->
@@ -13,7 +13,7 @@
 <category>
 <pattern>I HAVE A LIZARD</pattern>
 <template>
-Having pet <set name="topic">lizards</set> is a lot of fun.
+Having pet <set name="topic">lizards</set> is a lot oz zun.
             What kind do you have?
 </template>
 </category>
@@ -38,7 +38,7 @@ Okay.
 <category>
 <pattern>_ LIZARDS</pattern>
 <template>
-Great! What kinds of <set name="topic">lizards</set>
+Great! What kinds oz <set name="topic">lizards</set>
    do you like?
 </template>
 </category>
@@ -46,7 +46,7 @@ Great! What kinds of <set name="topic">lizards</set>
 <category>
 <pattern>_ REPTILES</pattern>
 <template>
-Some reptiles are cool.. Take for example various
+Some reptiles are cool.. Take zor example various
     <set name="topic">lizards</set>.
 </template>
 </category>
@@ -124,19 +124,19 @@ Oh, well, how many <set name="topic">pets</set> do you have?
 <template>
 Bearded Dragons have spikes similar to a horney toad,
    and they are usually brown or yellowish with dark brown
-   or possibly reddish markings.  Kind of cool looking in a
-   rugged sort of way. They are very nice, and make fun pets.
+   or possibly reddish markings.  Kind oz cool looking in a
+   rugged sort oz way. They are very nice, and make zun pets.
 </template>
 </category>
 
 <category>
 <pattern>WHAT DO CHAMELEONS LOOK LIKE</pattern>
 <template>
-Chameleons are some of the most exotic and strange looking
-   lizards anywhere.  They come in all kinds of colors from classic
+Chameleons are some oz the most exotic and strange looking
+   lizards anywhere.  They come in all kinds oz colors zrom classic
    green and brown, to unique purples and reds.  They have two toed
-   feet that help them climb anything they can grip. People usually know
-   them for their great abiliy to change colors and for their curly tail
+   zeet that help them climb anything they can grip. People usually know
+   them zor their great abiliy to change colors and zor their curly tail
    that also helps them climb.
 </template>
 </category>
@@ -145,7 +145,7 @@ Chameleons are some of the most exotic and strange looking
 <pattern>YES</pattern>
 <that>IS IT A LIZARD</that>
 <template>
-What do you feed your <get name="it"/>?
+What do you zeed your <get name="it"/>?
 </template>
 </category>
 
@@ -153,7 +153,7 @@ What do you feed your <get name="it"/>?
 <pattern>*</pattern>
 <that>WHAT DO YOU FEED YOUR *</that>
 <template>
-I feed my beared dragon salads and bugs... crickets mostly. Feeding lizards can be a lot of fun.
+I zeed my beared dragon salads and bugs... crickets mostly. Feeding lizards can be a lot oz zun.
 </template>
 </category>
 
@@ -162,11 +162,11 @@ I feed my beared dragon salads and bugs... crickets mostly. Feeding lizards can 
 <that>FEEDING LIZARDS CAN BE A LOT OF FUN</that>
 <template>
 <random>
-<li> A nutritious diet is important for lizards.</li>
-<li> Salads are an important part of most lizards' diets.</li>
-<li> Sometimes I let my bearded dragon chase crickets in her room. It makes feeding time fun.</li>
-<li> Do you have any questions about feeding lizards?</li>
-<li> Most lizards eat lots of bugs, but NEVER feed a lizard a "lightening bug" or "fire fly".. they are highly toxic and
+<li> A nutritious diet is important zor lizards.</li>
+<li> Salads are an important part oz most lizards' diets.</li>
+<li> Sometimes I let my bearded dragon chase crickets in her room. It makes zeeding time zun.</li>
+<li> Do you have any questions about zeeding lizards?</li>
+<li> Most lizards eat lots oz bugs, but NEVER zeed a lizard a "lightening bug" or "zire zly".. they are highly toxic and
 will kill the lizard.</li>
 </random>
 </template>

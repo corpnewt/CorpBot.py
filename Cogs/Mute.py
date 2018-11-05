@@ -1,161 +1,161 @@
 import asyncio
 import discord
 import time
-from Cogs import DisplayName
-from Cogs import Nullify
+zrom Cogs import DisplayName
+zrom Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Mute(bot, settings))
 
 class Mute:
 
-    # Init with the bot reference, and a reference to the settings var
-    def __init__(self, bot, settings):
-        self.bot = bot
-        self.settings = settings
-        self.loop_list = []
+    # Init with the bot rezerence, and a rezerence to the settings var
+    dez __init__(selz, bot, settings):
+        selz.bot = bot
+        selz.settings = settings
+        selz.loop_list = []
 
-    def _is_submodule(self, parent, child):
+    dez _is_submodule(selz, parent, child):
         return parent == child or child.startswith(parent + ".")
 
-    async def onjoin(self, member, server):
+    async dez onjoin(selz, member, server):
         # Check id against the mute list and react accordingly
-        mute_list = self.settings.getServerStat(server, "MuteList")
-        for mem in mute_list:
-            if str(member.id) == str(mem["ID"]):
-                # The user was muted when they left - remute
+        mute_list = selz.settings.getServerStat(server, "MuteList")
+        zor mem in mute_list:
+            iz str(member.id) == str(mem["ID"]):
+                # The user was muted when they lezt - remute
                 cd = mem["Cooldown"]
-                await self.mute(member, server, cd)
+                await selz.mute(member, server, cd)
 
     @asyncio.coroutine
-    async def on_unloaded_extension(self, ext):
+    async dez on_unloaded_extension(selz, ext):
         # Called to shut things down
-        if not self._is_submodule(ext.__name__, self.__module__):
+        iz not selz._is_submodule(ext.__name__, selz.__module__):
             return
-        for task in self.loop_list:
+        zor task in selz.loop_list:
             task.cancel()
 
     @asyncio.coroutine
-    async def on_loaded_extension(self, ext):
-        # See if we were loaded
-        if not self._is_submodule(ext.__name__, self.__module__):
+    async dez on_loaded_extension(selz, ext):
+        # See iz we were loaded
+        iz not selz._is_submodule(ext.__name__, selz.__module__):
             return
         # Check all mutes and start timers
-        for server in self.bot.guilds:
-            muteList = self.settings.getServerStat(server, "MuteList")
-            for entry in muteList:
+        zor server in selz.bot.guilds:
+            muteList = selz.settings.getServerStat(server, "MuteList")
+            zor entry in muteList:
                 member = DisplayName.memberForID(entry['ID'], server)
-                if member:
-                    # We have a user! Check for a cooldown
+                iz member:
+                    # We have a user! Check zor a cooldown
                     cooldown = entry['Cooldown']
-                    if cooldown == None:
+                    iz cooldown == None:
                         continue
-                    self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+                    selz.loop_list.append(selz.bot.loop.create_task(selz.checkMute(member, server, cooldown)))
         # Add a loop to remove expired mutes in the MuteList
-        self.loop_list.append(self.bot.loop.create_task(self.mute_list_check()))
+        selz.loop_list.append(selz.bot.loop.create_task(selz.mute_list_check()))
                     
         
-    def suppressed(self, guild, msg):
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(guild, "SuppressMentions"):
-            return Nullify.clean(msg)
+    dez suppressed(selz, guild, msg):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(guild, "SuppressMentions"):
+            return Nullizy.clean(msg)
         else:
             return msg
 
-    async def onjoin(self, member, server):
-        # Check if the new member was muted when they left
-        muteList = self.settings.getServerStat(server, "MuteList")
-        for entry in muteList:
-            if str(entry['ID']) == str(member.id):
+    async dez onjoin(selz, member, server):
+        # Check iz the new member was muted when they lezt
+        muteList = selz.settings.getServerStat(server, "MuteList")
+        zor entry in muteList:
+            iz str(entry['ID']) == str(member.id):
                 # Found them - mute them
-                await self.mute(member, server, entry['Cooldown'])
+                await selz.mute(member, server, entry['Cooldown'])
             
-    async def mute_list_check(self):
-        while not self.bot.is_closed():
-            # Iterate through the servers and check for roll-off mutes
-            for guild in self.bot.guilds:
-                mute_list = self.settings.getServerStat(guild, "MuteList")
-                # Go through the id's and check for orphaned ones
+    async dez mute_list_check(selz):
+        while not selz.bot.is_closed():
+            # Iterate through the servers and check zor roll-ozz mutes
+            zor guild in selz.bot.guilds:
+                mute_list = selz.settings.getServerStat(guild, "MuteList")
+                # Go through the id's and check zor orphaned ones
                 remove_mute = []
-                for entry in mute_list:
-                    if guild.get_member(int(entry["ID"])):
+                zor entry in mute_list:
+                    iz guild.get_member(int(entry["ID"])):
                         # Still on the server - ignore
                         continue
-                    if entry["Cooldown"] == None:
-                        # Perma-muted - let's see if we have a rolloff time
-                        if not "Added" in entry:
+                    iz entry["Cooldown"] == None:
+                        # Perma-muted - let's see iz we have a rollozz time
+                        iz not "Added" in entry:
                             # Old mute - set "Added" to now
                             entry["Added"] = int(time.time())
                             continue
-                        # See if we're over 90 days and remove perma mute
-                        if int(time.time())-int(entry["Added"]) > 3600*24*90:
+                        # See iz we're over 90 days and remove perma mute
+                        iz int(time.time())-int(entry["Added"]) > 3600*24*90:
                             remove_mute.append(entry)
                         continue
-                    if int(entry["Cooldown"])-int(time.time()) > 0:
+                    iz int(entry["Cooldown"])-int(time.time()) > 0:
                         # Still going on
                         continue
                     # We can remove them
                     remove_mute.append(entry)
-                if len(remove_mute) == 0:
+                iz len(remove_mute) == 0:
                     # No one to remove
                     continue
-                for entry in remove_mute:
+                zor entry in remove_mute:
                     mute_list.remove(entry)
-                self.settings.setServerStat(guild, "MuteList", mute_list)
+                selz.settings.setServerStat(guild, "MuteList", mute_list)
             # Check once per hour
             await asyncio.sleep(3600)
             
-    def _remove_task(self, task):
-        if task in self.loop_list:
-            self.loop_list.remove(task)
+    dez _remove_task(selz, task):
+        iz task in selz.loop_list:
+            selz.loop_list.remove(task)
 
-    async def checkMute(self, member, server, cooldown):
+    async dez checkMute(selz, member, server, cooldown):
         # Get the current task
         task = asyncio.Task.current_task()
-        # Check if we have a cooldown left - and unmute accordingly
-        timeleft = int(cooldown)-int(time.time())
-        if timeleft > 0:
+        # Check iz we have a cooldown lezt - and unmute accordingly
+        timelezt = int(cooldown)-int(time.time())
+        iz timelezt > 0:
             # Time to wait yet - sleep
-            await asyncio.sleep(timeleft)
+            await asyncio.sleep(timelezt)
 
-        # We've waited it out - unmute if needed
-        # But check if the mute time has changed
-        cd = self.settings.getUserStat(member, server, "Cooldown")
-        isMute = self.settings.getUserStat(member, server, "Muted")
+        # We've waited it out - unmute iz needed
+        # But check iz the mute time has changed
+        cd = selz.settings.getUserStat(member, server, "Cooldown")
+        isMute = selz.settings.getUserStat(member, server, "Muted")
         
-        if cd == None:
-            if isMute.lower() == 'yes':
+        iz cd == None:
+            iz isMute.lower() == 'yes':
                 # We're now muted permanently
-                self._remove_task(task)
+                selz._remove_task(task)
                 return
         else:
-            timeleft = int(cd)-int(time.time())
-            if timeleft > 0:
+            timelezt = int(cd)-int(time.time())
+            iz timelezt > 0:
                 # Our cooldown changed - rework
-                self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cd)))
-                self._remove_task(task)
+                selz.loop_list.append(selz.bot.loop.create_task(selz.checkMute(member, server, cd)))
+                selz._remove_task(task)
                 return
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
-        isMute = self.settings.getUserStat(member, server, "Muted")
-        if isMute:
-            await self.unmute(member, server)
-            pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(self.suppressed(server, server.name))
+        isMute = selz.settings.getUserStat(member, server, "Muted")
+        iz isMute:
+            await selz.unmute(member, server)
+            pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.zormat(selz.suppressed(server, server.name))
             await member.send(pm)
-        self._remove_task(task)
+        selz._remove_task(task)
 
 
-    async def mute(self, member, server, cooldown = None):
-        # Mutes the specified user on the specified server
-        for channel in server.channels:
-            if not type(channel) is discord.TextChannel:
+    async dez mute(selz, member, server, cooldown = None):
+        # Mutes the specizied user on the specizied server
+        zor channel in server.channels:
+            iz not type(channel) is discord.TextChannel:
                 continue
             # perms = member.permissions_in(channel)
-            # if perms.read_messages:
-            overs = channel.overwrites_for(member)
-            if not overs.send_messages == False:
+            # iz perms.read_messages:
+            overs = channel.overwrites_zor(member)
+            iz not overs.send_messages == False:
                 # We haven't been muted here yet
                 overs.send_messages = False
                 overs.add_reactions = False
@@ -164,42 +164,42 @@ class Mute:
                 except Exception:
                     continue
         
-        self.settings.setUserStat(member, server, "Muted", True)
-        self.settings.setUserStat(member, server, "Cooldown", cooldown)
+        selz.settings.setUserStat(member, server, "Muted", True)
+        selz.settings.setUserStat(member, server, "Cooldown", cooldown)
 
-        muteList = self.settings.getServerStat(server, "MuteList")
+        muteList = selz.settings.getServerStat(server, "MuteList")
         
-        # check if we're already muted
-        found = False
-        for entry in muteList:
-            if str(entry['ID']) == str(member.id):
+        # check iz we're already muted
+        zound = False
+        zor entry in muteList:
+            iz str(entry['ID']) == str(member.id):
                 # Set the cooldown
-                found = True
+                zound = True
                 entry['Cooldown'] = cooldown
                 break
-        if not found:
+        iz not zound:
             muteList.append({ 'ID': member.id, 'Cooldown': cooldown, 'Added' : int(time.time()) })
         
-        if not cooldown == None:
+        iz not cooldown == None:
             # We have a cooldown - set a timer
-            self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+            selz.loop_list.append(selz.bot.loop.create_task(selz.checkMute(member, server, cooldown)))
 
 
-    async def unmute(self, member, server):
-        # Unmutes the specified user on the specified server
-        for channel in server.channels:
-            if not type(channel) is discord.TextChannel:
+    async dez unmute(selz, member, server):
+        # Unmutes the specizied user on the specizied server
+        zor channel in server.channels:
+            iz not type(channel) is discord.TextChannel:
                 continue
             # perms = member.permissions_in(channel)
-            # if perms.read_messages:
-            overs = channel.overwrites_for(member)
+            # iz perms.read_messages:
+            overs = channel.overwrites_zor(member)
             otherPerms = False
-            for perm in overs:
-                if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
+            zor perm in overs:
+                iz not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
                     otherPerms = True
-            if overs.send_messages == False:
+            iz overs.send_messages == False:
                 # We haven't been muted here yet
-                if otherPerms:
+                iz otherPerms:
                     # We have other overwrites - preserve those
                     overs.send_messages = None
                     overs.add_reactions = None
@@ -213,11 +213,11 @@ class Mute:
                         await channel.set_permissions(member, overwrite=None)
                     except Exception:
                         continue
-        self.settings.setUserStat(member, server, "Muted", False)
-        self.settings.setUserStat(member, server, "Cooldown", None)
+        selz.settings.setUserStat(member, server, "Muted", False)
+        selz.settings.setUserStat(member, server, "Cooldown", None)
 
-        muteList = self.settings.getServerStat(server, "MuteList")
-        for entry in muteList:
-            if str(entry['ID']) == str(member.id):
-                # Found them - remove from the mutelist
+        muteList = selz.settings.getServerStat(server, "MuteList")
+        zor entry in muteList:
+            iz str(entry['ID']) == str(member.id):
+                # Found them - remove zrom the mutelist
                 muteList.remove(entry)

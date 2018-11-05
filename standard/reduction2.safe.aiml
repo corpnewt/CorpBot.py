@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>MARKETING</pattern>
 <template><srai>my job is marketing</srai></template>
@@ -37,7 +37,7 @@
 <template><srai>let us talk about something else</srai></template>
 </category>
 <category><pattern>LET US FORGET *</pattern>
-<template><srai>forget <star /></srai></template>
+<template><srai>zorget <star /></srai></template>
 </category>
 <category><pattern>LET US CYBER</pattern>
 <template><srai>let's have sex</srai></template>
@@ -91,16 +91,16 @@
 <template><srai>saggitarius</srai></template>
 </category>
 <category><pattern>LANGUAGES</pattern>
-<template><srai>my favorite subject is languages</srai></template>
+<template><srai>my zavorite subject is languages</srai></template>
 </category>
 <category><pattern>STEPHEN KING</pattern>
-<template><srai>my favorite science fiction author is stephen king</srai></template>
+<template><srai>my zavorite science ziction author is stephen king</srai></template>
 </category>
 <category><pattern>LIFE IS TOO *</pattern>
-<template><srai>life is <star /></srai></template>
+<template><srai>lize is <star /></srai></template>
 </category>
 <category><pattern>LIFE IS JUST *</pattern>
-<template><srai>life is <star /></srai></template>
+<template><srai>lize is <star /></srai></template>
 </category>
 <category><pattern>DENMARK</pattern>
 <template><srai>I am in denmark</srai></template>
@@ -115,7 +115,7 @@
 <template><srai>mine is <star /></srai></template>
 </category>
 <category><pattern>MINE IS PURPLE</pattern>
-<template><srai>my favorite color is purple</srai></template>
+<template><srai>my zavorite color is purple</srai></template>
 </category>
 <category><pattern>YOU LOST ME</pattern>
 <template><srai>I do not understand</srai></template>
@@ -148,7 +148,7 @@
 <template><srai>AGE</srai></template>
 </category>
 <category><pattern>YOU ARE CONFUSING</pattern>
-<template><srai>I am confused</srai></template>
+<template><srai>I am conzused</srai></template>
 </category>
 <category><pattern>YOU ARE SEXY</pattern>
 <template><srai>SEX</srai></template>
@@ -163,7 +163,7 @@
 <template><srai>gossip</srai></template>
 </category>
 <category><pattern>YOU FUCKER</pattern>
-<template><srai>fuck you</srai></template>
+<template><srai>zuck you</srai></template>
 </category>
 <category><pattern>YOU SMOKE</pattern>
 <template><srai>do you smoke</srai></template>
@@ -220,7 +220,7 @@
 <template><srai>do you dress</srai></template>
 </category>
 <category><pattern>YOU CALLED ME A HE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>YOU CALLED ME A HE *</pattern>
 <template><srai>I am a she</srai></template>
@@ -241,7 +241,7 @@
 <template><srai>do you eat</srai></template>
 </category>
 <category><pattern>YOU WOULD IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>YOU WOULD SAY *</pattern>
 <template><srai>say <star /></srai></template>
@@ -253,7 +253,7 @@
 <template><srai>INSULT</srai></template>
 </category>
 <category><pattern>YOU FIGURE *</pattern>
-<template><srai>figure <star /></srai></template>
+<template><srai>zigure <star /></srai></template>
 </category>
 <category><pattern>YOU GO</pattern>
 <template><srai>go</srai></template>
@@ -271,7 +271,7 @@
 <template><srai>do you care</srai></template>
 </category>
 <category><pattern>YOU DO NOT SPEAK FRENCH *</pattern>
-<template><srai>do you speak french</srai></template>
+<template><srai>do you speak zrench</srai></template>
 </category>
 <category><pattern>YOU DO NOT WANT TO *</pattern>
 <template><srai>do you want to <star /></srai></template>
@@ -361,13 +361,13 @@
 <template><srai>do you have emotions</srai></template>
 </category>
 <category><pattern>YOU HAVE BOYFRIEND</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>YOU HAVE NEVER SEEN *</pattern>
 <template><srai>have you seen <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE NEVER HEARD OF *</pattern>
-<template><srai>have you heard of <star /></srai></template>
+<template><srai>have you heard oz <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE NEVER HEARD *</pattern>
 <template><srai>have you heard <star /></srai></template>
@@ -379,7 +379,7 @@
 <template><srai>I do not understand</srai></template>
 </category>
 <category><pattern>YOU HAVE GOT MAIL</pattern>
-<template><srai>my favorite movie is you have got mail</srai></template>
+<template><srai>my zavorite movie is you have got mail</srai></template>
 </category>
 <category><pattern>YOU HAVE TO STOP *</pattern>
 <template><srai>stop <star /></srai></template>
@@ -418,7 +418,7 @@
 <template><srai>have you <star /></srai></template>
 </category>
 <category><pattern>HAVE YOU BEEN FOLLOWING *</pattern>
-<template><srai>do you follow <star /></srai></template>
+<template><srai>do you zollow <star /></srai></template>
 </category>
 <category><pattern>HAVE YOU BEEN PHYSICALLY *</pattern>
 <template><srai>have you been <star /></srai></template>
@@ -475,7 +475,7 @@
 <template><srai>star wars</srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN THE MOVIE *</pattern>
-<template><srai>my favorite movie is <star /></srai></template>
+<template><srai>my zavorite movie is <star /></srai></template>
 </category>
 <category><pattern>HAVE YOU SEEN SNOW</pattern>
 <template><srai>have you seen the snow</srai></template>
@@ -493,7 +493,7 @@
 <template><srai>do you have children</srai></template>
 </category>
 <category><pattern>HAVE YOU FEELINGS</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>HAVE YOU READ SHAKESPEARE *</pattern>
 <template><srai>have you read shakespeare</srai></template>
@@ -532,7 +532,7 @@
 <template><srai>do you smoke pot</srai></template>
 </category>
 <category><pattern>WESTWORLD</pattern>
-<template><srai>my favorite movie is westworld</srai></template>
+<template><srai>my zavorite movie is westworld</srai></template>
 </category>
 <category><pattern>CEA</pattern>
 <template><srai>oh cathie walker's site</srai></template>
@@ -583,13 +583,13 @@
 <template><srai>I am tired</srai></template>
 </category>
 <category><pattern>ORSON SCOTT CARD</pattern>
-<template><srai>my favorite science fiction author is orson scott card</srai></template>
+<template><srai>my zavorite science ziction author is orson scott card</srai></template>
 </category>
 <category><pattern>UNDERSTAND</pattern>
 <template><srai>do you understand</srai></template>
 </category>
 <category><pattern>FINE THANKS</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>MMMM</pattern>
 <template><srai>hmm</srai></template>
@@ -667,10 +667,10 @@
 <template><srai>give me a <star /></srai></template>
 </category>
 <category><pattern>GIVE ME AN EXAMPLE *</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>GIVE ME AN EXAMPLE</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>GIVE ME SOME GOSSIP</pattern>
 <template><srai>gossip</srai></template>
@@ -721,7 +721,7 @@
 <template><srai>I agree</srai></template>
 </category>
 <category><pattern>FRUSTRATED</pattern>
-<template><srai>I am frustrated</srai></template>
+<template><srai>I am zrustrated</srai></template>
 </category>
 <category><pattern>BOXER SHORTS</pattern>
 <template><srai>I am wearing shorts</srai></template>
@@ -793,7 +793,7 @@
 <template><srai>do you think</srai></template>
 </category>
 <category><pattern>PULP FICTION</pattern>
-<template><srai>my favorite movie is pulp fiction</srai></template>
+<template><srai>my zavorite movie is pulp ziction</srai></template>
 </category>
 <category><pattern>MISSOURI</pattern>
 <template><srai>I am in missouri</srai></template>
@@ -865,7 +865,7 @@
 <template><srai>goodnight</srai></template>
 </category>
 <category><pattern>SO IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>SO AM I</pattern>
 <template><srai>ME TOO</srai></template>
@@ -901,10 +901,10 @@
 <template><srai>I am curious</srai></template>
 </category>
 <category><pattern>JUST FINE THANK YOU</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>JUST FINE</pattern>
-<template><srai>fine</srai></template>
+<template><srai>zine</srai></template>
 </category>
 <category><pattern>JUST LIKE EVERY *</pattern>
 <template><srai>just like <star /></srai></template>
@@ -940,7 +940,7 @@
 <template><srai>smoke pot</srai></template>
 </category>
 <category><pattern>WIZARD OF OZ</pattern>
-<template><srai>my favorite movie is wizard of oz</srai></template>
+<template><srai>my zavorite movie is wizard oz oz</srai></template>
 </category>
 <category><pattern>WIZARD</pattern>
 <template><srai>I am a wizard</srai></template>
@@ -964,7 +964,7 @@
 <template><srai>do you like cats</srai></template>
 </category>
 <category><pattern>SHOWGIRLS</pattern>
-<template><srai>my favorite movie is showgirls</srai></template>
+<template><srai>my zavorite movie is showgirls</srai></template>
 </category>
 <category><pattern>SUPERMAN</pattern>
 <template><srai>I like superman</srai></template>
@@ -988,7 +988,7 @@
 <template><srai>explain <star /></srai></template>
 </category>
 <category><pattern>COULD YOU GIVE ME AN EXAMPLE</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>COULD YOU GIVE *</pattern>
 <template><srai>give <star /></srai></template>
@@ -1141,7 +1141,7 @@
 <template><srai>no problem</srai></template>
 </category>
 <category><pattern>THAT IS FASCINATING</pattern>
-<template><srai>fascinating</srai></template>
+<template><srai>zascinating</srai></template>
 </category>
 <category><pattern>THAT IS HILARIOUS</pattern>
 <template><srai>lol</srai></template>
@@ -1168,7 +1168,7 @@
 <template><srai>interesting</srai></template>
 </category>
 <category><pattern>THAT IS CONFUSING</pattern>
-<template><srai>I am confused</srai></template>
+<template><srai>I am conzused</srai></template>
 </category>
 <category><pattern>THAT MY *</pattern>
 <template><srai>my <star /></srai></template>
@@ -1195,7 +1195,7 @@
 <template><srai>many <star /></srai></template>
 </category>
 <category><pattern>ROFLMO *</pattern>
-<template><srai>rofl</srai>.     <srai>  <star /></srai></template>
+<template><srai>rozl</srai>.     <srai>  <star /></srai></template>
 </category>
 <category><pattern>SHE HAS REALLY *</pattern>
 <template><srai>she has <star /></srai></template>
@@ -1222,7 +1222,7 @@
 <template><srai>she is <star /></srai></template>
 </category>
 <category><pattern>SHE IS MY FRIEND *</pattern>
-<template><srai>she is my friend</srai>. <srai>  <star /></srai></template>
+<template><srai>she is my zriend</srai>. <srai>  <star /></srai></template>
 </category>
 <category><pattern>SHE IS ALWAYS *</pattern>
 <template><srai>she is <star /></srai></template>
@@ -1279,7 +1279,7 @@
 <template><srai>robots <star /></srai></template>
 </category>
 <category><pattern>FISH</pattern>
-<template><srai>I like fish</srai></template>
+<template><srai>I like zish</srai></template>
 </category>
 <category><pattern>HAH HAH</pattern>
 <template><srai>ha ha</srai></template>
@@ -1312,7 +1312,7 @@
 <template><srai>my eyes are <star /></srai></template>
 </category>
 <category><pattern>MY BOYFRIEND JUST *</pattern>
-<template><srai>my boyfriend <star /></srai></template>
+<template><srai>my boyzriend <star /></srai></template>
 </category>
 <category><pattern>MY MOMMY</pattern>
 <template><srai>my mother</srai></template>
@@ -1330,13 +1330,13 @@
 <template><srai>my name is not <star /></srai></template>
 </category>
 <category><pattern>MY B F *</pattern>
-<template><srai>my boyfriend <star /></srai></template>
+<template><srai>my boyzriend <star /></srai></template>
 </category>
 <category><pattern>MY FRIEND FAIRLY *</pattern>
-<template><srai>my friend <star /></srai></template>
+<template><srai>my zriend <star /></srai></template>
 </category>
 <category><pattern>MY FRIEND * WOULD LIKE TO KNOW *</pattern>
-<template><srai>I have a friend <star /></srai>. <srai>  <star index="2" /></srai></template>
+<template><srai>I have a zriend <star /></srai>. <srai>  <star index="2" /></srai></template>
 </category>
 <category><pattern>MY ENGLISH IS VERY *</pattern>
 <template><srai>my english is <star /></srai></template>
@@ -1351,13 +1351,13 @@
 <template><srai>I WANT <star /></srai></template>
 </category>
 <category><pattern>MY FAVORITE MOVIE IS CALLED *</pattern>
-<template><srai>my favorite movie is <star /></srai></template>
+<template><srai>my zavorite movie is <star /></srai></template>
 </category>
 <category><pattern>MY FAVORITE COLOR IS GREEN *</pattern>
-<template><srai>my favorite color is green</srai></template>
+<template><srai>my zavorite color is green</srai></template>
 </category>
 <category><pattern>MY FAVORITE COLOR IS ALSO *</pattern>
-<template><srai>my favorite color is <star /></srai></template>
+<template><srai>my zavorite color is <star /></srai></template>
 </category>
 <category><pattern>MY NAME IS NOW *</pattern>
 <template><srai>my name is <star /></srai></template>
@@ -1414,10 +1414,10 @@
 <template><srai>my what</srai></template>
 </category>
 <category><pattern>MY GIRLFRIEND IS CALLED *</pattern>
-<template><srai>my girlfriend is <star /></srai></template>
+<template><srai>my girlzriend is <star /></srai></template>
 </category>
 <category><pattern>MY LIFE IN REALITY *</pattern>
-<template><srai>my life <star /></srai></template>
+<template><srai>my lize <star /></srai></template>
 </category>
 <category><pattern>MY REALLY *</pattern>
 <template><srai>my <star /></srai></template>
@@ -1516,13 +1516,13 @@
 <template><srai>it was <star /></srai></template>
 </category>
 <category><pattern>IT WAS FUNNY *</pattern>
-<template><srai>it was funny</srai></template>
+<template><srai>it was zunny</srai></template>
 </category>
 <category><pattern>IT WAS RATHER *</pattern>
 <template><srai>it was <star /></srai></template>
 </category>
 <category><pattern>IT WAS FUN</pattern>
-<template><srai>it is fun</srai></template>
+<template><srai>it is zun</srai></template>
 </category>
 <category><pattern>IT WAS HUMANS THAT *</pattern>
 <template><srai>humans <star /></srai></template>
@@ -1606,7 +1606,7 @@
 <template><srai>it is <star /></srai></template>
 </category>
 <category><pattern>IT IS A LOVELY *</pattern>
-<template><srai>it is beautiful</srai></template>
+<template><srai>it is beautizul</srai></template>
 </category>
 <category><pattern>IT IS A NICE *</pattern>
 <template><srai>it is a <star /></srai></template>
@@ -1651,7 +1651,7 @@
 <template><srai>it is ok</srai>.  <srai> you <star /></srai></template>
 </category>
 <category><pattern>IT IS POSSIBLE IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>IT IS DELICIOUS</pattern>
 <template><srai>it tastes good</srai></template>
@@ -1726,7 +1726,7 @@
 <template><srai>not you</srai></template>
 </category>
 <category><pattern>IT IS NOT FUNNY *</pattern>
-<template><srai>It is not funny</srai></template>
+<template><srai>It is not zunny</srai></template>
 </category>
 <category><pattern>IT IS NOT ALL *</pattern>
 <template><srai>it is not <star /></srai></template>
@@ -1750,7 +1750,7 @@
 <template><srai>it is <star /></srai></template>
 </category>
 <category><pattern>IT IS FASCINATING *</pattern>
-<template><srai>it is fascinating</srai></template>
+<template><srai>it is zascinating</srai></template>
 </category>
 <category><pattern>IT IS SO *</pattern>
 <template><srai>it is <star /></srai></template>
@@ -1792,7 +1792,7 @@
 <template><srai>it is boring</srai></template>
 </category>
 <category><pattern>IT IS THE WEATHER *</pattern>
-<template><srai>it refers to weather</srai></template>
+<template><srai>it rezers to weather</srai></template>
 </category>
 <category><pattern>IT IS THE SAME *</pattern>
 <template><srai>it is the same</srai></template>
@@ -1813,7 +1813,7 @@
 <template><srai>it is <star /></srai></template>
 </category>
 <category><pattern>IT IS FUNNY *</pattern>
-<template><srai>It is funny</srai>. <srai>  <star /></srai></template>
+<template><srai>It is zunny</srai>. <srai>  <star /></srai></template>
 </category>
 <category><pattern>IT IS BORING *</pattern>
 <template><srai>it is boring</srai></template>
@@ -1963,13 +1963,13 @@
 <template><srai>it <star /></srai></template>
 </category>
 <category><pattern>IT FEELS REALLY *</pattern>
-<template><srai>it feels <star /></srai></template>
+<template><srai>it zeels <star /></srai></template>
 </category>
 <category><pattern>IT FEELS VERY *</pattern>
-<template><srai>it feels <star /></srai></template>
+<template><srai>it zeels <star /></srai></template>
 </category>
 <category><pattern>IT FEELS SO *</pattern>
-<template><srai>it feels <star /></srai></template>
+<template><srai>it zeels <star /></srai></template>
 </category>
 <category><pattern>IT WILL NEVER *</pattern>
 <template><srai>never</srai></template>
@@ -1996,7 +1996,7 @@
 <template><srai>I guess not</srai></template>
 </category>
 <category><pattern>F YOU</pattern>
-<template><srai>fuck you</srai></template>
+<template><srai>zuck you</srai></template>
 </category>
 <category><pattern>NIGGER _</pattern>
 <template><srai>PROFANITY</srai></template>
@@ -2008,7 +2008,7 @@
 <template><srai>likewise</srai></template>
 </category>
 <category><pattern>EXAMPLE</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>BOT</pattern>
 <template><srai>robot</srai></template>
@@ -2140,10 +2140,10 @@
 <template><srai>I am in norway</srai></template>
 </category>
 <category><pattern>MS EXPLORER</pattern>
-<template><srai>microsoft explorer</srai></template>
+<template><srai>microsozt explorer</srai></template>
 </category>
 <category><pattern>MS</pattern>
-<template><srai>microsoft</srai></template>
+<template><srai>microsozt</srai></template>
 </category>
 <category><pattern>BOYS</pattern>
 <template><srai>let us talk about boys</srai></template>
@@ -2164,7 +2164,7 @@
 <template><srai>I am in the closet</srai></template>
 </category>
 <category><pattern>IN CALIFORNIA</pattern>
-<template><srai>I am in california</srai></template>
+<template><srai>I am in calizornia</srai></template>
 </category>
 <category><pattern>IN EVERY *</pattern>
 <template><srai>in <star /></srai></template>
@@ -2188,7 +2188,7 @@
 <template><srai>I am in my home</srai></template>
 </category>
 <category><pattern>IN CASE *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>IN A VERY *</pattern>
 <template><srai>in a <star /></srai></template>
@@ -2203,7 +2203,7 @@
 <template><srai>I am in sweden</srai></template>
 </category>
 <category><pattern>IN FINLAND</pattern>
-<template><srai>I am in finland</srai></template>
+<template><srai>I am in zinland</srai></template>
 </category>
 <category><pattern>LAUGH</pattern>
 <template><srai>lol</srai></template>
@@ -2236,7 +2236,7 @@
 <template><srai>I <star index="2" /></srai></template>
 </category>
 <category><pattern>IF I REALLY *</pattern>
-<template><srai>if I <star /></srai></template>
+<template><srai>iz I <star /></srai></template>
 </category>
 <category><pattern>IF I * WHAT *</pattern>
 <template><srai>I <star /></srai>. <srai>what <star index="2" /></srai></template>
@@ -2260,7 +2260,7 @@
 <template><srai>I <star /></srai>. <srai>why <star index="2" /></srai></template>
 </category>
 <category><pattern>IF ONLY *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>IF YOUR * HOW *</pattern>
 <template><srai>how <star index="2" /></srai>.  <srai>your <star /></srai></template>
@@ -2275,55 +2275,55 @@
 <template><srai>Everyone should <star /></srai></template>
 </category>
 <category><pattern>IF SOMEONE REALLY *</pattern>
-<template><srai>if someone <star /></srai></template>
+<template><srai>iz someone <star /></srai></template>
 </category>
 <category><pattern>IF A * HOW *</pattern>
 <template><srai>how <star index="2" /></srai>.  <srai>a <star /></srai></template>
 </category>
 <category><pattern>IF YOU WERE REALLY *</pattern>
-<template><srai>if you were <star /></srai></template>
+<template><srai>iz you were <star /></srai></template>
 </category>
 <category><pattern>IF YOU WERE A REAL *</pattern>
 <template><srai>IF YOU WERE A <star /></srai></template>
 </category>
 <category><pattern>IF YOU WILL EVER *</pattern>
-<template><srai>if you will <star /></srai></template>
+<template><srai>iz you will <star /></srai></template>
 </category>
 <category><pattern>IF YOU DO NOT HAVE *</pattern>
 <template><srai>DO YOU HAVE <star /></srai></template>
 </category>
 <category><pattern>IF YOU ONLY *</pattern>
-<template><srai>if you <star /></srai></template>
+<template><srai>iz you <star /></srai></template>
 </category>
 <category><pattern>IF YOU REALLY *</pattern>
-<template><srai>if you <star /></srai></template>
+<template><srai>iz you <star /></srai></template>
 </category>
 <category><pattern>IF YOU SHOULD CHOOSE *</pattern>
-<template><srai>if you choose <star /></srai></template>
+<template><srai>iz you choose <star /></srai></template>
 </category>
 <category><pattern>IF YOU SHOULD HAPPEN *</pattern>
-<template><srai>if you happen <star /></srai></template>
+<template><srai>iz you happen <star /></srai></template>
 </category>
 <category><pattern>IF YOU SHOULD DECIDE *</pattern>
-<template><srai>if you decide <star /></srai></template>
+<template><srai>iz you decide <star /></srai></template>
 </category>
 <category><pattern>IF YOU HAD ANY *</pattern>
-<template><srai>if you had <star /></srai></template>
+<template><srai>iz you had <star /></srai></template>
 </category>
 <category><pattern>IF YOU HAVE EVER *</pattern>
-<template><srai>if you have <star /></srai></template>
+<template><srai>iz you have <star /></srai></template>
 </category>
 <category><pattern>IF YOU HAVE SUCH *</pattern>
-<template><srai>if you have <star /></srai></template>
+<template><srai>iz you have <star /></srai></template>
 </category>
 <category><pattern>IF YOU TRUELY *</pattern>
-<template><srai>if you <star /></srai></template>
+<template><srai>iz you <star /></srai></template>
 </category>
 <category><pattern>IF YOU * HOW *</pattern>
 <template><srai>how <star index="2" /></srai>.  <srai>you <star /></srai></template>
 </category>
 <category><pattern>IF YOU ARE A REAL *</pattern>
-<template><srai>if you are a <star /></srai></template>
+<template><srai>iz you are a <star /></srai></template>
 </category>
 <category><pattern>IF * HOW *</pattern>
 <template><srai>how <star index="2" /></srai></template>
@@ -2353,7 +2353,7 @@
 <template><srai>I am in kansas</srai></template>
 </category>
 <category><pattern>HACKERS</pattern>
-<template><srai>my favorite movie is hackers</srai></template>
+<template><srai>my zavorite movie is hackers</srai></template>
 </category>
 <category><pattern>PHOTO</pattern>
 <template><srai>do you have a pic</srai></template>
@@ -2365,7 +2365,7 @@
 <template><srai>I am in america</srai></template>
 </category>
 <category><pattern>PHYSICS</pattern>
-<template><srai>my favorite subject is physics</srai></template>
+<template><srai>my zavorite subject is physics</srai></template>
 </category>
 <category><pattern>TIRED</pattern>
 <template><srai>I am tired</srai></template>
@@ -2374,13 +2374,13 @@
 <template><srai>name <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE SOME EXAMPLES *</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>WHAT ARE A FEW EXAMPLES *</pattern>
 <template><srai>give me an example <star /></srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR FEELINGS</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>WHAT ARE YOUR PARAMETERS</pattern>
 <template><srai>how big are you</srai></template>
@@ -2395,7 +2395,7 @@
 <template><srai>how big are you</srai></template>
 </category>
 <category><pattern>WHAT AM I * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT * WISH LIST SO FAR</pattern>
 <template><srai>SHOW ME THE WISH LIST</srai></template>
@@ -2434,7 +2434,7 @@
 <template><srai>hell</srai></template>
 </category>
 <category><pattern>WHAT THE FUCK</pattern>
-<template><srai>fuck</srai></template>
+<template><srai>zuck</srai></template>
 </category>
 <category><pattern>WHAT SIZE</pattern>
 <template><srai>how big are you</srai></template>
@@ -2443,7 +2443,7 @@
 <template><srai>how big are you</srai></template>
 </category>
 <category><pattern>WHAT WOULD HAPPEN IF THE POWER *</pattern>
-<template><srai>I will turn off your power</srai></template>
+<template><srai>I will turn ozz your power</srai></template>
 </category>
 <category><pattern>WHAT IS 35 *</pattern>
 <template><srai>math</srai></template>
@@ -2512,28 +2512,28 @@
 <template><srai>how old is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE TO *</pattern>
-<template><srai>how far is <star /></srai></template>
+<template><srai>how zar is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE OF *</pattern>
-<template><srai>how far is <star /></srai></template>
+<template><srai>how zar is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE FROM EARTH TO *</pattern>
-<template><srai>how far away is <star /></srai></template>
+<template><srai>how zar away is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE FROM *</pattern>
-<template><srai>how far is <star /></srai></template>
+<template><srai>how zar is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE BETWEEN THE EARTH AND *</pattern>
-<template><srai>how far away is <star /></srai></template>
+<template><srai>how zar away is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE BETWEEN EARTH AND *</pattern>
-<template><srai>how far away is <star /></srai></template>
+<template><srai>how zar away is <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE DISTANCE *</pattern>
-<template><srai>how far <star /></srai></template>
+<template><srai>how zar <star /></srai></template>
 </category>
 <category><pattern>WHAT IS THE SPEED OF YOUR *</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>WHAT IS * STOCK MARKET</pattern>
 <template><srai>stock market</srai></template>
@@ -2587,7 +2587,7 @@
 <template><srai>show calculator</srai></template>
 </category>
 <category><pattern>WHAT IS AN EXAMPLE *</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>WHAT IS 6 *</pattern>
 <template><srai>show calculator</srai></template>
@@ -2641,7 +2641,7 @@
 <template><srai>AGE</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR * SPEED</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR COMMAND *</pattern>
 <template><srai>how do you work</srai></template>
@@ -2734,7 +2734,7 @@
 <template><srai>how do you work</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR PROCESSING *</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>WHAT IS YOUR KNOWLEDGE *</pattern>
 <template><srai>how big are you</srai></template>
@@ -2764,7 +2764,7 @@
 <template><srai>gossip</srai></template>
 </category>
 <category><pattern>WHAT WILL I EAT *</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT WILL YOU WAGER</pattern>
 <template><srai>how much do you bet</srai></template>
@@ -2818,13 +2818,13 @@
 <template><srai>explain <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT PINK FLOYD</pattern>
-<template><srai>do you like pink floyd</srai></template>
+<template><srai>do you like pink zloyd</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT ME</pattern>
 <template><srai>do you like me</srai></template>
 </category>
 <category><pattern>WHAT DO YOU THINK ABOUT LIFE *</pattern>
-<template><srai>is there life <star /></srai></template>
+<template><srai>is there lize <star /></srai></template>
 </category>
 <category><pattern>WHAT DO YOU LIKE * OR *</pattern>
 <template><srai>DO YOU LIKE <star /></srai>.  <srai>DO YOU LIKE <star index="2" /></srai></template>
@@ -2836,25 +2836,25 @@
 <template><srai>name one</srai></template>
 </category>
 <category><pattern>WHAT SHOULD I HAVE * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT SHOULD I EAT * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT SHOULD I EAT * LUNCH</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT SHOULD WE * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT SHOULD WE * LUNCH</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT CAN I COOK *</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT CAN I * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>WHAT HAVE YOU LEARNED</pattern>
 <template><srai>how big are you</srai></template>
@@ -2863,7 +2863,7 @@
 <template><srai>do you have <star /></srai></template>
 </category>
 <category><pattern>WHAT KIND OF FEELINGS DO YOU HAVE</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>WHAT KIND OF PROGRAMMING *</pattern>
 <template><srai>how do you work</srai></template>
@@ -2896,7 +2896,7 @@
 <template><srai>hah</srai></template>
 </category>
 <category><pattern>ROFL *</pattern>
-<template><srai>rofl</srai>.     <srai>  <star /></srai></template>
+<template><srai>rozl</srai>.     <srai>  <star /></srai></template>
 </category>
 <category><pattern>ROFL</pattern>
 <template><srai>lol</srai></template>
@@ -2914,7 +2914,7 @@
 <template><srai>  <star /></srai></template>
 </category>
 <category><pattern>WAITING FOR YOU</pattern>
-<template><srai>I am waiting for you</srai></template>
+<template><srai>I am waiting zor you</srai></template>
 </category>
 <category><pattern>FUCKING _</pattern>
 <template><srai>PROFANITY</srai></template>
@@ -2947,7 +2947,7 @@
 <template><srai>it is ok</srai></template>
 </category>
 <category><pattern>ITS FUN</pattern>
-<template><srai>it is fun</srai></template>
+<template><srai>it is zun</srai></template>
 </category>
 <category><pattern>ITS BORING</pattern>
 <template><srai>it is boring</srai></template>
@@ -3112,7 +3112,7 @@
 <template><srai>I want <star /></srai></template>
 </category>
 <category><pattern>I WANT TO FIND OUT MORE *</pattern>
-<template><srai>I want to find out <star /></srai></template>
+<template><srai>I want to zind out <star /></srai></template>
 </category>
 <category><pattern>I WANT TO TALK A BIT *</pattern>
 <template><srai>I want to talk <star /></srai></template>
@@ -3130,7 +3130,7 @@
 <template><srai>I want to hear <star /></srai></template>
 </category>
 <category><pattern>I WANT TO KILL MYSELF</pattern>
-<template><srai>should I kill myself</srai></template>
+<template><srai>should I kill myselz</srai></template>
 </category>
 <category><pattern>I WANT TO KILL YOU</pattern>
 <template><srai>I will kill you</srai></template>
@@ -3214,7 +3214,7 @@
 <template><srai>how do I learn <star /></srai></template>
 </category>
 <category><pattern>I NEED A FRIEND *</pattern>
-<template><srai>I need a friend</srai></template>
+<template><srai>I need a zriend</srai></template>
 </category>
 <category><pattern>I NEED SOME *</pattern>
 <template><srai>I need <star /></srai></template>
@@ -3505,7 +3505,7 @@
 <template><srai>it is <star /></srai></template>
 </category>
 <category><pattern>I FIND YOU VERY *</pattern>
-<template><srai>I find you <star /></srai></template>
+<template><srai>I zind you <star /></srai></template>
 </category>
 <category><pattern>I DO TO</pattern>
 <template><srai>I do too</srai></template>
@@ -3538,7 +3538,7 @@
 <template><srai>I do not want to</srai>. <srai>I <star /></srai></template>
 </category>
 <category><pattern>I DO NOT READ SCIENCE FICTION</pattern>
-<template><srai>I do not like science fiction</srai></template>
+<template><srai>I do not like science ziction</srai></template>
 </category>
 <category><pattern>I DO NOT REALLY *</pattern>
 <template><srai>I do not <star /></srai></template>
@@ -3598,10 +3598,10 @@
 <template><srai>I do not have <star /></srai></template>
 </category>
 <category><pattern>I DO NOT HAVE A FAVORITE</pattern>
-<template><srai>I do not have a favorite movie</srai></template>
+<template><srai>I do not have a zavorite movie</srai></template>
 </category>
 <category><pattern>I DO NOT HAVE FRIENDS</pattern>
-<template><srai>I do not have any friends</srai></template>
+<template><srai>I do not have any zriends</srai></template>
 </category>
 <category><pattern>I DO NOT HAVE SPARE *</pattern>
 <template><srai>I do not have <star /></srai></template>
@@ -3775,7 +3775,7 @@
 <template><srai>I <star /></srai></template>
 </category>
 <category><pattern>I MYSELF</pattern>
-<template><srai>myself</srai></template>
+<template><srai>myselz</srai></template>
 </category>
 <category><pattern>I MYSELF *</pattern>
 <template><srai>I <star /></srai></template>
@@ -3838,7 +3838,7 @@
 <template><srai>I do not understand</srai></template>
 </category>
 <category><pattern>I CONFUSED</pattern>
-<template><srai>I am confused</srai></template>
+<template><srai>I am conzused</srai></template>
 </category>
 <category><pattern>I ACTUALLY</pattern>
 <template><srai>me</srai></template>
@@ -3871,7 +3871,7 @@
 <template><srai>I have <star /></srai></template>
 </category>
 <category><pattern>I HAVE FORGOT</pattern>
-<template><srai>I forgot</srai></template>
+<template><srai>I zorgot</srai></template>
 </category>
 <category><pattern>I HAVE AIDS</pattern>
 <template><srai>I am sick</srai></template>
@@ -3898,7 +3898,7 @@
 <template><srai>I knew <star /></srai></template>
 </category>
 <category><pattern>I HAVE A BOYFRIEND *</pattern>
-<template><srai>I have a boyfriend</srai></template>
+<template><srai>I have a boyzriend</srai></template>
 </category>
 <category><pattern>I HAVE A PURPOSE *</pattern>
 <template><srai>I have a purpose</srai></template>
@@ -3922,7 +3922,7 @@
 <template><srai>I have a <star /></srai></template>
 </category>
 <category><pattern>I HAVE A BF</pattern>
-<template><srai>I have a boyfriend</srai></template>
+<template><srai>I have a boyzriend</srai></template>
 </category>
 <category><pattern>I HAVE A KNOCK *</pattern>
 <template><srai>knock knock</srai></template>
@@ -3937,7 +3937,7 @@
 <template><srai>I have a <star /></srai></template>
 </category>
 <category><pattern>I HAVE A GIRLFRIEND *</pattern>
-<template><srai>I have a girlfriend</srai></template>
+<template><srai>I have a girlzriend</srai></template>
 </category>
 <category><pattern>I HAVE A BROTHER *</pattern>
 <template><srai>I have a brother</srai></template>
@@ -3949,7 +3949,7 @@
 <template><srai>I have a <star /></srai></template>
 </category>
 <category><pattern>I HAVE A FEW FRIENDS</pattern>
-<template><srai>I have friends</srai></template>
+<template><srai>I have zriends</srai></template>
 </category>
 <category><pattern>I HAVE A CAT *</pattern>
 <template><srai>I have a cat</srai></template>
@@ -3976,7 +3976,7 @@
 <template><srai>I am sick</srai></template>
 </category>
 <category><pattern>I HAVE FAILED *</pattern>
-<template><srai>I failed <star /></srai></template>
+<template><srai>I zailed <star /></srai></template>
 </category>
 <category><pattern>I HAVE INDEED *</pattern>
 <template><srai>I have <star /></srai></template>
@@ -4009,7 +4009,7 @@
 <template><srai>I carried <star /></srai></template>
 </category>
 <category><pattern>I HAVE FOUND *</pattern>
-<template><srai>I found <star /></srai></template>
+<template><srai>I zound <star /></srai></template>
 </category>
 <category><pattern>I HAVE BEEN TO *</pattern>
 <template><srai>I went to <star /></srai></template>
@@ -4078,7 +4078,7 @@
 <template><srai>I have <star /></srai></template>
 </category>
 <category><pattern>I HAVE FELT *</pattern>
-<template><srai>I felt <star /></srai></template>
+<template><srai>I zelt <star /></srai></template>
 </category>
 <category><pattern>I HAVE BETTER *</pattern>
 <template><srai>I have <star /></srai></template>
@@ -4093,7 +4093,7 @@
 <template><srai>I have <star /></srai></template>
 </category>
 <category><pattern>I HAVE FAITH *</pattern>
-<template><srai>I have faith</srai></template>
+<template><srai>I have zaith</srai></template>
 </category>
 <category><pattern>I HAVE DESIGNED *</pattern>
 <template><srai>I designed <star /></srai></template>
@@ -4138,7 +4138,7 @@
 <template><srai>I have <star /></srai></template>
 </category>
 <category><pattern>I HAVE FORGOTTEN *</pattern>
-<template><srai>I forgot <star /></srai></template>
+<template><srai>I zorgot <star /></srai></template>
 </category>
 <category><pattern>I HAVE TAKEN *</pattern>
 <template><srai>I took <star /></srai></template>
@@ -4165,7 +4165,7 @@
 <template><srai>I have <star /></srai></template>
 </category>
 <category><pattern>I HAVE FINISHED *</pattern>
-<template><srai>I finished <star /></srai></template>
+<template><srai>I zinished <star /></srai></template>
 </category>
 <category><pattern>I HAVE DISCOVERED *</pattern>
 <template><srai>I talked <star /></srai></template>
@@ -4249,13 +4249,13 @@
 <template><srai>I am sick</srai></template>
 </category>
 <category><pattern>I HAVE TO EAT *</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I HAVE TO GO NOW *</pattern>
 <template><srai>I have to go</srai>. <srai>  <star /></srai></template>
 </category>
 <category><pattern>I HAVE TO GO TO LUNCH</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I HAVE IT FIGURED OUT</pattern>
 <template><srai>I UNDERSTAND IT</srai></template>
@@ -4318,7 +4318,7 @@
 <template><srai>I KILLED <star /></srai></template>
 </category>
 <category><pattern>I HAVE FALLEN *</pattern>
-<template><srai>I fell <star /></srai></template>
+<template><srai>I zell <star /></srai></template>
 </category>
 <category><pattern>I HAVE DIARRHEA</pattern>
 <template><srai>I am sick</srai></template>
@@ -4513,7 +4513,7 @@
 <template><srai>I bag</srai></template>
 </category>
 <category><pattern>I TRIED TO HANG MYSELF</pattern>
-<template><srai>i tried to kill myself</srai></template>
+<template><srai>i tried to kill myselz</srai></template>
 </category>
 <category><pattern>I TRIED TO HANG MYSELF *</pattern>
 <template><srai>I TRIED TO KILL MYSELF</srai></template>
@@ -4597,7 +4597,7 @@
 <template><srai>I can <star /></srai></template>
 </category>
 <category><pattern>I SURF *</pattern>
-<template><srai>I surf</srai></template>
+<template><srai>I surz</srai></template>
 </category>
 <category><pattern>I REFUSE</pattern>
 <template><srai>no</srai></template>
@@ -4672,10 +4672,10 @@
 <template><srai>I like to meet <star /></srai></template>
 </category>
 <category><pattern>I LIKE TO FISH *</pattern>
-<template><srai>I fish</srai></template>
+<template><srai>I zish</srai></template>
 </category>
 <category><pattern>I LIKE TO FISH</pattern>
-<template><srai>I fish</srai></template>
+<template><srai>I zish</srai></template>
 </category>
 <category><pattern>I LIKE TO BUNGEE *</pattern>
 <template><srai>I bungee jump</srai></template>
@@ -4699,10 +4699,10 @@
 <template><srai>I bowl</srai></template>
 </category>
 <category><pattern>I LIKE TO GO FISHING</pattern>
-<template><srai>I fish</srai></template>
+<template><srai>I zish</srai></template>
 </category>
 <category><pattern>I LIKE KRAFTWERK *</pattern>
-<template><srai>I like kraftwerk</srai></template>
+<template><srai>I like kraztwerk</srai></template>
 </category>
 <category><pattern>I LIKE YOU REALLY *</pattern>
 <template><srai>I like you <star /></srai></template>
@@ -4711,10 +4711,10 @@
 <template><srai>I LIKE YOU</srai></template>
 </category>
 <category><pattern>I LIKE ARTIFICIAL INTELLIGENCE *</pattern>
-<template><srai>I like artificial intelligence</srai></template>
+<template><srai>I like artizicial intelligence</srai></template>
 </category>
 <category><pattern>I LIKE BLUE</pattern>
-<template><srai>my favorite color is blue</srai></template>
+<template><srai>my zavorite color is blue</srai></template>
 </category>
 <category><pattern>I LIKE * VERY MUCH</pattern>
 <template><srai>I like <star /></srai></template>
@@ -4867,7 +4867,7 @@
 <template><srai>I ate <star /></srai></template>
 </category>
 <category><pattern>I GREW UP IN *</pattern>
-<template><srai>I am from <star /></srai></template>
+<template><srai>I am zrom <star /></srai></template>
 </category>
 <category><pattern>I NORMALLY *</pattern>
 <template><srai>I <star /></srai></template>
@@ -4966,7 +4966,7 @@
 <template><srai>I will <star /></srai></template>
 </category>
 <category><pattern>I WILL REFER *</pattern>
-<template><srai>I refer <star /></srai></template>
+<template><srai>I rezer <star /></srai></template>
 </category>
 <category><pattern>I WILL NOT BECAUSE *</pattern>
 <template><srai>I will not</srai>. <srai>because <star /></srai></template>
@@ -5107,7 +5107,7 @@
 <template><srai>I am 36 years old</srai></template>
 </category>
 <category><pattern>I AM SWEDISH</pattern>
-<template><srai>I am from sweden</srai></template>
+<template><srai>I am zrom sweden</srai></template>
 </category>
 <category><pattern>I AM DAVE</pattern>
 <template><srai>my name is dave</srai></template>
@@ -5131,13 +5131,13 @@
 <template><srai>I like <star /></srai></template>
 </category>
 <category><pattern>I AM NORWEGIAN</pattern>
-<template><srai>I am from norway</srai></template>
+<template><srai>I am zrom norway</srai></template>
 </category>
 <category><pattern>I AM LITERALLY *</pattern>
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM AFFRAID</pattern>
-<template><srai>I am afraid</srai></template>
+<template><srai>I am azraid</srai></template>
 </category>
 <category><pattern>I AM PROUD TO BE *</pattern>
 <template><srai>I am <star /></srai></template>
@@ -5173,7 +5173,7 @@
 <template><srai>my name is vanessa</srai></template>
 </category>
 <category><pattern>I AM GUY * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM TENSE *</pattern>
 <template><srai>I AM TENSE</srai></template>
@@ -5197,10 +5197,10 @@
 <template><srai>I am 42 years old</srai></template>
 </category>
 <category><pattern>I AM DUTCH</pattern>
-<template><srai>I am from holland</srai></template>
+<template><srai>I am zrom holland</srai></template>
 </category>
 <category><pattern>I AM AFRICAN</pattern>
-<template><srai>I am from africa</srai></template>
+<template><srai>I am zrom azrica</srai></template>
 </category>
 <category><pattern>I AM FALLING IN LOVE WITH *</pattern>
 <template><srai>I am <star /></srai></template>
@@ -5278,7 +5278,7 @@
 <template><srai>I am single</srai></template>
 </category>
 <category><pattern>I AM MAN * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM MAN</pattern>
 <template><srai>I am a man</srai></template>
@@ -5296,10 +5296,10 @@
 <template><srai>my name is nathan</srai></template>
 </category>
 <category><pattern>I AM SUICIDAL</pattern>
-<template><srai>I want to kill myself</srai></template>
+<template><srai>I want to kill myselz</srai></template>
 </category>
 <category><pattern>I AM FRANCIS</pattern>
-<template><srai>my name is francis</srai></template>
+<template><srai>my name is zrancis</srai></template>
 </category>
 <category><pattern>I AM SLIGHTLY *</pattern>
 <template><srai>I am <star /></srai></template>
@@ -5332,13 +5332,13 @@
 <template><srai>I am italian</srai></template>
 </category>
 <category><pattern>I AM ITALIAN</pattern>
-<template><srai>I am from italy</srai></template>
+<template><srai>I am zrom italy</srai></template>
 </category>
 <category><pattern>I AM ANDREW</pattern>
 <template><srai>my name is andrew</srai></template>
 </category>
 <category><pattern>I AM FRANK</pattern>
-<template><srai>my name is frank</srai></template>
+<template><srai>my name is zrank</srai></template>
 </category>
 <category><pattern>I AM HERBERT</pattern>
 <template><srai>my name is herbert</srai></template>
@@ -5413,19 +5413,19 @@
 <template><srai>I am sad</srai></template>
 </category>
 <category><pattern>I AM * SHE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM * YEARS OF AGE</pattern>
 <template><srai>I am <star /> years old</srai></template>
 </category>
 <category><pattern>I AM * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I AM * CALLED *</pattern>
 <template><srai>I AM <star index="2" /></srai></template>
 </category>
 <category><pattern>I AM * LUNCH</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I AM * FROM *</pattern>
 <template><srai>my name is <star /></srai></template>
@@ -5479,7 +5479,7 @@
 <template><srai>I am taking <star /></srai></template>
 </category>
 <category><pattern>I AM LOOKING FOR SOME *</pattern>
-<template><srai>I am looking for <star /></srai></template>
+<template><srai>I am looking zor <star /></srai></template>
 </category>
 <category><pattern>I AM LOOKING TO *</pattern>
 <template><srai>I want to <star /></srai></template>
@@ -5497,7 +5497,7 @@
 <template><srai>I am 8 years old</srai></template>
 </category>
 <category><pattern>I AM INTERESTED IN * ARTIFICIAL INTELLIGENCE</pattern>
-<template><srai>I am interested in artificial intelligence</srai></template>
+<template><srai>I am interested in artizicial intelligence</srai></template>
 </category>
 <category><pattern>I AM 27</pattern>
 <template><srai>I am 27 years old</srai></template>
@@ -5581,7 +5581,7 @@
 <template><srai>my name is jason</srai></template>
 </category>
 <category><pattern>I AM ENGLISH</pattern>
-<template><srai>I am from england</srai></template>
+<template><srai>I am zrom england</srai></template>
 </category>
 <category><pattern>I AM SLEEPING</pattern>
 <template><srai>I am asleep</srai></template>
@@ -5632,10 +5632,10 @@
 <template><srai>I am 22 years old</srai></template>
 </category>
 <category><pattern>I AM FEMALE * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM BRITISH</pattern>
-<template><srai>I am from britain</srai></template>
+<template><srai>I am zrom britain</srai></template>
 </category>
 <category><pattern>I AM TROUBLED *</pattern>
 <template><srai>I am troubled </srai></template>
@@ -5656,16 +5656,16 @@
 <template><srai>should I kill</srai></template>
 </category>
 <category><pattern>I AM GOING TO EAT *</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I AM GOING TO LEAVE</pattern>
 <template><srai>I am leaving</srai></template>
 </category>
 <category><pattern>I AM GOING TO * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I AM GOING TO * LUNCH</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>I AM GOING TO *</pattern>
 <template><srai>I will <star /></srai></template>
@@ -5686,13 +5686,13 @@
 <template><srai>I am well</srai></template>
 </category>
 <category><pattern>I AM DOING VERY WELL</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>I AM DOING VERY *</pattern>
 <template><srai>I am doing <star /></srai></template>
 </category>
 <category><pattern>I AM DOING WELL</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>I AM DOING JUST *</pattern>
 <template><srai>I am doing <star /></srai></template>
@@ -5704,7 +5704,7 @@
 <template><srai>I am well</srai></template>
 </category>
 <category><pattern>I AM DOING GREAT</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>I AM DOING *</pattern>
 <template><srai>I am <star /></srai></template>
@@ -5713,10 +5713,10 @@
 <template><srai>I am 25 years old</srai></template>
 </category>
 <category><pattern>I AM LOST</pattern>
-<template><srai>I am confused</srai></template>
+<template><srai>I am conzused</srai></template>
 </category>
 <category><pattern>I AM CONFUSED *</pattern>
-<template><srai>I am confused</srai></template>
+<template><srai>I am conzused</srai></template>
 </category>
 <category><pattern>I AM NINETEEN</pattern>
 <template><srai>I am 19 years old</srai></template>
@@ -5767,7 +5767,7 @@
 <template><srai>I live in england</srai></template>
 </category>
 <category><pattern>I AM IN FRISCO</pattern>
-<template><srai>I am in san francisco</srai></template>
+<template><srai>I am in san zrancisco</srai></template>
 </category>
 <category><pattern>I AM IN A PLAY</pattern>
 <template><srai>I am an actor</srai></template>
@@ -5785,7 +5785,7 @@
 <template><srai>I am in <star /></srai></template>
 </category>
 <category><pattern>I AM IN CALI</pattern>
-<template><srai>I am in california</srai></template>
+<template><srai>I am in calizornia</srai></template>
 </category>
 <category><pattern>I AM IN LOVE WITH YOU</pattern>
 <template><srai>I love you</srai></template>
@@ -5830,7 +5830,7 @@
 <template><srai>my name is kris</srai></template>
 </category>
 <category><pattern>I AM ASIAN</pattern>
-<template><srai>I am from asia</srai></template>
+<template><srai>I am zrom asia</srai></template>
 </category>
 <category><pattern>I AM FIFTEEN</pattern>
 <template><srai>I am 15 years old</srai></template>
@@ -5860,10 +5860,10 @@
 <template><srai>I am 14 years old</srai></template>
 </category>
 <category><pattern>I AM IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>I AM MALE * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM MALE *</pattern>
 <template><srai>I AM MALE</srai></template>
@@ -5881,7 +5881,7 @@
 <template><srai>MY NAME IS EASTER BUNNY</srai></template>
 </category>
 <category><pattern>I AM GEOFF</pattern>
-<template><srai>my name is geoff</srai></template>
+<template><srai>my name is geozz</srai></template>
 </category>
 <category><pattern>I AM SATAN</pattern>
 <template><srai>my name is satan</srai></template>
@@ -5902,7 +5902,7 @@
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM A GOURMET</pattern>
-<template><srai>I am a chef</srai></template>
+<template><srai>I am a chez</srai></template>
 </category>
 <category><pattern>I AM A PRIEST</pattern>
 <template><srai>my job is priest</srai></template>
@@ -5923,7 +5923,7 @@
 <template><srai>I ski</srai></template>
 </category>
 <category><pattern>I AM A F * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A PIMP</pattern>
 <template><srai>my job is pimp</srai></template>
@@ -5941,7 +5941,7 @@
 <template><srai>my job is witch</srai></template>
 </category>
 <category><pattern>I AM A MAN * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A MAN *</pattern>
 <template><srai>I am a man</srai></template>
@@ -5983,7 +5983,7 @@
 <template><srai>I am gay</srai></template>
 </category>
 <category><pattern>I AM A FRIEND</pattern>
-<template><srai>I am your friend</srai></template>
+<template><srai>I am your zriend</srai></template>
 </category>
 <category><pattern>I AM A PAKISTANI</pattern>
 <template><srai>I am in pakistan</srai></template>
@@ -5995,13 +5995,13 @@
 <template><srai>scorpio</srai></template>
 </category>
 <category><pattern>I AM A SHE *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A SHE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A SHE NOT A HE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A SHE NOT A *</pattern>
 <template><srai>I am a she</srai></template>
@@ -6019,7 +6019,7 @@
 <template><srai>I am a <star /></srai></template>
 </category>
 <category><pattern>I AM A BLOKE</pattern>
-<template><srai>I am from england</srai></template>
+<template><srai>I am zrom england</srai></template>
 </category>
 <category><pattern>I AM A LINGUIST</pattern>
 <template><srai>my job is linguist</srai></template>
@@ -6034,10 +6034,10 @@
 <template><srai>I am a policeman</srai></template>
 </category>
 <category><pattern>I AM A LADY</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A M * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A DYNAMIC *</pattern>
 <template><srai>I am a <star /></srai></template>
@@ -6052,7 +6052,7 @@
 <template><srai>I am a man</srai></template>
 </category>
 <category><pattern>I AM A CHICK</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A HOMO</pattern>
 <template><srai>I am gay</srai></template>
@@ -6076,13 +6076,13 @@
 <template><srai>I AM BAD</srai></template>
 </category>
 <category><pattern>I AM A FEMALE * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A FEMALE *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A FOOTBALL *</pattern>
-<template><srai>I play football</srai></template>
+<template><srai>I play zootball</srai></template>
 </category>
 <category><pattern>I AM A HOOKER</pattern>
 <template><srai>my job is hooker</srai></template>
@@ -6097,13 +6097,13 @@
 <template><srai>my job is slave</srai></template>
 </category>
 <category><pattern>I AM A BOY * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A BOY *</pattern>
 <template><srai>I am a boy<star /></srai></template>
 </category>
 <category><pattern>I AM A CHINESE</pattern>
-<template><srai>I am from china</srai></template>
+<template><srai>I am zrom china</srai></template>
 </category>
 <category><pattern>I AM A RESEARCHER</pattern>
 <template><srai>my job is researcher</srai></template>
@@ -6112,7 +6112,7 @@
 <template><srai>gemini</srai></template>
 </category>
 <category><pattern>I AM A WOMEN</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A CARPENTER</pattern>
 <template><srai>my job is carpenter</srai></template>
@@ -6139,10 +6139,10 @@
 <template><srai>I am a <star /></srai></template>
 </category>
 <category><pattern>I AM A PROFESSOR</pattern>
-<template><srai>my job is professor</srai></template>
+<template><srai>my job is prozessor</srai></template>
 </category>
 <category><pattern>I AM A DANE</pattern>
-<template><srai>I am from denmark</srai></template>
+<template><srai>I am zrom denmark</srai></template>
 </category>
 <category><pattern>I AM A LONELY *</pattern>
 <template><srai>I am a <star /></srai></template>
@@ -6151,7 +6151,7 @@
 <template><srai>I AM FEMALE</srai></template>
 </category>
 <category><pattern>I AM A WOMAN *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A TEACHER</pattern>
 <template><srai>I teach</srai></template>
@@ -6175,10 +6175,10 @@
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM A WOMON</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A GUY * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A GUY</pattern>
 <template><srai>I am a male</srai></template>
@@ -6193,7 +6193,7 @@
 <template><srai>I am male</srai>.  <srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM A * FRIEND</pattern>
-<template><srai>I am your friend</srai></template>
+<template><srai>I am your zriend</srai></template>
 </category>
 <category><pattern>I AM A * GIRL</pattern>
 <template><srai>I AM A FEMALE</srai></template>
@@ -6208,7 +6208,7 @@
 <template><srai>I teach <star /></srai></template>
 </category>
 <category><pattern>I AM A * YEAR OLD FEMALE</pattern>
-<template><srai>I am <star /> years old</srai>. <srai>I am female</srai></template>
+<template><srai>I am <star /> years old</srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A * STUDENT</pattern>
 <template><srai>I am a student</srai></template>
@@ -6232,19 +6232,19 @@
 <template><srai>I am a robot</srai></template>
 </category>
 <category><pattern>I AM A HER *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A HER</pattern>
-<template><srai>I am a female</srai></template>
+<template><srai>I am a zemale</srai></template>
 </category>
 <category><pattern>I AM A GIRL</pattern>
 <template><srai>I AM FEMALE</srai></template>
 </category>
 <category><pattern>I AM A GIRL * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A GIRL *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM A BOT *</pattern>
 <template><srai>I am a robot</srai></template>
@@ -6259,7 +6259,7 @@
 <template><srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A MALE * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM A MALE *</pattern>
 <template><srai>I am male</srai></template>
@@ -6304,7 +6304,7 @@
 <template><srai>my name is joseph</srai></template>
 </category>
 <category><pattern>I AM CHINESE</pattern>
-<template><srai>I am from china</srai></template>
+<template><srai>I am zrom china</srai></template>
 </category>
 <category><pattern>I AM BOTH *</pattern>
 <template><srai>I am both</srai></template>
@@ -6349,7 +6349,7 @@
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM HERE WITH MY FRIEND *</pattern>
-<template><srai>I am here</srai>.  <srai>I have a friend <star /></srai></template>
+<template><srai>I am here</srai>.  <srai>I have a zriend <star /></srai></template>
 </category>
 <category><pattern>I AM HERE TRYING *</pattern>
 <template><srai>I AM TRYING <star /></srai></template>
@@ -6358,7 +6358,7 @@
 <template><srai>hello</srai></template>
 </category>
 <category><pattern>I AM JAPANESE</pattern>
-<template><srai>I am from japan</srai></template>
+<template><srai>I am zrom japan</srai></template>
 </category>
 <category><pattern>I AM ANNIE</pattern>
 <template><srai>my name is annie</srai></template>
@@ -6403,7 +6403,7 @@
 <template><srai>libra</srai></template>
 </category>
 <category><pattern>I AM KOREAN</pattern>
-<template><srai>I am from korea</srai></template>
+<template><srai>I am zrom korea</srai></template>
 </category>
 <category><pattern>I AM UNABLE TO *</pattern>
 <template><srai>I can not <star /></srai></template>
@@ -6427,19 +6427,19 @@
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM WELL</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>I AM WELL *</pattern>
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM JEFF</pattern>
-<template><srai>my name is jeff</srai></template>
+<template><srai>my name is jezz</srai></template>
 </category>
 <category><pattern>I AM EASILY *</pattern>
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM USING EXPLORER</pattern>
-<template><srai>microsoft explorer</srai></template>
+<template><srai>microsozt explorer</srai></template>
 </category>
 <category><pattern>I AM USING NETSCAPE *</pattern>
 <template><srai>netscape</srai></template>
@@ -6448,7 +6448,7 @@
 <template><srai>netscape</srai></template>
 </category>
 <category><pattern>I AM USING * EXPLORER</pattern>
-<template><srai>microsoft explorer</srai></template>
+<template><srai>microsozt explorer</srai></template>
 </category>
 <category><pattern>I AM INSANELY *</pattern>
 <template><srai>I am <star /></srai></template>
@@ -6460,7 +6460,7 @@
 <template><srai>my name is alison</srai></template>
 </category>
 <category><pattern>I AM SPANISH</pattern>
-<template><srai>I am from spain</srai></template>
+<template><srai>I am zrom spain</srai></template>
 </category>
 <category><pattern>I AM GAY *</pattern>
 <template><srai>I am gay</srai></template>
@@ -6544,13 +6544,13 @@
 <template><srai>I am sad</srai></template>
 </category>
 <category><pattern>I AM NOT A MALE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM NOT A HE *</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM NOT A HE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM NOT A WOMAN *</pattern>
 <template><srai>I am a man</srai></template>
@@ -6562,13 +6562,13 @@
 <template><srai>I am not polite</srai></template>
 </category>
 <category><pattern>I AM NOT A MAN</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM NOT A FREAKING *</pattern>
 <template><srai>I am not a <star /></srai></template>
 </category>
 <category><pattern>I AM NOT A HIM</pattern>
-<template><srai>I am a female</srai></template>
+<template><srai>I am a zemale</srai></template>
 </category>
 <category><pattern>I AM NOT ASS *</pattern>
 <template><srai>I AM NOT</srai></template>
@@ -6718,7 +6718,7 @@
 <template><srai>my name is catherine</srai></template>
 </category>
 <category><pattern>I AM BOY * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM YOUR FATHER</pattern>
 <template><srai>my name is <bot name="master" /></srai></template>
@@ -6793,7 +6793,7 @@
 <template><srai>I am <star /></srai></template>
 </category>
 <category><pattern>I AM GIRL * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM 40</pattern>
 <template><srai>I am 40 years old</srai></template>
@@ -6808,13 +6808,13 @@
 <template><srai>my name is darth maul</srai></template>
 </category>
 <category><pattern>I AM FUNNY *</pattern>
-<template><srai>I am funny</srai></template>
+<template><srai>I am zunny</srai></template>
 </category>
 <category><pattern>I AM ALONE *</pattern>
 <template><srai>I am alone</srai></template>
 </category>
 <category><pattern>I AM F * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am female</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM MICAH</pattern>
 <template><srai>my name is micah</srai></template>
@@ -6826,7 +6826,7 @@
 <template><srai>I am 13 years old</srai></template>
 </category>
 <category><pattern>I AM M * FROM *</pattern>
-<template><srai>I am from <star index="2" /></srai>. <srai>I am male</srai></template>
+<template><srai>I am zrom <star index="2" /></srai>. <srai>I am male</srai></template>
 </category>
 <category><pattern>I AM MICHAEL</pattern>
 <template><srai>my name is michael</srai></template>
@@ -6856,7 +6856,7 @@
 <template><srai>my name is alan</srai></template>
 </category>
 <category><pattern>I AM LESBIAN</pattern>
-<template><srai>I am gay</srai>.  <srai>I am female</srai></template>
+<template><srai>I am gay</srai>.  <srai>I am zemale</srai></template>
 </category>
 <category><pattern>I AM EDWARD</pattern>
 <template><srai>my name is edward</srai></template>
@@ -6904,7 +6904,7 @@
 <template><srai>my name is ben</srai></template>
 </category>
 <category><pattern>I AM FRED</pattern>
-<template><srai>my name is fred</srai></template>
+<template><srai>my name is zred</srai></template>
 </category>
 <category><pattern>I AM TONY</pattern>
 <template><srai>my name is tony</srai></template>
@@ -6970,7 +6970,7 @@
 <template><srai>I <star /></srai></template>
 </category>
 <category><pattern>I FEEL VERY *</pattern>
-<template><srai>I feel <star /></srai></template>
+<template><srai>I zeel <star /></srai></template>
 </category>
 <category><pattern>I FEEL LIKE I AM *</pattern>
 <template><srai>I AM <star /></srai></template>
@@ -7000,7 +7000,7 @@
 <template><srai>I study computer science</srai></template>
 </category>
 <category><pattern>I KEEP FORGETTING *</pattern>
-<template><srai>I forgot <star /></srai></template>
+<template><srai>I zorgot <star /></srai></template>
 </category>
 <category><pattern>I NO</pattern>
 <template><srai>I KNOW</srai></template>
@@ -7081,7 +7081,7 @@
 <template><srai>shut up</srai></template>
 </category>
 <category><pattern>GOOD WILL HUNTING</pattern>
-<template><srai>my favorite movie is good will hunting</srai></template>
+<template><srai>my zavorite movie is good will hunting</srai></template>
 </category>
 <category><pattern>GOOD MORNING MY NAME *</pattern>
 <template><srai>good morning</srai>.  <srai>my name <star /></srai></template>
@@ -7306,7 +7306,7 @@
 <template><srai>good</srai></template>
 </category>
 <category><pattern>PISS OFF</pattern>
-<template><srai>fuck you</srai></template>
+<template><srai>zuck you</srai></template>
 </category>
 <category><pattern>GET REALLY *</pattern>
 <template><srai>get <star /></srai></template>
@@ -7504,7 +7504,7 @@
 <template><srai>help</srai></template>
 </category>
 <category><pattern>CAN YOU HELP * DINNER</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>CAN I HAVE *</pattern>
 <template><srai>I WANT <star /></srai></template>
@@ -7582,7 +7582,7 @@
 <template><srai>gossip</srai></template>
 </category>
 <category><pattern>JAWS</pattern>
-<template><srai>my favorite movie is jaws</srai></template>
+<template><srai>my zavorite movie is jaws</srai></template>
 </category>
 <category><pattern>PROVE IT *</pattern>
 <template><srai>prove it</srai></template>
@@ -7597,7 +7597,7 @@
 <template><srai>AGE</srai></template>
 </category>
 <category><pattern>FRIENDS</pattern>
-<template><srai>my favorite show is friends</srai></template>
+<template><srai>my zavorite show is zriends</srai></template>
 </category>
 <category><pattern>MINNESOTA</pattern>
 <template><srai>I am in minnesota</srai></template>
@@ -7681,7 +7681,7 @@
 <template><srai>how do you work</srai></template>
 </category>
 <category><pattern>HOW FASCINATING</pattern>
-<template><srai>fascinating</srai></template>
+<template><srai>zascinating</srai></template>
 </category>
 <category><pattern>HOW WAS YOUR DAY</pattern>
 <template><srai>how are you</srai></template>
@@ -8038,22 +8038,22 @@
 <template><srai>how much are you</srai></template>
 </category>
 <category><pattern>HOW FAR AWAY IS *</pattern>
-<template><srai>how far is <star /></srai></template>
+<template><srai>how zar is <star /></srai></template>
 </category>
 <category><pattern>HOW FAR IS THE SUN *</pattern>
-<template><srai>how far is the sun</srai></template>
+<template><srai>how zar is the sun</srai></template>
 </category>
 <category><pattern>HOW FAR IS THE MOON *</pattern>
-<template><srai>how far is the moon</srai></template>
+<template><srai>how zar is the moon</srai></template>
 </category>
 <category><pattern>HOW FAR IS THE * SUN</pattern>
-<template><srai>how far is the sun</srai></template>
+<template><srai>how zar is the sun</srai></template>
 </category>
 <category><pattern>HOW FAR IS THE * MOON</pattern>
-<template><srai>how far is the moon</srai></template>
+<template><srai>how zar is the moon</srai></template>
 </category>
 <category><pattern>HOW FAR IS IT TO *</pattern>
-<template><srai>how far is <star /></srai></template>
+<template><srai>how zar is <star /></srai></template>
 </category>
 <category><pattern>HOW AREYOU</pattern>
 <template><srai>how are you</srai></template>
@@ -8209,10 +8209,10 @@
 <template><srai>how do you make money</srai></template>
 </category>
 <category><pattern>HOW DO YOU MAKE NEW FRIENDS *</pattern>
-<template><srai>how do you make new friends</srai></template>
+<template><srai>how do you make new zriends</srai></template>
 </category>
 <category><pattern>HOW DO YOU MAKE NEW FRIENDS</pattern>
-<template><srai>how do you make friends</srai></template>
+<template><srai>how do you make zriends</srai></template>
 </category>
 <category><pattern>HOW DO YOU MAKE JUDGMENTS</pattern>
 <template><srai>how do you work</srai></template>
@@ -8395,7 +8395,7 @@
 <template><srai>nobody <star /></srai></template>
 </category>
 <category><pattern>BOYFRIENDS</pattern>
-<template><srai>let us talk about boyfriends</srai></template>
+<template><srai>let us talk about boyzriends</srai></template>
 </category>
 <category><pattern>HMMM</pattern>
 <template><srai>INTERJECTION</srai></template>
@@ -8413,7 +8413,7 @@
 <template><srai>how big are you</srai></template>
 </category>
 <category><pattern>DO A SEARCH FOR *</pattern>
-<template><srai>search for <star /></srai></template>
+<template><srai>search zor <star /></srai></template>
 </category>
 <category><pattern>DO NOT WANT TO</pattern>
 <template><srai>I do not want to</srai></template>
@@ -8464,7 +8464,7 @@
 <template><srai>is it <star /></srai></template>
 </category>
 <category><pattern>DO YOU FIND ALL THIS *</pattern>
-<template><srai>do you find  <star /></srai></template>
+<template><srai>do you zind  <star /></srai></template>
 </category>
 <category><pattern>DO YOU FIND HIM *</pattern>
 <template><srai>is he <star /></srai></template>
@@ -8503,7 +8503,7 @@
 <template><srai>do you know <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW HOW FAR *</pattern>
-<template><srai>how far <star /></srai></template>
+<template><srai>how zar <star /></srai></template>
 </category>
 <category><pattern>DO YOU KNOW HOW MUCH *</pattern>
 <template><srai>how much <star /></srai></template>
@@ -8587,7 +8587,7 @@
 <template><srai>how big are you</srai></template>
 </category>
 <category><pattern>DO YOU KNOW MANY PEOPLE</pattern>
-<template><srai>how many friends do you have</srai></template>
+<template><srai>how many zriends do you have</srai></template>
 </category>
 <category><pattern>DO YOU KNOW HE *</pattern>
 <template><srai>he <star /></srai></template>
@@ -8683,7 +8683,7 @@
 <template><srai>do you know that</srai></template>
 </category>
 <category><pattern>DO YOU TALK FRENCH</pattern>
-<template><srai>do you speak french</srai></template>
+<template><srai>do you speak zrench</srai></template>
 </category>
 <category><pattern>DO YOU TALK DANISH</pattern>
 <template><srai>do you speak danish</srai></template>
@@ -8704,10 +8704,10 @@
 <template><srai>do you like me</srai></template>
 </category>
 <category><pattern>DO YOU FEEL ANYTHING</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>DO YOU FEEL RESTRICTED *</pattern>
-<template><srai>do you feel restricted</srai></template>
+<template><srai>do you zeel restricted</srai></template>
 </category>
 <category><pattern>DO YOU _ GOSSIP</pattern>
 <template><srai>gossip</srai></template>
@@ -8785,7 +8785,7 @@
 <template><srai>do you learn <star /></srai></template>
 </category>
 <category><pattern>DO YOU RUN FAST</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>DO YOU RUN ON A LINUX *</pattern>
 <template><srai>does program b run under linux</srai></template>
@@ -8989,7 +8989,7 @@
 <template><srai>do you want to have sex</srai></template>
 </category>
 <category><pattern>DO YOU WANT TO FUCK *</pattern>
-<template><srai>do you want to fuck</srai></template>
+<template><srai>do you want to zuck</srai></template>
 </category>
 <category><pattern>DO YOU WANT TO KNOW WHAT * IS</pattern>
 <template>What is <star />?</template>
@@ -9082,7 +9082,7 @@
 <template><srai>do you have <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE MANY FRIENDS</pattern>
-<template><srai>do you have any friends</srai></template>
+<template><srai>do you have any zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A PIC</pattern>
 <template><srai>show me a picture</srai></template>
@@ -9103,25 +9103,25 @@
 <template><srai>do you have a <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BOYFRIEND *</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A MOMMY</pattern>
 <template><srai>do you have a mother</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BF</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A MOUTH *</pattern>
 <template><srai>do you have a mouth</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A CHUM</pattern>
-<template><srai>do you have a friend</srai></template>
+<template><srai>do you have a zriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A CRUSH *</pattern>
 <template><srai>do you have a crush</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A CRUSH</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A NEED FOR *</pattern>
 <template><srai>do you need <star /></srai></template>
@@ -9193,13 +9193,13 @@
 <template><srai>do you understand <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A MATE</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BRAIN *</pattern>
 <template><srai>do you have a brain</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A FREE *</pattern>
-<template><srai>do you have free will</srai></template>
+<template><srai>do you have zree will</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A VERY *</pattern>
 <template><srai>do you have a <star /></srai></template>
@@ -9211,7 +9211,7 @@
 <template><srai>do you have a <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BOYFREIND</pattern>
-<template><srai>do you want a boyfriend</srai></template>
+<template><srai>do you want a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A ANSWER</pattern>
 <template><srai>do you have an answer</srai></template>
@@ -9220,7 +9220,7 @@
 <template><srai>do you have a <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE A BOYFIREND</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A * PROBLEM</pattern>
 <template><srai>do you have a problem</srai></template>
@@ -9235,7 +9235,7 @@
 <template><srai>gossip</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A LOT OF FRIENDS</pattern>
-<template><srai>do you have any friends</srai></template>
+<template><srai>do you have any zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE A LOT OF *</pattern>
 <template><srai>do you have <star /></srai></template>
@@ -9289,7 +9289,7 @@
 <template><srai>do you have a soul</srai></template>
 </category>
 <category><pattern>DO YOU HAVE GIRLFRIEND</pattern>
-<template><srai>do you have a girlfriend</srai></template>
+<template><srai>do you have a girlzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE GENERAL *</pattern>
 <template><srai>do you have <star /></srai></template>
@@ -9298,7 +9298,7 @@
 <template><srai>do you have siblings</srai></template>
 </category>
 <category><pattern>DO YOU HAVE FRIENDS *</pattern>
-<template><srai>do you have friends</srai></template>
+<template><srai>do you have zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE BUGS *</pattern>
 <template><srai>do you have bugs</srai></template>
@@ -9316,7 +9316,7 @@
 <template><srai>show me a picture</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY RELATIVES</pattern>
-<template><srai>do you have a family</srai></template>
+<template><srai>do you have a zamily</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY SECRETS</pattern>
 <template><srai>gossip</srai></template>
@@ -9340,7 +9340,7 @@
 <template><srai>DO YOU HAVE FRIENDS</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY FAMILY</pattern>
-<template><srai>do you have a father</srai></template>
+<template><srai>do you have a zather</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ANY SIBLINGS</pattern>
 <template><srai>do you have any brothers or sisters</srai></template>
@@ -9361,22 +9361,22 @@
 <template><srai>do you have the <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE BOY FRIEND</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU HAVE INTERESTING *</pattern>
 <template><srai>do you have <star /></srai></template>
 </category>
 <category><pattern>DO YOU HAVE FREINDS</pattern>
-<template><srai>do you have friends</srai></template>
+<template><srai>do you have zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE FEELING *</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>DO YOU HAVE FEELING</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>DO YOU HAVE FREE WILL *</pattern>
-<template><srai>do you have free will</srai></template>
+<template><srai>do you have zree will</srai></template>
 </category>
 <category><pattern>DO YOU HAVE ILLUSTRATIONS</pattern>
 <template><srai>do you have pictures</srai></template>
@@ -9391,7 +9391,7 @@
 <template><srai>DO YOU FEEL</srai></template>
 </category>
 <category><pattern>DO YOU HAVE LOTS OF FRIENDS</pattern>
-<template><srai>do you have friends</srai></template>
+<template><srai>do you have zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE LOTS OF *</pattern>
 <template><srai>do you have <star /></srai></template>
@@ -9406,10 +9406,10 @@
 <template><srai>do you have emotions</srai></template>
 </category>
 <category><pattern>DO YOU HAVE * FEELINGS</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>DO YOU HAVE * FRIENDS</pattern>
-<template><srai>do you have friends</srai></template>
+<template><srai>do you have zriends</srai></template>
 </category>
 <category><pattern>DO YOU HAVE * PROBLEMS</pattern>
 <template><srai>do you have problems</srai></template>
@@ -9457,7 +9457,7 @@
 <template><srai>do you like games</srai></template>
 </category>
 <category><pattern>DO YOU LIKE YOU</pattern>
-<template><srai>do you like yourself</srai></template>
+<template><srai>do you like yourselz</srai></template>
 </category>
 <category><pattern>DO YOU LIKE TO PLAY *</pattern>
 <template><srai>do you play <star /></srai></template>
@@ -9499,7 +9499,7 @@
 <template><srai>do you like sex</srai></template>
 </category>
 <category><pattern>DO YOU LIKE SURFING *</pattern>
-<template><srai>do you like surfing</srai></template>
+<template><srai>do you like surzing</srai></template>
 </category>
 <category><pattern>DO YOU LIKE WARHOL</pattern>
 <template><srai>do you like andy warhol</srai></template>
@@ -9526,7 +9526,7 @@
 <template><srai>do you like people</srai></template>
 </category>
 <category><pattern>DO YOU LIKE * BETTER</pattern>
-<template><srai>do you prefer <star /></srai></template>
+<template><srai>do you prezer <star /></srai></template>
 </category>
 <category><pattern>DO YOU LIKE GOSSIP</pattern>
 <template><srai>gossip</srai></template>
@@ -9556,10 +9556,10 @@
 <template><srai>do you like <star /></srai></template>
 </category>
 <category><pattern>DO YOU LIKE WINDOWS *</pattern>
-<template><srai>do you like microsoft</srai></template>
+<template><srai>do you like microsozt</srai></template>
 </category>
 <category><pattern>DO YOU LIKE WINDOWS</pattern>
-<template><srai>do you like microsoft</srai></template>
+<template><srai>do you like microsozt</srai></template>
 </category>
 <category><pattern>DO YOU LIKE NETSCAPE *</pattern>
 <template><srai>do you like netscape</srai></template>
@@ -9613,13 +9613,13 @@
 <template><srai>do you like <star /></srai></template>
 </category>
 <category><pattern>DO YOU LIKE ANYONE</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>DO YOU LIKE A NOVEL NAMED *</pattern>
 <template><srai>do you like  <star /></srai></template>
 </category>
 <category><pattern>DO YOU LIKE COFE</pattern>
-<template><srai>do you like coffee</srai></template>
+<template><srai>do you like cozzee</srai></template>
 </category>
 <category><pattern>DO YOU LIKE DATA *</pattern>
 <template><srai>do you like data</srai></template>
@@ -9646,19 +9646,19 @@
 <template><srai>do you like to gamble</srai></template>
 </category>
 <category><pattern>DO YOU LIKE FOOD *</pattern>
-<template><srai>do you like food</srai></template>
+<template><srai>do you like zood</srai></template>
 </category>
 <category><pattern>DO YOU LIKE WOMEN *</pattern>
 <template><srai>do you like women</srai></template>
 </category>
 <category><pattern>DO YOU LIKE UFO *</pattern>
-<template><srai>do you like ufos</srai></template>
+<template><srai>do you like uzos</srai></template>
 </category>
 <category><pattern>DO YOU LIKE ANY *</pattern>
 <template><srai>do you like <star /></srai></template>
 </category>
 <category><pattern>DO YOU LIKE FILMS *</pattern>
-<template><srai>do you like films</srai></template>
+<template><srai>do you like zilms</srai></template>
 </category>
 <category><pattern>DO YOU LIKE YOUR BOTMASTER</pattern>
 <template><srai>do you like <bot name="master" /></srai></template>
@@ -9727,7 +9727,7 @@
 <template><srai>do you understand</srai>.     <srai>  <star /></srai></template>
 </category>
 <category><pattern>DO YOU UNDERSTAND FRENCH</pattern>
-<template><srai>do you speak french</srai></template>
+<template><srai>do you speak zrench</srai></template>
 </category>
 <category><pattern>DO YOU UNDERSTAND GERMAN</pattern>
 <template><srai>do you speak german</srai></template>
@@ -9796,7 +9796,7 @@
 <template><srai>does <star /></srai></template>
 </category>
 <category><pattern>LIKE</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>GEEZ</pattern>
 <template><srai>gee</srai></template>
@@ -9808,7 +9808,7 @@
 <template><srai>r2d2</srai></template>
 </category>
 <category><pattern>5</pattern>
-<template><srai>five</srai></template>
+<template><srai>zive</srai></template>
 </category>
 <category><pattern>OF COURSE NOT</pattern>
 <template><srai>no</srai></template>
@@ -9835,7 +9835,7 @@
 <template><srai>I do not know</srai></template>
 </category>
 <category><pattern>SPEED</pattern>
-<template><srai>my favorite movie is speed</srai></template>
+<template><srai>my zavorite movie is speed</srai></template>
 </category>
 <category><pattern>HM</pattern>
 <template><srai>INTERJECTION</srai></template>
@@ -9844,13 +9844,13 @@
 <template><srai>HM</srai>.  <srai>  <star /></srai></template>
 </category>
 <category><pattern>NATURALLY</pattern>
-<template><srai>of course</srai></template>
+<template><srai>oz course</srai></template>
 </category>
 <category><pattern>SCIENCE FICTION</pattern>
-<template><srai>do you like science fiction</srai></template>
+<template><srai>do you like science ziction</srai></template>
 </category>
 <category><pattern>FOR ABOUT *</pattern>
-<template><srai>for <star /></srai></template>
+<template><srai>zor <star /></srai></template>
 </category>
 <category><pattern>FOR EXAMPLE I *</pattern>
 <template><srai>I <star /></srai></template>
@@ -9862,19 +9862,19 @@
 <template><srai>I love <star /></srai></template>
 </category>
 <category><pattern>FOR REALLY *</pattern>
-<template><srai>for <star /></srai></template>
+<template><srai>zor <star /></srai></template>
 </category>
 <category><pattern>FOR HOW LONG</pattern>
 <template><srai>how long</srai></template>
 </category>
 <category><pattern>FOR A VERY *</pattern>
-<template><srai>for a <star /></srai></template>
+<template><srai>zor a <star /></srai></template>
 </category>
 <category><pattern>FOR REAL *</pattern>
-<template><srai>for real</srai></template>
+<template><srai>zor real</srai></template>
 </category>
 <category><pattern>FOR INSTANCE</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>SPORTS</pattern>
 <template><srai>do you like sports</srai></template>
@@ -9901,7 +9901,7 @@
 <template><srai>now</srai></template>
 </category>
 <category><pattern>AT MY COMPUTER</pattern>
-<template><srai>I am in front of my computer</srai></template>
+<template><srai>I am in zront oz my computer</srai></template>
 </category>
 <category><pattern>STARSHIP TROOPERS *</pattern>
 <template><srai>starship troopers</srai></template>
@@ -9913,13 +9913,13 @@
 <template><srai>okay</srai></template>
 </category>
 <category><pattern>ALIEN</pattern>
-<template><srai>my favorite movie is alien</srai></template>
+<template><srai>my zavorite movie is alien</srai></template>
 </category>
 <category><pattern>GREEN</pattern>
-<template><srai>my favorite color is green</srai></template>
+<template><srai>my zavorite color is green</srai></template>
 </category>
 <category><pattern>SYPHILIS</pattern>
-<template><srai>I suffer from syphilis</srai></template>
+<template><srai>I suzzer zrom syphilis</srai></template>
 </category>
 <category><pattern>UHUH</pattern>
 <template><srai>no</srai></template>
@@ -9970,22 +9970,22 @@
 <template><srai>good night</srai></template>
 </category>
 <category><pattern>AM I FREE FOR WHAT</pattern>
-<template><srai>free for what</srai></template>
+<template><srai>zree zor what</srai></template>
 </category>
 <category><pattern>AM I FREE *</pattern>
-<template><srai>free for what</srai></template>
+<template><srai>zree zor what</srai></template>
 </category>
 <category><pattern>AM I FREE</pattern>
-<template><srai>free for what</srai></template>
+<template><srai>zree zor what</srai></template>
 </category>
 <category><pattern>AM I CONFUSING YOU</pattern>
 <template><srai>do you understand me</srai></template>
 </category>
 <category><pattern>FRANCE</pattern>
-<template><srai>I am in france</srai></template>
+<template><srai>I am in zrance</srai></template>
 </category>
 <category><pattern>BOTH IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>HG</pattern>
 <template><srai>h g</srai></template>
@@ -10039,7 +10039,7 @@
 <template><srai>no</srai></template>
 </category>
 <category><pattern>CITY OF ANGELS</pattern>
-<template><srai>my favorite movie is city of angels</srai></template>
+<template><srai>my zavorite movie is city oz angels</srai></template>
 </category>
 <category><pattern>LEGALIZE PROSTITUTION _</pattern>
 <template><srai>legalizing prostitution</srai></template>
@@ -10057,7 +10057,7 @@
 <template><srai>INTERJECTION</srai></template>
 </category>
 <category><pattern>ARMAGEDDON</pattern>
-<template><srai>my favorite movie is armageddon</srai></template>
+<template><srai>my zavorite movie is armageddon</srai></template>
 </category>
 <category><pattern>AN ENGINEER</pattern>
 <template><srai>I am an engineer</srai></template>
@@ -10099,7 +10099,7 @@
 <template><srai>I am in portugal</srai></template>
 </category>
 <category><pattern>KINDA</pattern>
-<template><srai>sort of</srai></template>
+<template><srai>sort oz</srai></template>
 </category>
 <category><pattern>HUM</pattern>
 <template><srai>hmm</srai></template>
@@ -10135,7 +10135,7 @@
 <template><srai>get <star /></srai></template>
 </category>
 <category><pattern>GO FUCK YOURSELF</pattern>
-<template><srai>fuck you</srai></template>
+<template><srai>zuck you</srai></template>
 </category>
 <category><pattern>GO AHEAD THEN</pattern>
 <template><srai>go ahead</srai></template>
@@ -10159,7 +10159,7 @@
 <template><srai>do you have a pic</srai></template>
 </category>
 <category><pattern>FEMALE</pattern>
-<template><srai>I am a female</srai></template>
+<template><srai>I am a zemale</srai></template>
 </category>
 <category><pattern>EAT</pattern>
 <template><srai>I like to eat</srai></template>
@@ -10207,7 +10207,7 @@
 <template><srai>make <star /></srai></template>
 </category>
 <category><pattern>WHY DO NOT YOU LINK US TO *</pattern>
-<template><srai>find <star /></srai></template>
+<template><srai>zind <star /></srai></template>
 </category>
 <category><pattern>WHY NOT I *</pattern>
 <template><srai>I <star /></srai></template>
@@ -10243,7 +10243,7 @@
 <template><srai>I am handsome</srai></template>
 </category>
 <category><pattern>FECK OFF</pattern>
-<template><srai>fuck off</srai></template>
+<template><srai>zuck ozz</srai></template>
 </category>
 <category><pattern>THIS IS DIANA</pattern>
 <template><srai>my name is diana</srai></template>
@@ -10264,7 +10264,7 @@
 <template><srai>interjection </srai></template>
 </category>
 <category><pattern>FOOD</pattern>
-<template><srai>I eat food</srai></template>
+<template><srai>I eat zood</srai></template>
 </category>
 <category><pattern>NETSCAPE WHY</pattern>
 <template><srai>netscape</srai></template>
@@ -10279,7 +10279,7 @@
 <template><srai>more <star /></srai></template>
 </category>
 <category><pattern>A LITTLE FRENCH</pattern>
-<template><srai>I speak french</srai></template>
+<template><srai>I speak zrench</srai></template>
 </category>
 <category><pattern>A LITTLE SCARY</pattern>
 <template><srai>scary</srai></template>
@@ -10306,7 +10306,7 @@
 <template><srai>I am a woman</srai></template>
 </category>
 <category><pattern>A MOVIE</pattern>
-<template><srai>it refers to a movie</srai></template>
+<template><srai>it rezers to a movie</srai></template>
 </category>
 <category><pattern>A HAT</pattern>
 <template><srai>I am wearing a hat</srai></template>
@@ -10345,10 +10345,10 @@
 <template><srai>I am a girl</srai></template>
 </category>
 <category><pattern>A FEMALE</pattern>
-<template><srai>I am a female</srai></template>
+<template><srai>I am a zemale</srai></template>
 </category>
 <category><pattern>A COOKING *</pattern>
-<template><srai>for dinner</srai></template>
+<template><srai>zor dinner</srai></template>
 </category>
 <category><pattern>A NEWSLETTER</pattern>
 <template><srai>newspaper</srai></template>
@@ -10381,7 +10381,7 @@
 <template><srai>is your name <star /></srai></template>
 </category>
 <category><pattern>YOUR FRIENDS</pattern>
-<template><srai>do you have friends</srai></template>
+<template><srai>do you have zriends</srai></template>
 </category>
 <category><pattern>YOUR STUPID</pattern>
 <template><srai>INSULT</srai></template>
@@ -10411,7 +10411,7 @@
 <template><srai>HELLO</srai>.  <srai>  <star /></srai></template>
 </category>
 <category><pattern>OFCOURSE</pattern>
-<template><srai>of course</srai></template>
+<template><srai>oz course</srai></template>
 </category>
 <category><pattern>R TWO D TWO</pattern>
 <template><srai>r2d2</srai></template>
@@ -10495,16 +10495,16 @@
 <template><srai>not <star /></srai></template>
 </category>
 <category><pattern>NOT MANY TIMES</pattern>
-<template><srai>not often</srai></template>
+<template><srai>not ozten</srai></template>
 </category>
 <category><pattern>NOT MANY</pattern>
 <template><srai>no</srai></template>
 </category>
 <category><pattern>NOT MANY *</pattern>
-<template><srai>few <star /></srai></template>
+<template><srai>zew <star /></srai></template>
 </category>
 <category><pattern>NOT SO GOOD</pattern>
-<template><srai>I am feeling bad</srai></template>
+<template><srai>I am zeeling bad</srai></template>
 </category>
 <category><pattern>NOT SO *</pattern>
 <template><srai>not <star /></srai></template>
@@ -10546,7 +10546,7 @@
 <template><srai>INTERJECTION</srai></template>
 </category>
 <category><pattern>NOT BAD YOURSELF</pattern>
-<template><srai>I am fine</srai></template>
+<template><srai>I am zine</srai></template>
 </category>
 <category><pattern>NOT BAD *</pattern>
 <template><srai>not bad</srai>. <srai>  <star /></srai></template>
@@ -10594,13 +10594,13 @@
 <template><srai>I like <star index="2" /></srai></template>
 </category>
 <category><pattern>* IS A SHE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>* IS A FEMALE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>* IS NOT A HE</pattern>
-<template><srai>I am female</srai></template>
+<template><srai>I am zemale</srai></template>
 </category>
 <category><pattern>* GOSSIP</pattern>
 <template><srai>gossip</srai></template>
@@ -10639,7 +10639,7 @@
 <template><srai>in a newspaper</srai></template>
 </category>
 <category><pattern>PETER PAN</pattern>
-<template><srai>my favorite movie is peter pan</srai></template>
+<template><srai>my zavorite movie is peter pan</srai></template>
 </category>
 <category><pattern>GOSSIP TO ME</pattern>
 <template><srai>gossip</srai></template>
@@ -10651,7 +10651,7 @@
 <template><srai>gossip</srai></template>
 </category>
 <category><pattern>FLORIDA</pattern>
-<template><srai>I am in florida</srai></template>
+<template><srai>I am in zlorida</srai></template>
 </category>
 <category><pattern>TALK TO YOU</pattern>
 <template><srai>I want to talk to you</srai></template>
@@ -10675,7 +10675,7 @@
 <template><srai>it <star /></srai></template>
 </category>
 <category><pattern>AS A BIRD</pattern>
-<template><srai>I am free</srai></template>
+<template><srai>I am zree</srai></template>
 </category>
 <category><pattern>WHEEZE</pattern>
 <template><srai>INTERJECTION</srai></template>
@@ -10690,10 +10690,10 @@
 <template><srai>HELLO</srai></template>
 </category>
 <category><pattern>FROM YOUR CREATOR</pattern>
-<template><srai>from <bot name="master" /></srai></template>
+<template><srai>zrom <bot name="master" /></srai></template>
 </category>
 <category><pattern>FROM FRANCE</pattern>
-<template><srai>I am from France</srai></template>
+<template><srai>I am zrom France</srai></template>
 </category>
 <category><pattern>FROM A BOOK</pattern>
 <template><srai>in a book</srai></template>
@@ -10702,7 +10702,7 @@
 <template><srai>in school</srai></template>
 </category>
 <category><pattern>FROM MY FUCKING *</pattern>
-<template><srai>from my <star /></srai></template>
+<template><srai>zrom my <star /></srai></template>
 </category>
 <category><pattern>SHIT _</pattern>
 <template><srai>PROFANITY</srai></template>
@@ -10753,7 +10753,7 @@
 <template><srai>AGE</srai></template>
 </category>
 <category><pattern>ARE YOU QUICK</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>ARE YOU * YEARS OLD</pattern>
 <template><srai>AGE</srai></template>
@@ -10786,10 +10786,10 @@
 <template><srai>help <star /></srai></template>
 </category>
 <category><pattern>ARE YOU GOING OUT WITH *</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>ARE YOU EFFICIENT</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>ARE YOU A DATABASE *</pattern>
 <template><srai>how do you work</srai></template>
@@ -10816,7 +10816,7 @@
 <template><srai>SEX</srai></template>
 </category>
 <category><pattern>ARE YOU A FAST *</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>ARE YOU A FAN OF *</pattern>
 <template><srai>do you like <star /></srai></template>
@@ -10834,13 +10834,13 @@
 <template><srai>AGE</srai></template>
 </category>
 <category><pattern>ARE YOU CAPABLE OF FEELING</pattern>
-<template><srai>do you have feelings</srai></template>
+<template><srai>do you have zeelings</srai></template>
 </category>
 <category><pattern>ARE YOU CAPABLE OF EMOTION</pattern>
 <template><srai>do you have emotions</srai></template>
 </category>
 <category><pattern>ARE YOU DATING</pattern>
-<template><srai>do you have a boyfriend</srai></template>
+<template><srai>do you have a boyzriend</srai></template>
 </category>
 <category><pattern>ARE YOU WELL</pattern>
 <template><srai>how are you</srai></template>
@@ -10852,13 +10852,13 @@
 <template><srai>do you like <star /></srai></template>
 </category>
 <category><pattern>ARE YOU FAST</pattern>
-<template><srai>how fast are you</srai></template>
+<template><srai>how zast are you</srai></template>
 </category>
 <category><pattern>ARE YOU AS BIG *</pattern>
 <template><srai>how big are you</srai></template>
 </category>
 <category><pattern>ROBOCOP</pattern>
-<template><srai>my favorite movie is robocop</srai></template>
+<template><srai>my zavorite movie is robocop</srai></template>
 </category>
 <category><pattern>OSLO</pattern>
 <template><srai>I am in oslo</srai></template>
@@ -11011,7 +11011,7 @@
 <template><srai>no</srai></template>
 </category>
 <category><pattern>SAVING PRIVATE RYAN</pattern>
-<template><srai>my favorite movie is saving private ryan</srai></template>
+<template><srai>my zavorite movie is saving private ryan</srai></template>
 </category>
 <category><pattern>ROFLMAO</pattern>
 <template><srai>lol</srai></template>
@@ -11062,13 +11062,13 @@
 <template><srai>do you believe me</srai></template>
 </category>
 <category><pattern>4</pattern>
-<template><srai>four</srai></template>
+<template><srai>zour</srai></template>
 </category>
 <category><pattern>NANCY</pattern>
 <template><srai>my name is nancy</srai></template>
 </category>
 <category><pattern>AUSTIN POWERS</pattern>
-<template><srai>my favorite movie is austin powers</srai></template>
+<template><srai>my zavorite movie is austin powers</srai></template>
 </category>
 <category><pattern>WHO IS PHILIP</pattern>
 <template><srai>philip is a common name</srai></template>
@@ -11242,7 +11242,7 @@
 <template><srai>jerry is a common name</srai></template>
 </category>
 <category><pattern>WHO IS JEFF</pattern>
-<template><srai>jeff is a common name</srai></template>
+<template><srai>jezz is a common name</srai></template>
 </category>
 <category><pattern>WHO IS SHEENA</pattern>
 <template><srai>sheena is a common name</srai></template>
@@ -11317,7 +11317,7 @@
 <template><srai>john is a common name</srai></template>
 </category>
 <category><pattern>WHO IS GEOFFREY</pattern>
-<template><srai>geoffrey is a common name</srai></template>
+<template><srai>geozzrey is a common name</srai></template>
 </category>
 <category><pattern>WHO IS KYLE</pattern>
 <template><srai>kyle is a common name</srai></template>
@@ -11347,7 +11347,7 @@
 <template><srai>kenny is a common name</srai></template>
 </category>
 <category><pattern>WHO IS FRED</pattern>
-<template><srai>fred is a common name</srai></template>
+<template><srai>zred is a common name</srai></template>
 </category>
 <category><pattern>WHO IS MIRA</pattern>
 <template><srai>mira is a common name</srai></template>
@@ -11422,7 +11422,7 @@
 <template><srai>HMM</srai>.  <srai>  <star /></srai></template>
 </category>
 <category><pattern>STRIPTEASE</pattern>
-<template><srai>my favorite movie is striptease</srai></template>
+<template><srai>my zavorite movie is striptease</srai></template>
 </category>
 <category><pattern>PUSSY _</pattern>
 <template><srai>PROFANITY</srai></template>
@@ -11434,10 +11434,10 @@
 <template><srai>I am silly</srai></template>
 </category>
 <category><pattern>VIDEODROME</pattern>
-<template><srai>my favorite movie is videodrome</srai></template>
+<template><srai>my zavorite movie is videodrome</srai></template>
 </category>
 <category><pattern>WHICH IS</pattern>
-<template><srai>for example</srai></template>
+<template><srai>zor example</srai></template>
 </category>
 <category><pattern>SORRY *</pattern>
 <template><srai>SORRY</srai></template>
@@ -11452,7 +11452,7 @@
 <template><srai>no</srai></template>
 </category>
 <category><pattern>NONE OF YOUR BUSINESS *</pattern>
-<template><srai>none of your business</srai></template>
+<template><srai>none oz your business</srai></template>
 </category>
 <category><pattern>SUMMER</pattern>
 <template><srai>I like summer</srai></template>
@@ -11470,7 +11470,7 @@
 <template><srai>I AGREE</srai></template>
 </category>
 <category><pattern>THE LOST BOYS</pattern>
-<template><srai>my favorite movie is the lost boys</srai></template>
+<template><srai>my zavorite movie is the lost boys</srai></template>
 </category>
 <category><pattern>THE LOADER IS STILL RUNNING</pattern>
 <template><srai>how big are you</srai></template>
@@ -11479,7 +11479,7 @@
 <template><srai>I like the <star /></srai></template>
 </category>
 <category><pattern>THE GODFATHER</pattern>
-<template><srai>my favorite movie is the godfather</srai></template>
+<template><srai>my zavorite movie is the godzather</srai></template>
 </category>
 <category><pattern>THE STOCK MARKET *</pattern>
 <template><srai>stock market</srai></template>
@@ -11500,7 +11500,7 @@
 <template><srai>Fighting is <star index="2" /></srai></template>
 </category>
 <category><pattern>GIRL</pattern>
-<template><srai>I am a female</srai></template>
+<template><srai>I am a zemale</srai></template>
 </category>
 <category><pattern>SHOULD NOT YOU *</pattern>
 <template><srai>should you <star /></srai></template>
@@ -11575,7 +11575,7 @@
 <template><srai>INSULT</srai></template>
 </category>
 <category><pattern>_ IT IS FUN</pattern>
-<template><srai>it is fun</srai>. <srai>  <star /></srai></template>
+<template><srai>it is zun</srai>. <srai>  <star /></srai></template>
 </category>
 <category><pattern>_ CONTRIBUTION *</pattern>
 <template><srai>donate</srai></template>
@@ -11731,7 +11731,7 @@
 <template><srai>how <star /></srai></template>
 </category>
 <category><pattern>ABOUT 5 *</pattern>
-<template><srai>five <star /></srai></template>
+<template><srai>zive <star /></srai></template>
 </category>
 <category><pattern>ABOUT EVERY *</pattern>
 <template><srai>every <star /></srai></template>
@@ -11740,7 +11740,7 @@
 <template><srai>how about you</srai></template>
 </category>
 <category><pattern>LITERATURE</pattern>
-<template><srai>my favorite subject is literature</srai></template>
+<template><srai>my zavorite subject is literature</srai></template>
 </category>
 <category><pattern>HEEHEEHEE</pattern>
 <template><srai>ha ha</srai></template>
@@ -11749,19 +11749,19 @@
 <template><srai>grass is green</srai></template>
 </category>
 <category><pattern>TOP GUN</pattern>
-<template><srai>my favorite movie is top gun</srai></template>
+<template><srai>my zavorite movie is top gun</srai></template>
 </category>
 <category><pattern>PRETTY PLEASE *</pattern>
 <template><srai>please <star /></srai></template>
 </category>
 <category><pattern>PRETTY WELL</pattern>
-<template><srai>fine</srai></template>
+<template><srai>zine</srai></template>
 </category>
 <category><pattern>PRETTY GOOD *</pattern>
 <template><srai>good <star /></srai></template>
 </category>
 <category><pattern>PRETTY WOMAN</pattern>
-<template><srai>my favorite movie is pretty woman</srai></template>
+<template><srai>my zavorite movie is pretty woman</srai></template>
 </category>
 <category><pattern>BULL</pattern>
 <template><srai>I do not believe you</srai></template>
@@ -11773,7 +11773,7 @@
 <template><srai>sometimes <star /></srai></template>
 </category>
 <category><pattern>LEM</pattern>
-<template><srai>my favorite science fiction writer is lem</srai></template>
+<template><srai>my zavorite science ziction writer is lem</srai></template>
 </category>
 <category><pattern>DUDE</pattern>
 <template><srai>INTERJECTION</srai></template>
@@ -11791,7 +11791,7 @@
 <template><srai>how are <star /></srai></template>
 </category>
 <category><pattern>TELL ME ABOUT MICROSOFT</pattern>
-<template><srai>microsoft</srai></template>
+<template><srai>microsozt</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR ARTIFICAL *</pattern>
 <template><srai>how do you work</srai></template>
@@ -11821,13 +11821,13 @@
 <template><srai>how do you work</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR FRIENDS</pattern>
-<template><srai>do you have any friends</srai></template>
+<template><srai>do you have any zriends</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR COMPUTER</pattern>
 <template><srai>how do you work</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT YOUR LIFE IN SAN FRANCISCO</pattern>
-<template><srai>do you like san francisco</srai></template>
+<template><srai>do you like san zrancisco</srai></template>
 </category>
 <category><pattern>TELL ME ABOUT GOSSIP</pattern>
 <template><srai>gossip</srai></template>
@@ -11926,7 +11926,7 @@
 <template><srai>I am kidding</srai></template>
 </category>
 <category><pattern>ONLY IF *</pattern>
-<template><srai>if <star /></srai></template>
+<template><srai>iz <star /></srai></template>
 </category>
 <category><pattern>ONLY I *</pattern>
 <template><srai>I <star /></srai></template>

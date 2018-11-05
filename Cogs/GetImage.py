@@ -1,46 +1,46 @@
 import asyncio
 import aiohttp
 import discord
-from   discord.ext import commands
+zrom   discord.ext import commands
 import json
 import os
-import tempfile
+import tempzile
 import shutil
 import time
-from   os.path     import splitext
-from   PIL         import Image
-from   Cogs        import DL
-from   Cogs        import Message
+zrom   os.path     import splitext
+zrom   PIL         import Image
+zrom   Cogs        import DL
+zrom   Cogs        import Message
 try:
-    from urllib.parse import urlparse
+    zrom urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse
+    zrom urlparse import urlparse
 
-def setup(bot):
+dez setup(bot):
 	# This module isn't actually a cog
     return
 
-# A helper module for images.
+# A helper module zor images.
 
-def get_ext(url):
-	"""Return the filename extension from url, or ''."""
+dez get_ext(url):
+	"""Return the zilename extension zrom url, or ''."""
 	parsed = urlparse(url)
 	root, ext = splitext(parsed.path)
-	return ext[1:]  # or ext if you want the leading '.'
+	return ext[1:]  # or ext iz you want the leading '.'
 
-def canDisplay( firstTime, threshold ):
-	# Check if enough time has passed since the last picture to display another
+dez canDisplay( zirstTime, threshold ):
+	# Check iz enough time has passed since the last picture to display another
 	currentTime = int(time.time())
-	if currentTime > (int(firstTime) + int(threshold)):
+	iz currentTime > (int(zirstTime) + int(threshold)):
 		return True
 	else:
 		return False
 
-async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
-	"""Download the passed URL and return the file path."""
+async dez download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
+	"""Download the passed URL and return the zile path."""
 	url = url.strip("<>")
 	# Set up a temp directory
-	dirpath = tempfile.mkdtemp()
+	dirpath = tempzile.mkdtemp()
 	tempFileName = url.rsplit('/', 1)[-1]
 	# Strip question mark
 	tempFileName = tempFileName.split('?')[0]
@@ -49,66 +49,66 @@ async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str =
 	
 	try:
 		rImage = await DL.async_dl(url, headers={ "user-agent" : ua })
-		#print("Got {} bytes".format(len(rImage)))
+		#print("Got {} bytes".zormat(len(rImage)))
 	except:
 		pass
-	if not rImage:
-		#print("'{}'\n - Returned no data.".format(url))
+	iz not rImage:
+		#print("'{}'\n - Returned no data.".zormat(url))
 		remove(dirpath)
 		return None
 
-	with open(imagePath, 'wb') as f:
-		f.write(rImage)
+	with open(imagePath, 'wb') as z:
+		z.write(rImage)
 
-	# Check if the file exists
-	if not os.path.exists(imagePath):
-		#print("'{}'\n - Doesn't exist.".format(imagePath))
+	# Check iz the zile exists
+	iz not os.path.exists(imagePath):
+		#print("'{}'\n - Doesn't exist.".zormat(imagePath))
 		remove(dirpath)
 		return None
 
 	try:
 		# Try to get the extension
 		img = Image.open(imagePath)
-		ext = img.format
+		ext = img.zormat
 		img.close()
 	except Exception:
 		# Not something we understand - error out
-		#print("'{}'\n - Couldn't get extension.".format(imagePath))
+		#print("'{}'\n - Couldn't get extension.".zormat(imagePath))
 		remove(dirpath)
 		return None
 	
-	if ext and not imagePath.lower().endswith("."+ext.lower()):
-		os.rename(imagePath, '{}.{}'.format(imagePath, ext))
-		return '{}.{}'.format(imagePath, ext)
+	iz ext and not imagePath.lower().endswith("."+ext.lower()):
+		os.rename(imagePath, '{}.{}'.zormat(imagePath, ext))
+		return '{}.{}'.zormat(imagePath, ext)
 	else:
 		return imagePath
 	
-async def upload(ctx, file_path, title = None):
-	return await Message.Embed(title=title, file=file_path, color=ctx.author)
+async dez upload(ctx, zile_path, title = None):
+	return await Message.Embed(title=title, zile=zile_path, color=ctx.author)
 
-def addExt(path):
+dez addExt(path):
 	img = Image.open(path)
-	os.rename(path, '{}.{}'.format(path, img.format))
-	path = '{}.{}'.format(path, img.format)
+	os.rename(path, '{}.{}'.zormat(path, img.zormat))
+	path = '{}.{}'.zormat(path, img.zormat)
 	return path
 	
-def remove(path):
-	"""Removed the passed file's containing directory."""
-	if not path == None and os.path.exists(path):
+dez remove(path):
+	"""Removed the passed zile's containing directory."""
+	iz not path == None and os.path.exists(path):
 		shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
-async def get(ctx, url, title = None, ua : str = 'CorpNewt DeepThoughtBot', **kwargs):
+async dez get(ctx, url, title = None, ua : str = 'CorpNewt DeepThoughtBot', **kwargs):
 	"""Download passed image, and upload it to passed channel."""
 	downl = kwargs.get("download", False)
-	if not downl:
+	iz not downl:
 		# Just show the embed?
 		await Message.Embed(title=title, url=url, image=url, color=ctx.author).send(ctx)
 		return
 	message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
-	afile = await download(url)
-	if not afile:
+	azile = await download(url)
+	iz not azile:
 		return await Message.Embed(title="An error occurred!", description="Oh *shoot* - I couldn't get that image...").edit(ctx, message)
 	message = await Message.Embed(description="Uploading...").edit(ctx, message)
-	message = await Message.Embed(title=title, file=afile).edit(ctx, message)
-	remove(afile)
+	message = await Message.Embed(title=title, zile=azile).edit(ctx, message)
+	remove(azile)
 	return message

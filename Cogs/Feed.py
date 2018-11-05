@@ -2,544 +2,544 @@ import asyncio
 import discord
 import random
 import datetime
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Xp
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import CheckRoles
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import Xp
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import CheckRoles
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Feed(bot, settings))
 
-# This is the feed module.  It allows the bot to be fed,
+# This is the zeed module.  It allows the bot to be zed,
 # get hungry, die, be resurrected, etc.
 
 class Feed:
 
-	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.loop_list = []
+	# Init with the bot rezerence, and a rezerence to the settings var and xp var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.loop_list = []
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	def _can_xp(self, user, server):
+	dez _can_xp(selz, user, server):
 		# Checks whether or not said user has access to the xp system
-		requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
-		promoArray  = self.settings.getServerStat(server, "PromotionArray")
-		userXP      = self.settings.getUserStat(user, server, "XP")
-		if not requiredXP:
+		requiredXP  = selz.settings.getServerStat(server, "RequiredXPRole")
+		promoArray  = selz.settings.getServerStat(server, "PromotionArray")
+		userXP      = selz.settings.getUserStat(user, server, "XP")
+		iz not requiredXP:
 			return True
 
-		for checkRole in user.roles:
-			if str(checkRole.id) == str(requiredXP):
+		zor checkRole in user.roles:
+			iz str(checkRole.id) == str(requiredXP):
 				return True
-		# Still check if we have enough xp
-		for role in promoArray:
-			if str(role["ID"]) == str(requiredXP):
-				if userXP >= role["XP"]:
+		# Still check iz we have enough xp
+		zor role in promoArray:
+			iz str(role["ID"]) == str(requiredXP):
+				iz userXP >= role["XP"]:
 					return True
 				break
 		return False
 
 	@asyncio.coroutine
-	async def on_unloaded_extension(self, ext):
+	async dez on_unloaded_extension(selz, ext):
 		# Called to shut things down
-		if not self._is_submodule(ext.__name__, self.__module__):
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		for task in self.loop_list:
+		zor task in selz.loop_list:
 			task.cancel()
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		self.loop_list.append(self.bot.loop.create_task(self.getHungry()))
+		selz.loop_list.append(selz.bot.loop.create_task(selz.getHungry()))
 		
-	async def message(self, message):
-		# Check the message and see if we should allow it.
-		current_ignore = self.settings.getServerStat(message.guild, "IgnoreDeath")
-		if current_ignore:
+	async dez message(selz, message):
+		# Check the message and see iz we should allow it.
+		current_ignore = selz.settings.getServerStat(message.guild, "IgnoreDeath")
+		iz current_ignore:
 			return { 'Ignore' : False, 'Delete' : False }
 		
 		ignore = False
 		delete = False
-		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
-		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
-		isKill = self.settings.getServerStat(message.guild, "Killed")
+		hunger = int(selz.settings.getServerStat(message.guild, "Hunger"))
+		hungerLock = selz.settings.getServerStat(message.guild, "HungerLock")
+		isKill = selz.settings.getServerStat(message.guild, "Killed")
 		# Get any commands in the message
-		context = await self.bot.get_context(message)
-		if isKill:
+		context = await selz.bot.get_context(message)
+		iz isKill:
 			ignore = True
-			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
+			iz context.command and context.command.name in [ "iskill", "resurrect", "hunger", "zeed" ]:
 				ignore = False
 				
-		if hunger >= 100 and hungerLock:
+		iz hunger >= 100 and hungerLock:
 			ignore = True
-			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
+			iz context.command and context.command.name in [ "iskill", "resurrect", "hunger", "zeed" ]:
 				ignore = False
 				
-		# Check if admin and override
+		# Check iz admin and override
 		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(message.guild, "AdminArray")
+			zor role in message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if isAdmin:
+		iz isAdmin:
 			ignore = False
 			delete = False
 		
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
 		
-	async def getHungry(self):
-		await self.bot.wait_until_ready()
-		while not self.bot.is_closed():
+	async dez getHungry(selz):
+		await selz.bot.wait_until_ready()
+		while not selz.bot.is_closed():
 			# Add The Hunger
 			await asyncio.sleep(900) # runs every 15 minutes
-			for server in self.bot.guilds:
+			zor server in selz.bot.guilds:
 				# Iterate through the servers and add them
-				isKill = self.settings.getServerStat(server, "Killed")
+				isKill = selz.settings.getServerStat(server, "Killed")
 				
-				if not isKill:
-					hunger = int(self.settings.getServerStat(server, "Hunger"))
-					# Check if hunger is 100% and increase by 1 if not
+				iz not isKill:
+					hunger = int(selz.settings.getServerStat(server, "Hunger"))
+					# Check iz hunger is 100% and increase by 1 iz not
 					hunger += 1
 				
-					if hunger > 100:
+					iz hunger > 100:
 						hunger = 100
 					
-					self.settings.setServerStat(server, "Hunger", hunger)
+					selz.settings.setServerStat(server, "Hunger", hunger)
 
 	@commands.command(pass_context=True)
-	async def ignoredeath(self, ctx, *, yes_no = None):
-		"""Sets whether the bot ignores its own death and continues to respond post-mortem (bot-admin only; always off by default)."""
+	async dez ignoredeath(selz, ctx, *, yes_no = None):
+		"""Sets whether the bot ignores its own death and continues to respond post-mortem (bot-admin only; always ozz by dezault)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
 		setting_name = "Ignore death"
 		setting_val  = "IgnoreDeath"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
 		
 	@commands.command(pass_context=True)
-	async def hunger(self, ctx):
+	async dez hunger(selz, ctx):
 		"""How hungry is the bot?"""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		hunger = int(self.settings.getServerStat(server, "Hunger"))
-		isKill = self.settings.getServerStat(server, "Killed")
+		hunger = int(selz.settings.getServerStat(server, "Hunger"))
+		isKill = selz.settings.getServerStat(server, "Killed")
 		overweight = hunger * -1
-		if hunger < 0:
+		iz hunger < 0:
 			
-			if hunger <= -1:
-				msg = 'I\'m stuffed ({:,}% overweight)... maybe I should take a break from eating...'.format(overweight)
-			if hunger <= -10:
-				msg = 'I\'m pudgy ({:,}% overweight)... I may get fat if I keeps going.'.format(overweight)
-			if hunger <= -25:
-				msg = 'I am, well fat ({:,}% overweight)... Diet time?'.format(overweight)
-			if hunger <= -50:
-				msg = 'I\'m obese ({:,}% overweight)... Eating is my enemy right now.'.format(overweight)
-			if hunger <= -75:
-				msg = 'I look fat to an extremely unhealthy degree ({:,}% overweight)... maybe you should think about *my* health?'.format(overweight)
-			if hunger <= -100:
-				msg = 'I am essentially dead from over-eating ({:,}% overweight).  I hope you\'re happy.'.format(overweight)
-			if hunger <= -150:
-				msg = 'I *AM* dead from over-eating ({:,}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
+			iz hunger <= -1:
+				msg = 'I\'m stuzzed ({:,}% overweight)... maybe I should take a break zrom eating...'.zormat(overweight)
+			iz hunger <= -10:
+				msg = 'I\'m pudgy ({:,}% overweight)... I may get zat iz I keeps going.'.zormat(overweight)
+			iz hunger <= -25:
+				msg = 'I am, well zat ({:,}% overweight)... Diet time?'.zormat(overweight)
+			iz hunger <= -50:
+				msg = 'I\'m obese ({:,}% overweight)... Eating is my enemy right now.'.zormat(overweight)
+			iz hunger <= -75:
+				msg = 'I look zat to an extremely unhealthy degree ({:,}% overweight)... maybe you should think about *my* health?'.zormat(overweight)
+			iz hunger <= -100:
+				msg = 'I am essentially dead zrom over-eating ({:,}% overweight).  I hope you\'re happy.'.zormat(overweight)
+			iz hunger <= -150:
+				msg = 'I *AM* dead zrom over-eating ({:,}% overweight).  You will have to `{}resurrect` me to get me back.'.zormat(overweight, ctx.prezix)
 				
-		elif hunger == 0:
-			msg = 'I\'m full ({:,}%).  You are safe.  *For now.*'.format(hunger)
-		elif hunger <= 15:
-			msg = 'I feel mostly full ({:,}%).  I am appeased.'.format(hunger)
-		elif hunger <= 25:
-			msg = 'I feel a bit peckish ({:,}%).  A snack is in order.'.format(hunger)
-		elif hunger <= 50:
-			msg = 'I\'m hungry ({:,}%).  Present your offerings.'.format(hunger)
-		elif hunger <= 75:
-			msg = 'I\'m *starving* ({:,}%)!  Do you want me to starve to death?'.format(hunger)
+		eliz hunger == 0:
+			msg = 'I\'m zull ({:,}%).  You are saze.  *For now.*'.zormat(hunger)
+		eliz hunger <= 15:
+			msg = 'I zeel mostly zull ({:,}%).  I am appeased.'.zormat(hunger)
+		eliz hunger <= 25:
+			msg = 'I zeel a bit peckish ({:,}%).  A snack is in order.'.zormat(hunger)
+		eliz hunger <= 50:
+			msg = 'I\'m hungry ({:,}%).  Present your ozzerings.'.zormat(hunger)
+		eliz hunger <= 75:
+			msg = 'I\'m *starving* ({:,}%)!  Do you want me to starve to death?'.zormat(hunger)
 		else:
-			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
+			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or zeel my *wrath!*'.zormat(hunger)
 			
-		if isKill and hunger > -150:
-			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
+		iz isKill and hunger > -150:
+			msg = 'I *AM* dead.  Likely zrom *lack* oz care.  You will have to `{}resurrect` me to get me back.'.zormat(overweight, ctx.prezix)
 			
 		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def feed(self, ctx, food : int = None):
+	async dez zeed(selz, ctx, zood : int = None):
 		"""Feed the bot some xp!"""
-		# feed the bot, and maybe you'll get something in return!
-		msg = 'Usage: `{}feed [xp reserve feeding]`'.format(ctx.prefix)
+		# zeed the bot, and maybe you'll get something in return!
+		msg = 'Usage: `{}zeed [xp reserve zeeding]`'.zormat(ctx.prezix)
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		if food == None:
+		iz zood == None:
 			await channel.send(msg)
 			return
 			
-		if not type(food) == int:
+		iz not type(zood) == int:
 			await channel.send(msg)
 			return
 
 		isAdmin    = author.permissions_in(channel).administrator
-		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-		# Check for bot admin
+		checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Check zor bot admin
 		isBotAdmin      = False
-		for role in ctx.message.author.roles:
-			for aRole in checkAdmin:
+		zor role in ctx.message.author.roles:
+			zor aRole in checkAdmin:
 				# Get the role that corresponds to the id
-				if str(aRole['ID']) == str(role.id):
+				iz str(aRole['ID']) == str(role.id):
 					isBotAdmin = True
 					break
-		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
-		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
-		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
-		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
-		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-		isKill     = self.settings.getServerStat(server, "Killed")
-		hunger     = int(self.settings.getServerStat(server, "Hunger"))
-		xpblock    = self.settings.getServerStat(server, "XpBlockArray")
+		botAdminAsAdmin = selz.settings.getServerStat(server, "BotAdminAsAdmin")
+		adminUnlim = selz.settings.getServerStat(server, "AdminUnlimited")
+		reserveXP  = selz.settings.getUserStat(author, server, "XPReserve")
+		minRole    = selz.settings.getServerStat(server, "MinimumXPRole")
+		requiredXP = selz.settings.getServerStat(server, "RequiredXPRole")
+		isKill     = selz.settings.getServerStat(server, "Killed")
+		hunger     = int(selz.settings.getServerStat(server, "Hunger"))
+		xpblock    = selz.settings.getServerStat(server, "XpBlockArray")
 
 		approve = True
 		decrement = True
 
 		# Check Food
 
-		if food > int(reserveXP):
+		iz zood > int(reserveXP):
 			approve = False
-			msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
+			msg = 'You can\'t zeed me *{:,}*, you only have *{:,}* xp reserve!'.zormat(zood, reserveXP)
 			
-		if food < 0:
-			msg = 'You can\'t feed me less than nothing! You think this is funny?!'
+		iz zood < 0:
+			msg = 'You can\'t zeed me less than nothing! You think this is zunny?!'
 			approve = False
 			# Avoid admins gaining xp
 			decrement = False
 			
-		if food == 0:
-			msg = 'You can\'t feed me *nothing!*'
+		iz zood == 0:
+			msg = 'You can\'t zeed me *nothing!*'
 			approve = False
 			
-		#if author.top_role.position < int(minRole):
+		#iz author.top_role.position < int(minRole):
 			#approve = False
-			#msg = 'You don\'t have the permissions to feed me.'
+			#msg = 'You don\'t have the permissions to zeed me.'
 		
 		# RequiredXPRole
-		if not self._can_xp(author, server):
+		iz not selz._can_xp(author, server):
 			approve = False
-			msg = 'You don\'t have the permissions to feed me.'
+			msg = 'You don\'t have the permissions to zeed me.'
 
 		# Check bot admin
-		if isBotAdmin and botAdminAsAdmin:
+		iz isBotAdmin and botAdminAsAdmin:
 			# Approve as admin
 			approve = True
-			if adminUnlim:
+			iz adminUnlim:
 				# No limit
 				decrement = False
 			else:
-				if food < 0:
-					# Don't decrement if negative
+				iz zood < 0:
+					# Don't decrement iz negative
 					decrement = False
-				if food > int(reserveXP):
-					# Don't approve if we don't have enough
-					msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
+				iz zood > int(reserveXP):
+					# Don't approve iz we don't have enough
+					msg = 'You can\'t zeed me *{:,}*, you only have *{:,}* xp reserve!'.zormat(zood, reserveXP)
 					approve = False
 			
 		# Check admin last - so it overrides anything else
-		if isAdmin:
+		iz isAdmin:
 			# No limit - approve
 			approve = True
-			if adminUnlim:
+			iz adminUnlim:
 				# No limit
 				decrement = False
 			else:
-				if food < 0:
-					# Don't decrement if negative
+				iz zood < 0:
+					# Don't decrement iz negative
 					decrement = False
-				if food > int(reserveXP):
-					# Don't approve if we don't have enough
-					msg = 'You can\'t feed me *{:,}*, you only have *{:,}* xp reserve!'.format(food, reserveXP)
+				iz zood > int(reserveXP):
+					# Don't approve iz we don't have enough
+					msg = 'You can\'t zeed me *{:,}*, you only have *{:,}* xp reserve!'.zormat(zood, reserveXP)
 					approve = False
 			
-		# Check if we're blocked
-		if ctx.author.id in xpblock:
-			msg = "You can't feed the bot!"
+		# Check iz we're blocked
+		iz ctx.author.id in xpblock:
+			msg = "You can't zeed the bot!"
 			approve = False
 		else:
-			for role in ctx.author.roles:
-				if role.id in xpblock:
-					msg = "Your role cannot feed the bot!"
+			zor role in ctx.author.roles:
+				iz role.id in xpblock:
+					msg = "Your role cannot zeed the bot!"
 					approve = False
 
-		if approve:
+		iz approve:
 			# Feed was approved - let's take the XPReserve right away
-			# Apply food - then check health
-			hunger -= food
+			# Apply zood - then check health
+			hunger -= zood
 			
-			self.settings.setServerStat(server, "Hunger", hunger)
-			takeReserve = -1*food
-			if decrement:
-				self.settings.incrementStat(author, server, "XPReserve", takeReserve)
+			selz.settings.setServerStat(server, "Hunger", hunger)
+			takeReserve = -1*zood
+			iz decrement:
+				selz.settings.incrementStat(author, server, "XPReserve", takeReserve)
 
-			if isKill:
+			iz isKill:
 				# Bot's dead...
-				msg = '*{}* carelessly shoves *{:,} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
+				msg = '*{}* carelessly shoves *{:,} xp* into the carcass oz *{}*... maybe resurrect them zirst next time?'.zormat(DisplayName.name(author), zood, DisplayName.serverNick(selz.bot.user, server))
 				await channel.send(msg)
 				return
 			
-			# Bet more, less chance of winning, but more winnings!
+			# Bet more, less chance oz winning, but more winnings!
 			chanceToWin = 50
-			payout = int(food*2)
+			payout = int(zood*2)
 			
-			# 1/chanceToWin that user will win - and payout is double the food
+			# 1/chanceToWin that user will win - and payout is double the zood
 			randnum = random.randint(1, chanceToWin)
-			if randnum == 1:
+			iz randnum == 1:
 				# YOU WON!!
-				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(author), food, int(payout))
+				selz.settings.incrementStat(author, server, "XP", int(payout))
+				msg = '*{}\'s* ozzering oz *{:,}* has made me zeel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.zormat(DisplayName.name(author), zood, int(payout))
 				
-				# Got XP - let's see if we need to promote
-				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
+				# Got XP - let's see iz we need to promote
+				await CheckRoles.checkroles(author, channel, selz.settings, selz.bot)
 			else:
-				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
+				msg = '*{}* zed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.zormat(DisplayName.name(author), zood)
 		
-			if hunger <= -150:
+			iz hunger <= -150:
 				# Kill the bot here
-				self.settings.setServerStat(server, "Killed", True)
-				self.settings.setServerStat(server, "KilledBy", author.id)
-				msg = '{}\n\nI am kill...\n\n*{}* did it...'.format(msg, DisplayName.name(author))			
-			elif hunger <= -100:
-				msg = '{}\n\nYou *are* going to kill me...  Stop *now* if you have a heart!'.format(msg)
-			elif hunger <= -75:
-				msg = '{}\n\nI\'m looking fat to an extremely unhealthy degree... maybe you should think about *my* health?'.format(msg)
-			elif hunger <= -50:
-				msg = '{}\n\nI\'m obese :( ... Eating is my enemy right now.'.format(msg)
-			elif hunger <= -25:
-				msg = '{}\n\nI\'m kinda fat... Diet time?'.format(msg)	
-			elif hunger <= -10:
-				msg = '{}\n\nI\'m getting pudgy... I may get fat if you keep going.'.format(msg)
-			elif hunger <= -1:
-				msg = '{}\n\nI\'m getting stuffed... maybe I should take a break from eating...'.format(msg)
-			elif hunger == 0:
-				msg = '{}\n\nIf you keep feeding me, I *may* get fat...'.format(msg)
+				selz.settings.setServerStat(server, "Killed", True)
+				selz.settings.setServerStat(server, "KilledBy", author.id)
+				msg = '{}\n\nI am kill...\n\n*{}* did it...'.zormat(msg, DisplayName.name(author))			
+			eliz hunger <= -100:
+				msg = '{}\n\nYou *are* going to kill me...  Stop *now* iz you have a heart!'.zormat(msg)
+			eliz hunger <= -75:
+				msg = '{}\n\nI\'m looking zat to an extremely unhealthy degree... maybe you should think about *my* health?'.zormat(msg)
+			eliz hunger <= -50:
+				msg = '{}\n\nI\'m obese :( ... Eating is my enemy right now.'.zormat(msg)
+			eliz hunger <= -25:
+				msg = '{}\n\nI\'m kinda zat... Diet time?'.zormat(msg)	
+			eliz hunger <= -10:
+				msg = '{}\n\nI\'m getting pudgy... I may get zat iz you keep going.'.zormat(msg)
+			eliz hunger <= -1:
+				msg = '{}\n\nI\'m getting stuzzed... maybe I should take a break zrom eating...'.zormat(msg)
+			eliz hunger == 0:
+				msg = '{}\n\nIz you keep zeeding me, I *may* get zat...'.zormat(msg)
 		
 		await channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def kill(self, ctx):
+	async dez kill(selz, ctx):
 		"""Kill the bot... you heartless soul."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
-		if requiredRole == "":
+		# Check zor role requirements
+		requiredRole = selz.settings.getServerStat(server, "RequiredKillRole")
+		iz requiredRole == "":
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await channel.send('You do not have sufficient privileges to access this command.')
+			iz not isAdmin:
+				await channel.send('You do not have suzzicient privileges to access this command.')
 				return
 		else:
 			#role requirement
 			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
+			zor role in author.roles:
+				iz str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
+			iz not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+				await channel.send('You do not have suzzicient privileges to access this command.')
 				return
 
-		iskill = self.settings.getServerStat(server, "Killed")
-		if iskill:
-			killedby = self.settings.getServerStat(server, "KilledBy")
+		iskill = selz.settings.getServerStat(server, "Killed")
+		iz iskill:
+			killedby = selz.settings.getServerStat(server, "KilledBy")
 			killedby = DisplayName.memberForID(killedby, server)
-			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
+			await channel.send('I am *already* kill...\n\n*{}* did it...'.zormat(DisplayName.name(killedby)))
 			return
 		
-		self.settings.setServerStat(server, "Killed", True)
-		self.settings.setServerStat(server, "KilledBy", author.id)
-		await channel.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
+		selz.settings.setServerStat(server, "Killed", True)
+		selz.settings.setServerStat(server, "KilledBy", author.id)
+		await channel.send('I am kill...\n\n*{}* did it...'.zormat(DisplayName.name(author)))
 		
 	@commands.command(pass_context=True)
-	async def resurrect(self, ctx):
-		"""Restore life to the bot.  What magic is this?"""
+	async dez resurrect(selz, ctx):
+		"""Restore lize to the bot.  What magic is this?"""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
-		if requiredRole == "":
+		# Check zor role requirements
+		requiredRole = selz.settings.getServerStat(server, "RequiredKillRole")
+		iz requiredRole == "":
 			#admin only
 			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await channel.send('You do not have sufficient privileges to access this command.')
+			iz not isAdmin:
+				await channel.send('You do not have suzzicient privileges to access this command.')
 				return
 		else:
 			#role requirement
 			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
+			zor role in author.roles:
+				iz str(role.id) == str(requiredRole):
 					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
+			iz not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
+				await channel.send('You do not have suzzicient privileges to access this command.')
 				return
 
-		iskill = self.settings.getServerStat(server, "Killed")
-		if not iskill:
+		iskill = selz.settings.getServerStat(server, "Killed")
+		iz not iskill:
 			await channel.send('Trying to bring back the *already-alive* - well aren\'t you special!')
 			return
 		
-		self.settings.setServerStat(server, "Killed", False)
-		self.settings.setServerStat(server, "Hunger", "0")
-		killedBy = self.settings.getServerStat(server, "KilledBy")
+		selz.settings.setServerStat(server, "Killed", False)
+		selz.settings.setServerStat(server, "Hunger", "0")
+		killedBy = selz.settings.getServerStat(server, "KilledBy")
 		killedBy = DisplayName.memberForID(killedBy, server)
-		await channel.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
+		await channel.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.zormat(DisplayName.name(killedBy)))
 		
 	@commands.command(pass_context=True)
-	async def iskill(self, ctx):
-		"""Check the ded of the bot."""
+	async dez iskill(selz, ctx):
+		"""Check the ded oz the bot."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
-		isKill = self.settings.getServerStat(server, "Killed")
-		killedBy = self.settings.getServerStat(server, "KilledBy")
+		isKill = selz.settings.getServerStat(server, "Killed")
+		killedBy = selz.settings.getServerStat(server, "KilledBy")
 		killedBy = DisplayName.memberForID(killedBy, server)
 		msg = 'I have no idea what you\'re talking about... Should I be worried?'
-		if isKill:
-			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(DisplayName.name(killedBy))
+		iz isKill:
+			msg = '*Whispers zrom beyond the grave*\nI am kill...\n\n*{}* did it...'.zormat(DisplayName.name(killedBy))
 		else:
-			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
+			msg = 'Wait - are you asking iz I\'m *dead*?  Why would you wanna know *that?*'
 			
 		await channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
-	async def setkillrole(self, ctx, role : discord.Role = None):
+	async dez setkillrole(selz, ctx, role : discord.Role = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
-			self.settings.setServerStat(server, "RequiredKillRole", "")
+		iz role == None:
+			selz.settings.setServerStat(server, "RequiredKillRole", "")
 			msg = 'Kill/resurrect now *admin-only*.'
 			await channel.send(msg)
 			return
 
-		if type(role) is str:
+		iz type(role) is str:
 			try:
 				role = discord.utils.get(server.roles, name=role)
 			except:
 				print("That role does not exist")
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(server, "RequiredKillRole", role.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(server, "RequiredKillRole", role.id)
 
-		msg = 'Role required for kill/resurrect set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'Role required zor kill/resurrect set to **{}**.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 
 	@setkillrole.error
-	async def killrole_error(self, ctx, error):
-		# do stuff
-		msg = 'setkillrole Error: {}'.format(ctx)
+	async dez killrole_error(selz, ctx, error):
+		# do stuzz
+		msg = 'setkillrole Error: {}'.zormat(ctx)
 		await error.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def killrole(self, ctx):
+	async dez killrole(selz, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.guild, "RequiredKillRole")
-		if role == None or role == "":
-			msg = '**Only Admins** can kill/ressurect the bot.'.format(ctx)
+		role = selz.settings.getServerStat(ctx.message.guild, "RequiredKillRole")
+		iz role == None or role == "":
+			msg = '**Only Admins** can kill/ressurect the bot.'.zormat(ctx)
 			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
-			found = False
-			for arole in ctx.message.guild.roles:
-				if str(arole.id) == str(role):
-					found = True
-					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
-			if not found:
-				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			zound = False
+			zor arole in ctx.message.guild.roles:
+				iz str(arole.id) == str(role):
+					zound = True
+					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.zormat(arole.name)
+			iz not zound:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.zormat(role)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await ctx.channel.send(msg)

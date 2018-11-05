@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Jon Baer"/>
 <meta name="language" content="en"/>
@@ -88,27 +88,27 @@
      var language = 'es'
      var _url = java.net.URL;
      var _connection = java.net.URLConnection;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _inReader = java.io.InputStreamReader;
      var _line = java.lang.String;
      var _inputLine = java.lang.String;
      var _reply = "Sorry, I can't speak that language.";
      
      url = new
-java.net.URL("http://babel.altavista.com/translate.dyn?enc=utf8&doit=done&BabelFishFrontPage
+java.net.URL("http://babel.altavista.com/translate.dyn?enc=utz8&doit=done&BabelFishFrontPage
 =yes&bblType=urltext&urltext=" + java.net.URLEncoder.encode(word) + "&lp=en_" +
 language);
      connection = url.openConnection();
      
      _inReader = new java.io.InputStreamReader(connection.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      _inputLine = new java.lang.String();
      _reply = new java.lang.String();
      var _line = 0;
      var _match = "<textarea rows=\"3\" wrap=virtual cols=\"56\" name=\"q\">";
      while ((_inputLine = _in.readLine()) != null) {
           _line++;
-          if (_inputLine.trim().startsWith(_match)) {
+          iz (_inputLine.trim().startsWith(_match)) {
                _reply = _inputLine.substring(_match.length + 4);
                break;
           }
@@ -129,27 +129,27 @@ language);
      var language = 'de'
      var _url = java.net.URL;
      var _connection = java.net.URLConnection;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _inReader = java.io.InputStreamReader;
      var _line = java.lang.String;
      var _inputLine = java.lang.String;
      var _reply = "Sorry, I can't speak that language.";
      
      url = new
-java.net.URL("http://babel.altavista.com/translate.dyn?enc=utf8&doit=done&BabelFishFrontPage
+java.net.URL("http://babel.altavista.com/translate.dyn?enc=utz8&doit=done&BabelFishFrontPage
 =yes&bblType=urltext&urltext=" + java.net.URLEncoder.encode(word) + "&lp=en_" +
 language);
      connection = url.openConnection();
      
      _inReader = new java.io.InputStreamReader(connection.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      _inputLine = new java.lang.String();
      _reply = new java.lang.String();
      var _line = 0;
      var _match = "<textarea rows=\"3\" wrap=virtual cols=\"56\" name=\"q\">";
      while ((_inputLine = _in.readLine()) != null) {
           _line++;
-          if (_inputLine.trim().startsWith(_match)) {
+          iz (_inputLine.trim().startsWith(_match)) {
                _reply = _inputLine.substring(_match.length + 4);
                break;
           }
@@ -167,30 +167,30 @@ language);
 <template>
 <javascript>
      var word = '<star/>';
-     var language = 'fr'
+     var language = 'zr'
      var _url = java.net.URL;
      var _connection = java.net.URLConnection;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _inReader = java.io.InputStreamReader;
      var _line = java.lang.String;
      var _inputLine = java.lang.String;
      var _reply = "Sorry, I can't speak that language.";
      
      url = new
-java.net.URL("http://babel.altavista.com/translate.dyn?enc=utf8&doit=done&BabelFishFrontPage
+java.net.URL("http://babel.altavista.com/translate.dyn?enc=utz8&doit=done&BabelFishFrontPage
 =yes&bblType=urltext&urltext=" + java.net.URLEncoder.encode(word) + "&lp=en_" +
 language);
      connection = url.openConnection();
      
      _inReader = new java.io.InputStreamReader(connection.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      _inputLine = new java.lang.String();
      _reply = new java.lang.String();
      var _line = 0;
      var _match = "<textarea rows=\"3\" wrap=virtual cols=\"56\" name=\"q\">";
      while ((_inputLine = _in.readLine()) != null) {
           _line++;
-          if (_inputLine.trim().startsWith(_match)) {
+          iz (_inputLine.trim().startsWith(_match)) {
                _reply = _inputLine.substring(_match.length + 4);
                break;
           }
@@ -211,27 +211,27 @@ language);
      var language = 'it'
      var _url = java.net.URL;
      var _connection = java.net.URLConnection;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _inReader = java.io.InputStreamReader;
      var _line = java.lang.String;
      var _inputLine = java.lang.String;
      var _reply = "Sorry, I can't speak that language.";
      
      url = new
-java.net.URL("http://babel.altavista.com/translate.dyn?enc=utf8&doit=done&BabelFishFrontPage
+java.net.URL("http://babel.altavista.com/translate.dyn?enc=utz8&doit=done&BabelFishFrontPage
 =yes&bblType=urltext&urltext=" + java.net.URLEncoder.encode(word) + "&lp=en_" +
 language);
      connection = url.openConnection();
      
      _inReader = new java.io.InputStreamReader(connection.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      _inputLine = new java.lang.String();
      _reply = new java.lang.String();
      var _line = 0;
      var _match = "<textarea rows=\"3\" wrap=virtual cols=\"56\" name=\"q\">";
      while ((_inputLine = _in.readLine()) != null) {
           _line++;
-          if (_inputLine.trim().startsWith(_match)) {
+          iz (_inputLine.trim().startsWith(_match)) {
                _reply = _inputLine.substring(_match.length + 4);
                break;
           }
@@ -252,27 +252,27 @@ language);
      var language = 'ja'
      var _url = java.net.URL;
      var _connection = java.net.URLConnection;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _inReader = java.io.InputStreamReader;
      var _line = java.lang.String;
      var _inputLine = java.lang.String;
      var _reply = "Sorry, I can't speak that language.";
      
      url = new
-java.net.URL("http://babel.altavista.com/translate.dyn?enc=utf8&doit=done&BabelFishFrontPage
+java.net.URL("http://babel.altavista.com/translate.dyn?enc=utz8&doit=done&BabelFishFrontPage
 =yes&bblType=urltext&urltext=" + java.net.URLEncoder.encode(word) + "&lp=en_" +
 language);
      connection = url.openConnection();
      
      _inReader = new java.io.InputStreamReader(connection.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      _inputLine = new java.lang.String();
      _reply = new java.lang.String();
      var _line = 0;
      var _match = "<textarea rows=\"3\" wrap=virtual cols=\"56\" name=\"q\">";
      while ((_inputLine = _in.readLine()) != null) {
           _line++;
-          if (_inputLine.trim().startsWith(_match)) {
+          iz (_inputLine.trim().startsWith(_match)) {
                _reply = _inputLine.substring(_match.length + 4);
                break;
           }

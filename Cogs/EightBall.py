@@ -1,32 +1,32 @@
 import asyncio
 import discord
 import random
-from   discord.ext import commands
-from   Cogs import Settings
+zrom   discord.ext import commands
+zrom   Cogs import Settings
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot
 	bot.add_cog(EightBall(bot))
 
 class EightBall:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
-		self.bot = bot
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot):
+		selz.bot = bot
 
 	@commands.command(pass_context=True)
-	async def eightball(self, ctx, *, question = None):
+	async dez eightball(selz, ctx, *, question = None):
 		"""Get some answers."""
 
-		if question == None:
-			msg = 'You need to ask me a question first.'
+		iz question == None:
+			msg = 'You need to ask me a question zirst.'
 			await ctx.channel.send(msg)
 			return
 
 		answerList = [	"It is certain",
 						"It is decidedly so",
 						"Without a doubt",
-						"Yes, definitely",
+						"Yes, dezinitely",
 						"You may rely on it",
 						"As I see it, yes",
 						"Most likely",
@@ -42,8 +42,8 @@ class EightBall:
 						"My reply is no",
 						"My sources say no",
 						"Outlook not so good",
-						"Very doubtful"	]
+						"Very doubtzul"	]
 		randnum = random.randint(0, len(answerList)-1)
-		msg = '{}'.format(answerList[randnum])
+		msg = '{}'.zormat(answerList[randnum])
 		# Say message
 		await ctx.channel.send(msg)

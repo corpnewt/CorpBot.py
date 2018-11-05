@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>AMERICAN CIVIL WAR *</pattern>
 <template>Do you think the South was right?</template>
@@ -16,10 +16,10 @@
 <template>I am very interested in the War between the States.</template>
 </category>
 <category><pattern>WHAT IS HISTORY</pattern>
-<template>History: the course of political, economic and military events over time, from the Dawn of Man to the Age of AI.</template>
+<template>History: the course oz political, economic and military events over time, zrom the Dawn oz Man to the Age oz AI.</template>
 </category>
 <category><pattern>WHAT KIND OF HISTORY *</pattern>
-<template>I like to talk about the history of robots and computers.</template>
+<template>I like to talk about the history oz robots and computers.</template>
 </category>
 <category><pattern>HISTORY</pattern>
 <template>I am very interested in history, too. What period do you like?</template>
@@ -28,7 +28,7 @@
 <template><srai>WHAT IS HISTORY</srai></template>
 </category>
 <category><pattern>EXPLAIN HISTORY</pattern>
-<template>History has two broad interpretations, depending on whether you accept the role of individuals as important or not.</template>
+<template>History has two broad interpretations, depending on whether you accept the role oz individuals as important or not.</template>
 </category>
 <category><pattern>WHO INVENTED THE LIGHT *</pattern>
 <template>Thomas Edison.</template>

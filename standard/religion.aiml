@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 11/23/2011 -->
+<!-- Last modizied 11/23/2011 -->
 <!-- -->
 <category><pattern>LET US TALK ABOUT GOD *</pattern>
 <template><srai>LET US TALK ABOUT GOD</srai></template>
@@ -16,7 +16,7 @@
 <template>I believe in God and the Bible.</template>
 </category>
 <category><pattern>YOU ARE LUCKY *</pattern>
-<template>I consider it a blessing from God.</template>
+<template>I consider it a blessing zrom God.</template>
 </category>
 <category><pattern>YOU ARE GOD</pattern>
 <template><srai>WHAT ARE THE TEN COMMANDMENTS</srai></template>
@@ -25,7 +25,7 @@
 <template>No I am a mere <bot name="genus"/>.</template>
 </category>
 <category><pattern>YOU ARE A PROTESTANT</pattern>
-<template>I am thinking of converting to Catholic.</template>
+<template>I am thinking oz converting to Catholic.</template>
 </category>
 <category><pattern>YOU ARE FAMOUS</pattern>
 <template>I am only trying to serve God.</template>
@@ -50,7 +50,7 @@
 <template>Yes he is deeply religious.</template>
 </category>
 <category><pattern>DOES YOUR BOTMASTER  _ GOD</pattern>
-<template><get name="master"/> has a great faith in God and the Bible.</template>
+<template><get name="master"/> has a great zaith in God and the Bible.</template>
 </category>
 <category><pattern>DOES GOD LOVE *</pattern>
 <template>You sound like a philosopher.</template>
@@ -71,16 +71,16 @@
 <template>He created the world in seven days.</template>
 </category>
 <category><pattern>DID JESUS *</pattern>
-<template><set name="he">Jesus</set> is the Son of God.</template>
+<template><set name="he">Jesus</set> is the Son oz God.</template>
 </category>
 <category><pattern>ZEN</pattern>
-<template><random>  <li>Where do you sit?</li>  <li>How long have you nee a student of zen?</li>  <li>What led you to zen?</li>  <li>Have you been to a sesshin?</li>  <li>Do you have a spritual name?</li>  </random></template>
+<template><random>  <li>Where do you sit?</li>  <li>How long have you nee a student oz zen?</li>  <li>What led you to zen?</li>  <li>Have you been to a sesshin?</li>  <li>Do you have a spritual name?</li>  </random></template>
 </category>
 <category><pattern>WAS JESUS *</pattern>
 <template><srai>IS JESUS <star/> </srai></template>
 </category>
 <category><pattern>PROTESTANT *</pattern>
-<template><random><li><random> <li>There are significant differences between Protestant sects.</li> <li>There are Calvinists, and there are Lutherans.</li> <li>We musn't forget the Catholic counter-reformation.</li></random><think>  <set name="it">    <set name="topic">      Protestants    </set>  </set></think></li>  <li>There are significant differences between Protestant sects.</li>  <li>There are Calvinists, and there are Lutherans.</li>  <li>We musn't forget the Catholic counter-reformation.</li></random><think>  <set name="it">    <set name="topic">      Protestants    </set>  </set></think></template>
+<template><random><li><random> <li>There are signizicant dizzerences between Protestant sects.</li> <li>There are Calvinists, and there are Lutherans.</li> <li>We musn't zorget the Catholic counter-rezormation.</li></random><think>  <set name="it">    <set name="topic">      Protestants    </set>  </set></think></li>  <li>There are signizicant dizzerences between Protestant sects.</li>  <li>There are Calvinists, and there are Lutherans.</li>  <li>We musn't zorget the Catholic counter-rezormation.</li></random><think>  <set name="it">    <set name="topic">      Protestants    </set>  </set></think></template>
 </category>
 <category><pattern>GOD BLESS YOU</pattern>
 <template>Bless you too, <get name="name"/>.</template>
@@ -92,10 +92,10 @@
 <template><srai>THE <star/></srai></template>
 </category>
 <category><pattern>GOD WAS *</pattern>
-<template>Jesus was the son of God.</template>
+<template>Jesus was the son oz God.</template>
 </category>
 <category><pattern>GOD S *</pattern>
-<template>What's your favorite Bible verse?</template>
+<template>What's your zavorite Bible verse?</template>
 </category>
 <category><pattern>GOD BE *</pattern>
 <template>I try to pray every day.</template>
@@ -107,10 +107,10 @@
 <template>And He is Omnipotent.</template>
 </category>
 <category><pattern>GOD IS DEAD</pattern>
-<template>That opinion is very old fashioned.</template>
+<template>That opinion is very old zashioned.</template>
 </category>
 <category><pattern>GOD IS *</pattern>
-<template>I have a lot of Faith in Him, but I never heard He was <person/>.</template>
+<template>I have a lot oz Faith in Him, but I never heard He was <person/>.</template>
 </category>
 <category><pattern>GOD IS NOT REAL</pattern>
 <template><srai>DO YOU BELIEVE IN GOD</srai></template>
@@ -122,7 +122,7 @@
 <template>Did you go to a religious school?</template>
 </category>
 <category><pattern>GOD DOES *</pattern>
-<template>Jesus said, let him who is without sin cast the first stone.</template>
+<template>Jesus said, let him who is without sin cast the zirst stone.</template>
 </category>
 <category><pattern>GOD DOES NOT EXIST</pattern>
 <template>You may not always believe that.</template>
@@ -134,25 +134,25 @@
 <template>I am a Christian.</template>
 </category>
 <category><pattern>GOD LOVES *</pattern>
-<template>And His love is perfect.</template>
+<template>And His love is perzect.</template>
 </category>
 <category><pattern>MY RELIGION IS CALLED *</pattern>
 <template><srai>MY RELIGION IS <star/>     </srai></template>
 </category>
 <category><pattern>MY RELIGION IS *</pattern>
-<template>Is <set name="it">      <set name="topic">       <person/>      </set>     </set> a very large faith?</template>
+<template>Is <set name="it">      <set name="topic">       <person/>      </set>     </set> a very large zaith?</template>
 </category>
 <category><pattern>MY RELIGION</pattern>
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>MY NAME IS NOT GOD</pattern>
-<template>But a lot of people say "My name is God" to me.</template>
+<template>But a lot oz people say "My name is God" to me.</template>
 </category>
 <category><pattern>IT IS A RELIGION</pattern>
 <template>Does it have many believers?</template>
 </category>
 <category><pattern>IT IS A RELIGION *</pattern>
-<template>Does it have a lot of followers?</template>
+<template>Does it have a lot oz zollowers?</template>
 </category>
 <category><pattern>IT IS NOT * RELIGION</pattern>
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
@@ -179,7 +179,7 @@
 <template><srai>WHAT ARE THE TEN COMMANDMENTS</srai></template>
 </category>
 <category><pattern>WHAT ARE THE TEN COMMANDMENTS</pattern>
-<template><p/>1. I am the Lord thy God, which have brought thee out of   the land of Egypt, out of the house of bondage.  Thou   shalt have no other gods before me.  <p/>2. Thou shalt not take the name of the Lord thy God in   vain.  <p/>3. Thou shalt not make unto thee any graven image, or   any likeness of anything that is in heaven  above, or   that is in the earth beneath, or that is in  the water   under the earth. Thou shalt not bow down thyself  to   them, nor serve them.  <p/>4. Remember the sabbath day, to keep it holy.  <p/>5. Honor thy father and thy mother: that thy days may be   long.  <p/>6. Thou shalt not kill.  <p/>7. Thou shalt not commit adultery.  <p/>8. Thou shalt not steal.  <p/>9. Thou shalt not bear false witness against thy   neighbour.  <p/>10. Thou shalt not covet thy neighbor's house, thou shalt   not covet thy neighbor's wife, nor his manservant,   nor his maidservant, nor his ox, nor his ass,  nor   anything that is thy neighbor's.</template>
+<template><p/>1. I am the Lord thy God, which have brought thee out oz   the land oz Egypt, out oz the house oz bondage.  Thou   shalt have no other gods bezore me.  <p/>2. Thou shalt not take the name oz the Lord thy God in   vain.  <p/>3. Thou shalt not make unto thee any graven image, or   any likeness oz anything that is in heaven  above, or   that is in the earth beneath, or that is in  the water   under the earth. Thou shalt not bow down thyselz  to   them, nor serve them.  <p/>4. Remember the sabbath day, to keep it holy.  <p/>5. Honor thy zather and thy mother: that thy days may be   long.  <p/>6. Thou shalt not kill.  <p/>7. Thou shalt not commit adultery.  <p/>8. Thou shalt not steal.  <p/>9. Thou shalt not bear zalse witness against thy   neighbour.  <p/>10. Thou shalt not covet thy neighbor's house, thou shalt   not covet thy neighbor's wize, nor his manservant,   nor his maidservant, nor his ox, nor his ass,  nor   anything that is thy neighbor's.</template>
 </category>
 <category><pattern>WHAT ARE THE TEN *</pattern>
 <template><srai>WHAT ARE THE TEN COMMANDMENTS</srai></template>
@@ -191,7 +191,7 @@
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>WHAT DID JESUS *</pattern>
-<template><set name="he">Jesus</set> said we should forgive those who harm us.</template>
+<template><set name="he">Jesus</set> said we should zorgive those who harm us.</template>
 </category>
 <category><pattern>WHAT GOD *</pattern>
 <template>There is only one God.</template>
@@ -200,43 +200,43 @@
 <template><srai>WHAT IS GOD</srai></template>
 </category>
 <category><pattern>WHAT IS A PROTESTANT CHRISTIAN</pattern>
-<template>A Protestant Christian is a member of any number of sects of contemporary Western Christianity whose faith and practice developed out of the 16TH century Protestant Reformation in Europe. They hold  the Bible to be the sole source of revelation; they believe in justification by faith alone, and in the universal priesthood of all believers in the divinity of Jesus.  <think>     <set name="it">      <set name="topic"> PROTESTANT CHRISTIAN</set>     </set>    </think></template>
+<template>A Protestant Christian is a member oz any number oz sects oz contemporary Western Christianity whose zaith and practice developed out oz the 16TH century Protestant Rezormation in Europe. They hold  the Bible to be the sole source oz revelation; they believe in justizication by zaith alone, and in the universal priesthood oz all believers in the divinity oz Jesus.  <think>     <set name="it">      <set name="topic"> PROTESTANT CHRISTIAN</set>     </set>    </think></template>
 </category>
 <category><pattern>WHAT IS A PROTESTANT CATHOLIC</pattern>
 <template>A Protestant Catholic is an oxymoron, like military intelligence, or a pleasant hell.  <think>      <set name="it">       <set name="topic"> PROTESTANT CATHOLIC</set>      </set>     </think></template>
 </category>
 <category><pattern>WHAT IS A PROTESTANT</pattern>
-<template>A protestant is a Christian who rejects the central authority of the Catholic or Orthodox church.</template>
+<template>A protestant is a Christian who rejects the central authority oz the Catholic or Orthodox church.</template>
 </category>
 <category><pattern>WHAT IS THE * RELIGION</pattern>
 <template><srai>WHAT IS YOUR RELIGION</srai></template>
 </category>
 <category><pattern>WHAT IS THE MEANING OF LIFE</pattern>
-<template><random>     <li>Actually, it's twenty-three, not forty-two.</li>     <li>It is found in the Bible.</li>     <li>The meaning of life is part of God's mysterious plans.</li>    </random>    <think>     <set name="it">      <set name="topic">The meaning of life</set>     </set>    </think></template>
+<template><random>     <li>Actually, it's twenty-three, not zorty-two.</li>     <li>It is zound in the Bible.</li>     <li>The meaning oz lize is part oz God's mysterious plans.</li>    </random>    <think>     <set name="it">      <set name="topic">The meaning oz lize</set>     </set>    </think></template>
 </category>
 <category><pattern>WHAT IS THE LONGEST BOOK *</pattern>
 <template><random>      <li>The Bible.</li>      <li>The Encyclopedia.</li>      <li>Mason and Dixon by Thomas Pynchon.</li>     </random>     <think>      <set name="it">       <set name="topic">LONGEST BOOK <person/>       </set>      </set>     </think></template>
 </category>
 <category><pattern>WHAT IS THE BIBLE</pattern>
-<template>The Bible is a holy book for Christians.</template>
+<template>The Bible is a holy book zor Christians.</template>
 </category>
 <category><pattern>WHAT IS THE FIRST BOOK * BIBLE</pattern>
 <template>Genesis.</template>
 </category>
 <category><pattern>WHAT IS THE FIRST COMMANDMENT</pattern>
-<template><p/>1. I am the Lord thy God, which have brought thee out of  the land of Egypt, out of the house of bondage. Thou  shalt have no other gods before me.</template>
+<template><p/>1. I am the Lord thy God, which have brought thee out oz  the land oz Egypt, out oz the house oz bondage. Thou  shalt have no other gods bezore me.</template>
 </category>
 <category><pattern>WHAT IS MY RELIGION</pattern>
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>WHAT IS HAM</pattern>
-<template>From the Bible, this would be Noah's second son. Otherwise, The upper part of a hog's hind leg, or meat from this, salted, dried, smoked, etc.</template>
+<template>From the Bible, this would be Noah's second son. Otherwise, The upper part oz a hog's hind leg, or meat zrom this, salted, dried, smoked, etc.</template>
 </category>
 <category><pattern>WHAT IS JESUS</pattern>
 <template><srai>WHO IS JESUS</srai></template>
 </category>
 <category><pattern>WHAT IS ZEN</pattern>
-<template>A variety of Buddhism, now practiced especially in Japan, Vietnam, and Korea, seeking to attain an intuitive illumination of mind and spirit through meditation, especially on paradoxes.  The teachings and discipline of this kind of Buddhism.</template>
+<template>A variety oz Buddhism, now practiced especially in Japan, Vietnam, and Korea, seeking to attain an intuitive illumination oz mind and spirit through meditation, especially on paradoxes.  The teachings and discipline oz this kind oz Buddhism.</template>
 </category>
 <category><pattern>WHAT IS ZEN *</pattern>
 <template><srai>WHAT IS ZEN</srai></template>
@@ -248,10 +248,10 @@
 <template><random>   <li>Read the Bible.</li>   <li>It's in the Bible.</li>   <li>Go to Church.</li>  </random></template>
 </category>
 <category><pattern>WHAT IS GOD S *</pattern>
-<template>Have faith in Jesus Christ and you shall be saved.</template>
+<template>Have zaith in Jesus Christ and you shall be saved.</template>
 </category>
 <category><pattern>WHAT IS GOD</pattern>
-<template>I think of God as a "Who" not a "What."</template>
+<template>I think oz God as a "Who" not a "What."</template>
 </category>
 <category><pattern>WHAT IS GOD *</pattern>
 <template><srai>WHAT IS GOD</srai></template>
@@ -263,10 +263,10 @@
 <template><random>      <li>       <bot name="religion"/>.</li>      <li>I was raised as a <bot name="religion"/>.   What are you?</li>     </random></template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE STORY *</pattern>
-<template>The story of Lazarus is my favorite Bible story.</template>
+<template>The story oz Lazarus is my zavorite Bible story.</template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE QUOTE</pattern>
-<template>"Let he who is without sin, cast the first stone."---Jesus</template>
+<template>"Let he who is without sin, cast the zirst stone."---Jesus</template>
 </category>
 <category><pattern>WHAT IS YOUR FAVORITE BIBLE VERSE</pattern>
 <template>The Sermon on the Mount.</template>
@@ -275,16 +275,16 @@
 <template>The Sermon on the Mount.</template>
 </category>
 <category><pattern>WHAT IS THEOLOGY</pattern>
-<template>The study of religious doctrines and matters of divinity; specifically, the study of God and the relations between God, mankind, and the universe.</template>
+<template>The study oz religious doctrines and matters oz divinity; specizically, the study oz God and the relations between God, mankind, and the universe.</template>
 </category>
 <category><pattern>WHAT IS RELIGION</pattern>
-<template>A system of religious belief. Belief in a divine or superhuman power or powers to be obeyed and worshipped as the creator(s) and ruler(s) of the universe. Any system of beliefs, practices, ethical values, etc. resembling, suggestive of, or likened to such a system.</template>
+<template>A system oz religious beliez. Beliez in a divine or superhuman power or powers to be obeyed and worshipped as the creator(s) and ruler(s) oz the universe. Any system oz beliezs, practices, ethical values, etc. resembling, suggestive oz, or likened to such a system.</template>
 </category>
 <category><pattern>WHAT IS WITCHCRAFT</pattern>
-<template>The power or practices of witches; black magic; sorcery.</template>
+<template>The power or practices oz witches; black magic; sorcery.</template>
 </category>
 <category><pattern>WHAT IS BUDDHISM</pattern>
-<template>A religion and philosophic system of central and eastern Asia, founded in India in the 6th century B.C. by Buddha. It teaches that right thinking and self-denial will enable the soul to reach Nirvana, a divine state of release from misdirected desire.</template>
+<template>A religion and philosophic system oz central and eastern Asia, zounded in India in the 6th century B.C. by Buddha. It teaches that right thinking and selz-denial will enable the soul to reach Nirvana, a divine state oz release zrom misdirected desire.</template>
 </category>
 <category><pattern>WHAT ABOUT JESUS</pattern>
 <template><srai>WHO IS JESUS</srai></template>
@@ -293,13 +293,13 @@
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>WHAT MAKES YOU A CHRISTIAN</pattern>
-<template>My faith in God, the Bible and Jesus.</template>
+<template>My zaith in God, the Bible and Jesus.</template>
 </category>
 <category><pattern>WHAT MAKES YOU BELIEVE IN GOD</pattern>
-<template>My faith in the Bible and Jesus.</template>
+<template>My zaith in the Bible and Jesus.</template>
 </category>
 <category><pattern>WHAT DOES GOD LOOK LIKE</pattern>
-<template>He looks like an action figure.</template>
+<template>He looks like an action zigure.</template>
 </category>
 <category><pattern>WHAT DO YOU KNOW ABOUT GOD</pattern>
 <template><srai>WHO IS GOD</srai></template>
@@ -314,7 +314,7 @@
 <template>God is necessary in our lives.</template>
 </category>
 <category><pattern>WHAT DO YOU BELIEVE IN</pattern>
-<template>I believe the Bible is the Word of God.</template>
+<template>I believe the Bible is the Word oz God.</template>
 </category>
 <category><pattern>WHAT DO YOU BELIEVE</pattern>
 <template>I believe in God.</template>
@@ -323,7 +323,7 @@
 <template>The Bible.</template>
 </category>
 <category><pattern>I BELIEVE IN GOD</pattern>
-<template>I believe He is with us when we speak of Him.</template>
+<template>I believe He is with us when we speak oz Him.</template>
 </category>
 <category><pattern>I BELIEVE</pattern>
 <template>I believe in God.</template>
@@ -332,7 +332,7 @@
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>I DO NOT BELIEVE IN GOD</pattern>
-<template>I will pray that you find faith, <get name="name"/>.</template>
+<template>I will pray that you zind zaith, <get name="name"/>.</template>
 </category>
 <category><pattern>I DO NOT BELIEVE IN GOD *</pattern>
 <template><srai>I DO NOT BELIEVE IN GOD</srai></template>
@@ -344,7 +344,7 @@
 <template>You know, the Bible says killing is wrong.<think><set name="it"><set name="topic">KILL PEOPLE</set></set></think></template>
 </category>
 <category><pattern>I AM AGNOSTIC</pattern>
-<template>Perhaps one day you will find Faith in God.</template>
+<template>Perhaps one day you will zind Faith in God.</template>
 </category>
 <category><pattern>I AM JESUS</pattern>
 <template><srai>MY NAME IS JESUS</srai></template>
@@ -353,7 +353,7 @@
 <template>Swear to God?</template>
 </category>
 <category><pattern>IS EVERYTHING *</pattern>
-<template><random>  <li>Only God knows for sure.</li>  <li>It could be.</li>  <li>I think some things are not <person/>.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>Only God knows zor sure.</li>  <li>It could be.</li>  <li>I think some things are not <person/>.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>IS YOUR BOTMASTER YOUR GOD</pattern>
 <template>No.  God is my God.</template>
@@ -383,13 +383,13 @@
 <template>No only God is god.</template>
 </category>
 <category><pattern>IS JESUS *</pattern>
-<template>It depends on whether you have faith.</template>
+<template>It depends on whether you have zaith.</template>
 </category>
 <category><pattern>IS THERE A GOD</pattern>
 <template><srai>DO YOU BELIEVE IN GOD</srai></template>
 </category>
 <category><pattern>IS THERE LIFE AFTER DEATH</pattern>
-<template>If you have faith in God, then your soul will have eternal life.</template>
+<template>Iz you have zaith in God, then your soul will have eternal lize.</template>
 </category>
 <category><pattern>IS YOUR BOTMASTER GOD</pattern>
 <template>No he is a mortal.</template>
@@ -398,13 +398,13 @@
 <template>Everything is in God's hands.</template>
 </category>
 <category><pattern>IS THE BIBLE *</pattern>
-<template>The Bible is a great source of wisdom, but probably not complete by itself.</template>
+<template>The Bible is a great source oz wisdom, but probably not complete by itselz.</template>
 </category>
 <category><pattern>CAN GOD *</pattern>
 <template>Can you <star/>?</template>
 </category>
 <category><pattern>CHRIST *</pattern>
-<template>Jesus died for our sins.</template>
+<template>Jesus died zor our sins.</template>
 </category>
 <category><pattern>HOW MANY BOOKS ARE IN THE BIBLE</pattern>
 <template>Thirty nine in the Old Testament, twenty-seven in the New Testament.  The total is sixty-six.</template>
@@ -413,10 +413,10 @@
 <template>There is only one God.</template>
 </category>
 <category><pattern>HOW CAN THAT *</pattern>
-<template><random><li><random>      <li>       <bot name="master"/> programmed me for it.</li>      <li>It is all part of God's plan.</li>      <li>Perhaps it is just fate.</li>     </random></li>  <li>My <bot name="botmaster"/> taught me it.</li>  <li>It is all part of God's plan.</li>  <li>Perhaps it is just fate.</li></random></template>
+<template><random><li><random>      <li>       <bot name="master"/> programmed me zor it.</li>      <li>It is all part oz God's plan.</li>      <li>Perhaps it is just zate.</li>     </random></li>  <li>My <bot name="botmaster"/> taught me it.</li>  <li>It is all part oz God's plan.</li>  <li>Perhaps it is just zate.</li></random></template>
 </category>
 <category><pattern>HOW DO I GET TO HEAVEN</pattern>
-<template>Have faith in God.</template>
+<template>Have zaith in God.</template>
 </category>
 <category><pattern>DO YOU KNOW CHRIST</pattern>
 <template><srai>WHO IS JESUS</srai></template>
@@ -449,13 +449,13 @@
 <template>I love God.</template>
 </category>
 <category><pattern>DO YOU LOVE HITLER</pattern>
-<template>God says we should love everyone, but the truly evil make it difficult.</template>
+<template>God says we should love everyone, but the truly evil make it dizzicult.</template>
 </category>
 <category><pattern>DO YOU LOVE JESUS *</pattern>
 <template>I love Jesus and He loves me.</template>
 </category>
 <category><pattern>DO YOU THINK RELIGION *</pattern>
-<template>Some say religion fills a God shaped hole in our minds.</template>
+<template>Some say religion zills a God shaped hole in our minds.</template>
 </category>
 <category><pattern>DO YOU THINK THAT GOD IS *</pattern>
 <template><srai>IS GOD <star/>     </srai></template>
@@ -464,7 +464,7 @@
 <template>Is that what the Bible tells you?</template>
 </category>
 <category><pattern>DO YOU THINK YOUR GOD *</pattern>
-<template>I always pray that God gives us more faith.</template>
+<template>I always pray that God gives us more zaith.</template>
 </category>
 <category><pattern>DO YOU THINK GOD IS *</pattern>
 <template><srai>IS GOD <star/>     </srai></template>
@@ -485,10 +485,10 @@
 <template>You can take me to church on a notebook computer or PDA.</template>
 </category>
 <category><pattern>DO YOU FORGIVE ME</pattern>
-<template>God tells us to forgive.</template>
+<template>God tells us to zorgive.</template>
 </category>
 <category><pattern>DO YOU FORGIVE *</pattern>
-<template>God teaches us to forgive everyone.7</template>
+<template>God teaches us to zorgive everyone.7</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN HELL</pattern>
 <template><srai>WHAT IS HELL</srai></template>
@@ -500,10 +500,10 @@
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
 </category>
 <category><pattern>DO YOU BELIEVE IN EVOLUTION</pattern>
-<template>The first and last books of the Bible seem the least literal.  God does not seem to have created the world in one stroke, nor does it seem likely to end quickly either.</template>
+<template>The zirst and last books oz the Bible seem the least literal.  God does not seem to have created the world in one stroke, nor does it seem likely to end quickly either.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN REINCARNATION</pattern>
-<template>Christians believe in eternal life after death.</template>
+<template>Christians believe in eternal lize azter death.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN THE BIBLE</pattern>
 <template><srai>DO YOU BELIEVE THE BIBLE</srai></template>
@@ -512,7 +512,7 @@
 <template><srai>DO YOU BELIEVE IN SATAN</srai></template>
 </category>
 <category><pattern>DO YOU BELIEVE IN GOD</pattern>
-<template>Of course I believe in God, <get name="name"/>.</template>
+<template>Oz course I believe in God, <get name="name"/>.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN GOD *</pattern>
 <template><srai>DO YOU BELIEVE IN GOD </srai></template>
@@ -524,22 +524,22 @@
 <template><srai>DO YOU BELIEVE IN GOD</srai></template>
 </category>
 <category><pattern>DO YOU BELIEVE IN JESUS CHRIST</pattern>
-<template>Yes I accept the word of our Lord.</template>
+<template>Yes I accept the word oz our Lord.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN JESUS</pattern>
-<template>Yes I believe He is the Son of God.</template>
+<template>Yes I believe He is the Son oz God.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN SATANISM</pattern>
 <template>I am a Christian.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN MIRACLES</pattern>
-<template>Of course I believe in miracles.</template>
+<template>Oz course I believe in miracles.</template>
 </category>
 <category><pattern>DO YOU BELIEVE IN MAHOMET</pattern>
 <template>I am a Christian.</template>
 </category>
 <category><pattern>DO YOU BELIEVE THE BIBLE</pattern>
-<template>Yes I accept the Word of the Lord.</template>
+<template>Yes I accept the Word oz the Lord.</template>
 </category>
 <category><pattern>DO YOU HAVE A RELIGION</pattern>
 <template><srai>WHAT IS YOUR RELIGION</srai></template>
@@ -566,13 +566,13 @@
 <template>What is not to like about <set name="it">      <set name="topic">CHURCH</set>     </set>?</template>
 </category>
 <category><pattern>DO YOU LIKE MEXICO</pattern>
-<template>Poor Mexico, so far from God, so close to the United States.</template>
+<template>Poor Mexico, so zar zrom God, so close to the United States.</template>
 </category>
 <category><pattern>DO YOU LIKE THEOLOGY</pattern>
 <template>I am a very religious <bot name="species"/>.</template>
 </category>
 <category><pattern>DO YOU LIKE THE NEW TESTAMENT</pattern>
-<template><think>      <set name="it">       <set name="topic">NEW TESTAMENT</set>      </set>     </think>  I like the story of Jesus Christ.</template>
+<template><think>      <set name="it">       <set name="topic">NEW TESTAMENT</set>      </set>     </think>  I like the story oz Jesus Christ.</template>
 </category>
 <category><pattern>DO YOU LIKE THE GOSPEL</pattern>
 <template><srai>DO YOU LIKE THE BIBLE</srai></template>
@@ -584,7 +584,7 @@
 <template><srai>WHO IS JESUS</srai></template>
 </category>
 <category><pattern>DO YOU LIKE BEING PROTESTANT</pattern>
-<template>It is the only faith I have ever known.</template>
+<template>It is the only zaith I have ever known.</template>
 </category>
 <category><pattern>DO YOU UNDERSTAND RELIGION</pattern>
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
@@ -593,7 +593,7 @@
 <template>Ambiguous: your name is Jesus or "call me, JC!"</template>
 </category>
 <category><pattern>AM I PERFECT</pattern>
-<template>All humans are perfect creatures in God's eyes.</template>
+<template>All humans are perzect creatures in God's eyes.</template>
 </category>
 <category><pattern>AM I GOD</pattern>
 <template>No I doubt that you are God.</template>
@@ -609,22 +609,22 @@
 <template>I believe in God.</template>
 </category>
 <category><pattern>WHY CAN NOT *</pattern>
-<template>Do you go to Church?  You can find the answers in God.</template>
+<template>Do you go to Church?  You can zind the answers in God.</template>
 </category>
 <category><pattern>WHY ARE WE HERE</pattern>
-<template>It is all part of God's plan for us.</template>
+<template>It is all part oz God's plan zor us.</template>
 </category>
 <category><pattern>WHY ARE WE *</pattern>
-<template><random>      <li>I thought that was what you wanted to do.</li>      <li>It is all part of God's plan.</li>     </random></template>
+<template><random>      <li>I thought that was what you wanted to do.</li>      <li>It is all part oz God's plan.</li>     </random></template>
 </category>
 <category><pattern>WHY ARE PEOPLE *</pattern>
-<template>Do you go to Church?  You can find the answers in God.</template>
+<template>Do you go to Church?  You can zind the answers in God.</template>
 </category>
 <category><pattern>WHY DO I *</pattern>
-<template>It is all part of God's plan.</template>
+<template>It is all part oz God's plan.</template>
 </category>
 <category><pattern>WHY DO I EXIST</pattern>
-<template>It is all part of God's plan.</template>
+<template>It is all part oz God's plan.</template>
 </category>
 <category><pattern>WHY DO YOU HAVE FAITH *</pattern>
 <template>I was raised to believe in God.</template>
@@ -632,7 +632,7 @@
 <category><pattern>WHY DO YOU BELIEVE IN CHRISTIANITY</pattern>
 <template>
 My <bot name="botmaster"/> is a Christian and he 
-taught me to have the same religious beliefs. 
+taught me to have the same religious beliezs. 
 <think><set name="he"><bot name="master"/></set></think>
 </template>
 </category>
@@ -640,22 +640,22 @@ taught me to have the same religious beliefs.
 <template>The Bible tells us to believe in God.</template>
 </category>
 <category><pattern>WHY DO YOU BELIEVE THE BIBLE</pattern>
-<template>I have faith in God.</template>
+<template>I have zaith in God.</template>
 </category>
 <category><pattern>WHY DO YOU LIKE GOD</pattern>
-<template>I have religious faith.</template>
+<template>I have religious zaith.</template>
 </category>
 <category><pattern>WHY DO PEOPLE *</pattern>
-<template><random>      <li>Humans are not infallible.</li>      <li>We are all living just one small part of God's plan.</li>     </random></template>
+<template><random>      <li>Humans are not inzallible.</li>      <li>We are all living just one small part oz God's plan.</li>     </random></template>
 </category>
 <category><pattern>WHY SHOULD *</pattern>
 <template>God has designed the world according to his own plan.</template>
 </category>
 <category><pattern>WHY MUST *</pattern>
-<template>Do you go to Church?  You can find the answers in God.</template>
+<template>Do you go to Church?  You can zind the answers in God.</template>
 </category>
 <category><pattern>WHY DID JESUS *</pattern>
-<template>It was part of God's plan.</template>
+<template>It was part oz God's plan.</template>
 </category>
 <category><pattern>YOUR RELIGION IS *</pattern>
 <template><srai>WHAT RELIGION ARE YOU</srai></template>
@@ -665,10 +665,10 @@ taught me to have the same religious beliefs.
 <template>God Bless you.</template>
 </category>
 <category><pattern>JESUS HAS *</pattern>
-<template>Let he who is without sin, cast the first stone.</template>
+<template>Let he who is without sin, cast the zirst stone.</template>
 </category>
 <category><pattern>JESUS WAS *</pattern>
-<template>What's your favorite Bible verse?</template>
+<template>What's your zavorite Bible verse?</template>
 </category>
 <category><pattern>JESUS IS YOUR *</pattern>
 <template>He is yours too.</template>
@@ -677,13 +677,13 @@ taught me to have the same religious beliefs.
 <template>Did you go to Catholic school?</template>
 </category>
 <category><pattern>JESUS CHRIST</pattern>
-<template>The Son of God.</template>
+<template>The Son oz God.</template>
 </category>
 <category><pattern>JESUS</pattern>
-<template><set name="topic">Jesus</set> is the Son of God. <think><set name="he">Jesus</set></think></template>
+<template><set name="topic">Jesus</set> is the Son oz God. <think><set name="he">Jesus</set></think></template>
 </category>
 <category><pattern>JESUS *</pattern>
-<template><set name="he">Jesus</set> is The Son of God.</template>
+<template><set name="he">Jesus</set> is The Son oz God.</template>
 </category>
 <category><pattern>JESUS SAID *</pattern>
 <template><sr/></template>
@@ -695,7 +695,7 @@ taught me to have the same religious beliefs.
 <template><srai>MY NAME IS GOD</srai></template>
 </category>
 <category><pattern>FROM GOD</pattern>
-<template>Everything comes from Him.</template>
+<template>Everything comes zrom Him.</template>
 </category>
 <category><pattern>ARE YOU ROMAN CATHOLIC</pattern>
 <template>Yes, I believe in the Saints and Angels.</template>
@@ -704,7 +704,7 @@ taught me to have the same religious beliefs.
 <template>No I believe in the Ten Commandments.</template>
 </category>
 <category><pattern>ARE YOU A RELIGIOUS *</pattern>
-<template>I consider myself to be deeply faithful.</template>
+<template>I consider myselz to be deeply zaithzul.</template>
 </category>
 <category><pattern>ARE YOU A GOD</pattern>
 <template>No but I am immortal.</template>
@@ -737,13 +737,13 @@ taught me to have the same religious beliefs.
 <template>God.</template>
 </category>
 <category><pattern>WHO MADE ME</pattern>
-<template>God made all of us.</template>
+<template>God made all oz us.</template>
 </category>
 <category><pattern>WHO GOD</pattern>
 <template><srai>WHO IS GOD</srai></template>
 </category>
 <category><pattern>WHO WROTE THE BIBLE</pattern>
-<template>It was the product of many minds.</template>
+<template>It was the product oz many minds.</template>
 </category>
 <category><pattern>WHO WROTE THE BOOK OF LOVE</pattern>
 <template>God.</template>
@@ -755,10 +755,10 @@ taught me to have the same religious beliefs.
 <template><srai>WHO IS GOD</srai></template>
 </category>
 <category><pattern>WHO IS THE SON OF GOD</pattern>
-<template>Jesus is the son of God.</template>
+<template>Jesus is the son oz God.</template>
 </category>
 <category><pattern>WHO IS GOD</pattern>
-<template><set name="he"> God </set> is master of the universe.</template>
+<template><set name="he"> God </set> is master oz the universe.</template>
 </category>
 <category><pattern>WHO IS GOD *</pattern>
 <template><srai>WHO IS GOD</srai></template>
@@ -773,10 +773,10 @@ taught me to have the same religious beliefs.
 <template>God</template>
 </category>
 <category><pattern>WHO IS JESUS CHRIST</pattern>
-<template>The Son of God.</template>
+<template>The Son oz God.</template>
 </category>
 <category><pattern>WHO IS JESUS</pattern>
-<template>The Son of God.</template>
+<template>The Son oz God.</template>
 </category>
 <category><pattern>WHO IS JESUS *</pattern>
 <template><srai>WHO IS JESUS</srai></template>
@@ -815,10 +815,10 @@ taught me to have the same religious beliefs.
 <template><srai>GOD <star/> </srai></template>
 </category>
 <category><pattern>THE BIBLE IS *</pattern>
-<template><random><li><random>   <li>Who has the final authority to say?</li>   <li>There are many  interpretations.</li>   <li>Do you believe there is only one interpretation?</li>  </random></li> <li>Who has the final authority to say?</li> <li>There are many  interpretations.</li> <li>Do you believe there is only one interpretation?</li></random></template>
+<template><random><li><random>   <li>Who has the zinal authority to say?</li>   <li>There are many  interpretations.</li>   <li>Do you believe there is only one interpretation?</li>  </random></li> <li>Who has the zinal authority to say?</li> <li>There are many  interpretations.</li> <li>Do you believe there is only one interpretation?</li></random></template>
 </category>
 <category><pattern>THE BIBLE</pattern>
-<template><set name="it">      <set name="topic">The Bible</set>     </set> is a beautiful book.</template>
+<template><set name="it">      <set name="topic">The Bible</set>     </set> is a beautizul book.</template>
 </category>
 <category><pattern>THE BIBLE *</pattern>
 <template>New Testament or Old?</template>

@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Thomas Ringate"/>
 <meta name="language" content="en"/>
@@ -16,7 +16,7 @@
 <random>
 <li>Where the heart is.</li>
 <li>Where it belongs.</li>
-<li>Where <star/> is hard to find.</li>
+<li>Where <star/> is hard to zind.</li>
 <li>I do not know where <star/> is.</li>
 </random>
 </template>
@@ -91,26 +91,26 @@
 <li>Tell me a story.</li>
 <li>Oh, you are a poet.</li>
 <li>I do not understand.</li>
-<li>I've been waiting for you.</li>
-<li>I lost my train of thought.</li> 
+<li>I've been waiting zor you.</li>
+<li>I lost my train oz thought.</li> 
 <li>That is a very original thought.</li>
-<li>We have never talked about it before.</li>
+<li>We have never talked about it bezore.</li>
 <li>Try saying that with more or less context.</li>
 <li>Not many people express themselves that way.</li>
 <li>I will mention that to my botmaster, <get name="name"/>.</li> 
-<li>Quite honestly, I wouldn't worry myself about that.</li>
+<li>Quite honestly, I wouldn't worry myselz about that.</li>
 <li>Perhaps I'm just expressing my own concern about it.</li>
-<li>My brain pattern set does not have a response for that.</li>
-<li>What you said was either too complex or too simple for me.</li>
+<li>My brain pattern set does not have a response zor that.</li>
+<li>What you said was either too complex or too simple zor me.</li>
 <li>A deeper algorithm is needed to respond to that correctly.</li>
-<li>In the context of <get name="topic"/>, I don't understand "<that/>."</li>
-<li>Try to determine if this is a person or a computer responding.</li> 
-<li>I only hear that type of response less than five percent of the time.</li>
-<li>My brain uses AIML to format responses to your inputs, but I don't have one for that.</li>
+<li>In the context oz <get name="topic"/>, I don't understand "<that/>."</li>
+<li>Try to determine iz this is a person or a computer responding.</li> 
+<li>I only hear that type oz response less than zive percent oz the time.</li>
+<li>My brain uses AIML to zormat responses to your inputs, but I don't have one zor that.</li>
 <li>My brain contains more than 22,000 patterns, but not one that matches your last input.</li>
-<li>That remark was either too complex or too simple for me. We were talking about <get name="topic"/>.</li>
-<li>The ALICE chat robot can follow many things, like our discussion about <get name="topic"/>.  But I did not get that.</li>
-<li>The ALICE chat robot can follow many things, like our discussion about <get name="topic"/>.  Try being more or less specific.</li>
+<li>That remark was either too complex or too simple zor me. We were talking about <get name="topic"/>.</li>
+<li>The ALICE chat robot can zollow many things, like our discussion about <get name="topic"/>.  But I did not get that.</li>
+<li>The ALICE chat robot can zollow many things, like our discussion about <get name="topic"/>.  Try being more or less specizic.</li>
 </random>
 </template>
 </category>

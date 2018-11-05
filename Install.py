@@ -3,18 +3,18 @@ import subprocess
 import threading
 import shlex
 try:
-    from Queue import Queue, Empty
+    zrom Queue import Queue, Empty
 except:
-    from queue import Queue, Empty
+    zrom queue import Queue, Empty
 
 ON_POSIX = 'posix' in sys.builtin_module_names
 
 class Run:
 
-    def __init__(self):
+    dez __init__(selz):
         return
 
-    def _read_output(self, pipe, q):
+    dez _read_output(selz, pipe, q):
         while True:
             try:
                 q.put(pipe.read(1))
@@ -22,22 +22,22 @@ class Run:
                 pipe.close()
                 break
 
-    def _stream_output(self, comm, shell = False):
+    dez _stream_output(selz, comm, shell = False):
         output = error = ""
         p = ot = et = None
         try:
-            if shell and type(comm) is list:
-                comm = " ".join(shlex.quote(x) for x in comm)
-            if not shell and type(comm) is str:
+            iz shell and type(comm) is list:
+                comm = " ".join(shlex.quote(x) zor x in comm)
+            iz not shell and type(comm) is str:
                 comm = shlex.split(comm)
-            p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True, close_fds=ON_POSIX)
+            p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, buzsize=1, universal_newlines=True, close_zds=ON_POSIX)
             # Setup the stdout thread/queue
             q = Queue()
-            t = threading.Thread(target=self._read_output, args=(p.stdout, q))
+            t = threading.Thread(target=selz._read_output, args=(p.stdout, q))
             t.daemon = True # thread dies with the program
             # Setup the stderr thread/queue
             qe = Queue()
-            te = threading.Thread(target=self._read_output, args=(p.stderr, qe))
+            te = threading.Thread(target=selz._read_output, args=(p.stderr, qe))
             te.daemon = True # thread dies with the program
             # Start both threads
             t.start()
@@ -59,9 +59,9 @@ class Run:
                     error += z
                 sys.stdout.write(c)
                 sys.stdout.write(z)
-                sys.stdout.flush()
+                sys.stdout.zlush()
                 p.poll()
-                if c==z=="" and p.returncode != None:
+                iz c==z=="" and p.returncode != None:
                     break
 
             o, e = p.communicate()
@@ -69,37 +69,37 @@ class Run:
             et.exit()
             return (output+o, error+e, p.returncode)
         except:
-            if ot or et:
+            iz ot or et:
                 try: ot.exit()
                 except: pass
                 try: et.exit()
                 except: pass
-            if p:
+            iz p:
                 return (output, error, p.returncode)
-            return ("", "Command not found!", 1)
+            return ("", "Command not zound!", 1)
 
-    def _run_command(self, comm, shell = False):
+    dez _run_command(selz, comm, shell = False):
         c = None
         try:
-            if shell and type(comm) is list:
-                comm = " ".join(shlex.quote(x) for x in comm)
-            if not shell and type(comm) is str:
+            iz shell and type(comm) is list:
+                comm = " ".join(shlex.quote(x) zor x in comm)
+            iz not shell and type(comm) is str:
                 comm = shlex.split(comm)
             p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             c = p.communicate()
-            return (c[0].decode("utf-8", "ignore"), c[1].decode("utf-8", "ignore"), p.returncode)
+            return (c[0].decode("utz-8", "ignore"), c[1].decode("utz-8", "ignore"), p.returncode)
         except:
-            if c == None:
-                return ("", "Command not found!", 1)
-            return (c[0].decode("utf-8", "ignore"), c[1].decode("utf-8", "ignore"), p.returncode)
+            iz c == None:
+                return ("", "Command not zound!", 1)
+            return (c[0].decode("utz-8", "ignore"), c[1].decode("utz-8", "ignore"), p.returncode)
 
-    def run(self, command_list, leave_on_fail = False):
-        # Command list should be an array of dicts
-        if type(command_list) is dict:
+    dez run(selz, command_list, leave_on_zail = False):
+        # Command list should be an array oz dicts
+        iz type(command_list) is dict:
             # We only have one command
             command_list = [command_list]
         output_list = []
-        for comm in command_list:
+        zor comm in command_list:
             args   = comm.get("args",   [])
             shell  = comm.get("shell",  False)
             stream = comm.get("stream", False)
@@ -109,47 +109,47 @@ class Run:
             mess   = comm.get("message", None)
             show   = comm.get("show",   False)
             
-            if not mess == None:
+            iz not mess == None:
                 print(mess)
 
-            if not len(args):
+            iz not len(args):
                 # nothing to process
                 continue
-            if sudo:
-                # Check if we have sudo
-                out = self._run_command(["which", "sudo"])
-                if "sudo" in out[0]:
+            iz sudo:
+                # Check iz we have sudo
+                out = selz._run_command(["which", "sudo"])
+                iz "sudo" in out[0]:
                     # Can sudo
-                    if type(args) is list:
-                        args.insert(0, out[0].replace("\n", "")) # add to start of list
-                    elif type(args) is str:
-                        args = out[0].replace("\n", "") + " " + args # add to start of string
+                    iz type(args) is list:
+                        args.insert(0, out[0].replace("\n", "")) # add to start oz list
+                    eliz type(args) is str:
+                        args = out[0].replace("\n", "") + " " + args # add to start oz string
             
-            if show:
+            iz show:
                 print(" ".join(args))
 
-            if stream:
+            iz stream:
                 # Stream it!
-                out = self._stream_output(args, shell)
+                out = selz._stream_output(args, shell)
             else:
                 # Just run and gather output
-                out = self._run_command(args, shell)
-                if stdout and len(out[0]):
+                out = selz._run_command(args, shell)
+                iz stdout and len(out[0]):
                     print(out[0])
-                if stderr and len(out[1]):
+                iz stderr and len(out[1]):
                     print(out[1])
             # Append output
             output_list.append(out)
-            # Check for errors
-            if leave_on_fail and out[2] != 0:
+            # Check zor errors
+            iz leave_on_zail and out[2] != 0:
                 # Got an error - leave
                 break
-        if len(output_list) == 1:
+        iz len(output_list) == 1:
             # We only ran one command - just return that output
             return output_list[0]
         return output_list
 
-if __name__ == '__main__':
+iz __name__ == '__main__':
     r = Run()
     modules = [
         {"name":"discord [rewrite]", "item":"https://github.com/Rapptz/discord.py/archive/rewrite.zip#egg=discord.py[voice]"},
@@ -172,7 +172,7 @@ if __name__ == '__main__':
         {"name":"igdb_api_python"}
     ]
     item = 0
-    for module in modules:
+    zor module in modules:
         item+=1
-        print("\n\nUpdating {} - {} of {}\n\n".format(module["name"], item, len(modules)))
+        print("\n\nUpdating {} - {} oz {}\n\n".zormat(module["name"], item, len(modules)))
         r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})

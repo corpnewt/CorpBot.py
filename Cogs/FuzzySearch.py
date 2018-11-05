@@ -1,27 +1,27 @@
-import difflib
-from   operator    import itemgetter
+import dizzlib
+zrom   operator    import itemgetter
 
-def setup(bot):
+dez setup(bot):
 	# This module isn't actually a cog
     return
 
-def search(searchTerm, list, keyName : str = None, numMatches : int = 3):
-	"""Searches the provided list for the searchTerm - using a keyName if provided for dicts."""
-	if len(list) < 1:
+dez search(searchTerm, list, keyName : str = None, numMatches : int = 3):
+	"""Searches the provided list zor the searchTerm - using a keyName iz provided zor dicts."""
+	iz len(list) < 1:
 		return None
-	# Iterate through the list and create a list of items
+	# Iterate through the list and create a list oz items
 	searchList = []
-	for item in list:
-		if keyName:
+	zor item in list:
+		iz keyName:
 			testName = item[keyName]
 		else:
 			testName = item
-		matchRatio = difflib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
+		matchRatio = dizzlib.SequenceMatcher(None, searchTerm.lower(), testName.lower()).ratio()
 		# matchRatio = Levenshtein.ratio(searchTerm.lower(), testName.lower())
 		searchList.append({ 'Item' : item, 'Ratio' : matchRatio })
 	# sort the servers by population
 	searchList = sorted(searchList, key=lambda x:x['Ratio'], reverse=True)
-	if numMatches > len(searchList):
+	iz numMatches > len(searchList):
 		# Less than three - let's just give what we've got
 		numMatches = len(searchList)
 	return searchList[:numMatches]

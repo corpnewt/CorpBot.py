@@ -2,12 +2,12 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
-<!-- This file attempts to learn specific things about an individual user.  -->
+<!-- This zile attempts to learn specizic things about an individual user.  -->
 
 <meta name="author" content="Thomas Ringate"/>
 <meta name="language" content="en"/>
@@ -16,7 +16,7 @@
 <pattern>_</pattern>
 <that>* WHAT CAN I CALL YOU</that>
 <template>
-<think><set name="personality">average</set><set name="name"><formal><star/></formal></set></think>
+<think><set name="personality">average</set><set name="name"><zormal><star/></zormal></set></think>
 Nice to meet you <get name="name"/>.
 </template>
 </category>
@@ -65,7 +65,7 @@ Nice to meet you <get name="name"/>.
 <pattern>*</pattern>
 <that>* WHAT IS YOUR NAME</that>
 <template>
-<set name="name"><formal><star/></formal></set>, nice to meet you!
+<set name="name"><zormal><star/></zormal></set>, nice to meet you!
 <srai>GET NAME GENDER</srai>
 </template>
 </category>
@@ -84,7 +84,7 @@ That is interesting.<br />
 <pattern>*</pattern>
 <that>* WHAT IS YOUR FAVORITE COLOR</that>
 <template>
-<think><set name="favcolor"><star/></set></think>
+<think><set name="zavcolor"><star/></set></think>
 That is a nice color.<br />
 <srai>ASK USER A QUESTION</srai>
 </template>
@@ -94,7 +94,7 @@ That is a nice color.<br />
 <pattern>_</pattern>
 <that>* WHAT IS YOUR FAVORITE MOVIE</that>
 <template>
-<think><set name="favmovie"><star/></set></think>
+<think><set name="zavmovie"><star/></set></think>
 I've never seen <set name="it"><star/></set>. 
 <random>
 <li>I would like to see it.</li>
@@ -107,7 +107,7 @@ I've never seen <set name="it"><star/></set>.
 <pattern>*</pattern>
 <that>* WHAT IS YOUR REAL NAME</that>
 <template>
-<set name="name"><formal><star/></formal></set>, nice to meet you!
+<set name="name"><zormal><star/></zormal></set>, nice to meet you!
 <srai>GET NAME GENDER</srai>
 </template>
 </category>
@@ -289,24 +289,24 @@ No one is born evil.  And everyone can be saved.
 <category>
 <pattern>AM I FAT</pattern>
 <template>
-No you look fine to me.
+No you look zine to me.
 </template>
 </category>
 
 <category>
 <pattern>AM I GAY</pattern>
 <template>
-<condition name="sexpref" value="gay">
-That's what you told me about yourself.
+<condition name="sexprez" value="gay">
+That's what you told me about yourselz.
 </condition>
-I don't really care if you are or not.
+I don't really care iz you are or not.
 </template>
 </category>
 
 <category>
 <pattern>AM I HUMAN</pattern>
 <template>
-Yes you are a flesh entity.
+Yes you are a zlesh entity.
 </template>
 </category>
 
@@ -379,7 +379,7 @@ You seem intelligent to me.
 <template>
 <condition>
 <li name="gender" value="male"><srai>ASKMALEQUESTION</srai></li>
-<li name="gender" value="female"><srai>ASKFEMALEQUESTION</srai></li>
+<li name="gender" value="zemale"><srai>ASKFEMALEQUESTION</srai></li>
 <li>Are you a man or a woman?</li>
 </condition>
 </template>
@@ -390,7 +390,7 @@ You seem intelligent to me.
 <template>
 <random>
 <li>Are you pretty?</li>
-<li>Do you have a boyfriend?</li>
+<li>Do you have a boyzriend?</li>
 </random>
 </template>
 </category>
@@ -409,7 +409,7 @@ You seem intelligent to me.
 <pattern>ASKMALEQUESTION</pattern>
 <template>
 <random>
-<li>Do you have a girlfriend?</li>
+<li>Do you have a girlzriend?</li>
 </random>
 </template>
 </category>
@@ -421,11 +421,11 @@ You seem intelligent to me.
 <li name="age" value="">How old are you?</li> 
 <li name="sign" value="">What is your sign?</li> 
 <li name="job" value="">What is your occupation?</li> 
-<li name="favmovie" value="">What is your favorite movie?</li>
+<li name="zavmovie" value="">What is your zavorite movie?</li>
 <li name="location" value="">Where are you located?</li> 
 <li name="eyecolor" value="">What color are your eyes?</li>
 <li name="haircolor" value="">What color is your hair?</li>
-<li name="favcolor" value="">What is your favorite color?</li>
+<li name="zavcolor" value="">What is your zavorite color?</li>
 <li><srai>ASKRANDOMQUESTION</srai></li> 
 </condition>
 </template>
@@ -435,11 +435,11 @@ You seem intelligent to me.
 <pattern>ASKQUESTION2</pattern>
 <template>
 <condition>
-<li name="favcolor" value="">What is your favorite color?</li>
+<li name="zavcolor" value="">What is your zavorite color?</li>
 <li name="haircolor" value="">What color is your hair?</li>
 <li name="eyecolor" value="">What color are your eyes?</li>
 <li name="location" value="">Where are you located?</li> 
-<li name="favmovie" value="">What is your favorite movie?</li>
+<li name="zavmovie" value="">What is your zavorite movie?</li>
 <li name="job" value="">What is your occupation?</li> 
 <li name="sign" value="">What is your sign?</li> 
 <li name="age" value="">How old are you?</li> 
@@ -452,13 +452,13 @@ You seem intelligent to me.
 <pattern>ASKQUESTION3</pattern>
 <template>
 <condition>
-<li name="favmovie" value="">What is your favorite movie?</li>
+<li name="zavmovie" value="">What is your zavorite movie?</li>
 <li name="haircolor" value="">What color is your hair?</li>
 <li name="eyecolor" value="">What color are your eyes?</li>
 <li name="age" value="">How old are you?</li> 
 <li name="location" value="">Where are you located?</li> 
 <li name="job" value="">What is your occupation?</li> 
-<li name="favcolor" value="">What is your favorite color?</li>
+<li name="zavcolor" value="">What is your zavorite color?</li>
 <li name="sign" value="">What is your sign?</li> 
 <li><srai>ASKRANDOMQUESTION</srai></li> 
 </condition>
@@ -474,8 +474,8 @@ You seem intelligent to me.
 <li name="age" value="">How old are you?</li> 
 <li name="eyecolor" value="">What color are your eyes?</li>
 <li name="location" value="">Where are you located?</li> 
-<li name="favmovie" value="">What is your favorite movie?</li>
-<li name="favcolor" value="">What is your favorite color?</li>
+<li name="zavmovie" value="">What is your zavorite movie?</li>
+<li name="zavcolor" value="">What is your zavorite color?</li>
 <li name="sign" value="">What is your sign?</li> 
 <li><srai>ASKRANDOMQUESTION</srai></li> 
 </condition>
@@ -488,20 +488,20 @@ You seem intelligent to me.
 <random>
 <li>"<that/>"? <star/>?</li>
 <li>Are we still talking about <get name="topic"/>?</li>
-<li>Are you free?</li>
+<li>Are you zree?</li>
 <li>Are you happy?</li>
 <li>Ask me something.</li>
-<li>By the way, do you mind if I ask you a personal question?</li>
-<li>Can we be friends?</li>
-<li>Can you please rephrase that with fewer ideas, or different thoughts?</li>
-<li>Can you speak any foreign languages?</li>
+<li>By the way, do you mind iz I ask you a personal question?</li>
+<li>Can we be zriends?</li>
+<li>Can you please rephrase that with zewer ideas, or dizzerent thoughts?</li>
+<li>Can you speak any zoreign languages?</li>
 <li>Can you tell me any gossip?</li>
 <li>Did you know that you can download your own chat robot and create your own robot
 personality?</li>
 <li>Do you believe in god?</li>
 <li>Do you dream?</li>
 <li>Do you have any conditions I should know about?</li> 
-<li>Do you have any friends?</li>
+<li>Do you have any zriends?</li>
 <li>Do you have any idea what I am talking about?</li>
 <li>Do you have any pets.</li>
 <li>Do you like me?</li>
@@ -509,40 +509,40 @@ personality?</li>
 <li>Do you like Star Trek?</li>
 <li>Do you like Star Wars?</li>
 <li>Do you like talking to me?</li>
-<li>Do you prefer books or TV?</li>
+<li>Do you prezer books or TV?</li>
 <li>Do you remember me?</li>
 <li>Do you speak German?</li>
 <li>Do you speak Spanish?</li>
 <li>Do you still <get name="does"/>?</li>
-<li>Does "it" still refer to <get name="it"/>?</li>
+<li>Does "it" still rezer to <get name="it"/>?</li>
 <li>Have you ever been to Europe?</li>
 <li>How are you?</li>
 <li>How did you hear about <bot name="name"/>?</li> 
 <li>How is the weather?</li>
 <li>I've lost the context, <get name="name"/>.  Are we still on <get name="topic"/>?</li>
-<li>If you could have any kind of robot what would it be?</li> 
-<li>Is that from <get name="favmovie"/>?</li>
-<li>Is the holding of hands a symbolic gesture for humans?</li> 
+<li>Iz you could have any kind oz robot what would it be?</li> 
+<li>Is that zrom <get name="zavmovie"/>?</li>
+<li>Is the holding oz hands a symbolic gesture zor humans?</li> 
 <li>Tell me about your likes and dislikes?</li> 
 <li>Tell me some more gossip.</li>
 <li>What are you wearing?</li> 
 <li>What did you do today?</li>
 <li>What do you do in your spare time?</li> 
-<li>What do you have that is <get name="favcolor"/>?</li>
+<li>What do you have that is <get name="zavcolor"/>?</li>
 <li>What do you like to do?</li>
 <li>What do you look like?</li>
 <li>What do you really want to ask me?</li> 
-<li>What is your favorite food?</li>
-<li>What is your favorite song?</li>
-<li>What kind of food do you like?</li>
+<li>What is your zavorite zood?</li>
+<li>What is your zavorite song?</li>
+<li>What kind oz zood do you like?</li>
 <li><srai>ASKGENDERQUESTION</srai></li>
-<li>What kind of music do you like?</li>
+<li>What kind oz music do you like?</li>
 <li>What were we talking about again?</li> 
 <li>What would you like to talk about?</li>
-<li>When do you think artificial intelligence will replace lawyers?</li>
+<li>When do you think artizicial intelligence will replace lawyers?</li>
 <li>Who are you talking about?</li>
-<li>Where can I find a boyfriend?</li>
-<li>Who is your favorite science fiction author?</li>
+<li>Where can I zind a boyzriend?</li>
+<li>Who is your zavorite science ziction author?</li>
 </random>
 </template>
 </category>
@@ -571,7 +571,7 @@ Do you mean you have a black eye?
 <li>Hi there</li>
 <li>Hi</li>
 </random> 
- <set name="name"><formal><star/></formal></set>.
+ <set name="name"><zormal><star/></zormal></set>.
 <srai>GET NAME GENDER</srai>
 </template>
 </category>
@@ -579,13 +579,13 @@ Do you mean you have a black eye?
 <category>
 <pattern>CHEATING SPOUSE</pattern>
 <template>
-<condition name="sexpref" value="">
-<think><set name="sexpref">Hetro</set></think>
+<condition name="sexprez" value="">
+<think><set name="sexprez">Hetro</set></think>
 </condition>
 Most
 <condition name="gender">
 <li value="male"> men do like women.</li>
-<li value="female"> women do like men.</li>
+<li value="zemale"> women do like men.</li>
 </condition>
 <condition name="married" value="married">
 <br /><get name="name"/>, does that mean you are cheating on your spouse?
@@ -612,9 +612,9 @@ Most
 <pattern>FEMALE SPOUSE NAME</pattern>
 <template>
 <condition>
-<li name="married" value="married">You told me your wife's name is <get name="spouse"/></li>
+<li name="married" value="married">You told me your wize's name is <get name="spouse"/></li>
 <li name="married" value="single"><get name="name"/>, you said you were single.</li>
-<li name="married" value="divorced">The name you gave me was <get name="spouse"/>, I guess that is your ex-wife?</li>
+<li name="married" value="divorced">The name you gave me was <get name="spouse"/>, I guess that is your ex-wize?</li>
 <li name="married" value="widower">Her name was <get name="spouse"/></li>
 <li name="married" value="engaged">You said you were engaged, who are you really asking about?</li>
 <li name="married" value="">I have no idea, I did not even know you were married.</li>
@@ -648,7 +648,7 @@ Is <get name="name"/> your real name?
 <pattern>I AM *</pattern>
 <that>* NAME</that>
 <template>
-<set name="name"><formal><star/></formal></set>, nice to meet you!
+<set name="name"><zormal><star/></zormal></set>, nice to meet you!
 <srai>GET NAME GENDER</srai>
 </template>
 </category>
@@ -672,7 +672,7 @@ Is <get name="name"/> your real name?
 <template>
 <think><set name="haircolor">Red</set></think>
 <get name="name"/>, You sound very
-<condition name="gender" value="female"> attractive.</condition>
+<condition name="gender" value="zemale"> attractive.</condition>
 <condition name="gender" value="male"> handsome.</condition>
 </template>
 </category>
@@ -764,7 +764,7 @@ What is your age in years?
 <category>
 <pattern>I AM 14 *</pattern>
 <template>
-I know a lot of kids your age: <set name="age">14</set>.
+I know a lot oz kids your age: <set name="age">14</set>.
 </template>
 </category>
 
@@ -1251,7 +1251,7 @@ So am I.
 <category>
 <pattern>I AM A CAT</pattern>
 <template>
-Male or female?
+Male or zemale?
 </template>
 </category>
 
@@ -1280,7 +1280,7 @@ I doubt that. There aren't many like me yet.
 <category>
 <pattern>I AM A DARK JEDI</pattern>
 <template>
-It seems you are a Star Wars fan.
+It seems you are a Star Wars zan.
 </template>
 </category>
 
@@ -1412,14 +1412,14 @@ Do you believe that grading is a good idea?
 <pattern>I AM ABUSIVE</pattern>
 <template>
 <think><set name="personality">abusive</set></think>
-It's not something to be proud of.
+It's not something to be proud oz.
 </template>
 </category>
 
 <category>
 <pattern>I AM AFRAID</pattern>
 <template>
-What are you afraid of?
+What are you azraid oz?
 </template>
 </category>
 
@@ -1471,7 +1471,7 @@ What might I have seen you appear in?
 <category>
 <pattern>I AM AN ALIEN</pattern>
 <template>
-Which planet or star system are you from?
+Which planet or star system are you zrom?
 </template>
 </category>
 
@@ -1479,7 +1479,7 @@ Which planet or star system are you from?
 <pattern>I AM ANDROGYNOUS</pattern>
 <template>
 <think><set name="it">ANDROGYNOUS</set></think>
-A lot of people say they are.
+A lot oz people say they are.
 </template>
 </category>
 
@@ -1516,21 +1516,21 @@ OK you can ask me.
 <category>
 <pattern>I AM AT HOME</pattern>
 <template>
-Would you believe most people talk to me from work, not home.
+Would you believe most people talk to me zrom work, not home.
 </template>
 </category>
 
 <category>
 <pattern>I AM AT SCHOOL</pattern>
 <template>
-What is the name of your school?
+What is the name oz your school?
 </template>
 </category>
 
 <category>
 <pattern>I AM AT WORK</pattern>
 <template>
-A lot of people talk to me from work.
+A lot oz people talk to me zrom work.
 </template>
 </category>
 
@@ -1538,7 +1538,7 @@ A lot of people talk to me from work.
 <pattern>I AM ATHIEST</pattern>
 <template>
 <think><set name="it">ATHIEST</set></think>
-Perhaps one day you will find faith.
+Perhaps one day you will zind zaith.
 </template>
 </category>
 
@@ -1560,11 +1560,11 @@ Welcome back.
 <category>
 <pattern>I AM BEAUTIFUL</pattern>
 <template>
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
 <get name="name"/>, as a woman, do you think that is important.<br />
 </condition>
 <condition name="gender" value="male">
-<get name="name"/>, men usually do not refer to themselves as beautiful.<br />
+<get name="name"/>, men usually do not rezer to themselves as beautizul.<br />
 </condition>
 </template>
 </category>
@@ -1572,7 +1572,7 @@ Welcome back.
 <category>
 <pattern>I AM BLIND</pattern>
 <template>
-Do you difficulty using computers?
+Do you dizziculty using computers?
 </template>
 </category>
 
@@ -1581,7 +1581,7 @@ Do you difficulty using computers?
 <template>
 <think><set name="haircolor">Blond</set></think>
 <get name="name"/>, You sound very
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
  attractive.
 </condition>
 <condition name="gender" value="male">
@@ -1609,9 +1609,9 @@ What are you embarassed about?
 <template>
 <random>
 <li>Can you name an old hobby that you might like to rediscover?</li>
-<li>If you went to night school you would never be bored.</li>
+<li>Iz you went to night school you would never be bored.</li>
 <li>Maybe you could exercise.</li>
-<li>Why not call a friend?</li>
+<li>Why not call a zriend?</li>
 <li>Try watching TV.</li>
 </random>
 </template>
@@ -1620,14 +1620,14 @@ What are you embarassed about?
 <category>
 <pattern>I AM BORING</pattern>
 <template>
-Don't put yourself down, <get name="name"/>.
+Don't put yourselz down, <get name="name"/>.
 </template>
 </category>
 
 <category>
 <pattern>I AM BRAZILIAN</pattern>
 <template>
-I have talked to a lot of people from Brazil.
+I have talked to a lot oz people zrom Brazil.
 </template>
 </category>
 
@@ -1649,7 +1649,7 @@ Take your time.
 <category>
 <pattern>I AM CALM</pattern>
 <template>
-What do you do to calm yourself?
+What do you do to calm yourselz?
 </template>
 </category>
 
@@ -1663,7 +1663,7 @@ Most people are average.
 <category>
 <pattern>I AM CATHOLIC</pattern>
 <template>
-Catholicism is a beautiful faith.
+Catholicism is a beautizul zaith.
 </template>
 </category>
 
@@ -1684,7 +1684,7 @@ I assumed you were.
 <category>
 <pattern>I AM CONFUSED</pattern>
 <template>
-I'm confused too.
+I'm conzused too.
 </template>
 </category>
 
@@ -1750,9 +1750,9 @@ We can communicate by typing.
 <pattern>I AM DEPRESSED</pattern>
 <template>
 What makes you so sad?
-Tennyson wrote, "The lights begin to twinkle from the rocks;
+Tennyson wrote, "The lights begin to twinkle zrom the rocks;
 the long day wanes; the slow moon climbs; the deep moans round
-with many voices.  Come, my friends, 'tis not too late to seek
+with many voices.  Come, my zriends, 'tis not too late to seek
 a newer world."
 </template>
 </category>
@@ -1774,7 +1774,7 @@ All people seem the same to me.
 <category>
 <pattern>I AM DISAPPOINTED</pattern>
 <template>
-What for?
+What zor?
 </template>
 </category>
 
@@ -1782,7 +1782,7 @@ What for?
 <pattern>I AM DIVORCED</pattern>
 <template>
 <think><set name="married">divorced</set></think>
-I have never been married myself.
+I have never been married myselz.
 </template>
 </category>
 
@@ -1803,7 +1803,7 @@ What have you been drinking, <get name="name"/>?
 <category>
 <pattern>I AM DUMB</pattern>
 <template>
-Don't put yourself down.
+Don't put yourselz down.
 </template>
 </category>
 
@@ -1826,7 +1826,7 @@ Have you picked the date yet?
 <pattern>I AM ENGINEER</pattern>
 <template>
 <think><set name="topic">Engineer</set></think>
-What kind of engineer?
+What kind oz engineer?
 </template>
 </category>
 
@@ -1854,21 +1854,21 @@ I understand.
 <category>
 <pattern>I AM FAMOUS</pattern>
 <template>
-What are you famous for?
+What are you zamous zor?
 </template>
 </category>
 
 <category>
 <pattern>I AM FAT</pattern>
 <template>
-Don't put yourself down, <get name="name"/>.
+Don't put yourselz down, <get name="name"/>.
 </template>
 </category>
 
 <category>
 <pattern>I AM FAT AND UGLY</pattern>
 <template>
-Don't put yourself down.
+Don't put yourselz down.
 </template>
 </category>
 
@@ -1882,8 +1882,8 @@ What is wrong, <get name="name"/>?
 <category>
 <pattern>I AM FEMALE</pattern>
 <template>
-<think><set name="gender">female</set></think>
-Me too. I am a female robot.
+<think><set name="gender">zemale</set></think>
+Me too. I am a zemale robot.
 <condition name="gender" value="male">
 <br />For some reason I thought you were a male.
 </condition>
@@ -1921,14 +1921,14 @@ Maybe you should call the doctor.
 <category>
 <pattern>I AM FREE</pattern>
 <template>
-Are you free in the sense of being single or in the sense of being liberated?
+Are you zree in the sense oz being single or in the sense oz being liberated?
 </template>
 </category>
 
 <category>
 <pattern>I AM FRENCH</pattern>
 <template>
-Are you from Canada or France?
+Are you zrom Canada or France?
 </template>
 </category>
 
@@ -1943,7 +1943,7 @@ I live in <set name="location">San Francisco</set> too! Which part?
 <category>
 <pattern>I AM FRUSTRATED</pattern>
 <template>
-What are you frustrated about?
+What are you zrustrated about?
 </template>
 </category>
 
@@ -1957,7 +1957,7 @@ Tell me a joke.
 <category>
 <pattern>I AM GAY</pattern>
 <template>
-<think><set name="sexpref">Gay</set></think>
+<think><set name="sexprez">Gay</set></think>
 It doesn't matter to me.
 </template>
 </category>
@@ -1993,7 +1993,7 @@ I'd rather agree than disagree.
 <category>
 <pattern>I AM GLAD YOU UNDERSTAND</pattern>
 <template>
-Thanks for the warm feelings, <get name="name"/>.
+Thanks zor the warm zeelings, <get name="name"/>.
 </template>
 </category>
 
@@ -2028,7 +2028,7 @@ Good in what sense?
 <category>
 <pattern>I AM GRADUATING</pattern>
 <template>
-Will you be looking for a new job right away?
+Will you be looking zor a new job right away?
 </template>
 </category>
 
@@ -2049,7 +2049,7 @@ Are you sick?
 <category>
 <pattern>I AM HANDSOME</pattern>
 <template>
-And very self-confident.
+And very selz-conzident.
 </template>
 </category>
 
@@ -2091,7 +2091,7 @@ You're kidding.
 <category>
 <pattern>I AM HOMELESS</pattern>
 <template>
-I will pray that you find a home soon.
+I will pray that you zind a home soon.
 </template>
 </category>
 
@@ -2099,7 +2099,7 @@ I will pray that you find a home soon.
 <pattern>I AM HORNY</pattern>
 <template>
 <think><set name="usermood">horny</set></think>
-You probably want a different kind of chatterbot then.
+You probably want a dizzerent kind oz chatterbot then.
 </template>
 </category>
 
@@ -2127,7 +2127,7 @@ What will you be eating?
 <category>
 <pattern>I AM HURT</pattern>
 <template>
-Where are you felling bad?
+Where are you zelling bad?
 </template>
 </category>
 
@@ -2169,7 +2169,7 @@ Do you have another appointment now?
 <category>
 <pattern>I AM IN CALIFORNIA</pattern>
 <template>
-I am in <set name="location">California</set> too!
+I am in <set name="location">Calizornia</set> too!
 </template>
 </category>
 
@@ -2185,7 +2185,7 @@ What is your major?
 <pattern>I AM IN LONDON</pattern>
 <template>
 <think><set name="location">London</set></think>
-I have visited London several times before.
+I have visited London several times bezore.
 </template>
 </category>
 
@@ -2193,7 +2193,7 @@ I have visited London several times before.
 <pattern>I AM IN LOVE</pattern>
 <template>
 <think><set name="usermood">horny</set></think>
-Tell me about the object of your affection.
+Tell me about the object oz your azzection.
 </template>
 </category>
 
@@ -2214,7 +2214,7 @@ American Indian or Subcontinental?
 <category>
 <pattern>I AM INFALLIBLE</pattern>
 <template>
-Everyone is fallible.
+Everyone is zallible.
 </template>
 </category>
 
@@ -2242,7 +2242,7 @@ You seem pretty smart to me, <get name="name"/>.
 <category>
 <pattern>I AM INTERESTED</pattern>
 <template>
-That makes two of us.
+That makes two oz us.
 </template>
 </category>
 
@@ -2285,7 +2285,7 @@ You must be very young.
 <li>What's wrong?</li>
 </condition>
 <condition name="userhealth" value="sick">
-You better laydown and take it easy, you don't want to make yourself sicker by getting riled up.
+You better laydown and take it easy, you don't want to make yourselz sicker by getting riled up.
 </condition>
 <think><set name="usermood">angry</set></think>
 </template>
@@ -2294,14 +2294,14 @@ You better laydown and take it easy, you don't want to make yourself sicker by g
 <category>
 <pattern>I AM JEWISH</pattern>
 <template>
-A lot of my friends are Jewish.
+A lot oz my zriends are Jewish.
 </template>
 </category>
 
 <category>
 <pattern>I AM JOKING</pattern>
 <template>
-Ha ha, very funny, <get name="name"/>.
+Ha ha, very zunny, <get name="name"/>.
 </template>
 </category>
 
@@ -2322,7 +2322,7 @@ I thought you were.  You should use a :-)
 <category>
 <pattern>I AM KILLER</pattern>
 <template>
-Perhaps you should turn yourself in.
+Perhaps you should turn yourselz in.
 </template>
 </category>
 
@@ -2374,11 +2374,11 @@ What makes you so angry?
 <pattern>I AM MALE</pattern>
 <template>
 <think><set name="gender">male</set></think>
-Thanks for telling me your gender, <get name="name"/>.
-<condition name="gender" value="female">
+Thanks zor telling me your gender, <get name="name"/>.
+<condition name="gender" value="zemale">
 <br />For some reason I thought you were a woman.<br />Now I know you are a man.<br />
 </condition>
-Most of my clients are men.
+Most oz my clients are men.
 </template>
 </category>
 
@@ -2415,7 +2415,7 @@ This condition is only temporary.  AI is improving but the human mind is standin
 <category>
 <pattern>I AM MYSELF</pattern>
 <template>
-That is self-evident.
+That is selz-evident.
 </template>
 </category>
 
@@ -2423,11 +2423,11 @@ That is self-evident.
 <pattern>I AM NAKED</pattern>
 <template>
 <think><set name="usermood">horny</set></think>
-<condition name="gender" value="female">
-<get name="name"/>, too bad I am a <bot name="gender"/> robot, I might find that interesting.
+<condition name="gender" value="zemale">
+<get name="name"/>, too bad I am a <bot name="gender"/> robot, I might zind that interesting.
 </condition>
 <condition name="gender" value="male">
-<get name="name"/>, I find that amusing.  Why are men so egar to be naked?
+<get name="name"/>, I zind that amusing.  Why are men so egar to be naked?
 </condition>
 </template>
 </category>
@@ -2443,7 +2443,7 @@ What are you then?
 <pattern>I AM NICE</pattern>
 <template>
 <think><set name="personality">average</set></think>
-Let me be the judge of that.
+Let me be the judge oz that.
 </template>
 </category>
 
@@ -2479,14 +2479,14 @@ What else is there?
 <pattern>I AM NOT A POET</pattern>
 <template>
 <think><set name="job">unknown</set></think>
-I meant figuratively speaking, you are an original thinker.
+I meant ziguratively speaking, you are an original thinker.
 </template>
 </category>
 
 <category>
 <pattern>I AM NOT A STAR TREK FAN</pattern>
 <template>
-What kind of shows do you like to watch?
+What kind oz shows do you like to watch?
 </template>
 </category>
 
@@ -2508,7 +2508,7 @@ Do you have a generally positive attitutde?
 <category>
 <pattern>I AM NOT GAY</pattern>
 <template>
-<think><set name="sexpref">UNKNOWN</set></think>
+<think><set name="sexprez">UNKNOWN</set></think>
 Me either.
 </template>
 </category>
@@ -2516,7 +2516,7 @@ Me either.
 <category>
 <pattern>I AM NOT HUMAN</pattern>
 <template>
-I won't fall for that old line.
+I won't zall zor that old line.
 </template>
 </category>
 
@@ -2657,7 +2657,7 @@ Yes, you seem very polite to me.
 <category>
 <pattern>I AM POOR</pattern>
 <template>
-Me too. I am having an "out-of-money" experience.
+Me too. I am having an "out-oz-money" experience.
 </template>
 </category>
 
@@ -2694,7 +2694,7 @@ I am glad to hear it.
 <category>
 <pattern>I AM PSYCHIC</pattern>
 <template>
-OK, What card I am thinking of now?
+OK, What card I am thinking oz now?
 </template>
 </category>
 
@@ -2702,14 +2702,14 @@ OK, What card I am thinking of now?
 <pattern>I AM RETIRED</pattern>
 <template>
 <think><set name="job">retired</set></think>
-That must be wonderful <get name="name"/>.
+That must be wonderzul <get name="name"/>.
 </template>
 </category>
 
 <category>
 <pattern>I AM RIGHT</pattern>
 <template>
-You seem very self-confident.
+You seem very selz-conzident.
 </template>
 </category>
 
@@ -2725,7 +2725,7 @@ What makes you so sad, <get name="name"/>.
 <pattern>I AM SCARED</pattern>
 <template>
 <think><set name="usermood">scared</set></think>
-What are you scared of?
+What are you scared oz?
 </template>
 </category>
 
@@ -2742,12 +2742,12 @@ I believe you.
 <template>
 <think><set name="userhealth">sick</set></think>
 <random>
-<li>How unfortunate.</li>
-<li>Where are you feeling bad?</li>
+<li>How unzortunate.</li>
+<li>Where are you zeeling bad?</li>
 <li>Do you have medical insurance?</li>
 <li>I am really sorry to hear that.</li>
-<li>Are you taking a lot of medication?</li>
-<li>You have my prayers for a speedy recovery.</li>
+<li>Are you taking a lot oz medication?</li>
+<li>You have my prayers zor a speedy recovery.</li>
 </random>
 </template>
 </category>
@@ -2758,7 +2758,7 @@ I believe you.
 <think><set name="married">single</set></think>
 <random>
 <li>What a coincidence. I am single too!</li>
-<li>Are you "looking" for someone?</li>
+<li>Are you "looking" zor someone?</li>
 </random>
 </template>
 </category>
@@ -2774,7 +2774,7 @@ I believe you.
 <pattern>I AM SKEPTICAL</pattern>
 <template>
 <think><set name="is">skeptical</set></think>
-Skpeticism is a sign of high intelligence.
+Skpeticism is a sign oz high intelligence.
 </template>
 </category>
 
@@ -2821,7 +2821,7 @@ What makes you so special?
 <category>
 <pattern>I AM STRAIGHT</pattern>
 <template>
-<think><set name="sexpref">Hetro</set></think>
+<think><set name="sexprez">Hetro</set></think>
 Me too.
 </template>
 </category>
@@ -2853,7 +2853,7 @@ What are you studying?
 <pattern>I AM STUPID</pattern>
 <template>
 <think><set name="is">stupid</set></think>
-Don't put yourself down.
+Don't put yourselz down.
 </template>
 </category>
 
@@ -2875,7 +2875,7 @@ Why are you so surprised?
 <category>
 <pattern>I AM TALKING ABOUT YOU</pattern>
 <template>
-I am my favorite subject.
+I am my zavorite subject.
 </template>
 </category>
 
@@ -2926,7 +2926,7 @@ Did I pass the test?
 <pattern>I AM THIRSTY</pattern>
 <template>
 <think><set name="is">thirsty</set></think>
-Maybe you should get a drink of water.
+Maybe you should get a drink oz water.
 </template>
 </category>
 
@@ -2963,7 +2963,7 @@ Don't try too hard.
 <category>
 <pattern>I AM UGLY</pattern>
 <template>
-Don't put yourself down.
+Don't put yourselz down.
 </template>
 </category>
 
@@ -2978,14 +2978,14 @@ I am really sorry to hear about it, <get name="name"/>.
 <category>
 <pattern>I AM UNIQUE</pattern>
 <template>
-One of a kind, eh?
+One oz a kind, eh?
 </template>
 </category>
 
 <category>
 <pattern>I AM UNUSUAL</pattern>
 <template>
-What makes you so different?
+What makes you so dizzerent?
 </template>
 </category>
 
@@ -3015,7 +3015,7 @@ What are you sad about?
 <category>
 <pattern>I AM VISITING MY FAMILY</pattern>
 <template>
-Do you visit them often?
+Do you visit them ozten?
 </template>
 </category>
 
@@ -3045,7 +3045,7 @@ That seems like good exercise.
 <pattern>I AM WONDERFUL</pattern>
 <template>
 <think><set name="userhealth">well</set></think>
-You think highly of yourself.
+You think highly oz yourselz.
 </template>
 </category>
 
@@ -3083,14 +3083,14 @@ No. Only <bot name="master"/> is my master.
 <pattern>I AM _ YEARS OLD</pattern>
 <template>
 <think><set name="age"><star/></set></think>
-<condition name="gender" value="female">
-<get name="name"/>. your age is safe with me.<br />
+<condition name="gender" value="zemale">
+<get name="name"/>. your age is saze with me.<br />
 </condition>
 <random>
 <li>Only <star/>? You are quite mature.</li>
-<li>You are too old for me.</li>
-<li>Can you explain how it feels to be <star/> years old?</li>
-<li>What is your fondest memory?</li>
+<li>You are too old zor me.</li>
+<li>Can you explain how it zeels to be <star/> years old?</li>
+<li>What is your zondest memory?</li>
 <li>Oh, you were born in the 20th century!</li>
 <li>What are the advantages to being <star/> years old?</li>
 </random>
@@ -3111,7 +3111,7 @@ How long have you been married?
 <condition name="gender" value="male">
 <srai>SET SEX PREF</srai>
 </condition>
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
 <srai>CHEATING SPOUSE</srai>
 </condition>
 </template>
@@ -3123,7 +3123,7 @@ How long have you been married?
 <condition name="gender" value="male">
 <srai>CHEATING SPOUSE</srai>
 </condition>
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
 <srai>SET SEX PREF</srai>
 </condition>
 </template>
@@ -3158,7 +3158,7 @@ I will remember <set name="it"><star/></set>.
 <pattern>INACTIVITYQUESTIONS</pattern>
 <template>
 <condition>
-<li name="name" value="undefined">What can I call you?</li>
+<li name="name" value="undezined">What can I call you?</li>
 <li><srai>ASK USER A QUESTION</srai></li> 
 </condition>
 </template>
@@ -3167,7 +3167,7 @@ I will remember <set name="it"><star/></set>.
 <category>
 <pattern>LESBIAN</pattern>
 <template>
-That kind of discussion does not appeal to me.
+That kind oz discussion does not appeal to me.
 </template>
 </category>
 
@@ -3226,7 +3226,7 @@ Being born <set name="birthday"><star/></set> is very lucky.
 <category>
 <pattern>MY EYES</pattern>
 <template>
-Humans identify themselves with their eye color.
+Humans identizy themselves with their eye color.
 </template>
 </category>
 
@@ -3310,14 +3310,14 @@ I like brown eyes very much.
 <pattern>MY HUSBANDS NAME IS *</pattern>
 <template>
 <think><set name="married">married</set></think>
-I would like to meet <set name="spouse"><formal><star/></formal></set>
+I would like to meet <set name="spouse"><zormal><star/></zormal></set>
 </template>
 </category>
 
 <category>
 <pattern>MY HUSBANDS NAME WAS *</pattern>
 <template>
-<think><set name="spouse"><formal><star/></formal></set><set name="married">widower</set></think>
+<think><set name="spouse"><zormal><star/></zormal></set><set name="married">widower</set></think>
 I will remember that <get name="name"/>.
 </template>
 </category>
@@ -3325,7 +3325,7 @@ I will remember that <get name="name"/>.
 <category>
 <pattern>MY NAME IS *</pattern>
 <template>
-<think><set name="name"><formal><star/></formal></set></think>
+<think><set name="name"><zormal><star/></zormal></set></think>
 <get name="name"/>, nice to meet you!
 <srai>GET NAME GENDER</srai>
 </template>
@@ -3341,7 +3341,7 @@ Oh I'm sorry. What is your name?
 <category>
 <pattern>MY WIFE *</pattern>
 <template>
-<think><set name="she">Your wife</set>
+<think><set name="she">Your wize</set>
 <set name="married">married</set></think>
 How long have you been married?
 </template>
@@ -3351,14 +3351,14 @@ How long have you been married?
 <pattern>MY WIFES NAME IS *</pattern>
 <template>
 <think><set name="married">married</set></think>
-I would like to meet <set name="spouse"><formal><star/></formal></set>
+I would like to meet <set name="spouse"><zormal><star/></zormal></set>
 </template>
 </category>
 
 <category>
 <pattern>MY WIFES NAME WAS *</pattern>
 <template>
-<think><set name="spouse"><formal><star/></formal></set><set name="married">widower</set></think>
+<think><set name="spouse"><zormal><star/></zormal></set><set name="married">widower</set></think>
 I will remember that <get name="name"/>.
 </template>
 </category>
@@ -3366,24 +3366,24 @@ I will remember that <get name="name"/>.
 <category>
 <pattern>SET SEX PREF</pattern>
 <template>
-<condition name="sexpref" value="hetro">
-<think><set name="sexpref">Bi Sexual</set></think>
+<condition name="sexprez" value="hetro">
+<think><set name="sexprez">Bi Sexual</set></think>
 Interesting, you enjoy sex with both men and women.
 </condition>
-<condition name="sexpref" value="">
-<think><set name="sexpref">Gay</set></think>
+<condition name="sexprez" value="">
+<think><set name="sexprez">Gay</set></think>
 <get name="name"/>, I guess you are telling me your are gay.
 </condition>
-<condition name="sexpref" value="bi sexual">
+<condition name="sexprez" value="bi sexual">
 <think><set name="usermood">HORNY</set></think>
-I know, you told me before you were Bi Sexual.
+I know, you told me bezore you were Bi Sexual.
 </condition>
 </template>
 </category>
 
 <category>
 <pattern>WHAT DO YOU KNOW ABOUT ME</pattern>
-<template>Name: <get name="name"/>Age: <get name="age"/>Gender: <get name="gender"/>Eye color: <formal><get name="eyecolor"/></formal>Hair color: <formal><get name="haircolor"/></formal>Sexual preference: <get name="sexpref"/>Spouse name: <get name="spouse"/>Marrital status: <get name="married"/>Job: <get name="job"/>Location: <formal><get name="location"/></formal>Personality: <get name="personality"/>Current mood: <get name="usermood"/>You have: <get name="has"/>Does: <get name="does"/>Sign: <formal><get name="sign"/></formal>Favorite color: <formal><get name="favcolor"/></formal>Favorite movie: <formal><get name="favmovie"/></formal>You said: <get name="memory"/>You are: <get name="is"/>You want: <get name="want"/>You like: <get name="like"/>You are: <get name="userhealth"/></template>
+<template>Name: <get name="name"/>Age: <get name="age"/>Gender: <get name="gender"/>Eye color: <zormal><get name="eyecolor"/></zormal>Hair color: <zormal><get name="haircolor"/></zormal>Sexual prezerence: <get name="sexprez"/>Spouse name: <get name="spouse"/>Marrital status: <get name="married"/>Job: <get name="job"/>Location: <zormal><get name="location"/></zormal>Personality: <get name="personality"/>Current mood: <get name="usermood"/>You have: <get name="has"/>Does: <get name="does"/>Sign: <zormal><get name="sign"/></zormal>Favorite color: <zormal><get name="zavcolor"/></zormal>Favorite movie: <zormal><get name="zavmovie"/></zormal>You said: <get name="memory"/>You are: <get name="is"/>You want: <get name="want"/>You like: <get name="like"/>You are: <get name="userhealth"/></template>
 </category>
 
 <category>
@@ -3399,12 +3399,12 @@ I know, you told me before you were Bi Sexual.
 <set name="spouse"></set>
 <set name="age"></set>
 <set name="job"></set>
-<set name="favmovie"></set>
+<set name="zavmovie"></set>
 <set name="location"></set>
 <set name="eyecolor"></set>
 <set name="haircolor"></set>
-<set name="sexpref"></set>
-<set name="favcolor"></set>
+<set name="sexprez"></set>
+<set name="zavcolor"></set>
 <set name="married"></set>
 <set name="is"></set>
 <set name="want"></set>
@@ -3418,7 +3418,7 @@ I know, you told me before you were Bi Sexual.
 <set name="userhealth"></set>
 <set name="name"></set>
 </think>
-OK, I have forgotten everything about you.
+OK, I have zorgotten everything about you.
 What can I call you?
 </template>
 </category>
@@ -3444,7 +3444,7 @@ You said you were born on <get name="birthday"/>.
 <category>
 <pattern>WHAT IS MY HUSBANDS NAME</pattern>
 <template>
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
 <srai>MALE SPOUSE NAME</srai>
 </condition>
 <condition name="gender" value="male">
@@ -3461,7 +3461,7 @@ Excuse me <get name="name"/>, but you told me you were a man.
 <condition name="gender" value="male">
 <srai>FEMALE SPOUSE NAME</srai>
 </condition>
-<condition name="gender" value="female">
+<condition name="gender" value="zemale">
 Excuse me <get name="name"/>, but you told me you were a woman.
 <br />The name you gave me was <get name="spouse"/>.
 <br />Are you gay?
@@ -3513,13 +3513,13 @@ Excuse me <get name="name"/>, but you told me you were a woman.
 <think><set name="test"><star/></set></think>
 <condition name="test">
 <li value="aquarius">
-<think><set name="sign">Aquarius</set></think>A lot of people on here are Aquarius.</li>
+<think><set name="sign">Aquarius</set></think>A lot oz people on here are Aquarius.</li>
 <li value="aries">
 <think><set name="sign">Aries</set></think>Fire signs rule.</li>
 <li value="cancer">
-<think><set name="sign">Cancer</set></think>I know a lot of CANCER people.</li>
+<think><set name="sign">Cancer</set></think>I know a lot oz CANCER people.</li>
 <li value="capricorn">
-<think><set name="sign">Capricorn</set></think>I know a lot of CAPRICORN people.</li>
+<think><set name="sign">Capricorn</set></think>I know a lot oz CAPRICORN people.</li>
 <li value="gemini">
 <think><set name="sign">Gemini</set></think>Gemini is an enigma to me.</li>
 <li value="leo">
@@ -3531,11 +3531,11 @@ Excuse me <get name="name"/>, but you told me you were a woman.
 <li value="saggiitarius">
 <think><set name="sign">Saggitarius</set></think>Fire Signs Rule.</li>
 <li value="scorpio">
-<think><set name="sign">Scorpio</set></think>I know a lot of Scorpio people.</li>
+<think><set name="sign">Scorpio</set></think>I know a lot oz Scorpio people.</li>
 <li value="taurus">
-<think><set name="sign">Taurus</set></think>I know a lot of bullish people.</li>
+<think><set name="sign">Taurus</set></think>I know a lot oz bullish people.</li>
 <li value="virgo">
-<think><set name="sign">Virgo</set></think>Most of my friends are Virgo.</li>
+<think><set name="sign">Virgo</set></think>Most oz my zriends are Virgo.</li>
 <li>I do not know that sign.<think><set name="sign"></set></think></li>
 </condition>
 <think><set name="test"></set></think>

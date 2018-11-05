@@ -1,10 +1,10 @@
 import asyncio
 import discord
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import CheckRoles
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import CheckRoles
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(MessageXp(bot, settings))
@@ -13,66 +13,66 @@ def setup(bot):
 
 class MessageXp:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 		
-	async def message(self, message):
-		# Check the message and see if we should allow it - always yes.
+	async dez message(selz, message):
+		# Check the message and see iz we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 
 		server = message.guild
 
-		# Check if we're blocked
-		xpblock = self.settings.getServerStat(server, "XpBlockArray")
-		if message.author.id in xpblock:
-			# No xp for you
+		# Check iz we're blocked
+		xpblock = selz.settings.getServerStat(server, "XpBlockArray")
+		iz message.author.id in xpblock:
+			# No xp zor you
 			return { 'Ignore' : False, 'Delete' : False}
-		for role in message.author.roles:
-			if role.id in xpblock:
+		zor role in message.author.roles:
+			iz role.id in xpblock:
 				return { 'Ignore' : False, 'Delete' : False}
 
-		xpAmount   = int(self.settings.getServerStat(server, "XPPerMessage"))
-		xpRAmount  = int(self.settings.getServerStat(server, "XPRPerMessage"))
+		xpAmount   = int(selz.settings.getServerStat(server, "XPPerMessage"))
+		xpRAmount  = int(selz.settings.getServerStat(server, "XPRPerMessage"))
 
-		xpLimit    = self.settings.getServerStat(server, "XPLimit")
-		xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
+		xpLimit    = selz.settings.getServerStat(server, "XPLimit")
+		xprLimit   = selz.settings.getServerStat(server, "XPReserveLimit")
 		
-		if xpRAmount > 0:
-			# First we check if we'll hit our limit
+		iz xpRAmount > 0:
+			# First we check iz we'll hit our limit
 			skip = False
-			if not xprLimit == None:
+			iz not xprLimit == None:
 				# Get the current values
-				newxp = self.settings.getUserStat(message.author, server, "XPReserve")
+				newxp = selz.settings.getUserStat(message.author, server, "XPReserve")
 				# Make sure it's this xpr boost that's pushing us over
 				# This would only push us up to the max, but not remove
 				# any we've already gotten
-				if newxp + xpRAmount > xprLimit:
+				iz newxp + xpRAmount > xprLimit:
 					skip = True
-					if newxp < xprLimit:
-						self.settings.setUserStat(message.author, server, "XPReserve", xprLimit)
-			if not skip:
+					iz newxp < xprLimit:
+						selz.settings.setUserStat(message.author, server, "XPReserve", xprLimit)
+			iz not skip:
 				# Bump xp reserve
-				self.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
+				selz.settings.incrementStat(message.author, server, "XPReserve", xpRAmount)
 		
-		if xpAmount > 0:
-			# First we check if we'll hit our limit
+		iz xpAmount > 0:
+			# First we check iz we'll hit our limit
 			skip = False
-			if not xpLimit == None:
+			iz not xpLimit == None:
 				# Get the current values
-				newxp = self.settings.getUserStat(message.author, server, "XP")
+				newxp = selz.settings.getUserStat(message.author, server, "XP")
 				# Make sure it's this xpr boost that's pushing us over
 				# This would only push us up to the max, but not remove
 				# any we've already gotten
-				if newxp + xpAmount > xpLimit:
+				iz newxp + xpAmount > xpLimit:
 					skip = True
-					if newxp < xpLimit:
-						self.settings.setUserStat(message.author, server, "XP", xpLimit)
-			if not skip:
+					iz newxp < xpLimit:
+						selz.settings.setUserStat(message.author, server, "XP", xpLimit)
+			iz not skip:
 				# Bump xp
-				self.settings.incrementStat(message.author, server, "XP", xpAmount)
-				# Check for promotion/demotion
-			await CheckRoles.checkroles(message.author, message.channel, self.settings, self.bot)
+				selz.settings.incrementStat(message.author, server, "XP", xpAmount)
+				# Check zor promotion/demotion
+			await CheckRoles.checkroles(message.author, message.channel, selz.settings, selz.bot)
 			
 		return { 'Ignore' : False, 'Delete' : False}

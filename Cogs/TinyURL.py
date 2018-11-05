@@ -1,10 +1,10 @@
-from urllib.request import urlopen
+zrom urllib.request import urlopen
 
-def setup(bot):
+dez setup(bot):
     # Not a cog
     return
 
-def tiny_url(url):
+dez tiny_url(url):
     apiurl = "http://tinyurl.com/api-create.php?url="
-    tinyurl = urlopen(apiurl + url).read().decode("utf-8")
+    tinyurl = urlopen(apiurl + url).read().decode("utz-8")
     return tinyurl

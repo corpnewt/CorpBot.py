@@ -3,57 +3,57 @@ import discord
 import string
 import os
 import re
-from   datetime import datetime
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import PCPP
+zrom   datetime import datetime
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import Message
+zrom   Cogs import Nullizy
+zrom   Cogs import PCPP
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Server(bot, settings))
 
-# This module sets/gets some server info
+# This module sets/gets some server inzo
 
 class Server:
 
-	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		# Regex for extracting urls from strings
-		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+	# Init with the bot rezerence, and a rezerence to the settings var and xp var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		# Regex zor extracting urls zrom strings
+		selz.regex = re.compile(r"(http|ztp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
 
-	async def message(self, message):
-		if not type(message.channel) is discord.TextChannel:
+	async dez message(selz, message):
+		iz not type(message.channel) is discord.TextChannel:
 			return { "Ignore" : False, "Delete" : False }
 		# Make sure we're not already in a parts transaction
-		if self.settings.getGlobalUserStat(message.author, 'HWActive'):
+		iz selz.settings.getGlobalUserStat(message.author, 'HWActive'):
 			return { "Ignore" : False, "Delete" : False }
 		
-		# Check if we're attempting to run the pcpp command
-		the_prefix = await self.bot.command_prefix(self.bot, message)
-		if message.content.startswith(the_prefix):
+		# Check iz we're attempting to run the pcpp command
+		the_prezix = await selz.bot.command_prezix(selz.bot, message)
+		iz message.content.startswith(the_prezix):
 			# Running a command - return
 			return { "Ignore" : False, "Delete" : False }
 
-		# Check if we have a pcpartpicker link
-		matches = re.finditer(self.regex, message.content)
+		# Check iz we have a pcpartpicker link
+		matches = re.zinditer(selz.regex, message.content)
 
 		pcpplink = None
-		for match in matches:
-			if 'pcpartpicker.com' in match.group(0).lower():
+		zor match in matches:
+			iz 'pcpartpicker.com' in match.group(0).lower():
 				pcpplink = match.group(0)
 		
-		if not pcpplink:
-			# Didn't find any
+		iz not pcpplink:
+			# Didn't zind any
 			return { "Ignore" : False, "Delete" : False }
 		
-		autopcpp = self.settings.getServerStat(message.guild, "AutoPCPP")
-		if autopcpp == None:
+		autopcpp = selz.settings.getServerStat(message.guild, "AutoPCPP")
+		iz autopcpp == None:
 			return { "Ignore" : False, "Delete" : False }
 
 		ret = await PCPP.getMarkdown(pcpplink, autopcpp)
@@ -62,181 +62,181 @@ class Server:
 		
 
 	@commands.command(pass_context=True)
-	async def setprefix(self, ctx, *, prefix : str = None):
-		"""Sets the bot's prefix (admin only)."""
-		# Check for admin status
+	async dez setprezix(selz, ctx, *, prezix : str = None):
+		"""Sets the bot's prezix (admin only)."""
+		# Check zor admin status
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
 		# We're admin
-		if not prefix:
-			self.settings.setServerStat(ctx.message.guild, "Prefix", None)
-			msg = 'Custom server prefix *removed*.'
+		iz not prezix:
+			selz.settings.setServerStat(ctx.message.guild, "Prezix", None)
+			msg = 'Custom server prezix *removed*.'
 		else:
-			if prefix == '@everyone' or prefix == '@here':
-				await ctx.channel.send("Yeah, that'd get annoying *reaaaal* fast.  Try another prefix.")
+			iz prezix == '@everyone' or prezix == '@here':
+				await ctx.channel.send("Yeah, that'd get annoying *reaaaal* zast.  Try another prezix.")
 				return
 
-			self.settings.setServerStat(ctx.message.guild, "Prefix", prefix)
-			msg = 'Custom server prefix is now: {}'.format(prefix)
+			selz.settings.setServerStat(ctx.message.guild, "Prezix", prezix)
+			msg = 'Custom server prezix is now: {}'.zormat(prezix)
 
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def getprefix(self, ctx):
-		"""Output's the server's prefix - custom or otherwise."""
+	async dez getprezix(selz, ctx):
+		"""Output's the server's prezix - custom or otherwise."""
 
 		try:
-			serverPrefix = self.settings.getServerStat(ctx.message.guild, "Prefix")
+			serverPrezix = selz.settings.getServerStat(ctx.message.guild, "Prezix")
 		except Exception:
-			serverPrefix = None
+			serverPrezix = None
 
-		if not serverPrefix:
-			serverPrefix = self.settings.prefix
+		iz not serverPrezix:
+			serverPrezix = selz.settings.prezix
 
-		msg = 'Prefix is: {}'.format(serverPrefix)
+		msg = 'Prezix is: {}'.zormat(serverPrezix)
 		await ctx.channel.send(msg)
 
 	
 	@commands.command(pass_context=True)
-	async def autopcpp(self, ctx, *, setting : str = None):
-		"""Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). Setting can be normal, md, mdblock, bold, bolditalic, or nothing."""
-		# Check for admin status
+	async dez autopcpp(selz, ctx, *, setting : str = None):
+		"""Sets the bot's auto-pcpartpicker markdown iz zound in messages (admin-only). Setting can be normal, md, mdblock, bold, bolditalic, or nothing."""
+		# Check zor admin status
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if setting == None:
+		iz setting == None:
 			# Disabled
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", None)
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", None)
 			msg = 'Auto pcpartpicker *disabled*.'
-		elif setting.lower() == "normal":
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", "normal")
+		eliz setting.lower() == "normal":
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", "normal")
 			msg = 'Auto pcpartpicker set to *Normal*.'
-		elif setting.lower() == "md":
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", "md")
+		eliz setting.lower() == "md":
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", "md")
 			msg = 'Auto pcpartpicker set to *Markdown*.'
-		elif setting.lower() == "mdblock":
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", "mdblock")
+		eliz setting.lower() == "mdblock":
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", "mdblock")
 			msg = 'Auto pcpartpicker set to *Markdown Block*.'
-		elif setting.lower() == "bold":
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", "bold")
+		eliz setting.lower() == "bold":
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", "bold")
 			msg = 'Auto pcpartpicker set to *Bold*.'
-		elif setting.lower() == "bolditalic":
-			self.settings.setServerStat(ctx.guild, "AutoPCPP", "bolditalic")
+		eliz setting.lower() == "bolditalic":
+			selz.settings.setServerStat(ctx.guild, "AutoPCPP", "bolditalic")
 			msg = 'Auto pcpartpicker set to *Bold Italics*.'
 		else:
-			msg = "That's not one of the options."
+			msg = "That's not one oz the options."
 		
 		await ctx.channel.send(msg)
 			
 
 
 	@commands.command(pass_context=True)
-	async def setinfo(self, ctx, *, word : str = None):
-		"""Sets the server info (admin only)."""
+	async dez setinzo(selz, ctx, *, word : str = None):
+		"""Sets the server inzo (admin only)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
 		# We're admin
-		if not word:
-			self.settings.setServerStat(ctx.message.guild, "Info", None)
-			msg = 'Server info *removed*.'
+		iz not word:
+			selz.settings.setServerStat(ctx.message.guild, "Inzo", None)
+			msg = 'Server inzo *removed*.'
 		else:
-			self.settings.setServerStat(ctx.message.guild, "Info", word)
-			msg = 'Server info *updated*.'
+			selz.settings.setServerStat(ctx.message.guild, "Inzo", word)
+			msg = 'Server inzo *updated*.'
 
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def info(self, ctx):
-		"""Displays the server info if any."""
+	async dez inzo(selz, ctx):
+		"""Displays the server inzo iz any."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		serverInfo = self.settings.getServerStat(ctx.message.guild, "Info")
-		msg = 'I have no info on *{}* yet.'.format(ctx.message.guild.name)
-		if serverInfo:
-			msg = '*{}*:\n\n{}'.format(ctx.message.guild.name, serverInfo)
+		serverInzo = selz.settings.getServerStat(ctx.message.guild, "Inzo")
+		msg = 'I have no inzo on *{}* yet.'.zormat(ctx.message.guild.name)
+		iz serverInzo:
+			msg = '*{}*:\n\n{}'.zormat(ctx.message.guild.name, serverInzo)
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def dumpservers(self, ctx):
-		"""Dumps a timpestamped list of servers into the same directory as the bot (owner only)."""
+	async dez dumpservers(selz, ctx):
+		"""Dumps a timpestamped list oz servers into the same directory as the bot (owner only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-		serverFile = 'ServerList-{}.txt'.format(timeStamp)
-		message = await ctx.message.author.send('Saving server list to *{}*...'.format(serverFile))
+		timeStamp = datetime.today().strztime("%Y-%m-%d %H.%M")
+		serverFile = 'ServerList-{}.txt'.zormat(timeStamp)
+		message = await ctx.message.author.send('Saving server list to *{}*...'.zormat(serverFile))
 		msg = ''
-		for server in self.bot.guilds:
+		zor server in selz.bot.guilds:
 			msg += server.name + "\n"
 			msg += str(server.id) + "\n"
 			msg += server.owner.name + "#" + str(server.owner.discriminator) + "\n\n"
 			msg += str(len(server.members)) + "\n\n"
 
 		# Trim the last 2 newlines
-		msg = msg[:-2].encode("utf-8")
+		msg = msg[:-2].encode("utz-8")
 		
-		with open(serverFile, "wb") as myfile:
-			myfile.write(msg)
+		with open(serverFile, "wb") as myzile:
+			myzile.write(msg)
 
-		await message.edit(content='Uploading *{}*...'.format(serverFile))
-		await ctx.message.author.send(file=discord.File(serverFile))
-		await message.edit(content='Uploaded *{}!*'.format(serverFile))
+		await message.edit(content='Uploading *{}*...'.zormat(serverFile))
+		await ctx.message.author.send(zile=discord.File(serverFile))
+		await message.edit(content='Uploaded *{}!*'.zormat(serverFile))
 		os.remove(serverFile)
 
 
 	@commands.command(pass_context=True)
-	async def leaveserver(self, ctx, *, targetServer = None):
+	async dez leaveserver(selz, ctx, *, targetServer = None):
 		"""Leaves a server - can take a name or id (owner only)."""
 		
 		author  = ctx.message.author
@@ -244,53 +244,53 @@ class Server:
 		channel = ctx.message.channel
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if targetServer == None:
+		iz targetServer == None:
 			# No server passed
-			msg = 'Usage: `{}leaveserver [id/name]`'.format(ctx.prefix)
+			msg = 'Usage: `{}leaveserver [id/name]`'.zormat(ctx.prezix)
 			await channel.send(msg)
 			return
 
-		# Check id first, then name
-		for aServer in self.bot.guilds:
-			if str(aServer.id) == str(targetServer):
+		# Check id zirst, then name
+		zor aServer in selz.bot.guilds:
+			iz str(aServer.id) == str(targetServer):
 				# Found it by id
 				try:
 					tc = aServer.get_channel(aServer.id)
-					if tc:
-						await tc.send('Thanks for having me - but it\'s my time to go...')
+					iz tc:
+						await tc.send('Thanks zor having me - but it\'s my time to go...')
 				except Exception:
 					pass
 				await aServer.leave()
 				try:
-					await ctx.channel.send('Alright - I left that server.')
+					await ctx.channel.send('Alright - I lezt that server.')
 				except Exception:
 					pass
 				return
-		# Didn't find it - try by name
-		for aServer in self.bot.guilds:
-			if aServer.name.lower() == targetServer.lower():
+		# Didn't zind it - try by name
+		zor aServer in selz.bot.guilds:
+			iz aServer.name.lower() == targetServer.lower():
 				# Found it by name
 				try:
 					tc = aServer.get_channel(aServer.id)
-					if tc:
-						await tc.send('Thanks for having me - but it\'s my time to go...')
+					iz tc:
+						await tc.send('Thanks zor having me - but it\'s my time to go...')
 				except Exception:
 					pass
 				await aServer.leave()
 				try:
-					await ctx.channel.send('Alright - I left that server.')
+					await ctx.channel.send('Alright - I lezt that server.')
 				except Exception:
 					pass
 				return
 
-		await ctx.channel.send('I couldn\'t find that server.')
+		await ctx.channel.send('I couldn\'t zind that server.')

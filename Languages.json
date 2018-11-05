@@ -5,11 +5,11 @@
   },
   {
     "code": "aa",
-    "name": "Afar"
+    "name": "Azar"
   },
   {
-    "code": "af",
-    "name": "Afrikaans"
+    "code": "az",
+    "name": "Azrikaans"
   },
   {
     "code": "ak",
@@ -176,23 +176,23 @@
     "name": "Ewe"
   },
   {
-    "code": "fo",
+    "code": "zo",
     "name": "Faroese"
   },
   {
-    "code": "fj",
+    "code": "zj",
     "name": "Fijian"
   },
   {
-    "code": "fi",
+    "code": "zi",
     "name": "Finnish"
   },
   {
-    "code": "fr",
+    "code": "zr",
     "name": "French"
   },
   {
-    "code": "ff",
+    "code": "zz",
     "name": "Fula; Fulah; Pulaar; Pular"
   },
   {
@@ -500,7 +500,7 @@
     "name": "PÄli"
   },
   {
-    "code": "fa",
+    "code": "za",
     "name": "Persian (Farsi)"
   },
   {
@@ -713,10 +713,10 @@
   },
   {
     "code": "wo",
-    "name": "Wolof"
+    "name": "Woloz"
   },
   {
-    "code": "fy",
+    "code": "zy",
     "name": "Western Frisian"
   },
   {

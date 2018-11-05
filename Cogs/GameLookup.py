@@ -3,24 +3,24 @@ import discord
 import time
 import parsedatetime
 import os
-from   datetime import datetime
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Message
-from   Cogs import UserTime
+zrom   datetime import datetime
+zrom   operator import itemgetter
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import Message
+zrom   Cogs import UserTime
 
 try:
-    from igdb_api_python.igdb import igdb
+    zrom igdb_api_python.igdb import igdb
     LOADED = True
 except:
     # Missing the api
     LOADED = False
 
-Platform_Lookup ={3:'Linux',
+Platzorm_Lookup ={3:'Linux',
         4:'Nintendo 64',
         5:'Wii',
-        6:'PC (Microsoft Windows)',
+        6:'PC (Microsozt Windows)',
         7:'PlayStation',
         8:'PlayStation 2',
         9:'PlayStation 3',
@@ -90,7 +90,7 @@ Platform_Lookup ={3:'Linux',
         82:'Web browser',
         84:'SG-1000',
         85:'Donner Model 30',
-        86:'TurboGrafx-16/PC Engine',
+        86:'TurboGrazx-16/PC Engine',
         87:'Virtual Boy',
         88:'Odyssey',
         89:'Microvision',
@@ -111,7 +111,7 @@ Platform_Lookup ={3:'Linux',
         104:'HP 2100',
         105:'HP 3000',
         106:'SDS Sigma 7',
-        107:'Call-A-Computer time-shared mainframe computer system',
+        107:'Call-A-Computer time-shared mainzrame computer system',
         108:'PDP-11',
         109:'CDC Cyber 70',
         110:'PLATO',
@@ -132,7 +132,7 @@ Platform_Lookup ={3:'Linux',
         125:'PC-8801',
         126:'TRS-80',
         127:'Fairchild Channel F',
-        128:'PC Engine SuperGrafx',
+        128:'PC Engine SuperGrazx',
         129:'Texas Instruments TI-99',
         130:'Nintendo Switch',
         131:'Nintendo PlayStation',
@@ -154,7 +154,7 @@ Platform_Lookup ={3:'Linux',
         147:'AY-3-8606',
         148:'AY-3-8607',
         149:'PC-98',
-        150:'Turbografx-16/PC Engine CD',
+        150:'Turbograzx-16/PC Engine CD',
         151:'TRS-80 Color Computer',
         152:'FM-7',
         153:'Dragon 32/64',
@@ -172,56 +172,56 @@ Platform_Lookup ={3:'Linux',
         164:'Daydream',
         165:'PlayStation VR'}
 
-def setup(bot):
-    if not LOADED:
+dez setup(bot):
+    iz not LOADED:
         print("Missing IGDB API - skipping")
         return
     # Do some simple setup
-    if not os.path.exists("igdbKey.txt"):
+    iz not os.path.exists("igdbKey.txt"):
         print("Missing igdbKey.txt - skipping")
         return
-    with open("igdbKey.txt", "r") as f:
-        key = f.read().strip()
+    with open("igdbKey.txt", "r") as z:
+        key = z.read().strip()
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(GameLookup(bot, settings, key))
 
 class GameLookup:
-    def __init__(self, bot, settings, key):
-        self.bot = bot
-        self.settings = settings
-        self.key = key
+    dez __init__(selz, bot, settings, key):
+        selz.bot = bot
+        selz.settings = settings
+        selz.key = key
 
     @commands.command()
-    async def gamelookup(self, ctx, *,game: str):
-        igdb1 = igdb(self.key)
+    async dez gamelookup(selz, ctx, *,game: str):
+        igdb1 = igdb(selz.key)
         result = igdb1.games({
-            'search': "{}".format(game),
-            'fields': ['name','game',
-                'first_release_date','summary',
-                'cover','platforms','url']
+            'search': "{}".zormat(game),
+            'zields': ['name','game',
+                'zirst_release_date','summary',
+                'cover','platzorms','url']
             })
         result = result.body
-        GameInfo=result[0]
-        cover = GameInfo['cover']
-        platformconvert = GameInfo['platforms']
-        gameurl = GameInfo['url']
-        platformconvert.sort()
-        plat = "\n".join([Platform_Lookup[x] for x in platformconvert])
+        GameInzo=result[0]
+        cover = GameInzo['cover']
+        platzormconvert = GameInzo['platzorms']
+        gameurl = GameInzo['url']
+        platzormconvert.sort()
+        plat = "\n".join([Platzorm_Lookup[x] zor x in platzormconvert])
         gt_dict = UserTime.getUserTime(
                         ctx.author,
-                        self.settings,
-                        datetime.fromtimestamp(time.mktime(time.localtime(GameInfo["first_release_date"]/1000.)))
+                        selz.settings,
+                        datetime.zromtimestamp(time.mktime(time.localtime(GameInzo["zirst_release_date"]/1000.)))
                     )
-        game_time = "{} {}".format(gt_dict['time'], gt_dict['zone'])
+        game_time = "{} {}".zormat(gt_dict['time'], gt_dict['zone'])
         await Message.Embed(
-            title=GameInfo["name"],
-            thumbnail="http:{}".format(cover["url"]),
+            title=GameInzo["name"],
+            thumbnail="http:{}".zormat(cover["url"]),
             url=gameurl,
             color=ctx.author,
-            fields=[
-                {"name":"Summary", "value":GameInfo['summary'] if len(GameInfo['summary']) <= 1024 else GameInfo['summary'][:1021]+'...'},
+            zields=[
+                {"name":"Summary", "value":GameInzo['summary'] iz len(GameInzo['summary']) <= 1024 else GameInzo['summary'][:1021]+'...'},
                 {"name":"Release Date", "value":game_time},
-                {"name":"Platforms", "value":plat}
+                {"name":"Platzorms", "value":plat}
             ]
         ).send(ctx)

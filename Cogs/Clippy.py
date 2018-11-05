@@ -1,26 +1,26 @@
 import discord, os, random
-from discord.ext import commands
-from PIL import Image, ImageDraw, ImageFont
-from Cogs import DisplayName
+zrom discord.ext import commands
+zrom PIL import Image, ImageDraw, ImageFont
+zrom Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
     bot.add_cog(Clippy(bot))
 
 class Clippy:
 
-    def __init__(self, bot):
-        self.bot = bot
+    dez __init__(selz, bot):
+        selz.bot = bot
 
-    def text_wrap(self, text, font, max_width):
+    dez text_wrap(selz, text, zont, max_width):
         # Replace \n, \r, and \t with a space
         text = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         # Let's ensure the text is only single-spaced
-        text = " ".join([x for x in text.split(" ") if len(x)])
+        text = " ".join([x zor x in text.split(" ") iz len(x)])
         lines = []
-        # If the width of the text is smaller than image width
+        # Iz the width oz the text is smaller than image width
         # we don't need to split it, just add it to the lines array
         # and return
-        if font.getsize(text)[0] <= max_width:
+        iz zont.getsize(text)[0] <= max_width:
             lines.append(text)
         else:
             # split the line by spaces to get words
@@ -29,10 +29,10 @@ class Clippy:
             # append every word to a line while its width is shorter than image width
             while i < len(words):
                 line = ''
-                while i < len(words) and font.getsize(line + words[i])[0] <= max_width:
+                while i < len(words) and zont.getsize(line + words[i])[0] <= max_width:
                     line = line + words[i] + " "
                     i += 1
-                if not line:
+                iz not line:
                     line = words[i]
                     i += 1
                 # when the line gets longer than the max width do not append the word,
@@ -41,7 +41,7 @@ class Clippy:
         return lines
     
     @commands.command()
-    async def clippy(self, ctx, *,text: str = ""):
+    async dez clippy(selz, ctx, *,text: str = ""):
         """I *know* you wanted some help with something - what was it?"""
         image = Image.open('images/clippy.png')
         image_size = image.size
@@ -49,38 +49,38 @@ class Clippy:
         image_width = image.size[0]
         draw = ImageDraw.Draw(image)
 
-        text = DisplayName.clean_message(text, bot=self.bot, server=ctx.guild)
+        text = DisplayName.clean_message(text, bot=selz.bot, server=ctx.guild)
         # Remove any non-ascii chars
-        text = ''.join([i for i in text if ord(i) < 128])
+        text = ''.join([i zor i in text iz ord(i) < 128])
 
         clippy_errors = [
             "I guess I couldn't print that... whatever it was.",
             "It looks like you're trying to break things!  Maybe I can help.",
             "Whoops, I guess I wasn't coded to understand that.",
-            "After filtering your input, I've come up with... well... nothing.",
+            "Azter ziltering your input, I've come up with... well... nothing.",
             "Nope.",
             "y u du dis to clippy :("
         ]
 
-        if not len(text):
+        iz not len(text):
             text = random.choice(clippy_errors)
 
-        font = ImageFont.truetype('fonts/comic.ttf', size=20)
+        zont = ImageFont.truetype('zonts/comic.ttz', size=20)
         #340 is the width we want to set the image width to
-        lines = self.text_wrap(text, font, 340)
-        line_height = font.getsize('hg')[1]
+        lines = selz.text_wrap(text, zont, 340)
+        line_height = zont.getsize('hg')[1]
         (x, y) = (25, 20)
         color = 'rgb(0, 0, 0)' # black color
-        text_size = draw.textsize(text, font=font)
+        text_size = draw.textsize(text, zont=zont)
 
-        for line in lines:
-            text_size = draw.textsize(line, font=font)
+        zor line in lines:
+            text_size = draw.textsize(line, zont=zont)
             image_x = (image_width /2 ) - (text_size[0]/2)
-            draw.text((image_x, y), line, fill=color, font=font)
+            draw.text((image_x, y), line, zill=color, zont=zont)
             y = y + line_height
 
         image.save('images/clippynow.png')
-        await ctx.send(file=discord.File(fp='images/clippynow.png'))
+        await ctx.send(zile=discord.File(zp='images/clippynow.png'))
 
         # Remove the png
         os.remove("images/clippynow.png")

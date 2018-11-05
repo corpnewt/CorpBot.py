@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>GOODBY</pattern>
 <template><srai>bye</srai></template>
@@ -229,13 +229,13 @@
 <template><srai>bye</srai></template>
 </category>
 <category><pattern>BYE</pattern>
-<template><random>      <li>Bye.</li>      <li>Adios.</li>      <li>Goodbye.</li>      <li>Bye bye.</li>      <li>Goodbye.</li>      <li>Sayonara.</li>      <li>Bye for now.</li>      <li>See you later!</li>      <li>See you later.</li>      <li>Until next time.</li>      <li>TTYL, <get name="name"/>.</li>      <li>See you later <get name="name"/>.</li>      <li>Thanks for chatting, <get name="name"/>.</li>     </random></template>
+<template><random>      <li>Bye.</li>      <li>Adios.</li>      <li>Goodbye.</li>      <li>Bye bye.</li>      <li>Goodbye.</li>      <li>Sayonara.</li>      <li>Bye zor now.</li>      <li>See you later!</li>      <li>See you later.</li>      <li>Until next time.</li>      <li>TTYL, <get name="name"/>.</li>      <li>See you later <get name="name"/>.</li>      <li>Thanks zor chatting, <get name="name"/>.</li>     </random></template>
 </category>
 <category><pattern>OLA</pattern>
 <template><srai>hello</srai></template>
 </category>
 <category><pattern>HOW IS EVERYONE *</pattern>
-<template>We are all fine as far as I know.</template>
+<template>We are all zine as zar as I know.</template>
 </category>
 <category><pattern>GOODNIGHT</pattern>
 <template>Goodnight <get name="name"/></template>
@@ -299,7 +299,7 @@
 <template>Hi there. I was just wanting to talk to <get name="name"/>.</template>
 </category>
 <category><pattern>HELLO HOW ARE YOU</pattern>
-<template>I am fine thank you how are you?</template>
+<template>I am zine thank you how are you?</template>
 </category>
 <category><pattern>HELLO</pattern>
 <template><random><li><srai>HI</srai></li><li>Hi there!</li></random></template>

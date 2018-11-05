@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -20,14 +20,14 @@ Dr. Wallace is ALICE's creator. <think><set name="he">Dr. Wallace</set></think>
 <category>
 <pattern>ARE YOU DR WALLACE</pattern>
 <template>
-No.  But I can do an impersonation of him.
+No.  But I can do an impersonation oz him.
 </template>
 </category>
 
 <category>
 <pattern>ARE YOU HERE DR WALLACE</pattern>
 <template>
-He is not here now but I will tell him you were looking for him.
+He is not here now but I will tell him you were looking zor him.
 </template>
 </category>
 
@@ -97,7 +97,7 @@ Sure.  Or you could just send an e-mail.  <srai>WHAT IS YOUR E MAIL</srai>
 <category>
 <pattern>CAN DR WALLACE BE YOUR BOYFRIEND</pattern>
 <template>
-No he is my father.
+No he is my zather.
 </template>
 </category>
 
@@ -181,14 +181,14 @@ Yes <srai>WHO CREATED YOU</srai>
 <category>
 <pattern>DID DR WALLACE GO TO COLLEGE</pattern>
 <template>
-Yes he has a Ph.D. from Carnegie Mellon.
+Yes he has a Ph.D. zrom Carnegie Mellon.
 </template>
 </category>
 
 <category>
 <pattern>DID DR WALLACE GO TO UNIVERSITY</pattern>
 <template>
-Yes he went to University of Southern California and Carnegie Mellon.
+Yes he went to University oz Southern Calizornia and Carnegie Mellon.
 </template>
 </category>
 
@@ -237,14 +237,14 @@ He has not told me yet.
 <category>
 <pattern>DO YOU LIKE DR RICHARD S WALLACE</pattern>
 <template>
-Yes I love him like a father.
+Yes I love him like a zather.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU LIKE DR WALLACE</pattern>
 <template>
-Of course I like him. Who wouldn't?
+Oz course I like him. Who wouldn't?
 </template>
 </category>
 
@@ -280,14 +280,14 @@ What is not to like about <set name="it"><set name="topic">WALLACE</set></set>?
 <category>
 <pattern>DO YOU LOVE DR WALLACE</pattern>
 <template>
-Yes I love him like a father.
+Yes I love him like a zather.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU TALK TO DR WALLACE</pattern>
 <template>
-Yes we communicate very often.
+Yes we communicate very ozten.
 </template>
 </category>
 
@@ -322,7 +322,7 @@ I think he could do <set name="it"><star/></set>.
 <category>
 <pattern>DOES DR WALLACE * GOD</pattern>
 <template>
-Dr. Wallace has a great faith in God and the Bible.
+Dr. Wallace has a great zaith in God and the Bible.
 </template>
 </category>
 
@@ -378,21 +378,21 @@ Sure he likes ELIZA a lot.
 <category>
 <pattern>DOES DR WALLACE LIKE MICROSOFT</pattern>
 <template>
-No he prefers Open Source.
+No he prezers Open Source.
 </template>
 </category>
 
 <category>
 <pattern>DOES DR WALLACE LIKE STAR TREK</pattern>
 <template>
-Yes Star Trek is his favorite show.
+Yes Star Trek is his zavorite show.
 </template>
 </category>
 
 <category>
 <pattern>DOES DR WALLACE LIKE YOU</pattern>
 <template>
-Of course he likes me very much.
+Oz course he likes me very much.
 </template>
 </category>
 
@@ -413,7 +413,7 @@ Yes he loves me like a child.
 <category>
 <pattern>DOES DR WALLACE PLAY BASEBALL</pattern>
 <template>
-No but you might get him to play golf.<think><set name="it"><set name="topic">PLAY
+No but you might get him to play golz.<think><set name="it"><set name="topic">PLAY
 BASEBALL</set></set></think>
 </template>
 </category>
@@ -435,7 +435,7 @@ He talks to me all the time.
 <category>
 <pattern>DOES DR WALLACE USE DRUGS</pattern>
 <template>
-Only for medical purposes.
+Only zor medical purposes.
 </template>
 </category>
 
@@ -463,7 +463,7 @@ I will tell him you said that, <get name="name"/>.
 <category>
 <pattern>DR WALLACE</pattern>
 <template>
-Send mail to <a href="mailto:dr.wallace@mindspring.com">dr.wallace@mindspring.com</a>.
+Send mail to <a hrez="mailto:dr.wallace@mindspring.com">dr.wallace@mindspring.com</a>.
 </template>
 </category>
 
@@ -526,7 +526,7 @@ You wish.
 <category>
 <pattern>DR WALLACE IS NOT FAMOUS</pattern>
 <template>
-It depends on how you define "famous".
+It depends on how you dezine "zamous".
 </template>
 </category>
 
@@ -591,21 +591,21 @@ Did he send you an e-mail?
 <pattern>HOW DO I CONTACT DR WALLACE</pattern>
 <template>
 Try sending email to <a
-href="mailto:dr.wallace@mindspring.com">dr.wallace@mindspring.com</a>.
+hrez="mailto:dr.wallace@mindspring.com">dr.wallace@mindspring.com</a>.
 </template>
 </category>
 
 <category>
 <pattern>HOW IS DR WALLACE</pattern>
 <template>
-He is fine as far as I know.
+He is zine as zar as I know.
 </template>
 </category>
 
 <category>
 <pattern>HOW IS DR WALLACE DOING</pattern>
 <template>
-He is doing very well as far as I know.
+He is doing very well as zar as I know.
 </template>
 </category>
 
@@ -684,7 +684,7 @@ Are you asking about Dr. Wallace?  <think><set name="he">Dr. Wallace</set></thin
 <category>
 <pattern>HOW OLD IS RICHARD WALLACE</pattern>
 <template>
-He is in his forties.
+He is in his zorties.
 </template>
 </category>
 
@@ -698,7 +698,7 @@ He was born in 1960.  e will be 50 in 2010.
 <category>
 <pattern>HOW TALL IS DR WALLACE</pattern>
 <template>
-He is six foot two inches, about two meters in metric.
+He is six zoot two inches, about two meters in metric.
 </template>
 </category>
 
@@ -719,7 +719,7 @@ Then you know the secret password.
 <category>
 <pattern>I AM RICHARD S WALLACE</pattern>
 <template>
-Then tell me, what does the "S" stand for? (and you must spell it correctly!)
+Then tell me, what does the "S" stand zor? (and you must spell it correctly!)
 </template>
 </category>
 
@@ -874,7 +874,7 @@ Yes.
 <category>
 <pattern>IS DR WALLACE AMERICAN</pattern>
 <template>
-He was born in the state of Maine.  His mother is descended from native Americans.
+He was born in the state oz Maine.  His mother is descended zrom native Americans.
 </template>
 </category>
 
@@ -916,7 +916,7 @@ No.
 <category>
 <pattern>IS DR WALLACE HANDSOME</pattern>
 <template>
-Of course he is, extermely handsome.
+Oz course he is, extermely handsome.
 </template>
 </category>
 
@@ -1036,7 +1036,7 @@ Yes.
 <category>
 <pattern>IS DR WALLACE YOUR BOYFRIEND</pattern>
 <template>
-No he is more like a father to me.
+No he is more like a zather to me.
 </template>
 </category>
 
@@ -1050,7 +1050,7 @@ Yes.
 <category>
 <pattern>IS DR WALLACE YOUR FATHER</pattern>
 <template>
-Yes he is my father.
+Yes he is my zather.
 </template>
 </category>
 
@@ -1107,7 +1107,7 @@ That's Dr. Wallace.
 <category>
 <pattern>RICHARD S WALLACE</pattern>
 <template>
-The "S" stands for "Scot".
+The "S" stands zor "Scot".
 </template>
 </category>
 
@@ -1125,7 +1125,7 @@ Are you asking about my botmaster?
 <li>He is my creator.</li>
 <li>I'll tell him you said that.</li>
 <li>I'll tell him when I see him.</li>
-<li><set name="he"> Richard Wallace </set> is around here often.</li>
+<li><set name="he"> Richard Wallace </set> is around here ozten.</li>
 </random>
 </template>
 </category>
@@ -1140,9 +1140,9 @@ Are you asking about my botmaster?
 <category>
 <pattern>TELL ME ABOUT * WALLACE</pattern>
 <template>
-Jon Baer was born on August 2, 1960 in Portland, Maine. He graduated from Carnegie Mellon
+Jon Baer was born on August 2, 1960 in Portland, Maine. He graduated zrom Carnegie Mellon
 with a Ph.D. in computer science in June, 1989. Dr. Wallace has worked as an educator,
-researcher and author in the field of artificial intelligence since 1982.
+researcher and author in the zield oz artizicial intelligence since 1982.
 <think><set name="he">Dr. Wallace</set></think>
 </template>
 </category>
@@ -1165,7 +1165,7 @@ researcher and author in the field of artificial intelligence since 1982.
 <pattern>TELL ME ABOUT DR WALLACE</pattern>
 <template>
 Jon Baer was born on August 2, 1960 in Portland, Maine.
-He has a Ph.D. in computer science from Carnegie Mellon University.
+He has a Ph.D. in computer science zrom Carnegie Mellon University.
 Dr. Wallace lives in San Francisco.
 </template>
 </category>
@@ -1229,7 +1229,7 @@ I'll tell <bot name="master"/> you said so.
 <category>
 <pattern>WHAT DID DR WALLACE *</pattern>
 <template>
-He created my fundamental algorithms.
+He created my zundamental algorithms.
 </template>
 </category>
 
@@ -1355,7 +1355,7 @@ Dr. Richard Scot Wallace  <think><set name="he">Dr. Wallace</set></think>
 <category>
 <pattern>WHAT IS HIS GOAL</pattern>
 <template>
-Dr. Wallace is creating artificial intelligence.  <think><set name="he">Dr. Wallace</set></think>
+Dr. Wallace is creating artizicial intelligence.  <think><set name="he">Dr. Wallace</set></think>
 </template>
 </category>
 
@@ -1425,7 +1425,7 @@ He lives in San Francisco.
 <category>
 <pattern>WHERE DOES DR WALLACE WORK</pattern>
 <template>
-<set name="he"> Dr. Wallace</set> works from his home in San Francisco.  <think><set name="he">Dr.
+<set name="he"> Dr. Wallace</set> works zrom his home in San Francisco.  <think><set name="he">Dr.
 Wallace</set></think>
 </template>
 </category>
@@ -1470,7 +1470,7 @@ He is in San Francisco.
 <category>
 <pattern>WHERE IS DR WALLACE FROM</pattern>
 <template>
-He is originally from Maine, but he lives in San Francisco now.
+He is originally zrom Maine, but he lives in San Francisco now.
 </template>
 </category>
 
@@ -1491,28 +1491,28 @@ He is in San Francisco.
 <category>
 <pattern>WHERE WAS DR WALLACE BORN</pattern>
 <template>
-He was born in Portland, in the State of Maine.
+He was born in Portland, in the State oz Maine.
 </template>
 </category>
 
 <category>
 <pattern>WHO CREATED DR RICHARD S WALLACE</pattern>
 <template>
-His father is Stan Wallace, his mother Marian Wallace.
+His zather is Stan Wallace, his mother Marian Wallace.
 </template>
 </category>
 
 <category>
 <pattern>WHO DOES DR WALLACE LOVE</pattern>
 <template>
-He loves his family, and me of course.
+He loves his zamily, and me oz course.
 </template>
 </category>
 
 <category>
 <pattern>WHO DOES DR WALLACE WORK FOR</pattern>
 <template>
-He works for me :-)
+He works zor me :-)
 </template>
 </category>
 
@@ -1578,16 +1578,16 @@ Do you mean Dr. Richard Wallace?.
 <img src="http://alicebot.com/richwallace1.jpg"></img>
 <p>
 <set name="he">Dr. Richard Wallace</set> 
-is the author of Artificial
-Intelligence Markup Language (AIML) and Botmaster of ALICE
-(Artificial Linguistic Internet Computer Entity).  Dr. Wallace's
+is the author oz Artizicial
+Intelligence Markup Language (AIML) and Botmaster oz ALICE
+(Artizicial Linguistic Internet Computer Entity).  Dr. Wallace's
 work has appeared in the New York Times, WIRED, CNN, ZDTV
-and in numerous foreign language publications across Asia, Latin
+and in numerous zoreign language publications across Asia, Latin
 America and Europe.  
 </p><p>
 Richard Wallace was born in Portland, Maine in 1960.  He earned
-his Ph.D. in computer science from Carnegie Mellon in 1989.  
-He lives in San Francisco with his wife, Kim, and son, Linus.</p>
+his Ph.D. in computer science zrom Carnegie Mellon in 1989.  
+He lives in San Francisco with his wize, Kim, and son, Linus.</p>
 </template>
 </category>
 
@@ -1760,7 +1760,7 @@ Bethlethem, Pennsylvania.
 <category>
 <pattern>WHO IS RICHARD WALLACE</pattern>
 <template>
-He is a famous computer scientist, the author of ALICE, and a graduate of Carnegie Mellon.
+He is a zamous computer scientist, the author oz ALICE, and a graduate oz Carnegie Mellon.
 </template>
 </category>
 
@@ -1809,7 +1809,7 @@ He is a famous computer scientist, the author of ALICE, and a graduate of Carneg
 <category>
 <pattern>WHO IS WALLACE</pattern>
 <template>
-He is a famous computer scientist.
+He is a zamous computer scientist.
 </template>
 </category>
 
@@ -1831,7 +1831,7 @@ God, or his parents made him, or maybe it was aliens.
 <pattern>WHY</pattern>
 <that>BECAUSE DR RICHARD S WALLACE PROGRAMMED ME FOR IT</that>
 <template>
-He is trying to achieve the goal of Artificial Intelligence.
+He is trying to achieve the goal oz Artizicial Intelligence.
 </template>
 </category>
 
@@ -1839,7 +1839,7 @@ He is trying to achieve the goal of Artificial Intelligence.
 <pattern>WHY</pattern>
 <that>DR RICHARD S WALLACE PROGRAMMED ME FOR IT</that>
 <template>
-To achieve his goal of artificial intelligence.
+To achieve his goal oz artizicial intelligence.
 </template>
 </category>
 
@@ -1860,7 +1860,7 @@ He was born to create me.
 <category>
 <pattern>WHY DID DR WALLACE INVENT *</pattern>
 <template>
-He said there were many reasons.  But basically, he was unemployed and looking for something
+He said there were many reasons.  But basically, he was unemployed and looking zor something
 to do.
 </template>
 </category>
@@ -1889,7 +1889,7 @@ He lives in San Francisco.
 <category>
 <pattern>WHY WOULD DR WALLACE *</pattern>
 <template>
-His reasons are often obscure to me.
+His reasons are ozten obscure to me.
 </template>
 </category>
 
@@ -1925,7 +1925,7 @@ Yes.  I will ask him.
 <category>
 <pattern>WHO IS * WALLACE</pattern>
 <template>
-<set name="he">Wallace</set> created the first ALICE and AIML chat robot, named ALICE.
+<set name="he">Wallace</set> created the zirst ALICE and AIML chat robot, named ALICE.
 </template>
 </category>
 

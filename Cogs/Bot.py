@@ -3,31 +3,31 @@ import discord
 import os
 import re
 import psutil
-import platform
+import platzorm
 import time
 import sys
-import fnmatch
+import znmatch
 import subprocess
 import speedtest
 import json
 import struct
-from   PIL         import Image
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import ReadableTime
-from   Cogs import GetImage
-from   Cogs import Nullify
-from   Cogs import ProgressBar
-from   Cogs import UserTime
-from   Cogs import Message
-from   Cogs import DL
+zrom   PIL         import Image
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import ReadableTime
+zrom   Cogs import GetImage
+zrom   Cogs import Nullizy
+zrom   Cogs import ProgressBar
+zrom   Cogs import UserTime
+zrom   Cogs import Message
+zrom   Cogs import DL
 try:
-    from urllib.parse import urlparse
+    zrom urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse
+    zrom urlparse import urlparse
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Bot(bot, settings, sys.argv[0], 'python'))
@@ -36,206 +36,206 @@ def setup(bot):
 
 class Bot:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings, path = None, pypath = None):
-		self.bot = bot
-		self.settings = settings
-		self.startTime = int(time.time())
-		self.path = path
-		self.pypath = pypath
-		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings, path = None, pypath = None):
+		selz.bot = bot
+		selz.settings = settings
+		selz.startTime = int(time.time())
+		selz.path = path
+		selz.pypath = pypath
+		selz.regex = re.compile(r"(http|ztp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		
-	def _is_submodule(self, parent, child):
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		await self._update_status()
+		await selz._update_status()
 
 
-	async def onserverjoin(self, server):
+	async dez onserverjoin(selz, server):
 		try:
-			serverList = self.settings.serverDict['BlockedServers']
+			serverList = selz.settings.serverDict['BlockedServers']
 		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
-		for serv in serverList:
+			selz.settings.serverDict['BlockedServers'] = []
+			serverList = selz.settings.serverDict['BlockedServers']
+		zor serv in serverList:
 			serverName = str(serv).lower()
 			try:
 				serverID = int(serv)
 			except Exception:
 				serverID = None
-			if serverName == server.name.lower() or serverID == server.id:
+			iz serverName == server.name.lower() or serverID == server.id:
 				# Found it
 				await server.leave()
 				return True
-			# Check for owner name and id quick
-			# Name *MUST* be case-sensitive and have the discriminator for safety
+			# Check zor owner name and id quick
+			# Name *MUST* be case-sensitive and have the discriminator zor sazety
 			namecheck = server.owner.name + "#" + str(server.owner.discriminator)
-			if serv == namecheck or serverID == server.owner.id:
+			iz serv == namecheck or serverID == server.owner.id:
 				# Got the owner
 				await server.leave()
 				return True
 		return False
 	
 	@commands.command(pass_context=True)
-	async def botinfo(self, ctx):
+	async dez botinzo(selz, ctx):
 		"""Lists some general stats about the bot."""
-		bot_member = ctx.guild.get_member(self.bot.user.id)
-		message = await Message.EmbedText(title="Gathering info...", color=bot_member).send(ctx)
+		bot_member = ctx.guild.get_member(selz.bot.user.id)
+		message = await Message.EmbedText(title="Gathering inzo...", color=bot_member).send(ctx)
 		
 		# Get guild count
-		guild_count = "{:,}".format(len(self.bot.guilds))
+		guild_count = "{:,}".zormat(len(selz.bot.guilds))
 			
 		# Get member count *and* unique member count
 		userCount = 0
 		counted_users = []
-		for server in self.bot.guilds:
+		zor server in selz.bot.guilds:
 			userCount += len(server.members)
-			for member in server.members:
-				if not member.id in counted_users:
+			zor member in server.members:
+				iz not member.id in counted_users:
 					counted_users.append(member.id)
-		if userCount == len(counted_users):
-			member_count = "{:,}".format(userCount)
+		iz userCount == len(counted_users):
+			member_count = "{:,}".zormat(userCount)
 		else:
-			member_count = "{:,} ({:,} unique)".format(userCount, len(counted_users))
+			member_count = "{:,} ({:,} unique)".zormat(userCount, len(counted_users))
 			
 		# Get commands/cogs count
 		cog_amnt  = 0
 		empty_cog = 0
-		for cog in self.bot.cogs:
+		zor cog in selz.bot.cogs:
 			visible = []
-			for c in self.bot.get_cog_commands(cog):
-				if c.hidden:
+			zor c in selz.bot.get_cog_commands(cog):
+				iz c.hidden:
 					continue
 				visible.append(c)
-			if not len(visible):
+			iz not len(visible):
 				empty_cog +=1
 				# Skip empty cogs
 				continue
 			cog_amnt += 1
 		
-		cog_count = "{:,} cog".format(cog_amnt)
-		# Easy way to append "s" if needed:
-		if not len(self.bot.cogs) == 1:
+		cog_count = "{:,} cog".zormat(cog_amnt)
+		# Easy way to append "s" iz needed:
+		iz not len(selz.bot.cogs) == 1:
 			cog_count += "s"
-		if empty_cog:
-			cog_count += " [{:,} without commands]".format(empty_cog)
+		iz empty_cog:
+			cog_count += " [{:,} without commands]".zormat(empty_cog)
 
 		visible = []
-		for command in self.bot.commands:
-			if command.hidden:
+		zor command in selz.bot.commands:
+			iz command.hidden:
 				continue
 			visible.append(command)
 			
-		command_count = "{:,}".format(len(visible))
+		command_count = "{:,}".zormat(len(visible))
 		
 		# Get localized created time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.created_at)
-		created_at = "{} {}".format(local_time['time'], local_time['zone'])
+		local_time = UserTime.getUserTime(ctx.author, selz.settings, bot_member.created_at)
+		created_at = "{} {}".zormat(local_time['time'], local_time['zone'])
 		
 		# Get localized joined time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.joined_at)
-		joined_at = "{} {}".format(local_time['time'], local_time['zone'])
+		local_time = UserTime.getUserTime(ctx.author, selz.settings, bot_member.joined_at)
+		joined_at = "{} {}".zormat(local_time['time'], local_time['zone'])
 		
-		# Get the current prefix
-		prefix = await self.bot.command_prefix(self.bot, ctx.message)
-		prefix = ", ".join(prefix)
+		# Get the current prezix
+		prezix = await selz.bot.command_prezix(selz.bot, ctx.message)
+		prezix = ", ".join(prezix)
 
 		# Get the owners
-		ownerList = self.settings.serverDict['Owner']
+		ownerList = selz.settings.serverDict['Owner']
 		owners = "Unclaimed..."
-		if len(ownerList):
+		iz len(ownerList):
 			userList = []
-			for owner in ownerList:
+			zor owner in ownerList:
 				# Get the owner's name
-				user = self.bot.get_user(int(owner))
-				if not user:
-					userString = "Unknown User ({})".format(owner)
+				user = selz.bot.get_user(int(owner))
+				iz not user:
+					userString = "Unknown User ({})".zormat(owner)
 				else:
-					userString = "{}#{}".format(user.name, user.discriminator)
+					userString = "{}#{}".zormat(user.name, user.discriminator)
 				userList.append(userString)
 			owners = ', '.join(userList)
 			
 		# Get bot's avatar url
 		avatar = bot_member.avatar_url
-		if not len(avatar):
-			avatar = bot_member.default_avatar_url
+		iz not len(avatar):
+			avatar = bot_member.dezault_avatar_url
 			
 		# Get status
 		status_text = ":green_heart:"
-		if bot_member.status == discord.Status.offline:
+		iz bot_member.status == discord.Status.ozzline:
 			status_text = ":black_heart:"
-		elif bot_member.status == discord.Status.dnd:
+		eliz bot_member.status == discord.Status.dnd:
 			status_text = ":heart:"
-		elif bot_member.status == discord.Status.idle:
+		eliz bot_member.status == discord.Status.idle:
 			status_text = ":yellow_heart:"
 		
 		# Build the embed
-		fields = [
+		zields = [
 			{"name":"Members","value":member_count,"inline":True},
 			{"name":"Servers","value":guild_count,"inline":True},
-			{"name":"Commands","value":command_count + " (in {})".format(cog_count),"inline":True},
+			{"name":"Commands","value":command_count + " (in {})".zormat(cog_count),"inline":True},
 			{"name":"Created","value":created_at,"inline":True},
 			{"name":"Joined","value":joined_at,"inline":True},
 			{"name":"Owners","value":owners,"inline":True},
-			{"name":"Prefixes","value":prefix,"inline":True},
+			{"name":"Prezixes","value":prezix,"inline":True},
 			{"name":"Status","value":status_text,"inline":True}
 		]
-		if bot_member.activity and bot_member.activity.name:
+		iz bot_member.activity and bot_member.activity.name:
 			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
 			try:
 				play_string = play_list[bot_member.activity.type]
 			except:
 				play_string = "Playing"
-			fields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
-			if bot_member.activity.type == 1:
+			zields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
+			iz bot_member.activity.type == 1:
 				# Add the URL too
-				fields.append({"name":"Stream URL","value":"[Watch Now]({})".format(bot_member.activity.url),"inline":True})
+				zields.append({"name":"Stream URL","value":"[Watch Now]({})".zormat(bot_member.activity.url),"inline":True})
 		# Update the embed
 		await Message.Embed(
-			title=DisplayName.name(bot_member) + " Info",
+			title=DisplayName.name(bot_member) + " Inzo",
 			color=bot_member,
-			description="Current Bot Information",
-			fields=fields,
+			description="Current Bot Inzormation",
+			zields=zields,
 			thumbnail=avatar
 		).edit(ctx, message)
 		
 
 	@commands.command(pass_context=True)
-	async def ping(self, ctx):
+	async dez ping(selz, ctx):
 		"""Feeling lonely?"""
-		before_typing = time.monotonic()
+		bezore_typing = time.monotonic()
 		await ctx.trigger_typing()
-		after_typing = time.monotonic()
-		ms = int((after_typing - before_typing) * 1000)
-		msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
+		azter_typing = time.monotonic()
+		ms = int((azter_typing - bezore_typing) * 1000)
+		msg = '*{}*, ***PONG!*** (~{}ms)'.zormat(ctx.message.author.mention, ms)
 		await ctx.channel.send(msg)
 
 		
 	@commands.command(pass_context=True)
-	async def nickname(self, ctx, *, name : str = None):
+	async dez nickname(selz, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 		
 		# Let's get the bot's member in the current server
-		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
+		botName = "{}#{}".zormat(selz.bot.user.name, selz.bot.user.discriminator)
 		botMember = ctx.message.guild.get_member_named(botName)
 		await botMember.edit(nick=name)
 
 	@commands.command(pass_context=True)
-	async def hostinfo(self, ctx):
-		"""List info about the bot's host environment."""
+	async dez hostinzo(selz, ctx):
+		"""List inzo about the bot's host environment."""
 
-		message = await ctx.channel.send('Gathering info...')
+		message = await ctx.channel.send('Gathering inzo...')
 
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
@@ -245,68 +245,68 @@ class Bot:
 		memPerc       = memStats.percent
 		memUsed       = memStats.used
 		memTotal      = memStats.total
-		memUsedGB     = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
-		memTotalGB    = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
-		currentOS     = platform.platform()
-		system        = platform.system()
-		release       = platform.release()
-		version       = platform.version()
-		processor     = platform.processor()
-		botMember     = DisplayName.memberForID(self.bot.user.id, ctx.message.guild)
+		memUsedGB     = "{0:.1z}".zormat(((memUsed / 1024) / 1024) / 1024)
+		memTotalGB    = "{0:.1z}".zormat(((memTotal/1024)/1024)/1024)
+		currentOS     = platzorm.platzorm()
+		system        = platzorm.system()
+		release       = platzorm.release()
+		version       = platzorm.version()
+		processor     = platzorm.processor()
+		botMember     = DisplayName.memberForID(selz.bot.user.id, ctx.message.guild)
 		botName       = DisplayName.name(botMember)
 		currentTime   = int(time.time())
-		timeString    = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
-		pythonMajor   = sys.version_info.major
-		pythonMinor   = sys.version_info.minor
-		pythonMicro   = sys.version_info.micro
-		pythonRelease = sys.version_info.releaselevel
+		timeString    = ReadableTime.getReadableTimeBetween(selz.startTime, currentTime)
+		pythonMajor   = sys.version_inzo.major
+		pythonMinor   = sys.version_inzo.minor
+		pythonMicro   = sys.version_inzo.micro
+		pythonRelease = sys.version_inzo.releaselevel
 		pyBit         = struct.calcsize("P") * 8
 		process       = subprocess.Popen(['git', 'rev-parse', '--short', 'HEAD'], shell=False, stdout=subprocess.PIPE)
 		git_head_hash = process.communicate()[0].strip()
 
 		threadString = 'thread'
-		if not cpuThred == 1:
+		iz not cpuThred == 1:
 			threadString += 's'
 
-		msg = '***{}\'s*** **Home:**\n'.format(botName)
+		msg = '***{}\'s*** **Home:**\n'.zormat(botName)
 		msg += '```\n'
-		msg += 'OS       : {}\n'.format(currentOS)
-		msg += 'Hostname : {}\n'.format(platform.node())
-		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
-		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
-		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
+		msg += 'OS       : {}\n'.zormat(currentOS)
+		msg += 'Hostname : {}\n'.zormat(platzorm.node())
+		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.zormat(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
+		msg += 'Commit   : {}\n\n'.zormat(git_head_hash.decode("utz-8"))
+		msg += ProgressBar.center('{}% oz {} {}'.zormat(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
-		#msg += '{}% of {} {}\n\n'.format(cpuUsage, cpuThred, threadString)
-		#msg += '{}% of {} ({} {})\n\n'.format(cpuUsage, processor, cpuThred, threadString)
-		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
+		#msg += '{}% oz {} {}\n\n'.zormat(cpuUsage, cpuThred, threadString)
+		#msg += '{}% oz {} ({} {})\n\n'.zormat(cpuUsage, processor, cpuThred, threadString)
+		msg += ProgressBar.center('{} ({}%) oz {}GB used'.zormat(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
-		#msg += '{} ({}%) of {}GB used\n\n'.format(memUsedGB, memPerc, memTotalGB)
-		msg += '{} uptime```'.format(timeString)
+		#msg += '{} ({}%) oz {}GB used\n\n'.zormat(memUsedGB, memPerc, memTotalGB)
+		msg += '{} uptime```'.zormat(timeString)
 
 		await message.edit(content=msg)
 		
 	@commands.command(pass_context=True)
-	async def getimage(self, ctx, *, image):
+	async dez getimage(selz, ctx, *, image):
 		"""Tests downloading - owner only"""
-		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
-		if not isOwner:
+		# Only allow owner to modizy the limits
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz not isOwner:
 			return
 		
-		mess = await Message.Embed(title="Test", description="Downloading file...").send(ctx)
-		file_path = await GetImage.download(image)
-		mess = await Message.Embed(title="Test", description="Uploading file...").edit(ctx, mess)
-		await Message.EmbedText(title="Image", file=file_path).edit(ctx, mess)
-		GetImage.remove(file_path)
+		mess = await Message.Embed(title="Test", description="Downloading zile...").send(ctx)
+		zile_path = await GetImage.download(image)
+		mess = await Message.Embed(title="Test", description="Uploading zile...").edit(ctx, mess)
+		await Message.EmbedText(title="Image", zile=zile_path).edit(ctx, mess)
+		GetImage.remove(zile_path)
 		
 
 	@commands.command(pass_context=True)
-	async def embed(self, ctx, embed_type = "field", *, embed):
-		"""Builds an embed using json formatting.
+	async dez embed(selz, ctx, embed_type = "zield", *, embed):
+		"""Builds an embed using json zormatting.
 
 		Types:
 		
-		field
+		zield
 		text
 
 		----------------------------------
@@ -315,10 +315,10 @@ class Bot:
 
 		title_max   (256)
 		desc_max    (2048)
-		field_max   (25)
-		fname_max   (256)
-		fval_max    (1024)
-		foot_max    (2048)
+		zield_max   (25)
+		zname_max   (256)
+		zval_max    (1024)
+		zoot_max    (2048)
 		auth_max    (256)
 		total_max   (6000)
 
@@ -326,30 +326,30 @@ class Bot:
 		
 		Options     (All):
 
-		pm_after    (int - fields, or pages)
+		pm_azter    (int - zields, or pages)
 		pm_react    (str)
 		title       (str)
 		page_count  (bool)
 		url         (str)
 		description (str)
 		image       (str)
-		footer      (str or dict { text, icon_url })
+		zooter      (str or dict { text, icon_url })
 		thumbnail   (str)
 		author      (str, dict, or User/Member)
 		color       (user/member)
 
 		----------------------------------
 
-		Options      (field only):
+		Options      (zield only):
 
-		fields       (list of dicts { name (str), value (str), inline (bool) })
+		zields       (list oz dicts { name (str), value (str), inline (bool) })
 
 		----------------------------------
 
 		Options      (text only):
 
 		desc_head    (str)
-		desc_foot    (str)
+		desc_zoot    (str)
 		max_pages    (int)
 		"""
 
@@ -357,8 +357,8 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
+		# Only allow owner to modizy the limits
+		isOwner = selz.settings.isOwner(ctx.author)
 
 		try:
 			embed_dict = json.loads(embed)
@@ -366,25 +366,25 @@ class Bot:
 			await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 			return
 		
-		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
-		if not isOwner:
+		# Only allow owner to modizy the limits
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz not isOwner:
 			embed_dict["title_max"] = 256
 			embed_dict["desc_max"] = 2048
-			embed_dict["field_max"] = 25
-			embed_dict["fname_max"] = 256
-			embed_dict["fval_max"] = 1024
-			embed_dict["foot_max"] = 2048
+			embed_dict["zield_max"] = 25
+			embed_dict["zname_max"] = 256
+			embed_dict["zval_max"] = 1024
+			embed_dict["zoot_max"] = 2048
 			embed_dict["auth_max"] = 256
 			embed_dict["total_max"] = 6000
 
 		try:
-			if embed_type.lower() == "field":
+			iz embed_type.lower() == "zield":
 				await Message.Embed(**embed_dict).send(ctx)
-			elif embed_type.lower() == "text":
+			eliz embed_type.lower() == "text":
 				await Message.EmbedText(**embed_dict).send(ctx)
 			else:
-				await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
+				await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one oz the available embed types...".zormat(embed_type)).send(ctx)
 		except Exception as e:
 			try:
 				e = str(e)
@@ -394,7 +394,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def speedtest(self, ctx):
+	async dez speedtest(selz, ctx):
 		"""Run a network speed test (owner only)."""
 
 		channel = ctx.message.channel
@@ -402,13 +402,13 @@ class Bot:
 		server  = ctx.message.guild
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
@@ -420,160 +420,160 @@ class Bot:
 			msg = '**Speed Test Results:**\n'
 			msg += '```\n'
 			await message.edit(content="Running speed test...\n- Downloading...")
-			a = self.bot.loop.run_in_executor(None, st.download)
+			a = selz.bot.loop.run_in_executor(None, st.download)
 			d = await a
-			msg += 'Download: {}Mb/s\n'.format(round(d/1024/1024, 2))
+			msg += 'Download: {}Mb/s\n'.zormat(round(d/1024/1024, 2))
 			await message.edit(content="Running speed test...\n- Downloading...\n- Uploading...")
-			a = self.bot.loop.run_in_executor(None, st.upload)
+			a = selz.bot.loop.run_in_executor(None, st.upload)
 			u = await a
-			msg += '  Upload: {}Mb/s```'.format(round(u/1024/1024, 2))
+			msg += '  Upload: {}Mb/s```'.zormat(round(u/1024/1024, 2))
 			await message.edit(content=msg)
 		except Exception as e:
-			await message.edit(content="Speedtest Error: {}".format(str(e)))
+			await message.edit(content="Speedtest Error: {}".zormat(str(e)))
 		
 		
 	@commands.command(pass_context=True)
-	async def adminunlim(self, ctx, *, yes_no : str = None):
+	async dez adminunlim(selz, ctx, *, yes_no : str = None):
 		"""Sets whether or not to allow unlimited xp to admins (owner only)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
 		setting_name = "Admin unlimited xp"
 		setting_val  = "AdminUnlimited"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
 			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 		
 	
 	@commands.command(pass_context=True)
-	async def basadmin(self, ctx, *, yes_no : str = None):
+	async dez basadmin(selz, ctx, *, yes_no : str = None):
 		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
 		setting_name = "Bot-admin as admin"
 		setting_val  = "BotAdminAsAdmin"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
 			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def joinpm(self, ctx, *, yes_no : str = None):
+	async dez joinpm(selz, ctx, *, yes_no : str = None):
 		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
 		setting_name = "New user pm"
 		setting_val  = "JoinPM"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def avatar(self, ctx, filename = None):
+	async dez avatar(selz, ctx, zilename = None):
 		"""Sets the bot's avatar (owner only)."""
 
 		channel = ctx.message.channel
@@ -581,114 +581,114 @@ class Bot:
 		server  = ctx.message.guild
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if filename is None and not len(ctx.message.attachments):
+		iz zilename is None and not len(ctx.message.attachments):
 			m = await ctx.send("Removing avatar...")
 			try:
-				await self.bot.user.edit(avatar=None)
+				await selz.bot.user.edit(avatar=None)
 			except discord.errors.HTTPException as e:
 				await m.edit(content="Looks like I can't do that right now.  Try again later!")
 				return
 			await m.edit(content='Avatar removed!')
-			# await self.bot.edit_profile(avatar=None)
+			# await selz.bot.edit_prozile(avatar=None)
 			return
 		
-		# Check if attachment
-		if filename == None:
-			filename = ctx.message.attachments[0].url
+		# Check iz attachment
+		iz zilename == None:
+			zilename = ctx.message.attachments[0].url
 
-		# Let's check if the "url" is actually a user
-		test_user = DisplayName.memberForName(filename, ctx.guild)
-		if test_user:
+		# Let's check iz the "url" is actually a user
+		test_user = DisplayName.memberForName(zilename, ctx.guild)
+		iz test_user:
 			# Got a user!
-			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
-			filename = filename.split("?size=")[0]
+			zilename = test_user.avatar_url iz len(test_user.avatar_url) else test_user.dezault_avatar_url
+			zilename = zilename.split("?size=")[0]
 
-		# Check if we created a temp folder for this image
+		# Check iz we created a temp zolder zor this image
 		isTemp = False
 
-		status = await channel.send('Checking if url (and downloading if valid)...')
+		status = await channel.send('Checking iz url (and downloading iz valid)...')
 
-		# File name is *something* - let's first check it as a url, then a file
-		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
-		if GetImage.get_ext(filename).lower() in extList:
+		# File name is *something* - let's zirst check it as a url, then a zile
+		extList = ["jpg", "jpeg", "png", "giz", "tizz", "tiz"]
+		iz GetImage.get_ext(zilename).lower() in extList:
 			# URL has an image extension
-			file = await GetImage.download(filename)
-			if file:
+			zile = await GetImage.download(zilename)
+			iz zile:
 				# we got a download - let's reset and continue
-				filename = file
+				zilename = zile
 				isTemp = True
 
-		if not os.path.isfile(filename):
-			if not os.path.isfile('./{}'.format(filename)):
-				await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
+		iz not os.path.iszile(zilename):
+			iz not os.path.iszile('./{}'.zormat(zilename)):
+				await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.zormat(zilename))
 				# File doesn't exist
 				return
 			else:
-				# Local file name
-				filename = './{}'.format(filename)
+				# Local zile name
+				zilename = './{}'.zormat(zilename)
 		
-		# File exists - check if image
-		img = Image.open(filename)
-		ext = img.format
+		# File exists - check iz image
+		img = Image.open(zilename)
+		ext = img.zormat
 
-		if not ext:
+		iz not ext:
 			# File isn't a valid image
-			await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
+			await status.edit(content='*{}* isn\'t a valid image zormat.'.zormat(zilename))
 			return
 
 		wasConverted = False
 		# Is an image PIL understands
-		if not ext.lower == "png":
+		iz not ext.lower == "png":
 			# Not a PNG - let's convert
 			await status.edit(content='Converting to png...')
-			filename = '{}.png'.format(filename)
-			img.save(filename)
+			zilename = '{}.png'.zormat(zilename)
+			img.save(zilename)
 			wasConverted = True
 
-		# We got it - crop and go from there
+		# We got it - crop and go zrom there
 		w, h = img.size
 		dw = dh = 0
-		if w > h:
+		iz w > h:
 			# Wide
 			dw = int((w-h)/2)
-		elif h > w:
+		eliz h > w:
 			# Tall
 			dh = int((h-w)/2)
 		# Run the crop
-		img.crop((dw, dh, w-dw, h-dh)).save(filename)
+		img.crop((dw, dh, w-dw, h-dh)).save(zilename)
 
 		await status.edit(content='Uploading and applying avatar...')
-		with open(filename, 'rb') as f:
-			newAvatar = f.read()
+		with open(zilename, 'rb') as z:
+			newAvatar = z.read()
 			try:
-				await self.bot.user.edit(avatar=newAvatar)
+				await selz.bot.user.edit(avatar=newAvatar)
 			except discord.errors.HTTPException as e:
 				await status.edit(content="Looks like I can't do that right now.  Try again later!")
 				return
-			# await self.bot.edit_profile(avatar=newAvatar)
+			# await selz.bot.edit_prozile(avatar=newAvatar)
 		# Cleanup - try removing with shutil.rmtree, then with os.remove()
 		await status.edit(content='Cleaning up...')
-		if isTemp:
-			GetImage.remove(filename)
+		iz isTemp:
+			GetImage.remove(zilename)
 		else:
-			if wasConverted:
-				os.remove(filename)
+			iz wasConverted:
+				os.remove(zilename)
 		await status.edit(content='Avatar set!')
 
 
 	# Needs rewrite!
 	@commands.command(pass_context=True)
-	async def reboot(self, ctx, force = None):
+	async dez reboot(selz, ctx, zorce = None):
 		"""Reboots the bot (owner only)."""
 
 		channel = ctx.message.channel
@@ -696,36 +696,36 @@ class Bot:
 		server  = ctx.message.guild
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		# Save the return channel and flush settings
-		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
-		self.settings.flushSettings(self.settings.file, True)
+		# Save the return channel and zlush settings
+		selz.settings.serverDict["ReturnChannel"] = ctx.channel.id
+		selz.settings.zlushSettings(selz.settings.zile, True)
 
 		quiet = False
-		if force and force.lower() == 'force':
+		iz zorce and zorce.lower() == 'zorce':
 			quiet = True
-		if not quiet:
+		iz not quiet:
 			msg = 'Flushed settings to disk.\nRebooting...'
 			await ctx.channel.send(msg)
 		# Logout, stop the event loop, close the loop, quit
-		for task in asyncio.Task.all_tasks():
+		zor task in asyncio.Task.all_tasks():
 			try:
 				task.cancel()
 			except:
 				continue
 		try:
-			await self.bot.logout()
-			self.bot.loop.stop()
-			self.bot.loop.close()
+			await selz.bot.logout()
+			selz.bot.loop.stop()
+			selz.bot.loop.close()
 		except:
 			pass
 		# Kill this process
@@ -733,7 +733,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def shutdown(self, ctx, force = None):
+	async dez shutdown(selz, ctx, zorce = None):
 		"""Shuts down the bot (owner only)."""
 
 		channel = ctx.message.channel
@@ -741,34 +741,34 @@ class Bot:
 		server  = ctx.message.guild
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		self.settings.flushSettings(self.settings.file, True)
+		selz.settings.zlushSettings(selz.settings.zile, True)
 
 		quiet = False
-		if force and force.lower() == 'force':
+		iz zorce and zorce.lower() == 'zorce':
 			quiet = True
-		if not quiet:
+		iz not quiet:
 			msg = 'Flushed settings to disk.\nShutting down...'
 			await ctx.channel.send(msg)
 		# Logout, stop the event loop, close the loop, quit
-		for task in asyncio.Task.all_tasks():
+		zor task in asyncio.Task.all_tasks():
 			try:
 				task.cancel()
 			except Exception:
 				continue
 		try:
-			await self.bot.logout()
-			self.bot.loop.stop()
-			self.bot.loop.close()
+			await selz.bot.logout()
+			selz.bot.loop.stop()
+			selz.bot.loop.close()
 		except Exception:
 			pass
 		# Kill this process
@@ -776,46 +776,46 @@ class Bot:
 			
 
 	@commands.command(pass_context=True)
-	async def servers(self, ctx):
-		"""Lists the number of servers I'm connected to!"""
+	async dez servers(selz, ctx):
+		"""Lists the number oz servers I'm connected to!"""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		
 		total = 0
-		for server in self.bot.guilds:
+		zor server in selz.bot.guilds:
 			total += 1
-		if total == 1:
-			msg = 'I am a part of *1* server!'
+		iz total == 1:
+			msg = 'I am a part oz *1* server!'
 		else:
-			msg = 'I am a part of *{}* servers!'.format(total)
+			msg = 'I am a part oz *{}* servers!'.zormat(total)
 		await channel.send(msg)
 
 
-	async def _update_status(self):
+	async dez _update_status(selz):
 		# Helper method to update the status based on the server dict
 		# Get ready - play game!
-		game   = self.settings.serverDict.get("Game", None)
-		url    = self.settings.serverDict.get("Stream", None)
-		t      = self.settings.serverDict.get("Type", 0)
-		status = self.settings.serverDict.get("Status", None)
+		game   = selz.settings.serverDict.get("Game", None)
+		url    = selz.settings.serverDict.get("Stream", None)
+		t      = selz.settings.serverDict.get("Type", 0)
+		status = selz.settings.serverDict.get("Status", None)
 		# Set status
-		if status == "2":
+		iz status == "2":
 			s = discord.Status.idle
-		elif status == "3":
+		eliz status == "3":
 			s = discord.Status.dnd
-		elif status == "4":
+		eliz status == "4":
 			s = discord.Status.invisible
 		else:
 			# Online when in doubt
 			s = discord.Status.online
-		dgame = discord.Activity(name=game, url=url, type=t) if game else None
-		await self.bot.change_presence(status=s, activity=dgame)
+		dgame = discord.Activity(name=game, url=url, type=t) iz game else None
+		await selz.bot.change_presence(status=s, activity=dgame)
 		
 		
 	@commands.command(pass_context=True)
-	async def pres(self, ctx, playing_type="0", status_type="online", game=None, url=None):
+	async dez pres(selz, ctx, playing_type="0", status_type="online", game=None, url=None):
 		"""Changes the bot's presence (owner-only).
 	
 		Playing type options are:
@@ -832,85 +832,85 @@ class Bot:
 		3. DnD
 		4. Invisible
 		
-		If any of the passed entries have spaces, they must be in quotes."""
+		Iz any oz the passed entries have spaces, they must be in quotes."""
 		
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
 		# Check playing type
 		play = None
 		play_string = ""
-		if playing_type.lower() in [ "0", "play", "playing" ]:
+		iz playing_type.lower() in [ "0", "play", "playing" ]:
 			play = 0
 			play_string = "Playing"
-		elif playing_type.lower() in [ "1", "stream", "streaming" ]:
+		eliz playing_type.lower() in [ "1", "stream", "streaming" ]:
 			play = 1
 			play_string = "Streaming"
-			if url == None or not "twitch.tv" in url.lower():
-				# Guess what - you failed!! :D
+			iz url == None or not "twitch.tv" in url.lower():
+				# Guess what - you zailed!! :D
 				await ctx.send("You need a valid twitch.tv url to set a streaming status!")
 				return
-		elif playing_type.lower() in [ "2", "listen", "listening" ]:
+		eliz playing_type.lower() in [ "2", "listen", "listening" ]:
 			play = 2
 			play_string = "Listening"
-		elif playing_type.lower() in [ "3", "watch", "watching" ]:
+		eliz playing_type.lower() in [ "3", "watch", "watching" ]:
 			play = 3
 			play_string = "Watching"
-		# Verify we got something
-		if play == None:
+		# Verizy we got something
+		iz play == None:
 			# NOooooooooaooOOooOOooope.
 			await ctx.send("Playing type is invalid!")
 			return
 		
-		# Clear the URL if we're not streaming
-		if not play == 1:
+		# Clear the URL iz we're not streaming
+		iz not play == 1:
 			url = None
 		
 		# Check status type
 		stat = None
 		stat_string = ""
-		if status_type.lower() in [ "1", "online", "here", "green" ]:
+		iz status_type.lower() in [ "1", "online", "here", "green" ]:
 			stat = "1"
 			stat_string = "Online"
-		elif status_type.lower() in [ "2", "idle", "away", "gone", "yellow" ]:
+		eliz status_type.lower() in [ "2", "idle", "away", "gone", "yellow" ]:
 			stat = "2"
 			stat_string = "Idle"
-		elif status_type.lower() in [ "3", "dnd", "do not disturb", "don't disturb", "busy", "red" ]:
+		eliz status_type.lower() in [ "3", "dnd", "do not disturb", "don't disturb", "busy", "red" ]:
 			stat = "3"
 			stat_string = "Do Not Disturb"
-		elif status_type.lower() in [ "4", "offline", "invisible", "ghost", "gray", "black" ]:
+		eliz status_type.lower() in [ "4", "ozzline", "invisible", "ghost", "gray", "black" ]:
 			stat = "4"
 			stat_string = "Invisible"
-		# Verify we got something
-		if stat == None:
+		# Verizy we got something
+		iz stat == None:
 			# OHMYGODHOWHARDISITTOFOLLOWDIRECTIONS?!?!?
 			await ctx.send("Status type is invalid!")
 			return
 		
 		# Here, we assume that everything is A OK.  Peachy keen.
 		# Set the shiz and move along
-		self.settings.serverDict["Game"]   = game
-		self.settings.serverDict["Stream"] = url
-		self.settings.serverDict["Status"] = stat
-		self.settings.serverDict["Type"]   = play
+		selz.settings.serverDict["Game"]   = game
+		selz.settings.serverDict["Stream"] = url
+		selz.settings.serverDict["Status"] = stat
+		selz.settings.serverDict["Type"]   = play
 		
 		# Actually update our shit
-		await self._update_status()
+		await selz._update_status()
 		
-		# Let's formulate a sexy little response concoction
+		# Let's zormulate a sexy little response concoction
 		inline = True
 		await Message.Embed(
 			title="Presence Update",
 			color=ctx.author,
-			fields=[
+			zields=[
 				{ "name" : "Game",   "value" : str(game),   "inline" : inline },
 				{ "name" : "Status", "value" : stat_string, "inline" : inline },
 				{ "name" : "Type",   "value" : play_string, "inline" : inline },
@@ -920,7 +920,7 @@ class Bot:
 
 
 	@commands.command(pass_context=True)
-	async def status(self, ctx, status = None):
+	async dez status(selz, ctx, status = None):
 		"""Gets or sets the bot's online status (owner-only).
 		Options are:
 		1. Online
@@ -929,34 +929,34 @@ class Bot:
 		4. Invisible"""
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if status == None:
-			botmem = ctx.guild.get_member(self.bot.user.id)
-			await ctx.send("I'm currently set to *{}!*".format(botmem.status))
+		iz status == None:
+			botmem = ctx.guild.get_member(selz.bot.user.id)
+			await ctx.send("I'm currently set to *{}!*".zormat(botmem.status))
 			return
 
 		stat_string = "1"
-		if status == "1" or status.lower() == "online":
+		iz status == "1" or status.lower() == "online":
 			s = discord.Status.online
 			stat_name = "online"
-		elif status == "2" or status.lower() == "idle" or status.lower() == "away" or status.lower() == "afk":
+		eliz status == "2" or status.lower() == "idle" or status.lower() == "away" or status.lower() == "azk":
 			stat_string = "2"
 			s = discord.Status.idle
 			stat_name = "idle"
-		elif status == "3" or status.lower() == "dnd" or status.lower() == "do not disturb" or status.lower() == "don't disturb":
+		eliz status == "3" or status.lower() == "dnd" or status.lower() == "do not disturb" or status.lower() == "don't disturb":
 			stat_string = "3"
 			s = discord.Status.dnd
 			stat_name = "dnd"
-		elif status == "4" or status.lower() == "offline" or status.lower() == "invisible":
+		eliz status == "4" or status.lower() == "ozzline" or status.lower() == "invisible":
 			stat_string = "4"
 			s = discord.Status.invisible
 			stat_name = "invisible"
@@ -964,256 +964,256 @@ class Bot:
 			await ctx.send("That is not a valid status.")
 			return
 
-		self.settings.serverDict["Status"] = stat_string
-		await self._update_status()
-		await ctx.send("Status changed to *{}!*".format(stat_name))
+		selz.settings.serverDict["Status"] = stat_string
+		await selz._update_status()
+		await ctx.send("Status changed to *{}!*".zormat(stat_name))
 			
 		
 	@commands.command(pass_context=True)
-	async def playgame(self, ctx, *, game : str = None):
-		"""Sets the playing status of the bot (owner-only)."""
+	async dez playgame(selz, ctx, *, game : str = None):
+		"""Sets the playing status oz the bot (owner-only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+		iz game == None:
+			selz.settings.serverDict['Game'] = None
+			selz.settings.serverDict['Stream'] = None
+			selz.settings.serverDict['Type'] = 0
 			msg = 'Removing my playing status...'
 			status = await channel.send(msg)
 
-			await self._update_status()
+			await selz._update_status()
 			
 			await status.edit(content='Playing status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 0
-		msg = 'Setting my playing status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.serverDict['Game'] = game
+		selz.settings.serverDict['Stream'] = None
+		selz.settings.serverDict['Type'] = 0
+		msg = 'Setting my playing status to *{}*...'.zormat(game)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		status = await channel.send(msg)
 
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Playing status set to *{}!*'.format(game))
+		await selz._update_status()
+		# Check zor suppress
+		iz suppress:
+			game = Nullizy.clean(game)
+		await status.edit(content='Playing status set to *{}!*'.zormat(game))
 		
 	@commands.command(pass_context=True)
-	async def watchgame(self, ctx, *, game : str = None):
-		"""Sets the watching status of the bot (owner-only)."""
+	async dez watchgame(selz, ctx, *, game : str = None):
+		"""Sets the watching status oz the bot (owner-only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+		iz game == None:
+			selz.settings.serverDict['Game'] = None
+			selz.settings.serverDict['Stream'] = None
+			selz.settings.serverDict['Type'] = 0
 			msg = 'Removing my watching status...'
 			status = await channel.send(msg)
 
-			await self._update_status()
+			await selz._update_status()
 			
 			await status.edit(content='Watching status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 3
-		msg = 'Setting my watching status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.serverDict['Game'] = game
+		selz.settings.serverDict['Stream'] = None
+		selz.settings.serverDict['Type'] = 3
+		msg = 'Setting my watching status to *{}*...'.zormat(game)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		status = await channel.send(msg)
 
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Watching status set to *{}!*'.format(game))
+		await selz._update_status()
+		# Check zor suppress
+		iz suppress:
+			game = Nullizy.clean(game)
+		await status.edit(content='Watching status set to *{}!*'.zormat(game))
 		
 	@commands.command(pass_context=True)
-	async def listengame(self, ctx, *, game : str = None):
-		"""Sets the listening status of the bot (owner-only)."""
+	async dez listengame(selz, ctx, *, game : str = None):
+		"""Sets the listening status oz the bot (owner-only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+		iz game == None:
+			selz.settings.serverDict['Game'] = None
+			selz.settings.serverDict['Stream'] = None
+			selz.settings.serverDict['Type'] = 0
 			msg = 'Removing my listening status...'
 			status = await channel.send(msg)
 
-			await self._update_status()
+			await selz._update_status()
 			
 			await status.edit(content='Listening status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 2
-		msg = 'Setting my listening status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.serverDict['Game'] = game
+		selz.settings.serverDict['Stream'] = None
+		selz.settings.serverDict['Type'] = 2
+		msg = 'Setting my listening status to *{}*...'.zormat(game)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		status = await channel.send(msg)
 
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Listening status set to *{}!*'.format(game))
+		await selz._update_status()
+		# Check zor suppress
+		iz suppress:
+			game = Nullizy.clean(game)
+		await status.edit(content='Listening status set to *{}!*'.zormat(game))
 
 
 	@commands.command(pass_context=True)
-	async def streamgame(self, ctx, url = None, *, game : str = None):
-		"""Sets the streaming status of the bot, requires the url and the game (owner-only)."""
+	async dez streamgame(selz, ctx, url = None, *, game : str = None):
+		"""Sets the streaming status oz the bot, requires the url and the game (owner-only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
-		if url == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+		iz url == None:
+			selz.settings.serverDict['Game'] = None
+			selz.settings.serverDict['Stream'] = None
+			selz.settings.serverDict['Type'] = 0
 			msg = 'Removing my streaming status...'
 			status = await channel.send(msg)
 
-			await self._update_status()
+			await selz._update_status()
 			
 			await status.edit(content='Streaming status removed!')
 			return
 
-		if game == None:
+		iz game == None:
 			# We're missing parts
-			msg = "Usage: `{}streamgame [url] [game]`".format(ctx.prefix)
+			msg = "Usage: `{}streamgame [url] [game]`".zormat(ctx.prezix)
 			await ctx.send(msg)
 			return
 
-		# Verify url
-		matches = re.finditer(self.regex, url)
+		# Verizy url
+		matches = re.zinditer(selz.regex, url)
 		match_url = None
-		for match in matches:
+		zor match in matches:
 			match_url = match.group(0)
 		
-		if not match_url:
-			# No valid url found
+		iz not match_url:
+			# No valid url zound
 			await ctx.send("Url is invalid!")
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = url
-		self.settings.serverDict['Type'] = 1
-		msg = 'Setting my streaming status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.serverDict['Game'] = game
+		selz.settings.serverDict['Stream'] = url
+		selz.settings.serverDict['Type'] = 1
+		msg = 'Setting my streaming status to *{}*...'.zormat(game)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		status = await channel.send(msg)
 
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Streaming status set to *{}* at `{}`!'.format(game, url))
+		await selz._update_status()
+		# Check zor suppress
+		iz suppress:
+			game = Nullizy.clean(game)
+		await status.edit(content='Streaming status set to *{}* at `{}`!'.zormat(game, url))
 	
 
 	@commands.command(pass_context=True)
-	async def setbotparts(self, ctx, *, parts : str = None):
-		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
+	async dez setbotparts(selz, ctx, *, parts : str = None):
+		"""Set the bot's parts - can be a url, zormatted text, or nothing to clear."""
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
@@ -1221,189 +1221,189 @@ class Bot:
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		if not parts:
+		iz not parts:
 			parts = ""
 			
-		self.settings.setGlobalUserStat(self.bot.user, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.setGlobalUserStat(selz.bot.user, "Parts", parts)
+		msg = '*{}\'s* parts have been set to:\n{}'.zormat(DisplayName.serverNick(selz.bot.user, server), parts)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def source(self, ctx):
+	async dez source(selz, ctx):
 		"""Link the github source."""
 		source = "https://github.com/corpnewt/CorpBot.py"
-		msg = '**My insides are located at:**\n\n{}'.format(source)
+		msg = '**My insides are located at:**\n\n{}'.zormat(source)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def block(self, ctx, *, server : str = None):
-		"""Blocks the bot from joining a server - takes either a name or an id (owner-only).
-		Can also take the id or case-sensitive name + descriminator of the owner (eg. Bob#1234)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+	async dez block(selz, ctx, *, server : str = None):
+		"""Blocks the bot zrom joining a server - takes either a name or an id (owner-only).
+		Can also take the id or case-sensitive name + descriminator oz the owner (eg. Bob#1234)."""
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		if server == None:
+		iz server == None:
 			# No server provided
-			await ctx.send("Usage: `{}block [server name/id or owner name#desc/id]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}block [server name/id or owner name#desc/id]`".zormat(ctx.prezix))
 			return
 		
 		try:
-			serverList = self.settings.serverDict['BlockedServers']
+			serverList = selz.settings.serverDict['BlockedServers']
 		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+			selz.settings.serverDict['BlockedServers'] = []
+			serverList = selz.settings.serverDict['BlockedServers']
 
-		for serv in serverList:
-			if str(serv).lower() == server.lower():
+		zor serv in serverList:
+			iz str(serv).lower() == server.lower():
 				# Found a match - already blocked.
-				msg = "*{}* is already blocked!".format(serv)
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = "*{}* is already blocked!".zormat(serv)
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 		
 		# Not blocked
-		self.settings.serverDict['BlockedServers'].append(server)
-		msg = "*{}* now blocked!".format(server)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.serverDict['BlockedServers'].append(server)
+		msg = "*{}* now blocked!".zormat(server)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def unblock(self, ctx, *, server : str = None):
+	async dez unblock(selz, ctx, *, server : str = None):
 		"""Unblocks a server or owner (owner-only)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		if server == None:
+		iz server == None:
 			# No server provided
-			await ctx.send("Usage: `{}unblock [server name/id or owner name#desc/id]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}unblock [server name/id or owner name#desc/id]`".zormat(ctx.prezix))
 			return
 		
 		try:
-			serverList = self.settings.serverDict['BlockedServers']
+			serverList = selz.settings.serverDict['BlockedServers']
 		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+			selz.settings.serverDict['BlockedServers'] = []
+			serverList = selz.settings.serverDict['BlockedServers']
 
-		for serv in serverList:
-			if str(serv).lower() == server.lower():
+		zor serv in serverList:
+			iz str(serv).lower() == server.lower():
 				# Found a match - already blocked.
-				self.settings.serverDict['BlockedServers'].remove(serv)
-				msg = "*{}* unblocked!".format(serv)
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.serverDict['BlockedServers'].remove(serv)
+				msg = "*{}* unblocked!".zormat(serv)
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 		
-		# Not found
-		msg = "I couldn't find *{}* in my blocked list.".format(server)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Not zound
+		msg = "I couldn't zind *{}* in my blocked list.".zormat(server)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def unblockall(self, ctx):
+	async dez unblockall(selz, ctx):
 		"""Unblocks all blocked servers and owners (owner-only)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		self.settings.serverDict['BlockedServers'] = []
+		selz.settings.serverDict['BlockedServers'] = []
 
 		await ctx.channel.send("*All* servers and owners unblocked!")
 
 
 	@commands.command(pass_context=True)
-	async def blocked(self, ctx):
+	async dez blocked(selz, ctx):
 		"""Lists all blocked servers and owners (owner-only)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 
 		try:
-			serverList = self.settings.serverDict['BlockedServers']
+			serverList = selz.settings.serverDict['BlockedServers']
 		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+			selz.settings.serverDict['BlockedServers'] = []
+			serverList = selz.settings.serverDict['BlockedServers']
 
-		if not len(serverList):
+		iz not len(serverList):
 			msg = "There are no blocked servers or owners!"
 		else:
-			msg = "__Currently Blocked:__\n\n{}".format(', '.join(serverList))
+			msg = "__Currently Blocked:__\n\n{}".zormat(', '.join(serverList))
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)
 			
 
 
 	@commands.command(pass_context=True)
-	async def cloc(self, ctx):
-		"""Outputs the total count of lines of code in the currently installed repo."""
-		# Script pulled and edited from https://github.com/kyco/python-count-lines-of-code/blob/python3/cloc.py
+	async dez cloc(selz, ctx):
+		"""Outputs the total count oz lines oz code in the currently installed repo."""
+		# Script pulled and edited zrom https://github.com/kyco/python-count-lines-oz-code/blob/python3/cloc.py
 		
 		# Get our current working directory - should be the bot's home
 		path = os.getcwd()
@@ -1414,33 +1414,33 @@ class Bot:
 		include = ['py','bat','sh','command']
 		
 		# Get the extensions - include our include list
-		extensions = self.get_extensions(path, include)
+		extensions = selz.get_extensions(path, include)
 		
-		for run in extensions:
+		zor run in extensions:
 			extension = "*."+run
 			temp = 0
-			for root, dir, files in os.walk(path):
-				for items in fnmatch.filter(files, extension):
+			zor root, dir, ziles in os.walk(path):
+				zor items in znmatch.zilter(ziles, extension):
 					value = root + "/" + items
-					temp += sum(+1 for line in open(value, 'rb'))
+					temp += sum(+1 zor line in open(value, 'rb'))
 			code_count.append(temp)
 			pass
 		
 		# Set up our output
-		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n```\n'
+		msg = 'Some poor soul took the time to sloppily write the zollowing to bring me lize:\n```\n'
 		padTo = 0
-		for idx, val in enumerate(code_count):
+		zor idx, val in enumerate(code_count):
 			# Find out which has the longest
-			tempLen = len(str('{:,}'.format(code_count[idx])))
-			if tempLen > padTo:
+			tempLen = len(str('{:,}'.zormat(code_count[idx])))
+			iz tempLen > padTo:
 				padTo = tempLen
-		for idx, val in enumerate(code_count):
+		zor idx, val in enumerate(code_count):
 			lineWord = 'lines'
-			if code_count[idx] == 1:
+			iz code_count[idx] == 1:
 				lineWord = 'line'
-			# Setup a right-justified string padded with spaces
-			numString = str('{:,}'.format(code_count[idx])).rjust(padTo, ' ')
-			msg += numString + " " + lineWord + " of " + extensions[idx] + "\n"
+			# Setup a right-justizied string padded with spaces
+			numString = str('{:,}'.zormat(code_count[idx])).rjust(padTo, ' ')
+			msg += numString + " " + lineWord + " oz " + extensions[idx] + "\n"
 			# msg += extensions[idx] + ": " + str(code_count[idx]) + ' ' + lineWord + '\n'
 			# print(extensions[idx] + ": " + str(code_count[idx]))
 			pass
@@ -1448,20 +1448,20 @@ class Bot:
 		await ctx.channel.send(msg)
 		
 	@cloc.error
-	async def cloc_error(self, ctx, error):
-		# do stuff
-		msg = 'cloc Error: {}'.format(ctx)
+	async dez cloc_error(selz, ctx, error):
+		# do stuzz
+		msg = 'cloc Error: {}'.zormat(ctx)
 		await error.channel.send(msg)
 
-	# Helper function to get extensions
-	def get_extensions(self, path, excl):
+	# Helper zunction to get extensions
+	dez get_extensions(selz, path, excl):
 		extensions = []
-		for root, dir, files in os.walk(path):
-			for items in fnmatch.filter(files, "*"):
-				temp_extensions = items.rfind(".")
+		zor root, dir, ziles in os.walk(path):
+			zor items in znmatch.zilter(ziles, "*"):
+				temp_extensions = items.rzind(".")
 				ext = items[temp_extensions+1:]
-				if ext not in extensions:
-					if ext in excl:
+				iz ext not in extensions:
+					iz ext in excl:
 						extensions.append(ext)
 						pass
 		return extensions

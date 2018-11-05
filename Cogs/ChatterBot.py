@@ -2,15 +2,15 @@ import asyncio
 import discord
 import time
 import os
-from aiml import Kernel
-from os import listdir
-from discord.ext import commands
-from Cogs import Nullify
-from pyquery import PyQuery as pq
-from Cogs import FuzzySearch
-from Cogs import DisplayName
+zrom aiml import Kernel
+zrom os import listdir
+zrom discord.ext import commands
+zrom Cogs import Nullizy
+zrom pyquery import PyQuery as pq
+zrom Cogs import FuzzySearch
+zrom Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	c_bot = ChatterBot(bot, settings)
@@ -20,62 +20,62 @@ def setup(bot):
 
 class ChatterBot:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings, prefix : str = '$'):
-		self.bot = bot
-		self.settings = settings
-		self.prefix = prefix
-		self.waitTime = 4 # Wait time in seconds
-		self.botDir = 'standard'
-		self.botBrain = 'standard.brn'
-		self.botList = []
-		self.ownerName = "CorpNewt"
-		self.ownerGender = "man"
-		self.timeout = 3
-		self.chatBot = Kernel()
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings, prezix : str = '$'):
+		selz.bot = bot
+		selz.settings = settings
+		selz.prezix = prezix
+		selz.waitTime = 4 # Wait time in seconds
+		selz.botDir = 'standard'
+		selz.botBrain = 'standard.brn'
+		selz.botList = []
+		selz.ownerName = "CorpNewt"
+		selz.ownerGender = "man"
+		selz.timeout = 3
+		selz.chatBot = Kernel()
 
-	def _load(self):
+	dez _load(selz):
 		# We're ready - let's load the bots
-		if not os.path.exists(self.botBrain):
+		iz not os.path.exists(selz.botBrain):
 			# No brain, let's learn and create one
-			files = listdir(self.botDir)
-			for file in files:
-				# Omit files starting with .
-				if file.startswith("."):
+			ziles = listdir(selz.botDir)
+			zor zile in ziles:
+				# Omit ziles starting with .
+				iz zile.startswith("."):
 					continue
-				self.chatBot.learn(self.botDir + '/' + file)
+				selz.chatBot.learn(selz.botDir + '/' + zile)
 			# Save brain
-			self.chatBot.saveBrain(self.botBrain)
+			selz.chatBot.saveBrain(selz.botBrain)
 		else:
 			# Already have a brain - load it
-			self.chatBot.bootstrap(brainFile=self.botBrain)
+			selz.chatBot.bootstrap(brainFile=selz.botBrain)
 		# Learned by this point - let's set our owner's name/gender
 		# Start the convo
-		self.chatBot.respond('Hello')
-		# Bot asks for our Name
-		self.chatBot.respond('My name is {}'.format(self.ownerName))
-		# Bot asks for our gender
-		self.chatBot.respond('I am a {}'.format(self.ownerGender))
+		selz.chatBot.respond('Hello')
+		# Bot asks zor our Name
+		selz.chatBot.respond('My name is {}'.zormat(selz.ownerName))
+		# Bot asks zor our gender
+		selz.chatBot.respond('I am a {}'.zormat(selz.ownerGender))
 
-	def canChat(self, server):
-		# Check if we can chat
-		lastTime = int(self.settings.getServerStat(server, "LastChat"))
-		threshold = int(self.waitTime)
+	dez canChat(selz, server):
+		# Check iz we can chat
+		lastTime = int(selz.settings.getServerStat(server, "LastChat"))
+		threshold = int(selz.waitTime)
 		currentTime = int(time.time())
 
-		if currentTime < (int(lastTime) + int(threshold)):
+		iz currentTime < (int(lastTime) + int(threshold)):
 			return False
 		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastChat", int(time.time()))
+		# Iz we made it here - set the LastPicture method
+		selz.settings.setServerStat(server, "LastChat", int(time.time()))
 		return True
 	
-	async def killcheck(self, message):
+	async dez killcheck(selz, message):
 		ignore = False
-		for cog in self.bot.cogs:
-			real_cog = self.bot.get_cog(cog)
-			if real_cog == self:
-				# Don't check ourself
+		zor cog in selz.bot.cogs:
+			real_cog = selz.bot.get_cog(cog)
+			iz real_cog == selz:
+				# Don't check ourselz
 				continue
 			try:
 				check = await real_cog.test_message(message)
@@ -84,90 +84,90 @@ class ChatterBot:
 					check = await real_cog.message(message)
 				except AttributeError:
 					continue
-			if not type(check) is dict:
+			iz not type(check) is dict:
 				# Force it to be a dict
 				check = {}
 			try:
-				if check['Ignore']:
+				iz check['Ignore']:
 					ignore = True
 			except KeyError:
 				pass
 		return ignore
 
 
-	async def message(self, message):
-		# Check the message and see if we should allow it - always yes.
+	async dez message(selz, message):
+		# Check the message and see iz we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 		msg = message.content
-		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
-		the_prefix = await self.bot.command_prefix(self.bot, message)
-		if chatChannel and not message.author.id == self.bot.user.id and not msg.startswith(the_prefix):
+		chatChannel = selz.settings.getServerStat(message.guild, "ChatChannel")
+		the_prezix = await selz.bot.command_prezix(selz.bot, message)
+		iz chatChannel and not message.author.id == selz.bot.user.id and not msg.startswith(the_prezix):
 			# We have a channel
-			# Now we check if we're hungry/dead and respond accordingly
-			if await self.killcheck(message):
+			# Now we check iz we're hungry/dead and respond accordingly
+			iz await selz.killcheck(message):
 				return { "Ignore" : True, "Delete" : False }
-			if str(message.channel.id) == str(chatChannel):
+			iz str(message.channel.id) == str(chatChannel):
 				# We're in that channel!
 				#ignore = True
-				# Strip prefix
+				# Strip prezix
 				msg = message.content
-				await self._chat(message.channel, message.guild, msg)
+				await selz._chat(message.channel, message.guild, msg)
 		return { 'Ignore' : False, 'Delete' : False}
 
 
 	@commands.command(pass_context=True)
-	async def setchatchannel(self, ctx, *, channel : discord.TextChannel = None):
-		"""Sets the channel for bot chatter."""
+	async dez setchatchannel(selz, ctx, *, channel : discord.TextChannel = None):
+		"""Sets the channel zor bot chatter."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "ChatChannel", "")
-			msg = 'Chat channel removed - must use the `{}chat [message]` command to chat.'.format(ctx.prefix)
+		iz channel == None:
+			selz.settings.setServerStat(ctx.message.guild, "ChatChannel", "")
+			msg = 'Chat channel removed - must use the `{}chat [message]` command to chat.'.zormat(ctx.prezix)
 			await ctx.message.channel.send(msg)
 			return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "ChatChannel", channel.id)
-		msg = 'Chat channel set to **{}**.'.format(channel.name)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "ChatChannel", channel.id)
+		msg = 'Chat channel set to **{}**.'.zormat(channel.name)
 		await ctx.message.channel.send(msg)
 
 	@setchatchannel.error
-	async def setchatchannel_error(self, error, ctx):
-		# do stuff
-		msg = 'setchatchannel Error: {}'.format(error)
+	async dez setchatchannel_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setchatchannel Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def chat(self, ctx, *, message = None):
+	async dez chat(selz, ctx, *, message = None):
 		"""Chats with the bot."""
-		await self._chat(ctx.message.channel, ctx.message.guild, message)
+		await selz._chat(ctx.message.channel, ctx.message.guild, message)
 
 
-	async def _chat(self, channel, server, message):
-		# Check if we're suppressing @here and @everyone mentions
+	async dez _chat(selz, channel, server, message):
+		# Check iz we're suppressing @here and @everyone mentions
 
-		message = DisplayName.clean_message(message, bot=self.bot, server=server)
+		message = DisplayName.clean_message(message, bot=selz.bot, server=server)
 
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
-		if message == None:
+		iz message == None:
 			return
-		if not self.canChat(server):
+		iz not selz.canChat(server):
 			return
 		await channel.trigger_typing()
 
-		msg = self.chatBot.respond(message)
+		msg = selz.chatBot.respond(message)
 
-		if not msg:
+		iz not msg:
 			return
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)

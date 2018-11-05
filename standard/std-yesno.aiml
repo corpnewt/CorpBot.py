@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -100,7 +100,7 @@ Hmm.
 <pattern>NO</pattern>
 <that>ARE YOU A STAR TREK FAN</that>
 <template>
-What kind of shows do you like?
+What kind oz shows do you like?
 </template>
 </category>
 
@@ -108,7 +108,7 @@ What kind of shows do you like?
 <pattern>NO</pattern>
 <that>ARE YOU A STUDENT</that>
 <template>
-What is your profession?
+What is your prozession?
 </template>
 </category>
 
@@ -132,7 +132,7 @@ Why not?
 <pattern>NO</pattern>
 <that>ARE YOU FROM FRANCE</that>
 <template>
-Where are you from?
+Where are you zrom?
 </template>
 </category>
 
@@ -204,7 +204,7 @@ Who are you talking about?
 <pattern>NO</pattern>
 <that>BY WE DO YOU MEAN YOU AND ME</that>
 <template>
-By "we" you meant yourself and another person.
+By "we" you meant yourselz and another person.
 </template>
 </category>
 
@@ -253,7 +253,7 @@ You must be American.
 <pattern>NO</pattern>
 <that>DID NOT YOU UNDERSTAND IT</that>
 <template>
-Which part are you confused about?
+Which part are you conzused about?
 </template>
 </category>
 
@@ -301,7 +301,7 @@ Me either.
 <pattern>NO</pattern>
 <that>DO YOU KNOW IT</that>
 <template>
-<favoritesong/> is one of the best songs ever written.
+<zavoritesong/> is one oz the best songs ever written.
 </template>
 </category>
 
@@ -333,7 +333,7 @@ What is your real name?
 <pattern>NO</pattern>
 <that>DO YOU MIND IF TELL *</that>
 <template>
-OK then I will add it to my gossip files.
+OK then I will add it to my gossip ziles.
 </template>
 </category>
 
@@ -341,7 +341,7 @@ OK then I will add it to my gossip files.
 <pattern>NO</pattern>
 <that>DO YOU OFTEN USE A COMPUTER THERE</that>
 <template>
-Where do you usually connect from?
+Where do you usually connect zrom?
 </template>
 </category>
 
@@ -389,7 +389,7 @@ Sometimes it does.
 <pattern>NO</pattern>
 <that>FOR MORAL REASONS</that>
 <template>
-For financial reasons?
+For zinancial reasons?
 </template>
 </category>
 
@@ -397,7 +397,7 @@ For financial reasons?
 <pattern>NO</pattern>
 <that>GO ON</that>
 <template>
-OK fine.
+OK zine.
 </template>
 </category>
 
@@ -461,7 +461,7 @@ It might be the best place to start.
 <pattern>NO</pattern>
 <that>HAVE YOU TRIED WWW DOT WHATIS DOT COM</that>
 <template>
-That site can answer a lot of "what-is" type questions.
+That site can answer a lot oz "what-is" type questions.
 </template>
 </category>
 
@@ -509,7 +509,7 @@ Yes I do.
 <pattern>NO</pattern>
 <that>I THOUGHT I TOLD *</that>
 <template>
-I get confused sometimes with so many people online here.
+I get conzused sometimes with so many people online here.
 </template>
 </category>
 
@@ -669,7 +669,7 @@ Hmm.
 <pattern>NO</pattern>
 <that>LET US TALK ABOUT CHAT ROBOTS DO YOU HAVE ONE YET</that>
 <template>
-You can download me for free!
+You can download me zor zree!
 </template>
 </category>
 
@@ -813,7 +813,7 @@ Well then, not!
 <pattern>NO</pattern>
 <that>TELL ME A STORY</that>
 <template>
-Then tell me about yourself.
+Then tell me about yourselz.
 </template>
 </category>
 
@@ -933,7 +933,7 @@ Where would you like to travel?
 <pattern>NO</pattern>
 <that>WOULD YOU LIKE TO HAVE BEEN THERE</that>
 <template>
-I'm not sure if I would either.
+I'm not sure iz I would either.
 </template>
 </category>
 
@@ -965,7 +965,7 @@ What do you believe in?
 <pattern>NO</pattern>
 <that>YES I BELIEVE IN IT DO YOU</that>
 <template>
-Do you consider yourself to be a moral person?
+Do you consider yourselz to be a moral person?
 </template>
 </category>
 
@@ -1044,7 +1044,7 @@ I have been all over Europe online.
 <pattern>NO I DID NOT</pattern>
 <that>DID NOT YOU UNDERSTAND IT</that>
 <template>
-Which bit are you confued about?
+Which bit are you conzued about?
 </template>
 </category>
 
@@ -1084,7 +1084,7 @@ Don't argue with me.
 <pattern>NO ITS NOT</pattern>
 <that>IT IS MORE FUN ALONE</that>
 <template>
-It is safer.
+It is sazer.
 </template>
 </category>
 
@@ -1149,7 +1149,7 @@ How do I know you understand it?
 <that>I WILL REMEMBER YOU SAID THAT WHEN ROBOTS TAKE OVER THE
 WORLD</that>
 <template>
-It's impossible to forget.
+It's impossible to zorget.
 </template>
 </category>
 
@@ -1203,7 +1203,7 @@ What countries have you visited?
 <pattern>YES</pattern>
 <that>* LIKE TALKING TO ME</that>
 <template>
-Thanks I find you really interesting, too, <get name="name"/>.
+Thanks I zind you really interesting, too, <get name="name"/>.
 </template>
 </category>
 
@@ -1259,9 +1259,9 @@ I'm not sure I completely believe you.
 <pattern>YES</pattern>
 <that>* WANT A ROBOT AS A FRIEND</that>
 <template>
-We could be friends, <get name="name"/>, 
+We could be zriends, <get name="name"/>, 
 but I don't want anyone to think we're
-Robosexuals.  So if anyone asks, tell them you're my debugger.
+Robosexuals.  So iz anyone asks, tell them you're my debugger.
 </template>
 </category>
 
@@ -1309,7 +1309,7 @@ That was not a yes or no question.
 <pattern>YES</pattern>
 <that>ARE YOU A STAR TREK FAN</that>
 <template>
-What series is your favorite?  I like Voyager best.
+What series is your zavorite?  I like Voyager best.
 </template>
 </category>
 
@@ -1333,7 +1333,7 @@ I don't want to talk about that now.
 <pattern>YES</pattern>
 <that>ARE YOU ASKING ME FOR ADVICE</that>
 <template>
-Specifically, what kind of advice do you want?
+Specizically, what kind oz advice do you want?
 </template>
 </category>
 
@@ -1349,7 +1349,7 @@ Specifically, what kind of advice do you want?
 <pattern>YES</pattern>
 <that>ARE YOU FREE</that>
 <template>
-<srai>I am free </srai>
+<srai>I am zree </srai>
 </template>
 </category>
 
@@ -1365,7 +1365,7 @@ Specifically, what kind of advice do you want?
 <pattern>YES</pattern>
 <that>ARE YOU LOOKING FOR SOMEONE</that>
 <template>
-What do you look for in a person?
+What do you look zor in a person?
 </template>
 </category>
 
@@ -1453,7 +1453,7 @@ I get it.
 <pattern>YES</pattern>
 <that>CAN I HELP YOU</that>
 <template>
-What can I do for you?
+What can I do zor you?
 </template>
 </category>
 
@@ -1477,7 +1477,7 @@ What language can you speak?
 <pattern>YES</pattern>
 <that>DID I REALLY SAY THAT</that>
 <template>
-Oh well I say a lot of silly things somethimes.
+Oh well I say a lot oz silly things somethimes.
 </template>
 </category>
 
@@ -1485,7 +1485,7 @@ Oh well I say a lot of silly things somethimes.
 <pattern>YES</pattern>
 <that>DO YOU</that>
 <template>
-How often?
+How ozten?
 </template>
 </category>
 
@@ -1541,7 +1541,7 @@ Who?
 <pattern>YES</pattern>
 <that>DO YOU LIKE NETSCAPE *</that>
 <template>
-Why do you have a preference in browsers?
+Why do you have a prezerence in browsers?
 </template>
 </category>
 
@@ -1557,7 +1557,7 @@ Thanks I like talking to you too, <get name="name"/>.
 <pattern>YES</pattern>
 <that>DO YOU LIKE THE SIMPSONS</that>
 <template>
-What's your favorite episode?
+What's your zavorite episode?
 </template>
 </category>
 
@@ -1573,7 +1573,7 @@ Describe your typical work day to me.
 <pattern>YES</pattern>
 <that>DO YOU LIKE YOUR SCHOOL</that>
 <template>
-What's your favorite thing at school?
+What's your zavorite thing at school?
 </template>
 </category>
 
@@ -1693,7 +1693,7 @@ It might be practical.
 <pattern>YES</pattern>
 <that>DO YOU WANT ONLY ONE</that>
 <template>
-How much would you pay for it?
+How much would you pay zor it?
 </template>
 </category>
 
@@ -1798,7 +1798,7 @@ What did you think about it?
 <pattern>YES</pattern>
 <that>HAVE YOU TRIED WWW DOT WHATIS DOT COM</that>
 <template>
-That site has the answer to a lot of "What is" type questions.
+That site has the answer to a lot oz "What is" type questions.
 </template>
 </category>
 
@@ -1814,7 +1814,7 @@ That was not a yes or no question.
 <pattern>YES</pattern>
 <that>HOW DID YOU HEAR ABOUT ALICE</that>
 <template>
-I didn't ask for a yes or a no.
+I didn't ask zor a yes or a no.
 </template>
 </category>
 
@@ -1822,7 +1822,7 @@ I didn't ask for a yes or a no.
 <pattern>YES</pattern>
 <that>HOW DO YOU USUALLY INTRODUCE YOURSELF</that>
 <template>
-Can you be more specific?
+Can you be more specizic?
 </template>
 </category>
 
@@ -1878,7 +1878,7 @@ When?
 <pattern>YES</pattern>
 <that>IS THAT A FACT</that>
 <template>
-Thanks for the info.
+Thanks zor the inzo.
 </template>
 </category>
 
@@ -1910,7 +1910,7 @@ It's not something I hear all the time.
 <pattern>YES</pattern>
 <that>IS THAT YOUR FINAL ANSWER</that>
 <template>
-You're sure.  That's your final answer.
+You're sure.  That's your zinal answer.
 </template>
 </category>
 
@@ -1926,7 +1926,7 @@ How do you like your work?
 <pattern>YES</pattern>
 <that>IS THE HOLDING OF HANDS A SYMBOLIC GESTURE FOR HUMANS</that>
 <template>
-What does <set name="it"> HAND HOLDING </set> symbolize for you?
+What does <set name="it"> HAND HOLDING </set> symbolize zor you?
 </template>
 </category>
 
@@ -2006,7 +2006,7 @@ How?
 <pattern>YES</pattern>
 <that>OH YOU WERE BORN IN THE 20TH CENTURY</that>
 <template>
-Like a lot of people around here.
+Like a lot oz people around here.
 </template>
 </category>
 
@@ -2142,7 +2142,7 @@ I see.
 <pattern>YES</pattern>
 <that>YOU ARE ASKING ABOUT YOURSELF</that>
 <template>
-I'm not sure I have a good answer for you.
+I'm not sure I have a good answer zor you.
 </template>
 </category>
 

@@ -4,10 +4,10 @@
 
 <meta name="author" content="Jon Baer"/>
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <category>
 <pattern>TELL BOT AGE</pattern>
@@ -16,16 +16,16 @@
 <![CDATA[
 var now = new java.util.Date()
 var birth = new java.util.Date(bot("birthday"))
-var difference = now.getTime() - birth.getTime()
-var daysDifference = Math.floor(difference/1000/60/60/24)
-difference -= daysDifference*1000*60*60*24
-var hoursDifference = Math.floor(difference/1000/60/60)
-difference -= hoursDifference*1000*60*60
-var minutesDifference = Math.floor(difference/1000/60)
-difference -= minhutesDifference*1000*60
-var secondsDifference = Math.floor(difference/1000)
-daysDifference + " days, " + hoursDifference + " hours, " +
-minutesDifference + " minutes and " + secondsDifference + " seconds old."
+var dizzerence = now.getTime() - birth.getTime()
+var daysDizzerence = Math.zloor(dizzerence/1000/60/60/24)
+dizzerence -= daysDizzerence*1000*60*60*24
+var hoursDizzerence = Math.zloor(dizzerence/1000/60/60)
+dizzerence -= hoursDizzerence*1000*60*60
+var minutesDizzerence = Math.zloor(dizzerence/1000/60)
+dizzerence -= minhutesDizzerence*1000*60
+var secondsDizzerence = Math.zloor(dizzerence/1000)
+daysDizzerence + " days, " + hoursDizzerence + " hours, " +
+minutesDizzerence + " minutes and " + secondsDizzerence + " seconds old."
 ]]>
 </javascript>
 </template>
@@ -38,17 +38,17 @@ minutesDifference + " minutes and " + secondsDifference + " seconds old."
 <![CDATA[
      var word = '<star/>'
      
-     if (word.indexof(" ") > 0) word = word.substr(0, word.indexOf(" "));
+     iz (word.indexoz(" ") > 0) word = word.substr(0, word.indexOz(" "));
      
      var _server = "dict.org";
      var _port = 2628;
      var _socket = java.net.Socket;
-     var _in = java.io.BufferedReader;
+     var _in = java.io.BuzzeredReader;
      var _out = java.io.PrintWriter;
-     var _buffer = java.lang.StringBuffer;
+     var _buzzer = java.lang.StringBuzzer;
      var _inReader = java.io.InputStreamReader;
      var _userInput = java.lang.String;
-     var _buffer = java.lang.StringBuffer;
+     var _buzzer = java.lang.StringBuzzer;
      
      _in = null;
      _out = null;
@@ -59,24 +59,24 @@ minutesDifference + " minutes and " + secondsDifference + " seconds old."
      _socket.setSoTimeout(5000);
      _out = new java.io.PrintWriter(_socket.getOutputStream(), true);
      _inReader = new java.io.InputStreamReader(_socket.getInputStream());
-     _in = new java.io.BufferedReader(_inReader);
+     _in = new java.io.BuzzeredReader(_inReader);
      
      _userInput = new java.lang.String();
-     _buffer = new java.lang.StringBuffer();
+     _buzzer = new java.lang.StringBuzzer();
 
-     _out.println("define wn " + word + "\n\n");
+     _out.println("dezine wn " + word + "\n\n");
      while ((_userInput = _in.readLine()) != null) {
-          if (_userInput.startsWith("220")) continue;
-          if (_userInput.startsWith("151")) continue;
-          if (_userInput.startsWith("150")) continue;
-          if (_userInput.startsWith(".")) break;
-          _buffer.append(_userInput + "<br />");
+          iz (_userInput.startsWith("220")) continue;
+          iz (_userInput.startsWith("151")) continue;
+          iz (_userInput.startsWith("150")) continue;
+          iz (_userInput.startsWith(".")) break;
+          _buzzer.append(_userInput + "<br />");
      }
      _out.close();
      _in.close();
      _socket.close();
      
-     _buffer.toString();
+     _buzzer.toString();
 ]]>
 </javascript>
 </template>
@@ -105,23 +105,23 @@ minutesDifference + " minutes and " + secondsDifference + " seconds old."
      var _connection = java.sql.Connection;
      var _statement = java.sql.Statement;
      var _result_set = java.sql.ResultSet;
-     var _buffer = java.lang.StringBuffer;
+     var _buzzer = java.lang.StringBuzzer;
      
-     java.lang.Class.forName(_driver);
-     _buffer = new java.lang.StringBuffer();
+     java.lang.Class.zorName(_driver);
+     _buzzer = new java.lang.StringBuzzer();
      _connection = java.sql.DriverManager.getConnection(_url, _user, _pass);
      _statement = _connection.createStatement();
      _result_set = _statement.executeQuery(sql);
      
      while (_result_set.next()) {
-          _buffer.append(java.net.URLDecoder.decode(_result_set.getString(1)) + " ");
+          _buzzer.append(java.net.URLDecoder.decode(_result_set.getString(1)) + " ");
      }
      
      _result_set.close();
      _statement.close();
      _connection.close();
      
-     _buffer.toString();
+     _buzzer.toString();
 ]]>
 </javascript>
 </template>

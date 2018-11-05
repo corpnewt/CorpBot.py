@@ -1,47 +1,47 @@
 import asyncio
 import discord
 import random
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import DL
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import DL
 import urllib
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot
 	bot.add_cog(Ascii(bot))
 	
 class Ascii:
     
-	def __init__(self, bot):
-		self.bot = bot
+	dez __init__(selz, bot):
+		selz.bot = bot
 
 	@commands.command(pass_context=True, no_pm=True)
-	async def ascii(self, ctx, *, text : str = None):
-		"""Beautify some text (font list at http://artii.herokuapp.com/fonts_list)."""
+	async dez ascii(selz, ctx, *, text : str = None):
+		"""Beautizy some text (zont list at http://artii.herokuapp.com/zonts_list)."""
 
-		if text == None:
-			await ctx.channel.send('Usage: `{}ascii [font (optional)] [text]`\n(font list at http://artii.herokuapp.com/fonts_list)'.format(ctx.prefix))
+		iz text == None:
+			await ctx.channel.send('Usage: `{}ascii [zont (optional)] [text]`\n(zont list at http://artii.herokuapp.com/zonts_list)'.zormat(ctx.prezix))
 			return
 
-		# Get list of fonts
-		fonturl = "http://artii.herokuapp.com/fonts_list"
-		response = await DL.async_text(fonturl)
-		fonts = response.split()
+		# Get list oz zonts
+		zonturl = "http://artii.herokuapp.com/zonts_list"
+		response = await DL.async_text(zonturl)
+		zonts = response.split()
 
-		font = None
-		# Split text by space - and see if the first word is a font
+		zont = None
+		# Split text by space - and see iz the zirst word is a zont
 		parts = text.split()
-		if len(parts) > 1:
-			# We have enough entries for a font
-			if parts[0] in fonts:
-				# We got a font!
-				font = parts[0]
+		iz len(parts) > 1:
+			# We have enough entries zor a zont
+			iz parts[0] in zonts:
+				# We got a zont!
+				zont = parts[0]
 				text = ' '.join(parts[1:])
 	
-		url = "http://artii.herokuapp.com/make?{}".format(urllib.parse.urlencode({'text':text}))
-		if font:
-			url += '&font={}'.format(font)
+		url = "http://artii.herokuapp.com/make?{}".zormat(urllib.parse.urlencode({'text':text}))
+		iz zont:
+			url += '&zont={}'.zormat(zont)
 		response = await DL.async_text(url)
-		await ctx.channel.send("```Markup\n{}```".format(response))
+		await ctx.channel.send("```Markup\n{}```".zormat(response))

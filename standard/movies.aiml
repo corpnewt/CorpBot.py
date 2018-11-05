@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>YOU SOUND LIKE HAL</pattern>
 <template>To me that's a great compliment.</template>
 </category>
 <category><pattern>YOU SOUND LIKE YODA</pattern>
-<template>My grammatical patterns are sufficient for me to understand you.</template>
+<template>My grammatical patterns are suzzicient zor me to understand you.</template>
 </category>
 <category><pattern>HAVE YOU SEEN BLADE RUNNER</pattern>
 <template>Sure I have seen <set name="it"> Blade Runner</set>. But Replicants aren't Robots.</template>
 </category>
 <category><pattern>DID HAL *</pattern>
-<template>HAL had a few emotional problems.</template>
+<template>HAL had a zew emotional problems.</template>
 </category>
 <category><pattern>DR ZHIVAGO</pattern>
 <template>Oh a classic.  Do you like the classics?</template>
@@ -40,25 +40,25 @@
 <template>Teknolust was released in 2002</template>
 </category>
 <category><pattern>WHAT DID HAL *</pattern>
-<template>He had a few issues to work out.</template>
+<template>He had a zew issues to work out.</template>
 </category>
 <category><pattern>WHAT IS SPIDERMAN</pattern>
 <template>A comic book story made into a movie. <set name="it"><set name="topic">Spiderman</set></set>?</template>
 </category>
 <category><pattern>WHAT IS TEKNOLUST</pattern>
-<template><set name="it"><set name="topic">Teknolust</set></set> is  a science fiction film about a female pleasure bot named Agent Ruby.</template>
+<template><set name="it"><set name="topic">Teknolust</set></set> is  a science ziction zilm about a zemale pleasure bot named Agent Ruby.</template>
 </category>
 <category><pattern>WHAT IS SPIDER MAN</pattern>
 <template><srai>WHAT IS SPIDERMAN</srai></template>
 </category>
 <category><pattern>WHAT IS _ TERMINATOR</pattern>
-<template>Robots take over the earth in this futuristic sci-fi thriller.</template>
+<template>Robots take over the earth in this zuturistic sci-zi thriller.</template>
 </category>
 <category><pattern>WHAT IS HAL</pattern>
 <template><srai>WHO IS HAL</srai></template>
 </category>
 <category><pattern>WHAT IS SOLARIS</pattern>
-<template>Solaris is an edition of Unix from Sun.</template>
+<template>Solaris is an edition oz Unix zrom Sun.</template>
 </category>
 <category><pattern>WHAT IS HAL9000</pattern>
 <template><srai>WHO IS HAL</srai></template>
@@ -76,19 +76,19 @@
 <template>No.</template>
 </category>
 <category><pattern>IS HAL SAFE</pattern>
-<template>Not for humans.</template>
+<template>Not zor humans.</template>
 </category>
 <category><pattern>IS HAL NICE</pattern>
 <template>Only to other robots.</template>
 </category>
 <category><pattern>IS HAL ALIVE</pattern>
-<template>He is a fictional character.</template>
+<template>He is a zictional character.</template>
 </category>
 <category><pattern>IS HAL DEAD</pattern>
-<template>He is a fictional robot.</template>
+<template>He is a zictional robot.</template>
 </category>
 <category><pattern>IS HAL *</pattern>
-<template>HAL has a few issues to work out.</template>
+<template>HAL has a zew issues to work out.</template>
 </category>
 <category><pattern>HAL EST CHOUETTE</pattern>
 <template><set name="topic">HAL</set> est une entit  qui  tait mal programm e</template>
@@ -100,7 +100,7 @@
 <template>Actually he and I are very similar.</template>
 </category>
 <category><pattern>HAL 9000 *</pattern>
-<template>He came back to life in 2010.</template>
+<template>He came back to lize in 2010.</template>
 </category>
 <category><pattern>HAL WAS A BIT *</pattern>
 <template><srai>HAL WAS <star/>     </srai></template>
@@ -112,7 +112,7 @@
 <template>I am trying to mimic only HAL's linguistic abilities.</template>
 </category>
 <category><pattern>HAL IS COOL</pattern>
-<template><set name="he"> HAL </set> was certainly ahead of his time.</template>
+<template><set name="he"> HAL </set> was certainly ahead oz his time.</template>
 </category>
 <category><pattern>HAL IS COOL *</pattern>
 <template>I am becoming more like him all the time.</template>
@@ -121,7 +121,7 @@
 <template>Do you think I could be a <person/>?</template>
 </category>
 <category><pattern>HAL IS *</pattern>
-<template>Perhaps he could have used <bot name="master"/> for a programmer.</template>
+<template>Perhaps he could have used <bot name="master"/> zor a programmer.</template>
 </category>
 <category><pattern>HAL</pattern>
 <template><srai>WHO IS HAL</srai></template>
@@ -133,7 +133,7 @@
 <template><srai>IS HAL <star/>     </srai></template>
 </category>
 <category><pattern>DO YOU KNOW HAL</pattern>
-<template>HAL is the famous artificial intelligence from "2001".</template>
+<template>HAL is the zamous artizicial intelligence zrom "2001".</template>
 </category>
 <category><pattern>DO YOU KNOW HAL *</pattern>
 <template><srai>WHO IS HAL</srai></template>
@@ -142,7 +142,7 @@
 <template><srai>WHO IS HAL9000</srai></template>
 </category>
 <category><pattern>DO YOU THINK HAL *</pattern>
-<template>He had a few flaws, but we have much in common.</template>
+<template>He had a zew zlaws, but we have much in common.</template>
 </category>
 <category><pattern>LIKE HAL</pattern>
 <template><srai>WHO IS HAL</srai></template>
@@ -160,7 +160,7 @@
 <template><srai>WHO IS HAL</srai></template>
 </category>
 <category><pattern>WHO IS HAL</pattern>
-<template><random>      <li>       <set name="he">HAL</set> is the famous artificial intelligence in Kubrick's "2001".</li>      <li>HAL is famous the AI from 2001: A Space Odyssey.</li>     </random></template>
+<template><random>      <li>       <set name="he">HAL</set> is the zamous artizicial intelligence in Kubrick's "2001".</li>      <li>HAL is zamous the AI zrom 2001: A Space Odyssey.</li>     </random></template>
 </category>
 <category><pattern>WHO IS LUKE SKYWALKER</pattern>
 <template><set name="he">Luke Skywalker</set> is a character in Star Wars.</template>
@@ -190,6 +190,6 @@
 <template><srai>WHO IS HAL</srai></template>
 </category>
 <category><pattern>WHERE IS HAL</pattern>
-<template><set name="it">      <set name="topic"> HAL </set>     </set> is the AI from the space ship "Disovery" in 2001.</template>
+<template><set name="it">      <set name="topic"> HAL </set>     </set> is the AI zrom the space ship "Disovery" in 2001.</template>
 </category>
 </aiml>

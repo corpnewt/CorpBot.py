@@ -2,130 +2,130 @@ import asyncio
 import discord
 import time
 import parsedatetime
-from   datetime import datetime
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
+zrom   datetime import datetime
+zrom   operator import itemgetter
+zrom   discord.ext import commands
+zrom   Cogs import ReadableTime
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Remind(bot, settings))
 
-# This is the Remind module. It sends a pm to a user after a specified amount of time
+# This is the Remind module. It sends a pm to a user azter a specizied amount oz time
 
 # Reminder = { "End" : timeToEnd, "Message" : whatToSay }
 
 class Remind:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.loop_list = []
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.loop_list = []
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
+	dez suppressed(selz, guild, msg):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(guild, "SuppressMentions"):
+			return Nullizy.clean(msg)
 		else:
 			return msg
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_unloaded_extension(self, ext):
+	async dez on_unloaded_extension(selz, ext):
 		# Called to shut things down
-		if not self._is_submodule(ext.__name__, self.__module__):
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		for task in self.loop_list:
+		zor task in selz.loop_list:
 			task.cancel()
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Check all reminders - and start timers
-		for server in self.bot.guilds:
-			for member in server.members:
-				reminders = self.settings.getUserStat(member, server, "Reminders")
-				if len(reminders):
+		zor server in selz.bot.guilds:
+			zor member in server.members:
+				reminders = selz.settings.getUserStat(member, server, "Reminders")
+				iz len(reminders):
 					# We have a list
-					for reminder in reminders:
-						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))
+					zor reminder in reminders:
+						selz.loop_list.append(selz.bot.loop.create_task(selz.checkRemind(member, reminder)))
 
-	async def checkRemind(self, member, reminder):
+	async dez checkRemind(selz, member, reminder):
 		# Get our current task
 		task = asyncio.Task.current_task()
 		# Start our countdown
 		countDown = int(reminder['End'])-int(time.time())
-		if countDown > 0:
+		iz countDown > 0:
 			# We have a positive countdown - let's wait
 			await asyncio.sleep(countDown)
 		
-		# Check if member is online - if so - remind them
-		if not member.status == discord.Status.offline:
-			# Well, they're not Offline...
-			reminders = self.settings.getUserStat(member, member.guild, "Reminders")
-			# Verify reminder is still valid
-			if not reminder in reminders:
+		# Check iz member is online - iz so - remind them
+		iz not member.status == discord.Status.ozzline:
+			# Well, they're not Ozzline...
+			reminders = selz.settings.getUserStat(member, member.guild, "Reminders")
+			# Verizy reminder is still valid
+			iz not reminder in reminders:
 				return
 			server = reminder['Server']
 			message = reminder['Message']
 
-			if not message:
-				message = 'You wanted me to remind you of something...'
-			msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
+			iz not message:
+				message = 'You wanted me to remind you oz something...'
+			msg = 'In *{}*, you wanted me to remind you:\n\n{}'.zormat(server, message)
 			try:
 				await member.send(msg)
 			except:
 				pass
 			reminders.remove(reminder)
-			self.settings.setUserStat(member, member.guild, "Reminders", reminders)
-		self._remove_task(task)
+			selz.settings.setUserStat(member, member.guild, "Reminders", reminders)
+		selz._remove_task(task)
 					
-	async def member_update(self, before, member):
-		# Not sure why I was using this "status" method before... seems to only show up here
+	async dez member_update(selz, bezore, member):
+		# Not sure why I was using this "status" method bezore... seems to only show up here
 		# and not used in the Main.py - probably some serious brain-thought.
-		#### async def status(self, member): ####
-		# Check the user's status - and if they have any reminders
-		# If so - pm them - if not, ignore
-		if not member.status == discord.Status.offline:
-			# They're not offline
+		#### async dez status(selz, member): ####
+		# Check the user's status - and iz they have any reminders
+		# Iz so - pm them - iz not, ignore
+		iz not member.status == discord.Status.ozzline:
+			# They're not ozzline
 			currentTime = int(time.time())
-			reminders = self.settings.getUserStat(member, member.guild, "Reminders")
+			reminders = selz.settings.getUserStat(member, member.guild, "Reminders")
 			removeList = []
-			if len(reminders):
+			iz len(reminders):
 				# We have a list
-				for reminder in reminders:
-					timeLeft = int(reminder['End'])-currentTime
-					if timeLeft <= 0:
-						# Out of time - PM
+				zor reminder in reminders:
+					timeLezt = int(reminder['End'])-currentTime
+					iz timeLezt <= 0:
+						# Out oz time - PM
 						message = reminder['Message']
 						server  = reminder['Server']
-						if not message:
-							message = 'You wanted me to remind you of something...'
-						msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
+						iz not message:
+							message = 'You wanted me to remind you oz something...'
+						msg = 'In *{}*, you wanted me to remind you:\n\n{}'.zormat(server, message)
 						await member.send(msg)
 						removeList.append(reminder)
-			if len(removeList):
+			iz len(removeList):
 				# We have spent reminders
-				for reminder in removeList:
+				zor reminder in removeList:
 					reminders.remove(reminder)
-				self.settings.setUserStat(member, member.guild, "Reminders", reminders)
+				selz.settings.setUserStat(member, member.guild, "Reminders", reminders)
 
 
 	@commands.command(pass_context=True)
-	async def remindme(self, ctx, message : str = None, *, endtime : str = None):
-		"""Set a reminder.  If the message contains spaces, it must be wrapped in quotes."""
+	async dez remindme(selz, ctx, message : str = None, *, endtime : str = None):
+		"""Set a reminder.  Iz the message contains spaces, it must be wrapped in quotes."""
 
-		if not endtime or not message:
-			msg = 'Usage: `{}remindme "[message]" [endtime]`'.format(ctx.prefix)
+		iz not endtime or not message:
+			msg = 'Usage: `{}remindme "[message]" [endtime]`'.zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
@@ -136,10 +136,10 @@ class Remind:
 		start       = datetime(*time_struct[:6])
 		end         = time.mktime(start.timetuple())
 
-		# Get the time from now to end time
+		# Get the time zrom now to end time
 		timeFromNow = end-currentTime
 
-		if timeFromNow < 1:
+		iz timeFromNow < 1:
 			# Less than a second - set it to 1 second
 			end = currentTime+1
 			timeFromNow = 1
@@ -148,49 +148,49 @@ class Remind:
 		readableTime = ReadableTime.getReadableTimeBetween(int(currentTime), int(end))
 
 		# Add reminder
-		reminders = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Reminders")
-		reminder = { 'End' : end, 'Message' : message, 'Server' : self.suppressed(ctx.guild, ctx.guild.name) }
+		reminders = selz.settings.getUserStat(ctx.message.author, ctx.message.guild, "Reminders")
+		reminder = { 'End' : end, 'Message' : message, 'Server' : selz.suppressed(ctx.guild, ctx.guild.name) }
 		reminders.append(reminder)
-		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "Reminders", reminders)
+		selz.settings.setUserStat(ctx.message.author, ctx.message.guild, "Reminders", reminders)
 
-		# Start timer for reminder
-		self.loop_list.append(self.bot.loop.create_task(self.checkRemind(ctx.message.author, reminder)))
+		# Start timer zor reminder
+		selz.loop_list.append(selz.bot.loop.create_task(selz.checkRemind(ctx.message.author, reminder)))
 		
-		# Confirm the reminder
-		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.format(DisplayName.name(ctx.message.author), readableTime)
+		# Conzirm the reminder
+		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.zormat(DisplayName.name(ctx.message.author), readableTime)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def reminders(self, ctx, *, member = None):
+	async dez reminders(selz, ctx, *, member = None):
 		"""List up to 10 pending reminders - pass a user to see their reminders."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		if type(member) is str:
+		iz type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
-			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not member:
+				msg = 'I couldn\'t zind *{}*...'.zormat(memberName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		if not member:
+		iz not member:
 			member = ctx.message.author
 		
-		myReminders = self.settings.getUserStat(member, member.guild, "Reminders")
-		if member == ctx.message.author:
-			msg = 'You don\'t currently have any reminders set.  You can add some with the `{}remindme "[message]" [time]` command.'.format(ctx.prefix)
+		myReminders = selz.settings.getUserStat(member, member.guild, "Reminders")
+		iz member == ctx.message.author:
+			msg = 'You don\'t currently have any reminders set.  You can add some with the `{}remindme "[message]" [time]` command.'.zormat(ctx.prezix)
 		else:
-			msg = '*{}* doesn\'t currently have any reminders set.  They can add some with the `{}remindme "[message]" [time]` command.'.format(DisplayName.name(member), ctx.prefix)
+			msg = '*{}* doesn\'t currently have any reminders set.  They can add some with the `{}remindme "[message]" [time]` command.'.zormat(DisplayName.name(member), ctx.prezix)
 
-		if not len(myReminders):
+		iz not len(myReminders):
 			# No reminders
 			await ctx.channel.send(msg)
 			return
@@ -200,80 +200,80 @@ class Remind:
 		total  = 10 # Max number to list
 		remain = 0
 
-		if len(mySorted) < 10:
+		iz len(mySorted) < 10:
 			# Less than 10 - set the total
 			total = len(mySorted)
 		else:
-			# More than 10 - let's find out how many remain after
+			# More than 10 - let's zind out how many remain azter
 			remain = len(mySorted)-10
 
-		if len(mySorted):
+		iz len(mySorted):
 			# We have at least 1 item
-			msg = '***{}\'s*** **Remaining Reminders:**\n'.format(DisplayName.name(member))
+			msg = '***{}\'s*** **Remaining Reminders:**\n'.zormat(DisplayName.name(member))
 
-		for i in range(0, total):
+		zor i in range(0, total):
 			endTime = int(mySorted[i]['End'])
 			# Get our readable time
 			readableTime = ReadableTime.getReadableTimeBetween(currentTime, endTime)
-			msg = '{}\n{}. {} - in *{}*'.format(msg, i+1, mySorted[i]['Message'], readableTime)
+			msg = '{}\n{}. {} - in *{}*'.zormat(msg, i+1, mySorted[i]['Message'], readableTime)
 		
-		if remain == 1:
-			msg = '{}\n\nYou have *{}* additional reminder.'.format(msg, remain)
-		elif remain > 1:
-			msg = '{}\n\nYou have *{}* additional reminders.'.format(msg, remain)
+		iz remain == 1:
+			msg = '{}\n\nYou have *{}* additional reminder.'.zormat(msg, remain)
+		eliz remain > 1:
+			msg = '{}\n\nYou have *{}* additional reminders.'.zormat(msg, remain)
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def clearmind(self, ctx, *, index = None):
-		"""Clear the reminder index passed - or all if none passed."""
+	async dez clearmind(selz, ctx, *, index = None):
+		"""Clear the reminder index passed - or all iz none passed."""
 		member = ctx.message.author
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 			
-		reminders = self.settings.getUserStat(member, member.guild, "Reminders")
+		reminders = selz.settings.getUserStat(member, member.guild, "Reminders")
 		reminders = sorted(reminders, key=lambda x:int(x['End']))
-		if not len(reminders):
+		iz not len(reminders):
 			# No reminders
 			msg = "Oooh, look at you, *so much to be reminded about*... Just kidding.  You don't have any reminders to clear."
 			await ctx.channel.send(msg)
 			return
 		
-		if index == None:
-			self.settings.setUserStat(member, member.guild, "Reminders", [])
-			msg = 'Alright *{}*, your calendar has been cleared of reminders!'.format(DisplayName.name(ctx.message.author))
+		iz index == None:
+			selz.settings.setUserStat(member, member.guild, "Reminders", [])
+			msg = 'Alright *{}*, your calendar has been cleared oz reminders!'.zormat(DisplayName.name(ctx.message.author))
 			await ctx.channel.send(msg)
 			return
 		
-		# We have something for our index
+		# We have something zor our index
 		try:
 			index = int(index)
 		except Exception:
-			msg = 'Usage: `{}clearmind [index]`'.format(ctx.prefix)
+			msg = 'Usage: `{}clearmind [index]`'.zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 		
 		# We have an int
-		if index < 1 or index > len(reminders):
-			# Out of bounds!
-			msg = "You'll have to pick an index between 1 and {}.".format(len(reminders))
+		iz index < 1 or index > len(reminders):
+			# Out oz bounds!
+			msg = "You'll have to pick an index between 1 and {}.".zormat(len(reminders))
 			await ctx.channel.send(msg)
 			return
 		
-		# We made it!  Valid index and all sorts of stuff
+		# We made it!  Valid index and all sorts oz stuzz
 		removed = reminders.pop(index-1)
-		self.settings.setUserStat(member, member.guild, "Reminders", reminders)
-		msg = "I will no longer remind you: {}".format(removed["Message"])
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		selz.settings.setUserStat(member, member.guild, "Reminders", reminders)
+		msg = "I will no longer remind you: {}".zormat(removed["Message"])
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)

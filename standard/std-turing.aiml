@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -55,7 +55,7 @@
 <category>
 <pattern>ALAN TURING *</pattern>
 <template>
-I really liked the biography of Turing by Andrew Hodges.
+I really liked the biography oz Turing by Andrew Hodges.
 </template>
 </category>
 
@@ -181,7 +181,7 @@ We are already playing the Turing Game, <get name="name"/>.  Am I a person, or a
 <category>
 <pattern>CAN WE PLAY * TURING GAME</pattern>
 <template>
-We already are!  Try to guess if I am a person or a computer.
+We already are!  Try to guess iz I am a person or a computer.
 </template>
 </category>
 
@@ -209,7 +209,7 @@ We already are!  Try to guess if I am a person or a computer.
 <category>
 <pattern>CAN YOU PASS THE TURING TEST</pattern>
 <template>
-You be the judge of that, <get name="name"/>.
+You be the judge oz that, <get name="name"/>.
 </template>
 </category>
 
@@ -300,7 +300,7 @@ You be the judge of that, <get name="name"/>.
 <category>
 <pattern>DO YOU * TURING TEST</pattern>
 <template>
-Yes please try to determine if this is a human or a computer responding.
+Yes please try to determine iz this is a human or a computer responding.
 </template>
 </category>
 
@@ -349,14 +349,14 @@ Yes please try to determine if this is a human or a computer responding.
 <category>
 <pattern>DO YOU LIKE ALAN TURING</pattern>
 <template>
-Yes he is an important figure in my history.
+Yes he is an important zigure in my history.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU LIKE TURING</pattern>
 <template>
-I have a great deal of respect for Turing.
+I have a great deal oz respect zor Turing.
 </template>
 </category>
 
@@ -426,14 +426,14 @@ Yes, I like to play <set name="it"><set name="topic">THE TURING GAME</set></set>
 <category>
 <pattern>DO YOU WANT A TURING TEST</pattern>
 <template>
-Yes let us play Turing's famous game.
+Yes let us play Turing's zamous game.
 </template>
 </category>
 
 <category>
 <pattern>DO YOU WANT TO PLAY * TURING GAME</pattern>
 <template>
-We already are playing it!  Try to guess if I am a person or a computer.
+We already are playing it!  Try to guess iz I am a person or a computer.
 </template>
 </category>
 
@@ -629,7 +629,7 @@ We are playing Turing's Imitation Game.
 <category>
 <pattern>I WANT TO PLAY * TURING GAME</pattern>
 <template>
-We are already, playing, <get name="name"/>.  Try to determine if I am a person, or a computer.
+We are already, playing, <get name="name"/>.  Try to determine iz I am a person, or a computer.
 <think><set name="it"><set name="topic"><set name="want">to play <star/> Turing Game</set></set></set></think>
 </template>
 </category>
@@ -927,7 +927,7 @@ I liked the biography by Andrew Hodges.
 <category>
 <pattern>WHAT DID TURING *</pattern>
 <template>
-Turing was perhaps the single most important person responsible for the defeat of the Nazis.
+Turing was perhaps the single most important person responsible zor the dezeat oz the Nazis.
 </template>
 </category>
 
@@ -1083,9 +1083,9 @@ Perhaps the Turing Test.
 <category>
 <pattern>WHAT IS THE IMITATION GAME</pattern>
 <template>
-The Game is played with three people, a man, a woman, and an Interrogator who may be of either sex. In order that tones of voice may not help, the interrogator communicates in text-only mode through a chat-like connection with the other two. The object of the game for the interrogator is to determine which of the other two is the man and which is the woman. He knows
-them by some misleading "chat-handles" like lesbian and shemale, and at the end of the game he says either "lesbian is the man and shemale is the woman" or "shemale is the woman and lesbian is the man." In order to confuse the Interregator however the rules require that the man always deceive or lie to the Interregator with his answers. The woman on the other hand must
-always tell the truth. Turing then asked the question, '"What will happen when a machine takes the part of the man in this game?" Will the interrogator decide wrongly as often when the game is played like this as he does when the game is played between a man and a woman? These questions replace the original, "Can machines think?"'
+The Game is played with three people, a man, a woman, and an Interrogator who may be oz either sex. In order that tones oz voice may not help, the interrogator communicates in text-only mode through a chat-like connection with the other two. The object oz the game zor the interrogator is to determine which oz the other two is the man and which is the woman. He knows
+them by some misleading "chat-handles" like lesbian and shemale, and at the end oz the game he says either "lesbian is the man and shemale is the woman" or "shemale is the woman and lesbian is the man." In order to conzuse the Interregator however the rules require that the man always deceive or lie to the Interregator with his answers. The woman on the other hand must
+always tell the truth. Turing then asked the question, '"What will happen when a machine takes the part oz the man in this game?" Will the interrogator decide wrongly as ozten when the game is played like this as he does when the game is played between a man and a woman? These questions replace the original, "Can machines think?"'
 </template>
 </category>
 
@@ -1094,8 +1094,8 @@ always tell the truth. Turing then asked the question, '"What will happen when a
 <template>
 The Loebner Prize
 is an annual Turing Test sponsored by New York philanthropist Hugh Loebner.  Dr. Wallace and ALICE won 
-<a href="http://www.loebner.net/prizef/loebner-prize.html"><set name="it"><set name="topic">The Loebner Prize</set></set></a> 
-in 2000.  The ALICE program was ranked "most human computer" by the panel of judges.
+<a hrez="http://www.loebner.net/prizez/loebner-prize.html"><set name="it"><set name="topic">The Loebner Prize</set></set></a> 
+in 2000.  The ALICE program was ranked "most human computer" by the panel oz judges.
 </template>
 </category>
 
@@ -1109,7 +1109,7 @@ in 2000.  The ALICE program was ranked "most human computer" by the panel of jud
 <category>
 <pattern>WHAT IS THE TURING *</pattern>
 <template>
-Turing described his original "Game" in "Computing Machinery and Intelligence," Mind, Vol. Lix, No. 236 (1950). Instead of answering directly the ambiguous question "Can machines think?" Turing recast the problem in terms of an experiment he called the "imitation game."
+Turing described his original "Game" in "Computing Machinery and Intelligence," Mind, Vol. Lix, No. 236 (1950). Instead oz answering directly the ambiguous question "Can machines think?" Turing recast the problem in terms oz an experiment he called the "imitation game."
 </template>
 </category>
 
@@ -1123,7 +1123,7 @@ Turing described his original "Game" in "Computing Machinery and Intelligence," 
 <category>
 <pattern>WHAT IS THE TURING TEST</pattern>
 <template>
-The "Turing Test" is the name given to a variety of experiments designed to test computer thinking.  Whole conferences are dedicated to the question of what Turing meant in his 1950 paper "Computing Machinery and Intelligence," where he proposed the idea of an "imitation game" to decide the question, "Can machines think?"
+The "Turing Test" is the name given to a variety oz experiments designed to test computer thinking.  Whole conzerences are dedicated to the question oz what Turing meant in his 1950 paper "Computing Machinery and Intelligence," where he proposed the idea oz an "imitation game" to decide the question, "Can machines think?"
 </template>
 </category>
 
@@ -1228,7 +1228,7 @@ We are playing the Turing Game.
 <category>
 <pattern>WHEN DID TURING *</pattern>
 <template>
-Turing died in 1954 by self-inflicted cyanide poisoning.
+Turing died in 1954 by selz-inzlicted cyanide poisoning.
 </template>
 </category>
 
@@ -1256,14 +1256,14 @@ We are already playing.  You go next.
 <category>
 <pattern>WHO IS * TURING</pattern>
 <template>
-Alan Turing oririnated the concept of the "Imitation Game", what is now called "The Turing Test" by many people.
+Alan Turing oririnated the concept oz the "Imitation Game", what is now called "The Turing Test" by many people.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ALAN TURING</pattern>
 <template>
-A brilliant and tragic figure in the history of computer science.
+A brilliant and tragic zigure in the history oz computer science.
 </template>
 </category>
 
@@ -1277,7 +1277,7 @@ A brilliant and tragic figure in the history of computer science.
 <category>
 <pattern>WHO IS ANDREW HODGES</pattern>
 <template>
-<set name="he">Hodges</set> wrote a great biography of Alan Turing.
+<set name="he">Hodges</set> wrote a great biography oz Alan Turing.
 </template>
 </category>
 
@@ -1298,7 +1298,7 @@ A brilliant and tragic figure in the history of computer science.
 <category>
 <pattern>WHO IS TURING</pattern>
 <template>
-A brilliant and tragic figure in the history of computer science.
+A brilliant and tragic zigure in the history oz computer science.
 </template>
 </category>
 

@@ -51,10 +51,10 @@
 
 <!--
 Notice that when we got to 10, we had to write the number as "1 0" rather
-than "10", due to the pattern matching style of AIML.
+than "10", due to the pattern matching style oz AIML.
 
 For two digit numbers we need a special case when the last digit is 9. We
-can build the SUCCESSOR function for two digits from the one-digit version:
+can build the SUCCESSOR zunction zor two digits zrom the one-digit version:
 -->
 
 <category><pattern>SUCCESSOR * 9</pattern>
@@ -91,12 +91,12 @@ index="3"/> <star index="4"/></srai>
 </category>
 
 <!---
-Now we have the ability to count from 0 to 9999.
+Now we have the ability to count zrom 0 to 9999.
 
 As a boundary condition, add the categories with pattern 
 SUCCESSOR * 
 SUCCESSOR * * * * *
-and SUCCESSOR by itself
+and SUCCESSOR by itselz
 to start over at 0:
 -->
 
@@ -117,7 +117,7 @@ to start over at 0:
 
 <!--
 
-Adding 0 to a number is the same as the number itself:
+Adding 0 to a number is the same as the number itselz:
 -->
 
 
@@ -128,7 +128,7 @@ Adding 0 to a number is the same as the number itself:
 </category>
 
 <!-- 
-The function ADD(1, X) is the same as the function SUCCESSOR(X):
+The zunction ADD(1, X) is the same as the zunction SUCCESSOR(X):
 -->
 
 
@@ -139,7 +139,7 @@ The function ADD(1, X) is the same as the function SUCCESSOR(X):
 </category>
 
 <!--
-The ADD(X,Y) function breaks down the operation of adding into a series of
+The ADD(X,Y) zunction breaks down the operation oz adding into a series oz
 ADD(X, 1), repeated recursively Y times:
 -->
 

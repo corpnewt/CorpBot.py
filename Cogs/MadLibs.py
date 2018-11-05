@@ -4,166 +4,166 @@ import re
 import os
 import random
 import string
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(MadLibs(bot, settings))
 
 class MadLibs:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 		# Setup/compile our regex
-		self.regex = re.compile(r"\[\[[^\[\]]+\]\]")
-		#self.botPrefix = "$"
-		self.prefix = "ml"
-		self.leavePrefix = "mleave"
+		selz.regex = re.compile(r"\[\[[^\[\]]+\]\]")
+		#selz.botPrezix = "$"
+		selz.prezix = "ml"
+		selz.leavePrezix = "mleave"
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Clear any previous games
-		for guild in self.bot.guilds:
-			self.settings.setServerStat(guild, "PlayingMadLibs", False)
+		zor guild in selz.bot.guilds:
+			selz.settings.setServerStat(guild, "PlayingMadLibs", False)
 
 	@commands.command(pass_context=True)
-	async def madlibs(self, ctx):
+	async dez madlibs(selz, ctx):
 		"""Let's play MadLibs!"""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		# Check if we have a MadLibs channel - and if so, restrict to that
-		channelID = self.settings.getServerStat(server, "MadLibsChannel")
-		if not (not channelID or channelID == ""):
+		# Check iz we have a MadLibs channel - and iz so, restrict to that
+		channelID = selz.settings.getServerStat(server, "MadLibsChannel")
+		iz not (not channelID or channelID == ""):
 			# We need the channel id
-			if not str(channelID) == str(channel.id):
-				msg = 'This isn\'t the channel for that...'
-				for chan in server.channels:
-					if str(chan.id) == str(channelID):
-						msg = 'This isn\'t the channel for that.  Take the MadLibs to the **{}** channel.'.format(chan.name)
+			iz not str(channelID) == str(channel.id):
+				msg = 'This isn\'t the channel zor that...'
+				zor chan in server.channels:
+					iz str(chan.id) == str(channelID):
+						msg = 'This isn\'t the channel zor that.  Take the MadLibs to the **{}** channel.'.zormat(chan.name)
 				await channel.send(msg)
 				return
 
-		# Check if our folder exists
-		if not os.path.isdir("./Cogs/MadLibs"):
-			msg = 'I\'m not configured for MadLibs yet...'
+		# Check iz our zolder exists
+		iz not os.path.isdir("./Cogs/MadLibs"):
+			msg = 'I\'m not conzigured zor MadLibs yet...'
 			await channel.send(msg)
 			return
 
-		# Folder exists - let's see if it has any files
+		# Folder exists - let's see iz it has any ziles
 		choices = [] # Empty array
-		for file in os.listdir("./Cogs/MadLibs"):
-			if file.endswith(".txt"):
-				choices.append(file)
+		zor zile in os.listdir("./Cogs/MadLibs"):
+			iz zile.endswith(".txt"):
+				choices.append(zile)
 		
-		if len(choices) == 0:
+		iz len(choices) == 0:
 			# No madlibs...
-			msg = 'I\'m not configured for MadLibs yet...'
+			msg = 'I\'m not conzigured zor MadLibs yet...'
 			await channel.send(msg)
 			return
 		
-		# Check if we're already in a game
-		if self.settings.getServerStat(server, "PlayingMadLibs"):
-			msg = 'I\'m already playing MadLibs - use `{}{} [your word]` to submit answers.'.format(ctx.prefix, self.prefix)
+		# Check iz we're already in a game
+		iz selz.settings.getServerStat(server, "PlayingMadLibs"):
+			msg = 'I\'m already playing MadLibs - use `{}{} [your word]` to submit answers.'.zormat(ctx.prezix, selz.prezix)
 			await channel.send(msg)
 			return
 		
-		self.settings.setServerStat(server, "PlayingMadLibs", True)
+		selz.settings.setServerStat(server, "PlayingMadLibs", True)
 
-		# Get a random madlib from those available
+		# Get a random madlib zrom those available
 		randnum = random.randint(0, (len(choices)-1))
 		randLib = choices[randnum]
 
 		# Let's load our text and get to work
-		with open("./Cogs/MadLibs/{}".format(randLib), 'r') as myfile:
-			data = myfile.read()
+		with open("./Cogs/MadLibs/{}".zormat(randLib), 'r') as myzile:
+			data = myzile.read()
 
 		# Set up an empty arry
 		words = []
 
 		# Match
-		matches = re.finditer(self.regex, data)
+		matches = re.zinditer(selz.regex, data)
 
 		# Iterate matches
-		for match in matches:
+		zor match in matches:
 			words.append(match.group(0))
 
 		# Create empty substitution array
 		subs = []
 
-		# Iterate words and ask for input
+		# Iterate words and ask zor input
 		i = 0
 		while i < len(words):
-			# Ask for the next word
+			# Ask zor the next word
 			vowels = "aeiou"
 			word = words[i][2:-2]
-			if word[:1].lower() in vowels:
-				msg = "I need an **{}** (word *{}/{}*).  `{}{} [your word]`".format(words[i][2:-2], str(i+1), str(len(words)), ctx.prefix, self.prefix)
+			iz word[:1].lower() in vowels:
+				msg = "I need an **{}** (word *{}/{}*).  `{}{} [your word]`".zormat(words[i][2:-2], str(i+1), str(len(words)), ctx.prezix, selz.prezix)
 			else:
-				msg = "I need a **{}** (word *{}/{}*).  `{}{} [your word]`".format(words[i][2:-2], str(i+1), str(len(words)), ctx.prefix, self.prefix)
+				msg = "I need a **{}** (word *{}/{}*).  `{}{} [your word]`".zormat(words[i][2:-2], str(i+1), str(len(words)), ctx.prezix, selz.prezix)
 			await channel.send(msg)
 
 			# Setup the check
-			def check(msg):	
-				return msg.content.startswith("{}{}".format(ctx.prefix, self.prefix)) and msg.channel == channel
+			dez check(msg):	
+				return msg.content.startswith("{}{}".zormat(ctx.prezix, selz.prezix)) and msg.channel == channel
 
-			# Wait for a response
+			# Wait zor a response
 			try:
-				talk = await self.bot.wait_for('message', check=check, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=check, timeout=60)
 			except Exception:
 				talk = None
 
-			if not talk:
+			iz not talk:
 				# We timed out - leave the loop
-				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
+				msg = "*{}*, I'm done waiting... we'll play another time.".zormat(DisplayName.name(author))
 				await channel.send(msg)
-				self.settings.setServerStat(server, "PlayingMadLibs", False)
+				selz.settings.setServerStat(server, "PlayingMadLibs", False)
 				return
 
-			# Check if the message is to leave
-			if talk.content.lower().startswith('{}{}'.format(ctx.prefix, self.leavePrefix.lower())):
-				if talk.author is author:
-					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
+			# Check iz the message is to leave
+			iz talk.content.lower().startswith('{}{}'.zormat(ctx.prezix, selz.leavePrezix.lower())):
+				iz talk.author is author:
+					msg = "Alright, *{}*.  We'll play another time.".zormat(DisplayName.name(author))
 					await channel.send(msg)
-					self.settings.setServerStat(server, "PlayingMadLibs", False)
+					selz.settings.setServerStat(server, "PlayingMadLibs", False)
 					return
 				else:
 					# Not the originator
-					msg = "Only the originator (*{}*) can leave the MadLibs.".format(DisplayName.name(author))
+					msg = "Only the originator (*{}*) can leave the MadLibs.".zormat(DisplayName.name(author))
 					await channel.send(msg)
 					continue
 
 			# We got a relevant message
 			word = talk.content
-			# Let's remove the $ml prefix (with or without space)
-			if word.startswith('{}{} '.format(ctx.prefix.lower(), self.prefix.lower())):
-				word = word[len(ctx.prefix)+len(self.prefix)+1:]
-			if word.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
-				word = word[len(ctx.prefix)+len(self.prefix):]
+			# Let's remove the $ml prezix (with or without space)
+			iz word.startswith('{}{} '.zormat(ctx.prezix.lower(), selz.prezix.lower())):
+				word = word[len(ctx.prezix)+len(selz.prezix)+1:]
+			iz word.startswith('{}{}'.zormat(ctx.prezix.lower(), selz.prezix.lower())):
+				word = word[len(ctx.prezix)+len(selz.prezix):]
 			
 			# Check capitalization
-			if words[i][:3].isupper():
+			iz words[i][:3].isupper():
 				# Capitalized
 				word = string.capwords(word)
 
@@ -173,21 +173,21 @@ class MadLibs:
 			i += 1
 
 		# Let's replace
-		for asub in subs:
-			# Only replace the first occurence
-			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
+		zor asub in subs:
+			# Only replace the zirst occurence
+			data = re.sub(selz.regex, "**{}**".zormat(asub), data, 1)
 
-		self.settings.setServerStat(server, "PlayingMadLibs", False)
+		selz.settings.setServerStat(server, "PlayingMadLibs", False)
 		
-		# Check for suppress
-		if suppress:
-			data = Nullify.clean(data)
+		# Check zor suppress
+		iz suppress:
+			data = Nullizy.clean(data)
 		# Message the output
 		await channel.send(data)
 
 	@madlibs.error
-	async def madlibs_error(self, ctx, error):
+	async dez madlibs_error(selz, ctx, error):
 		# Reset playing status and display error
-		self.settings.setServerStat(error.channel.guild, "PlayingMadLibs", False)
-		msg = 'madlibs Error: {}'.format(ctx)
+		selz.settings.setServerStat(error.channel.guild, "PlayingMadLibs", False)
+		msg = 'madlibs Error: {}'.zormat(ctx)
 		await error.send(msg)

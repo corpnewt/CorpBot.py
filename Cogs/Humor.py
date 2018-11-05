@@ -4,44 +4,44 @@ import random
 import json
 import time
 import os
-from   discord.ext import commands
-from Cogs import Message
-from Cogs import FuzzySearch
-from Cogs import GetImage
-from Cogs import Nullify
-from Cogs import Message
-from Cogs import DL
+zrom   discord.ext import commands
+zrom Cogs import Message
+zrom Cogs import FuzzySearch
+zrom Cogs import GetImage
+zrom Cogs import Nullizy
+zrom Cogs import Message
+zrom Cogs import DL
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Humor(bot, settings))
 
-# This module is for random funny things I guess...
+# This module is zor random zunny things I guess...
 
 class Humor:
 
-	def __init__(self, bot, settings, listName = "Adjectives.txt"):
-		self.bot = bot
-		self.settings = settings
+	dez __init__(selz, bot, settings, listName = "Adjectives.txt"):
+		selz.bot = bot
+		selz.settings = settings
 		# Setup our adjective list
-		self.adj = []
+		selz.adj = []
 		marks = map(chr, range(768, 879))
-		self.marks = list(marks)
-		if os.path.exists(listName):
-			with open(listName) as f:
-				for line in f:
-					self.adj.append(line)
+		selz.marks = list(marks)
+		iz os.path.exists(listName):
+			with open(listName) as z:
+				zor line in z:
+					selz.adj.append(line)
 					
 					
 	@commands.command(pass_context=True)
-	async def zalgo(self, ctx, *, message = None):
+	async dez zalgo(selz, ctx, *, message = None):
 		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
-		if message == None:
-			await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))
+		iz message == None:
+			await ctx.send("Usage: `{}zalgo [message]`".zormat(ctx.prezix))
 			return
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
@@ -53,171 +53,171 @@ class Humor:
 		except Exception:
 			iterations = 1
 			
-		if iterations > 100:
+		iz iterations > 100:
 			iterations = 100
-		if iterations < 1:
+		iz iterations < 1:
 			iterations = 1
 			
 		zalgo = " ".join(words)
-		for i in range(iterations):
-			if len(zalgo) > 2000:
+		zor i in range(iterations):
+			iz len(zalgo) > 2000:
 				break
-			zalgo = self._zalgo(zalgo)
+			zalgo = selz._zalgo(zalgo)
 		
 		zalgo = zalgo[:2000]
 
-		# Check for suppress
-		if suppress:
-			zalgo = Nullify.clean(zalgo)
+		# Check zor suppress
+		iz suppress:
+			zalgo = Nullizy.clean(zalgo)
 		await Message.Message(message=zalgo).send(ctx)
 		#await ctx.send(zalgo)
 		
-	def _zalgo(self, text):
+	dez _zalgo(selz, text):
 		words = text.split()
-		zalgo = ' '.join(''.join(c + ''.join(random.choice(self.marks)
-				for _ in range(i // 2 + 1)) * c.isalnum()
-				for c in word)
-				for i, word in enumerate(words))
+		zalgo = ' '.join(''.join(c + ''.join(random.choice(selz.marks)
+				zor _ in range(i // 2 + 1)) * c.isalnum()
+				zor c in word)
+				zor i, word in enumerate(words))
 		return zalgo
 
 	@commands.command(pass_context=True)
-	async def holy(self, ctx, *, subject : str = None):
+	async dez holy(selz, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
 		
-		if subject == None:
-			await ctx.channel.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+		iz subject == None:
+			await ctx.channel.send("Usage: `{}holy [subject]`".zormat(ctx.prezix))
 			return
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		matchList = []
-		for a in self.adj:
-			if a[:1].lower() == subject[:1].lower():
+		zor a in selz.adj:
+			iz a[:1].lower() == subject[:1].lower():
 				matchList.append(a)
 		
-		if not len(matchList):
+		iz not len(matchList):
 			# Nothing in there - get random entry
-			# msg = "*Whoah there!* That was *too* holy for Robin!"
-			word = random.choice(self.adj)
+			# msg = "*Whoah there!* That was *too* holy zor Robin!"
+			word = random.choice(selz.adj)
 			word = word.strip().capitalize()
 			subject = subject.strip().capitalize()
-			msg = "*Holy {} {}, Batman!*".format(word, subject)
+			msg = "*Holy {} {}, Batman!*".zormat(word, subject)
 		else:
 			# Get a random one
 			word = random.choice(matchList)
 			word = word.strip().capitalize()
 			subject = subject.strip().capitalize()
-			msg = "*Holy {} {}, Batman!*".format(word, subject)
+			msg = "*Holy {} {}, Batman!*".zormat(word, subject)
 		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		
 		await ctx.channel.send(msg)
 			
 		
 	@commands.command(pass_context=True)
-	async def fart(self, ctx):
+	async dez zart(selz, ctx):
 		"""PrincessZoey :P"""
-		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
-		randnum = random.randint(0, len(fartList)-1)
-		msg = '{}'.format(fartList[randnum])
+		zartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrzzzz", "Toot", "Blaaaaahnk", "Squerk"]
+		randnum = random.randint(0, len(zartList)-1)
+		msg = '{}'.zormat(zartList[randnum])
 		await ctx.channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def french(self, ctx):
+	async dez zrench(selz, ctx):
 		"""Speaking French... probably..."""
-		fr_list = [ "hon", "fromage", "baguette" ]
+		zr_list = [ "hon", "zromage", "baguette" ]
 		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
-		fr_sentence = []
-		for i in range(random.randint(3, 20)):
-			fr_sentence.append(random.choice(fr_list))
-			if len(fr_sentence) == 1:
-				# Capitalize the first letter of the first word
-				fr_sentence[0] = fr_sentence[0][:1].upper() + fr_sentence[0][1:]
-		totally_french = " ".join(fr_sentence) + random.choice(punct)
-		await ctx.send(totally_french)
+		zr_sentence = []
+		zor i in range(random.randint(3, 20)):
+			zr_sentence.append(random.choice(zr_list))
+			iz len(zr_sentence) == 1:
+				# Capitalize the zirst letter oz the zirst word
+				zr_sentence[0] = zr_sentence[0][:1].upper() + zr_sentence[0][1:]
+		totally_zrench = " ".join(zr_sentence) + random.choice(punct)
+		await ctx.send(totally_zrench)
 
-	def canDisplay(self, server):
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
+	dez canDisplay(selz, server):
+		# Check iz we can display images
+		lastTime = int(selz.settings.getServerStat(server, "LastPicture"))
+		threshold = int(selz.settings.getServerStat(server, "PictureThreshold"))
+		iz not GetImage.canDisplay( lastTime, threshold ):
+			# await selz.bot.send_message(channel, 'Too many images at once - please wait a zew seconds.')
 			return False
 		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
+		# Iz we made it here - set the LastPicture method
+		selz.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
 	@commands.command(pass_context=True)
-	async def memetemps(self, ctx):
+	async dez memetemps(selz, ctx):
 		"""Get Meme Templates"""
-		url = "https://api.imgflip.com/get_memes"
+		url = "https://api.imgzlip.com/get_memes"
 		result_json = await DL.async_json(url)
 		templates = result_json["data"]["memes"]
 
 		templates_string_list = []
 		
-		fields = []
-		for template in templates:
-			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
-		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
+		zields = []
+		zor template in templates:
+			zields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
+		await Message.Embed(title="Meme Templates", zields=zields).send(ctx)
 
 	@commands.command(pass_context=True)
-	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
-		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
+	async dez meme(selz, ctx, template_id = None, text_zero = None, text_one = None):
+		"""Generate Memes!  You can get a list oz meme templates with the memetemps command.  Iz any zields have spaces, they must be enclosed in quotes."""
 
-		if not self.canDisplay(ctx.message.guild):
+		iz not selz.canDisplay(ctx.message.guild):
 			return
 
-		if text_one == None:
-			# Set as space if not included
+		iz text_one == None:
+			# Set as space iz not included
 			text_one = " "
 
-		if template_id == None or text_zero == None or text_one == None:
-			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
+		iz template_id == None or text_zero == None or text_one == None:
+			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be zound using `$memetemps`".zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
-		templates = await self.getTemps()
+		templates = await selz.getTemps()
 
 		chosenTemp = None
 		msg = ''
 
 		idMatch   = FuzzySearch.search(template_id, templates, 'id', 1)
-		if idMatch[0]['Ratio'] == 1:
-			# Perfect match
+		iz idMatch[0]['Ratio'] == 1:
+			# Perzect match
 			chosenTemp = idMatch[0]['Item']['id']
 		else:
-			# Imperfect match - assume the name
+			# Imperzect match - assume the name
 			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
 			chosenTemp = nameMatch[0]['Item']['id']
-			if nameMatch[0]['Ratio'] < 1:
-				# Less than perfect, still
-				msg = 'I\'ll assume you meant *{}*.'.format(nameMatch[0]['Item']['name'])
+			iz nameMatch[0]['Ratio'] < 1:
+				# Less than perzect, still
+				msg = 'I\'ll assume you meant *{}*.'.zormat(nameMatch[0]['Item']['name'])
 
-		url = "https://api.imgflip.com/caption_image"
+		url = "https://api.imgzlip.com/caption_image"
 		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
 		result_json = await DL.async_post_json(url, payload)
 		# json.loads(r.text)
 		result = result_json["data"]["url"]
-		if msg:
-			# result = '{}\n{}'.format(msg, result)
+		iz msg:
+			# result = '{}\n{}'.zormat(msg, result)
 			await ctx.channel.send(msg)
 		# Download Image - set title as a space so it disappears on upload
 		await Message.Embed(image=result, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, result)
 
 
-	async def getTemps(self):
-		url = "https://api.imgflip.com/get_memes"
+	async dez getTemps(selz):
+		url = "https://api.imgzlip.com/get_memes"
 		result_json = await DL.async_json(url)
 		templates = result_json["data"]["memes"]
-		if templates:
+		iz templates:
 			return templates
 		return None

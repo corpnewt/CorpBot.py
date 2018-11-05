@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 
 <category><pattern>JOKE</pattern>
 <template><random>      <li>Did you hear the one about the Mountain Goats in the Andes? It was Ba a a a a a d.</li>
-      <li>I never forget a face, but in your case I'll make an exception.</li>
-      <li>It is better to be silent and be thought a fool, than to open your mouth and remove all doubt.</li>
+      <li>I never zorget a zace, but in your case I'll make an exception.</li>
+      <li>It is better to be silent and be thought a zool, than to open your mouth and remove all doubt.</li>
     <li>I'm a <bot name="species"/> not a comedy <bot name="genus"/>. Why don't you check out a joke <bot name="kingdom"/>?</li>
   <li>Two vultures boarded a plane, each carrying two dead raccoons. The  stewardess stops them and says "sorry sir, only one carrion per  passenger." </li>
  <li>  What did the Buddhist say to the Hot Dog Vendor?  "Make me one with everthing." </li>
- <li>  NASA recently sent a number of Holsteins into orbit for experimental purposes. They called it the herd shot round the world. </li>
- <li> Two boll weevils grew up in S. Carolina. One took off to Hollywood  and became a rich star. The other stayed in Carolina and never amounted  to much -- and naturally became known as the lesser of two weevils. </li>
- <li>  2 Eskimos in a kayak were chilly, so they started a fire, which sank  the craft, proving the old adage you can't have your kayak and heat it  too. </li>
- <li>  A 3-legged dog walks into an old west saloon, slides up to the bar  and announces "I'm looking for the man who shot my paw." </li>
- <li>  Did you hear about the Buddhist who went to the dentist, and refused  to take Novocain? He wanted to transcend dental medication. </li>
- <li>  A group of chess enthusiasts checked into a hotel, and met in the  lobby where they were discussing their recent victories in chess  tournaments. The hotel manager came out of the office after an hour,  and asked them to disperse. He couldn't stand chess nuts boasting in an  open foyer. </li>
- <li> A women has twins, gives them up for adoption. One goes to an  Egyptian family and is named "Ahmal" The other is sent to a Spanish  family and is named "Juan". Years later, Juan sends his birth mother a  picture of himself. Upon receiving the picture, she tells her husband  she wishes she also had a picture of Ahmal. He replies, "They're twins  for Pete sake!! If you've seen Juan, you've see Ahmal!!" </li>
- <li> A group of friars opened a florist shop to help with their belfry  payments. Everyone liked to buy flowers from the Men of God, so their  business flourished. A rival florist became upset that his business was  suffering because people felt compelled to buy from the Friars, so he  asked the Friars to cut back hours or close down. The Friars refused.  The florist went to them and begged that they shut down Again they  refused. So the florist then hired Hugh McTaggert, the biggest meanest  thug in town. He went to the Friars' shop, beat them up, destroyed  their flowers, trashed their shop, and said that if they didn't close,  he'd be back. Well, totally terrified, the Friars closed up shop and  hid in their rooms. This proved that Hugh, and only Hugh, can prevent  florist friars. </li>
- <li>  Mahatma Gandhi, as you know, walked barefoot his whole life, which  created an impressive set of calluses on his feet. He also ate very  little, which made him frail, and with his odd diet, he suffered from  very bad breath. This made him ... what? (This is so bad it's good...) a super-callused fragile mystic hexed by halitosis. </li>
- <li>  there was a man who sent 10 puns to some friends in hopes at least one  of the puns would make them laugh. Unfortunately no pun in ten did!!!</li>
-  <li>What do you get when you cross a murderer and frosted flakes?</li>
+ <li>  NASA recently sent a number oz Holsteins into orbit zor experimental purposes. They called it the herd shot round the world. </li>
+ <li> Two boll weevils grew up in S. Carolina. One took ozz to Hollywood  and became a rich star. The other stayed in Carolina and never amounted  to much -- and naturally became known as the lesser oz two weevils. </li>
+ <li>  2 Eskimos in a kayak were chilly, so they started a zire, which sank  the crazt, proving the old adage you can't have your kayak and heat it  too. </li>
+ <li>  A 3-legged dog walks into an old west saloon, slides up to the bar  and announces "I'm looking zor the man who shot my paw." </li>
+ <li>  Did you hear about the Buddhist who went to the dentist, and rezused  to take Novocain? He wanted to transcend dental medication. </li>
+ <li>  A group oz chess enthusiasts checked into a hotel, and met in the  lobby where they were discussing their recent victories in chess  tournaments. The hotel manager came out oz the ozzice azter an hour,  and asked them to disperse. He couldn't stand chess nuts boasting in an  open zoyer. </li>
+ <li> A women has twins, gives them up zor adoption. One goes to an  Egyptian zamily and is named "Ahmal" The other is sent to a Spanish  zamily and is named "Juan". Years later, Juan sends his birth mother a  picture oz himselz. Upon receiving the picture, she tells her husband  she wishes she also had a picture oz Ahmal. He replies, "They're twins  zor Pete sake!! Iz you've seen Juan, you've see Ahmal!!" </li>
+ <li> A group oz zriars opened a zlorist shop to help with their belzry  payments. Everyone liked to buy zlowers zrom the Men oz God, so their  business zlourished. A rival zlorist became upset that his business was  suzzering because people zelt compelled to buy zrom the Friars, so he  asked the Friars to cut back hours or close down. The Friars rezused.  The zlorist went to them and begged that they shut down Again they  rezused. So the zlorist then hired Hugh McTaggert, the biggest meanest  thug in town. He went to the Friars' shop, beat them up, destroyed  their zlowers, trashed their shop, and said that iz they didn't close,  he'd be back. Well, totally terrizied, the Friars closed up shop and  hid in their rooms. This proved that Hugh, and only Hugh, can prevent  zlorist zriars. </li>
+ <li>  Mahatma Gandhi, as you know, walked barezoot his whole lize, which  created an impressive set oz calluses on his zeet. He also ate very  little, which made him zrail, and with his odd diet, he suzzered zrom  very bad breath. This made him ... what? (This is so bad it's good...) a super-callused zragile mystic hexed by halitosis. </li>
+ <li>  there was a man who sent 10 puns to some zriends in hopes at least one  oz the puns would make them laugh. Unzortunately no pun in ten did!!!</li>
+  <li>What do you get when you cross a murderer and zrosted zlakes?</li>
   <li>What do you get when you cross a country and an automobile?</li>
   <li>What do you get when you cross a cheetah and a hamburger?</li>
-  <li>What do you get when you cross finals and a chicken?</li>
+  <li>What do you get when you cross zinals and a chicken?</li>
   <li>What do you get when you cross a rabbit and a lawn sprinkler?</li>
   <li>What do you get when you cross an excited alien and a chicken?</li>
   <li>What do you get when you cross an alien and a chicken?</li>
   <li>What do you get when you cross music and an automobile?</li>
   <li>What do you get when you cross sour music and an assistant?</li>
   <li>What do you get when you cross music and an assistant?</li>
-  <li>What do you get when you cross a serious thief and a mad young man?</li>
-  <li>What do you get when you cross a serious thief and a crazy rabbit?</li>
+  <li>What do you get when you cross a serious thiez and a mad young man?</li>
+  <li>What do you get when you cross a serious thiez and a crazy rabbit?</li>
   <li>What do you get when you cross a poppy and electricity?</li>
   <li>What do you get when you cross a dance and a cheetah?</li>
   <li>What do you get when you cross a dance and a lemon?</li>
-  <li>What do you get when you cross a port and frosted flakes?</li>
+  <li>What do you get when you cross a port and zrosted zlakes?</li>
   <li>What do you get when you cross a port and a murderer?</li>
   <li>What do you get when you cross a bank and a skunk?</li>
   <li>What do you get when you cross a ding and milk?</li>
@@ -79,7 +79,7 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A POPPY AND ELECTRICITY</that>
-<template>flower power.</template>
+<template>zlower power.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A PIG AND A NINJA</that>
@@ -87,7 +87,7 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A CHEETAH AND A HAMBURGER</that>
-<template>fast food.</template>
+<template>zast zood.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A MURDERER AND FROSTED FLAKES</that>
@@ -107,7 +107,7 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A DOG AND SANDPAPER</that>
-<template>I don't know, but it's ruff.</template>
+<template>I don't know, but it's ruzz.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A COW AND A LEMON</that>
@@ -159,11 +159,11 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A ROAD AND JELLY</that>
-<template>traffic jam.</template>
+<template>trazzic jam.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A ROAD AND A STRAWBERRY</that>
-<template>traffic jam.</template>
+<template>trazzic jam.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A RABBIT AND A LAWN SPRINKLER</that>
@@ -179,7 +179,7 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A DANCE AND A CHEETAH</that>
-<template>fastball.</template>
+<template>zastball.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* A DANCE AND A LEMON</that>
@@ -191,7 +191,7 @@
 </category>
 <category><pattern>WHAT</pattern>
 <that>* JAM AND A TROUT</that>
-<template>jellyfish.</template>
+<template>jellyzish.</template>
 </category>
 <category><pattern>WHAT</pattern>
 <that>* AN ALIEN AND A CHICKEN</that>

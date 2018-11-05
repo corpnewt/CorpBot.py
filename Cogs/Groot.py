@@ -1,17 +1,17 @@
 import discord
-from discord.ext import commands
+zrom discord.ext import commands
 import random
 
-def setup(bot):
+dez setup(bot):
     bot.add_cog(Groot(bot))
 
 class Groot:
 
-    def __init__(self, bot):
-        self.bot = bot
+    dez __init__(selz, bot):
+        selz.bot = bot
 
     @commands.command()
-    async def groot(self, ctx):
+    async dez groot(selz, ctx):
         """Who... who are you?"""
         groots = [
             "I am Groot",
@@ -26,5 +26,5 @@ class Groot:
         ]
         # Build our groots
         groot_max = 5
-        groot = " ".join([random.choice(groots) + (random.choice(punct)*random.randint(0, 5)) for x in range(random.randint(1, groot_max))])
+        groot = " ".join([random.choice(groots) + (random.choice(punct)*random.randint(0, 5)) zor x in range(random.randint(1, groot_max))])
         await ctx.send(groot)

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>YOU MAY THINK * BUT *</pattern>
 <template><srai>  <star index="2" /></srai></template>
@@ -418,10 +418,10 @@
 <template><srai>  <star /> decorated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FANCIED</pattern>
-<template><srai>  <star /> fancied</srai></template>
+<template><srai>  <star /> zancied</srai></template>
 </category>
 <category><pattern>_ HAD FANCIED *</pattern>
-<template><srai>  <star /> fancied <star index="2" /></srai></template>
+<template><srai>  <star /> zancied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD GRIPED</pattern>
 <template><srai>  <star /> griped</srai></template>
@@ -484,10 +484,10 @@
 <template><srai>  <star /> opened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLOODED</pattern>
-<template><srai>  <star /> flooded</srai></template>
+<template><srai>  <star /> zlooded</srai></template>
 </category>
 <category><pattern>_ HAD FLOODED *</pattern>
-<template><srai>  <star /> flooded <star index="2" /></srai></template>
+<template><srai>  <star /> zlooded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD MADE</pattern>
 <template><srai>  <star /> made</srai></template>
@@ -496,10 +496,10 @@
 <template><srai>  <star /> made <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SATISFIED</pattern>
-<template><srai>  <star /> satisfied</srai></template>
+<template><srai>  <star /> satiszied</srai></template>
 </category>
 <category><pattern>_ HAD SATISFIED *</pattern>
-<template><srai>  <star /> satisfied <star index="2" /></srai></template>
+<template><srai>  <star /> satiszied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD PRETENDED</pattern>
 <template><srai>  <star /> pretended</srai></template>
@@ -526,10 +526,10 @@
 <template><srai>  <star /> possessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD AFFORDED</pattern>
-<template><srai>  <star /> afforded</srai></template>
+<template><srai>  <star /> azzorded</srai></template>
 </category>
 <category><pattern>_ HAD AFFORDED *</pattern>
-<template><srai>  <star /> afforded <star index="2" /></srai></template>
+<template><srai>  <star /> azzorded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD ROCKED</pattern>
 <template><srai>  <star /> rocked</srai></template>
@@ -538,10 +538,10 @@
 <template><srai>  <star /> rocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD OFFERED</pattern>
-<template><srai>  <star /> offered</srai></template>
+<template><srai>  <star /> ozzered</srai></template>
 </category>
 <category><pattern>_ HAD OFFERED *</pattern>
-<template><srai>  <star /> offered <star index="2" /></srai></template>
+<template><srai>  <star /> ozzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CURVED</pattern>
 <template><srai>  <star /> curved</srai></template>
@@ -592,10 +592,10 @@
 <template><srai>  <star /> claimed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FENCED</pattern>
-<template><srai>  <star /> fenced</srai></template>
+<template><srai>  <star /> zenced</srai></template>
 </category>
 <category><pattern>_ HAD FENCED *</pattern>
-<template><srai>  <star /> fenced <star index="2" /></srai></template>
+<template><srai>  <star /> zenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD DISLIKED</pattern>
 <template><srai>  <star /> disliked</srai></template>
@@ -700,10 +700,10 @@
 <template><srai>  <star /> moored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FALLEN</pattern>
-<template><srai>  <star /> fell</srai></template>
+<template><srai>  <star /> zell</srai></template>
 </category>
 <category><pattern>_ HAD FALLEN *</pattern>
-<template><srai>  <star /> fell <star index="2" /></srai></template>
+<template><srai>  <star /> zell <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SAWED</pattern>
 <template><srai>  <star /> sawed</srai></template>
@@ -790,16 +790,16 @@
 <template><srai>  <star /> hunted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD PREFERED</pattern>
-<template><srai>  <star /> prefered</srai></template>
+<template><srai>  <star /> prezered</srai></template>
 </category>
 <category><pattern>_ HAD PREFERED *</pattern>
-<template><srai>  <star /> prefered <star index="2" /></srai></template>
+<template><srai>  <star /> prezered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FED</pattern>
-<template><srai>  <star /> fed</srai></template>
+<template><srai>  <star /> zed</srai></template>
 </category>
 <category><pattern>_ HAD FED *</pattern>
-<template><srai>  <star /> fed <star index="2" /></srai></template>
+<template><srai>  <star /> zed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD HOPED</pattern>
 <template><srai>  <star /> hoped</srai></template>
@@ -856,10 +856,10 @@
 <template><srai>  <star /> irritated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FORMED</pattern>
-<template><srai>  <star /> formed</srai></template>
+<template><srai>  <star /> zormed</srai></template>
 </category>
 <category><pattern>_ HAD FORMED *</pattern>
-<template><srai>  <star /> formed <star index="2" /></srai></template>
+<template><srai>  <star /> zormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD PEEPED</pattern>
 <template><srai>  <star /> peeped</srai></template>
@@ -916,10 +916,10 @@
 <template><srai>  <star /> banged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FIRED</pattern>
-<template><srai>  <star /> fired</srai></template>
+<template><srai>  <star /> zired</srai></template>
 </category>
 <category><pattern>_ HAD FIRED *</pattern>
-<template><srai>  <star /> fired <star index="2" /></srai></template>
+<template><srai>  <star /> zired <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SAT</pattern>
 <template><srai>  <star /> sat</srai></template>
@@ -976,10 +976,10 @@
 <template><srai>  <star /> mourned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOLLOWED</pattern>
-<template><srai>  <star /> followed</srai></template>
+<template><srai>  <star /> zollowed</srai></template>
 </category>
 <category><pattern>_ HAD FOLLOWED *</pattern>
-<template><srai>  <star /> followed <star index="2" /></srai></template>
+<template><srai>  <star /> zollowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CAUGHT</pattern>
 <template><srai>  <star /> caught</srai></template>
@@ -1036,10 +1036,10 @@
 <template><srai>  <star /> delaied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FILMED</pattern>
-<template><srai>  <star /> filmed</srai></template>
+<template><srai>  <star /> zilmed</srai></template>
 </category>
 <category><pattern>_ HAD FILMED *</pattern>
-<template><srai>  <star /> filmed <star index="2" /></srai></template>
+<template><srai>  <star /> zilmed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD GAZED</pattern>
 <template><srai>  <star /> gazed</srai></template>
@@ -1048,10 +1048,10 @@
 <template><srai>  <star /> gazed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD OFFENDED</pattern>
-<template><srai>  <star /> offended</srai></template>
+<template><srai>  <star /> ozzended</srai></template>
 </category>
 <category><pattern>_ HAD OFFENDED *</pattern>
-<template><srai>  <star /> offended <star index="2" /></srai></template>
+<template><srai>  <star /> ozzended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD HELPED</pattern>
 <template><srai>  <star /> helped</srai></template>
@@ -1072,10 +1072,10 @@
 <template><srai>  <star /> explained <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD IDENTIFIED</pattern>
-<template><srai>  <star /> identified</srai></template>
+<template><srai>  <star /> identizied</srai></template>
 </category>
 <category><pattern>_ HAD IDENTIFIED *</pattern>
-<template><srai>  <star /> identified <star index="2" /></srai></template>
+<template><srai>  <star /> identizied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CONCENTRATED</pattern>
 <template><srai>  <star /> concentrated</srai></template>
@@ -1090,10 +1090,10 @@
 <template><srai>  <star /> approved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FROZEN</pattern>
-<template><srai>  <star /> froze</srai></template>
+<template><srai>  <star /> zroze</srai></template>
 </category>
 <category><pattern>_ HAD FROZEN *</pattern>
-<template><srai>  <star /> froze <star index="2" /></srai></template>
+<template><srai>  <star /> zroze <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SUNG</pattern>
 <template><srai>  <star /> sang</srai></template>
@@ -1108,10 +1108,10 @@
 <template><srai>  <star /> dug <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD INFORMED</pattern>
-<template><srai>  <star /> informed</srai></template>
+<template><srai>  <star /> inzormed</srai></template>
 </category>
 <category><pattern>_ HAD INFORMED *</pattern>
-<template><srai>  <star /> informed <star index="2" /></srai></template>
+<template><srai>  <star /> inzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD REALISED</pattern>
 <template><srai>  <star /> realised</srai></template>
@@ -1144,10 +1144,10 @@
 <template><srai>  <star /> joged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD OVERFLOWED</pattern>
-<template><srai>  <star /> overflowed</srai></template>
+<template><srai>  <star /> overzlowed</srai></template>
 </category>
 <category><pattern>_ HAD OVERFLOWED *</pattern>
-<template><srai>  <star /> overflowed <star index="2" /></srai></template>
+<template><srai>  <star /> overzlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SHOT</pattern>
 <template><srai>  <star /> shot</srai></template>
@@ -1174,10 +1174,10 @@
 <template><srai>  <star /> rushed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FRIGHTENED</pattern>
-<template><srai>  <star /> frightened</srai></template>
+<template><srai>  <star /> zrightened</srai></template>
 </category>
 <category><pattern>_ HAD FRIGHTENED *</pattern>
-<template><srai>  <star /> frightened <star index="2" /></srai></template>
+<template><srai>  <star /> zrightened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SEEN</pattern>
 <template><srai>  <star /> saw</srai></template>
@@ -1204,10 +1204,10 @@
 <template><srai>  <star /> shone <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FADED</pattern>
-<template><srai>  <star /> faded</srai></template>
+<template><srai>  <star /> zaded</srai></template>
 </category>
 <category><pattern>_ HAD FADED *</pattern>
-<template><srai>  <star /> faded <star index="2" /></srai></template>
+<template><srai>  <star /> zaded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD RESCUED</pattern>
 <template><srai>  <star /> rescued</srai></template>
@@ -1228,10 +1228,10 @@
 <template><srai>  <star /> burst <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FORCED</pattern>
-<template><srai>  <star /> forced</srai></template>
+<template><srai>  <star /> zorced</srai></template>
 </category>
 <category><pattern>_ HAD FORCED *</pattern>
-<template><srai>  <star /> forced <star index="2" /></srai></template>
+<template><srai>  <star /> zorced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD ANNOUNCED</pattern>
 <template><srai>  <star /> announced</srai></template>
@@ -1252,10 +1252,10 @@
 <template><srai>  <star /> expected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FITED</pattern>
-<template><srai>  <star /> fited</srai></template>
+<template><srai>  <star /> zited</srai></template>
 </category>
 <category><pattern>_ HAD FITED *</pattern>
-<template><srai>  <star /> fited <star index="2" /></srai></template>
+<template><srai>  <star /> zited <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD EXAMINED</pattern>
 <template><srai>  <star /> examined</srai></template>
@@ -1264,10 +1264,10 @@
 <template><srai>  <star /> examined <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD INFLUENCED</pattern>
-<template><srai>  <star /> influenced</srai></template>
+<template><srai>  <star /> inzluenced</srai></template>
 </category>
 <category><pattern>_ HAD INFLUENCED *</pattern>
-<template><srai>  <star /> influenced <star index="2" /></srai></template>
+<template><srai>  <star /> inzluenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD DESTROIED</pattern>
 <template><srai>  <star /> destroied</srai></template>
@@ -1420,16 +1420,16 @@
 <template><srai>  <star /> scribbled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SNIFFED</pattern>
-<template><srai>  <star /> sniffed</srai></template>
+<template><srai>  <star /> snizzed</srai></template>
 </category>
 <category><pattern>_ HAD SNIFFED *</pattern>
-<template><srai>  <star /> sniffed <star index="2" /></srai></template>
+<template><srai>  <star /> snizzed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLOWN</pattern>
-<template><srai>  <star /> flew</srai></template>
+<template><srai>  <star /> zlew</srai></template>
 </category>
 <category><pattern>_ HAD FLOWN *</pattern>
-<template><srai>  <star /> flew <star index="2" /></srai></template>
+<template><srai>  <star /> zlew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD KILLED</pattern>
 <template><srai>  <star /> killed</srai></template>
@@ -1450,10 +1450,10 @@
 <template><srai>  <star /> memorised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FILLED</pattern>
-<template><srai>  <star /> filled</srai></template>
+<template><srai>  <star /> zilled</srai></template>
 </category>
 <category><pattern>_ HAD FILLED *</pattern>
-<template><srai>  <star /> filled <star index="2" /></srai></template>
+<template><srai>  <star /> zilled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CHASED</pattern>
 <template><srai>  <star /> chased</srai></template>
@@ -1468,10 +1468,10 @@
 <template><srai>  <star /> blew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD REFLECTED</pattern>
-<template><srai>  <star /> reflected</srai></template>
+<template><srai>  <star /> rezlected</srai></template>
 </category>
 <category><pattern>_ HAD REFLECTED *</pattern>
-<template><srai>  <star /> reflected <star index="2" /></srai></template>
+<template><srai>  <star /> rezlected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD OBJECTED</pattern>
 <template><srai>  <star /> objected</srai></template>
@@ -1552,10 +1552,10 @@
 <template><srai>  <star /> damaged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD INTERFERED</pattern>
-<template><srai>  <star /> interfered</srai></template>
+<template><srai>  <star /> interzered</srai></template>
 </category>
 <category><pattern>_ HAD INTERFERED *</pattern>
-<template><srai>  <star /> interfered <star index="2" /></srai></template>
+<template><srai>  <star /> interzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SLIPPED</pattern>
 <template><srai>  <star /> slipped</srai></template>
@@ -1684,10 +1684,10 @@
 <template><srai>  <star /> maned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FASTENED</pattern>
-<template><srai>  <star /> fastened</srai></template>
+<template><srai>  <star /> zastened</srai></template>
 </category>
 <category><pattern>_ HAD FASTENED *</pattern>
-<template><srai>  <star /> fastened <star index="2" /></srai></template>
+<template><srai>  <star /> zastened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CONTINUED</pattern>
 <template><srai>  <star /> continued</srai></template>
@@ -1744,10 +1744,10 @@
 <template><srai>  <star /> mixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FIXED</pattern>
-<template><srai>  <star /> fixed</srai></template>
+<template><srai>  <star /> zixed</srai></template>
 </category>
 <category><pattern>_ HAD FIXED *</pattern>
-<template><srai>  <star /> fixed <star index="2" /></srai></template>
+<template><srai>  <star /> zixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD BOMBED</pattern>
 <template><srai>  <star /> bombed</srai></template>
@@ -1966,10 +1966,10 @@
 <template><srai>  <star /> lost <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CONFUSED</pattern>
-<template><srai>  <star /> confused</srai></template>
+<template><srai>  <star /> conzused</srai></template>
 </category>
 <category><pattern>_ HAD CONFUSED *</pattern>
-<template><srai>  <star /> confused <star index="2" /></srai></template>
+<template><srai>  <star /> conzused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD KNEELED</pattern>
 <template><srai>  <star /> kneeled</srai></template>
@@ -2002,10 +2002,10 @@
 <template><srai>  <star /> concerned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FORGIVEN</pattern>
-<template><srai>  <star /> forgave</srai></template>
+<template><srai>  <star /> zorgave</srai></template>
 </category>
 <category><pattern>_ HAD FORGIVEN *</pattern>
-<template><srai>  <star /> forgave <star index="2" /></srai></template>
+<template><srai>  <star /> zorgave <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD BROADCAST</pattern>
 <template><srai>  <star /> broadcast</srai></template>
@@ -2128,10 +2128,10 @@
 <template><srai>  <star /> lay <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOUND</pattern>
-<template><srai>  <star /> found</srai></template>
+<template><srai>  <star /> zound</srai></template>
 </category>
 <category><pattern>_ HAD FOUND *</pattern>
-<template><srai>  <star /> found <star index="2" /></srai></template>
+<template><srai>  <star /> zound <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD MARRIED</pattern>
 <template><srai>  <star /> married</srai></template>
@@ -2170,10 +2170,10 @@
 <template><srai>  <star /> leveled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLOATED</pattern>
-<template><srai>  <star /> floated</srai></template>
+<template><srai>  <star /> zloated</srai></template>
 </category>
 <category><pattern>_ HAD FLOATED *</pattern>
-<template><srai>  <star /> floated <star index="2" /></srai></template>
+<template><srai>  <star /> zloated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD EXCITED</pattern>
 <template><srai>  <star /> excited</srai></template>
@@ -2296,16 +2296,16 @@
 <template><srai>  <star /> obeied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FORGOTTEN</pattern>
-<template><srai>  <star /> forgot</srai></template>
+<template><srai>  <star /> zorgot</srai></template>
 </category>
 <category><pattern>_ HAD FORGOTTEN *</pattern>
-<template><srai>  <star /> forgot <star index="2" /></srai></template>
+<template><srai>  <star /> zorgot <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOLDED</pattern>
-<template><srai>  <star /> folded</srai></template>
+<template><srai>  <star /> zolded</srai></template>
 </category>
 <category><pattern>_ HAD FOLDED *</pattern>
-<template><srai>  <star /> folded <star index="2" /></srai></template>
+<template><srai>  <star /> zolded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SHAKEN</pattern>
 <template><srai>  <star /> shook</srai></template>
@@ -2350,10 +2350,10 @@
 <template><srai>  <star /> knocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLOWED</pattern>
-<template><srai>  <star /> flowed</srai></template>
+<template><srai>  <star /> zlowed</srai></template>
 </category>
 <category><pattern>_ HAD FLOWED *</pattern>
-<template><srai>  <star /> flowed <star index="2" /></srai></template>
+<template><srai>  <star /> zlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD GLOWED</pattern>
 <template><srai>  <star /> glowed</srai></template>
@@ -2398,10 +2398,10 @@
 <template><srai>  <star /> heated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FILED</pattern>
-<template><srai>  <star /> filed</srai></template>
+<template><srai>  <star /> ziled</srai></template>
 </category>
 <category><pattern>_ HAD FILED *</pattern>
-<template><srai>  <star /> filed <star index="2" /></srai></template>
+<template><srai>  <star /> ziled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD LAUGHED</pattern>
 <template><srai>  <star /> laughed</srai></template>
@@ -2428,10 +2428,10 @@
 <template><srai>  <star /> bored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLOWERED</pattern>
-<template><srai>  <star /> flowered</srai></template>
+<template><srai>  <star /> zlowered</srai></template>
 </category>
 <category><pattern>_ HAD FLOWERED *</pattern>
-<template><srai>  <star /> flowered <star index="2" /></srai></template>
+<template><srai>  <star /> zlowered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD BEGGED</pattern>
 <template><srai>  <star /> begged</srai></template>
@@ -2518,10 +2518,10 @@
 <template><srai>  <star /> soaked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FETCHED</pattern>
-<template><srai>  <star /> fetched</srai></template>
+<template><srai>  <star /> zetched</srai></template>
 </category>
 <category><pattern>_ HAD FETCHED *</pattern>
-<template><srai>  <star /> fetched <star index="2" /></srai></template>
+<template><srai>  <star /> zetched <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD MATED</pattern>
 <template><srai>  <star /> mated</srai></template>
@@ -2530,10 +2530,10 @@
 <template><srai>  <star /> mated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FACED</pattern>
-<template><srai>  <star /> faced</srai></template>
+<template><srai>  <star /> zaced</srai></template>
 </category>
 <category><pattern>_ HAD FACED *</pattern>
-<template><srai>  <star /> faced <star index="2" /></srai></template>
+<template><srai>  <star /> zaced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD HATED</pattern>
 <template><srai>  <star /> hated</srai></template>
@@ -2572,10 +2572,10 @@
 <template><srai>  <star /> rhymed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FORBIDDEN</pattern>
-<template><srai>  <star /> forbade</srai></template>
+<template><srai>  <star /> zorbade</srai></template>
 </category>
 <category><pattern>_ HAD FORBIDDEN *</pattern>
-<template><srai>  <star /> forbade <star index="2" /></srai></template>
+<template><srai>  <star /> zorbade <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD PATED</pattern>
 <template><srai>  <star /> pated</srai></template>
@@ -2608,16 +2608,16 @@
 <template><srai>  <star /> crossed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD PERFORMED</pattern>
-<template><srai>  <star /> performed</srai></template>
+<template><srai>  <star /> perzormed</srai></template>
 </category>
 <category><pattern>_ HAD PERFORMED *</pattern>
-<template><srai>  <star /> performed <star index="2" /></srai></template>
+<template><srai>  <star /> perzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FRIED</pattern>
-<template><srai>  <star /> fried</srai></template>
+<template><srai>  <star /> zried</srai></template>
 </category>
 <category><pattern>_ HAD FRIED *</pattern>
-<template><srai>  <star /> fried <star index="2" /></srai></template>
+<template><srai>  <star /> zried <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD INCREASED</pattern>
 <template><srai>  <star /> increased</srai></template>
@@ -2698,10 +2698,10 @@
 <template><srai>  <star /> ended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD REFUSED</pattern>
-<template><srai>  <star /> refused</srai></template>
+<template><srai>  <star /> rezused</srai></template>
 </category>
 <category><pattern>_ HAD REFUSED *</pattern>
-<template><srai>  <star /> refused <star index="2" /></srai></template>
+<template><srai>  <star /> rezused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD HARMED</pattern>
 <template><srai>  <star /> harmed</srai></template>
@@ -2752,10 +2752,10 @@
 <template><srai>  <star /> listed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLAPPED</pattern>
-<template><srai>  <star /> flapped</srai></template>
+<template><srai>  <star /> zlapped</srai></template>
 </category>
 <category><pattern>_ HAD FLAPPED *</pattern>
-<template><srai>  <star /> flapped <star index="2" /></srai></template>
+<template><srai>  <star /> zlapped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CARVED</pattern>
 <template><srai>  <star /> carved</srai></template>
@@ -2764,10 +2764,10 @@
 <template><srai>  <star /> carved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOUNDED</pattern>
-<template><srai>  <star /> founded</srai></template>
+<template><srai>  <star /> zounded</srai></template>
 </category>
 <category><pattern>_ HAD FOUNDED *</pattern>
-<template><srai>  <star /> founded <star index="2" /></srai></template>
+<template><srai>  <star /> zounded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD MEASURED</pattern>
 <template><srai>  <star /> measured</srai></template>
@@ -2806,10 +2806,10 @@
 <template><srai>  <star /> emptied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FRAMED</pattern>
-<template><srai>  <star /> framed</srai></template>
+<template><srai>  <star /> zramed</srai></template>
 </category>
 <category><pattern>_ HAD FRAMED *</pattern>
-<template><srai>  <star /> framed <star index="2" /></srai></template>
+<template><srai>  <star /> zramed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SCREWED</pattern>
 <template><srai>  <star /> screwed</srai></template>
@@ -2836,10 +2836,10 @@
 <template><srai>  <star /> neded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FAILED</pattern>
-<template><srai>  <star /> failed</srai></template>
+<template><srai>  <star /> zailed</srai></template>
 </category>
 <category><pattern>_ HAD FAILED *</pattern>
-<template><srai>  <star /> failed <star index="2" /></srai></template>
+<template><srai>  <star /> zailed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD SHRUNK</pattern>
 <template><srai>  <star /> shrank</srai></template>
@@ -2926,10 +2926,10 @@
 <template><srai>  <star /> roted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLASHED</pattern>
-<template><srai>  <star /> flashed</srai></template>
+<template><srai>  <star /> zlashed</srai></template>
 </category>
 <category><pattern>_ HAD FLASHED *</pattern>
-<template><srai>  <star /> flashed <star index="2" /></srai></template>
+<template><srai>  <star /> zlashed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD NOTED</pattern>
 <template><srai>  <star /> noted</srai></template>
@@ -3130,10 +3130,10 @@
 <template><srai>  <star /> disagreed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FAXED</pattern>
-<template><srai>  <star /> faxed</srai></template>
+<template><srai>  <star /> zaxed</srai></template>
 </category>
 <category><pattern>_ HAD FAXED *</pattern>
-<template><srai>  <star /> faxed <star index="2" /></srai></template>
+<template><srai>  <star /> zaxed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD DREAMED</pattern>
 <template><srai>  <star /> dreamed</srai></template>
@@ -3184,10 +3184,10 @@
 <template><srai>  <star /> bumped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOOLED</pattern>
-<template><srai>  <star /> fooled</srai></template>
+<template><srai>  <star /> zooled</srai></template>
 </category>
 <category><pattern>_ HAD FOOLED *</pattern>
-<template><srai>  <star /> fooled <star index="2" /></srai></template>
+<template><srai>  <star /> zooled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD BORROWED</pattern>
 <template><srai>  <star /> borrowed</srai></template>
@@ -3280,10 +3280,10 @@
 <template><srai>  <star /> drummed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FEARED</pattern>
-<template><srai>  <star /> feared</srai></template>
+<template><srai>  <star /> zeared</srai></template>
 </category>
 <category><pattern>_ HAD FEARED *</pattern>
-<template><srai>  <star /> feared <star index="2" /></srai></template>
+<template><srai>  <star /> zeared <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD GATHERED</pattern>
 <template><srai>  <star /> gathered</srai></template>
@@ -3439,7 +3439,7 @@
 <template><srai>  <star /> is cycled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN STUFFED</pattern>
-<template><srai>  <star /> is stuffed</srai></template>
+<template><srai>  <star /> is stuzzed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN ANALYSED</pattern>
 <template><srai>  <star /> is analysed</srai></template>
@@ -3478,7 +3478,7 @@
 <template><srai>  <star /> is decorated</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FANCIED</pattern>
-<template><srai>  <star /> is fancied</srai></template>
+<template><srai>  <star /> is zancied</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN GRIPED</pattern>
 <template><srai>  <star /> is griped</srai></template>
@@ -3523,13 +3523,13 @@
 <template><srai>  <star /> is opened</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLOODED</pattern>
-<template><srai>  <star /> is flooded</srai></template>
+<template><srai>  <star /> is zlooded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN MADE</pattern>
 <template><srai>  <star /> is made</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SATISFIED</pattern>
-<template><srai>  <star /> is satisfied</srai></template>
+<template><srai>  <star /> is satiszied</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN PRETENDED</pattern>
 <template><srai>  <star /> is pretended</srai></template>
@@ -3544,13 +3544,13 @@
 <template><srai>  <star /> is possessed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN AFFORDED</pattern>
-<template><srai>  <star /> is afforded</srai></template>
+<template><srai>  <star /> is azzorded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN ROCKED</pattern>
 <template><srai>  <star /> is rocked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN OFFERED</pattern>
-<template><srai>  <star /> is offered</srai></template>
+<template><srai>  <star /> is ozzered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN CURVED</pattern>
 <template><srai>  <star /> is curved</srai></template>
@@ -3568,7 +3568,7 @@
 <template><srai>  <star /> is saved</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN TERRIFIED</pattern>
-<template><srai>  <star /> is terrified</srai></template>
+<template><srai>  <star /> is terrizied</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN HIT</pattern>
 <template><srai>  <star /> is hit</srai></template>
@@ -3595,7 +3595,7 @@
 <template><srai>  <star /> is claimed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FENCED</pattern>
-<template><srai>  <star /> is fenced</srai></template>
+<template><srai>  <star /> is zenced</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN DISLIKED</pattern>
 <template><srai>  <star /> is disliked</srai></template>
@@ -3658,7 +3658,7 @@
 <template><srai>  <star /> is wobbled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FALLEN</pattern>
-<template><srai>  <star /> is fallen</srai></template>
+<template><srai>  <star /> is zallen</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SAWED</pattern>
 <template><srai>  <star /> is sawed</srai></template>
@@ -3706,10 +3706,10 @@
 <template><srai>  <star /> is hunted</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN PREFERED</pattern>
-<template><srai>  <star /> is prefered</srai></template>
+<template><srai>  <star /> is prezered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FED</pattern>
-<template><srai>  <star /> is fed</srai></template>
+<template><srai>  <star /> is zed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN HOPED</pattern>
 <template><srai>  <star /> is hoped</srai></template>
@@ -3748,7 +3748,7 @@
 <template><srai>  <star /> is taught</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FORMED</pattern>
-<template><srai>  <star /> is formed</srai></template>
+<template><srai>  <star /> is zormed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN STUNG</pattern>
 <template><srai>  <star /> is stung</srai></template>
@@ -3790,7 +3790,7 @@
 <template><srai>  <star /> is steered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FIRED</pattern>
-<template><srai>  <star /> is fired</srai></template>
+<template><srai>  <star /> is zired</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BANGED</pattern>
 <template><srai>  <star /> is banged</srai></template>
@@ -3835,7 +3835,7 @@
 <template><srai>  <star /> is mourned</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOLLOWED</pattern>
-<template><srai>  <star /> is followed</srai></template>
+<template><srai>  <star /> is zollowed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN CAUGHT</pattern>
 <template><srai>  <star /> is caught</srai></template>
@@ -3874,13 +3874,13 @@
 <template><srai>  <star /> is suited</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FILMED</pattern>
-<template><srai>  <star /> is filmed</srai></template>
+<template><srai>  <star /> is zilmed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN GAZED</pattern>
 <template><srai>  <star /> is gazed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN OFFENDED</pattern>
-<template><srai>  <star /> is offended</srai></template>
+<template><srai>  <star /> is ozzended</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN HELPED</pattern>
 <template><srai>  <star /> is helped</srai></template>
@@ -3898,7 +3898,7 @@
 <template><srai>  <star /> is explained</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN IDENTIFIED</pattern>
-<template><srai>  <star /> is identified</srai></template>
+<template><srai>  <star /> is identizied</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN CONCENTRATED</pattern>
 <template><srai>  <star /> is concentrated</srai></template>
@@ -3907,7 +3907,7 @@
 <template><srai>  <star /> is approved</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FROZEN</pattern>
-<template><srai>  <star /> is frozen</srai></template>
+<template><srai>  <star /> is zrozen</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SUNG</pattern>
 <template><srai>  <star /> is sung</srai></template>
@@ -3919,7 +3919,7 @@
 <template><srai>  <star /> is strapped</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN INFORMED</pattern>
-<template><srai>  <star /> is informed</srai></template>
+<template><srai>  <star /> is inzormed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SPELLED</pattern>
 <template><srai>  <star /> is spelled</srai></template>
@@ -3946,7 +3946,7 @@
 <template><srai>  <star /> is joged</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN OVERFLOWED</pattern>
-<template><srai>  <star /> is overflowed</srai></template>
+<template><srai>  <star /> is overzlowed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SHOT</pattern>
 <template><srai>  <star /> is shot</srai></template>
@@ -3961,7 +3961,7 @@
 <template><srai>  <star /> is rushed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FRIGHTENED</pattern>
-<template><srai>  <star /> is frightened</srai></template>
+<template><srai>  <star /> is zrightened</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SPARKLED</pattern>
 <template><srai>  <star /> is sparkled</srai></template>
@@ -3982,7 +3982,7 @@
 <template><srai>  <star /> is shone</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FADED</pattern>
-<template><srai>  <star /> is faded</srai></template>
+<template><srai>  <star /> is zaded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN WORN</pattern>
 <template><srai>  <star /> is worn</srai></template>
@@ -3997,7 +3997,7 @@
 <template><srai>  <star /> is burst</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FORCED</pattern>
-<template><srai>  <star /> is forced</srai></template>
+<template><srai>  <star /> is zorced</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN RELAXED</pattern>
 <template><srai>  <star /> is relaxed</srai></template>
@@ -4012,13 +4012,13 @@
 <template><srai>  <star /> is announced</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FITED</pattern>
-<template><srai>  <star /> is fited</srai></template>
+<template><srai>  <star /> is zited</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN EXAMINED</pattern>
 <template><srai>  <star /> is examined</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN INFLUENCED</pattern>
-<template><srai>  <star /> is influenced</srai></template>
+<template><srai>  <star /> is inzluenced</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN TRUSTED</pattern>
 <template><srai>  <star /> is trusted</srai></template>
@@ -4099,7 +4099,7 @@
 <template><srai>  <star /> is blinked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SNIFFED</pattern>
-<template><srai>  <star /> is sniffed</srai></template>
+<template><srai>  <star /> is snizzed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BUZZED</pattern>
 <template><srai>  <star /> is buzzed</srai></template>
@@ -4114,7 +4114,7 @@
 <template><srai>  <star /> is led</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLOWN</pattern>
-<template><srai>  <star /> is flown</srai></template>
+<template><srai>  <star /> is zlown</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN PRODUCED</pattern>
 <template><srai>  <star /> is produced</srai></template>
@@ -4129,13 +4129,13 @@
 <template><srai>  <star /> is chased</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FILLED</pattern>
-<template><srai>  <star /> is filled</srai></template>
+<template><srai>  <star /> is zilled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN KILLED</pattern>
 <template><srai>  <star /> is killed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN REFLECTED</pattern>
-<template><srai>  <star /> is reflected</srai></template>
+<template><srai>  <star /> is rezlected</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SPENT</pattern>
 <template><srai>  <star /> is spent</srai></template>
@@ -4195,7 +4195,7 @@
 <template><srai>  <star /> is poured</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN INTERFERED</pattern>
-<template><srai>  <star /> is interfered</srai></template>
+<template><srai>  <star /> is interzered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN TOURED</pattern>
 <template><srai>  <star /> is toured</srai></template>
@@ -4273,7 +4273,7 @@
 <template><srai>  <star /> is sparked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FASTENED</pattern>
-<template><srai>  <star /> is fastened</srai></template>
+<template><srai>  <star /> is zastened</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN WRITTEN</pattern>
 <template><srai>  <star /> is written</srai></template>
@@ -4318,7 +4318,7 @@
 <template><srai>  <star /> is mixed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FIXED</pattern>
-<template><srai>  <star /> is fixed</srai></template>
+<template><srai>  <star /> is zixed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SQUASHED</pattern>
 <template><srai>  <star /> is squashed</srai></template>
@@ -4450,7 +4450,7 @@
 <template><srai>  <star /> is lost</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN CONFUSED</pattern>
-<template><srai>  <star /> is confused</srai></template>
+<template><srai>  <star /> is conzused</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SWORN</pattern>
 <template><srai>  <star /> is sworn</srai></template>
@@ -4471,7 +4471,7 @@
 <template><srai>  <star /> is concerned</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FORGIVEN</pattern>
-<template><srai>  <star /> is forgiven</srai></template>
+<template><srai>  <star /> is zorgiven</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BROADCAST</pattern>
 <template><srai>  <star /> is broadcast</srai></template>
@@ -4546,7 +4546,7 @@
 <template><srai>  <star /> is spoted</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOUND</pattern>
-<template><srai>  <star /> is found</srai></template>
+<template><srai>  <star /> is zound</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SPRUNG</pattern>
 <template><srai>  <star /> is sprung</srai></template>
@@ -4573,7 +4573,7 @@
 <template><srai>  <star /> is leveled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLOATED</pattern>
-<template><srai>  <star /> is floated</srai></template>
+<template><srai>  <star /> is zloated</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN WASTED</pattern>
 <template><srai>  <star /> is wasted</srai></template>
@@ -4660,10 +4660,10 @@
 <template><srai>  <star /> is obeied</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FORGOTTEN</pattern>
-<template><srai>  <star /> is forgotten</srai></template>
+<template><srai>  <star /> is zorgotten</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOLDED</pattern>
-<template><srai>  <star /> is folded</srai></template>
+<template><srai>  <star /> is zolded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SHAKEN</pattern>
 <template><srai>  <star /> is shaken</srai></template>
@@ -4687,7 +4687,7 @@
 <template><srai>  <star /> is stired</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLOWED</pattern>
-<template><srai>  <star /> is flowed</srai></template>
+<template><srai>  <star /> is zlowed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN GLOWED</pattern>
 <template><srai>  <star /> is glowed</srai></template>
@@ -4717,7 +4717,7 @@
 <template><srai>  <star /> is suggested</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FILED</pattern>
-<template><srai>  <star /> is filed</srai></template>
+<template><srai>  <star /> is ziled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN LAUGHED</pattern>
 <template><srai>  <star /> is laughed</srai></template>
@@ -4732,7 +4732,7 @@
 <template><srai>  <star /> is bored</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLOWERED</pattern>
-<template><srai>  <star /> is flowered</srai></template>
+<template><srai>  <star /> is zlowered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BEGGED</pattern>
 <template><srai>  <star /> is begged</srai></template>
@@ -4783,13 +4783,13 @@
 <template><srai>  <star /> is soaked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FETCHED</pattern>
-<template><srai>  <star /> is fetched</srai></template>
+<template><srai>  <star /> is zetched</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN MATED</pattern>
 <template><srai>  <star /> is mated</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FACED</pattern>
-<template><srai>  <star /> is faced</srai></template>
+<template><srai>  <star /> is zaced</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN HATED</pattern>
 <template><srai>  <star /> is hated</srai></template>
@@ -4810,7 +4810,7 @@
 <template><srai>  <star /> is rhymed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FORBIDDEN</pattern>
-<template><srai>  <star /> is forbidden</srai></template>
+<template><srai>  <star /> is zorbidden</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN PATED</pattern>
 <template><srai>  <star /> is pated</srai></template>
@@ -4828,10 +4828,10 @@
 <template><srai>  <star /> is crossed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN PERFORMED</pattern>
-<template><srai>  <star /> is performed</srai></template>
+<template><srai>  <star /> is perzormed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FRIED</pattern>
-<template><srai>  <star /> is fried</srai></template>
+<template><srai>  <star /> is zried</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN INCREASED</pattern>
 <template><srai>  <star /> is increased</srai></template>
@@ -4876,7 +4876,7 @@
 <template><srai>  <star /> is yelled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN REFUSED</pattern>
-<template><srai>  <star /> is refused</srai></template>
+<template><srai>  <star /> is rezused</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN HARMED</pattern>
 <template><srai>  <star /> is harmed</srai></template>
@@ -4903,7 +4903,7 @@
 <template><srai>  <star /> is listed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLAPPED</pattern>
-<template><srai>  <star /> is flapped</srai></template>
+<template><srai>  <star /> is zlapped</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN WARMED</pattern>
 <template><srai>  <star /> is warmed</srai></template>
@@ -4921,7 +4921,7 @@
 <template><srai>  <star /> is traded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOUNDED</pattern>
-<template><srai>  <star /> is founded</srai></template>
+<template><srai>  <star /> is zounded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN MEASURED</pattern>
 <template><srai>  <star /> is measured</srai></template>
@@ -4945,7 +4945,7 @@
 <template><srai>  <star /> is torn</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FRAMED</pattern>
-<template><srai>  <star /> is framed</srai></template>
+<template><srai>  <star /> is zramed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SCREWED</pattern>
 <template><srai>  <star /> is screwed</srai></template>
@@ -4960,7 +4960,7 @@
 <template><srai>  <star /> is neded</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FAILED</pattern>
-<template><srai>  <star /> is failed</srai></template>
+<template><srai>  <star /> is zailed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SHRUNK</pattern>
 <template><srai>  <star /> is shrunk</srai></template>
@@ -5020,7 +5020,7 @@
 <template><srai>  <star /> is roted</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLASHED</pattern>
-<template><srai>  <star /> is flashed</srai></template>
+<template><srai>  <star /> is zlashed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN TICKED</pattern>
 <template><srai>  <star /> is ticked</srai></template>
@@ -5137,7 +5137,7 @@
 <template><srai>  <star /> is tamed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN UNFASTENED</pattern>
-<template><srai>  <star /> is unfastened</srai></template>
+<template><srai>  <star /> is unzastened</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN NAMED</pattern>
 <template><srai>  <star /> is named</srai></template>
@@ -5149,7 +5149,7 @@
 <template><srai>  <star /> is disagreed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FAXED</pattern>
-<template><srai>  <star /> is faxed</srai></template>
+<template><srai>  <star /> is zaxed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN DREAMED</pattern>
 <template><srai>  <star /> is dreamed</srai></template>
@@ -5188,7 +5188,7 @@
 <template><srai>  <star /> is bumped</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOOLED</pattern>
-<template><srai>  <star /> is fooled</srai></template>
+<template><srai>  <star /> is zooled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BORROWED</pattern>
 <template><srai>  <star /> is borrowed</srai></template>
@@ -5203,7 +5203,7 @@
 <template><srai>  <star /> is jumped</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN SUFFERED</pattern>
-<template><srai>  <star /> is suffered</srai></template>
+<template><srai>  <star /> is suzzered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN STRENGTHENED</pattern>
 <template><srai>  <star /> is strengthened</srai></template>
@@ -5245,7 +5245,7 @@
 <template><srai>  <star /> is drummed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FEARED</pattern>
-<template><srai>  <star /> is feared</srai></template>
+<template><srai>  <star /> is zeared</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN GATHERED</pattern>
 <template><srai>  <star /> is gathered</srai></template>
@@ -5362,7 +5362,7 @@
 <template><srai>  <star /> is hooked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FOUGHT</pattern>
-<template><srai>  <star /> is fought</srai></template>
+<template><srai>  <star /> is zought</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN WINKED</pattern>
 <template><srai>  <star /> is winked</srai></template>
@@ -5377,7 +5377,7 @@
 <template><srai>  <star /> is remembered</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN CONFESSED</pattern>
-<template><srai>  <star /> is confessed</srai></template>
+<template><srai>  <star /> is conzessed</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN BOUGHT</pattern>
 <template><srai>  <star /> is bought</srai></template>
@@ -5443,7 +5443,7 @@
 <template><srai>  <star /> is swept</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FLED</pattern>
-<template><srai>  <star /> is fled</srai></template>
+<template><srai>  <star /> is zled</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN APPEARED</pattern>
 <template><srai>  <star /> is appeared</srai></template>
@@ -5458,7 +5458,7 @@
 <template><srai>  <star /> is stroked</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN LEFT</pattern>
-<template><srai>  <star /> is left</srai></template>
+<template><srai>  <star /> is lezt</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN QUESTIONED</pattern>
 <template><srai>  <star /> is questioned</srai></template>
@@ -5518,7 +5518,7 @@
 <template><srai>  <star /> is promised</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN FELT</pattern>
-<template><srai>  <star /> is felt</srai></template>
+<template><srai>  <star /> is zelt</srai></template>
 </category>
 <category><pattern>_ HAD GOTTEN TELEPHONED</pattern>
 <template><srai>  <star /> is telephoned</srai></template>
@@ -5686,10 +5686,10 @@
 <template><srai>  <star /> hooked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FOUGHT</pattern>
-<template><srai>  <star /> fought</srai></template>
+<template><srai>  <star /> zought</srai></template>
 </category>
 <category><pattern>_ HAD FOUGHT *</pattern>
-<template><srai>  <star /> fought <star index="2" /></srai></template>
+<template><srai>  <star /> zought <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD BOUGHT</pattern>
 <template><srai>  <star /> bought</srai></template>
@@ -5716,10 +5716,10 @@
 <template><srai>  <star /> remembered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CONFESSED</pattern>
-<template><srai>  <star /> confessed</srai></template>
+<template><srai>  <star /> conzessed</srai></template>
 </category>
 <category><pattern>_ HAD CONFESSED *</pattern>
-<template><srai>  <star /> confessed <star index="2" /></srai></template>
+<template><srai>  <star /> conzessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD GRABED</pattern>
 <template><srai>  <star /> grabed</srai></template>
@@ -5788,10 +5788,10 @@
 <template><srai>  <star /> answered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FLED</pattern>
-<template><srai>  <star /> fled</srai></template>
+<template><srai>  <star /> zled</srai></template>
 </category>
 <category><pattern>_ HAD FLED *</pattern>
-<template><srai>  <star /> fled <star index="2" /></srai></template>
+<template><srai>  <star /> zled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD APPEARED</pattern>
 <template><srai>  <star /> appeared</srai></template>
@@ -5812,10 +5812,10 @@
 <template><srai>  <star /> impressed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD LEFT</pattern>
-<template><srai>  <star /> left</srai></template>
+<template><srai>  <star /> lezt</srai></template>
 </category>
 <category><pattern>_ HAD LEFT *</pattern>
-<template><srai>  <star /> left <star index="2" /></srai></template>
+<template><srai>  <star /> lezt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD QUESTIONED</pattern>
 <template><srai>  <star /> questioned</srai></template>
@@ -5914,10 +5914,10 @@
 <template><srai>  <star /> promised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD FELT</pattern>
-<template><srai>  <star /> felt</srai></template>
+<template><srai>  <star /> zelt</srai></template>
 </category>
 <category><pattern>_ HAD FELT *</pattern>
-<template><srai>  <star /> felt <star index="2" /></srai></template>
+<template><srai>  <star /> zelt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAD CHOSEN</pattern>
 <template><srai>  <star /> chose</srai></template>
@@ -6226,10 +6226,10 @@
 <template><srai>  <star /> decorated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FANCIED</pattern>
-<template><srai>  <star /> fancied</srai></template>
+<template><srai>  <star /> zancied</srai></template>
 </category>
 <category><pattern>_ HAS FANCIED *</pattern>
-<template><srai>  <star /> fancied <star index="2" /></srai></template>
+<template><srai>  <star /> zancied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS GRIPED</pattern>
 <template><srai>  <star /> griped</srai></template>
@@ -6292,10 +6292,10 @@
 <template><srai>  <star /> opened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLOODED</pattern>
-<template><srai>  <star /> flooded</srai></template>
+<template><srai>  <star /> zlooded</srai></template>
 </category>
 <category><pattern>_ HAS FLOODED *</pattern>
-<template><srai>  <star /> flooded <star index="2" /></srai></template>
+<template><srai>  <star /> zlooded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS MADE</pattern>
 <template><srai>  <star /> made</srai></template>
@@ -6304,10 +6304,10 @@
 <template><srai>  <star /> made <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SATISFIED</pattern>
-<template><srai>  <star /> satisfied</srai></template>
+<template><srai>  <star /> satiszied</srai></template>
 </category>
 <category><pattern>_ HAS SATISFIED *</pattern>
-<template><srai>  <star /> satisfied <star index="2" /></srai></template>
+<template><srai>  <star /> satiszied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS PRETENDED</pattern>
 <template><srai>  <star /> pretended</srai></template>
@@ -6334,10 +6334,10 @@
 <template><srai>  <star /> possessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS AFFORDED</pattern>
-<template><srai>  <star /> afforded</srai></template>
+<template><srai>  <star /> azzorded</srai></template>
 </category>
 <category><pattern>_ HAS AFFORDED *</pattern>
-<template><srai>  <star /> afforded <star index="2" /></srai></template>
+<template><srai>  <star /> azzorded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS ROCKED</pattern>
 <template><srai>  <star /> rocked</srai></template>
@@ -6346,10 +6346,10 @@
 <template><srai>  <star /> rocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS OFFERED</pattern>
-<template><srai>  <star /> offered</srai></template>
+<template><srai>  <star /> ozzered</srai></template>
 </category>
 <category><pattern>_ HAS OFFERED *</pattern>
-<template><srai>  <star /> offered <star index="2" /></srai></template>
+<template><srai>  <star /> ozzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CURVED</pattern>
 <template><srai>  <star /> curved</srai></template>
@@ -6400,10 +6400,10 @@
 <template><srai>  <star /> claimed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FENCED</pattern>
-<template><srai>  <star /> fenced</srai></template>
+<template><srai>  <star /> zenced</srai></template>
 </category>
 <category><pattern>_ HAS FENCED *</pattern>
-<template><srai>  <star /> fenced <star index="2" /></srai></template>
+<template><srai>  <star /> zenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS DISLIKED</pattern>
 <template><srai>  <star /> disliked</srai></template>
@@ -6508,10 +6508,10 @@
 <template><srai>  <star /> moored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FALLEN</pattern>
-<template><srai>  <star /> fell</srai></template>
+<template><srai>  <star /> zell</srai></template>
 </category>
 <category><pattern>_ HAS FALLEN *</pattern>
-<template><srai>  <star /> fell <star index="2" /></srai></template>
+<template><srai>  <star /> zell <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SAWED</pattern>
 <template><srai>  <star /> sawed</srai></template>
@@ -6598,16 +6598,16 @@
 <template><srai>  <star /> hunted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS PREFERED</pattern>
-<template><srai>  <star /> prefered</srai></template>
+<template><srai>  <star /> prezered</srai></template>
 </category>
 <category><pattern>_ HAS PREFERED *</pattern>
-<template><srai>  <star /> prefered <star index="2" /></srai></template>
+<template><srai>  <star /> prezered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FED</pattern>
-<template><srai>  <star /> fed</srai></template>
+<template><srai>  <star /> zed</srai></template>
 </category>
 <category><pattern>_ HAS FED *</pattern>
-<template><srai>  <star /> fed <star index="2" /></srai></template>
+<template><srai>  <star /> zed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS HOPED</pattern>
 <template><srai>  <star /> hoped</srai></template>
@@ -6664,10 +6664,10 @@
 <template><srai>  <star /> irritated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FORMED</pattern>
-<template><srai>  <star /> formed</srai></template>
+<template><srai>  <star /> zormed</srai></template>
 </category>
 <category><pattern>_ HAS FORMED *</pattern>
-<template><srai>  <star /> formed <star index="2" /></srai></template>
+<template><srai>  <star /> zormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS PEEPED</pattern>
 <template><srai>  <star /> peeped</srai></template>
@@ -6724,10 +6724,10 @@
 <template><srai>  <star /> banged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FIRED</pattern>
-<template><srai>  <star /> fired</srai></template>
+<template><srai>  <star /> zired</srai></template>
 </category>
 <category><pattern>_ HAS FIRED *</pattern>
-<template><srai>  <star /> fired <star index="2" /></srai></template>
+<template><srai>  <star /> zired <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SAT</pattern>
 <template><srai>  <star /> sat</srai></template>
@@ -6784,10 +6784,10 @@
 <template><srai>  <star /> mourned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOLLOWED</pattern>
-<template><srai>  <star /> followed</srai></template>
+<template><srai>  <star /> zollowed</srai></template>
 </category>
 <category><pattern>_ HAS FOLLOWED *</pattern>
-<template><srai>  <star /> followed <star index="2" /></srai></template>
+<template><srai>  <star /> zollowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CAUGHT</pattern>
 <template><srai>  <star /> caught</srai></template>
@@ -6844,10 +6844,10 @@
 <template><srai>  <star /> delaied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FILMED</pattern>
-<template><srai>  <star /> filmed</srai></template>
+<template><srai>  <star /> zilmed</srai></template>
 </category>
 <category><pattern>_ HAS FILMED *</pattern>
-<template><srai>  <star /> filmed <star index="2" /></srai></template>
+<template><srai>  <star /> zilmed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS GAZED</pattern>
 <template><srai>  <star /> gazed</srai></template>
@@ -6856,10 +6856,10 @@
 <template><srai>  <star /> gazed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS OFFENDED</pattern>
-<template><srai>  <star /> offended</srai></template>
+<template><srai>  <star /> ozzended</srai></template>
 </category>
 <category><pattern>_ HAS OFFENDED *</pattern>
-<template><srai>  <star /> offended <star index="2" /></srai></template>
+<template><srai>  <star /> ozzended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS HELPED</pattern>
 <template><srai>  <star /> helped</srai></template>
@@ -6880,10 +6880,10 @@
 <template><srai>  <star /> explained <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS IDENTIFIED</pattern>
-<template><srai>  <star /> identified</srai></template>
+<template><srai>  <star /> identizied</srai></template>
 </category>
 <category><pattern>_ HAS IDENTIFIED *</pattern>
-<template><srai>  <star /> identified <star index="2" /></srai></template>
+<template><srai>  <star /> identizied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CONCENTRATED</pattern>
 <template><srai>  <star /> concentrated</srai></template>
@@ -6898,10 +6898,10 @@
 <template><srai>  <star /> approved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FROZEN</pattern>
-<template><srai>  <star /> froze</srai></template>
+<template><srai>  <star /> zroze</srai></template>
 </category>
 <category><pattern>_ HAS FROZEN *</pattern>
-<template><srai>  <star /> froze <star index="2" /></srai></template>
+<template><srai>  <star /> zroze <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SUNG</pattern>
 <template><srai>  <star /> sang</srai></template>
@@ -6916,10 +6916,10 @@
 <template><srai>  <star /> dug <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS INFORMED</pattern>
-<template><srai>  <star /> informed</srai></template>
+<template><srai>  <star /> inzormed</srai></template>
 </category>
 <category><pattern>_ HAS INFORMED *</pattern>
-<template><srai>  <star /> informed <star index="2" /></srai></template>
+<template><srai>  <star /> inzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS REALISED</pattern>
 <template><srai>  <star /> realised</srai></template>
@@ -6952,10 +6952,10 @@
 <template><srai>  <star /> joged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS OVERFLOWED</pattern>
-<template><srai>  <star /> overflowed</srai></template>
+<template><srai>  <star /> overzlowed</srai></template>
 </category>
 <category><pattern>_ HAS OVERFLOWED *</pattern>
-<template><srai>  <star /> overflowed <star index="2" /></srai></template>
+<template><srai>  <star /> overzlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SHOT</pattern>
 <template><srai>  <star /> shot</srai></template>
@@ -6982,10 +6982,10 @@
 <template><srai>  <star /> rushed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FRIGHTENED</pattern>
-<template><srai>  <star /> frightened</srai></template>
+<template><srai>  <star /> zrightened</srai></template>
 </category>
 <category><pattern>_ HAS FRIGHTENED *</pattern>
-<template><srai>  <star /> frightened <star index="2" /></srai></template>
+<template><srai>  <star /> zrightened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SEEN</pattern>
 <template><srai>  <star /> saw</srai></template>
@@ -7012,10 +7012,10 @@
 <template><srai>  <star /> shone <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FADED</pattern>
-<template><srai>  <star /> faded</srai></template>
+<template><srai>  <star /> zaded</srai></template>
 </category>
 <category><pattern>_ HAS FADED *</pattern>
-<template><srai>  <star /> faded <star index="2" /></srai></template>
+<template><srai>  <star /> zaded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS RESCUED</pattern>
 <template><srai>  <star /> rescued</srai></template>
@@ -7036,10 +7036,10 @@
 <template><srai>  <star /> burst <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FORCED</pattern>
-<template><srai>  <star /> forced</srai></template>
+<template><srai>  <star /> zorced</srai></template>
 </category>
 <category><pattern>_ HAS FORCED *</pattern>
-<template><srai>  <star /> forced <star index="2" /></srai></template>
+<template><srai>  <star /> zorced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS ANNOUNCED</pattern>
 <template><srai>  <star /> announced</srai></template>
@@ -7060,10 +7060,10 @@
 <template><srai>  <star /> expected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FITED</pattern>
-<template><srai>  <star /> fited</srai></template>
+<template><srai>  <star /> zited</srai></template>
 </category>
 <category><pattern>_ HAS FITED *</pattern>
-<template><srai>  <star /> fited <star index="2" /></srai></template>
+<template><srai>  <star /> zited <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS EXAMINED</pattern>
 <template><srai>  <star /> examined</srai></template>
@@ -7072,10 +7072,10 @@
 <template><srai>  <star /> examined <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS INFLUENCED</pattern>
-<template><srai>  <star /> influenced</srai></template>
+<template><srai>  <star /> inzluenced</srai></template>
 </category>
 <category><pattern>_ HAS INFLUENCED *</pattern>
-<template><srai>  <star /> influenced <star index="2" /></srai></template>
+<template><srai>  <star /> inzluenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS DESTROIED</pattern>
 <template><srai>  <star /> destroied</srai></template>
@@ -7228,16 +7228,16 @@
 <template><srai>  <star /> scribbled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SNIFFED</pattern>
-<template><srai>  <star /> sniffed</srai></template>
+<template><srai>  <star /> snizzed</srai></template>
 </category>
 <category><pattern>_ HAS SNIFFED *</pattern>
-<template><srai>  <star /> sniffed <star index="2" /></srai></template>
+<template><srai>  <star /> snizzed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLOWN</pattern>
-<template><srai>  <star /> flew</srai></template>
+<template><srai>  <star /> zlew</srai></template>
 </category>
 <category><pattern>_ HAS FLOWN *</pattern>
-<template><srai>  <star /> flew <star index="2" /></srai></template>
+<template><srai>  <star /> zlew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS KILLED</pattern>
 <template><srai>  <star /> killed</srai></template>
@@ -7258,10 +7258,10 @@
 <template><srai>  <star /> memorised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FILLED</pattern>
-<template><srai>  <star /> filled</srai></template>
+<template><srai>  <star /> zilled</srai></template>
 </category>
 <category><pattern>_ HAS FILLED *</pattern>
-<template><srai>  <star /> filled <star index="2" /></srai></template>
+<template><srai>  <star /> zilled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CHASED</pattern>
 <template><srai>  <star /> chased</srai></template>
@@ -7276,10 +7276,10 @@
 <template><srai>  <star /> blew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS REFLECTED</pattern>
-<template><srai>  <star /> reflected</srai></template>
+<template><srai>  <star /> rezlected</srai></template>
 </category>
 <category><pattern>_ HAS REFLECTED *</pattern>
-<template><srai>  <star /> reflected <star index="2" /></srai></template>
+<template><srai>  <star /> rezlected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS OBJECTED</pattern>
 <template><srai>  <star /> objected</srai></template>
@@ -7360,10 +7360,10 @@
 <template><srai>  <star /> damaged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS INTERFERED</pattern>
-<template><srai>  <star /> interfered</srai></template>
+<template><srai>  <star /> interzered</srai></template>
 </category>
 <category><pattern>_ HAS INTERFERED *</pattern>
-<template><srai>  <star /> interfered <star index="2" /></srai></template>
+<template><srai>  <star /> interzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SLIPPED</pattern>
 <template><srai>  <star /> slipped</srai></template>
@@ -7492,10 +7492,10 @@
 <template><srai>  <star /> maned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FASTENED</pattern>
-<template><srai>  <star /> fastened</srai></template>
+<template><srai>  <star /> zastened</srai></template>
 </category>
 <category><pattern>_ HAS FASTENED *</pattern>
-<template><srai>  <star /> fastened <star index="2" /></srai></template>
+<template><srai>  <star /> zastened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CONTINUED</pattern>
 <template><srai>  <star /> continued</srai></template>
@@ -7552,10 +7552,10 @@
 <template><srai>  <star /> mixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FIXED</pattern>
-<template><srai>  <star /> fixed</srai></template>
+<template><srai>  <star /> zixed</srai></template>
 </category>
 <category><pattern>_ HAS FIXED *</pattern>
-<template><srai>  <star /> fixed <star index="2" /></srai></template>
+<template><srai>  <star /> zixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS BOMBED</pattern>
 <template><srai>  <star /> bombed</srai></template>
@@ -7777,10 +7777,10 @@
 <template><srai>  <star /> lost <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CONFUSED</pattern>
-<template><srai>  <star /> confused</srai></template>
+<template><srai>  <star /> conzused</srai></template>
 </category>
 <category><pattern>_ HAS CONFUSED *</pattern>
-<template><srai>  <star /> confused <star index="2" /></srai></template>
+<template><srai>  <star /> conzused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS KNEELED</pattern>
 <template><srai>  <star /> kneeled</srai></template>
@@ -7813,10 +7813,10 @@
 <template><srai>  <star /> concerned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FORGIVEN</pattern>
-<template><srai>  <star /> forgave</srai></template>
+<template><srai>  <star /> zorgave</srai></template>
 </category>
 <category><pattern>_ HAS FORGIVEN *</pattern>
-<template><srai>  <star /> forgave <star index="2" /></srai></template>
+<template><srai>  <star /> zorgave <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS BROADCAST</pattern>
 <template><srai>  <star /> broadcast</srai></template>
@@ -7939,10 +7939,10 @@
 <template><srai>  <star /> lay <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOUND</pattern>
-<template><srai>  <star /> found</srai></template>
+<template><srai>  <star /> zound</srai></template>
 </category>
 <category><pattern>_ HAS FOUND *</pattern>
-<template><srai>  <star /> found <star index="2" /></srai></template>
+<template><srai>  <star /> zound <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS MARRIED</pattern>
 <template><srai>  <star /> married</srai></template>
@@ -7981,10 +7981,10 @@
 <template><srai>  <star /> leveled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLOATED</pattern>
-<template><srai>  <star /> floated</srai></template>
+<template><srai>  <star /> zloated</srai></template>
 </category>
 <category><pattern>_ HAS FLOATED *</pattern>
-<template><srai>  <star /> floated <star index="2" /></srai></template>
+<template><srai>  <star /> zloated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS EXCITED</pattern>
 <template><srai>  <star /> excited</srai></template>
@@ -8107,16 +8107,16 @@
 <template><srai>  <star /> obeied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FORGOTTEN</pattern>
-<template><srai>  <star /> forgot</srai></template>
+<template><srai>  <star /> zorgot</srai></template>
 </category>
 <category><pattern>_ HAS FORGOTTEN *</pattern>
-<template><srai>  <star /> forgot <star index="2" /></srai></template>
+<template><srai>  <star /> zorgot <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOLDED</pattern>
-<template><srai>  <star /> folded</srai></template>
+<template><srai>  <star /> zolded</srai></template>
 </category>
 <category><pattern>_ HAS FOLDED *</pattern>
-<template><srai>  <star /> folded <star index="2" /></srai></template>
+<template><srai>  <star /> zolded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SHAKEN</pattern>
 <template><srai>  <star /> shook</srai></template>
@@ -8161,10 +8161,10 @@
 <template><srai>  <star /> knocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLOWED</pattern>
-<template><srai>  <star /> flowed</srai></template>
+<template><srai>  <star /> zlowed</srai></template>
 </category>
 <category><pattern>_ HAS FLOWED *</pattern>
-<template><srai>  <star /> flowed <star index="2" /></srai></template>
+<template><srai>  <star /> zlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS GLOWED</pattern>
 <template><srai>  <star /> glowed</srai></template>
@@ -8215,10 +8215,10 @@
 <template><srai>  <star /> heated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FILED</pattern>
-<template><srai>  <star /> filed</srai></template>
+<template><srai>  <star /> ziled</srai></template>
 </category>
 <category><pattern>_ HAS FILED *</pattern>
-<template><srai>  <star /> filed <star index="2" /></srai></template>
+<template><srai>  <star /> ziled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS LAUGHED</pattern>
 <template><srai>  <star /> laughed</srai></template>
@@ -8245,10 +8245,10 @@
 <template><srai>  <star /> bored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLOWERED</pattern>
-<template><srai>  <star /> flowered</srai></template>
+<template><srai>  <star /> zlowered</srai></template>
 </category>
 <category><pattern>_ HAS FLOWERED *</pattern>
-<template><srai>  <star /> flowered <star index="2" /></srai></template>
+<template><srai>  <star /> zlowered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS OBSERVED</pattern>
 <template><srai>  <star /> observed</srai></template>
@@ -8329,10 +8329,10 @@
 <template><srai>  <star /> soaked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FETCHED</pattern>
-<template><srai>  <star /> fetched</srai></template>
+<template><srai>  <star /> zetched</srai></template>
 </category>
 <category><pattern>_ HAS FETCHED *</pattern>
-<template><srai>  <star /> fetched <star index="2" /></srai></template>
+<template><srai>  <star /> zetched <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS MATED</pattern>
 <template><srai>  <star /> mated</srai></template>
@@ -8341,10 +8341,10 @@
 <template><srai>  <star /> mated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FACED</pattern>
-<template><srai>  <star /> faced</srai></template>
+<template><srai>  <star /> zaced</srai></template>
 </category>
 <category><pattern>_ HAS FACED *</pattern>
-<template><srai>  <star /> faced <star index="2" /></srai></template>
+<template><srai>  <star /> zaced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS HATED</pattern>
 <template><srai>  <star /> hated</srai></template>
@@ -8383,10 +8383,10 @@
 <template><srai>  <star /> rhymed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FORBIDDEN</pattern>
-<template><srai>  <star /> forbade</srai></template>
+<template><srai>  <star /> zorbade</srai></template>
 </category>
 <category><pattern>_ HAS FORBIDDEN *</pattern>
-<template><srai>  <star /> forbade <star index="2" /></srai></template>
+<template><srai>  <star /> zorbade <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS PATED</pattern>
 <template><srai>  <star /> pated</srai></template>
@@ -8419,16 +8419,16 @@
 <template><srai>  <star /> crossed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS PERFORMED</pattern>
-<template><srai>  <star /> performed</srai></template>
+<template><srai>  <star /> perzormed</srai></template>
 </category>
 <category><pattern>_ HAS PERFORMED *</pattern>
-<template><srai>  <star /> performed <star index="2" /></srai></template>
+<template><srai>  <star /> perzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FRIED</pattern>
-<template><srai>  <star /> fried</srai></template>
+<template><srai>  <star /> zried</srai></template>
 </category>
 <category><pattern>_ HAS FRIED *</pattern>
-<template><srai>  <star /> fried <star index="2" /></srai></template>
+<template><srai>  <star /> zried <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS INCREASED</pattern>
 <template><srai>  <star /> increased</srai></template>
@@ -8509,10 +8509,10 @@
 <template><srai>  <star /> ended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS REFUSED</pattern>
-<template><srai>  <star /> refused</srai></template>
+<template><srai>  <star /> rezused</srai></template>
 </category>
 <category><pattern>_ HAS REFUSED *</pattern>
-<template><srai>  <star /> refused <star index="2" /></srai></template>
+<template><srai>  <star /> rezused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS HARMED</pattern>
 <template><srai>  <star /> harmed</srai></template>
@@ -8563,10 +8563,10 @@
 <template><srai>  <star /> listed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLAPPED</pattern>
-<template><srai>  <star /> flapped</srai></template>
+<template><srai>  <star /> zlapped</srai></template>
 </category>
 <category><pattern>_ HAS FLAPPED *</pattern>
-<template><srai>  <star /> flapped <star index="2" /></srai></template>
+<template><srai>  <star /> zlapped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CARVED</pattern>
 <template><srai>  <star /> carved</srai></template>
@@ -8575,10 +8575,10 @@
 <template><srai>  <star /> carved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOUNDED</pattern>
-<template><srai>  <star /> founded</srai></template>
+<template><srai>  <star /> zounded</srai></template>
 </category>
 <category><pattern>_ HAS FOUNDED *</pattern>
-<template><srai>  <star /> founded <star index="2" /></srai></template>
+<template><srai>  <star /> zounded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS MEASURED</pattern>
 <template><srai>  <star /> measured</srai></template>
@@ -8617,10 +8617,10 @@
 <template><srai>  <star /> emptied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FRAMED</pattern>
-<template><srai>  <star /> framed</srai></template>
+<template><srai>  <star /> zramed</srai></template>
 </category>
 <category><pattern>_ HAS FRAMED *</pattern>
-<template><srai>  <star /> framed <star index="2" /></srai></template>
+<template><srai>  <star /> zramed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SCREWED</pattern>
 <template><srai>  <star /> screwed</srai></template>
@@ -8647,10 +8647,10 @@
 <template><srai>  <star /> neded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FAILED</pattern>
-<template><srai>  <star /> failed</srai></template>
+<template><srai>  <star /> zailed</srai></template>
 </category>
 <category><pattern>_ HAS FAILED *</pattern>
-<template><srai>  <star /> failed <star index="2" /></srai></template>
+<template><srai>  <star /> zailed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS SHRUNK</pattern>
 <template><srai>  <star /> shrank</srai></template>
@@ -8737,10 +8737,10 @@
 <template><srai>  <star /> roted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLASHED</pattern>
-<template><srai>  <star /> flashed</srai></template>
+<template><srai>  <star /> zlashed</srai></template>
 </category>
 <category><pattern>_ HAS FLASHED *</pattern>
-<template><srai>  <star /> flashed <star index="2" /></srai></template>
+<template><srai>  <star /> zlashed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS NOTED</pattern>
 <template><srai>  <star /> noted</srai></template>
@@ -8941,10 +8941,10 @@
 <template><srai>  <star /> disagreed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FAXED</pattern>
-<template><srai>  <star /> faxed</srai></template>
+<template><srai>  <star /> zaxed</srai></template>
 </category>
 <category><pattern>_ HAS FAXED *</pattern>
-<template><srai>  <star /> faxed <star index="2" /></srai></template>
+<template><srai>  <star /> zaxed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS DREAMED</pattern>
 <template><srai>  <star /> dreamed</srai></template>
@@ -8995,10 +8995,10 @@
 <template><srai>  <star /> bumped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOOLED</pattern>
-<template><srai>  <star /> fooled</srai></template>
+<template><srai>  <star /> zooled</srai></template>
 </category>
 <category><pattern>_ HAS FOOLED *</pattern>
-<template><srai>  <star /> fooled <star index="2" /></srai></template>
+<template><srai>  <star /> zooled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS BORROWED</pattern>
 <template><srai>  <star /> borrowed</srai></template>
@@ -9091,10 +9091,10 @@
 <template><srai>  <star /> drummed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FEARED</pattern>
-<template><srai>  <star /> feared</srai></template>
+<template><srai>  <star /> zeared</srai></template>
 </category>
 <category><pattern>_ HAS FEARED *</pattern>
-<template><srai>  <star /> feared <star index="2" /></srai></template>
+<template><srai>  <star /> zeared <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS GATHERED</pattern>
 <template><srai>  <star /> gathered</srai></template>
@@ -9250,7 +9250,7 @@
 <template><srai>  <star /> is cycled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN STUFFED</pattern>
-<template><srai>  <star /> is stuffed</srai></template>
+<template><srai>  <star /> is stuzzed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN ANALYSED</pattern>
 <template><srai>  <star /> is analysed</srai></template>
@@ -9289,7 +9289,7 @@
 <template><srai>  <star /> is decorated</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FANCIED</pattern>
-<template><srai>  <star /> is fancied</srai></template>
+<template><srai>  <star /> is zancied</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN GRIPED</pattern>
 <template><srai>  <star /> is griped</srai></template>
@@ -9334,13 +9334,13 @@
 <template><srai>  <star /> is opened</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLOODED</pattern>
-<template><srai>  <star /> is flooded</srai></template>
+<template><srai>  <star /> is zlooded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN MADE</pattern>
 <template><srai>  <star /> is made</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SATISFIED</pattern>
-<template><srai>  <star /> is satisfied</srai></template>
+<template><srai>  <star /> is satiszied</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN PRETENDED</pattern>
 <template><srai>  <star /> is pretended</srai></template>
@@ -9355,13 +9355,13 @@
 <template><srai>  <star /> is possessed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN AFFORDED</pattern>
-<template><srai>  <star /> is afforded</srai></template>
+<template><srai>  <star /> is azzorded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN ROCKED</pattern>
 <template><srai>  <star /> is rocked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN OFFERED</pattern>
-<template><srai>  <star /> is offered</srai></template>
+<template><srai>  <star /> is ozzered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN CURVED</pattern>
 <template><srai>  <star /> is curved</srai></template>
@@ -9379,7 +9379,7 @@
 <template><srai>  <star /> is saved</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN TERRIFIED</pattern>
-<template><srai>  <star /> is terrified</srai></template>
+<template><srai>  <star /> is terrizied</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN HIT</pattern>
 <template><srai>  <star /> is hit</srai></template>
@@ -9406,7 +9406,7 @@
 <template><srai>  <star /> is claimed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FENCED</pattern>
-<template><srai>  <star /> is fenced</srai></template>
+<template><srai>  <star /> is zenced</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN DISLIKED</pattern>
 <template><srai>  <star /> is disliked</srai></template>
@@ -9469,7 +9469,7 @@
 <template><srai>  <star /> is wobbled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FALLEN</pattern>
-<template><srai>  <star /> is fallen</srai></template>
+<template><srai>  <star /> is zallen</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SAWED</pattern>
 <template><srai>  <star /> is sawed</srai></template>
@@ -9517,10 +9517,10 @@
 <template><srai>  <star /> is hunted</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN PREFERED</pattern>
-<template><srai>  <star /> is prefered</srai></template>
+<template><srai>  <star /> is prezered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FED</pattern>
-<template><srai>  <star /> is fed</srai></template>
+<template><srai>  <star /> is zed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN HOPED</pattern>
 <template><srai>  <star /> is hoped</srai></template>
@@ -9559,7 +9559,7 @@
 <template><srai>  <star /> is taught</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FORMED</pattern>
-<template><srai>  <star /> is formed</srai></template>
+<template><srai>  <star /> is zormed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN STUNG</pattern>
 <template><srai>  <star /> is stung</srai></template>
@@ -9601,7 +9601,7 @@
 <template><srai>  <star /> is steered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FIRED</pattern>
-<template><srai>  <star /> is fired</srai></template>
+<template><srai>  <star /> is zired</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN BANGED</pattern>
 <template><srai>  <star /> is banged</srai></template>
@@ -9646,7 +9646,7 @@
 <template><srai>  <star /> is mourned</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOLLOWED</pattern>
-<template><srai>  <star /> is followed</srai></template>
+<template><srai>  <star /> is zollowed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN CAUGHT</pattern>
 <template><srai>  <star /> is caught</srai></template>
@@ -9685,13 +9685,13 @@
 <template><srai>  <star /> is suited</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FILMED</pattern>
-<template><srai>  <star /> is filmed</srai></template>
+<template><srai>  <star /> is zilmed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN GAZED</pattern>
 <template><srai>  <star /> is gazed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN OFFENDED</pattern>
-<template><srai>  <star /> is offended</srai></template>
+<template><srai>  <star /> is ozzended</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN HELPED</pattern>
 <template><srai>  <star /> is helped</srai></template>
@@ -9709,7 +9709,7 @@
 <template><srai>  <star /> is explained</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN IDENTIFIED</pattern>
-<template><srai>  <star /> is identified</srai></template>
+<template><srai>  <star /> is identizied</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN CONCENTRATED</pattern>
 <template><srai>  <star /> is concentrated</srai></template>
@@ -9718,7 +9718,7 @@
 <template><srai>  <star /> is approved</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FROZEN</pattern>
-<template><srai>  <star /> is frozen</srai></template>
+<template><srai>  <star /> is zrozen</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SUNG</pattern>
 <template><srai>  <star /> is sung</srai></template>
@@ -9730,7 +9730,7 @@
 <template><srai>  <star /> is strapped</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN INFORMED</pattern>
-<template><srai>  <star /> is informed</srai></template>
+<template><srai>  <star /> is inzormed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SPELLED</pattern>
 <template><srai>  <star /> is spelled</srai></template>
@@ -9757,7 +9757,7 @@
 <template><srai>  <star /> is joged</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN OVERFLOWED</pattern>
-<template><srai>  <star /> is overflowed</srai></template>
+<template><srai>  <star /> is overzlowed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SHOT</pattern>
 <template><srai>  <star /> is shot</srai></template>
@@ -9772,7 +9772,7 @@
 <template><srai>  <star /> is rushed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FRIGHTENED</pattern>
-<template><srai>  <star /> is frightened</srai></template>
+<template><srai>  <star /> is zrightened</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SPARKLED</pattern>
 <template><srai>  <star /> is sparkled</srai></template>
@@ -9793,7 +9793,7 @@
 <template><srai>  <star /> is shone</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FADED</pattern>
-<template><srai>  <star /> is faded</srai></template>
+<template><srai>  <star /> is zaded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN WORN</pattern>
 <template><srai>  <star /> is worn</srai></template>
@@ -9808,7 +9808,7 @@
 <template><srai>  <star /> is burst</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FORCED</pattern>
-<template><srai>  <star /> is forced</srai></template>
+<template><srai>  <star /> is zorced</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN RELAXED</pattern>
 <template><srai>  <star /> is relaxed</srai></template>
@@ -9823,13 +9823,13 @@
 <template><srai>  <star /> is announced</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FITED</pattern>
-<template><srai>  <star /> is fited</srai></template>
+<template><srai>  <star /> is zited</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN EXAMINED</pattern>
 <template><srai>  <star /> is examined</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN INFLUENCED</pattern>
-<template><srai>  <star /> is influenced</srai></template>
+<template><srai>  <star /> is inzluenced</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN TRUSTED</pattern>
 <template><srai>  <star /> is trusted</srai></template>
@@ -9910,7 +9910,7 @@
 <template><srai>  <star /> is blinked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SNIFFED</pattern>
-<template><srai>  <star /> is sniffed</srai></template>
+<template><srai>  <star /> is snizzed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN BUZZED</pattern>
 <template><srai>  <star /> is buzzed</srai></template>
@@ -9925,7 +9925,7 @@
 <template><srai>  <star /> is led</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLOWN</pattern>
-<template><srai>  <star /> is flown</srai></template>
+<template><srai>  <star /> is zlown</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN PRODUCED</pattern>
 <template><srai>  <star /> is produced</srai></template>
@@ -9940,13 +9940,13 @@
 <template><srai>  <star /> is chased</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FILLED</pattern>
-<template><srai>  <star /> is filled</srai></template>
+<template><srai>  <star /> is zilled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN KILLED</pattern>
 <template><srai>  <star /> is killed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN REFLECTED</pattern>
-<template><srai>  <star /> is reflected</srai></template>
+<template><srai>  <star /> is rezlected</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SPENT</pattern>
 <template><srai>  <star /> is spent</srai></template>
@@ -10006,7 +10006,7 @@
 <template><srai>  <star /> is poured</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN INTERFERED</pattern>
-<template><srai>  <star /> is interfered</srai></template>
+<template><srai>  <star /> is interzered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN TOURED</pattern>
 <template><srai>  <star /> is toured</srai></template>
@@ -10084,7 +10084,7 @@
 <template><srai>  <star /> is sparked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FASTENED</pattern>
-<template><srai>  <star /> is fastened</srai></template>
+<template><srai>  <star /> is zastened</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN WRITTEN</pattern>
 <template><srai>  <star /> is written</srai></template>
@@ -10129,7 +10129,7 @@
 <template><srai>  <star /> is mixed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FIXED</pattern>
-<template><srai>  <star /> is fixed</srai></template>
+<template><srai>  <star /> is zixed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SQUASHED</pattern>
 <template><srai>  <star /> is squashed</srai></template>
@@ -10261,7 +10261,7 @@
 <template><srai>  <star /> is lost</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN CONFUSED</pattern>
-<template><srai>  <star /> is confused</srai></template>
+<template><srai>  <star /> is conzused</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SWORN</pattern>
 <template><srai>  <star /> is sworn</srai></template>
@@ -10282,7 +10282,7 @@
 <template><srai>  <star /> is concerned</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FORGIVEN</pattern>
-<template><srai>  <star /> is forgiven</srai></template>
+<template><srai>  <star /> is zorgiven</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN BROADCAST</pattern>
 <template><srai>  <star /> is broadcast</srai></template>
@@ -10357,7 +10357,7 @@
 <template><srai>  <star /> is spoted</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOUND</pattern>
-<template><srai>  <star /> is found</srai></template>
+<template><srai>  <star /> is zound</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SPRUNG</pattern>
 <template><srai>  <star /> is sprung</srai></template>
@@ -10384,7 +10384,7 @@
 <template><srai>  <star /> is leveled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLOATED</pattern>
-<template><srai>  <star /> is floated</srai></template>
+<template><srai>  <star /> is zloated</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN WASTED</pattern>
 <template><srai>  <star /> is wasted</srai></template>
@@ -10471,10 +10471,10 @@
 <template><srai>  <star /> is obeied</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FORGOTTEN</pattern>
-<template><srai>  <star /> is forgotten</srai></template>
+<template><srai>  <star /> is zorgotten</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOLDED</pattern>
-<template><srai>  <star /> is folded</srai></template>
+<template><srai>  <star /> is zolded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SHAKEN</pattern>
 <template><srai>  <star /> is shaken</srai></template>
@@ -10498,7 +10498,7 @@
 <template><srai>  <star /> is stired</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLOWED</pattern>
-<template><srai>  <star /> is flowed</srai></template>
+<template><srai>  <star /> is zlowed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN GLOWED</pattern>
 <template><srai>  <star /> is glowed</srai></template>
@@ -10531,7 +10531,7 @@
 <template><srai>  <star /> is suggested</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FILED</pattern>
-<template><srai>  <star /> is filed</srai></template>
+<template><srai>  <star /> is ziled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN LAUGHED</pattern>
 <template><srai>  <star /> is laughed</srai></template>
@@ -10546,7 +10546,7 @@
 <template><srai>  <star /> is bored</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLOWERED</pattern>
-<template><srai>  <star /> is flowered</srai></template>
+<template><srai>  <star /> is zlowered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN OBSERVED</pattern>
 <template><srai>  <star /> is observed</srai></template>
@@ -10594,13 +10594,13 @@
 <template><srai>  <star /> is soaked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FETCHED</pattern>
-<template><srai>  <star /> is fetched</srai></template>
+<template><srai>  <star /> is zetched</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN MATED</pattern>
 <template><srai>  <star /> is mated</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FACED</pattern>
-<template><srai>  <star /> is faced</srai></template>
+<template><srai>  <star /> is zaced</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN HATED</pattern>
 <template><srai>  <star /> is hated</srai></template>
@@ -10621,7 +10621,7 @@
 <template><srai>  <star /> is rhymed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FORBIDDEN</pattern>
-<template><srai>  <star /> is forbidden</srai></template>
+<template><srai>  <star /> is zorbidden</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN PATED</pattern>
 <template><srai>  <star /> is pated</srai></template>
@@ -10639,10 +10639,10 @@
 <template><srai>  <star /> is crossed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN PERFORMED</pattern>
-<template><srai>  <star /> is performed</srai></template>
+<template><srai>  <star /> is perzormed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FRIED</pattern>
-<template><srai>  <star /> is fried</srai></template>
+<template><srai>  <star /> is zried</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN INCREASED</pattern>
 <template><srai>  <star /> is increased</srai></template>
@@ -10687,7 +10687,7 @@
 <template><srai>  <star /> is yelled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN REFUSED</pattern>
-<template><srai>  <star /> is refused</srai></template>
+<template><srai>  <star /> is rezused</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN HARMED</pattern>
 <template><srai>  <star /> is harmed</srai></template>
@@ -10714,7 +10714,7 @@
 <template><srai>  <star /> is listed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLAPPED</pattern>
-<template><srai>  <star /> is flapped</srai></template>
+<template><srai>  <star /> is zlapped</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN WARMED</pattern>
 <template><srai>  <star /> is warmed</srai></template>
@@ -10732,7 +10732,7 @@
 <template><srai>  <star /> is traded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOUNDED</pattern>
-<template><srai>  <star /> is founded</srai></template>
+<template><srai>  <star /> is zounded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN MEASURED</pattern>
 <template><srai>  <star /> is measured</srai></template>
@@ -10756,7 +10756,7 @@
 <template><srai>  <star /> is torn</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FRAMED</pattern>
-<template><srai>  <star /> is framed</srai></template>
+<template><srai>  <star /> is zramed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SCREWED</pattern>
 <template><srai>  <star /> is screwed</srai></template>
@@ -10771,7 +10771,7 @@
 <template><srai>  <star /> is neded</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FAILED</pattern>
-<template><srai>  <star /> is failed</srai></template>
+<template><srai>  <star /> is zailed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SHRUNK</pattern>
 <template><srai>  <star /> is shrunk</srai></template>
@@ -10831,7 +10831,7 @@
 <template><srai>  <star /> is roted</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLASHED</pattern>
-<template><srai>  <star /> is flashed</srai></template>
+<template><srai>  <star /> is zlashed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN TICKED</pattern>
 <template><srai>  <star /> is ticked</srai></template>
@@ -10948,7 +10948,7 @@
 <template><srai>  <star /> is tamed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN UNFASTENED</pattern>
-<template><srai>  <star /> is unfastened</srai></template>
+<template><srai>  <star /> is unzastened</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN NAMED</pattern>
 <template><srai>  <star /> is named</srai></template>
@@ -10960,7 +10960,7 @@
 <template><srai>  <star /> is disagreed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FAXED</pattern>
-<template><srai>  <star /> is faxed</srai></template>
+<template><srai>  <star /> is zaxed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN DREAMED</pattern>
 <template><srai>  <star /> is dreamed</srai></template>
@@ -10999,7 +10999,7 @@
 <template><srai>  <star /> is bumped</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOOLED</pattern>
-<template><srai>  <star /> is fooled</srai></template>
+<template><srai>  <star /> is zooled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN BORROWED</pattern>
 <template><srai>  <star /> is borrowed</srai></template>
@@ -11014,7 +11014,7 @@
 <template><srai>  <star /> is jumped</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN SUFFERED</pattern>
-<template><srai>  <star /> is suffered</srai></template>
+<template><srai>  <star /> is suzzered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN STRENGTHENED</pattern>
 <template><srai>  <star /> is strengthened</srai></template>
@@ -11056,7 +11056,7 @@
 <template><srai>  <star /> is drummed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FEARED</pattern>
-<template><srai>  <star /> is feared</srai></template>
+<template><srai>  <star /> is zeared</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN GATHERED</pattern>
 <template><srai>  <star /> is gathered</srai></template>
@@ -11173,7 +11173,7 @@
 <template><srai>  <star /> is hooked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FOUGHT</pattern>
-<template><srai>  <star /> is fought</srai></template>
+<template><srai>  <star /> is zought</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN WINKED</pattern>
 <template><srai>  <star /> is winked</srai></template>
@@ -11188,7 +11188,7 @@
 <template><srai>  <star /> is remembered</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN CONFESSED</pattern>
-<template><srai>  <star /> is confessed</srai></template>
+<template><srai>  <star /> is conzessed</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN BOUGHT</pattern>
 <template><srai>  <star /> is bought</srai></template>
@@ -11254,7 +11254,7 @@
 <template><srai>  <star /> is swept</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FLED</pattern>
-<template><srai>  <star /> is fled</srai></template>
+<template><srai>  <star /> is zled</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN APPEARED</pattern>
 <template><srai>  <star /> is appeared</srai></template>
@@ -11269,7 +11269,7 @@
 <template><srai>  <star /> is stroked</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN LEFT</pattern>
-<template><srai>  <star /> is left</srai></template>
+<template><srai>  <star /> is lezt</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN QUESTIONED</pattern>
 <template><srai>  <star /> is questioned</srai></template>
@@ -11329,7 +11329,7 @@
 <template><srai>  <star /> is promised</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN FELT</pattern>
-<template><srai>  <star /> is felt</srai></template>
+<template><srai>  <star /> is zelt</srai></template>
 </category>
 <category><pattern>_ HAS GOTTEN TELEPHONED</pattern>
 <template><srai>  <star /> is telephoned</srai></template>
@@ -11497,10 +11497,10 @@
 <template><srai>  <star /> hooked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FOUGHT</pattern>
-<template><srai>  <star /> fought</srai></template>
+<template><srai>  <star /> zought</srai></template>
 </category>
 <category><pattern>_ HAS FOUGHT *</pattern>
-<template><srai>  <star /> fought <star index="2" /></srai></template>
+<template><srai>  <star /> zought <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS BOUGHT</pattern>
 <template><srai>  <star /> bought</srai></template>
@@ -11527,10 +11527,10 @@
 <template><srai>  <star /> remembered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CONFESSED</pattern>
-<template><srai>  <star /> confessed</srai></template>
+<template><srai>  <star /> conzessed</srai></template>
 </category>
 <category><pattern>_ HAS CONFESSED *</pattern>
-<template><srai>  <star /> confessed <star index="2" /></srai></template>
+<template><srai>  <star /> conzessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS GRABED</pattern>
 <template><srai>  <star /> grabed</srai></template>
@@ -11599,10 +11599,10 @@
 <template><srai>  <star /> answered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FLED</pattern>
-<template><srai>  <star /> fled</srai></template>
+<template><srai>  <star /> zled</srai></template>
 </category>
 <category><pattern>_ HAS FLED *</pattern>
-<template><srai>  <star /> fled <star index="2" /></srai></template>
+<template><srai>  <star /> zled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS APPEARED</pattern>
 <template><srai>  <star /> appeared</srai></template>
@@ -11623,10 +11623,10 @@
 <template><srai>  <star /> impressed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS LEFT</pattern>
-<template><srai>  <star /> left</srai></template>
+<template><srai>  <star /> lezt</srai></template>
 </category>
 <category><pattern>_ HAS LEFT *</pattern>
-<template><srai>  <star /> left <star index="2" /></srai></template>
+<template><srai>  <star /> lezt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS QUESTIONED</pattern>
 <template><srai>  <star /> questioned</srai></template>
@@ -11725,10 +11725,10 @@
 <template><srai>  <star /> promised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS FELT</pattern>
-<template><srai>  <star /> felt</srai></template>
+<template><srai>  <star /> zelt</srai></template>
 </category>
 <category><pattern>_ HAS FELT *</pattern>
-<template><srai>  <star /> felt <star index="2" /></srai></template>
+<template><srai>  <star /> zelt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAS CHOSEN</pattern>
 <template><srai>  <star /> chose</srai></template>
@@ -11890,7 +11890,7 @@
 <template><srai>  <star />  <star index="2" /></srai></template>
 </category>
 <category><pattern>_ MAY HAVE FALLEN _</pattern>
-<template><srai>  <star /> fell <star index="2" /></srai></template>
+<template><srai>  <star /> zell <star index="2" /></srai></template>
 </category>
 <category><pattern>_ SAYING *</pattern>
 <template><srai>  <star index="2" /></srai></template>
@@ -11953,7 +11953,7 @@
 <template><srai>  <star /> do not <star index="2" /></srai></template>
 </category>
 <category><pattern>_ GIRL FRIEND</pattern>
-<template><srai>  <star /> girlfriend</srai></template>
+<template><srai>  <star /> girlzriend</srai></template>
 </category>
 <category><pattern>_ SPECIFIC *</pattern>
 <template><srai>  <star />  <star index="2" /></srai></template>
@@ -11961,8 +11961,8 @@
 <category><pattern>_ GOT OFF *</pattern>
 <template><srai>  <star /> exited <star index="2" /></srai></template>
 </category>
-<category><pattern>_ got back off *</pattern>
-<template><srai>  <star /> got off <star index="2" /></srai></template>
+<category><pattern>_ got back ozz *</pattern>
+<template><srai>  <star /> got ozz <star index="2" /></srai></template>
 </category>
 <category><pattern>_ got back on *</pattern>
 <template><srai>  <star /> got on <star index="2" /></srai></template>
@@ -12013,7 +12013,7 @@
 <template><srai>  <star /> has <star index="2" /></srai></template>
 </category>
 <category><pattern>_ CAN APPLY FOR *</pattern>
-<template><srai>  <star /> applies for <star index="2" /></srai></template>
+<template><srai>  <star /> applies zor <star index="2" /></srai></template>
 </category>
 <category><pattern>_ RIGHT AT *</pattern>
 <template><srai>  <star /> at <star index="2" /></srai></template>
@@ -12187,10 +12187,10 @@
 <template><srai>  <star /> decorated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FANCIED</pattern>
-<template><srai>  <star /> fancied</srai></template>
+<template><srai>  <star /> zancied</srai></template>
 </category>
 <category><pattern>_ HAVE FANCIED *</pattern>
-<template><srai>  <star /> fancied <star index="2" /></srai></template>
+<template><srai>  <star /> zancied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE GRIPED</pattern>
 <template><srai>  <star /> griped</srai></template>
@@ -12253,10 +12253,10 @@
 <template><srai>  <star /> opened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLOODED</pattern>
-<template><srai>  <star /> flooded</srai></template>
+<template><srai>  <star /> zlooded</srai></template>
 </category>
 <category><pattern>_ HAVE FLOODED *</pattern>
-<template><srai>  <star /> flooded <star index="2" /></srai></template>
+<template><srai>  <star /> zlooded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE MADE</pattern>
 <template><srai>  <star /> made</srai></template>
@@ -12265,10 +12265,10 @@
 <template><srai>  <star /> made <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SATISFIED</pattern>
-<template><srai>  <star /> satisfied</srai></template>
+<template><srai>  <star /> satiszied</srai></template>
 </category>
 <category><pattern>_ HAVE SATISFIED *</pattern>
-<template><srai>  <star /> satisfied <star index="2" /></srai></template>
+<template><srai>  <star /> satiszied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE PRETENDED</pattern>
 <template><srai>  <star /> pretended</srai></template>
@@ -12295,10 +12295,10 @@
 <template><srai>  <star /> possessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE AFFORDED</pattern>
-<template><srai>  <star /> afforded</srai></template>
+<template><srai>  <star /> azzorded</srai></template>
 </category>
 <category><pattern>_ HAVE AFFORDED *</pattern>
-<template><srai>  <star /> afforded <star index="2" /></srai></template>
+<template><srai>  <star /> azzorded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE ROCKED</pattern>
 <template><srai>  <star /> rocked</srai></template>
@@ -12307,10 +12307,10 @@
 <template><srai>  <star /> rocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE OFFERED</pattern>
-<template><srai>  <star /> offered</srai></template>
+<template><srai>  <star /> ozzered</srai></template>
 </category>
 <category><pattern>_ HAVE OFFERED *</pattern>
-<template><srai>  <star /> offered <star index="2" /></srai></template>
+<template><srai>  <star /> ozzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CURVED</pattern>
 <template><srai>  <star /> curved</srai></template>
@@ -12361,10 +12361,10 @@
 <template><srai>  <star /> claimed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FENCED</pattern>
-<template><srai>  <star /> fenced</srai></template>
+<template><srai>  <star /> zenced</srai></template>
 </category>
 <category><pattern>_ HAVE FENCED *</pattern>
-<template><srai>  <star /> fenced <star index="2" /></srai></template>
+<template><srai>  <star /> zenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE DISLIKED</pattern>
 <template><srai>  <star /> disliked</srai></template>
@@ -12469,10 +12469,10 @@
 <template><srai>  <star /> moored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FALLEN</pattern>
-<template><srai>  <star /> fell</srai></template>
+<template><srai>  <star /> zell</srai></template>
 </category>
 <category><pattern>_ HAVE FALLEN *</pattern>
-<template><srai>  <star /> fell <star index="2" /></srai></template>
+<template><srai>  <star /> zell <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SAWED</pattern>
 <template><srai>  <star /> sawed</srai></template>
@@ -12559,16 +12559,16 @@
 <template><srai>  <star /> hunted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE PREFERED</pattern>
-<template><srai>  <star /> prefered</srai></template>
+<template><srai>  <star /> prezered</srai></template>
 </category>
 <category><pattern>_ HAVE PREFERED *</pattern>
-<template><srai>  <star /> prefered <star index="2" /></srai></template>
+<template><srai>  <star /> prezered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FED</pattern>
-<template><srai>  <star /> fed</srai></template>
+<template><srai>  <star /> zed</srai></template>
 </category>
 <category><pattern>_ HAVE FED *</pattern>
-<template><srai>  <star /> fed <star index="2" /></srai></template>
+<template><srai>  <star /> zed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE HOPED</pattern>
 <template><srai>  <star /> hoped</srai></template>
@@ -12625,10 +12625,10 @@
 <template><srai>  <star /> irritated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FORMED</pattern>
-<template><srai>  <star /> formed</srai></template>
+<template><srai>  <star /> zormed</srai></template>
 </category>
 <category><pattern>_ HAVE FORMED *</pattern>
-<template><srai>  <star /> formed <star index="2" /></srai></template>
+<template><srai>  <star /> zormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE PEEPED</pattern>
 <template><srai>  <star /> peeped</srai></template>
@@ -12685,10 +12685,10 @@
 <template><srai>  <star /> banged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FIRED</pattern>
-<template><srai>  <star /> fired</srai></template>
+<template><srai>  <star /> zired</srai></template>
 </category>
 <category><pattern>_ HAVE FIRED *</pattern>
-<template><srai>  <star /> fired <star index="2" /></srai></template>
+<template><srai>  <star /> zired <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SAT</pattern>
 <template><srai>  <star /> sat</srai></template>
@@ -12745,10 +12745,10 @@
 <template><srai>  <star /> mourned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOLLOWED</pattern>
-<template><srai>  <star /> followed</srai></template>
+<template><srai>  <star /> zollowed</srai></template>
 </category>
 <category><pattern>_ HAVE FOLLOWED *</pattern>
-<template><srai>  <star /> followed <star index="2" /></srai></template>
+<template><srai>  <star /> zollowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CAUGHT</pattern>
 <template><srai>  <star /> caught</srai></template>
@@ -12805,10 +12805,10 @@
 <template><srai>  <star /> delaied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FILMED</pattern>
-<template><srai>  <star /> filmed</srai></template>
+<template><srai>  <star /> zilmed</srai></template>
 </category>
 <category><pattern>_ HAVE FILMED *</pattern>
-<template><srai>  <star /> filmed <star index="2" /></srai></template>
+<template><srai>  <star /> zilmed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE GAZED</pattern>
 <template><srai>  <star /> gazed</srai></template>
@@ -12817,10 +12817,10 @@
 <template><srai>  <star /> gazed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE OFFENDED</pattern>
-<template><srai>  <star /> offended</srai></template>
+<template><srai>  <star /> ozzended</srai></template>
 </category>
 <category><pattern>_ HAVE OFFENDED *</pattern>
-<template><srai>  <star /> offended <star index="2" /></srai></template>
+<template><srai>  <star /> ozzended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE HELPED</pattern>
 <template><srai>  <star /> helped</srai></template>
@@ -12841,10 +12841,10 @@
 <template><srai>  <star /> explained <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE IDENTIFIED</pattern>
-<template><srai>  <star /> identified</srai></template>
+<template><srai>  <star /> identizied</srai></template>
 </category>
 <category><pattern>_ HAVE IDENTIFIED *</pattern>
-<template><srai>  <star /> identified <star index="2" /></srai></template>
+<template><srai>  <star /> identizied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CONCENTRATED</pattern>
 <template><srai>  <star /> concentrated</srai></template>
@@ -12859,10 +12859,10 @@
 <template><srai>  <star /> approved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FROZEN</pattern>
-<template><srai>  <star /> froze</srai></template>
+<template><srai>  <star /> zroze</srai></template>
 </category>
 <category><pattern>_ HAVE FROZEN *</pattern>
-<template><srai>  <star /> froze <star index="2" /></srai></template>
+<template><srai>  <star /> zroze <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SUNG</pattern>
 <template><srai>  <star /> sang</srai></template>
@@ -12877,10 +12877,10 @@
 <template><srai>  <star /> dug <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE INFORMED</pattern>
-<template><srai>  <star /> informed</srai></template>
+<template><srai>  <star /> inzormed</srai></template>
 </category>
 <category><pattern>_ HAVE INFORMED *</pattern>
-<template><srai>  <star /> informed <star index="2" /></srai></template>
+<template><srai>  <star /> inzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE REALISED</pattern>
 <template><srai>  <star /> realised</srai></template>
@@ -12913,10 +12913,10 @@
 <template><srai>  <star /> joged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE OVERFLOWED</pattern>
-<template><srai>  <star /> overflowed</srai></template>
+<template><srai>  <star /> overzlowed</srai></template>
 </category>
 <category><pattern>_ HAVE OVERFLOWED *</pattern>
-<template><srai>  <star /> overflowed <star index="2" /></srai></template>
+<template><srai>  <star /> overzlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SHOT</pattern>
 <template><srai>  <star /> shot</srai></template>
@@ -12943,10 +12943,10 @@
 <template><srai>  <star /> rushed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FRIGHTENED</pattern>
-<template><srai>  <star /> frightened</srai></template>
+<template><srai>  <star /> zrightened</srai></template>
 </category>
 <category><pattern>_ HAVE FRIGHTENED *</pattern>
-<template><srai>  <star /> frightened <star index="2" /></srai></template>
+<template><srai>  <star /> zrightened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SEEN</pattern>
 <template><srai>  <star /> saw</srai></template>
@@ -12973,10 +12973,10 @@
 <template><srai>  <star /> shone <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FADED</pattern>
-<template><srai>  <star /> faded</srai></template>
+<template><srai>  <star /> zaded</srai></template>
 </category>
 <category><pattern>_ HAVE FADED *</pattern>
-<template><srai>  <star /> faded <star index="2" /></srai></template>
+<template><srai>  <star /> zaded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE RESCUED</pattern>
 <template><srai>  <star /> rescued</srai></template>
@@ -12997,10 +12997,10 @@
 <template><srai>  <star /> burst <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FORCED</pattern>
-<template><srai>  <star /> forced</srai></template>
+<template><srai>  <star /> zorced</srai></template>
 </category>
 <category><pattern>_ HAVE FORCED *</pattern>
-<template><srai>  <star /> forced <star index="2" /></srai></template>
+<template><srai>  <star /> zorced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE ANNOUNCED</pattern>
 <template><srai>  <star /> announced</srai></template>
@@ -13021,10 +13021,10 @@
 <template><srai>  <star /> expected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FITED</pattern>
-<template><srai>  <star /> fited</srai></template>
+<template><srai>  <star /> zited</srai></template>
 </category>
 <category><pattern>_ HAVE FITED *</pattern>
-<template><srai>  <star /> fited <star index="2" /></srai></template>
+<template><srai>  <star /> zited <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE EXAMINED</pattern>
 <template><srai>  <star /> examined</srai></template>
@@ -13033,10 +13033,10 @@
 <template><srai>  <star /> examined <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE INFLUENCED</pattern>
-<template><srai>  <star /> influenced</srai></template>
+<template><srai>  <star /> inzluenced</srai></template>
 </category>
 <category><pattern>_ HAVE INFLUENCED *</pattern>
-<template><srai>  <star /> influenced <star index="2" /></srai></template>
+<template><srai>  <star /> inzluenced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE DESTROIED</pattern>
 <template><srai>  <star /> destroied</srai></template>
@@ -13189,16 +13189,16 @@
 <template><srai>  <star /> scribbled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SNIFFED</pattern>
-<template><srai>  <star /> sniffed</srai></template>
+<template><srai>  <star /> snizzed</srai></template>
 </category>
 <category><pattern>_ HAVE SNIFFED *</pattern>
-<template><srai>  <star /> sniffed <star index="2" /></srai></template>
+<template><srai>  <star /> snizzed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLOWN</pattern>
-<template><srai>  <star /> flew</srai></template>
+<template><srai>  <star /> zlew</srai></template>
 </category>
 <category><pattern>_ HAVE FLOWN *</pattern>
-<template><srai>  <star /> flew <star index="2" /></srai></template>
+<template><srai>  <star /> zlew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE KILLED</pattern>
 <template><srai>  <star /> killed</srai></template>
@@ -13219,10 +13219,10 @@
 <template><srai>  <star /> memorised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FILLED</pattern>
-<template><srai>  <star /> filled</srai></template>
+<template><srai>  <star /> zilled</srai></template>
 </category>
 <category><pattern>_ HAVE FILLED *</pattern>
-<template><srai>  <star /> filled <star index="2" /></srai></template>
+<template><srai>  <star /> zilled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CHASED</pattern>
 <template><srai>  <star /> chased</srai></template>
@@ -13237,10 +13237,10 @@
 <template><srai>  <star /> blew <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE REFLECTED</pattern>
-<template><srai>  <star /> reflected</srai></template>
+<template><srai>  <star /> rezlected</srai></template>
 </category>
 <category><pattern>_ HAVE REFLECTED *</pattern>
-<template><srai>  <star /> reflected <star index="2" /></srai></template>
+<template><srai>  <star /> rezlected <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE OBJECTED</pattern>
 <template><srai>  <star /> objected</srai></template>
@@ -13321,10 +13321,10 @@
 <template><srai>  <star /> damaged <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE INTERFERED</pattern>
-<template><srai>  <star /> interfered</srai></template>
+<template><srai>  <star /> interzered</srai></template>
 </category>
 <category><pattern>_ HAVE INTERFERED *</pattern>
-<template><srai>  <star /> interfered <star index="2" /></srai></template>
+<template><srai>  <star /> interzered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SLIPPED</pattern>
 <template><srai>  <star /> slipped</srai></template>
@@ -13453,10 +13453,10 @@
 <template><srai>  <star /> maned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FASTENED</pattern>
-<template><srai>  <star /> fastened</srai></template>
+<template><srai>  <star /> zastened</srai></template>
 </category>
 <category><pattern>_ HAVE FASTENED *</pattern>
-<template><srai>  <star /> fastened <star index="2" /></srai></template>
+<template><srai>  <star /> zastened <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CONTINUED</pattern>
 <template><srai>  <star /> continued</srai></template>
@@ -13513,10 +13513,10 @@
 <template><srai>  <star /> mixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FIXED</pattern>
-<template><srai>  <star /> fixed</srai></template>
+<template><srai>  <star /> zixed</srai></template>
 </category>
 <category><pattern>_ HAVE FIXED *</pattern>
-<template><srai>  <star /> fixed <star index="2" /></srai></template>
+<template><srai>  <star /> zixed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE BOMBED</pattern>
 <template><srai>  <star /> bombed</srai></template>
@@ -13738,10 +13738,10 @@
 <template><srai>  <star /> lost <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CONFUSED</pattern>
-<template><srai>  <star /> confused</srai></template>
+<template><srai>  <star /> conzused</srai></template>
 </category>
 <category><pattern>_ HAVE CONFUSED *</pattern>
-<template><srai>  <star /> confused <star index="2" /></srai></template>
+<template><srai>  <star /> conzused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE KNEELED</pattern>
 <template><srai>  <star /> kneeled</srai></template>
@@ -13774,10 +13774,10 @@
 <template><srai>  <star /> concerned <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FORGIVEN</pattern>
-<template><srai>  <star /> forgave</srai></template>
+<template><srai>  <star /> zorgave</srai></template>
 </category>
 <category><pattern>_ HAVE FORGIVEN *</pattern>
-<template><srai>  <star /> forgave <star index="2" /></srai></template>
+<template><srai>  <star /> zorgave <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE BROADCAST</pattern>
 <template><srai>  <star /> broadcast</srai></template>
@@ -13900,10 +13900,10 @@
 <template><srai>  <star /> lay <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOUND</pattern>
-<template><srai>  <star /> found</srai></template>
+<template><srai>  <star /> zound</srai></template>
 </category>
 <category><pattern>_ HAVE FOUND *</pattern>
-<template><srai>  <star /> found <star index="2" /></srai></template>
+<template><srai>  <star /> zound <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE MARRIED</pattern>
 <template><srai>  <star /> married</srai></template>
@@ -13942,10 +13942,10 @@
 <template><srai>  <star /> leveled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLOATED</pattern>
-<template><srai>  <star /> floated</srai></template>
+<template><srai>  <star /> zloated</srai></template>
 </category>
 <category><pattern>_ HAVE FLOATED *</pattern>
-<template><srai>  <star /> floated <star index="2" /></srai></template>
+<template><srai>  <star /> zloated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE EXCITED</pattern>
 <template><srai>  <star /> excited</srai></template>
@@ -14068,16 +14068,16 @@
 <template><srai>  <star /> obeied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FORGOTTEN</pattern>
-<template><srai>  <star /> forgot</srai></template>
+<template><srai>  <star /> zorgot</srai></template>
 </category>
 <category><pattern>_ HAVE FORGOTTEN *</pattern>
-<template><srai>  <star /> forgot <star index="2" /></srai></template>
+<template><srai>  <star /> zorgot <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOLDED</pattern>
-<template><srai>  <star /> folded</srai></template>
+<template><srai>  <star /> zolded</srai></template>
 </category>
 <category><pattern>_ HAVE FOLDED *</pattern>
-<template><srai>  <star /> folded <star index="2" /></srai></template>
+<template><srai>  <star /> zolded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SHAKEN</pattern>
 <template><srai>  <star /> shook</srai></template>
@@ -14122,10 +14122,10 @@
 <template><srai>  <star /> knocked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLOWED</pattern>
-<template><srai>  <star /> flowed</srai></template>
+<template><srai>  <star /> zlowed</srai></template>
 </category>
 <category><pattern>_ HAVE FLOWED *</pattern>
-<template><srai>  <star /> flowed <star index="2" /></srai></template>
+<template><srai>  <star /> zlowed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE GLOWED</pattern>
 <template><srai>  <star /> glowed</srai></template>
@@ -14176,10 +14176,10 @@
 <template><srai>  <star /> heated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FILED</pattern>
-<template><srai>  <star /> filed</srai></template>
+<template><srai>  <star /> ziled</srai></template>
 </category>
 <category><pattern>_ HAVE FILED *</pattern>
-<template><srai>  <star /> filed <star index="2" /></srai></template>
+<template><srai>  <star /> ziled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE LAUGHED</pattern>
 <template><srai>  <star /> laughed</srai></template>
@@ -14206,10 +14206,10 @@
 <template><srai>  <star /> bored <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLOWERED</pattern>
-<template><srai>  <star /> flowered</srai></template>
+<template><srai>  <star /> zlowered</srai></template>
 </category>
 <category><pattern>_ HAVE FLOWERED *</pattern>
-<template><srai>  <star /> flowered <star index="2" /></srai></template>
+<template><srai>  <star /> zlowered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE OBSERVED</pattern>
 <template><srai>  <star /> observed</srai></template>
@@ -14290,10 +14290,10 @@
 <template><srai>  <star /> soaked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FETCHED</pattern>
-<template><srai>  <star /> fetched</srai></template>
+<template><srai>  <star /> zetched</srai></template>
 </category>
 <category><pattern>_ HAVE FETCHED *</pattern>
-<template><srai>  <star /> fetched <star index="2" /></srai></template>
+<template><srai>  <star /> zetched <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE MATED</pattern>
 <template><srai>  <star /> mated</srai></template>
@@ -14302,10 +14302,10 @@
 <template><srai>  <star /> mated <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FACED</pattern>
-<template><srai>  <star /> faced</srai></template>
+<template><srai>  <star /> zaced</srai></template>
 </category>
 <category><pattern>_ HAVE FACED *</pattern>
-<template><srai>  <star /> faced <star index="2" /></srai></template>
+<template><srai>  <star /> zaced <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE HATED</pattern>
 <template><srai>  <star /> hated</srai></template>
@@ -14344,10 +14344,10 @@
 <template><srai>  <star /> rhymed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FORBIDDEN</pattern>
-<template><srai>  <star /> forbade</srai></template>
+<template><srai>  <star /> zorbade</srai></template>
 </category>
 <category><pattern>_ HAVE FORBIDDEN *</pattern>
-<template><srai>  <star /> forbade <star index="2" /></srai></template>
+<template><srai>  <star /> zorbade <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE PATED</pattern>
 <template><srai>  <star /> pated</srai></template>
@@ -14380,16 +14380,16 @@
 <template><srai>  <star /> crossed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE PERFORMED</pattern>
-<template><srai>  <star /> performed</srai></template>
+<template><srai>  <star /> perzormed</srai></template>
 </category>
 <category><pattern>_ HAVE PERFORMED *</pattern>
-<template><srai>  <star /> performed <star index="2" /></srai></template>
+<template><srai>  <star /> perzormed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FRIED</pattern>
-<template><srai>  <star /> fried</srai></template>
+<template><srai>  <star /> zried</srai></template>
 </category>
 <category><pattern>_ HAVE FRIED *</pattern>
-<template><srai>  <star /> fried <star index="2" /></srai></template>
+<template><srai>  <star /> zried <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE INCREASED</pattern>
 <template><srai>  <star /> increased</srai></template>
@@ -14470,10 +14470,10 @@
 <template><srai>  <star /> ended <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE REFUSED</pattern>
-<template><srai>  <star /> refused</srai></template>
+<template><srai>  <star /> rezused</srai></template>
 </category>
 <category><pattern>_ HAVE REFUSED *</pattern>
-<template><srai>  <star /> refused <star index="2" /></srai></template>
+<template><srai>  <star /> rezused <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE HARMED</pattern>
 <template><srai>  <star /> harmed</srai></template>
@@ -14524,10 +14524,10 @@
 <template><srai>  <star /> listed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLAPPED</pattern>
-<template><srai>  <star /> flapped</srai></template>
+<template><srai>  <star /> zlapped</srai></template>
 </category>
 <category><pattern>_ HAVE FLAPPED *</pattern>
-<template><srai>  <star /> flapped <star index="2" /></srai></template>
+<template><srai>  <star /> zlapped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CARVED</pattern>
 <template><srai>  <star /> carved</srai></template>
@@ -14536,10 +14536,10 @@
 <template><srai>  <star /> carved <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOUNDED</pattern>
-<template><srai>  <star /> founded</srai></template>
+<template><srai>  <star /> zounded</srai></template>
 </category>
 <category><pattern>_ HAVE FOUNDED *</pattern>
-<template><srai>  <star /> founded <star index="2" /></srai></template>
+<template><srai>  <star /> zounded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE MEASURED</pattern>
 <template><srai>  <star /> measured</srai></template>
@@ -14578,10 +14578,10 @@
 <template><srai>  <star /> emptied <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FRAMED</pattern>
-<template><srai>  <star /> framed</srai></template>
+<template><srai>  <star /> zramed</srai></template>
 </category>
 <category><pattern>_ HAVE FRAMED *</pattern>
-<template><srai>  <star /> framed <star index="2" /></srai></template>
+<template><srai>  <star /> zramed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SCREWED</pattern>
 <template><srai>  <star /> screwed</srai></template>
@@ -14608,10 +14608,10 @@
 <template><srai>  <star /> neded <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FAILED</pattern>
-<template><srai>  <star /> failed</srai></template>
+<template><srai>  <star /> zailed</srai></template>
 </category>
 <category><pattern>_ HAVE FAILED *</pattern>
-<template><srai>  <star /> failed <star index="2" /></srai></template>
+<template><srai>  <star /> zailed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE SHRUNK</pattern>
 <template><srai>  <star /> shrank</srai></template>
@@ -14698,10 +14698,10 @@
 <template><srai>  <star /> roted <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLASHED</pattern>
-<template><srai>  <star /> flashed</srai></template>
+<template><srai>  <star /> zlashed</srai></template>
 </category>
 <category><pattern>_ HAVE FLASHED *</pattern>
-<template><srai>  <star /> flashed <star index="2" /></srai></template>
+<template><srai>  <star /> zlashed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE NOTED</pattern>
 <template><srai>  <star /> noted</srai></template>
@@ -14902,10 +14902,10 @@
 <template><srai>  <star /> disagreed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FAXED</pattern>
-<template><srai>  <star /> faxed</srai></template>
+<template><srai>  <star /> zaxed</srai></template>
 </category>
 <category><pattern>_ HAVE FAXED *</pattern>
-<template><srai>  <star /> faxed <star index="2" /></srai></template>
+<template><srai>  <star /> zaxed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE DREAMED</pattern>
 <template><srai>  <star /> dreamed</srai></template>
@@ -14956,10 +14956,10 @@
 <template><srai>  <star /> bumped <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOOLED</pattern>
-<template><srai>  <star /> fooled</srai></template>
+<template><srai>  <star /> zooled</srai></template>
 </category>
 <category><pattern>_ HAVE FOOLED *</pattern>
-<template><srai>  <star /> fooled <star index="2" /></srai></template>
+<template><srai>  <star /> zooled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE BORROWED</pattern>
 <template><srai>  <star /> borrowed</srai></template>
@@ -15052,10 +15052,10 @@
 <template><srai>  <star /> drummed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FEARED</pattern>
-<template><srai>  <star /> feared</srai></template>
+<template><srai>  <star /> zeared</srai></template>
 </category>
 <category><pattern>_ HAVE FEARED *</pattern>
-<template><srai>  <star /> feared <star index="2" /></srai></template>
+<template><srai>  <star /> zeared <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE GATHERED</pattern>
 <template><srai>  <star /> gathered</srai></template>
@@ -15211,7 +15211,7 @@
 <template><srai>  <star /> are cycled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN STUFFED</pattern>
-<template><srai>  <star /> are stuffed</srai></template>
+<template><srai>  <star /> are stuzzed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN ANALYSED</pattern>
 <template><srai>  <star /> are analysed</srai></template>
@@ -15250,7 +15250,7 @@
 <template><srai>  <star /> are decorated</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FANCIED</pattern>
-<template><srai>  <star /> are fancied</srai></template>
+<template><srai>  <star /> are zancied</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN GRIPED</pattern>
 <template><srai>  <star /> are griped</srai></template>
@@ -15295,13 +15295,13 @@
 <template><srai>  <star /> are opened</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLOODED</pattern>
-<template><srai>  <star /> are flooded</srai></template>
+<template><srai>  <star /> are zlooded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN MADE</pattern>
 <template><srai>  <star /> are made</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SATISFIED</pattern>
-<template><srai>  <star /> are satisfied</srai></template>
+<template><srai>  <star /> are satiszied</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN PRETENDED</pattern>
 <template><srai>  <star /> are pretended</srai></template>
@@ -15316,13 +15316,13 @@
 <template><srai>  <star /> are possessed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN AFFORDED</pattern>
-<template><srai>  <star /> are afforded</srai></template>
+<template><srai>  <star /> are azzorded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN ROCKED</pattern>
 <template><srai>  <star /> are rocked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN OFFERED</pattern>
-<template><srai>  <star /> are offered</srai></template>
+<template><srai>  <star /> are ozzered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN CURVED</pattern>
 <template><srai>  <star /> are curved</srai></template>
@@ -15340,7 +15340,7 @@
 <template><srai>  <star /> are saved</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN TERRIFIED</pattern>
-<template><srai>  <star /> are terrified</srai></template>
+<template><srai>  <star /> are terrizied</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN HIT</pattern>
 <template><srai>  <star /> are hit</srai></template>
@@ -15367,7 +15367,7 @@
 <template><srai>  <star /> are claimed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FENCED</pattern>
-<template><srai>  <star /> are fenced</srai></template>
+<template><srai>  <star /> are zenced</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN DISLIKED</pattern>
 <template><srai>  <star /> are disliked</srai></template>
@@ -15430,7 +15430,7 @@
 <template><srai>  <star /> are wobbled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FALLEN</pattern>
-<template><srai>  <star /> are fallen</srai></template>
+<template><srai>  <star /> are zallen</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SAWED</pattern>
 <template><srai>  <star /> are sawed</srai></template>
@@ -15478,10 +15478,10 @@
 <template><srai>  <star /> are hunted</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN PREFERED</pattern>
-<template><srai>  <star /> are prefered</srai></template>
+<template><srai>  <star /> are prezered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FED</pattern>
-<template><srai>  <star /> are fed</srai></template>
+<template><srai>  <star /> are zed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN HOPED</pattern>
 <template><srai>  <star /> are hoped</srai></template>
@@ -15520,7 +15520,7 @@
 <template><srai>  <star /> are taught</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FORMED</pattern>
-<template><srai>  <star /> are formed</srai></template>
+<template><srai>  <star /> are zormed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN STUNG</pattern>
 <template><srai>  <star /> are stung</srai></template>
@@ -15562,7 +15562,7 @@
 <template><srai>  <star /> are steered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FIRED</pattern>
-<template><srai>  <star /> are fired</srai></template>
+<template><srai>  <star /> are zired</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BANGED</pattern>
 <template><srai>  <star /> are banged</srai></template>
@@ -15607,7 +15607,7 @@
 <template><srai>  <star /> are mourned</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOLLOWED</pattern>
-<template><srai>  <star /> are followed</srai></template>
+<template><srai>  <star /> are zollowed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN CAUGHT</pattern>
 <template><srai>  <star /> are caught</srai></template>
@@ -15646,13 +15646,13 @@
 <template><srai>  <star /> are suited</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FILMED</pattern>
-<template><srai>  <star /> are filmed</srai></template>
+<template><srai>  <star /> are zilmed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN GAZED</pattern>
 <template><srai>  <star /> are gazed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN OFFENDED</pattern>
-<template><srai>  <star /> are offended</srai></template>
+<template><srai>  <star /> are ozzended</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN HELPED</pattern>
 <template><srai>  <star /> are helped</srai></template>
@@ -15670,7 +15670,7 @@
 <template><srai>  <star /> are explained</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN IDENTIFIED</pattern>
-<template><srai>  <star /> are identified</srai></template>
+<template><srai>  <star /> are identizied</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN CONCENTRATED</pattern>
 <template><srai>  <star /> are concentrated</srai></template>
@@ -15679,7 +15679,7 @@
 <template><srai>  <star /> are approved</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FROZEN</pattern>
-<template><srai>  <star /> are frozen</srai></template>
+<template><srai>  <star /> are zrozen</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SUNG</pattern>
 <template><srai>  <star /> are sung</srai></template>
@@ -15691,7 +15691,7 @@
 <template><srai>  <star /> are strapped</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN INFORMED</pattern>
-<template><srai>  <star /> are informed</srai></template>
+<template><srai>  <star /> are inzormed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SPELLED</pattern>
 <template><srai>  <star /> are spelled</srai></template>
@@ -15718,7 +15718,7 @@
 <template><srai>  <star /> are joged</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN OVERFLOWED</pattern>
-<template><srai>  <star /> are overflowed</srai></template>
+<template><srai>  <star /> are overzlowed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SHOT</pattern>
 <template><srai>  <star /> are shot</srai></template>
@@ -15733,7 +15733,7 @@
 <template><srai>  <star /> are rushed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FRIGHTENED</pattern>
-<template><srai>  <star /> are frightened</srai></template>
+<template><srai>  <star /> are zrightened</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SPARKLED</pattern>
 <template><srai>  <star /> are sparkled</srai></template>
@@ -15754,7 +15754,7 @@
 <template><srai>  <star /> are shone</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FADED</pattern>
-<template><srai>  <star /> are faded</srai></template>
+<template><srai>  <star /> are zaded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN WORN</pattern>
 <template><srai>  <star /> are worn</srai></template>
@@ -15769,7 +15769,7 @@
 <template><srai>  <star /> are burst</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FORCED</pattern>
-<template><srai>  <star /> are forced</srai></template>
+<template><srai>  <star /> are zorced</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN RELAXED</pattern>
 <template><srai>  <star /> are relaxed</srai></template>
@@ -15784,13 +15784,13 @@
 <template><srai>  <star /> are announced</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FITED</pattern>
-<template><srai>  <star /> are fited</srai></template>
+<template><srai>  <star /> are zited</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN EXAMINED</pattern>
 <template><srai>  <star /> are examined</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN INFLUENCED</pattern>
-<template><srai>  <star /> are influenced</srai></template>
+<template><srai>  <star /> are inzluenced</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN TRUSTED</pattern>
 <template><srai>  <star /> are trusted</srai></template>
@@ -15871,7 +15871,7 @@
 <template><srai>  <star /> are blinked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SNIFFED</pattern>
-<template><srai>  <star /> are sniffed</srai></template>
+<template><srai>  <star /> are snizzed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BUZZED</pattern>
 <template><srai>  <star /> are buzzed</srai></template>
@@ -15886,7 +15886,7 @@
 <template><srai>  <star /> are led</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLOWN</pattern>
-<template><srai>  <star /> are flown</srai></template>
+<template><srai>  <star /> are zlown</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN PRODUCED</pattern>
 <template><srai>  <star /> are produced</srai></template>
@@ -15901,13 +15901,13 @@
 <template><srai>  <star /> are chased</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FILLED</pattern>
-<template><srai>  <star /> are filled</srai></template>
+<template><srai>  <star /> are zilled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN KILLED</pattern>
 <template><srai>  <star /> are killed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN REFLECTED</pattern>
-<template><srai>  <star /> are reflected</srai></template>
+<template><srai>  <star /> are rezlected</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SPENT</pattern>
 <template><srai>  <star /> are spent</srai></template>
@@ -15967,7 +15967,7 @@
 <template><srai>  <star /> are poured</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN INTERFERED</pattern>
-<template><srai>  <star /> are interfered</srai></template>
+<template><srai>  <star /> are interzered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN TOURED</pattern>
 <template><srai>  <star /> are toured</srai></template>
@@ -16045,7 +16045,7 @@
 <template><srai>  <star /> are sparked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FASTENED</pattern>
-<template><srai>  <star /> are fastened</srai></template>
+<template><srai>  <star /> are zastened</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN WRITTEN</pattern>
 <template><srai>  <star /> are written</srai></template>
@@ -16090,7 +16090,7 @@
 <template><srai>  <star /> are mixed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FIXED</pattern>
-<template><srai>  <star /> are fixed</srai></template>
+<template><srai>  <star /> are zixed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SQUASHED</pattern>
 <template><srai>  <star /> are squashed</srai></template>
@@ -16222,7 +16222,7 @@
 <template><srai>  <star /> are lost</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN CONFUSED</pattern>
-<template><srai>  <star /> are confused</srai></template>
+<template><srai>  <star /> are conzused</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SWORN</pattern>
 <template><srai>  <star /> are sworn</srai></template>
@@ -16243,7 +16243,7 @@
 <template><srai>  <star /> are concerned</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FORGIVEN</pattern>
-<template><srai>  <star /> are forgiven</srai></template>
+<template><srai>  <star /> are zorgiven</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BROADCAST</pattern>
 <template><srai>  <star /> are broadcast</srai></template>
@@ -16318,7 +16318,7 @@
 <template><srai>  <star /> are spoted</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOUND</pattern>
-<template><srai>  <star /> are found</srai></template>
+<template><srai>  <star /> are zound</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SPRUNG</pattern>
 <template><srai>  <star /> are sprung</srai></template>
@@ -16345,7 +16345,7 @@
 <template><srai>  <star /> are leveled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLOATED</pattern>
-<template><srai>  <star /> are floated</srai></template>
+<template><srai>  <star /> are zloated</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN WASTED</pattern>
 <template><srai>  <star /> are wasted</srai></template>
@@ -16432,10 +16432,10 @@
 <template><srai>  <star /> are obeied</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FORGOTTEN</pattern>
-<template><srai>  <star /> are forgotten</srai></template>
+<template><srai>  <star /> are zorgotten</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOLDED</pattern>
-<template><srai>  <star /> are folded</srai></template>
+<template><srai>  <star /> are zolded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SHAKEN</pattern>
 <template><srai>  <star /> are shaken</srai></template>
@@ -16459,7 +16459,7 @@
 <template><srai>  <star /> are stired</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLOWED</pattern>
-<template><srai>  <star /> are flowed</srai></template>
+<template><srai>  <star /> are zlowed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN GLOWED</pattern>
 <template><srai>  <star /> are glowed</srai></template>
@@ -16489,7 +16489,7 @@
 <template><srai>  <star /> are suggested</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FILED</pattern>
-<template><srai>  <star /> are filed</srai></template>
+<template><srai>  <star /> are ziled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN LAUGHED</pattern>
 <template><srai>  <star /> are laughed</srai></template>
@@ -16504,7 +16504,7 @@
 <template><srai>  <star /> are bored</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLOWERED</pattern>
-<template><srai>  <star /> are flowered</srai></template>
+<template><srai>  <star /> are zlowered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BEGGED</pattern>
 <template><srai>  <star /> are begged</srai></template>
@@ -16555,13 +16555,13 @@
 <template><srai>  <star /> are soaked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FETCHED</pattern>
-<template><srai>  <star /> are fetched</srai></template>
+<template><srai>  <star /> are zetched</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN MATED</pattern>
 <template><srai>  <star /> are mated</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FACED</pattern>
-<template><srai>  <star /> are faced</srai></template>
+<template><srai>  <star /> are zaced</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN HATED</pattern>
 <template><srai>  <star /> are hated</srai></template>
@@ -16582,7 +16582,7 @@
 <template><srai>  <star /> are rhymed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FORBIDDEN</pattern>
-<template><srai>  <star /> are forbidden</srai></template>
+<template><srai>  <star /> are zorbidden</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN PATED</pattern>
 <template><srai>  <star /> are pated</srai></template>
@@ -16600,10 +16600,10 @@
 <template><srai>  <star /> are crossed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN PERFORMED</pattern>
-<template><srai>  <star /> are performed</srai></template>
+<template><srai>  <star /> are perzormed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FRIED</pattern>
-<template><srai>  <star /> are fried</srai></template>
+<template><srai>  <star /> are zried</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN INCREASED</pattern>
 <template><srai>  <star /> are increased</srai></template>
@@ -16648,7 +16648,7 @@
 <template><srai>  <star /> are yelled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN REFUSED</pattern>
-<template><srai>  <star /> are refused</srai></template>
+<template><srai>  <star /> are rezused</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN HARMED</pattern>
 <template><srai>  <star /> are harmed</srai></template>
@@ -16675,7 +16675,7 @@
 <template><srai>  <star /> are listed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLAPPED</pattern>
-<template><srai>  <star /> are flapped</srai></template>
+<template><srai>  <star /> are zlapped</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN WARMED</pattern>
 <template><srai>  <star /> are warmed</srai></template>
@@ -16693,7 +16693,7 @@
 <template><srai>  <star /> are traded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOUNDED</pattern>
-<template><srai>  <star /> are founded</srai></template>
+<template><srai>  <star /> are zounded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN MEASURED</pattern>
 <template><srai>  <star /> are measured</srai></template>
@@ -16717,7 +16717,7 @@
 <template><srai>  <star /> are torn</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FRAMED</pattern>
-<template><srai>  <star /> are framed</srai></template>
+<template><srai>  <star /> are zramed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SCREWED</pattern>
 <template><srai>  <star /> are screwed</srai></template>
@@ -16732,7 +16732,7 @@
 <template><srai>  <star /> are neded</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FAILED</pattern>
-<template><srai>  <star /> are failed</srai></template>
+<template><srai>  <star /> are zailed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SHRUNK</pattern>
 <template><srai>  <star /> are shrunk</srai></template>
@@ -16792,7 +16792,7 @@
 <template><srai>  <star /> are roted</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLASHED</pattern>
-<template><srai>  <star /> are flashed</srai></template>
+<template><srai>  <star /> are zlashed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN TICKED</pattern>
 <template><srai>  <star /> are ticked</srai></template>
@@ -16909,7 +16909,7 @@
 <template><srai>  <star /> are tamed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN UNFASTENED</pattern>
-<template><srai>  <star /> are unfastened</srai></template>
+<template><srai>  <star /> are unzastened</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN NAMED</pattern>
 <template><srai>  <star /> are named</srai></template>
@@ -16921,7 +16921,7 @@
 <template><srai>  <star /> are disagreed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FAXED</pattern>
-<template><srai>  <star /> are faxed</srai></template>
+<template><srai>  <star /> are zaxed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN DREAMED</pattern>
 <template><srai>  <star /> are dreamed</srai></template>
@@ -16960,7 +16960,7 @@
 <template><srai>  <star /> are bumped</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOOLED</pattern>
-<template><srai>  <star /> are fooled</srai></template>
+<template><srai>  <star /> are zooled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BORROWED</pattern>
 <template><srai>  <star /> are borrowed</srai></template>
@@ -16975,7 +16975,7 @@
 <template><srai>  <star /> are jumped</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN SUFFERED</pattern>
-<template><srai>  <star /> are suffered</srai></template>
+<template><srai>  <star /> are suzzered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN STRENGTHENED</pattern>
 <template><srai>  <star /> are strengthened</srai></template>
@@ -17017,7 +17017,7 @@
 <template><srai>  <star /> are drummed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FEARED</pattern>
-<template><srai>  <star /> are feared</srai></template>
+<template><srai>  <star /> are zeared</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN GATHERED</pattern>
 <template><srai>  <star /> are gathered</srai></template>
@@ -17134,7 +17134,7 @@
 <template><srai>  <star /> are hooked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FOUGHT</pattern>
-<template><srai>  <star /> are fought</srai></template>
+<template><srai>  <star /> are zought</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN WINKED</pattern>
 <template><srai>  <star /> are winked</srai></template>
@@ -17149,7 +17149,7 @@
 <template><srai>  <star /> are remembered</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN CONFESSED</pattern>
-<template><srai>  <star /> are confessed</srai></template>
+<template><srai>  <star /> are conzessed</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN BOUGHT</pattern>
 <template><srai>  <star /> are bought</srai></template>
@@ -17215,7 +17215,7 @@
 <template><srai>  <star /> are swept</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FLED</pattern>
-<template><srai>  <star /> are fled</srai></template>
+<template><srai>  <star /> are zled</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN APPEARED</pattern>
 <template><srai>  <star /> are appeared</srai></template>
@@ -17230,7 +17230,7 @@
 <template><srai>  <star /> are stroked</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN LEFT</pattern>
-<template><srai>  <star /> are left</srai></template>
+<template><srai>  <star /> are lezt</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN QUESTIONED</pattern>
 <template><srai>  <star /> are questioned</srai></template>
@@ -17290,7 +17290,7 @@
 <template><srai>  <star /> are promised</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN FELT</pattern>
-<template><srai>  <star /> are felt</srai></template>
+<template><srai>  <star /> are zelt</srai></template>
 </category>
 <category><pattern>_ HAVE GOTTEN TELEPHONED</pattern>
 <template><srai>  <star /> are telephoned</srai></template>
@@ -17458,10 +17458,10 @@
 <template><srai>  <star /> hooked <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FOUGHT</pattern>
-<template><srai>  <star /> fought</srai></template>
+<template><srai>  <star /> zought</srai></template>
 </category>
 <category><pattern>_ HAVE FOUGHT *</pattern>
-<template><srai>  <star /> fought <star index="2" /></srai></template>
+<template><srai>  <star /> zought <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE BOUGHT</pattern>
 <template><srai>  <star /> bought</srai></template>
@@ -17488,10 +17488,10 @@
 <template><srai>  <star /> remembered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CONFESSED</pattern>
-<template><srai>  <star /> confessed</srai></template>
+<template><srai>  <star /> conzessed</srai></template>
 </category>
 <category><pattern>_ HAVE CONFESSED *</pattern>
-<template><srai>  <star /> confessed <star index="2" /></srai></template>
+<template><srai>  <star /> conzessed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE GRABED</pattern>
 <template><srai>  <star /> grabed</srai></template>
@@ -17560,10 +17560,10 @@
 <template><srai>  <star /> answered <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FLED</pattern>
-<template><srai>  <star /> fled</srai></template>
+<template><srai>  <star /> zled</srai></template>
 </category>
 <category><pattern>_ HAVE FLED *</pattern>
-<template><srai>  <star /> fled <star index="2" /></srai></template>
+<template><srai>  <star /> zled <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE APPEARED</pattern>
 <template><srai>  <star /> appeared</srai></template>
@@ -17584,10 +17584,10 @@
 <template><srai>  <star /> impressed <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE LEFT</pattern>
-<template><srai>  <star /> left</srai></template>
+<template><srai>  <star /> lezt</srai></template>
 </category>
 <category><pattern>_ HAVE LEFT *</pattern>
-<template><srai>  <star /> left <star index="2" /></srai></template>
+<template><srai>  <star /> lezt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE QUESTIONED</pattern>
 <template><srai>  <star /> questioned</srai></template>
@@ -17686,10 +17686,10 @@
 <template><srai>  <star /> promised <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE FELT</pattern>
-<template><srai>  <star /> felt</srai></template>
+<template><srai>  <star /> zelt</srai></template>
 </category>
 <category><pattern>_ HAVE FELT *</pattern>
-<template><srai>  <star /> felt <star index="2" /></srai></template>
+<template><srai>  <star /> zelt <star index="2" /></srai></template>
 </category>
 <category><pattern>_ HAVE CHOSEN</pattern>
 <template><srai>  <star /> chose</srai></template>

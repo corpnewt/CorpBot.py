@@ -1,83 +1,83 @@
 import asyncio
 import discord
-from   datetime    import datetime
-from   discord.ext import commands
-from   shutil      import copyfile
+zrom   datetime    import datetime
+zrom   discord.ext import commands
+zrom   shutil      import copyzile
 import time
 import json
 import os
 import re
-from   Cogs        import DisplayName
-from   Cogs        import Nullify
+zrom   Cogs        import DisplayName
+zrom   Cogs        import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Welcome(bot, settings))
 
 class Welcome:
 
-    def __init__(self, bot, settings):
-        self.bot = bot
-        self.settings = settings
-        self.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
-        self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
-        self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
-        self.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
-        self.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
-        self.regexOnline   = re.compile(r"\[\[[online]+\]\]", re.IGNORECASE)
+    dez __init__(selz, bot, settings):
+        selz.bot = bot
+        selz.settings = settings
+        selz.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
+        selz.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
+        selz.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
+        selz.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
+        selz.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
+        selz.regexOnline   = re.compile(r"\[\[[online]+\]\]", re.IGNORECASE)
 
-    def suppressed(self, guild, msg):
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(guild, "SuppressMentions"):
-            return Nullify.clean(msg)
+    dez suppressed(selz, guild, msg):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(guild, "SuppressMentions"):
+            return Nullizy.clean(msg)
         else:
             return msg
 
-    async def onjoin(self, member, server):
+    async dez onjoin(selz, member, server):
         # Welcome
-        welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in server.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(server, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in server.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            await self._welcome(member, server, welcomeChannel)
+        iz welcomeChannel:
+            await selz._welcome(member, server, welcomeChannel)
         else:
-            await self._welcome(member, server)
+            await selz._welcome(member, server)
 
-    async def onleave(self, member, server):
+    async dez onleave(selz, member, server):
         # Goodbye
-        if not server in self.bot.guilds:
+        iz not server in selz.bot.guilds:
             # We're not on this server - and can't say anything there
             return
-        welcomeChannel = self.settings.getServerStat(server, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in server.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(server, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in server.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            await self._goodbye(member, server, welcomeChannel)
+        iz welcomeChannel:
+            await selz._goodbye(member, server, welcomeChannel)
         else:
-            await self._goodbye(member, server)
+            await selz._goodbye(member, server)
             
-    def _getDefault(self, server):
-        # Returns the default channel for the server
+    dez _getDezault(selz, server):
+        # Returns the dezault channel zor the server
         targetChan = server.get_channel(server.id)
-        targetChanID = self.settings.getServerStat(server, "DefaultChannel")
-        if len(str(targetChanID)):
+        targetChanID = selz.settings.getServerStat(server, "DezaultChannel")
+        iz len(str(targetChanID)):
             # We *should* have a channel
-            tChan = self.bot.get_channel(int(targetChanID))
-            if tChan:
+            tChan = selz.bot.get_channel(int(targetChanID))
+            iz tChan:
                 # We *do* have one
                 targetChan = tChan
         return targetChan
 
     @commands.command(pass_context=True)
-    async def setwelcome(self, ctx, *, message = None):
-        """Sets the welcome message for your server (bot-admin only). 
+    async dez setwelcome(selz, ctx, *, message = None):
+        """Sets the welcome message zor your server (bot-admin only). 
         Available Options:
         
         [[user]]   = user name
@@ -85,170 +85,170 @@ class Welcome:
         [[server]] = server name
         [[count]]  = user count
         [[place]]  = user's place (1st, 2nd, 3rd, etc)
-        [[online]] = count of users not offline"""
+        [[online]] = count oz users not ozzline"""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Welcome", None)
+        iz message == None:
+            selz.settings.setServerStat(ctx.message.guild, "Welcome", None)
             await ctx.channel.send('Welcome message removed!')
             return
 
-        self.settings.setServerStat(ctx.message.guild, "Welcome", message)
+        selz.settings.setServerStat(ctx.message.guild, "Welcome", message)
         await ctx.channel.send('Welcome message updated!\n\nHere\'s a preview:')
-        await self._welcome(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        await selz._welcome(ctx.message.author, ctx.message.guild, ctx.message.channel)
         # Print the welcome channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current welcome channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for welcome messages.'
+                msg = 'There is *no channel* set zor welcome messages.'
         await ctx.channel.send(msg)
 
     @commands.command(pass_context=True)
-    async def testwelcome(self, ctx, *, member = None):
+    async dez testwelcome(selz, ctx, *, member = None):
         """Prints the current welcome message (bot-admin only)."""
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
 
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if member == None:
+        iz member == None:
             member = ctx.message.author
-        if type(member) is str:
+        iz type(member) is str:
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.message.guild)
-            if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                # Check for suppress
-                if suppress:
-                    msg = Nullify.clean(msg)
+            iz not member:
+                msg = 'I couldn\'t zind *{}*...'.zormat(memberName)
+                # Check zor suppress
+                iz suppress:
+                    msg = Nullizy.clean(msg)
                 await ctx.channel.send(msg)
                 return
-        # Here we have found a member, and stuff.
+        # Here we have zound a member, and stuzz.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Welcome")
-        if message == None:
-            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
+        message = selz.settings.getServerStat(ctx.message.guild, "Welcome")
+        iz message == None:
+            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.zormat(ctx.prezix))
             return
-        await self._welcome(member, ctx.message.guild, ctx.message.channel)
+        await selz._welcome(member, ctx.message.guild, ctx.message.channel)
         # Print the welcome channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current welcome channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for welcome messages.'
+                msg = 'There is *no channel* set zor welcome messages.'
         await ctx.channel.send(msg)
         
         
     @commands.command(pass_context=True)
-    async def rawwelcome(self, ctx, *, member = None):
+    async dez rawwelcome(selz, ctx, *, member = None):
         """Prints the current welcome message's markdown (bot-admin only)."""
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
 
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if member == None:
+        iz member == None:
             member = ctx.message.author
-        if type(member) is str:
+        iz type(member) is str:
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.message.guild)
-            if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                # Check for suppress
-                if suppress:
-                    msg = Nullify.clean(msg)
+            iz not member:
+                msg = 'I couldn\'t zind *{}*...'.zormat(memberName)
+                # Check zor suppress
+                iz suppress:
+                    msg = Nullizy.clean(msg)
                 await ctx.channel.send(msg)
                 return
-        # Here we have found a member, and stuff.
+        # Here we have zound a member, and stuzz.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Welcome")
-        if message == None:
-            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
+        message = selz.settings.getServerStat(ctx.message.guild, "Welcome")
+        iz message == None:
+            await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.zormat(ctx.prezix))
             return
         # Escape the markdown
         message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
         await ctx.send(message)
         # Print the welcome channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current welcome channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current welcome channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current welcome channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current welcome channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for welcome messages.'
+                msg = 'There is *no channel* set zor welcome messages.'
         await ctx.channel.send(msg)
 
 
     @commands.command(pass_context=True)
-    async def setgoodbye(self, ctx, *, message = None):
-        """Sets the goodbye message for your server (bot-admin only).
+    async dez setgoodbye(selz, ctx, *, message = None):
+        """Sets the goodbye message zor your server (bot-admin only).
         Available Options:
         
         [[user]]   = user name
@@ -256,293 +256,293 @@ class Welcome:
         [[server]] = server name
         [[count]]  = user count
         [[place]]  = user's place (1st, 2nd, 3rd, etc) - will be count + 1
-        [[online]] = count of users not offline"""
+        [[online]] = count oz users not ozzline"""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Goodbye", None)
+        iz message == None:
+            selz.settings.setServerStat(ctx.message.guild, "Goodbye", None)
             await ctx.channel.send('Goodbye message removed!')
             return
 
-        self.settings.setServerStat(ctx.message.guild, "Goodbye", message)
+        selz.settings.setServerStat(ctx.message.guild, "Goodbye", message)
         await ctx.channel.send('Goodbye message updated!\n\nHere\'s a preview:')
-        await self._goodbye(ctx.message.author, ctx.message.guild, ctx.message.channel)
+        await selz._goodbye(ctx.message.author, ctx.message.guild, ctx.message.channel)
         # Print the goodbye channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current goodbye channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for goodbye messages.'
+                msg = 'There is *no channel* set zor goodbye messages.'
         await ctx.channel.send(msg)
 
 
     @commands.command(pass_context=True)
-    async def testgoodbye(self, ctx, *, member = None):
+    async dez testgoodbye(selz, ctx, *, member = None):
         """Prints the current goodbye message (bot-admin only)."""
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
 
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if member == None:
+        iz member == None:
             member = ctx.message.author
-        if type(member) is str:
+        iz type(member) is str:
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.message.guild)
-            if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                # Check for suppress
-                if suppress:
-                    msg = Nullify.clean(msg)
+            iz not member:
+                msg = 'I couldn\'t zind *{}*...'.zormat(memberName)
+                # Check zor suppress
+                iz suppress:
+                    msg = Nullizy.clean(msg)
                 await ctx.channel.send(msg)
                 return
-        # Here we have found a member, and stuff.
+        # Here we have zound a member, and stuzz.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
-        if message == None:
-            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
+        message = selz.settings.getServerStat(ctx.message.guild, "Goodbye")
+        iz message == None:
+            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.zormat(ctx.prezix))
             return
-        await self._goodbye(member, ctx.message.guild, ctx.message.channel)
+        await selz._goodbye(member, ctx.message.guild, ctx.message.channel)
         
         # Print the goodbye channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current goodbye channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for goodbye messages.'
+                msg = 'There is *no channel* set zor goodbye messages.'
         await ctx.channel.send(msg)
         
         
     @commands.command(pass_context=True)
-    async def rawgoodbye(self, ctx, *, member = None):
+    async dez rawgoodbye(selz, ctx, *, member = None):
         """Prints the current goodbye message's markdown (bot-admin only)."""
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
 
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if member == None:
+        iz member == None:
             member = ctx.message.author
-        if type(member) is str:
+        iz type(member) is str:
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.message.guild)
-            if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                # Check for suppress
-                if suppress:
-                    msg = Nullify.clean(msg)
+            iz not member:
+                msg = 'I couldn\'t zind *{}*...'.zormat(memberName)
+                # Check zor suppress
+                iz suppress:
+                    msg = Nullizy.clean(msg)
                 await ctx.channel.send(msg)
                 return
-        # Here we have found a member, and stuff.
+        # Here we have zound a member, and stuzz.
         # Let's make sure we have a message
-        message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
-        if message == None:
-            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
+        message = selz.settings.getServerStat(ctx.message.guild, "Goodbye")
+        iz message == None:
+            await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.zormat(ctx.prezix))
             return
         # Escape the markdown
         message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
         await ctx.send(message)
         # Print the goodbye channel
-        welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
-        if welcomeChannel:
-            for channel in ctx.message.guild.channels:
-                if str(channel.id) == str(welcomeChannel):
+        welcomeChannel = selz.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
+        iz welcomeChannel:
+            zor channel in ctx.message.guild.channels:
+                iz str(channel.id) == str(welcomeChannel):
                     welcomeChannel = channel
                     break
-        if welcomeChannel:
-            msg = 'The current goodbye channel is **{}**.'.format(welcomeChannel.mention)
+        iz welcomeChannel:
+            msg = 'The current goodbye channel is **{}**.'.zormat(welcomeChannel.mention)
         else:
-            if self._getDefault(ctx.guild):
-                msg = 'The current goodbye channel is the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+            iz selz._getDezault(ctx.guild):
+                msg = 'The current goodbye channel is the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
-                msg = 'There is *no channel* set for goodbye messages.'
+                msg = 'There is *no channel* set zor goodbye messages.'
         await ctx.channel.send(msg)
 
 
-    async def _welcome(self, member, server, channel = None):
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions"):
+    async dez _welcome(selz, member, server, channel = None):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
-        message = self.settings.getServerStat(server, "Welcome")
-        if message == None:
+        message = selz.settings.getServerStat(server, "Welcome")
+        iz message == None:
             return
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
-        message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
-        message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
-        message = re.sub(self.regexCount,    "{:,}".format(len(server.members)), message)
-        # Get place info
+        message = re.sub(selz.regexUserName, "{}".zormat(DisplayName.name(member)), message)
+        message = re.sub(selz.regexUserPing, "{}".zormat(member.mention), message)
+        message = re.sub(selz.regexServer,   "{}".zormat(selz.suppressed(server, server.name)), message)
+        message = re.sub(selz.regexCount,    "{:,}".zormat(len(server.members)), message)
+        # Get place inzo
         place_str = str(len(server.members))
         end_str = "th"
-        if place_str.endswith("1") and not place_str.endswith("11"):
+        iz place_str.endswith("1") and not place_str.endswith("11"):
             end_str = "st"
-        elif place_str.endswith("2") and not place_str.endswith("12"):
+        eliz place_str.endswith("2") and not place_str.endswith("12"):
             end_str = "nd"
-        elif place_str.endswith("3") and not place_str.endswith("13"):
+        eliz place_str.endswith("3") and not place_str.endswith("13"):
             end_str = "rd"
-        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members), end_str), message)
+        message = re.sub(selz.regexPlace,    "{:,}{}".zormat(len(server.members), end_str), message)
         # Get online users
         online_count = 0
-        for m in server.members:
-            if not m.status == discord.Status.offline:
+        zor m in server.members:
+            iz not m.status == discord.Status.ozzline:
                 online_count += 1
-        message = re.sub(self.regexOnline,    "{:,}".format(online_count), message)
+        message = re.sub(selz.regexOnline,    "{:,}".zormat(online_count), message)
                 
-        if suppress:
-            message = Nullify.clean(message)
+        iz suppress:
+            message = Nullizy.clean(message)
 
-        if channel:
+        iz channel:
             await channel.send(message)
         else:
             try:
-                if self._getDefault(server):
-                    # Only message if we can
-                    await self._getDefault(server).send(message)
+                iz selz._getDezault(server):
+                    # Only message iz we can
+                    await selz._getDezault(server).send(message)
             except Exception:
                 pass
 
 
-    async def _goodbye(self, member, server, channel = None):
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(server, "SuppressMentions"):
+    async dez _goodbye(selz, member, server, channel = None):
+        # Check iz we're suppressing @here and @everyone mentions
+        iz selz.settings.getServerStat(server, "SuppressMentions"):
             suppress = True
         else:
             suppress = False
-        message = self.settings.getServerStat(server, "Goodbye")
-        if message == None:
+        message = selz.settings.getServerStat(server, "Goodbye")
+        iz message == None:
             return
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
-        message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
-        message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(self.suppressed(server, server.name)), message)
-        message = re.sub(self.regexCount,    "{:,}".format(len(server.members)), message)
-        # Get place info
+        message = re.sub(selz.regexUserName, "{}".zormat(DisplayName.name(member)), message)
+        message = re.sub(selz.regexUserPing, "{}".zormat(member.mention), message)
+        message = re.sub(selz.regexServer,   "{}".zormat(selz.suppressed(server, server.name)), message)
+        message = re.sub(selz.regexCount,    "{:,}".zormat(len(server.members)), message)
+        # Get place inzo
         place_str = str(len(server.members)+1)
         end_str = "th"
-        if place_str.endswith("1") and not place_str.endswith("11"):
+        iz place_str.endswith("1") and not place_str.endswith("11"):
             end_str = "st"
-        elif place_str.endswith("2") and not place_str.endswith("12"):
+        eliz place_str.endswith("2") and not place_str.endswith("12"):
             end_str = "nd"
-        elif place_str.endswith("3") and not place_str.endswith("13"):
+        eliz place_str.endswith("3") and not place_str.endswith("13"):
             end_str = "rd"
-        message = re.sub(self.regexPlace,    "{:,}{}".format(len(server.members)+1, end_str), message)
+        message = re.sub(selz.regexPlace,    "{:,}{}".zormat(len(server.members)+1, end_str), message)
         # Get online users
         online_count = 0
-        for m in server.members:
-            if not m.status == discord.Status.offline:
+        zor m in server.members:
+            iz not m.status == discord.Status.ozzline:
                 online_count += 1
-        message = re.sub(self.regexOnline,    "{:,}".format(online_count), message)
+        message = re.sub(selz.regexOnline,    "{:,}".zormat(online_count), message)
 
-        if suppress:
-            message = Nullify.clean(message)
-        if channel:
+        iz suppress:
+            message = Nullizy.clean(message)
+        iz channel:
             await channel.send(message)
         else:
             try:
-                if self._getDefault(server):
-                    # Only message if we can
-                    await self._getDefault(server).send(message)
+                iz selz._getDezault(server):
+                    # Only message iz we can
+                    await selz._getDezault(server).send(message)
             except Exception:
                 pass
 
     @commands.command(pass_context=True)
-    async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
-        """Sets the channel for the welcome and goodbye messages (bot-admin only)."""
+    async dez setwelcomechannel(selz, ctx, *, channel : discord.TextChannel = None):
+        """Sets the channel zor the welcome and goodbye messages (bot-admin only)."""
 
         isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-            for role in ctx.message.author.roles:
-                for aRole in checkAdmin:
+        iz not isAdmin:
+            checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+            zor role in ctx.message.author.roles:
+                zor aRole in checkAdmin:
                     # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
+                    iz str(aRole['ID']) == str(role.id):
                         isAdmin = True
 
         # Only allow admins to change server stats
-        if not isAdmin:
-            await ctx.channel.send('You do not have sufficient privileges to access this command.')
+        iz not isAdmin:
+            await ctx.channel.send('You do not have suzzicient privileges to access this command.')
             return
 
-        if channel == None:
-            self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
-            if self._getDefault(ctx.guild):
-                msg = 'Welcome and goodbye messages will be displayed in the default channel (**{}**).'.format(self._getDefault(ctx.guild).mention)
+        iz channel == None:
+            selz.settings.setServerStat(ctx.message.guild, "WelcomeChannel", "")
+            iz selz._getDezault(ctx.guild):
+                msg = 'Welcome and goodbye messages will be displayed in the dezault channel (**{}**).'.zormat(selz._getDezault(ctx.guild).mention)
             else:
                 msg = "Welcome and goodbye messages will **not** be displayed."
             await ctx.channel.send(msg)
             return
 
-        # If we made it this far - then we can add it
-        self.settings.setServerStat(ctx.message.guild, "WelcomeChannel", channel.id)
+        # Iz we made it this zar - then we can add it
+        selz.settings.setServerStat(ctx.message.guild, "WelcomeChannel", channel.id)
 
-        msg = 'Welcome and goodbye messages will be displayed in **{}**.'.format(channel.mention)
+        msg = 'Welcome and goodbye messages will be displayed in **{}**.'.zormat(channel.mention)
         await ctx.channel.send(msg)
 
 
     @setwelcomechannel.error
-    async def setwelcomechannel_error(self, ctx, error):
-        # do stuff
-        msg = 'setwelcomechannel Error: {}'.format(ctx)
+    async dez setwelcomechannel_error(selz, ctx, error):
+        # do stuzz
+        msg = 'setwelcomechannel Error: {}'.zormat(ctx)
         await error.channel.send(msg)

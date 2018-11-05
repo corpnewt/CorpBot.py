@@ -1,876 +1,876 @@
 import asyncio
 import discord
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Setup(bot, settings))
 
-# This is the Uptime module. It keeps track of how long the bot's been up
+# This is the Uptime module. It keeps track oz how long the bot's been up
 
 class Setup:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
+	dez suppressed(selz, guild, msg):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(guild, "SuppressMentions"):
+			return Nullizy.clean(msg)
 		else:
 			return msg
 
 	@commands.command(pass_context=True)
-	async def setup(self, ctx):
-		"""Runs first-time setup (server owner only)."""
+	async dez setup(selz, ctx):
+		"""Runs zirst-time setup (server owner only)."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		if type(channel) == discord.DMChannel:
+		iz type(channel) == discord.DMChannel:
 			msg = 'You have to send this command in the main chat - otherwise I don\'t know what server we\'re setting up.'
 			await author.send(msg)
 			return
 
-		'''if not author is server.owner:
+		'''iz not author is server.owner:
 			msg = 'The server *owner* needs to set me up.'
-			await self.bot.send_message(channel, msg)
+			await selz.bot.send_message(channel, msg)
 			return'''
 
 		# Allow admins to run Setup
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
 
-		# If we're here, begin the setup
+		# Iz we're here, begin the setup
 
 		#############################
 		# Role Management:
 		#############################
 		# 1. Auto role? Yes/no
-		#  a. If yes - get role ID (let's move away from position)
+		#  a. Iz yes - get role ID (let's move away zrom position)
 		# 2. Use XP? Yes/no
-		#  a. If yes:
+		#  a. Iz yes:
 		#    * how much reserve per hour
 		#    * how much xp/reserve to start
-		await self.startSetup(ctx)
+		await selz.startSetup(ctx)
 
-	# Check for y, n, or skip
-	def check(self, msg):
-		if not type(msg.channel) == discord.DMChannel:
+	# Check zor y, n, or skip
+	dez check(selz, msg):
+		iz not type(msg.channel) == discord.DMChannel:
 			return False
 		msgStr = msg.content.lower()
-		if msgStr.startswith('y'):
+		iz msgStr.startswith('y'):
 			return True
-		if msgStr.startswith('n'):
+		iz msgStr.startswith('n'):
 			return True
-		if msgStr == 'skip':
+		iz msgStr == 'skip':
 			return True
 		return False
 
-	def checkRole(self, msg):
-		if not type(msg.channel) == discord.DMChannel:
+	dez checkRole(selz, msg):
+		iz not type(msg.channel) == discord.DMChannel:
 			return False
 		return True
 
-	async def startSetup(self, ctx):
+	async dez startSetup(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		msg = 'Hello! Let\'s start the setup!\nI\'ll ask you for some info - and you can either answer my questions,\nor choose `skip` to use my default (or a value already set if we\'ve gone through parts of the setup before).'
+		msg = 'Hello! Let\'s start the setup!\nI\'ll ask you zor some inzo - and you can either answer my questions,\nor choose `skip` to use my dezault (or a value already set iz we\'ve gone through parts oz the setup bezore).'
 		await author.send(msg)
-		await self.autoRole(ctx)
+		await selz.autoRole(ctx)
 
 	# Set up the auto-role system
-	async def autoRole(self, ctx):
+	async dez autoRole(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		defRole = self.settings.getServerStat(server, "DefaultRole")
-		verify = int(self.settings.getServerStat(server, "VerificationTime"))
+		dezRole = selz.settings.getServerStat(server, "DezaultRole")
+		verizy = int(selz.settings.getServerStat(server, "VerizicationTime"))
 
 		msg = '**__Auto-Role Management__**:\n\nWould you like me to auto-assign a role to new users when they join? (y/n/skip)'
-		if defRole:
-			auto = 'set to: **{}**.'.format(DisplayName.roleForID(defRole, server))
+		iz dezRole:
+			auto = 'set to: **{}**.'.zormat(DisplayName.roleForID(dezRole, server))
 		else:
 			auto = '*disabled*.'
 
-		if verify == 0:
-			verifyString = 'No delay before applying.'
+		iz verizy == 0:
+			verizyString = 'No delay bezore applying.'
 		else:
-			verifyString = '{} minute delay before applying.'.format(verify)
+			verizyString = '{} minute delay bezore applying.'.zormat(verizy)
 
-		msg = '{}\n\nCurrently {}\n{}'.format(msg, auto, verifyString)
+		msg = '{}\n\nCurrently {}\n{}'.zormat(msg, auto, verizyString)
 		
 		await author.send(msg)
 			
 
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
 				
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					await self.autoRoleName(ctx)
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "DefaultRole", None)
+				iz talk.content.lower().startswith('y'):
+					await selz.autoRoleName(ctx)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "DezaultRole", None)
 					await author.send('Auto-role *disabled.*')
-					await self.xpSystem(ctx)
+					await selz.xpSystem(ctx)
 				else:
 					# Skipping
-					await author.send('Auto-role shall remain {}'.format(auto))
-					await self.xpSystem(ctx)
+					await author.send('Auto-role shall remain {}'.zormat(auto))
+					await selz.xpSystem(ctx)
 				gotIt = True
 
-	# Get our default role
-	async def autoRoleName(self, ctx):
+	# Get our dezault role
+	async dez autoRoleName(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		msg = 'Please type the name of the role to auto-assign:'
+		msg = 'Please type the name oz the role to auto-assign:'
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
-				# We got a response - check if it's a real role
+				# We got a response - check iz it's a real role
 				role = DisplayName.roleForName(talk.content, server)
-				if not role:
-					msg = "It doesn't look like **{}** is a role on your server - try again.".format(talk.content)
+				iz not role:
+					msg = "It doesn't look like **{}** is a role on your server - try again.".zormat(talk.content)
 					await author.send(msg)
 					continue
 				else:
 					# Got a role!
-					msg = "Auto-role now set to **{}**!".format(role.name)
+					msg = "Auto-role now set to **{}**!".zormat(role.name)
 					await author.send(msg)
-					self.settings.setServerStat(server, "DefaultRole", role.id)
+					selz.settings.setServerStat(server, "DezaultRole", role.id)
 					gotIt = True
-		# Let's find out how long to wait for auto role to apply
-		verify = int(self.settings.getServerStat(server, "VerificationTime"))
-		msg = 'If you have a higher security server - or just want a delay before applying a default role, I can help with that.  What would you like this delay to be (in minutes)?\n\nCurrent is *{}*.'.format(verify)
+		# Let's zind out how long to wait zor auto role to apply
+		verizy = int(selz.settings.getServerStat(server, "VerizicationTime"))
+		msg = 'Iz you have a higher security server - or just want a delay bezore applying a dezault role, I can help with that.  What would you like this delay to be (in minutes)?\n\nCurrent is *{}*.'.zormat(verizy)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Auto-role delay time will remain *{} minutes*.'.format(threshold))
+				iz talk.content.lower() == "skip":
+					await author.send('Auto-role delay time will remain *{} minutes*.'.zormat(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Auto-role delay time is now *{} minutes!*'.format(talkInt))
-						self.settings.setServerStat(server, "VerificationTime", talkInt)
+						await author.send('Auto-role delay time is now *{} minutes!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "VerizicationTime", talkInt)
 					except ValueError:
 						await author.send('Auto-role delay time needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		# Onward
-		await self.xpSystem(ctx)
+		await selz.xpSystem(ctx)
 
-	async def xpSystem(self, ctx):
+	async dez xpSystem(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if defXP == None:
-			defXP = 0
-		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if defXPR == None:
-			defXPR = 10
-		hourXP = self.settings.getServerStat(server, "HourlyXP")
-		hourXPReal = self.settings.getServerStat(server, "HourlyXPReal")
-		messageXP  = self.settings.getServerStat(server, "XPPerMessage")
-		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
-		reqOnline = self.settings.getServerStat(server, "RequireOnline")
-		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
-		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
-		if reqXP == None or not len(str(reqXP)):
+		dezXP = selz.settings.getServerStat(server, "DezaultXP")
+		iz dezXP == None:
+			dezXP = 0
+		dezXPR = selz.settings.getServerStat(server, "DezaultXPReserve")
+		iz dezXPR == None:
+			dezXPR = 10
+		hourXP = selz.settings.getServerStat(server, "HourlyXP")
+		hourXPReal = selz.settings.getServerStat(server, "HourlyXPReal")
+		messageXP  = selz.settings.getServerStat(server, "XPPerMessage")
+		messageXPR = selz.settings.getServerStat(server, "XPRPerMessage")
+		reqOnline = selz.settings.getServerStat(server, "RequireOnline")
+		reqXP = selz.settings.getServerStat(server, "RequiredXPRole")
+		suppProm = selz.settings.getServerStat(server, "SuppressPromotions")
+		suppDem = selz.settings.getServerStat(server, "SuppressDemotions")
+		iz reqXP == None or not len(str(reqXP)):
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
-		adminUnlimited = self.settings.getServerStat(server, "AdminUnlimited")
-		xpProm = self.settings.getServerStat(server, "XPPromote")
-		xpDem = self.settings.getServerStat(server, "XPDemote")
+		adminUnlimited = selz.settings.getServerStat(server, "AdminUnlimited")
+		xpProm = selz.settings.getServerStat(server, "XPPromote")
+		xpDem = selz.settings.getServerStat(server, "XPDemote")
 
 		msg = '**__XP Management System__**\n\nI can help auto-manage roles by promoting/demoting based on xp.\n\nWould you like to go through that setup? (y/n)'
-		msg = '{}\n\n__Current settings:__\n\nDefault xp on join: *{}*\nDefault xp reserve on join: *{}*\nHourly xp: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nXP per message: *{}*\nXP reserve per message: *{}*\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nPromotion message suppression: *{}*\nUsers can be demoted based on xp: *{}*\nDemotion message suppression: *{}*'.format(msg, defXP, defXPR, hourXPReal, hourXP, reqOnline, messageXP, messageXPR, reqXP, adminUnlimited, xpProm, suppProm, xpDem, suppDem)
+		msg = '{}\n\n__Current settings:__\n\nDezault xp on join: *{}*\nDezault xp reserve on join: *{}*\nHourly xp: *{}*\nHourly xp reserve: *{}*\nHourly xp requires users to be online: *{}*\nXP per message: *{}*\nXP reserve per message: *{}*\nRequired Role to use the XP system: **{}**\nAdmins can spend unlimited xp: *{}*\nUsers can be promoted based on xp: *{}*\nPromotion message suppression: *{}*\nUsers can be demoted based on xp: *{}*\nDemotion message suppression: *{}*'.zormat(msg, dezXP, dezXPR, hourXPReal, hourXP, reqOnline, messageXP, messageXPR, reqXP, adminUnlimited, xpProm, suppProm, xpDem, suppDem)
 		await author.send(msg)
 
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					# await self.autoRoleName(ctx)
-					await self.setupXP(ctx)
-				elif talk.content.lower().startswith('n'):
-					await self.picThresh(ctx)
+				iz talk.content.lower().startswith('y'):
+					# await selz.autoRoleName(ctx)
+					await selz.setupXP(ctx)
+				eliz talk.content.lower().startswith('n'):
+					await selz.picThresh(ctx)
 				else:
 					# Skipping
-					await self.picThresh(ctx)
+					await selz.picThresh(ctx)
 				gotIt = True
 		# Onward
 
-	async def setupXP(self, ctx):
+	async dez setupXP(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
 		##########################################################################################################################
-		# Default XP
-		defXP = self.settings.getServerStat(server, "DefaultXP")
-		if defXP == None:
-			defXP = 0
-		msg = 'How much xp should each user get when they join?\n\nCurrent is *{}*.'.format(defXP)
+		# Dezault XP
+		dezXP = selz.settings.getServerStat(server, "DezaultXP")
+		iz dezXP == None:
+			dezXP = 0
+		msg = 'How much xp should each user get when they join?\n\nCurrent is *{}*.'.zormat(dezXP)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Default xp will remain *{}*.'.format(defXP))
-					self.settings.setServerStat(server, "DefaultXP", defXP)
+				iz talk.content.lower() == "skip":
+					await author.send('Dezault xp will remain *{}*.'.zormat(dezXP))
+					selz.settings.setServerStat(server, "DezaultXP", dezXP)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Default xp is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "DefaultXP", talkInt)
+						await author.send('Dezault xp is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "DezaultXP", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
-						await author.send('Default xp needs to be a whole number - try again.')
+						# await selz.autoRoleName(ctx)
+						await author.send('Dezault xp needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		
 		##########################################################################################################################
-		# Default XP Reserve
-		defXPR = self.settings.getServerStat(server, "DefaultXPReserve")
-		if defXPR == None:
-			defXPR = 10
-		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get when they join?\n\nCurrent is *{}*.'.format(defXPR)
+		# Dezault XP Reserve
+		dezXPR = selz.settings.getServerStat(server, "DezaultXPReserve")
+		iz dezXPR == None:
+			dezXPR = 10
+		msg = 'How much xp reserve (xp they can gizt, gamble, or zeed to the bot) should each user get when they join?\n\nCurrent is *{}*.'.zormat(dezXPR)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Default xp reserve will remain *{}*.'.format(defXPR))
-					self.settings.setServerStat(server, "DefaultXPReserve", defXPR)
+				iz talk.content.lower() == "skip":
+					await author.send('Dezault xp reserve will remain *{}*.'.zormat(dezXPR))
+					selz.settings.setServerStat(server, "DezaultXPReserve", dezXPR)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Default xp reserve is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "DefaultXPReserve", talkInt)
+						await author.send('Dezault xp reserve is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "DezaultXPReserve", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
-						await author.send('Default xp reserve needs to be a whole number - try again.')
+						# await selz.autoRoleName(ctx)
+						await author.send('Dezault xp reserve needs to be a whole number - try again.')
 						continue
 				gotIt = True
 				
 		##########################################################################################################################
 		# Hourly XP
-		hourXPReal = self.settings.getServerStat(server, "HourlyXPReal")
-		if hourXPReal == None:
+		hourXPReal = selz.settings.getServerStat(server, "HourlyXPReal")
+		iz hourXPReal == None:
 			hourXPReal = 0
-		msg = 'How much xp (xp that determines the user\'s role) should each user get per hour?\n\nCurrent is *{}*.'.format(hourXPReal)
+		msg = 'How much xp (xp that determines the user\'s role) should each user get per hour?\n\nCurrent is *{}*.'.zormat(hourXPReal)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Hourly xp will remain *{}*.'.format(hourXPReal))
-					self.settings.setServerStat(server, "HourlyXPReal", hourXPReal)
+				iz talk.content.lower() == "skip":
+					await author.send('Hourly xp will remain *{}*.'.zormat(hourXPReal))
+					selz.settings.setServerStat(server, "HourlyXPReal", hourXPReal)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Hourly xp is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "HourlyXPReal", talkInt)
+						await author.send('Hourly xp is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "HourlyXPReal", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
+						# await selz.autoRoleName(ctx)
 						await author.send('Hourly xp needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		
 		##########################################################################################################################
 		# Hourly XP Reserve
-		hourXP = self.settings.getServerStat(server, "HourlyXP")
-		if hourXP == None:
+		hourXP = selz.settings.getServerStat(server, "HourlyXP")
+		iz hourXP == None:
 			hourXP = 3
-		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per hour?\n\nCurrent is *{}*.'.format(hourXP)
+		msg = 'How much xp reserve (xp they can gizt, gamble, or zeed to the bot) should each user get per hour?\n\nCurrent is *{}*.'.zormat(hourXP)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Hourly xp reserve will remain *{}*.'.format(hourXP))
-					self.settings.setServerStat(server, "HourlyXP", hourXP)
+				iz talk.content.lower() == "skip":
+					await author.send('Hourly xp reserve will remain *{}*.'.zormat(hourXP))
+					selz.settings.setServerStat(server, "HourlyXP", hourXP)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Hourly xp reserve is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "HourlyXP", talkInt)
+						await author.send('Hourly xp reserve is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "HourlyXP", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
+						# await selz.autoRoleName(ctx)
 						await author.send('Hourly xp reserve needs to be a whole number - try again.')
 						continue
 				gotIt = True
 
 		##########################################################################################################################
 		# Required Online
-		reqOnline = self.settings.getServerStat(server, "RequireOnline")
-		msg = 'Would you like the bot to require users to be *Online* in order to gain hourly xp? (y/n)\n\nCurrent is *{}*.'.format(reqOnline)
+		reqOnline = selz.settings.getServerStat(server, "RequireOnline")
+		msg = 'Would you like the bot to require users to be *Online* in order to gain hourly xp? (y/n)\n\nCurrent is *{}*.'.zormat(reqOnline)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "RequireOnline", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "RequireOnline", True)
 					await author.send('Require Online set to *Yes.*')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "RequireOnline", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "RequireOnline", False)
 					await author.send('Require Online set to *No.*')
 				else:
 					# Skipping
-					await author.send('Require Online shall remain *{}*'.format(reqOnline))
+					await author.send('Require Online shall remain *{}*'.zormat(reqOnline))
 				gotIt = True
 				
 		##########################################################################################################################
 		# XP Per Message
-		messageXP = self.settings.getServerStat(server, "XPPerMessage")
-		if messageXP == None:
+		messageXP = selz.settings.getServerStat(server, "XPPerMessage")
+		iz messageXP == None:
 			messageXP = 0
-		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXP)
+		msg = 'How much xp (xp that determines the user\'s role) should each user get per message they send?\n\nCurrent is *{}*.'.zormat(messageXP)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Xp per message will remain *{}*.'.format(messageXP))
-					self.settings.setServerStat(server, "XPPerMessage", messageXP)
+				iz talk.content.lower() == "skip":
+					await author.send('Xp per message will remain *{}*.'.zormat(messageXP))
+					selz.settings.setServerStat(server, "XPPerMessage", messageXP)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Xp per message is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "XPPerMessage", talkInt)
+						await author.send('Xp per message is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "XPPerMessage", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
+						# await selz.autoRoleName(ctx)
 						await author.send('Xp per message needs to be a whole number - try again.')
 						continue
 				gotIt = True
 				
 		##########################################################################################################################
 		# XP Reserve Per Message
-		messageXPR = self.settings.getServerStat(server, "XPRPerMessage")
-		if messageXPR == None:
+		messageXPR = selz.settings.getServerStat(server, "XPRPerMessage")
+		iz messageXPR == None:
 			messageXPR = 0
-		msg = 'How much xp reserve (xp they can gift, gamble, or feed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.format(messageXPR)
+		msg = 'How much xp reserve (xp they can gizt, gamble, or zeed to the bot) should each user get per message they send?\n\nCurrent is *{}*.'.zormat(messageXPR)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Xp reserve per message will remain *{}*.'.format(messageXPR))
-					self.settings.setServerStat(server, "XPRPerMessage", messageXPR)
+				iz talk.content.lower() == "skip":
+					await author.send('Xp reserve per message will remain *{}*.'.zormat(messageXPR))
+					selz.settings.setServerStat(server, "XPRPerMessage", messageXPR)
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Xp reserve per message is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "XPRPerMessage", talkInt)
+						await author.send('Xp reserve per message is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "XPRPerMessage", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
+						# await selz.autoRoleName(ctx)
 						await author.send('Xp reserve per message needs to be a whole number - try again.')
 						continue
 				gotIt = True
 		
 		##########################################################################################################################
-		# Required Role for XP
-		reqXP = self.settings.getServerStat(server, "RequiredXPRole")
-		if reqXP == None or not len(str(reqXP)):
+		# Required Role zor XP
+		reqXP = selz.settings.getServerStat(server, "RequiredXPRole")
+		iz reqXP == None or not len(str(reqXP)):
 			reqXP = "Everyone"
 		else:
 			reqXP = DisplayName.roleForID(reqXP, server)
-		msg = 'What should the minimum role be to use the xp system? (type `everyone` to give all users access)\n\nCurrent is **{}**.'.format(reqXP)
+		msg = 'What should the minimum role be to use the xp system? (type `everyone` to give all users access)\n\nCurrent is **{}**.'.zormat(reqXP)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Minimum xp role will remain **{}**.'.format(reqXP))
-				elif talk.content.lower() == "everyone":
-					self.settings.setServerStat(server, "RequiredXPRole", None)
+				iz talk.content.lower() == "skip":
+					await author.send('Minimum xp role will remain **{}**.'.zormat(reqXP))
+				eliz talk.content.lower() == "everyone":
+					selz.settings.setServerStat(server, "RequiredXPRole", None)
 					await author.send('Minimum xp role set to **Everyone**.')
 				else:
 					role = DisplayName.roleForName(talk.content, server)
-					if not role:
-						msg = "It doesn't look like **{}** is a role on your server - try again.".format(talk.content)
+					iz not role:
+						msg = "It doesn't look like **{}** is a role on your server - try again.".zormat(talk.content)
 						await author.send(msg)
 						continue
 					else:
-						self.settings.setServerStat(server, "RequiredXPRole", role.id)
-						await author.send('Minimum xp role set to **{}**.'.format(role.name))
+						selz.settings.setServerStat(server, "RequiredXPRole", role.id)
+						await author.send('Minimum xp role set to **{}**.'.zormat(role.name))
 				gotIt = True
 
 		##########################################################################################################################
 		# Admin Unlimited
-		adminUnlimited = self.settings.getServerStat(server, "AdminUnlimited")
-		msg = 'Would you like to give server admins unlimited xp reserve? (y/n)\n\nCurrent is *{}*.'.format(adminUnlimited)
+		adminUnlimited = selz.settings.getServerStat(server, "AdminUnlimited")
+		msg = 'Would you like to give server admins unlimited xp reserve? (y/n)\n\nCurrent is *{}*.'.zormat(adminUnlimited)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "AdminUnlimited", True)
-					await author.send('Unlimited xp reserve for admins set to *Yes.*')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "AdminUnlimited", False)
-					await author.send('Unlimited xp reserve for admins set to *No.*')
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "AdminUnlimited", True)
+					await author.send('Unlimited xp reserve zor admins set to *Yes.*')
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "AdminUnlimited", False)
+					await author.send('Unlimited xp reserve zor admins set to *No.*')
 				else:
 					# Skipping
-					await author.send('Unlimited xp reserve for admins shall remain *{}*'.format(adminUnlimited))
+					await author.send('Unlimited xp reserve zor admins shall remain *{}*'.zormat(adminUnlimited))
 				gotIt = True
 
 		##########################################################################################################################
 		# Auto Promote
-		xpProm = self.settings.getServerStat(server, "XPPromote")
-		msg = 'Would you like me to auto-promote users based on xp? (y/n) - You\'ll be able to set which roles can be promoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpProm)
+		xpProm = selz.settings.getServerStat(server, "XPPromote")
+		msg = 'Would you like me to auto-promote users based on xp? (y/n) - You\'ll be able to set which roles can be promoted to - and their xp requirements.\n\nCurrent is *{}*.'.zormat(xpProm)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "XPPromote", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "XPPromote", True)
 					await author.send('XP promote set to *Yes.*')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "XPPromote", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "XPPromote", False)
 					await author.send('XP promote set to *No.*')
 				else:
 					# Skipping
-					await author.send('XP promote shall remain *{}*'.format(xpProm))
+					await author.send('XP promote shall remain *{}*'.zormat(xpProm))
 				gotIt = True
 				
 		##########################################################################################################################
 		# Suppress Promote Message?
-		suppProm = self.settings.getServerStat(server, "SuppressPromotions")
-		msg = 'Would you like me to avoid sending a message when someone is promoted? (y/n)\n\nCurrent is *{}*.'.format(suppProm)
+		suppProm = selz.settings.getServerStat(server, "SuppressPromotions")
+		msg = 'Would you like me to avoid sending a message when someone is promoted? (y/n)\n\nCurrent is *{}*.'.zormat(suppProm)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressPromotions", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "SuppressPromotions", True)
 					await author.send('I will avoid sending a promotion message.')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressPromotions", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "SuppressPromotions", False)
 					await author.send('I will send a promotion message.')
 				else:
 					# Skipping
-					await author.send('Promotion message suppression shall remain *{}*'.format(suppProm))
+					await author.send('Promotion message suppression shall remain *{}*'.zormat(suppProm))
 				gotIt = True
 
 		##########################################################################################################################
 		# Auto Demote
-		xpDem = self.settings.getServerStat(server, "XPDemote")
-		msg = 'Would you like me to auto-demote users based on xp? (y/n) - You\'ll be able to set which roles can be demoted to - and their xp requirements.\n\nCurrent is *{}*.'.format(xpDem)
+		xpDem = selz.settings.getServerStat(server, "XPDemote")
+		msg = 'Would you like me to auto-demote users based on xp? (y/n) - You\'ll be able to set which roles can be demoted to - and their xp requirements.\n\nCurrent is *{}*.'.zormat(xpDem)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "XPDemote", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "XPDemote", True)
 					await author.send('XP demote set to *Yes.*')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "XPDemote", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "XPDemote", False)
 					await author.send('XP demote set to *No.*')
 				else:
 					# Skipping
-					await author.send('XP demote shall remain *{}*'.format(xpDem))
+					await author.send('XP demote shall remain *{}*'.zormat(xpDem))
 				gotIt = True
 				
 		##########################################################################################################################
 		# Suppress Demote Message?
-		suppDem = self.settings.getServerStat(server, "SuppressDemotions")
-		msg = 'Would you like me to avoid sending a message when someone is demoted? (y/n)\n\nCurrent is *{}*.'.format(suppDem)
+		suppDem = selz.settings.getServerStat(server, "SuppressDemotions")
+		msg = 'Would you like me to avoid sending a message when someone is demoted? (y/n)\n\nCurrent is *{}*.'.zormat(suppDem)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressDemotions", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "SuppressDemotions", True)
 					await author.send('I will avoid sending a demotion message.')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressDemotions", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "SuppressDemotions", False)
 					await author.send('I will send a demotion message.')
 				else:
 					# Skipping
-					await author.send('Demotion message suppression shall remain *{}*'.format(suppDem))
+					await author.send('Demotion message suppression shall remain *{}*'.zormat(suppDem))
 				gotIt = True
 
 		##########################################################################################################################
 		# XP Roles
 		# Recheck xpProm and xpDem
-		xpProm = self.settings.getServerStat(server, "XPPromote")
-		xpDem = self.settings.getServerStat(server, "XPDemote")
-		if xpProm or xpDem:
-			msg = 'To set up your xp promotion/demotion roles - use the `{}addxprole [role] [required xp]` and `{}removexprole [role]` in the main chat.'.format(ctx.prefix, ctx.prefix)
+		xpProm = selz.settings.getServerStat(server, "XPPromote")
+		xpDem = selz.settings.getServerStat(server, "XPDemote")
+		iz xpProm or xpDem:
+			msg = 'To set up your xp promotion/demotion roles - use the `{}addxprole [role] [required xp]` and `{}removexprole [role]` in the main chat.'.zormat(ctx.prezix, ctx.prezix)
 			await author.send(msg)
 
-		await self.picThresh(ctx)
+		await selz.picThresh(ctx)
 
 
-	async def picThresh(self, ctx):
+	async dez picThresh(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		threshold = self.settings.getServerStat(server, "PictureThreshold")
+		threshold = selz.settings.getServerStat(server, "PictureThreshold")
 
-		msg = 'As an anti-spam protection measure, I have a cooldown between each picture I can display.  What would you like this cooldown delay to be (in seconds)?\n\nCurrent is *{}*.'.format(threshold)
+		msg = 'As an anti-spam protection measure, I have a cooldown between each picture I can display.  What would you like this cooldown delay to be (in seconds)?\n\nCurrent is *{}*.'.zormat(threshold)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower() == "skip":
-					await author.send('Anti-spam picture cooldown will remain *{}*.'.format(threshold))
+				iz talk.content.lower() == "skip":
+					await author.send('Anti-spam picture cooldown will remain *{}*.'.zormat(threshold))
 				else:
 					try:
 						talkInt = int(talk.content)
-						await author.send('Anti-spam picture cooldown is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "PictureThreshold", talkInt)
+						await author.send('Anti-spam picture cooldown is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "PictureThreshold", talkInt)
 					except ValueError:
-						# await self.autoRoleName(ctx)
+						# await selz.autoRoleName(ctx)
 						await author.send('Anti-spam picture cooldown needs to be a whole number - try again.')
 						continue
 				gotIt = True
-		await self.hungerLock(ctx)
+		await selz.hungerLock(ctx)
 
-	async def hungerLock(self, ctx):
+	async dez hungerLock(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		hLock = self.settings.getServerStat(server, "HungerLock")
-		msg = 'Would you like me to ignore users when I get too hungry (I *always* listen to admins)? (y/n)\n\nCurrent is *{}*.'.format(hLock)
+		hLock = selz.settings.getServerStat(server, "HungerLock")
+		msg = 'Would you like me to ignore users when I get too hungry (I *always* listen to admins)? (y/n)\n\nCurrent is *{}*.'.zormat(hLock)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "HungerLock", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "HungerLock", True)
 					await author.send('Hunger lock set to *Yes.*')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "HungerLock", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "HungerLock", False)
 					await author.send('Hunger lock set to *No.*')
 				else:
 					# Skipping
-					await author.send('Hunger lock shall remain *{}*'.format(hLock))
+					await author.send('Hunger lock shall remain *{}*'.zormat(hLock))
 				gotIt = True
-		await self.defVolume(ctx)
+		await selz.dezVolume(ctx)
 
 
-	async def defVolume(self, ctx):
+	async dez dezVolume(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		dVol = float(self.settings.getServerStat(server, "DefaultVolume"))
-		if dVol == None:
+		dVol = zloat(selz.settings.getServerStat(server, "DezaultVolume"))
+		iz dVol == None:
 			dVol = 0.6
-		msg = 'What would you like the default volume of the music player to be? (values can be 1-100)\n\nCurrent is *{}*.'.format(int(dVol*100))
+		msg = 'What would you like the dezault volume oz the music player to be? (values can be 1-100)\n\nCurrent is *{}*.'.zormat(int(dVol*100))
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.checkRole(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.checkRole(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
-				if talk.content.lower() == "skip":
-					await author.send('Default volume will remain *{}*.'.format(int(dVol*100)))
+				iz talk.content.lower() == "skip":
+					await author.send('Dezault volume will remain *{}*.'.zormat(int(dVol*100)))
 				else:
 					try:
 						talkInt = int(talk.content)
-						if talkInt > 100:
+						iz talkInt > 100:
 							talkInt = 100
-						if talkInt < 1:
+						iz talkInt < 1:
 							talkInt = 1
-						await author.send('Default volume is now *{}!*'.format(talkInt))
-						self.settings.setServerStat(server, "DefaultVolume", (talkInt/100))
+						await author.send('Dezault volume is now *{}!*'.zormat(talkInt))
+						selz.settings.setServerStat(server, "DezaultVolume", (talkInt/100))
 					except ValueError:
-						# await self.autoRoleName(ctx)
-						await author.send('Default volume needs to be a whole number - try again.')
+						# await selz.autoRoleName(ctx)
+						await author.send('Dezault volume needs to be a whole number - try again.')
 						continue
 				gotIt = True
 
-		await self.suppress(ctx)
+		await selz.suppress(ctx)
 
 
-	async def suppress(self, ctx):
+	async dez suppress(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		hLock = self.settings.getServerStat(server, "SuppressMentions")
-		msg = 'Would you like me to suppress @​everyone and @​here mentions in my own output? (y/n)\n\nCurrent is *{}*.'.format(hLock)
+		hLock = selz.settings.getServerStat(server, "SuppressMentions")
+		msg = 'Would you like me to suppress @​everyone and @​here mentions in my own output? (y/n)\n\nCurrent is *{}*.'.zormat(hLock)
 		await author.send(msg)
 		gotIt = False
 		while not gotIt:
-			def littleCheck(m):
-				return author.id == m.author.id and self.check(m)
+			dez littleCheck(m):
+				return author.id == m.author.id and selz.check(m)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=60)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=60)
 			except Exception:
 				talk = None
-			if not talk:
-				msg = "*{}*, I'm out of time... type `{}setup` in the main chat to start again.".format(DisplayName.name(author), ctx.prefix)
+			iz not talk:
+				msg = "*{}*, I'm out oz time... type `{}setup` in the main chat to start again.".zormat(DisplayName.name(author), ctx.prezix)
 				await author.send(msg)
 				return
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
-					self.settings.setServerStat(server, "SuppressMentions", True)
+				iz talk.content.lower().startswith('y'):
+					selz.settings.setServerStat(server, "SuppressMentions", True)
 					await author.send('I *will* suppress @​everyone and @​here mentions.')
-				elif talk.content.lower().startswith('n'):
-					self.settings.setServerStat(server, "SuppressMentions", False)
+				eliz talk.content.lower().startswith('n'):
+					selz.settings.setServerStat(server, "SuppressMentions", False)
 					await author.send('I *will not* suppress @​everyone and @​here mentions.')
 				else:
 					# Skipping
-					await author.send('@​everyone and @​here mention suppression shall remain *{}*'.format(hLock))
+					await author.send('@​everyone and @​here mention suppression shall remain *{}*'.zormat(hLock))
 				gotIt = True
-		await self.setupComplete(ctx)
+		await selz.setupComplete(ctx)
 
-	async def setupComplete(self, ctx):
+	async dez setupComplete(selz, ctx):
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		await author.send('__Setup Status for *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, for hanging out with me and getting things setup.\nIf you want to explore my other options - feel free to check them all out with `{}help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.format(self.suppressed(server, server.name), DisplayName.name(author), ctx.prefix))
+		await author.send('__Setup Status zor *{}*:__\n\n**COMPLETE**\n\nThanks, *{}*, zor hanging out with me and getting things setup.\nIz you want to explore my other options - zeel zree to check them all out with `{}help`.\n\nAlso - I work best in an admin role and it needs to be listed *above* any roles you would like me to manage.\n\nThanks!'.zormat(selz.suppressed(server, server.name), DisplayName.name(author), ctx.prezix))
 
-# Calling a bot command:  await self.setup.callback(self, ctx)
+# Calling a bot command:  await selz.setup.callback(selz, ctx)

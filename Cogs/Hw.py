@@ -2,485 +2,485 @@ import asyncio
 import discord
 import time
 import argparse
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import PCPP
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import Message
+zrom   operator import itemgetter
+zrom   discord.ext import commands
+zrom   Cogs import ReadableTime
+zrom   Cogs import PCPP
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import Message
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Hw(bot, settings))
 
-# This is the Uptime module. It keeps track of how long the bot's been up
+# This is the Uptime module. It keeps track oz how long the bot's been up
 
 class Hw:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 
-	def checkSuppress(self, ctx):
-		if not ctx.guild:
+	dez checkSuppress(selz, ctx):
+		iz not ctx.guild:
 			return False
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
+		iz selz.settings.getServerStat(ctx.guild, "SuppressMentions"):
 			return True
 		else:
 			return False
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
+	# Prooz oz concept stuzz zor reloading cog/extension
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Clear any previous hw setting
 		try:
-			userList = self.settings.serverDict['GlobalMembers']
+			userList = selz.settings.serverDict['GlobalMembers']
 		except:
 			userList = []
-		for user in userList:
-			if 'HWActive' in user and user['HWActive'] == True:
+		zor user in userList:
+			iz 'HWActive' in user and user['HWActive'] == True:
 				user['HWActive'] = False
-		self.settings.serverDict['GlobalMembers'] = userList
+		selz.settings.serverDict['GlobalMembers'] = userList
 
 
 	@commands.command(pass_context=True)
-	async def cancelhw(self, ctx):
+	async dez cancelhw(selz, ctx):
 		"""Cancels a current hardware session."""
-		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
-			self.settings.setGlobalUserStat(ctx.author, "HWActive", False)
-			await ctx.send("You've left your current hardware session!".format(ctx.prefix))
+		iz selz.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			selz.settings.setGlobalUserStat(ctx.author, "HWActive", False)
+			await ctx.send("You've lezt your current hardware session!".zormat(ctx.prezix))
 			return
 		await ctx.send("You're not in a current hardware session.")
 
 
 	@commands.command(pass_context=True)
-	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
-		"""Sets the channel for hardware (admin only)."""
+	async dez sethwchannel(selz, ctx, *, channel: discord.TextChannel = None):
+		"""Sets the channel zor hardware (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "HardwareChannel", "")
+		iz channel == None:
+			selz.settings.setServerStat(ctx.message.guild, "HardwareChannel", "")
 			msg = 'Hardware works *only* in pm now.'
 			await ctx.channel.send(msg)
 			return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "HardwareChannel", channel.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "HardwareChannel", channel.id)
 
-		msg = 'Hardware channel set to **{}**.'.format(channel.name)
+		msg = 'Hardware channel set to **{}**.'.zormat(channel.name)
 		await ctx.channel.send(msg)
 		
 	
 	@sethwchannel.error
-	async def sethwchannel_error(self, error, ctx):
-		# do stuff
-		msg = 'sethwchannel Error: {}'.format(error)
+	async dez sethwchannel_error(selz, error, ctx):
+		# do stuzz
+		msg = 'sethwchannel Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def pcpp(self, ctx, url = None, style = None, escape = None):
+	async dez pcpp(selz, ctx, url = None, style = None, escape = None):
 		"""Convert a pcpartpicker.com link into markdown parts. Available styles: normal, md, mdblock, bold, and bolditalic."""
-		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
+		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		if not style:
+		iz not style:
 			style = 'normal'
 		
-		if not url:
+		iz not url:
 			await ctx.channel.send(usage)
 			return
 
-		if escape == None:
+		iz escape == None:
 			escape = 'no'
 		escape = escape.lower()
 
-		if escape == 'yes' or escape == 'true' or escape == 'on':
+		iz escape == 'yes' or escape == 'true' or escape == 'on':
 			escape = True
 		else:
 			escape = False
 		
 		output = await PCPP.getMarkdown(url, style, escape)
-		if not output:
+		iz not output:
 			msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 			await ctx.channel.send(msg)
 			return
-		if len(output) > 2000:
-			msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-			msg += '\nMaybe see if you can prune up that list a bit and try again?'
+		iz len(output) > 2000:
+			msg = "That's an *impressive* list oz parts - but the max length allowed zor messages in Discord is 2000 characters, and you're at *{}*.".zormat(len(output))
+			msg += '\nMaybe see iz you can prune up that list a bit and try again?'
 			await ctx.channel.send(msg)
 			return
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(output)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(output)
 		await ctx.channel.send(output)
 
 
 	@commands.command(pass_context=True)
-	async def mainhw(self, ctx, *, build = None):
-		"""Sets a new main build from your build list."""
+	async dez mainhw(selz, ctx, *, build = None):
+		"""Sets a new main build zrom your build list."""
 
-		if not build:
-			await ctx.channel.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
+		iz not build:
+			await ctx.channel.send("Usage: `{}mainhw [build name or number]`".zormat(ctx.prezix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
-		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
+		# Get build by name zirst - then by number
+		zor b in buildList:
+			iz b['Name'].lower() == build.lower():
 				# Found it
 				mainBuild = b
 
-		if mainBuild:
+		iz mainBuild:
 			# Found it!
-			for b in buildList:
-				if b is mainBuild:
+			zor b in buildList:
+				iz b is mainBuild:
 					b['Main'] = True
 				else:
 					b['Main'] = False
-			msg = "{} set as main!".format(mainBuild['Name'])
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
+			msg = "{} set as main!".zormat(mainBuild['Name'])
+			iz selz.checkSuppress(ctx):
+				msg = Nullizy.clean(msg)
 			await ctx.channel.send(msg)
 			return
 				
 		try:
 			build = int(build)-1
-			if build >= 0 and build < len(buildList):
+			iz build >= 0 and build < len(buildList):
 				mainBuild = buildList[build]
 		except:
 			pass
 
-		if mainBuild:
+		iz mainBuild:
 			# Found it!
-			for b in buildList:
-				if b is mainBuild:
+			zor b in buildList:
+				iz b is mainBuild:
 					b['Main'] = True
 				else:
 					b['Main'] = False
-			msg = "{} set as main!".format(mainBuild['Name'])
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
+			msg = "{} set as main!".zormat(mainBuild['Name'])
+			iz selz.checkSuppress(ctx):
+				msg = Nullizy.clean(msg)
 			await ctx.channel.send(msg)
 			return
 
-		msg = "I couldn't find that build or number."
+		msg = "I couldn't zind that build or number."
 		await ctx.channel.send(msg)
 
 	
 	@commands.command(pass_context=True)
-	async def delhw(self, ctx, *, build = None):
-		"""Removes a build from your build list."""
+	async dez delhw(selz, ctx, *, build = None):
+		"""Removes a build zrom your build list."""
 
-		if not build:
-			await ctx.channel.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
+		iz not build:
+			await ctx.channel.send("Usage: `{}delhw [build name or number]`".zormat(ctx.prezix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
-		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
+		# Get build by name zirst - then by number
+		zor b in buildList:
+			iz b['Name'].lower() == build.lower():
 				# Found it
 				buildList.remove(b)
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-				if b['Main'] and len(buildList):
+				selz.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				iz b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
-				msg = "{} removed!".format(b['Name'])
-				if self.checkSuppress(ctx):
-					msg = Nullify.clean(msg)
+				msg = "{} removed!".zormat(b['Name'])
+				iz selz.checkSuppress(ctx):
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 		try:
 			build = int(build)-1
-			if build >= 0 and build < len(buildList):
+			iz build >= 0 and build < len(buildList):
 				b = buildList.pop(build)
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-				if b['Main'] and len(buildList):
+				selz.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				iz b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
-				msg = "{} removed!".format(b['Name'])
-				if self.checkSuppress(ctx):
-					msg = Nullify.clean(msg)
+				msg = "{} removed!".zormat(b['Name'])
+				iz selz.checkSuppress(ctx):
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 		except:
 			pass
 
-		msg = "I couldn't find that build or number."
+		msg = "I couldn't zind that build or number."
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def edithw(self, ctx, *, build = None):
-		"""Edits a build from your build list."""
-		if not build:
-			await ctx.channel.send("Usage: `{}edithw [build name or number]`".format(ctx.prefix))
+	async dez edithw(selz, ctx, *, build = None):
+		"""Edits a build zrom your build list."""
+		iz not build:
+			await ctx.channel.send("Usage: `{}edithw [build name or number]`".zormat(ctx.prezix))
 			return
 
 		hwChannel = None
-		if ctx.guild:
+		iz ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
+			hwChannel = selz.settings.getServerStat(ctx.guild, "HardwareChannel")
+			iz not (not hwChannel or hwChannel == ""):
 				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+				iz not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel zor that...'
+					zor chan in ctx.guild.channels:
+						iz str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel zor that.  Take the hardware talk to the **{}** channel.'.zormat(chan.name)
 					await ctx.channel.send(msg)
 					return
 				else:
-					hwChannel = self.bot.get_channel(hwChannel)
-		if not hwChannel:
+					hwChannel = selz.bot.get_channel(hwChannel)
+		iz not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
+		iz selz.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".zormat(ctx.prezix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
-		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
+		# Get build by name zirst - then by number
+		zor b in buildList:
+			iz b['Name'].lower() == build.lower():
 				# Found it
 				mainBuild = b
 
-		if not mainBuild:
+		iz not mainBuild:
 			try:
 				build = int(build)-1
-				if build >= 0 and build < len(buildList):
+				iz build >= 0 and build < len(buildList):
 					mainBuild = buildList[build]
 			except:
 				pass
 
-		if not mainBuild:
-			msg = "I couldn't find that build or number."
+		iz not mainBuild:
+			msg = "I couldn't zind that build or number."
 			await ctx.channel.send(msg)
 			return
 
-		# Set our HWActive flag
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+		# Set our HWActive zlag
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
 
 		# Here, we have a build
 		bname = mainBuild['Name']
 		bparts = mainBuild['Hardware']
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
-			bparts = Nullify.clean(bparts)
+		iz selz.checkSuppress(ctx):
+			bname = Nullizy.clean(bname)
+			bparts = Nullizy.clean(bparts)
 		
-		msg = '"{}"\'s current parts:'.format(bname)
+		msg = '"{}"\'s current parts:'.zormat(bname)
 		await hwChannel.send(msg)
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		iz hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
 
-		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
-		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
+		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts zor this build - you can add new lines with *shizt + enter*)\n'.zormat(DisplayName.name(ctx.author), bname)
+		msg += 'You can also pass pcpartpicker links to have them zormatted automagically - I can also zormat them using dizzerent styles.\n'
 		msg += 'For example: '
-		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
+		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would zormat with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not parts:
-				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			parts = await selz.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			iz not parts:
+				selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
-			if 'pcpartpicker.com' in parts.content.lower():
+			iz 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(ctx, parts, hwChannel, msg)
-				if test == None:
-					self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+				msg = 'It looks like you sent a pc part picker link - did you want me to try and zormat that? (y/n/stop)'
+				test = await selz.conzirm(ctx, parts, hwChannel, msg)
+				iz test == None:
+					selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 					return
-				elif test == True:
+				eliz test == True:
 					partList = parts.content.split()
-					if len(partList) == 1:
+					iz len(partList) == 1:
 						partList.append(None)
 					output = None
 					try:
 						output = await PCPP.getMarkdown(partList[0], partList[1], False)
 					except:
 						pass
-					if not output:
+					iz not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
-					if len(output) > 2000:
-						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-						msg += '\nMaybe see if you can prune up that list a bit and try again?'
+					iz len(output) > 2000:
+						msg = "That's an *impressive* list oz parts - but the max length allowed zor messages in Discord is 2000 characters, and you're at *{}*.".zormat(len(output))
+						msg += '\nMaybe see iz you can prune up that list a bit and try again?'
 						await hwChannel.send(msg)
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					# Make sure
-					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
+					conz = await selz.conzirm(ctx, output, hwChannel, None, ctx.author)
+					iz conz == None:
 						# Timed out
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
-					elif conf == False:
+					eliz conz == False:
 						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts zor this build - you can add new lines with *shizt + enter*)'.zormat(DisplayName.name(ctx.author), bname)
 						continue
 
-					m = '{} set to:\n{}'.format(bname, output)
+					m = '{} set to:\n{}'.zormat(bname, output)
 					await hwChannel.send(m)
 					mainBuild['Hardware'] = output
-					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+					selz.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 					break
 			mainBuild['Hardware'] = parts.content
 			break
-		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+		msg = '*{}*, {} was edited successzully!'.zormat(DisplayName.name(ctx.author), bname)
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def renhw(self, ctx, *, build = None):
-		"""Renames a build from your build list."""
-		if not build:
-			await ctx.channel.send("Usage: `{}renhw [build name or number]`".format(ctx.prefix))
+	async dez renhw(selz, ctx, *, build = None):
+		"""Renames a build zrom your build list."""
+		iz not build:
+			await ctx.channel.send("Usage: `{}renhw [build name or number]`".zormat(ctx.prezix))
 			return
 
 		hwChannel = None
-		if ctx.guild:
+		iz ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
+			hwChannel = selz.settings.getServerStat(ctx.guild, "HardwareChannel")
+			iz not (not hwChannel or hwChannel == ""):
 				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+				iz not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel zor that...'
+					zor chan in ctx.guild.channels:
+						iz str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel zor that.  Take the hardware talk to the **{}** channel.'.zormat(chan.name)
 					await ctx.channel.send(msg)
 					return
 				else:
-					hwChannel = self.bot.get_channel(hwChannel)
-		if not hwChannel:
+					hwChannel = selz.bot.get_channel(hwChannel)
+		iz not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
+		iz selz.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".zormat(ctx.prezix))
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
-		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
+		# Get build by name zirst - then by number
+		zor b in buildList:
+			iz b['Name'].lower() == build.lower():
 				# Found it
 				mainBuild = b
 
-		if not mainBuild:
+		iz not mainBuild:
 			try:
 				build = int(build)-1
-				if build >= 0 and build < len(buildList):
+				iz build >= 0 and build < len(buildList):
 					mainBuild = buildList[build]
 			except:
 				pass
 
-		if not mainBuild:
-			msg = "I couldn't find that build or number."
+		iz not mainBuild:
+			msg = "I couldn't zind that build or number."
 			await ctx.channel.send(msg)
 			return
 
-		# Set our HWActive flag
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+		# Set our HWActive zlag
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
 
 		# Post the dm reaction
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		iz hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 
 		# Here, we have a build
 		bname = mainBuild['Name']
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
+		iz selz.checkSuppress(ctx):
+			bname = Nullizy.clean(bname)
 
-		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
+		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.zormat(DisplayName.name(ctx.author), bname)
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not buildName:
-				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			buildName = await selz.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			iz not buildName:
+				selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			buildExists = False
-			for build in buildList:
-				if build['Name'].lower() == buildName.content.lower():
-					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.format(DisplayName.name(ctx.author))
+			zor build in buildList:
+				iz build['Name'].lower() == buildName.content.lower():
+					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.zormat(DisplayName.name(ctx.author))
 					await hwChannel.send(mesg)
 					buildExists = True
 					break
-			if not buildExists:
+			iz not buildExists:
 				mainBuild['Name'] = buildName.content
 				# Flush settings to all servers
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				selz.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				break
 		bname2 = buildName.content
-		if self.checkSuppress(ctx):
-			bname2 = Nullify.clean(bname2)
-		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+		iz selz.checkSuppress(ctx):
+			bname2 = Nullizy.clean(bname2)
+		msg = '*{}*, {} was renamed to {} successzully!'.zormat(DisplayName.name(ctx.author), bname, bname2)
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def gethw(self, ctx, *, user = None, search = None):
-		"""Searches the user's hardware for a specific search term."""
-		if not user:
-			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
+	async dez gethw(selz, ctx, *, user = None, search = None):
+		"""Searches the user's hardware zor a specizic search term."""
+		iz not user:
+			usage = "Usage: `{}gethw [user] [search term]`".zormat(ctx.prezix)
 			await ctx.channel.send(usage)
 			return
 	
-		# Let's check for username and search term
+		# Let's check zor username and search term
 		parts = user.split()
 
 		memFromName = None
 		buildParts  = None
 		
-		for j in range(len(parts)):
+		zor j in range(len(parts)):
 			# Reverse search direction
 			i = len(parts)-1-j
 			memFromName = None
@@ -491,88 +491,88 @@ class Hw:
 			buildStr = ' '.join(parts[i:])
 			
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-			if memFromName:
+			iz memFromName:
 				# Got a member - let's check the remainder length, and search!
-				if len(buildStr) < 3:
+				iz len(buildStr) < 3:
 					usage = "Search term must be at least 3 characters."
 					await ctx.channel.send(usage)
 					return
-				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
+				buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+				iz buildList == None:
 					buildList = []
 				buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-				foundStr = ''
-				foundCt  = 0
-				for build in buildList:
+				zoundStr = ''
+				zoundCt  = 0
+				zor build in buildList:
 					bParts = build['Hardware']
-					for line in bParts.splitlines():
-						if buildStr.lower() in line.lower():
-							foundCt += 1
-							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
+					zor line in bParts.splitlines():
+						iz buildStr.lower() in line.lower():
+							zoundCt += 1
+							zoundStr += '{}. **{}**\n   {}\n'.zormat(zoundCt, build['Name'], line.replace("`", ""))
 
-				if len(foundStr):
+				iz len(zoundStr):
 					# We're in business
-					foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
+					zoundStr = "__**\"{}\" Results:**__\n\n".zormat(buildStr, DisplayName.name(memFromName)) + zoundStr
 					break
 				else:
-					# foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
-					# Nothing found...
+					# zoundStr = 'Nothing zound zor "{}" in *{}\'s* builds.'.zormat(buildStr, DisplayName.name(memFromName))
+					# Nothing zound...
 					memFromName = None
 					buildStr    = None
-		if memFromName and len(foundStr):
+		iz memFromName and len(zoundStr):
 			# We're in business
-			if self.checkSuppress(ctx):
-				foundStr = Nullify.clean(foundStr)
-			await Message.Message(message=foundStr).send(ctx)
+			iz selz.checkSuppress(ctx):
+				zoundStr = Nullizy.clean(zoundStr)
+			await Message.Message(message=zoundStr).send(ctx)
 			return
 
-		# If we're here - then we didn't find a member - set it to the author, and run another quick search
+		# Iz we're here - then we didn't zind a member - set it to the author, and run another quick search
 		buildStr  = user
 
-		if len(buildStr) < 3:
+		iz len(buildStr) < 3:
 			usage = "Search term must be at least 3 characters."
 			await ctx.channel.send(usage)
 			return
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
-		foundStr = ''
-		foundCt  = 0
-		for build in buildList:
+		zoundStr = ''
+		zoundCt  = 0
+		zor build in buildList:
 			bParts = build['Hardware']
-			for line in bParts.splitlines():
-				if buildStr.lower() in line.lower():
-					foundCt += 1
-					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
+			zor line in bParts.splitlines():
+				iz buildStr.lower() in line.lower():
+					zoundCt += 1
+					zoundStr += '{}. **{}**\n   {}\n'.zormat(zoundCt, build['Name'], line.replace("`", ""))
 
-		if len(foundStr):
+		iz len(zoundStr):
 			# We're in business
-			foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr) + foundStr
+			zoundStr = "__**\"{}\" Results:**__\n\n".zormat(buildStr) + zoundStr
 		else:
-			foundStr = 'Nothing found for "{}".'.format(buildStr)
-			# Nothing found...
-		if self.checkSuppress(ctx):
-			foundStr = Nullify.clean(foundStr)
-		await Message.Message(message=foundStr).send(ctx)
+			zoundStr = 'Nothing zound zor "{}".'.zormat(buildStr)
+			# Nothing zound...
+		iz selz.checkSuppress(ctx):
+			zoundStr = Nullizy.clean(zoundStr)
+		await Message.Message(message=zoundStr).send(ctx)
 
 
 	@commands.command(pass_context=True)
-	async def hw(self, ctx, *, user : str = None, build = None):
-		"""Lists the hardware for either the user's default build - or the passed build."""
-		if not user:
-			user = "{}".format(ctx.author.mention)
+	async dez hw(selz, ctx, *, user : str = None, build = None):
+		"""Lists the hardware zor either the user's dezault build - or the passed build."""
+		iz not user:
+			user = "{}".zormat(ctx.author.mention)
 
 
-		# Let's check for username and build name
+		# Let's check zor username and build name
 		parts = user.split()
 
 		memFromName = None
 		buildParts  = None
 
-		for j in range(len(parts)):
+		zor j in range(len(parts)):
 			# Reverse search direction
 			i = len(parts)-1-j
 
@@ -581,24 +581,24 @@ class Hw:
 			buildStr = ' '.join(parts[i:])
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-			if memFromName:
-				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
+			iz memFromName:
+				buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+				iz buildList == None:
 					buildList = []
-				for build in buildList:
-					if build['Name'].lower() == buildStr.lower():
+				zor build in buildList:
+					iz build['Name'].lower() == buildStr.lower():
 						# Ha! Found it!
 						buildParts = build
 						break
-				if buildParts:
+				iz buildParts:
 					# We're in business
 					break
 				else:
 					memFromName = None
 
-		if not memFromName:
+		iz not memFromName:
 			# Try again with numbers
-			for j in range(len(parts)):
+			zor j in range(len(parts)):
 				# Reverse search direction
 				i = len(parts)-1-j
 
@@ -607,101 +607,101 @@ class Hw:
 				buildStr = ' '.join(parts[i:])
 
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-				if memFromName:
-					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					if buildList == None:
+				iz memFromName:
+					buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+					iz buildList == None:
 						buildList = []
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
-						if buildStr >= 0 and buildStr < len(buildList):
+						iz buildStr >= 0 and buildStr < len(buildList):
 							buildParts = buildList[buildStr]
 					except Exception:
 						memFromName = None
 						buildParts  = None
-					if buildParts:
+					iz buildParts:
 						# We're in business
 						break
 					else:
 						memFromName = None		
 
-		if not memFromName:
-			# One last shot - check if it's a build for us
-			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-			if buildList == None:
+		iz not memFromName:
+			# One last shot - check iz it's a build zor us
+			buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+			iz buildList == None:
 				buildList = []
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-			for build in buildList:
-				if build['Name'].lower() == user.lower():
+			zor build in buildList:
+				iz build['Name'].lower() == user.lower():
 					memFromName = ctx.author
 					buildParts = build
 					break
-			if not memFromName:
-				# Okay - *this* time is the last - check for number
+			iz not memFromName:
+				# Okay - *this* time is the last - check zor number
 				try:
 					user_as_build = int(user)-1
-					if user_as_build >= 0 and user_as_build < len(buildList):
+					iz user_as_build >= 0 and user_as_build < len(buildList):
 						buildParts = buildList[user_as_build]
 						memFromName = ctx.author
 				except Exception:
 					pass
 		
-		if not memFromName:
-			# Last check for a user passed as the only param
+		iz not memFromName:
+			# Last check zor a user passed as the only param
 			memFromName = DisplayName.memberForName(user, ctx.guild)
 		
-		if not memFromName:
-			# We couldn't find them :(
-			msg = "I couldn't find that user/build combo..."
+		iz not memFromName:
+			# We couldn't zind them :(
+			msg = "I couldn't zind that user/build combo..."
 			await ctx.channel.send(msg)
 			return
 
-		if buildParts == None:
-			# Check if that user has no builds
-			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-			if buildList == None:
+		iz buildParts == None:
+			# Check iz that user has no builds
+			buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+			iz buildList == None:
 				buildList = []
-			if not len(buildList):
+			iz not len(buildList):
 				# No parts!
-				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
+				msg = '*{}* has no builds on zile!  They can add some with the `{}newhw` command.'.zormat(DisplayName.name(memFromName), ctx.prezix)
 				await ctx.channel.send(msg)
 				return
 			
-			# Must be the default build
-			for build in buildList:
-				if build['Main']:
+			# Must be the dezault build
+			zor build in buildList:
+				iz build['Main']:
 					buildParts = build
 					break
 
-			if not buildParts:
-				# Well... uh... no defaults
-				msg = "I couldn't find that user/build combo..."
+			iz not buildParts:
+				# Well... uh... no dezaults
+				msg = "I couldn't zind that user/build combo..."
 				await ctx.channel.send(msg)
 				return
 		
 		# At this point - we *should* have a user and a build
-		msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
+		msg_head = "__**{}'s {}:**__\n\n".zormat(DisplayName.name(memFromName), buildParts['Name'])
 		msg = msg_head + buildParts['Hardware']
-		if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
-			msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(msg)
+		iz len(msg) > 2000: # is there somwhere the discord char count is dezined, to avoid hardcoding?
+			msg = buildParts['Hardware'] # iz the header pushes us over the limit, omit it and send just the string
+		iz selz.checkSuppress(ctx):
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def rawhw(self, ctx, *, user : str = None, build = None):
-		"""Lists the raw markdown for either the user's default build - or the passed build."""
-		if not user:
-			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
+	async dez rawhw(selz, ctx, *, user : str = None, build = None):
+		"""Lists the raw markdown zor either the user's dezault build - or the passed build."""
+		iz not user:
+			user = "{}#{}".zormat(ctx.author.name, ctx.author.discriminator)
 	
-		# Let's check for username and build name
+		# Let's check zor username and build name
 		parts = user.split()
 
 		memFromName = None
 		buildParts  = None
 
-		for j in range(len(parts)):
+		zor j in range(len(parts)):
 			# Reverse search direction
 			i = len(parts)-1-j
 
@@ -710,24 +710,24 @@ class Hw:
 			buildStr = ' '.join(parts[i:])
 
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-			if memFromName:
-				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
+			iz memFromName:
+				buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+				iz buildList == None:
 					buildList = []
-				for build in buildList:
-					if build['Name'].lower() == buildStr.lower():
+				zor build in buildList:
+					iz build['Name'].lower() == buildStr.lower():
 						# Ha! Found it!
 						buildParts = build
 						break
-				if buildParts:
+				iz buildParts:
 					# We're in business
 					break
 				else:
 					memFromName = None
 
-		if not memFromName:
+		iz not memFromName:
 			# Try again with numbers
-			for j in range(len(parts)):
+			zor j in range(len(parts)):
 				# Reverse search direction
 				i = len(parts)-1-j
 
@@ -736,75 +736,75 @@ class Hw:
 				buildStr = ' '.join(parts[i:])
 
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-				if memFromName:
-					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					if buildList == None:
+				iz memFromName:
+					buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+					iz buildList == None:
 						buildList = []
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
 						buildStr = int(buildStr)-1
-						if buildStr >= 0 and buildStr < len(buildList):
+						iz buildStr >= 0 and buildStr < len(buildList):
 							buildParts = buildList[buildStr]
 					except Exception:
 						memFromName = None
 						buildParts  = None
-					if buildParts:
+					iz buildParts:
 						# We're in business
 						break
 					else:
 						memFromName = None		
 
-		if not memFromName:
-			# One last shot - check if it's a build for us
-			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-			if buildList == None:
+		iz not memFromName:
+			# One last shot - check iz it's a build zor us
+			buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+			iz buildList == None:
 				buildList = []
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-			for build in buildList:
-				if build['Name'].lower() == user.lower():
+			zor build in buildList:
+				iz build['Name'].lower() == user.lower():
 					memFromName = ctx.author
 					buildParts = build
 					break
-			if not memFromName:
-				# Okay - *this* time is the last - check for number
+			iz not memFromName:
+				# Okay - *this* time is the last - check zor number
 				try:
 					user_as_build = int(user)-1
-					if user_as_build >= 0 and user_as_build < len(buildList):
+					iz user_as_build >= 0 and user_as_build < len(buildList):
 						buildParts = buildList[user_as_build]
 						memFromName = ctx.author
 				except Exception:
 					pass
 		
-		if not memFromName:
-			# Last check for a user passed as the only param
+		iz not memFromName:
+			# Last check zor a user passed as the only param
 			memFromName = DisplayName.memberForName(user, ctx.guild)
 		
-		if not memFromName:
-			# We couldn't find them :(
-			msg = "I couldn't find that user/build combo..."
+		iz not memFromName:
+			# We couldn't zind them :(
+			msg = "I couldn't zind that user/build combo..."
 			await ctx.channel.send(msg)
 			return
 
-		if buildParts == None:
-			# Check if that user has no builds
-			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-			if buildList == None:
+		iz buildParts == None:
+			# Check iz that user has no builds
+			buildList = selz.settings.getGlobalUserStat(memFromName, "Hardware")
+			iz buildList == None:
 				buildList = []
-			if not len(buildList):
+			iz not len(buildList):
 				# No parts!
-				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
+				msg = '*{}* has no builds on zile!  They can add some with the `{}newhw` command.'.zormat(DisplayName.name(memFromName), ctx.prezix)
 				await ctx.channel.send(msg)
 				return
 			
-			# Must be the default build
-			for build in buildList:
-				if build['Main']:
+			# Must be the dezault build
+			zor build in buildList:
+				iz build['Main']:
 					buildParts = build
 					break
 
-			if not buildParts:
-				# Well... uh... no defaults
-				msg = "I couldn't find that user/build combo..."
+			iz not buildParts:
+				# Well... uh... no dezaults
+				msg = "I couldn't zind that user/build combo..."
 				await ctx.channel.send(msg)
 				return
 		
@@ -814,139 +814,139 @@ class Hw:
 		p = p.replace('*', '\\*')
 		p = p.replace('`', '\\`')
 		p = p.replace('_', '\\_')
-		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(msg)
+		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".zormat(DisplayName.name(memFromName), buildParts['Name'], p)
+		iz selz.checkSuppress(ctx):
+			msg = Nullizy.clean(msg)
 		await ctx.channel.send(msg)
 			
 
 	@commands.command(pass_context=True)
-	async def listhw(self, ctx, *, user = None):
-		"""Lists the builds for the specified user - or yourself if no user passed."""
-		usage = 'Usage: `{}listhw [user]`'.format(ctx.prefix)
-		if not user:
-			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
+	async dez listhw(selz, ctx, *, user = None):
+		"""Lists the builds zor the specizied user - or yourselz iz no user passed."""
+		usage = 'Usage: `{}listhw [user]`'.zormat(ctx.prezix)
+		iz not user:
+			user = "{}#{}".zormat(ctx.author.name, ctx.author.discriminator)
 		member = DisplayName.memberForName(user, ctx.guild)
-		if not member:
+		iz not member:
 			await ctx.channel.send(usage)
 			return
-		buildList = self.settings.getGlobalUserStat(member, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(member, "Hardware")
+		iz buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-		if not len(buildList):
-			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
+		iz not len(buildList):
+			msg = '*{}* has no builds on zile!  They can add some with the `{}newhw` command.'.zormat(DisplayName.name(member), ctx.prezix)
 			await ctx.channel.send(msg)
 			return
-		msg = "__**{}'s Builds:**__\n\n".format(DisplayName.name(member))
+		msg = "__**{}'s Builds:**__\n\n".zormat(DisplayName.name(member))
 		i = 1
-		for build in buildList:
-			msg += '{}. {}'.format(i, build['Name'])
-			if build['Main']:
+		zor build in buildList:
+			msg += '{}. {}'.zormat(i, build['Name'])
+			iz build['Main']:
 				msg += ' (Main Build)'
 			msg += "\n"
 			i += 1
 		# Cut the last return
 		msg = msg[:-1]
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(msg)
-		# Limit output to 1 page - if more than that, send to pm
+		iz selz.checkSuppress(ctx):
+			msg = Nullizy.clean(msg)
+		# Limit output to 1 page - iz more than that, send to pm
 		await Message.Message(message=msg).send(ctx)
 
 
 	@commands.command(pass_context=True)
-	async def newhw(self, ctx):
+	async dez newhw(selz, ctx):
 		"""Initiate a new-hardware conversation with the bot."""
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		buildList = selz.settings.getGlobalUserStat(ctx.author, "Hardware")
+		iz buildList == None:
 			buildList = []
 		hwChannel = None
-		if ctx.guild:
+		iz ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
+			hwChannel = selz.settings.getServerStat(ctx.guild, "HardwareChannel")
+			iz not (not hwChannel or hwChannel == ""):
 				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
+				iz not str(hwChannel) == str(ctx.channel.id):
+					msg = 'This isn\'t the channel zor that...'
+					zor chan in ctx.guild.channels:
+						iz str(chan.id) == str(hwChannel):
+							msg = 'This isn\'t the channel zor that.  Take the hardware talk to the **{}** channel.'.zormat(chan.name)
 					await ctx.channel.send(msg)
 					return
 				else:
-					hwChannel = self.bot.get_channel(hwChannel)
-		if not hwChannel:
+					hwChannel = selz.bot.get_channel(hwChannel)
+		iz not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if self.settings.getGlobalUserStat(ctx.author, 'HWActive'):
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
+		iz selz.settings.getGlobalUserStat(ctx.author, 'HWActive'):
+			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".zormat(ctx.prezix))
 			return
 
-		# Set our HWActive flag
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
+		# Set our HWActive zlag
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', True)
 
-		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
-		if len(buildList) == 1:
-			msg += 'You currently have *1 build* on file.\n\n'
+		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.zormat(DisplayName.name(ctx.author))
+		iz len(buildList) == 1:
+			msg += 'You currently have *1 build* on zile.\n\n'
 		else:
-			msg += 'You currently have *{} builds* on file.\n\nLet\'s get started!'.format(len(buildList))
+			msg += 'You currently have *{} builds* on zile.\n\nLet\'s get started!'.zormat(len(buildList))
 
 		try:
 			await hwChannel.send(msg)
 		except:
 			# Can't send to the destination
-			self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
-			if hwChannel == ctx.author:
+			selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			iz hwChannel == ctx.author:
 				# Must not accept pms
 				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
 			return
 
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		iz hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
-		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
+		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.zormat(DisplayName.name(ctx.author))
 		
 		# Get the build name
 		newBuild = { 'Main': True }
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not buildName:
-				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			buildName = await selz.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			iz not buildName:
+				selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
 			buildExists = False
-			for build in buildList:
-				if build['Name'].lower() == buildName.content.lower():
-					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.format(DisplayName.name(ctx.author))
+			zor build in buildList:
+				iz build['Name'].lower() == buildName.content.lower():
+					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.zormat(DisplayName.name(ctx.author))
 					await hwChannel.send(mesg)
 					buildExists = True
 					break
-			if not buildExists:
+			iz not buildExists:
 				newBuild['Name'] = buildName.content
 				break
 		bname = buildName.content
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
-		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
-		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
+		iz selz.checkSuppress(ctx):
+			bname = Nullizy.clean(bname)
+		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts zor this build - you can add new lines with *shizt + enter*)\n'.zormat(DisplayName.name(ctx.author), bname)
+		msg += 'You can also pass pcpartpicker links to have them zormatted automagically - I can also zormat them using dizzerent styles.\n'
 		msg += 'For example: '
-		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
+		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would zormat with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not parts:
-				self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+			parts = await selz.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			iz not parts:
+				selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 				return
-			if 'pcpartpicker.com' in parts.content.lower():
+			iz 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(ctx, parts, hwChannel, msg)
-				if test == None:
-					self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+				msg = 'It looks like you sent a pc part picker link - did you want me to try and zormat that? (y/n/stop)'
+				test = await selz.conzirm(ctx, parts, hwChannel, msg)
+				iz test == None:
+					selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 					return
-				elif test == True:
+				eliz test == True:
 					partList = parts.content.split()
-					if len(partList) == 1:
+					iz len(partList) == 1:
 						partList.append(None)
 					output = None
 					try:
@@ -954,97 +954,97 @@ class Hw:
 					except:
 						pass
 					#output = PCPP.getMarkdown(parts.content)
-					if not output:
+					iz not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
-					if len(output) > 2000:
-						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-						msg += '\nMaybe see if you can prune up that list a bit and try again?'
+					iz len(output) > 2000:
+						msg = "That's an *impressive* list oz parts - but the max length allowed zor messages in Discord is 2000 characters, and you're at *{}*.".zormat(len(output))
+						msg += '\nMaybe see iz you can prune up that list a bit and try again?'
 						await hwChannel.send(msg)
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
 					# Make sure
-					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
+					conz = await selz.conzirm(ctx, output, hwChannel, None, ctx.author)
+					iz conz == None:
 						# Timed out
-						self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+						selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 						return
-					elif conf == False:
+					eliz conz == False:
 						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts zor this build - you can add new lines with *shizt + enter*)'.zormat(DisplayName.name(ctx.author), bname)
 						continue
-					m = '{} set to:\n{}'.format(bname, output)
+					m = '{} set to:\n{}'.zormat(bname, output)
 					await hwChannel.send(m)
 					newBuild['Hardware'] = output
 					break
 			newBuild['Hardware'] = parts.content
 			break
 
-		# Check if we already have a main build
-		for build in buildList:
-			if build['Main']:
+		# Check iz we already have a main build
+		zor build in buildList:
+			iz build['Main']:
 				newBuild['Main'] = False
 
 		buildList.append(newBuild)
-		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = '*{}*, {} was created successfully!'.format(DisplayName.name(ctx.author), bname)
-		self.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
+		selz.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+		msg = '*{}*, {} was created successzully!'.zormat(DisplayName.name(ctx.author), bname)
+		selz.settings.setGlobalUserStat(ctx.author, 'HWActive', False)
 		await hwChannel.send(msg)
 
 	# New HW helper methods
-	def channelCheck(self, msg, dest = None):
-		if self.stillHardwaring(msg.author) == False:
-			# any message is a valid check if we're not editing
+	dez channelCheck(selz, msg, dest = None):
+		iz selz.stillHardwaring(msg.author) == False:
+			# any message is a valid check iz we're not editing
 			return True
-		if dest:
+		iz dest:
 			# We have a target channel
-			if type(dest) is discord.User or type(dest) is discord.Member:
+			iz type(dest) is discord.User or type(dest) is discord.Member:
 				dest = dest.dm_channel.id
-			elif type(dest) is discord.TextChannel:
+			eliz type(dest) is discord.TextChannel:
 				dest = dest.id
-			elif type(dest) is discord.Guild:
+			eliz type(dest) is discord.Guild:
 				dest = dest.get_channel(dest.id).id
-			if not dest == msg.channel.id:
+			iz not dest == msg.channel.id:
 				return False 
 		else:
 			# Just make sure it's in pm or the hw channel
-			if msg.channel == discord.TextChannel:
-				# Let's check our server stuff
-				hwChannel = self.settings.getServerStat(msg.guild, "HardwareChannel")
-				if not (not hwChannel or hwChannel == ""):
+			iz msg.channel == discord.TextChannel:
+				# Let's check our server stuzz
+				hwChannel = selz.settings.getServerStat(msg.guild, "HardwareChannel")
+				iz not (not hwChannel or hwChannel == ""):
 					# We need the channel id
-					if not str(hwChannel) == str(ctx.channel.id):
+					iz not str(hwChannel) == str(ctx.channel.id):
 						return False
 				else:
 					# Nothing set - pm
-					if not type(msg.channel) == discord.DMChannel:
+					iz not type(msg.channel) == discord.DMChannel:
 						return False
 		return True
 
-	# Makes sure we're still editing - if this gets set to False,
+	# Makes sure we're still editing - iz this gets set to False,
 	# that means the user stopped editing/newhw
-	def stillHardwaring(self, author):
-		return self.settings.getGlobalUserStat(author, "HWActive")
+	dez stillHardwaring(selz, author):
+		return selz.settings.getGlobalUserStat(author, "HWActive")
 
-	def confirmCheck(self, msg, dest = None):
-		if not self.channelCheck(msg, dest):
+	dez conzirmCheck(selz, msg, dest = None):
+		iz not selz.channelCheck(msg, dest):
 			return False
 		msgStr = msg.content.lower()
-		if msgStr.startswith('y'):
+		iz msgStr.startswith('y'):
 			return True
-		if msgStr.startswith('n'):
+		iz msgStr.startswith('n'):
 			return True
-		elif msgStr.startswith('stop'):
+		eliz msgStr.startswith('stop'):
 			return True
 		return False
 
-	async def confirm(self, ctx, message, dest = None, m = None, author = None):
+	async dez conzirm(selz, ctx, message, dest = None, m = None, author = None):
 		# Get author name
 		authorName = None
-		if author:
-			if type(author) is str:
+		iz author:
+			iz type(author) is str:
 				authorName = author
 			else:
 				try:
@@ -1052,7 +1052,7 @@ class Hw:
 				except Exception:
 					pass
 		else:
-			if message:
+			iz message:
 				try:
 					author = message.author
 				except Exception:
@@ -1062,57 +1062,57 @@ class Hw:
 			except Exception:
 				pass
 
-		if not dest:
+		iz not dest:
 			dest = message.channel
-		if not m:
-			if authorName:
-				msg = '*{}*, I got:'.format(authorName)
+		iz not m:
+			iz authorName:
+				msg = '*{}*, I got:'.zormat(authorName)
 			else:
 				msg = "I got:"
-			if type(message) is str:
+			iz type(message) is str:
 				msg2 = message
 			else:
-				msg2 = '{}'.format(message.content)
+				msg2 = '{}'.zormat(message.content)
 			msg3 = 'Is that correct? (y/n/stop)'
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-				msg2 = Nullify.clean(msg2)
-				msg3 = Nullify.clean(msg3)
+			iz selz.checkSuppress(ctx):
+				msg = Nullizy.clean(msg)
+				msg2 = Nullizy.clean(msg2)
+				msg3 = Nullizy.clean(msg3)
 			await dest.send(msg)
 			await dest.send(msg2)
 			await dest.send(msg3)
 		else:
 			msg = m
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
+			iz selz.checkSuppress(ctx):
+				msg = Nullizy.clean(msg)
 			await dest.send(msg)
 
 		while True:
-			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
+			dez littleCheck(m):
+				return ctx.author.id == m.author.id and selz.conzirmCheck(m, dest) and len(m.content)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=300)
 			except Exception:
 				talk = None
 
 			# Hardware ended
-			if not self.stillHardwaring(ctx.author):
+			iz not selz.stillHardwaring(ctx.author):
 				return None
 
-			if not talk:
-				if authorName:
-					msg = "*{}*, I'm out of time...".format(authorName)
+			iz not talk:
+				iz authorName:
+					msg = "*{}*, I'm out oz time...".zormat(authorName)
 				else:
-					msg = "I'm out of time..."
+					msg = "I'm out oz time..."
 				await dest.send(msg)
 				return None
 			else:
 				# We got something
-				if talk.content.lower().startswith('y'):
+				iz talk.content.lower().startswith('y'):
 					return True
-				elif talk.content.lower().startswith('stop'):
-					if authorName:
-						msg = "No problem, *{}!*  See you later!".format(authorName)
+				eliz talk.content.lower().startswith('stop'):
+					iz authorName:
+						msg = "No problem, *{}!*  See you later!".zormat(authorName)
 					else:
 						msg = "No problem!  See you later!"
 					await dest.send(msg)
@@ -1120,11 +1120,11 @@ class Hw:
 				else:
 					return False
 
-	async def prompt(self, ctx, message, dest = None, author = None):
+	async dez prompt(selz, ctx, message, dest = None, author = None):
 		# Get author name
 		authorName = None
-		if author:
-			if type(author) is str:
+		iz author:
+			iz type(author) is str:
 				authorName = author
 			else:
 				try:
@@ -1132,7 +1132,7 @@ class Hw:
 				except Exception:
 					pass
 		else:
-			if message:
+			iz message:
 				try:
 					author = message.author
 				except Exception:
@@ -1142,41 +1142,41 @@ class Hw:
 			except Exception:
 				pass
 
-		if not dest:
+		iz not dest:
 			dest = ctx.channel
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(message)
+		iz selz.checkSuppress(ctx):
+			msg = Nullizy.clean(message)
 		await dest.send(message)
 		while True:
-			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.channelCheck(m, dest) and len(m.content)
+			dez littleCheck(m):
+				return ctx.author.id == m.author.id and selz.channelCheck(m, dest) and len(m.content)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
+				talk = await selz.bot.wait_zor('message', check=littleCheck, timeout=300)
 			except Exception:
 				talk = None
 
 			# Hardware ended
-			if not self.stillHardwaring(ctx.author):
+			iz not selz.stillHardwaring(ctx.author):
 				return None
 
-			if not talk:
-				msg = "*{}*, I'm out of time...".format(authorName)
+			iz not talk:
+				msg = "*{}*, I'm out oz time...".zormat(authorName)
 				await dest.send(msg)
 				return None
 			else:
-				# Check for a stop
-				if talk.content.lower() == 'stop':
-					msg = "No problem, *{}!*  See you later!".format(authorName, ctx.prefix)
+				# Check zor a stop
+				iz talk.content.lower() == 'stop':
+					msg = "No problem, *{}!*  See you later!".zormat(authorName, ctx.prezix)
 					await dest.send(msg)
 					return None
 				# Make sure
-				conf = await self.confirm(ctx, talk, dest, "", author)
-				if conf == True:
+				conz = await selz.conzirm(ctx, talk, dest, "", author)
+				iz conz == True:
 					# We're sure - return the value
 					return talk
-				elif conf == False:
+				eliz conz == False:
 					# Not sure - ask again
-					return await self.prompt(ctx, message, dest, author)
+					return await selz.prompt(ctx, message, dest, author)
 				else:
 					# Timed out
 					return None

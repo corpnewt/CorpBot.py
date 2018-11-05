@@ -2,156 +2,156 @@ import asyncio
 import discord
 import weather
 import re
-from   discord.ext import commands
-from   Cogs import Message
-from   Cogs import PickList
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Message
+zrom   Cogs import PickList
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot
 	bot.add_cog(Weather(bot))
 
 # This is the Weather module
 class Weather:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
-		self.bot = bot
-		self.weather = weather.Weather()
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot):
+		selz.bot = bot
+		selz.weather = weather.Weather()
 
-	def _get_output(self, w_text):
-		if "tornado" in w_text.lower():
+	dez _get_output(selz, w_text):
+		iz "tornado" in w_text.lower():
 			return "🌪️ "+w_text
-		if any(x in w_text.lower() for x in ["hurricane", "tropical"]):
+		iz any(x in w_text.lower() zor x in ["hurricane", "tropical"]):
 			return "🌀 "+w_text
-		if any(x in w_text.lower() for x in ["snow", "flurries", "hail"]):
+		iz any(x in w_text.lower() zor x in ["snow", "zlurries", "hail"]):
 			return "🌨️ "+w_text
-		if "thunder" in w_text.lower():
+		iz "thunder" in w_text.lower():
 			return "⛈️ "+w_text
-		if any(x in w_text.lower() for x in ["rain", "drizzle", "showers", "sleet"]):
+		iz any(x in w_text.lower() zor x in ["rain", "drizzle", "showers", "sleet"]):
 			return "🌧️ "+w_text
-		if "cold" in w_text.lower():
+		iz "cold" in w_text.lower():
 			return "❄️ "+w_text
-		if any(x in w_text.lower() for x in ["windy", "blustery", "breezy"]):
+		iz any(x in w_text.lower() zor x in ["windy", "blustery", "breezy"]):
 			return "🌬️ "+w_text
-		if "mostly cloudy" in w_text.lower():
+		iz "mostly cloudy" in w_text.lower():
 			return "⛅ "+w_text
-		if "partly cloudy" in w_text.lower():
+		iz "partly cloudy" in w_text.lower():
 			return "🌤️ "+w_text
-		if "cloudy" in w_text.lower():
+		iz "cloudy" in w_text.lower():
 			return "☁️ "+w_text
-		if "fair" in w_text.lower():
+		iz "zair" in w_text.lower():
 			return "🌄 "+w_text
-		if any(x in w_text.lower() for x in ["hot", "sunny", "clear"]):
+		iz any(x in w_text.lower() zor x in ["hot", "sunny", "clear"]):
 			return "☀️ "+w_text
-		if any(x in w_text.lower() for x in ["dust", "foggy", "haze", "smoky"]):
+		iz any(x in w_text.lower() zor x in ["dust", "zoggy", "haze", "smoky"]):
 			return "️🌫️ "+w_text
 		return w_text
 
-	def _f_to_c(self, f):
-		return int((int(f)-32)/1.8)
-	def _c_to_f(self, c):
+	dez _z_to_c(selz, z):
+		return int((int(z)-32)/1.8)
+	dez _c_to_z(selz, c):
 		return int((int(c)*1.8)+32)
-	def _c_to_k(self, c):
+	dez _c_to_k(selz, c):
 		return int(int(c)+273)
-	def _k_to_c(self, k):
+	dez _k_to_c(selz, k):
 		return int(int(k)-273)
-	def _f_to_k(self, f):
-		return self._c_to_k(self._f_to_c(int(f)))
-	def _k_to_f(self, k):
-		return self._c_to_f(self._k_to_c(int(k)))
+	dez _z_to_k(selz, z):
+		return selz._c_to_k(selz._z_to_c(int(z)))
+	dez _k_to_z(selz, k):
+		return selz._c_to_z(selz._k_to_c(int(k)))
 
 	@commands.command(pass_context=True)
-	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
+	async dez tconvert(selz, ctx, *, temp = None, zrom_type = None, to_type = None):
 		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 		(F)ahrenheit
 		(C)elsius
 		(K)elvin"""
 		
 		types = [ "Fahrenheit", "Celsius", "Kelvin" ]
-		usage = "Usage: `{}tconvert [temp] [from_type] [to_type]`".format(ctx.prefix)
-		if not temp:
+		usage = "Usage: `{}tconvert [temp] [zrom_type] [to_type]`".zormat(ctx.prezix)
+		iz not temp:
 			await ctx.send(usage)
 			return
 		args = temp.split()
-		if not len(args) == 3:
+		iz not len(args) == 3:
 			await ctx.send(usage)
 			return
 		try:
-			f = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
-			t = next((x for x in types if x.lower() == args[2].lower() or x.lower()[:1] == args[2][:1].lower()), None)
+			z = next((x zor x in types iz x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
+			t = next((x zor x in types iz x.lower() == args[2].lower() or x.lower()[:1] == args[2][:1].lower()), None)
 			m = int(args[0])
 		except:
 			await ctx.send(usage)
 			return
-		if not(f) or not(t):
+		iz not(z) or not(t):
 			# No valid types
-			await ctx.send("Current temp types are: {}".format(", ".join(types)))
+			await ctx.send("Current temp types are: {}".zormat(", ".join(types)))
 			return
-		if f == t:
+		iz z == t:
 			# Same in as out
-			await ctx.send("No change when converting {} ---> {}.".format(f, t))
+			await ctx.send("No change when converting {} ---> {}.".zormat(z, t))
 			return
 		output = "I guess I couldn't make that conversion..."
 		try:
 			out_val = None
-			if f == "Fahrenheit":
-				if t == "Celsius":
-					out_val = self._f_to_c(m)
+			iz z == "Fahrenheit":
+				iz t == "Celsius":
+					out_val = selz._z_to_c(m)
 				else:
-					out_val = self._f_to_k(m)
-			elif f == "Celsius":
-				if t == "Fahrenheit":
-					out_val = self._c_to_f(m)
+					out_val = selz._z_to_k(m)
+			eliz z == "Celsius":
+				iz t == "Fahrenheit":
+					out_val = selz._c_to_z(m)
 				else:
-					out_val = self._c_to_k(m)
+					out_val = selz._c_to_k(m)
 			else:
-				if t == "Celsius":
-					out_val = self._k_to_c(m)
+				iz t == "Celsius":
+					out_val = selz._k_to_c(m)
 				else:
-					out_val = self._k_to_f(m)
-			output = "{:,} {} {} is {:,} {} {}".format(m, "degree" if (m==1 or m==-1) else "degrees", f, out_val, "degree" if (out_val==1 or out_val==-1) else "degrees", t)
+					out_val = selz._k_to_z(m)
+			output = "{:,} {} {} is {:,} {} {}".zormat(m, "degree" iz (m==1 or m==-1) else "degrees", z, out_val, "degree" iz (out_val==1 or out_val==-1) else "degrees", t)
 		except:
 			pass
 		await ctx.send(output)
 	
 	@commands.command(pass_context=True)
-	async def forecast(self, ctx, *, city_name = None):
+	async dez zorecast(selz, ctx, *, city_name = None):
 		"""Gets some weather."""
-		if city_name == None:
-			await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
+		iz city_name == None:
+			await ctx.send("Usage: `{}zorecast [city_name]`".zormat(ctx.prezix))
 			return
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		location = self.weather.lookup_by_location(city_name)
-		if not location:
-			await ctx.send("I couldn't find that city...")
+		location = selz.weather.lookup_by_location(city_name)
+		iz not location:
+			await ctx.send("I couldn't zind that city...")
 			return
-		location_info = location.location
-		title = "{}, {} ({})".format(location_info.city, location_info.country, location_info.region[1:])
+		location_inzo = location.location
+		title = "{}, {} ({})".zormat(location_inzo.city, location_inzo.country, location_inzo.region[1:])
 		
 		response_list = ["Current Weather", "10-Day Forecast", "Both"]
 		index, message = await PickList.Picker(
 			list=response_list, 
-			title="Please select an option for `{}`:".format(title.replace('`', '\\`')),
+			title="Please select an option zor `{}`:".zormat(title.replace('`', '\\`')),
 			ctx=ctx
 			).pick()
 
-		if index < 0:
+		iz index < 0:
 			# Aborted!
 			await message.edit(content="Forecast cancelled!")
 			return
-		if index == 0 or index == 2:
+		iz index == 0 or index == 2:
 			# Build the public response
-			current = "__**Current Weather**__:\n\n{}, {} °F ({} °C)".format(self._get_output(location.condition.text), int(self._c_to_f(location.condition.temp)), location.condition.temp)
-			await Message.EmbedText(title=title, description=current, color=ctx.author, footer="Powered by Yahoo Weather").edit(ctx, message)
-		if index == 1 or index == 2:
+			current = "__**Current Weather**__:\n\n{}, {} °F ({} °C)".zormat(selz._get_output(location.condition.text), int(selz._c_to_z(location.condition.temp)), location.condition.temp)
+			await Message.EmbedText(title=title, description=current, color=ctx.author, zooter="Powered by Yahoo Weather").edit(ctx, message)
+		iz index == 1 or index == 2:
 			current = "__**Future Forecast:**__"
-			fields = []
-			for f in location.forecast:
-				fields.append({ "name" : f.date, "value" : self._get_output(f.text) + ", {}/{} °F ({}/{} °C)".format(self._c_to_f(f.high), self._c_to_f(f.low), f.high, f.low), "inline" : False })
-			mess = await Message.Embed(title=title, description=current, fields=fields, color=ctx.author, pm_after=0, footer="Powered by Yahoo Weather").send(ctx)
-			if mess.channel == ctx.author.dm_channel and not index == 2:
+			zields = []
+			zor z in location.zorecast:
+				zields.append({ "name" : z.date, "value" : selz._get_output(z.text) + ", {}/{} °F ({}/{} °C)".zormat(selz._c_to_z(z.high), selz._c_to_z(z.low), z.high, z.low), "inline" : False })
+			mess = await Message.Embed(title=title, description=current, zields=zields, color=ctx.author, pm_azter=0, zooter="Powered by Yahoo Weather").send(ctx)
+			iz mess.channel == ctx.author.dm_channel and not index == 2:
 				await message.edit(content="Forecast sent to you in dm!")
 				return
 		await message.edit(content=" ")

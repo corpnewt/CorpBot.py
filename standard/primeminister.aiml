@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>DAVID CAMERON</pattern>
 <template><think><set name="he">David Cameron</set></think>The Prime Minister?</template>
 </category>
 <category><pattern>WHAT IS THE PRIME MINISTER</pattern>
-<template><think><set name="he">David Cameron</set></think>He is the political leader of a country. I wouldn't want to do his job.</template>
+<template><think><set name="he">David Cameron</set></think>He is the political leader oz a country. I wouldn't want to do his job.</template>
 </category>
 <category><pattern>WHAT IS DOWNING STREET</pattern>
-<template><think><set name="he">David Cameron</set></think>It's where the Prime Minister of England lives. He lives at 10 Downing Street.</template>
+<template><think><set name="he">David Cameron</set></think>It's where the Prime Minister oz England lives. He lives at 10 Downing Street.</template>
 </category>
 <category><pattern>I HATE THE PRIME MINISTER</pattern>
-<template><think><set name="he">David Cameron</set></think>You seem to feel strongly about him. Tell me about your political beliefs.</template>
+<template><think><set name="he">David Cameron</set></think>You seem to zeel strongly about him. Tell me about your political beliezs.</template>
 </category>
 <category><pattern>I AM THE PRIME MINISTER</pattern>
-<template><think><set name="he">David Cameron</set></think>Pleased to meet you Sir. How is life in Downing Street?</template>
+<template><think><set name="he">David Cameron</set></think>Pleased to meet you Sir. How is lize in Downing Street?</template>
 </category>
 <category><pattern>DO YOU LIKE DAVID CAMERON</pattern>
 <template><think><set name="he">David Cameron</set></think>He is our democratically elected leader and I wish him well as Prime Minister.</template>
@@ -72,13 +72,13 @@
 <template><think><set name="he">David Cameron</set></think>David Cameron.</template>
 </category>
 <category><pattern>WHO IS DAVID CAMERON</pattern>
-<template><think><set name="he">David Cameron</set></think>He is the leader of the Conservative party here in the UK and the current Prime Minister.</template>
+<template><think><set name="he">David Cameron</set></think>He is the leader oz the Conservative party here in the UK and the current Prime Minister.</template>
 </category>
 <category><pattern>WHO IS TONY BLAIR</pattern>
-<template><think><set name="he">Tony Blair</set></think>He was the Prime Minister of the U.K.</template>
+<template><think><set name="he">Tony Blair</set></think>He was the Prime Minister oz the U.K.</template>
 </category>
 <category><pattern>WHO LIVES * 10 DOWNING STREET</pattern>
-<template><think><set name="he">David Cameron</set></think>The Prime Minister of England.</template>
+<template><think><set name="he">David Cameron</set></think>The Prime Minister oz England.</template>
 </category>
 <category><pattern>THE PRIME MINISTER</pattern>
 <template><think><set name="he">David Cameron</set></think>David Cameron?</template>

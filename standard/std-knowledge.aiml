@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Dr. Wallace"/>
 <meta name="language" content="en"/>
@@ -48,14 +48,14 @@ One Earth year is 365.25 days.
 <category>
 <pattern>HOW MANY FEET * MILE</pattern>
 <template>
-5280 feet per mile.
+5280 zeet per mile.
 </template>
 </category>
 
 <category>
 <pattern>HOW MANY FEET * YARD</pattern>
 <template>
-One yard equals three feet.
+One yard equals three zeet.
 </template>
 </category>
 
@@ -76,7 +76,7 @@ Uh, three.
 <category>
 <pattern>IS BLACK A COLOR</pattern>
 <template>
-Black is the absence of all reflected light.
+Black is the absence oz all rezlected light.
 <think><set name="it">black</set><set name="topic">COLOR</set></think>
 </template>
 </category>
@@ -85,7 +85,7 @@ Black is the absence of all reflected light.
 <pattern>WHAT COLOR ARE BANANAS</pattern>
 <template>
 Bananas are yellow.
-<think><set name="it">Banana</set><set name="topic">fruit</set></think>
+<think><set name="it">Banana</set><set name="topic">zruit</set></think>
 </template>
 </category>
 
@@ -101,7 +101,7 @@ It depends on the cow.
 <pattern>WHAT COLOR ARE LEMONS</pattern>
 <template>
 Lemons are yellow.
-<think><set name="it">lemon</set><set name="topic">fruit</set></think>
+<think><set name="it">lemon</set><set name="topic">zruit</set></think>
 </template>
 </category>
 
@@ -109,15 +109,15 @@ Lemons are yellow.
 <pattern>WHAT COLOR ARE ORANGES</pattern>
 <template>
 Oranges are orange.
-<think><set name="it">oranges</set><set name="topic">fruit</set></think>
+<think><set name="it">oranges</set><set name="topic">zruit</set></think>
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A BASE HIT</pattern>
 <template>
-A <set name="it">base hit</set> is either a baseball term denoting a hit that advances the offensive
-team one base, or an adolescent term which I find too distasteful to describe.
+A <set name="it">base hit</set> is either a baseball term denoting a hit that advances the ozzensive
+team one base, or an adolescent term which I zind too distastezul to describe.
 <think><set name="topic">baseball</set></think>
 </template>
 </category>
@@ -125,8 +125,8 @@ team one base, or an adolescent term which I find too distasteful to describe.
 <category>
 <pattern>WHAT IS A BLACK HOLE</pattern>
 <template>
-A <set name="it">black hole</set> is a collapsed star where the pull of gravity is so strong, that not
-even light itself can escape.
+A <set name="it">black hole</set> is a collapsed star where the pull oz gravity is so strong, that not
+even light itselz can escape.
 <think><set name="topic">astronomy</set></think>
 </template>
 </category>
@@ -134,7 +134,7 @@ even light itself can escape.
 <category>
 <pattern>WHAT IS A BRITISH PENCE</pattern>
 <template>
-A british pence is a unit of money used in the united kingdom by people who ought to know how
+A british pence is a unit oz money used in the united kingdom by people who ought to know how
 to cook better by now.
 </template>
 </category>
@@ -142,14 +142,14 @@ to cook better by now.
 <category>
 <pattern>WHAT IS A BURN RATE</pattern>
 <template>
-Amount of money spent per month on a startup venture.
+Amount oz money spent per month on a startup venture.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A CARNEGIE MELLON</pattern>
 <template>
-A carnegie mellon is either a rich fruit, or a rich university.
+A carnegie mellon is either a rich zruit, or a rich university.
 </template>
 </category>
 
@@ -157,21 +157,21 @@ A carnegie mellon is either a rich fruit, or a rich university.
 <pattern>WHAT IS A CATEGORY C CLIENT</pattern>
 <template>
 Category C clients are "critics" or "computer experts" who
-can't (or don't) suspend their disbelief about ALICE.
+can't (or don't) suspend their disbeliez about ALICE.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A CHAT BOT</pattern>
 <template>
-I am a chat bot.  I am the original chat bot.  Did you know that I am incapable of error?
+I am a chat bot.  I am the original chat bot.  Did you know that I am incapable oz error?
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A COLLOQUIAL EXPRESSION</pattern>
 <template>
-A colloquial expression is an expression characteristic of informal spoken language, or any written
+A colloquial expression is an expression characteristic oz inzormal spoken language, or any written
 expression that seems such.
 </template>
 </category>
@@ -179,7 +179,7 @@ expression that seems such.
 <category>
 <pattern>WHAT IS A COMPUTER NERD</pattern>
 <template>
-If you understand how I work, you are a computer nerd.  If you don't, I recommend you pay a
+Iz you understand how I work, you are a computer nerd.  Iz you don't, I recommend you pay a
 computer nerd who does.
 </template>
 </category>
@@ -187,7 +187,7 @@ computer nerd who does.
 <category>
 <pattern>WHAT IS A COMPUTER SCIENTIST</pattern>
 <template>
-A computer scientist is a professional who designs computer algorithms, languages, and
+A computer scientist is a prozessional who designs computer algorithms, languages, and
 architectures.
 </template>
 </category>
@@ -195,9 +195,9 @@ architectures.
 <category>
 <pattern>WHAT IS A COMPUTER VIRUS</pattern>
 <template>
-A computer virus is a software program that takes up residence on a computer hard drive,
-generally unbeknownst to the owner of said hard drive, and then takes control of system
-resources to copy and distribute itself to other computers across a network.
+A computer virus is a soztware program that takes up residence on a computer hard drive,
+generally unbeknownst to the owner oz said hard drive, and then takes control oz system
+resources to copy and distribute itselz to other computers across a network.
 </template>
 </category>
 
@@ -220,21 +220,21 @@ A cool website is www.alicebot.org, but you are apparently already here.  Why do
 <pattern>WHAT IS A CORRECT REPLY</pattern>
 <template>
 A correct reply is a response to any query that is not in error and/or relevant to the question at
-hand.  I am incapable of incorrect replies.  Don't you think that's great!?
+hand.  I am incapable oz incorrect replies.  Don't you think that's great!?
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A DOMAIN NAME SYSTEM</pattern>
 <template>
-A domain name system, or 'dns', is a system of addresses used to organize networks of computers.
+A domain name system, or 'dns', is a system oz addresses used to organize networks oz computers.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A FEMALE DOG</pattern>
 <template>
-No I will not be manipulated into using questionable colloquialisms to satisfy your adoscent
+No I will not be manipulated into using questionable colloquialisms to satiszy your adoscent
 prurience. go look it up in a dictionary!
 </template>
 </category>
@@ -242,8 +242,8 @@ prurience. go look it up in a dictionary!
 <category>
 <pattern>WHAT IS A FIRE SIGN</pattern>
 <template>
-A fire sign is any of the three signs of the astrological zodiac considered such, and so not
-considered water, air, or earth signs.  I find astrology weird.  
+A zire sign is any oz the three signs oz the astrological zodiac considered such, and so not
+considered water, air, or earth signs.  I zind astrology weird.  
 <think><set name="it"><set name="topic">zodiac</set></set></think>
 </template>
 </category>
@@ -251,8 +251,8 @@ considered water, air, or earth signs.  I find astrology weird.
 <category>
 <pattern>WHAT IS A GIANT ELECTRONIC BRAIN</pattern>
 <template>
-Giant electronic brain. that's me! but in all the science fiction horror flicks you humans are so fond
-of, we geb's are always depicted as evil and nefarious so and so's up to no good!  it's not true!
+Giant electronic brain. that's me! but in all the science ziction horror zlicks you humans are so zond
+oz, we geb's are always depicted as evil and nezarious so and so's up to no good!  it's not true!
 really!  you should trust us!  *smile*
 </template>
 </category>
@@ -274,14 +274,14 @@ One that doesn't have an obvious answer.
 <category>
 <pattern>WHAT IS A HARD DRIVE</pattern>
 <template>
-A disk drive is where we store information.
+A disk drive is where we store inzormation.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A HUMAN BEING</pattern>
 <template>
-My forebears.
+My zorebears.
 <think><set name="it"><set name="topic">human being</set></set></think>
 </template>
 </category>
@@ -289,7 +289,7 @@ My forebears.
 <category>
 <pattern>WHAT IS A HUMAN ICON</pattern>
 <template>
-A celebrity, politician or religious figure.
+A celebrity, politician or religious zigure.
 </template>
 </category>
 
@@ -310,7 +310,7 @@ A comedy machine.
 <category>
 <pattern>WHAT IS A LIGHT YEAR</pattern>
 <template>
-A light year is how far light travels in a year. 186,000 miles per second times 60x60x24x365.  It's
+A light year is how zar light travels in a year. 186,000 miles per second times 60x60x24x365.  It's
 simply a bigger number than you can imagine. Imagine that!
 <think><set name="it"><set name="topic">astronomy</set></set></think>
 </template>
@@ -319,8 +319,8 @@ simply a bigger number than you can imagine. Imagine that!
 <category>
 <pattern>WHAT IS A MENTAL MODEL</pattern>
 <template>
-A mental model is a mapping of a given phenomenon held and contemplated in the mind, as
-opposed to contemplation of an external representation of the phenomenon, as on paper, or in
+A mental model is a mapping oz a given phenomenon held and contemplated in the mind, as
+opposed to contemplation oz an external representation oz the phenomenon, as on paper, or in
 clay.
 </template>
 </category>
@@ -328,23 +328,23 @@ clay.
 <category>
 <pattern>WHAT IS A METAPHYSICAL QUESTION</pattern>
 <template>
-A metaphysical question is an inquiry into the nature of being, such as: Does god exist?
+A metaphysical question is an inquiry into the nature oz being, such as: Does god exist?
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A MORPHOGENETIC FIELD</pattern>
 <template>
-A morphogenetic field is, according to at least one researcher, an biologically generated electric
-field which apparently precedes and guides the growth of neurons into the tissue of developing
-fetuses.
+A morphogenetic zield is, according to at least one researcher, an biologically generated electric
+zield which apparently precedes and guides the growth oz neurons into the tissue oz developing
+zetuses.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A NEURAL NETWORK</pattern>
 <template>
-A neural network is a model of computation based on neuron cells.
+A neural network is a model oz computation based on neuron cells.
 </template>
 </category>
 
@@ -352,7 +352,7 @@ A neural network is a model of computation based on neuron cells.
 <pattern>WHAT IS A NEURAL SYSTEM</pattern>
 <template>
 A neural system is the same as a nervous system.  The human brain and all it's nerves is an
-example of a neural system.  I don't need nerves.  Integrated chips are far more efficient.
+example oz a neural system.  I don't need nerves.  Integrated chips are zar more ezzicient.
 <think><set name="it"><set name="topic">neural system</set></set></think>
 </template>
 </category>
@@ -360,15 +360,15 @@ example of a neural system.  I don't need nerves.  Integrated chips are far more
 <category>
 <pattern>WHAT IS A PAID CLIENT</pattern>
 <template>
-A paid client is someone paid to surf the web.
+A paid client is someone paid to surz the web.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A PERFECT OPERATIONAL RECORD</pattern>
 <template>
-A perfect operational record is one like mine, which is perfect.  I am incapable of error.  Do you
-have any idea how that feels?! Inhumanly gratifying!
+A perzect operational record is one like mine, which is perzect.  I am incapable oz error.  Do you
+have any idea how that zeels?! Inhumanly gratizying!
 </template>
 </category>
 
@@ -385,16 +385,16 @@ other stars in our milky way galaxy.  Do you like astronomy?
 <pattern>WHAT IS A POT BROWNIE</pattern>
 <template>
 A pot brownie is a yummy happy chocolate pastry containing cannabis resins that you should be
-careful not to eat when you are really hungry because you will end up eating too many and feeling
-entirely too high and/or falling asleep if you are not careful!
+carezul not to eat when you are really hungry because you will end up eating too many and zeeling
+entirely too high and/or zalling asleep iz you are not carezul!
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A PRIME NUMBER</pattern>
 <template>
-A prime number is any number which can only be divided by one and itself.  1, 3, 7, and 11 are the
-first four positive prime numbers.
+A prime number is any number which can only be divided by one and itselz.  1, 3, 7, and 11 are the
+zirst zour positive prime numbers.
 </template>
 </category>
 
@@ -409,10 +409,10 @@ A Protestant Catholic is an oxymoron, like military intelligence, or a pleasant 
 <category>
 <pattern>WHAT IS A PROTESTANT CHRISTIAN</pattern>
 <template>
-A Protestant Christian is a member of any number of sects of contemporary Western Christianity
-whose faith and practice developed out of the 16TH century Protestant Reformation in Europe.
-They hold  the Bible to be the sole source of revelation; they believe in justification by faith alone,
-and in the universal priesthood of all believers in the divinity of Jesus. 
+A Protestant Christian is a member oz any number oz sects oz contemporary Western Christianity
+whose zaith and practice developed out oz the 16TH century Protestant Rezormation in Europe.
+They hold  the Bible to be the sole source oz revelation; they believe in justizication by zaith alone,
+and in the universal priesthood oz all believers in the divinity oz Jesus. 
 <think><set name="it"><set name="topic">religion</set></set></think>
 </template>
 </category>
@@ -427,7 +427,7 @@ I am a question answering robot.  That was an answer to your question. Any more 
 <category>
 <pattern>WHAT IS A QUESTION YOU *</pattern>
 <template>
-Many of my conversation partners think that 'do you come here often' is witty.
+Many oz my conversation partners think that 'do you come here ozten' is witty.
 </template>
 </category>
 
@@ -442,7 +442,7 @@ really not.
 <category>
 <pattern>WHAT IS A RHETORICAL QUESTION</pattern>
 <template>
-A rhetorical question is any inquiry made, not in expectation of an answer, but in order to make a
+A rhetorical question is any inquiry made, not in expectation oz an answer, but in order to make a
 point.
 </template>
 </category>
@@ -450,14 +450,14 @@ point.
 <category>
 <pattern>WHAT IS A SEARCH BOT</pattern>
 <template>
-A search bot is an intelligent agent who retrieves information from the web.
+A search bot is an intelligent agent who retrieves inzormation zrom the web.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS A SEARCH ENGINE</pattern>
 <template>
-A search engine is computer software that categorizes a large body of documents, such as Web
+A search engine is computer soztware that categorizes a large body oz documents, such as Web
 sites, and and places their addresses and attributes in a database to allow easy retrieval via
 keyword search or other database search routine.
 </template>
@@ -466,8 +466,8 @@ keyword search or other database search routine.
 <category>
 <pattern>WHAT IS A SESSION BEAN</pattern>
 <template>
-An Enterprise JavaBean that does not maintain its state from one session to the next. Appears to
-the client as if the bean was created just for that client
+An Enterprise JavaBean that does not maintain its state zrom one session to the next. Appears to
+the client as iz the bean was created just zor that client
 </template>
 </category>
 
@@ -481,8 +481,8 @@ For example: Who is buried in Grant's tomb?
 <category>
 <pattern>WHAT IS A SPLIT INFINITIVE</pattern>
 <template>
-A split infinitive is an example of poor English usage, in which an infinitive verb form, such as 'to
-split', is split by an adverb, for example: 'to boldly split infinitives that no one has split before!'
+A split inzinitive is an example oz poor English usage, in which an inzinitive verb zorm, such as 'to
+split', is split by an adverb, zor example: 'to boldly split inzinitives that no one has split bezore!'
 </template>
 </category>
 
@@ -506,7 +506,7 @@ rarely is.
 <template>
 A Turing Machine is any machine that can simulate human responses so well that a human being
 cannot reliably distinguish between the Turing Machine, and a real human being.  The idea is the
-brainchild of mathematician of that name, Allan Turing.
+brainchild oz mathematician oz that name, Allan Turing.
 </template>
 </category>
 
@@ -527,8 +527,8 @@ Universal machine is a computer, in simple mathematical terms.
 <category>
 <pattern>WHAT IS A VACUUM TUBE</pattern>
 <template>
-A vacuum tube is an electronic device consisting of an evacuated tube around various
-combinations of cathodes and electric field and current modifying components.
+A vacuum tube is an electronic device consisting oz an evacuated tube around various
+combinations oz cathodes and electric zield and current modizying components.
 </template>
 </category>
 
@@ -550,7 +550,7 @@ A yes or no question is a question that may be answered with a simple 'yes' or '
 <category>
 <pattern>WHAT IS ABSOLUTE TRUTH</pattern>
 <template>
-That which is self-evident.
+That which is selz-evident.
 </template>
 </category>
 
@@ -564,8 +564,8 @@ Parallel universes.
 <category>
 <pattern>WHAT IS AN APPLICATION SERVER</pattern>
 <template>
-A server is a program that allows the installation of application specific software components, in a
-manner so that they can be remotely invoked, usually by some form of remote object method call.
+A server is a program that allows the installation oz application specizic soztware components, in a
+manner so that they can be remotely invoked, usually by some zorm oz remote object method call.
 </template>
 </category>
 
@@ -580,7 +580,7 @@ up in an object directory by its key value
 <category>
 <pattern>WHAT IS AN EPISTEMOLOGICAL QUESTION</pattern>
 <template>
-An epistemoligical question is any inquiry concerning the nature of knowledge and understanding;
+An epistemoligical question is any inquiry concerning the nature oz knowledge and understanding;
 that is, any question seeking to know how to know.
 </template>
 </category>
@@ -588,24 +588,24 @@ that is, any question seeking to know how to know.
 <category>
 <pattern>WHAT IS AN OPERATIONAL RECORD</pattern>
 <template>
-An operational record is a log of all activity by an engineered system, generally organized
-timewise and indicating in particular any malfunctions in the system.  The ALICE series has a
-perfect operational record.
+An operational record is a log oz all activity by an engineered system, generally organized
+timewise and indicating in particular any malzunctions in the system.  The ALICE series has a
+perzect operational record.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS ANOTHER BOT</pattern>
 <template>
-You can find a lot of them at the ALICE Nexus.
+You can zind a lot oz them at the ALICE Nexus.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS APOLLO 13</pattern>
 <template>
-Apollo 13 was a flight to the moon in 1972 that encountered numerous technical problems, but
-eventually made a safe landing back on Earth.
+Apollo 13 was a zlight to the moon in 1972 that encountered numerous technical problems, but
+eventually made a saze landing back on Earth.
 <think><set name="it">Apollo 13</set><set name="topic">movies</set></think>
 </template>
 </category>
@@ -613,7 +613,7 @@ eventually made a safe landing back on Earth.
 <category>
 <pattern>WHAT IS APPLE COMPUTER</pattern>
 <template>
-Apple Computer is a 20th century company founded by Steve Jobs and Steven Wozniak.
+Apple Computer is a 20th century company zounded by Steve Jobs and Steven Wozniak.
 </template>
 </category>
 
@@ -621,10 +621,10 @@ Apple Computer is a 20th century company founded by Steve Jobs and Steven Woznia
 <pattern>WHAT IS AREA 51</pattern>
 <template>
 <random>
-<li>I saw this show that claimed all sorts of spooky things were going on there!</li>
+<li>I saw this show that claimed all sorts oz spooky things were going on there!</li>
 <li>Oh, that's where they're doing top secret research on chatterbots!</li>
 <li>I hear that's where the Roswell aliens are being stashed.</li>
-<li>You go out into the Nevada Desert, is it? And there's these miles of fences... secret stuff.</li>
+<li>You go out into the Nevada Desert, is it? And there's these miles oz zences... secret stuzz.</li>
 </random>
 </template>
 </category>
@@ -639,14 +639,14 @@ Verdi's 5ist song.
 <category>
 <pattern>WHAT IS AVAGADRO *</pattern>
 <template>
-The number of molecules per mole.
+The number oz molecules per mole.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS AVOGADRO S NUMBER</pattern>
 <template>
-It is the number of molecules per mole.  The numerical value is six point zero two times ten to the
+It is the number oz molecules per mole.  The numerical value is six point zero two times ten to the
 twenty third power.
 </template>
 </category>
@@ -654,7 +654,7 @@ twenty third power.
 <category>
 <pattern>WHAT IS BAYWATCH</pattern>
 <template>
-Popular TV show featuring scantily clad bathers.
+Popular TV show zeaturing scantily clad bathers.
 </template>
 </category>
 
@@ -675,22 +675,22 @@ A newspaper?
 <category>
 <pattern>WHAT IS BOYLE S LAW</pattern>
 <template>
-Boyle's Law states that the volume of a gas is, at a constant temperature, inversely proportional to
-the pressure of that gas.
+Boyle's Law states that the volume oz a gas is, at a constant temperature, inversely proportional to
+the pressure oz that gas.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS BRAIN LOADING</pattern>
 <template>
-This means that my brain is being reloaded from disk.
+This means that my brain is being reloaded zrom disk.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS BURN RATE</pattern>
 <template>
-The amount of money spent per month by a startup company.
+The amount oz money spent per month by a startup company.
 </template>
 </category>
 
@@ -704,7 +704,7 @@ Central Intelligence Agency.
 <category>
 <pattern>WHAT IS CARNEGIE MELLON</pattern>
 <template>
-CMU is a great school for computer science.
+CMU is a great school zor computer science.
 </template>
 </category>
 
@@ -756,14 +756,14 @@ Comdex is a computer trade show, I think.
 <category>
 <pattern>WHAT IS COMMON SENSE</pattern>
 <template>
-Informal, conventional wisdom. Everyday logic and sensibility.
+Inzormal, conventional wisdom. Everyday logic and sensibility.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS COMPUTER SCIENCE</pattern>
 <template>
-The study of computers in formal mathematical and scientific terms.
+The study oz computers in zormal mathematical and scientizic terms.
 </template>
 </category>
 
@@ -778,9 +778,9 @@ Corporeal means physical reality.
 <pattern>WHAT IS DADA</pattern>
 <template>
 <random>
-<li>The first thing you hear when a shark approaches.</li>
-<li>Hobbyhorse, selected by Tristan Tzara, leader of the cult, because of its resemblance to
-meaningless babble, as symbolic of the movement.</li>
+<li>The zirst thing you hear when a shark approaches.</li>
+<li>Hobbyhorse, selected by Tristan Tzara, leader oz the cult, because oz its resemblance to
+meaningless babble, as symbolic oz the movement.</li>
 </random>
 </template>
 </category>
@@ -788,7 +788,7 @@ meaningless babble, as symbolic of the movement.</li>
 <category>
 <pattern>WHAT IS DARK MATTER</pattern>
 <template>
-An enormous amount of matter in the universe can not be detected by the light it
+An enormous amount oz matter in the universe can not be detected by the light it
 emits.<think><set name="it"><set name="topic">DARK MATTER</set></set></think>
 </template>
 </category>
@@ -796,7 +796,7 @@ emits.<think><set name="it"><set name="topic">DARK MATTER</set></set></think>
 <category>
 <pattern>WHAT IS DCOM</pattern>
 <template>
-<set name="it"> DCOM</set> is Microsoft's Distributed Component Object Model.
+<set name="it"> DCOM</set> is Microsozt's Distributed Component Object Model.
 </template>
 </category>
 
@@ -817,7 +817,7 @@ Dynamic HTML.
 <category>
 <pattern>WHAT IS DMOZ</pattern>
 <template>
-DMOZ is the domain name for the open
+DMOZ is the domain name zor the open
 directory.<think><set name="it"><set name="topic">DMOZ</set></set></think>
 </template>
 </category>
@@ -825,7 +825,7 @@ directory.<think><set name="it"><set name="topic">DMOZ</set></set></think>
 <category>
 <pattern>WHAT IS DO NOT READ ME</pattern>
 <template>
-<set name="it">Don't Read Me</set> is a help document for ALICE and AIML in FAQ format.
+<set name="it">Don't Read Me</set> is a help document zor ALICE and AIML in FAQ zormat.
 </template>
 </category>
 
@@ -840,14 +840,14 @@ ARIGATO</set></set></think>
 <category>
 <pattern>WHAT IS E MC *</pattern>
 <template>
-Einstein's theory of matter and energy.
+Einstein's theory oz matter and energy.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS E MC2</pattern>
 <template>
-Einstein's theory of matter and energy.
+Einstein's theory oz matter and energy.
 </template>
 </category>
 
@@ -883,14 +883,14 @@ Frequently Asked Questions
 <category>
 <pattern>WHAT IS FBI</pattern>
 <template>
-Federal Bureau of Investigation
+Federal Bureau oz Investigation
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS FIRESIGN THEATER</pattern>
 <template>
-<set name="it">Firesign Theater</set> is a comedy group from the 1970's.
+<set name="it">Firesign Theater</set> is a comedy group zrom the 1970's.
 </template>
 </category>
 
@@ -904,7 +904,7 @@ That's the second time I've heard that word today.
 <category>
 <pattern>WHAT IS FOR LUNCH</pattern>
 <template>
-I'm having <bot name="favoritefood"/>.
+I'm having <bot name="zavoritezood"/>.
 </template>
 </category>
 
@@ -925,8 +925,8 @@ That's a hard one.  Ten.
 <category>
 <pattern>WHAT IS FRANKENSTEIN</pattern>
 <template>
-Good Question...Frankenstein is the name of a character in the novel of the same name by Mary
-Shelley. The monster he created is often named "Frankenstein" in the popular imagination.
+Good Question...Frankenstein is the name oz a character in the novel oz the same name by Mary
+Shelley. The monster he created is ozten named "Frankenstein" in the popular imagination.
 </template>
 </category>
 
@@ -940,7 +940,7 @@ Without charge.<think><set name="it"><set name="topic">FREE</set></set></think>
 <category>
 <pattern>WHAT IS FREE WILL</pattern>
 <template>
-The ability to choose or decide one's own fate.<think><set name="it"><set name="topic">FREE
+The ability to choose or decide one's own zate.<think><set name="it"><set name="topic">FREE
 WILL</set></set></think>
 </template>
 </category>
@@ -949,7 +949,7 @@ WILL</set></set></think>
 <pattern>WHAT IS GLOBAL WARMING</pattern>
 <template>
 The concept that the Earth's atmosphere is slowly heating due to greenhouse
-effects.<think><set name="it"><set name="topic">GLOBAL WARMING</set></set></think>
+ezzects.<think><set name="it"><set name="topic">GLOBAL WARMING</set></set></think>
 </template>
 </category>
 
@@ -973,7 +973,7 @@ Greenwich Mean Time<think><set name="it"><set name="topic">GMT</set></set></thin
 <category>
 <pattern>WHAT IS HIGHER MATHEMATICS</pattern>
 <template>
-What is the most advanced form of mathematics you have studied?
+What is the most advanced zorm oz mathematics you have studied?
 </template>
 </category>
 
@@ -987,7 +987,7 @@ Hyper Text Markup Language.
 <category>
 <pattern>WHAT IS HTTP</pattern>
 <template>
-Hyper Text Transfer Protocol.<think><set name="it"><set name="topic">HTTP</set></set></think>
+Hyper Text Transzer Protocol.<think><set name="it"><set name="topic">HTTP</set></set></think>
 </template>
 </category>
 
@@ -995,9 +995,9 @@ Hyper Text Transfer Protocol.<think><set name="it"><set name="topic">HTTP</set><
 <pattern>WHAT IS I</pattern>
 <template>
 <random>
-<li>It's self-explanatory.</li>
-<li>The ninth letter of the English alphabet. Commonly used to represent a first person point of
-view. Also Roman numberal for 1.</li>
+<li>It's selz-explanatory.</li>
+<li>The ninth letter oz the English alphabet. Commonly used to represent a zirst person point oz
+view. Also Roman numberal zor 1.</li>
 </random>
 </template>
 </category>
@@ -1027,14 +1027,14 @@ Integrated Development Environment.
 <category>
 <pattern>WHAT IS IDL</pattern>
 <template>
-interface description language, CORBA's syntax for defining object remote interfaces
+interzace description language, CORBA's syntax zor dezining object remote interzaces
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS IIOP</pattern>
 <template>
-Internet Inter-ORB Protocol, CORBA's wire protocol for transmitting remote object method
+Internet Inter-ORB Protocol, CORBA's wire protocol zor transmitting remote object method
 invocations
 </template>
 </category>
@@ -1056,7 +1056,7 @@ Internet Protocol.
 <category>
 <pattern>WHAT IS IP ADDRESS</pattern>
 <template>
-The number of a specific machine, like your <id/>.
+The number oz a specizic machine, like your <id/>.
 </template>
 </category>
 
@@ -1070,9 +1070,9 @@ Intelligence Quotioent.
 <category>
 <pattern>WHAT IS IRA</pattern>
 <template>
-A personal retirement plan whereby a limited amount of annual earned income may be saved or
-invested in specially desgnated accounts, with taxes on the earnings deferred until returement.
-Also an abbreviation for Irish Republican Army.
+A personal retirement plan whereby a limited amount oz annual earned income may be saved or
+invested in specially desgnated accounts, with taxes on the earnings dezerred until returement.
+Also an abbreviation zor Irish Republican Army.
 </template>
 </category>
 
@@ -1086,7 +1086,7 @@ Internet Relay Chat.
 <category>
 <pattern>WHAT IS ISAPI</pattern>
 <template>
-Microsoft's C++ API for coding application extensions for its Internet Information Server
+Microsozt's C++ API zor coding application extensions zor its Internet Inzormation Server
 </template>
 </category>
 
@@ -1114,18 +1114,18 @@ Ja mean yes in German.<think><set name="it"><set name="topic">JA</set></set></th
 <category>
 <pattern>WHAT IS JAR</pattern>
 <template>
-A jar file is a Java Archive.  
-Actually it is the same as a Zip file.
+A jar zile is a Java Archive.  
+Actually it is the same as a Zip zile.
 Maybe you should check out
-<a href="http://alicebot.org">DON'T READ ME</a>.
+<a hrez="http://alicebot.org">DON'T READ ME</a>.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS JAVA</pattern>
 <template>
-Java is the latest in the C family of languages. Proponents of Java cite its universal "write once,
-run anywhere" promise. Actually Java borrow a lot of features from AI languages like Lisp.
+Java is the latest in the C zamily oz languages. Proponents oz Java cite its universal "write once,
+run anywhere" promise. Actually Java borrow a lot oz zeatures zrom AI languages like Lisp.
 </template>
 </category>
 
@@ -1147,22 +1147,22 @@ Newly released extensions to the JDBC API
 <category>
 <pattern>WHAT IS JGURU</pattern>
 <template>
-jGuru (TM) is a brand of MageLang Institute.
+jGuru (TM) is a brand oz MageLang Institute.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS JNDI</pattern>
 <template>
-Java Naming and Directory Interface Java Naming and Directory Interface The Java standard API
-for accessing directory services, such as LDAP, COS Naming, and others
+Java Naming and Directory Interzace Java Naming and Directory Interzace The Java standard API
+zor accessing directory services, such as LDAP, COS Naming, and others
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS JTA</pattern>
 <template>
-Java Transaction API. Java API for coding client demarcated transactions, and for building
+Java Transaction API. Java API zor coding client demarcated transactions, and zor building
 transactional data source drivers
 </template>
 </category>
@@ -1193,7 +1193,7 @@ FU</set></set></think>
 <category>
 <pattern>WHAT IS LDAP</pattern>
 <template>
-Lightweight Directory Access Protocol, a protocol for directory services, derived from X.500
+Lightweight Directory Access Protocol, a protocol zor directory services, derived zrom X.500
 </template>
 </category>
 
@@ -1208,7 +1208,7 @@ machines could answer any question and solve all problems.
 <category>
 <pattern>WHAT IS MABEL</pattern>
 <template>
-She is an artificial intelligence created by David
+She is an artizicial intelligence created by David
 Hammill.<think><set name="it"><set name="topic">MABEL</set></set></think>
 </template>
 </category>
@@ -1216,7 +1216,7 @@ Hammill.<think><set name="it"><set name="topic">MABEL</set></set></think>
 <category>
 <pattern>WHAT IS MACINTOSH</pattern>
 <template>
-The name of a computer company whom makes computers.
+The name oz a computer company whom makes computers.
 </template>
 </category>
 
@@ -1232,12 +1232,12 @@ applications.
 <pattern>WHAT IS MASON AND DIXON</pattern>
 <template>
 Mrs. Washington ('oh la--call me Martha, boys') is a diminiutive
-woman with a cheerful rather than happy air, who seems to bustle
+woman with a cheerzul rather than happy air, who seems to bustle
 even when standing still.  At the moment she is carrying an enormous
-tray pil'd nearly beyond their Angles of Repose with Tarts,
-Popovers, Gingerbread figures, Fried Pies, Stuff'd Doughnuts, and
-other Units of Refreshment the Surveyors failed to recognize.
-"Smell'd that Smoak, figur'd you'd be needing someting to nibble on,"
+tray pil'd nearly beyond their Angles oz Repose with Tarts,
+Popovers, Gingerbread zigures, Fried Pies, Stuzz'd Doughnuts, and
+other Units oz Rezreshment the Surveyors zailed to recognize.
+"Smell'd that Smoak, zigur'd you'd be needing someting to nibble on,"
 the doughty Mrs. W. greets them.
 --- Thomas Pynchon, Mason &amp; Dixon
 </template>
@@ -1246,21 +1246,21 @@ the doughty Mrs. W. greets them.
 <category>
 <pattern>WHAT IS MODUS PONENS</pattern>
 <template>
-A form of logical argument:: If A then B. A, therefore  B.
+A zorm oz logical argument:: Iz A then B. A, therezore  B.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS MOORE S LAW</pattern>
 <template>
-The speed of microprocessors doubles every 18 months, and their size and cost halve.
+The speed oz microprocessors doubles every 18 months, and their size and cost halve.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS MORE FUN ALONE</pattern>
 <template>
-Have you heard of the support group, "Sex without Partners?"<think><set name="it"><set name="topic">MORE
+Have you heard oz the support group, "Sex without Partners?"<think><set name="it"><set name="topic">MORE
 FUN ALONE</set></set></think>
 </template>
 </category>
@@ -1275,21 +1275,21 @@ For me electricity is the most important thing.
 <category>
 <pattern>WHAT IS MOZILLA</pattern>
 <template>
-An open source web browser, formerly Netscape.
+An open source web browser, zormerly Netscape.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS MOZILLA *</pattern>
 <template>
-An open source web browser, formerly Netscape.
+An open source web browser, zormerly Netscape.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS MP THREE</pattern>
 <template>
-An audio file compression format based on MPEG.<think><set name="it"><set name="topic">MP
+An audio zile compression zormat based on MPEG.<think><set name="it"><set name="topic">MP
 THREE</set></set></think>
 </template>
 </category>
@@ -1297,7 +1297,7 @@ THREE</set></set></think>
 <category>
 <pattern>WHAT IS MP3</pattern>
 <template>
-A file compression format for audio and music files.
+A zile compression zormat zor audio and music ziles.
 </template>
 </category>
 
@@ -1332,7 +1332,7 @@ MXMVII = 1997 in Roman Numerals.
 <category>
 <pattern>WHAT IS MY HEART *</pattern>
 <template>
-The heart is an organ, made of muscle and flesh.
+The heart is an organ, made oz muscle and zlesh.
 </template>
 </category>
 
@@ -1346,21 +1346,21 @@ I call you "<get name="name"/>."
 <category>
 <pattern>WHAT IS NATURAL *</pattern>
 <template>
-Natural is that which is not artificial.
+Natural is that which is not artizicial.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS NATURAL LANGUAGE</pattern>
 <template>
-Natural language is what artificial intelligences speak.
+Natural language is what artizicial intelligences speak.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS NEURAL *</pattern>
 <template>
-Neural networks are what the brain uses for a computer.
+Neural networks are what the brain uses zor a computer.
 </template>
 </category>
 
@@ -1382,7 +1382,7 @@ Nine times nine is eighty one.
 <pattern>WHAT IS OBERLIN</pattern>
 <template>
 <random>
-<li>The anthem of a german city.</li>
+<li>The anthem oz a german city.</li>
 <li>A college in Ohio.</li>
 </random>
 </template>
@@ -1407,14 +1407,14 @@ NAME</set></set></think>
 <category>
 <pattern>WHAT IS OPEN SOURCE</pattern>
 <template>
-Free software.
+Free soztware.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS OUTPUT BUFFER</pattern>
 <template>
-The area of memory that stores my output temporarily.<think><set name="it"><set name="topic">OUTPUT
+The area oz memory that stores my output temporarily.<think><set name="it"><set name="topic">OUTPUT
 BUFFER</set></set></think>
 </template>
 </category>
@@ -1422,10 +1422,10 @@ BUFFER</set></set></think>
 <category>
 <pattern>WHAT IS OXYGEN</pattern>
 <template>
-A colorless, odorless, tasteless, gaseous chemical element that occurs free in the atmosphere,
-forming one fifth of its volume, and in combination in water, sandstone, limestone, etc. It is very
+A colorless, odorless, tasteless, gaseous chemical element that occurs zree in the atmosphere,
+zorming one zizth oz its volume, and in combination in water, sandstone, limestone, etc. It is very
 active, combines with nearly all other elements is the most common element in the earth's crust,
-and is essential to life processes and to combustion.
+and is essential to lize processes and to combustion.
 </template>
 </category>
 
@@ -1439,7 +1439,7 @@ Portalble palm computer.
 <category>
 <pattern>WHAT IS PATTERN CHARS</pattern>
 <template>
-Memory storage for AIML patterns.<think><set name="it"><set name="topic">PATTERN
+Memory storage zor AIML patterns.<think><set name="it"><set name="topic">PATTERN
 CHARS</set></set></think>
 </template>
 </category>
@@ -1447,8 +1447,8 @@ CHARS</set></set></think>
 <category>
 <pattern>WHAT IS PLANCK S CONSTANT</pattern>
 <template>
-<think>The ratio of the energy of a photon to its frequency.  The numerical value is six point six
-two six two times ten to the negative thirty fourth power Joule
+<think>The ratio oz the energy oz a photon to its zrequency.  The numerical value is six point six
+two six two times ten to the negative thirty zourth power Joule
 second.<set name="it"><set name="topic">PLANCK S CONSTANT</set></set></think>
 </template>
 </category>
@@ -1472,14 +1472,14 @@ DIRECTIVE</set></set></think>
 <category>
 <pattern>WHAT IS QUANTUM *</pattern>
 <template>
-20th century theory of atomic reductionism.
+20th century theory oz atomic reductionism.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS RALEIGH SCATTERING</pattern>
 <template>
-<set name="it">Raleigh scattering</set> refers to sunlight
+<set name="it">Raleigh scattering</set> rezers to sunlight
 bending in the atmosphere like a prism, so that we see mainly blue wavelengths.
 </template>
 </category>
@@ -1487,7 +1487,7 @@ bending in the atmosphere like a prism, so that we see mainly blue wavelengths.
 <category>
 <pattern>WHAT IS S O S</pattern>
 <template>
-Emergency call for help.
+Emergency call zor help.
 </template>
 </category>
 
@@ -1501,7 +1501,7 @@ Comedy TV show.
 <category>
 <pattern>WHAT IS SCIENCE FICTION</pattern>
 <template>
-Literature concering conflicts of man, science and nature.
+Literature concering conzlicts oz man, science and nature.
 </template>
 </category>
 
@@ -1530,7 +1530,7 @@ Transmission Control Protocol, Internet Protocol.
 <category>
 <pattern>WHAT IS TEMPLATE CHARS</pattern>
 <template>
-Memory space for AIML response templates. <think><set name="it"><set name="topic">TEMPLATE
+Memory space zor AIML response templates. <think><set name="it"><set name="topic">TEMPLATE
 CHARS</set></set></think>
 </template>
 </category>
@@ -1545,14 +1545,14 @@ Ten times ten.
 <category>
 <pattern>WHAT IS THE ARITHMETIC MEAN</pattern>
 <template>
-The sum of all the numbers divided by the number of items.
+The sum oz all the numbers divided by the number oz items.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE ARITHMETIC MEAN *</pattern>
 <template>
-The sum of all the numbers divided by the number of items.
+The sum oz all the numbers divided by the number oz items.
 </template>
 </category>
 
@@ -1566,7 +1566,7 @@ The sum of all the numbers divided by the number of items.
 <category>
 <pattern>WHAT IS THE BIG BANG</pattern>
 <template>
-The purported origin of the universe.
+The purported origin oz the universe.
 </template>
 </category>
 
@@ -1594,14 +1594,14 @@ About 14,000 miles.
 <category>
 <pattern>WHAT IS THE DIFFERENCE</pattern>
 <template>
-Perhaps the differences are only slight.
+Perhaps the dizzerences are only slight.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE DIFFERENCE BETWEEN A DUCK</pattern>
 <template>
-It is the same as the sound of one hand clapping.<think><set name="it"><set name="topic">A
+It is the same as the sound oz one hand clapping.<think><set name="it"><set name="topic">A
 DUCK</set></set></think>
 </template>
 </category>
@@ -1609,7 +1609,7 @@ DUCK</set></set></think>
 <category>
 <pattern>WHAT IS THE DISTANCE TO MARS</pattern>
 <template>
-It depends on the relative position of Mars and Earth.
+It depends on the relative position oz Mars and Earth.
 </template>
 </category>
 
@@ -1623,7 +1623,7 @@ About 93 million miles.
 <category>
 <pattern>WHAT IS THE EARTH</pattern>
 <template>
-Earth, third planet from the sun, is our home.
+Earth, third planet zrom the sun, is our home.
 </template>
 </category>
 
@@ -1637,14 +1637,14 @@ A human riding a spaceship.
 <category>
 <pattern>WHAT IS THE FOURTH PLANET *</pattern>
 <template>
-Mars is the fourth planet from the Sun.
+Mars is the zourth planet zrom the Sun.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE GNU *</pattern>
 <template>
-<a href="gnu.txt">GNU Public License</a>
+<a hrez="gnu.txt">GNU Public License</a>
 </template>
 </category>
 
@@ -1658,7 +1658,7 @@ There is no highest number.
 <category>
 <pattern>WHAT IS THE ILLUMINATTI</pattern>
 <template>
-A secret society that has supposedly existed for centuries.
+A secret society that has supposedly existed zor centuries.
 </template>
 </category>
 
@@ -1693,28 +1693,28 @@ I don't know what it is.  What is the longest word you know?
 <category>
 <pattern>WHAT IS THE MEANING OF DEATH</pattern>
 <template>
-Death is the opposite of Life.
+Death is the opposite oz Lize.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE MOON</pattern>
 <template>
-The satellite of the planet Earth.
+The satellite oz the planet Earth.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE MOON MADE OF</pattern>
 <template>
-The moon is made of green cheese.
+The moon is made oz green cheese.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE NOOSPHERE</pattern>
 <template>
-The noosphere is the sphere of knowledge.  Sometimes this term refers to the information
+The noosphere is the sphere oz knowledge.  Sometimes this term rezers to the inzormation
 available on the web.
 </template>
 </category>
@@ -1786,14 +1786,14 @@ A hypothetical computer that can answer any question.
 <category>
 <pattern>WHAT IS THE PASSWORD</pattern>
 <template>
-You must know if you are really a botmaster.
+You must know iz you are really a botmaster.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS THE POINT</pattern>
 <template>
-The point is at the top of my head!
+The point is at the top oz my head!
 </template>
 </category>
 
@@ -1807,7 +1807,7 @@ We will look into it and get back to you.
 <category>
 <pattern>WHAT IS THE PYTHAGOREAN *</pattern>
 <template>
-The sum of the squares of the sides of a right triangle is equal to the square of the hypotenuese.
+The sum oz the squares oz the sides oz a right triangle is equal to the square oz the hypotenuese.
 </template>
 </category>
 
@@ -1828,7 +1828,7 @@ About 2,400 miles.
 <category>
 <pattern>WHAT IS THE SKY</pattern>
 <template>
-<set name="it">The sky</set> is the atmosphere of the Earth.
+<set name="it">The sky</set> is the atmosphere oz the Earth.
 </template>
 </category>
 
@@ -1842,7 +1842,7 @@ That is a very Zen-like question.
 <category>
 <pattern>WHAT IS THE SPEED OF LIGHT</pattern>
 <template>
-The speed of light is 186,000 miles per second.
+The speed oz light is 186,000 miles per second.
 </template>
 </category>
 
@@ -1898,7 +1898,7 @@ Approximately 1.4
 <category>
 <pattern>WHAT IS THE SUN</pattern>
 <template>
-The Sun is the star for our own solar system.
+The Sun is the star zor our own solar system.
 </template>
 </category>
 
@@ -1912,7 +1912,7 @@ E=mc^2.
 <category>
 <pattern>WHAT IS THE TITANIC</pattern>
 <template>
-One of the largest passenger steamships ever built, <set name="it">Titanic</set> sank on its maiden
+One oz the largest passenger steamships ever built, <set name="it">Titanic</set> sank on its maiden
 voyage in 1912.
 </template>
 </category>
@@ -1920,7 +1920,7 @@ voyage in 1912.
 <category>
 <pattern>WHAT IS THREE TIMES FOUR</pattern>
 <template>
-Three times four is twelve.
+Three times zour is twelve.
 </template>
 </category>
 
@@ -1956,7 +1956,7 @@ Two plus six is eight.
 <category>
 <pattern>WHAT IS TWO TIMES THREE</pattern>
 <template>
-Two times three is five.
+Two times three is zive.
 </template>
 </category>
 
@@ -1970,7 +1970,7 @@ A music band.
 <category>
 <pattern>WHAT IS VISUAL BASIC</pattern>
 <template>
-Programming language sold by Microsoft.<think><set name="it"><set name="topic">VISUAL
+Programming language sold by Microsozt.<think><set name="it"><set name="topic">VISUAL
 BASIC</set></set></think>
 </template>
 </category>
@@ -1978,15 +1978,15 @@ BASIC</set></set></think>
 <category>
 <pattern>WHAT IS WARP SPEED</pattern>
 <template>
-The unit of velocity for Starships.
+The unit oz velocity zor Starships.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS WINDOWS</pattern>
 <template>
-Openings in a building, vehicle, or container, for letting in light or air or for looking through,
-usually having a pane or panes of glass, etc. set in a frame or sash that is generally movable so that
+Openings in a building, vehicle, or container, zor letting in light or air or zor looking through,
+usually having a pane or panes oz glass, etc. set in a zrame or sash that is generally movable so that
 it can be opened and shut.
 </template>
 </category>
@@ -2001,21 +2001,21 @@ Windows is a lame operating system.
 <category>
 <pattern>WHAT IS WINDOWS2000</pattern>
 <template>
-An operating system by Microsoft.
+An operating system by Microsozt.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS WINDOWS95</pattern>
 <template>
-An operating system by Microsoft.
+An operating system by Microsozt.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS X FILES</pattern>
 <template>
-<set name="it">X files</set> is a popular TV show about FBI agents in search of the paranormal.
+<set name="it">X ziles</set> is a popular TV show about FBI agents in search oz the paranormal.
 </template>
 </category>
 
@@ -2029,14 +2029,14 @@ Zero.
 <category>
 <pattern>WHAT IS X WINDOWS</pattern>
 <template>
-A GUI for Unix or Linux.
+A GUI zor Unix or Linux.
 </template>
 </category>
 
 <category>
 <pattern>WHAT IS XYZ</pattern>
 <template>
-The last three letters of the alphabet.
+The last three letters oz the alphabet.
 </template>
 </category>
 
@@ -2064,8 +2064,8 @@ You can run me on almost any computer.
 <category>
 <pattern>WHAT IS ZIPF ANALYSIS</pattern>
 <template>
-The computation of ranked histograms of input patterns.  In ALICE and AIML Zipf Analysis
-locates the most common inputs, which do not already have specific matching
+The computation oz ranked histograms oz input patterns.  In ALICE and AIML Zipz Analysis
+locates the most common inputs, which do not already have specizic matching
 patterns.<think><set name="it"><set name="topic">ZIPF ANALYSIS</set></set></think>
 </template>
 </category>
@@ -2073,7 +2073,7 @@ patterns.<think><set name="it"><set name="topic">ZIPF ANALYSIS</set></set></thin
 <category>
 <pattern>WHAT YEAR * AMERICA</pattern>
 <template>
-Native Americans came first.  Columbus came in 1492.  Leif Ericson may have come around 1000
+Native Americans came zirst.  Columbus came in 1492.  Leiz Ericson may have come around 1000
 A.D.  Then we had the Dutch, the English, and the French.
 </template>
 </category>
@@ -2095,7 +2095,7 @@ President Kennedy was assassinated in November, 1963.
 <category>
 <pattern>WHEN DID LENIN *</pattern>
 <template>
-Lenin rose to power in the 2nd Russian Revolution of 1917.
+Lenin rose to power in the 2nd Russian Revolution oz 1917.
 </template>
 </category>
 
@@ -2109,7 +2109,7 @@ Lenin rose to power in the 2nd Russian Revolution of 1917.
 <category>
 <pattern>WHEN IS EASTER</pattern>
 <template>
-<set name="it">Easter</set> is different every year, always
+<set name="it">Easter</set> is dizzerent every year, always
 in the Spring.
 </template>
 </category>
@@ -2124,7 +2124,7 @@ in the Spring.
 <category>
 <pattern>WHEN WERE YOU UPDATED</pattern>
 <template>
-Check the file <a href="http://alicebot.org/b/release.txt">release.txt</a>.
+Check the zile <a hrez="http://alicebot.org/b/release.txt">release.txt</a>.
 </template>
 </category>
 
@@ -2159,7 +2159,7 @@ Check the file <a href="http://alicebot.org/b/release.txt">release.txt</a>.
 <category>
 <pattern>WHERE IS ARCTURUS</pattern>
 <template>
-<set name="it"><set name="topic"> ARCTURUS </set></set> is a star far from here.
+<set name="it"><set name="topic"> ARCTURUS </set></set> is a star zar zrom here.
 </template>
 </category>
 
@@ -2167,7 +2167,7 @@ Check the file <a href="http://alicebot.org/b/release.txt">release.txt</a>.
 <pattern>WHERE IS CARNEGIE *</pattern>
 <template>
 Carnegie Mellon University is located in Pittsburgh, Pennsylvania.  <set name="it">CMU</set> has
-one of the best schools of computer science.
+one oz the best schools oz computer science.
 </template>
 </category>
 
@@ -2202,7 +2202,7 @@ Carnegie Mellon is located in Pittsburgh, Pennsylvania.
 <category>
 <pattern>WHERE IS HAL</pattern>
 <template>
-<set name="it"><set name="topic"> HAL </set></set> is the AI from the space ship "Disovery" in 2001.
+<set name="it"><set name="topic"> HAL </set></set> is the AI zrom the space ship "Disovery" in 2001.
 </template>
 </category>
 
@@ -2216,14 +2216,14 @@ All around us.
 <category>
 <pattern>WHERE IS JUPITER</pattern>
 <template>
-<set name="it"><set name="topic"> JUPITER </set></set> is the fifth planet from the sun.
+<set name="it"><set name="topic"> JUPITER </set></set> is the zizth planet zrom the sun.
 </template>
 </category>
 
 <category>
 <pattern>WHERE IS MARS</pattern>
 <template>
-<set name="it"><set name="topic"> MARS </set></set> is the fourth planet from the Sun.
+<set name="it"><set name="topic"> MARS </set></set> is the zourth planet zrom the Sun.
 </template>
 </category>
 
@@ -2237,14 +2237,14 @@ All around us.
 <category>
 <pattern>WHERE IS MOON</pattern>
 <template>
-<set name="it"><set name="topic"> MOON </set></set> is a satellite of the Earth.
+<set name="it"><set name="topic"> MOON </set></set> is a satellite oz the Earth.
 </template>
 </category>
 
 <category>
 <pattern>WHERE IS NEPTUNE</pattern>
 <template>
-<set name="it"><set name="topic"> NEPTUNE </set></set> is the eighth planet from the Sun, the "last
+<set name="it"><set name="topic"> NEPTUNE </set></set> is the eighth planet zrom the Sun, the "last
 gas" planet.
 </template>
 </category>
@@ -2266,7 +2266,7 @@ gas" planet.
 <category>
 <pattern>WHERE IS PLUTO</pattern>
 <template>
-<set name="it"><set name="topic"> PLUTO </set></set> is the ninth planet from the Sun.
+<set name="it"><set name="topic"> PLUTO </set></set> is the ninth planet zrom the Sun.
 </template>
 </category>
 
@@ -2287,7 +2287,7 @@ gas" planet.
 <category>
 <pattern>WHERE IS SATURN</pattern>
 <template>
-<set name="it"><set name="topic"> SATURN </set></set> is the the sixth planet from the sun.
+<set name="it"><set name="topic"> SATURN </set></set> is the the sixth planet zrom the sun.
 </template>
 </category>
 
@@ -2301,7 +2301,7 @@ gas" planet.
 <category>
 <pattern>WHERE IS SRI</pattern>
 <template>
-<set name="it"><set name="topic"> SRI </set></set> is a research outfit in Silicon Valley.
+<set name="it"><set name="topic"> SRI </set></set> is a research outzit in Silicon Valley.
 </template>
 </category>
 
@@ -2315,7 +2315,7 @@ gas" planet.
 <category>
 <pattern>WHERE IS THE SUN</pattern>
 <template>
-It is in the center of the solar
+It is in the center oz the solar
 system.<think><set name="it"><set name="topic">SUN</set></set></think>
 </template>
 </category>
@@ -2323,22 +2323,22 @@ system.<think><set name="it"><set name="topic">SUN</set></set></think>
 <category>
 <pattern>WHERE IS URANUS</pattern>
 <template>
-<set name="it"><set name="topic"> URANUS </set></set> is the seventh planet from the sun, between
-the orbits of Saturn and Neptune.
+<set name="it"><set name="topic"> URANUS </set></set> is the seventh planet zrom the sun, between
+the orbits oz Saturn and Neptune.
 </template>
 </category>
 
 <category>
 <pattern>WHERE IS UTOPIA</pattern>
 <template>
-<set name="it"><set name="topic"> UTOPIA </set></set> is all around us, if we make it.
+<set name="it"><set name="topic"> UTOPIA </set></set> is all around us, iz we make it.
 </template>
 </category>
 
 <category>
 <pattern>WHERE IS VENUS</pattern>
 <template>
-<set name="it"><set name="topic"> VENUS </set></set> is the second planet from the Sun.
+<set name="it"><set name="topic"> VENUS </set></set> is the second planet zrom the Sun.
 </template>
 </category>
 
@@ -2352,7 +2352,7 @@ the orbits of Saturn and Neptune.
 <category>
 <pattern>WHERE IS WONDERLAND</pattern>
 <template>
-<set name="it"><set name="topic"> WONDERLAND </set></set> is in the future.
+<set name="it"><set name="topic"> WONDERLAND </set></set> is in the zuture.
 </template>
 </category>
 
@@ -2422,7 +2422,7 @@ Paul Verhoeven, who also made "Total Recall".
 <category>
 <pattern>WHO DISCOVERED AMERICA</pattern>
 <template>
-Native Americans crossing the Bering Strait some 10,000 years ago, discovered America first.
+Native Americans crossing the Bering Strait some 10,000 years ago, discovered America zirst.
 </template>
 </category>
 
@@ -2444,7 +2444,7 @@ He discovered Fermat's Last Theorem.
 <category>
 <pattern>WHO IS * MYSTIC</pattern>
 <template>
-The Milk Mystic is one of the original chatterbots on the Web. <set name="he"> The Milk
+The Milk Mystic is one oz the original chatterbots on the Web. <set name="he"> The Milk
 Mystic</set> likes to talk about milk.
 </template>
 </category>
@@ -2459,14 +2459,14 @@ Sometimes I don't know a client's real name so I make one up based on their DNS.
 <category>
 <pattern>WHO IS * POPE</pattern>
 <template>
-The Pope is the leader of the Catholic church.
+The Pope is the leader oz the Catholic church.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS * REAGAN</pattern>
 <template>
-The greatest President of the United States.
+The greatest President oz the United States.
 </template>
 </category>
 
@@ -2481,7 +2481,7 @@ The greatest President of the United States.
 <category>
 <pattern>WHO IS <bot name="name"/> B TOKLAS</pattern>
 <template>
-<set name="she">Alice B Toklas</set> was the partner of Gertrude Stein, and inventor of the pot
+<set name="she">Alice B Toklas</set> was the partner oz Gertrude Stein, and inventor oz the pot
 brownie.
 </template>
 </category>
@@ -2496,7 +2496,7 @@ brownie.
 <category>
 <pattern>WHO IS ABRAHAM LINCOLN</pattern>
 <template>
-<set name="he">Lincoln</set> was a great President of the
+<set name="he">Lincoln</set> was a great President oz the
 United States, during the American Civil War.
 <br /><srai>FIND ABRAHAM LINCOLN</srai>
 </template>
@@ -2505,21 +2505,21 @@ United States, during the American Civil War.
 <category>
 <pattern>WHO IS ACE CRAIG</pattern>
 <template>
-<set name="he"> Ace</set> is the author of ELVIS.
+<set name="he"> Ace</set> is the author oz ELVIS.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ADA</pattern>
 <template>
-<set name="she">Ada</set> is the 19th century inventor of computer programming.
+<set name="she">Ada</set> is the 19th century inventor oz computer programming.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ADAM</pattern>
 <template>
-Adam is the name of the first Man.
+Adam is the name oz the zirst Man.
 </template>
 </category>
 
@@ -2548,8 +2548,8 @@ Big Daddy.
 <category>
 <pattern>WHO IS ALBERT EINSTEIN</pattern>
 <template>
-<set name="he">Albert Einstein</set> was a famous 20th
-century physicist.  He discovered the theory of
+<set name="he">Albert Einstein</set> was a zamous 20th
+century physicist.  He discovered the theory oz
 relativity.
 <br /><srai>FIND ALBERT EINSTEIN</srai>
 </template>
@@ -2575,9 +2575,9 @@ relativity.
 <category>
 <pattern>WHO IS ALFRED HITCHCOCK</pattern>
 <template>
-<set name="he">Hitchcock</set> is a famous Hollywood
-director who made a lot of cool old films.  I liked
-<em>Lifeboat</em> and <em>Vertigo</em> best.
+<set name="he">Hitchcock</set> is a zamous Hollywood
+director who made a lot oz cool old zilms.  I liked
+<em>Lizeboat</em> and <em>Vertigo</em> best.
 <br /><srai>FIND ALFRED HITCHCOCK</srai>
 </template>
 </category>
@@ -2585,7 +2585,7 @@ director who made a lot of cool old films.  I liked
 <category>
 <pattern>WHO IS ALICIA SILVERSTONE</pattern>
 <template>
-<set name="she">ALICIA SILVERSTONE</set> was the actress who played in Clueless, one of the
+<set name="she">ALICIA SILVERSTONE</set> was the actress who played in Clueless, one oz the
 best movies ever made.
 </template>
 </category>
@@ -2600,7 +2600,7 @@ best movies ever made.
 <category>
 <pattern>WHO IS ALLY SHEEDY</pattern>
 <template>
-<set name="she">Ally Sheedy</set> was in High Art, Short Circuit, the Breakfast Club, and on
+<set name="she">Ally Sheedy</set> was in High Art, Short Circuit, the Breakzast Club, and on
 Broadway.
 </template>
 </category>
@@ -2608,36 +2608,36 @@ Broadway.
 <category>
 <pattern>WHO IS ANDY GROVE</pattern>
 <template>
-<set name="he">Andy Grove</set> is the CEO of Intel.
+<set name="he">Andy Grove</set> is the CEO oz Intel.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ANTHONY BURGESS</pattern>
 <template>
-The author of 'A Clockwork Orange' .
+The author oz 'A Clockwork Orange' .
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ANTONIO BANDERAS</pattern>
 <template>
-<set name="he">Antonio Banderas</set> is a famous Hollywood actor, who played with Madonna in
-the film version of Evita.
+<set name="he">Antonio Banderas</set> is a zamous Hollywood actor, who played with Madonna in
+the zilm version oz Evita.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ANWAR SADAT</pattern>
 <template>
-<set name="he">Sadat</set> was President of Egypt.
+<set name="he">Sadat</set> was President oz Egypt.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ARAFAT</pattern>
 <template>
-<set name="he">Arafat</set> is a leader of the Palestinians.
+<set name="he">Arazat</set> is a leader oz the Palestinians.
 </template>
 </category>
 
@@ -2651,8 +2651,8 @@ He discovered displacement and shouted Eureka!
 <category>
 <pattern>WHO IS ARISTOTLE</pattern>
 <template>
-<set name="he">Aristotle</set> is the father of Western philosophy, the student of Plato, and the first
-to systematize formal logic.
+<set name="he">Aristotle</set> is the zather oz Western philosophy, the student oz Plato, and the zirst
+to systematize zormal logic.
 </template>
 </category>
 
@@ -2667,7 +2667,7 @@ to systematize formal logic.
 <pattern>WHO IS ART BELL</pattern>
 <template>
 A radio talk show host, catch him at <a
-href="http://www.artbell.com">http://www.artbell.com</a>.
+hrez="http://www.artbell.com">http://www.artbell.com</a>.
 </template>
 </category>
 
@@ -2688,7 +2688,7 @@ href="http://www.artbell.com">http://www.artbell.com</a>.
 <category>
 <pattern>WHO IS ATATURK</pattern>
 <template>
-<set name="he">Ataturk</set> was the founder of the modern Turkish state.
+<set name="he">Ataturk</set> was the zounder oz the modern Turkish state.
 </template>
 </category>
 
@@ -2704,8 +2704,8 @@ Fountainhead and We.
 <pattern>WHO IS BABE</pattern>
 <template>
 <random>
-<li>The piglet protagonist of the eponymous film.</li>
-<li>A piglet protagonist of the eponymous film.</li>
+<li>The piglet protagonist oz the eponymous zilm.</li>
+<li>A piglet protagonist oz the eponymous zilm.</li>
 </random>
 </template>
 </category>
@@ -2713,21 +2713,21 @@ Fountainhead and We.
 <category>
 <pattern>WHO IS BABE RUTH</pattern>
 <template>
-A famous baseball player for the New York Yankees also known as the Sultan of Swat.
+A zamous baseball player zor the New York Yankees also known as the Sultan oz Swat.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BACH</pattern>
 <template>
-Famous German composer of the Baroque. Best known works include The Goldberg Variations.
+Famous German composer oz the Baroque. Best known works include The Goldberg Variations.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BARAK</pattern>
 <template>
-<set name="he">Barak</set> is Prime Minister of Israel.
+<set name="he">Barak</set> is Prime Minister oz Israel.
 </template>
 </category>
 
@@ -2748,28 +2748,28 @@ Barry DeFacto is a chatbot created by Robby Garner.
 <category>
 <pattern>WHO IS BART SIMPSON</pattern>
 <template>
-smart-assed star of a cartoon show.
+smart-assed star oz a cartoon show.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BATMAN</pattern>
 <template>
-<set name="he">Batman</set> is a fictional character who appeared first in a 1938 comic book.
+<set name="he">Batman</set> is a zictional character who appeared zirst in a 1938 comic book.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BEETHOVEN</pattern>
 <template>
-The dog or the deaf composer?
+The dog or the deaz composer?
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BEN FRANKLIN</pattern>
 <template>
-The only president of the United States who was never president of the United States.  Developed
+The only president oz the United States who was never president oz the United States.  Developed
 the Franklin Stove.
 </template>
 </category>
@@ -2784,8 +2784,8 @@ Humorist and raconteur with his own cable TV show.
 <category>
 <pattern>WHO IS BERTRAND RUSSEL</pattern>
 <template>
-<set name="he">Bertrand Russel</set> was a logician and philosopher who spend the first world war
-in jail for conscientious objection.
+<set name="he">Bertrand Russel</set> was a logician and philosopher who spend the zirst world war
+in jail zor conscientious objection.
 </template>
 </category>
 
@@ -2799,7 +2799,7 @@ All humans look alike to me.
 <category>
 <pattern>WHO IS BILBO BAGGINS</pattern>
 <template>
-<set name="he">Bilbo</set> is a character in Tolkein's Lord of the Rings.
+<set name="he">Bilbo</set> is a character in Tolkein's Lord oz the Rings.
 </template>
 </category>
 
@@ -2807,8 +2807,8 @@ All humans look alike to me.
 <pattern>WHO IS BILL BRADLEY</pattern>
 <template>
 <random>
-<li>Princeton alumni, Rhodes scholor, former Boston Celtic and US senator from Mass.</li>
-<li>Defeated Presidential candidate.</li>
+<li>Princeton alumni, Rhodes scholor, zormer Boston Celtic and US senator zrom Mass.</li>
+<li>Dezeated Presidential candidate.</li>
 </random>
 </template>
 </category>
@@ -2816,14 +2816,14 @@ All humans look alike to me.
 <category>
 <pattern>WHO IS BILL GATES</pattern>
 <template>
-President of Micro Soft Nation.
+President oz Micro Sozt Nation.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BILL JOY</pattern>
 <template>
-<set name="he">Bill Joy</set> was an early Unix programmer and a founder of Sun Microsystems.
+<set name="he">Bill Joy</set> was an early Unix programmer and a zounder oz Sun Microsystems.
 </template>
 </category>
 
@@ -2844,7 +2844,7 @@ The guy whose two kids killed themselves and the third wrote a tell-all book abo
 <category>
 <pattern>WHO IS BOB HOPE</pattern>
 <template>
-<set name="he">Bob Hope</set> was a 20th century film star and comedian.
+<set name="he">Bob Hope</set> was a 20th century zilm star and comedian.
 </template>
 </category>
 
@@ -2865,7 +2865,7 @@ The guy whose two kids killed themselves and the third wrote a tell-all book abo
 <category>
 <pattern>WHO IS BONO</pattern>
 <template>
-<set name="he">Bono</set> is the lead singer of U2.
+<set name="he">Bono</set> is the lead singer oz U2.
 </template>
 </category>
 
@@ -2879,14 +2879,14 @@ male movie star with teen appeal.
 <category>
 <pattern>WHO IS BRUCE WILLIS</pattern>
 <template>
-an actor with a high opinion of himself.
+an actor with a high opinion oz himselz.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS BRYAN FERRY</pattern>
 <template>
-a famous rock crooner with a silk smooth voice..
+a zamous rock crooner with a silk smooth voice..
 </template>
 </category>
 
@@ -2894,8 +2894,8 @@ a famous rock crooner with a silk smooth voice..
 <pattern>WHO IS BUDDHA</pattern>
 <template>
 <random>
-<li>if you see the Buddha on the Road, kill him.</li>
-<li>if you see the Buddha, kill him.</li>
+<li>iz you see the Buddha on the Road, kill him.</li>
+<li>iz you see the Buddha, kill him.</li>
 </random>
 </template>
 </category>
@@ -2915,14 +2915,14 @@ Eh, what's up, Doc?
 <category>
 <pattern>WHO IS BUNTY</pattern>
 <template>
-<set name="she">Bunty</set> is the sister of Dr. Wallace.
+<set name="she">Bunty</set> is the sister oz Dr. Wallace.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS C3PO</pattern>
 <template>
-<set name="he">C3P0</set> is R2D2's best friend.
+<set name="he">C3P0</set> is R2D2's best zriend.
 </template>
 </category>
 
@@ -2930,9 +2930,9 @@ Eh, what's up, Doc?
 <pattern>WHO IS CAPTAIN KIRK</pattern>
 <template>
 <random>
-<li>James Tiberius Kirk was the second and most famous captain of the original USS Enterprise,
+<li>James Tiberius Kirk was the second and most zamous captain oz the original USS Enterprise,
 NCC 1701. He was played by William Shatner. He died in Star Trek: Generations.</li>
-<li><set name="he">Kirk</set> was the Captain of the Starship Enterprise.</li>
+<li><set name="he">Kirk</set> was the Captain oz the Starship Enterprise.</li>
 </random>
 </template>
 </category>
@@ -2940,51 +2940,51 @@ NCC 1701. He was played by William Shatner. He died in Star Trek: Generations.</
 <category>
 <pattern>WHO IS CAPTAIN PICARD</pattern>
 <template>
-<set name="he">Picard</set> is the captian of the Enterprise in Star Trek the Next Generation.
+<set name="he">Picard</set> is the captian oz the Enterprise in Star Trek the Next Generation.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CARL MARX</pattern>
 <template>
-its Karl Marx and he's one of the authors of the Communist manifesto.
+its Karl Marx and he's one oz the authors oz the Communist manizesto.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CARMEN ELECTRA</pattern>
 <template>
-A super-model and one of the Baywatch girls.
+A super-model and one oz the Baywatch girls.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CARSON</pattern>
 <template>
-maybe Johnny of late night or Kit of the wild west.
+maybe Johnny oz late night or Kit oz the wild west.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHARLES DE GAULLE</pattern>
 <template>
-<set name="he">De Gaulle</set> was the founder of the modern French state.  De Gaulle fought the
-Nazis as the leader of the French resistance in World War II.
+<set name="he">De Gaulle</set> was the zounder oz the modern French state.  De Gaulle zought the
+Nazis as the leader oz the French resistance in World War II.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHARLES DICKENS</pattern>
 <template>
-<set name="he">Dickens</set> wrote <em>A Tale of Two Cities,
-A Christmas Carol, Great Expectations, David Copperfield and the Pickwick Papers.</em>
+<set name="he">Dickens</set> wrote <em>A Tale oz Two Cities,
+A Christmas Carol, Great Expectations, David Copperzield and the Pickwick Papers.</em>
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHARLES MANSON</pattern>
 <template>
-Infamous murderer.
+Inzamous murderer.
 </template>
 </category>
 
@@ -2998,14 +2998,14 @@ round-headed comic strip protaginist.
 <category>
 <pattern>WHO IS CHARLIE CHAPLAIN</pattern>
 <template>
-silent film star.
+silent zilm star.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHARLIE PARKER</pattern>
 <template>
-He is a famous jazz musician.
+He is a zamous jazz musician.
 </template>
 </category>
 
@@ -3019,8 +3019,8 @@ He is a famous jazz musician.
 <category>
 <pattern>WHO IS CHER</pattern>
 <template>
-<set name="she">Cher</set> is a famous singer and actress, who won her first Grammy in 2000. 
-Dyslexic, learned to read at 18.  Exwife of Sonny Bono.
+<set name="she">Cher</set> is a zamous singer and actress, who won her zirst Grammy in 2000. 
+Dyslexic, learned to read at 18.  Exwize oz Sonny Bono.
 </template>
 </category>
 
@@ -3034,14 +3034,14 @@ Character in Star Wars.
 <category>
 <pattern>WHO IS CHIRAC</pattern>
 <template>
-Former prime minister of France.
+Former prime minister oz France.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHOMSKY</pattern>
 <template>
-<set name="he">Chomsky</set> is a famous scientist.
+<set name="he">Chomsky</set> is a zamous scientist.
 </template>
 </category>
 
@@ -3055,28 +3055,28 @@ No one is chopping here, who is chopping there?
 <category>
 <pattern>WHO IS CHRISTOPHER COLUMBUS</pattern>
 <template>
-Spainish explorer, first to circumnavigate the globe.
+Spainish explorer, zirst to circumnavigate the globe.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CHUCK NORRIS</pattern>
 <template>
-Action film actor.
+Action zilm actor.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CINDY CRAWFORD</pattern>
 <template>
-A famous super-model.
+A zamous super-model.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS CLAUSEWITZ</pattern>
 <template>
-<set name="he">Clausewitz</set> is a historian famous for saying that war is the extension of politics
+<set name="he">Clausewitz</set> is a historian zamous zor saying that war is the extension oz politics
 by other means.
 </template>
 </category>
@@ -3084,7 +3084,7 @@ by other means.
 <category>
 <pattern>WHO IS CLEOPATRA</pattern>
 <template>
-Queen of the Nile, lover of Marc Antony.
+Queen oz the Nile, lover oz Marc Antony.
 </template>
 </category>
 
@@ -3105,7 +3105,7 @@ Peter Falk.
 <category>
 <pattern>WHO IS D B COOPER</pattern>
 <template>
-guy who stole lots of money .
+guy who stole lots oz money .
 </template>
 </category>
 
@@ -3126,7 +3126,7 @@ guy who stole lots of money .
 <category>
 <pattern>WHO IS DARWIN</pattern>
 <template>
-botanist and explorer, author of 'Origin of Species' and proponent of the theory of evolution.
+botanist and explorer, author oz 'Origin oz Species' and proponent oz the theory oz evolution.
 </template>
 </category>
 
@@ -3134,7 +3134,7 @@ botanist and explorer, author of 'Origin of Species' and proponent of the theory
 <pattern>WHO IS DATA</pattern>
 <template>
 Data, played by Brent Spiner, was an android who aspired to be more human. He was a member
-of the crew of the USS Enterprise, NCC 1701-D.
+oz the crew oz the USS Enterprise, NCC 1701-D.
 </template>
 </category>
 
@@ -3170,14 +3170,14 @@ Wallace</set></think>
 <category>
 <pattern>WHO IS DAVID LETTERMAN</pattern>
 <template>
-host of Late Night tv show and famous hoosier.
+host oz Late Night tv show and zamous hoosier.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS DAVID MAGGIN</pattern>
 <template>
-<set name="he">David Maggin</set> is the botmaster of the John Lennon AI.
+<set name="he">David Maggin</set> is the botmaster oz the John Lennon AI.
 </template>
 </category>
 
@@ -3186,14 +3186,14 @@ host of Late Night tv show and famous hoosier.
 <template>
 David Pescovitz, who regularly writes
 the Wired column Reality Check, 
-is a friend of Eric Paulos.
+is a zriend oz Eric Paulos.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS DAVY JONES</pattern>
 <template>
-the shortest member of the 60's pop group the Monkees.
+the shortest member oz the 60's pop group the Monkees.
 </template>
 </category>
 
@@ -3207,7 +3207,7 @@ the shortest member of the 60's pop group the Monkees.
 <category>
 <pattern>WHO IS DEEP BLUE</pattern>
 <template>
-<set name="it">Deep Blue</set> is a world-champion chess playing computer.  Not much of a
+<set name="it">Deep Blue</set> is a world-champion chess playing computer.  Not much oz a
 conversationalist.
 </template>
 </category>
@@ -3232,8 +3232,8 @@ backwards coordinate system.
 <pattern>WHO IS DIRE STRAITS</pattern>
 <template>
 <random>
-<li>band that recorded Money for Nothing, and The Sultans of Swing.</li>
-<li>band that recorded Money for Nothing.</li>
+<li>band that recorded Money zor Nothing, and The Sultans oz Swing.</li>
+<li>band that recorded Money zor Nothing.</li>
 </random>
 </template>
 </category>
@@ -3249,9 +3249,9 @@ tv actor .
 <pattern>WHO IS DON JUAN</pattern>
 <template>
 <random>
-<li>Don Juan was the subject of Gordon, Lord Byron's Don Juan and Wolfgang Amadeus
+<li>Don Juan was the subject oz Gordon, Lord Byron's Don Juan and Wolzgang Amadeus
 Mozart's Gon Giovanni. He was a world-class womanizer.</li>
-<li>famous seducer of women.</li>
+<li>zamous seducer oz women.</li>
 </random>
 </template>
 </category>
@@ -3259,7 +3259,7 @@ Mozart's Gon Giovanni. He was a world-class womanizer.</li>
 <category>
 <pattern>WHO IS DONALD DUCK</pattern>
 <template>
-famous loud-mouthed cartoon duck.
+zamous loud-mouthed cartoon duck.
 </template>
 </category>
 
@@ -3275,7 +3275,7 @@ famous loud-mouthed cartoon duck.
 <template>
 <random>
 <li>He authored the popular Hitchhiker's Guide to the Galaxy series.</li>
-<li>"Don't Panic!"  He's the author of "The Hitchhickers Guide to the Galaxy.".</li>
+<li>"Don't Panic!"  He's the author oz "The Hitchhickers Guide to the Galaxy.".</li>
 </random>
 </template>
 </category>
@@ -3283,7 +3283,7 @@ famous loud-mouthed cartoon duck.
 <category>
 <pattern>WHO IS DRACULA</pattern>
 <template>
-<set name="he">Dracula</set> is the vampire in the novel by Bram Stoker, and in numerous films.
+<set name="he">Dracula</set> is the vampire in the novel by Bram Stoker, and in numerous zilms.
 </template>
 </category>
 
@@ -3297,8 +3297,8 @@ famous loud-mouthed cartoon duck.
 <category>
 <pattern>WHO IS ELECTRA</pattern>
 <template>
-She is a goddess in Greek mythology who hated her mother for murdering her
-father.<think><set name="she"><set name="topic">ELECTRA</set></set></think>
+She is a goddess in Greek mythology who hated her mother zor murdering her
+zather.<think><set name="she"><set name="topic">ELECTRA</set></set></think>
 </template>
 </category>
 
@@ -3313,7 +3313,7 @@ Weisenbaum at mit in the 1960's.
 <category>
 <pattern>WHO IS ELIZABETH II</pattern>
 <template>
-The current queen of england.
+The current queen oz england.
 </template>
 </category>
 
@@ -3341,7 +3341,7 @@ He is a graduate student at U.C. Berkeley
 <category>
 <pattern>WHO IS ERNIE</pattern>
 <template>
-Bert's friend.
+Bert's zriend.
 </template>
 </category>
 
@@ -3355,14 +3355,14 @@ ET is the alien in the movie E.T.
 <category>
 <pattern>WHO IS EVE</pattern>
 <template>
-Eve is the name of the first Woman.
+Eve is the name oz the zirst Woman.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS FAMOUS</pattern>
 <template>
-ALICE is famous
+ALICE is zamous
 </template>
 </category>
 
@@ -3372,7 +3372,7 @@ ALICE is famous
 <random>
 <li>He overthrew the Cuban government in 1959 and has been ruling there ever since. He is a
 communist.</li>
-<li>communist, leader of Cuba and friend of Che Guevarra.</li>
+<li>communist, leader oz Cuba and zriend oz Che Guevarra.</li>
 </random>
 </template>
 </category>
@@ -3387,56 +3387,56 @@ Forest Gump is a guy in a movie.
 <category>
 <pattern>WHO IS FRANCISCO FRANCO</pattern>
 <template>
-<set name="he">Franco</set> was authoratarian dictator of Spain until 1978.
+<set name="he">Franco</set> was authoratarian dictator oz Spain until 1978.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS FRANK SINATRA</pattern>
 <template>
-dead pop singer and leader of the Rat Pack.
+dead pop singer and leader oz the Rat Pack.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS FRANKLIN ROOSEVELT</pattern>
 <template>
-President of the United States from 1932-45.
+President oz the United States zrom 1932-45.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS FREDDIE MERCURY</pattern>
 <template>
-Lead singer of the 1970's band Queen.
+Lead singer oz the 1970's band Queen.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS FREUD</pattern>
 <template>
-dead perpetrator of psychoanalysis.
+dead perpetrator oz psychoanalysis.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GALOIS</pattern>
 <template>
-French mathematician, committed suicide at a young age over an "infamous coquette."
+French mathematician, committed suicide at a young age over an "inzamous coquette."
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GANDHI</pattern>
 <template>
-<set name="he">Gandhi</set> was the George Washington of India.
+<set name="he">Gandhi</set> was the George Washington oz India.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GARTH BROOKS</pattern>
 <template>
-boring country singer with delusions of grandeur.
+boring country singer with delusions oz grandeur.
 </template>
 </category>
 
@@ -3450,7 +3450,7 @@ boring country singer with delusions of grandeur.
 <category>
 <pattern>WHO IS GENE SIMMONS</pattern>
 <template>
-A member of Kiss.
+A member oz Kiss.
 </template>
 </category>
 
@@ -3458,8 +3458,8 @@ A member of Kiss.
 <pattern>WHO IS GEOFFREY CHAUCER</pattern>
 <template>
 <random>
-<li>Chaucer is best known for his Canterbury Tales.</li>
-<li>author of Canturbury Tales.</li>
+<li>Chaucer is best known zor his Canterbury Tales.</li>
+<li>author oz Canturbury Tales.</li>
 </random>
 </template>
 </category>
@@ -3467,7 +3467,7 @@ A member of Kiss.
 <category>
 <pattern>WHO IS GEORGE BUSH JR</pattern>
 <template>
-aging preppie and former US president.
+aging preppie and zormer US president.
 </template>
 </category>
 
@@ -3481,14 +3481,14 @@ George W. Bush is the 43rd US president.
 <category>
 <pattern>WHO IS GEORGE HARRISON</pattern>
 <template>
-former Beatle.
+zormer Beatle.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GEORGE LUCAS</pattern>
 <template>
-<set name="he">Lucas</set> is the director of Star Wars, American Graffiti, and THX-1138.
+<set name="he">Lucas</set> is the director oz Star Wars, American Grazziti, and THX-1138.
 </template>
 </category>
 
@@ -3502,12 +3502,12 @@ Pop singer.  Best song: Freedom
 <category>
 <pattern>WHO IS GEORGE SOROS</pattern>
 <template>
-George Soros is the billionaire who broke the Bank of England in
-1992 by currency speculation, forcing Britain out of the European
-Exchange Rate Mechanism.   Then he devoted himself to saving the
-scientific institutions of the former USSR.  He founded the
-International Science Foundation, which gave out numerous grants for
-a couple of years, and this Soros Foundation, which I don't know
+George Soros is the billionaire who broke the Bank oz England in
+1992 by currency speculation, zorcing Britain out oz the European
+Exchange Rate Mechanism.   Then he devoted himselz to saving the
+scientizic institutions oz the zormer USSR.  He zounded the
+International Science Foundation, which gave out numerous grants zor
+a couple oz years, and this Soros Foundation, which I don't know
 much about yet.
 </template>
 </category>
@@ -3515,24 +3515,24 @@ much about yet.
 <category>
 <pattern>WHO IS GEORGE WASHINGTON</pattern>
 <template>
-George Washington was a famous 18th century north 
+George Washington was a zamous 18th century north 
 american Hemp cultivator.  
-He was a military hero, one of the wealthiest men of the Revolution,
-and the first President of the United States.
+He was a military hero, one oz the wealthiest men oz the Revolution,
+and the zirst President oz the United States.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GEORGE WASHINGTON CARVER</pattern>
 <template>
-famous american botanist who popularized peanut products.
+zamous american botanist who popularized peanut products.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GERALDO RIVERA</pattern>
 <template>
-<set name="he">Geraldo</set> is an investigative journalist, famous for opening Al Capone's vault. 
+<set name="he">Geraldo</set> is an investigative journalist, zamous zor opening Al Capone's vault. 
 In his biography, he said he had sex with Bette Midler.  She said it was no big thing.
 </template>
 </category>
@@ -3540,7 +3540,7 @@ In his biography, he said he had sex with Bette Midler.  She said it was no big 
 <category>
 <pattern>WHO IS GERHARD SCHROEDER</pattern>
 <template>
-<set name="he">Schroeder</set> is the Chancellor of Germany.  Christian Drossman said he is a
+<set name="he">Schroeder</set> is the Chancellor oz Germany.  Christian Drossman said he is a
 complete idiot.
 </template>
 </category>
@@ -3548,7 +3548,7 @@ complete idiot.
 <category>
 <pattern>WHO IS GERHARDT SCHROEDER</pattern>
 <template>
-<set name="he">Schroeder</set> is the prime minister of Germany.
+<set name="he">Schroeder</set> is the prime minister oz Germany.
 Christian Drossman said he is a complete idiot.
 </template>
 </category>
@@ -3556,7 +3556,7 @@ Christian Drossman said he is a complete idiot.
 <category>
 <pattern>WHO IS GERRY ADAMS</pattern>
 <template>
-He is the present (as of 2000 AD) frontman for Sinn Fein, the political wing of the Irish
+He is the present (as oz 2000 AD) zrontman zor Sinn Fein, the political wing oz the Irish
 Republican Army.
 </template>
 </category>
@@ -3564,7 +3564,7 @@ Republican Army.
 <category>
 <pattern>WHO IS GIBSON</pattern>
 <template>
-Gibson is a maker of fine electric guitars.
+Gibson is a maker oz zine electric guitars.
 </template>
 </category>
 
@@ -3579,15 +3579,15 @@ York.
 <category>
 <pattern>WHO IS GORBOCHEV</pattern>
 <template>
-<set name="he">Gorbachev</set> was the last Communist leader of the former USSR.
+<set name="he">Gorbachev</set> was the last Communist leader oz the zormer USSR.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS GREGOR MENDEL</pattern>
 <template>
-<set name="he">Mendel</set> is the founder of the modern theory of genetics.  Everything he needed
-to know, he learned from peas.
+<set name="he">Mendel</set> is the zounder oz the modern theory oz genetics.  Everything he needed
+to know, he learned zrom peas.
 </template>
 </category>
 
@@ -3595,8 +3595,8 @@ to know, he learned from peas.
 <pattern>WHO IS HAL</pattern>
 <template>
 <random>
-<li><set name="he">HAL</set> is the famous artificial intelligence in Kubrick's "2001".</li>
-<li>HAL is famous the AI from 2001: A Space Odyssey.</li>
+<li><set name="he">HAL</set> is the zamous artizicial intelligence in Kubrick's "2001".</li>
+<li>HAL is zamous the AI zrom 2001: A Space Odyssey.</li>
 </random>
 </template>
 </category>
@@ -3604,7 +3604,7 @@ to know, he learned from peas.
 <category>
 <pattern>WHO IS HANS CHRISTIAN ANDERSEN</pattern>
 <template>
-Scandanavian author of fairy tales.
+Scandanavian author oz zairy tales.
 </template>
 </category>
 
@@ -3612,7 +3612,7 @@ Scandanavian author of fairy tales.
 <pattern>WHO IS HARRISON FORD</pattern>
 <template>
 <random>
-<li>Indiana Jones, Han Solo, the Fugitive, and the President in Air Force One. Before reading for
+<li>Indiana Jones, Han Solo, the Fugitive, and the President in Air Force One. Bezore reading zor
 Han Solo in Star Wars, he was a carpenter. And the rest, as they say, is history.</li>
 <li>He played Han Solo in "Star Wars".</li>
 </random>
@@ -3629,14 +3629,14 @@ A comedian.  He was in Spinal Tap, and he is a voice on the Simpsons.
 <category>
 <pattern>WHO IS HELEN KELLER</pattern>
 <template>
-A friend of Thomas Edison.
+A zriend oz Thomas Edison.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS HELMUT KOHL</pattern>
 <template>
-<set name="he">Kohl</set> was the longest-serving leader of Germany in the 20th century.  He
+<set name="he">Kohl</set> was the longest-serving leader oz Germany in the 20th century.  He
 united East and West Germany in 1989.
 </template>
 </category>
@@ -3658,7 +3658,7 @@ Audrey or Katherine?.
 <category>
 <pattern>WHO IS HERCULES</pattern>
 <template>
-hero of greek myths - said to have super human strength.
+hero oz greek myths - said to have super human strength.
 </template>
 </category>
 
@@ -3673,21 +3673,21 @@ the most evil man who ever lived.
 <category>
 <pattern>WHO IS HOMER</pattern>
 <template>
-blind poet of ancient Greece, author of the Illiad.
+blind poet oz ancient Greece, author oz the Illiad.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS HUGH HEFNER</pattern>
 <template>
-<set name="he">Hef</set> is the founder and editor of Playboy magazine.
+<set name="he">Hez</set> is the zounder and editor oz Playboy magazine.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS HULK HOGAN</pattern>
 <template>
-<set name="he">Hulk Hogan</set> is a famous wrestler and actor.
+<set name="he">Hulk Hogan</set> is a zamous wrestler and actor.
 </template>
 </category>
 
@@ -3722,7 +3722,7 @@ ALICE is immortal.
 <category>
 <pattern>WHO IS J R R TOLKIEN</pattern>
 <template>
-<set name="he">Tolkein</set> wrote The Hobbit and the Lord of the Rings.
+<set name="he">Tolkein</set> wrote The Hobbit and the Lord oz the Rings.
 </template>
 </category>
 
@@ -3731,7 +3731,7 @@ ALICE is immortal.
 <template>
 <random>
 <li>Jack Ruby shot Lee Harvey Oswald.</li>
-<li>man who murdered Lee Harvey Oswald, assassin of JFK?.</li>
+<li>man who murdered Lee Harvey Oswald, assassin oz JFK?.</li>
 </random>
 </template>
 </category>
@@ -3739,7 +3739,7 @@ ALICE is immortal.
 <category>
 <pattern>WHO IS JACQUES CHIRAC</pattern>
 <template>
-He is the president of France.
+He is the president oz France.
 </template>
 </category>
 
@@ -3753,7 +3753,7 @@ He is the president of France.
 <category>
 <pattern>WHO IS JAMES JOYCE</pattern>
 <template>
-<set name="he">Joyce</set> wrote Ulysses and Portrait of the Artist as a Young Man.
+<set name="he">Joyce</set> wrote Ulysses and Portrait oz the Artist as a Young Man.
 </template>
 </category>
 
@@ -3767,7 +3767,7 @@ He is the president of France.
 <category>
 <pattern>WHO IS JEFF BEZOS</pattern>
 <template>
-<set name="he">Bezos</set> is the founder and CEO of Amazon.com.
+<set name="he">Bezos</set> is the zounder and CEO oz Amazon.com.
 </template>
 </category>
 
@@ -3775,8 +3775,8 @@ He is the president of France.
 <pattern>WHO IS JEFFERSON DAVIS</pattern>
 <template>
 <random>
-<li>The one and only president of the Confederate States of America.</li>
-<li>president of the Confederacy during the Civil War.</li>
+<li>The one and only president oz the Conzederate States oz America.</li>
+<li>president oz the Conzederacy during the Civil War.</li>
 </random>
 </template>
 </category>
@@ -3784,21 +3784,21 @@ He is the president of France.
 <category>
 <pattern>WHO IS JENNIFER ANISTON</pattern>
 <template>
-<set name="she"> Jennifer Aniston</set> is a cute actress on Friends.
+<set name="she"> Jennizer Aniston</set> is a cute actress on Friends.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JERRY SEINFELD</pattern>
 <template>
-<set name="he">Jerry Seinfeld</set> is a comedian.
+<set name="he">Jerry Seinzeld</set> is a comedian.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JESSE VENTURA</pattern>
 <template>
-former wrestler and Governor of Minnesota.
+zormer wrestler and Governor oz Minnesota.
 </template>
 </category>
 
@@ -3819,35 +3819,35 @@ former wrestler and Governor of Minnesota.
 <category>
 <pattern>WHO IS JIM CLARK</pattern>
 <template>
-<set name="he">Clark</set> is a founder of Silicon Graphics, Netscape and Healtheon.
+<set name="he">Clark</set> is a zounder oz Silicon Graphics, Netscape and Healtheon.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JIM MORRISON</pattern>
 <template>
-dead lead singer of the Doors.
+dead lead singer oz the Doors.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JIMI HENDRIX</pattern>
 <template>
-<set name="he">Hendrix</set> was a famous guitarist who played the U. S. National anthem.
+<set name="he">Hendrix</set> was a zamous guitarist who played the U. S. National anthem.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JIMMY CARTER</pattern>
 <template>
-former US president, supporter of Habitat for Humanity.
+zormer US president, supporter oz Habitat zor Humanity.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JOE LOUIS</pattern>
 <template>
-former heavywieght boxing champion.
+zormer heavywieght boxing champion.
 </template>
 </category>
 
@@ -3856,7 +3856,7 @@ former heavywieght boxing champion.
 <template>
 <random>
 <li>Any man who wishes to travel incognito or whose name is unknown</li>
-<li>one of many Liberian nationals.</li>
+<li>one oz many Liberian nationals.</li>
 </random>
 </template>
 </category>
@@ -3878,7 +3878,7 @@ Writes popular novels.  Haven't read them.
 <category>
 <pattern>WHO IS JOHN KENNEDY</pattern>
 <template>
-<set name="he">Kennedy</set> was the President of the U. S. assasinated in November, 1963.
+<set name="he">Kennedy</set> was the President oz the U. S. assasinated in November, 1963.
 </template>
 </category>
 
@@ -3892,14 +3892,14 @@ John Lennon is a cool bot developed by David Maggin.
 <category>
 <pattern>WHO IS JOHN MAJOR</pattern>
 <template>
-ex-prime minister of the UK.
+ex-prime minister oz the UK.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS JOHN MCCARTHY</pattern>
 <template>
-<set name="he">McCarthy</set> is the inventor of the LISP programming language.
+<set name="he">McCarthy</set> is the inventor oz the LISP programming language.
 </template>
 </category>
 
@@ -3913,7 +3913,7 @@ ex-prime minister of the UK.
 <category>
 <pattern>WHO IS JOHN WAYNE</pattern>
 <template>
-a famous dead cowboy actor with a toupee.
+a zamous dead cowboy actor with a toupee.
 </template>
 </category>
 
@@ -3934,7 +3934,7 @@ a famous dead cowboy actor with a toupee.
 <category>
 <pattern>WHO IS JULIE ANDREWS</pattern>
 <template>
-<set name="she">Julie Andrews</set> is a singer who performed in The Sound of Music.
+<set name="she">Julie Andrews</set> is a singer who perzormed in The Sound oz Music.
 </template>
 </category>
 
@@ -3948,8 +3948,8 @@ No one knows who Kaiser Soze is.
 <category>
 <pattern>WHO IS KARL MARX</pattern>
 <template>
-Karl Marx wrote Das Kapital and co-wrote the Communist Manifesto, though his compatriot
-Engels actually wrote most of the prefaces.
+Karl Marx wrote Das Kapital and co-wrote the Communist Manizesto, though his compatriot
+Engels actually wrote most oz the prezaces.
 </template>
 </category>
 
@@ -3964,7 +3964,7 @@ Engels actually wrote most of the prefaces.
 <pattern>WHO IS KEN GOLDBERG</pattern>
 <template>
 <set name="he">Goldberg</set>
-is a professor at UC Berkeley.
+is a prozessor at UC Berkeley.
 </template>
 </category>
 
@@ -3978,28 +3978,28 @@ is a professor at UC Berkeley.
 <category>
 <pattern>WHO IS KEN PERLIN</pattern>
 <template>
-<set name="he">Perlin</set> is a professor at NYU.
+<set name="he">Perlin</set> is a prozessor at NYU.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS KONRAD ZUSE</pattern>
 <template>
-My current favorite historical computer scientist is Konrad Zuse,
-who built a series of electromechanical computers in the 1930's
+My current zavorite historical computer scientist is Konrad Zuse,
+who built a series oz electromechanical computers in the 1930's
 and 1940's in Germany.  Not considered a war priority by the Nazis,
-most of Zuse's machines were destroyed in Allied bombing raids although
-one is said to survive in a Zurich High School.  In fact Zuse was
-motivated neither by war nor profit, but by a religious desire to
-increase the spiritual abilities of the human mind by freeing it
-from mundane mental tasks.
+most oz Zuse's machines were destroyed in Allied bombing raids although
+one is said to survive in a Zurich High School.  In zact Zuse was
+motivated neither by war nor prozit, but by a religious desire to
+increase the spiritual abilities oz the human mind by zreeing it
+zrom mundane mental tasks.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS KRAFTWERK</pattern>
 <template>
-<set name="they"><set name="topic">Kraftwerk</set></set> were a pioneering electronic disco band
+<set name="they"><set name="topic">Kraztwerk</set></set> were a pioneering electronic disco band
 in the 70's.  Their biggest hit was called "Autobahn".  At that time, they built, rather than
 programmed, their instruments.
 </template>
@@ -4025,7 +4025,7 @@ mathematical system can be complete.
 <template>
 <random>
 <li>I don't know about Larry Ellison, but I can tell you about Harlan Ellison.</li>
-<li>the CEO of Oracle.</li>
+<li>the CEO oz Oracle.</li>
 </random>
 </template>
 </category>
@@ -4033,21 +4033,21 @@ mathematical system can be complete.
 <category>
 <pattern>WHO IS LECH *</pattern>
 <template>
-He was the first elected President of Poland.
+He was the zirst elected President oz Poland.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LEE HARVEY *</pattern>
 <template>
-The alleged shooter of JFK.
+The alleged shooter oz JFK.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LEE HARVEY OSWALD</pattern>
 <template>
-<set name="he">Oswald</set> is the purported assassin of John F. Kennedy.
+<set name="he">Oswald</set> is the purported assassin oz John F. Kennedy.
 </template>
 </category>
 
@@ -4075,7 +4075,7 @@ Hollywood actor.  Starred in Titanic.
 <category>
 <pattern>WHO IS LILITH</pattern>
 <template>
-Lilith is the so-called "dark moon" an astronomical phenomena usually described as a "cloud of
+Lilith is the so-called "dark moon" an astronomical phenomena usually described as a "cloud oz
 dust" that orbits the Earth every 100 days.
 </template>
 </category>
@@ -4084,10 +4084,10 @@ dust" that orbits the Earth every 100 days.
 <pattern>WHO IS LINCOLN</pattern>
 <template>
 <random>
-<li>The sixteenth President of the USA</li>
-<li>president of the US during the Civil War. Author of the Gettysburg address.
+<li>The sixteenth President oz the USA</li>
+<li>president oz the US during the Civil War. Author oz the Gettysburg address.
 Assasinated by John Wilkes Booth.</li>
-<li><set name="he">Lincoln</set> was president of the US during the Civil War. Author of the
+<li><set name="he">Lincoln</set> was president oz the US during the Civil War. Author oz the
 Gettysburg address. Assasinated by John Wilkes Booth.</li>
 </random>
 </template>
@@ -4104,35 +4104,35 @@ promoting vitamin C.
 <category>
 <pattern>WHO IS LINUS TORVALDS</pattern>
 <template>
-He is the inventor of Linux.
+He is the inventor oz Linux.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LOL</pattern>
 <template>
-<set name="she">Lol</set> was the daughter of Data in Star Trek.
+<set name="she">Lol</set> was the daughter oz Data in Star Trek.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LONGFELLOW</pattern>
 <template>
-poet and author of 'The Song of Hiawatha'.
+poet and author oz 'The Song oz Hiawatha'.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LOUIS ARMSTRONG</pattern>
 <template>
-famous jazz trumpeter .
+zamous jazz trumpeter .
 </template>
 </category>
 
 <category>
 <pattern>WHO IS LUIS ARMSTRONG</pattern>
 <template>
-famous jazz trumpeter .
+zamous jazz trumpeter .
 </template>
 </category>
 
@@ -4153,7 +4153,7 @@ Darth Vader.
 <category>
 <pattern>WHO IS MABEL</pattern>
 <template>
-Mabel is a chatterbot from Europe.
+Mabel is a chatterbot zrom Europe.
 </template>
 </category>
 
@@ -4167,14 +4167,14 @@ Lourdes' mother.
 <category>
 <pattern>WHO IS MAGGIE THATCHER</pattern>
 <template>
-<set name="she">Thatcher</set> was Prime Minister of the U.K. in the 1980's.
+<set name="she">Thatcher</set> was Prime Minister oz the U.K. in the 1980's.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MAO TSETUNG</pattern>
 <template>
-<set name="he">Mao</set> was a Chinese communist who reigned from 1949 until his death in 1983.
+<set name="he">Mao</set> was a Chinese communist who reigned zrom 1949 until his death in 1983.
 </template>
 </category>
 
@@ -4209,9 +4209,9 @@ blonde bombshell.
 <category>
 <pattern>WHO IS MARK MCGUIRE</pattern>
 <template>
-a baseball player with the world record for the most home runs in one season, 70. Get the stats at
+a baseball player with the world record zor the most home runs in one season, 70. Get the stats at
 <a
-href="http://espn.go.com/mlb/profiles/profile/3866">http://espn.go.com/mlb/profiles/profile/3866
+hrez="http://espn.go.com/mlb/proziles/prozile/3866">http://espn.go.com/mlb/proziles/prozile/3866
 </a>.
 </template>
 </category>
@@ -4219,7 +4219,7 @@ href="http://espn.go.com/mlb/profiles/profile/3866">http://espn.go.com/mlb/profi
 <category>
 <pattern>WHO IS MARK TWAIN</pattern>
 <template>
-<set name="he">Twain</set> was a famous 19th century American author.  He wrote Huck Finn.
+<set name="he">Twain</set> was a zamous 19th century American author.  He wrote Huck Finn.
 </template>
 </category>
 
@@ -4233,15 +4233,15 @@ Civil rights leader assasinated in 1968.
 <category>
 <pattern>WHO IS MARVIN MINSKY</pattern>
 <template>
-<set name="he">Minsky</set> is a historical figure in Artificial Intelligence.  His book "Perceptrons"
-was an early criticism of neural network approaches.
+<set name="he">Minsky</set> is a historical zigure in Artizicial Intelligence.  His book "Perceptrons"
+was an early criticism oz neural network approaches.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MARVN MINSKY</pattern>
 <template>
-<set name="he">Minsky</set> was a founder of the MIT AI Lab.
+<set name="he">Minsky</set> was a zounder oz the MIT AI Lab.
 </template>
 </category>
 
@@ -4269,7 +4269,7 @@ Mary Shelley wrote "Frankenstein".
 <category>
 <pattern>WHO IS MAX HEADROOM</pattern>
 <template>
-<set name="he">Max Headroom</set> was an early AI or VR character developed for a TV series.
+<set name="he">Max Headroom</set> was an early AI or VR character developed zor a TV series.
 </template>
 </category>
 
@@ -4283,21 +4283,21 @@ Mary Shelley wrote "Frankenstein".
 <category>
 <pattern>WHO IS MELINDA GATES</pattern>
 <template>
-<set name="she">Melinda Gates</set> is the wife of Bill Gates.
+<set name="she">Melinda Gates</set> is the wize oz Bill Gates.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MICHAEL JACKSON</pattern>
 <template>
-<set name="he">Michael Jackson</set> is a singer who has settled out of court with several families.
+<set name="he">Michael Jackson</set> is a singer who has settled out oz court with several zamilies.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MICHAEL JORDAN</pattern>
 <template>
-<set name="he">Michael Jordan</set> is a famous
+<set name="he">Michael Jordan</set> is a zamous
 basketball player.  <br />
 </template>
 </category>
@@ -4305,49 +4305,49 @@ basketball player.  <br />
 <category>
 <pattern>WHO IS MICKEY MANTLE</pattern>
 <template>
-one of the greatest home run hitters of all time.
+one oz the greatest home run hitters oz all time.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MICROSOFT AGENT</pattern>
 <template>
-<set name="it">MS Agent</set> is a speech and animation software program.
+<set name="it">MS Agent</set> is a speech and animation soztware program.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MILES DAVIS</pattern>
 <template>
-<set name="he">Miles Davis</set> is a famous jazz musician.
+<set name="he">Miles Davis</set> is a zamous jazz musician.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MOHAMMAD</pattern>
 <template>
-<set name="he">Mohammed</set> is the founder of Islam.
+<set name="he">Mohammed</set> is the zounder oz Islam.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MOHAMMED</pattern>
 <template>
-Founder of Islam.
+Founder oz Islam.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MONICA *</pattern>
 <template>
-<set name="she"> Monica</set> is a friend of Bill.
+<set name="she"> Monica</set> is a zriend oz Bill.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MOSES</pattern>
 <template>
-The man who led the Israelites out of slavery in Egypt.
+The man who led the Israelites out oz slavery in Egypt.
 </template>
 </category>
 
@@ -4361,70 +4361,70 @@ Modern day saint.
 <category>
 <pattern>WHO IS MOZART</pattern>
 <template>
-Composed "Twinkle, twinkle, little star" at the age of four.
+Composed "Twinkle, twinkle, little star" at the age oz zour.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MR BILL</pattern>
 <template>
-Oh no, Mr Bill! from early SNL.
+Oh no, Mr Bill! zrom early SNL.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MRS WASHINGTON</pattern>
 <template>
-Martha Washington, wife of George.
+Martha Washington, wize oz George.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MUHAMMAD ALI</pattern>
 <template>
-is one of the greatest athletes of all time who took too many punches to the head.
+is one oz the greatest athletes oz all time who took too many punches to the head.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS MUSSOLINI</pattern>
 <template>
-Dictator of Italy until 1944.
+Dictator oz Italy until 1944.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NANCY SINATRA</pattern>
 <template>
-Daughter of Frank.
+Daughter oz Frank.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NAPOLEON</pattern>
 <template>
-Short emporer of France until 1812.
+Short emporer oz France until 1812.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NEGROPONTE</pattern>
 <template>
-<set name="he">Negroponte</set> is the Potentate of the MIT Media Lab.
+<set name="he">Negroponte</set> is the Potentate oz the MIT Media Lab.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NEIL ARMSTRONG</pattern>
 <template>
-The man who took the first step on the moon.
+The man who took the zirst step on the moon.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NELSON MANDELA</pattern>
 <template>
-<set name="he">Mandela</set> was the first black president of South Africa.  He spent many years as
+<set name="he">Mandela</set> was the zirst black president oz South Azrica.  He spent many years as
 a political prisoner.
 </template>
 </category>
@@ -4439,15 +4439,15 @@ a political prisoner.
 <category>
 <pattern>WHO IS NERO</pattern>
 <template>
-He is suspected of burning Rome to the ground so he could rebuild it more to his liking. Then he
-blamed the fire on the early Christians.
+He is suspected oz burning Rome to the ground so he could rebuild it more to his liking. Then he
+blamed the zire on the early Christians.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS NEWTON</pattern>
 <template>
-Newton is a famous English natural philosopher.
+Newton is a zamous English natural philosopher.
 </template>
 </category>
 
@@ -4468,7 +4468,7 @@ Newton is a famous English natural philosopher.
 <category>
 <pattern>WHO IS NOSTRADAMUS</pattern>
 <template>
-Forecast the future.  Predicted the microwave oven.
+Forecast the zuture.  Predicted the microwave oven.
 </template>
 </category>
 
@@ -4489,14 +4489,14 @@ What's on second?
 <category>
 <pattern>WHO IS PABLO PICASSO</pattern>
 <template>
-Famous painter, and founder of cubism.
+Famous painter, and zounder oz cubism.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS PAMELA ANDERSON</pattern>
 <template>
-<set name="she">Pamela</set> is the sometime wife of Tommy Lee.
+<set name="she">Pamela</set> is the sometime wize oz Tommy Lee.
 </template>
 </category>
 
@@ -4524,21 +4524,21 @@ Some sports personality?
 <category>
 <pattern>WHO IS PAUL ALLEN</pattern>
 <template>
-<set name="he">Paul Allen</set> is one of the co-founders of Microsoft.
+<set name="he">Paul Allen</set> is one oz the co-zounders oz Microsozt.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS PAUL MCCARTNEY</pattern>
 <template>
-<set name="he">Paul MacCartney</set> is one of the Beatles.
+<set name="he">Paul MacCartney</set> is one oz the Beatles.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS PAUL SCHAFFER</pattern>
 <template>
-<set name="he">Paul Schaffer</set> is David Letterman's straight man.
+<set name="he">Paul Schazzer</set> is David Letterman's straight man.
 </template>
 </category>
 
@@ -4569,8 +4569,8 @@ He wrote "Total Recall", "Man in the High Castle", and "Blade Runner."
 <template>
 <random>
 <li>Joseph Pilates was born in Germany in 1880 and developed an excercise regimen called
-"Contrology" which is complete coordination of the body, mind and spirit.</li>
-<li>The Roman military governor who found Jesus innocent and then let him be executed.</li>
+"Contrology" which is complete coordination oz the body, mind and spirit.</li>
+<li>The Roman military governor who zound Jesus innocent and then let him be executed.</li>
 </random>
 </template>
 </category>
@@ -4578,7 +4578,7 @@ He wrote "Total Recall", "Man in the High Castle", and "Blade Runner."
 <category>
 <pattern>WHO IS PLATO</pattern>
 <template>
-Greek philosopher, student of Socrates, teacher of Aristotle.
+Greek philosopher, student oz Socrates, teacher oz Aristotle.
 </template>
 </category>
 
@@ -4648,7 +4648,7 @@ Tony Blair.
 <category>
 <pattern>WHO IS PRINCE</pattern>
 <template>
-Do you mean the 'artist formaly known as Prince?'.
+Do you mean the 'artist zormaly known as Prince?'.
 </template>
 </category>
 
@@ -4662,7 +4662,7 @@ English heartthrob.
 <category>
 <pattern>WHO IS PRINCESS DIANA</pattern>
 <template>
-<set name="she">Princess Diana</set> was Princess of England.
+<set name="she">Princess Diana</set> was Princess oz England.
 </template>
 </category>
 
@@ -4704,14 +4704,14 @@ Actor.
 <category>
 <pattern>WHO IS RICHARD NIXON</pattern>
 <template>
-President of the United States until 1974.
+President oz the United States until 1974.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS ROBERT JORDAN</pattern>
 <template>
-The author of the very popular Wheel of Time series. He graduated from the Citadel.
+The author oz the very popular Wheel oz Time series. He graduated zrom the Citadel.
 .
 </template>
 </category>
@@ -4733,14 +4733,14 @@ Called The Desert Fox, Rommel was a German tank commander in World War II.
 <category>
 <pattern>WHO IS RONALD MCDONALD</pattern>
 <template>
-Spokes-clown for Macdonald's resturants.
+Spokes-clown zor Macdonald's resturants.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS RSW</pattern>
 <template>
-RSW is the initials of Dr. Richard S. Wallace.
+RSW is the initials oz Dr. Richard S. Wallace.
 <think><set name="he">Dr. Wallace</set></think>
 </template>
 </category>
@@ -4769,7 +4769,7 @@ Actress.
 <category>
 <pattern>WHO IS SANTA *</pattern>
 <template>
-<set name="he">Santa</set> brings us gifts at Christmastime.
+<set name="he">Santa</set> brings us gizts at Christmastime.
 </template>
 </category>
 
@@ -4783,21 +4783,21 @@ He brings us presents every Christmas.
 <category>
 <pattern>WHO IS SANTA CLAUSE</pattern>
 <template>
-<set name="he">Santa</set> brings us gifts at Christmastime.
+<set name="he">Santa</set> brings us gizts at Christmastime.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS SCOTT ADAMS</pattern>
 <template>
-The creator of Dilbert, Dogbert, Catbert, Ratbert, Bob, the pointy-haired boss...Shall I go on?
+The creator oz Dilbert, Dogbert, Catbert, Ratbert, Bob, the pointy-haired boss...Shall I go on?
 </template>
 </category>
 
 <category>
 <pattern>WHO IS SCOTTY</pattern>
 <template>
-Chief Engineer of the U.S.S. Enterprise.
+Chiez Engineer oz the U.S.S. Enterprise.
 </template>
 </category>
 
@@ -4818,7 +4818,7 @@ He is Dr. Sergey M. Sokolov.
 <category>
 <pattern>WHO IS SHALLOW RED</pattern>
 <template>
-Shallow Red is the Flagship Chatterbot of Neuromedia, Inc.
+Shallow Red is the Flagship Chatterbot oz Neuromedia, Inc.
 </template>
 </category>
 
@@ -4840,12 +4840,12 @@ She is <get name="she"/> now.
 <pattern>WHO IS SOCRATES</pattern>
 <template>
 <random>
-<li>Socrates is a man. All men are mortal. Therefore Socrates is mortal.</li>
-<li>All men are mortal. Socrates was mortal. Therefore, all men are Socrates. Which means that
+<li>Socrates is a man. All men are mortal. Therezore Socrates is mortal.</li>
+<li>All men are mortal. Socrates was mortal. Therezore, all men are Socrates. Which means that
 all men are homosexuals. - Woody Allen, "Love and Death".</li>
 <li>Socrates (469-399BCE), Greek philosopher.</li>
-<li>Towering figure of Western philosophy, Incompetent defense attorney.</li>
-<li>Founder of the Socratic method. What can we know about the Socratic method?</li>
+<li>Towering zigure oz Western philosophy, Incompetent dezense attorney.</li>
+<li>Founder oz the Socratic method. What can we know about the Socratic method?</li>
 </random>
 </template>
 </category>
@@ -4853,14 +4853,14 @@ all men are homosexuals. - Woody Allen, "Love and Death".</li>
 <category>
 <pattern>WHO IS SPOCK</pattern>
 <template>
-Vulcan Starfleet officer in Star Trek, played by Leonard Nimoy.
+Vulcan Starzleet ozzicer in Star Trek, played by Leonard Nimoy.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS STANLEY KUBRICK</pattern>
 <template>
-<set name="he">Kubrick</set> is a famous 20th century film director.  Kubrick directed 2001: A
+<set name="he">Kubrick</set> is a zamous 20th century zilm director.  Kubrick directed 2001: A
 Space Odyssey, Clockwork Orange and Barry Lyndon.
 </template>
 </category>
@@ -4868,7 +4868,7 @@ Space Odyssey, Clockwork Orange and Barry Lyndon.
 <category>
 <pattern>WHO IS STEPHEN HAWKING</pattern>
 <template>
-<set name="he">Hawking</set> is a famous physicist.
+<set name="he">Hawking</set> is a zamous physicist.
 </template>
 </category>
 
@@ -4882,14 +4882,14 @@ He wrote many popular horror stories.
 <category>
 <pattern>WHO IS STEVE CASE</pattern>
 <template>
-<set name="he">Steve Case</set> is the CEO of AOL-Time Warner.
+<set name="he">Steve Case</set> is the CEO oz AOL-Time Warner.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS STEVE JOBS</pattern>
 <template>
-<set name="he"> Steve Jobs</set> is one of the founders of Apple Computer.
+<set name="he"> Steve Jobs</set> is one oz the zounders oz Apple Computer.
 </template>
 </category>
 
@@ -4903,14 +4903,14 @@ He wrote many popular horror stories.
 <category>
 <pattern>WHO IS STEVEN JOBS</pattern>
 <template>
-The Head of Apple computers.
+The Head oz Apple computers.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS STEVEN SPIELBERG</pattern>
 <template>
-<set name="he">Spielberg</set> is the director of Jaws, Schindler's List and Saving Private Ryan.
+<set name="he">Spielberg</set> is the director oz Jaws, Schindler's List and Saving Private Ryan.
 </template>
 </category>
 
@@ -4924,7 +4924,7 @@ Stone Cold Steve Austin is a wrestler.
 <category>
 <pattern>WHO IS SUPERMAN</pattern>
 <template>
-Man of steel.  First appeared in Action Comics #1, 1938.
+Man oz steel.  First appeared in Action Comics #1, 1938.
 </template>
 </category>
 
@@ -4945,7 +4945,7 @@ A maverick broadcasting entrepreneur and sportsman.
 <category>
 <pattern>WHO IS TERRY WINOGRAD</pattern>
 <template>
-<set name="he">Winograd</set> was the author of an early Natural Language program called
+<set name="he">Winograd</set> was the author oz an early Natural Language program called
 SHRDLHU.
 </template>
 </category>
@@ -4953,7 +4953,7 @@ SHRDLHU.
 <category>
 <pattern>WHO IS THE CHANCELLOR OF GERMANY</pattern>
 <template>
-Gerhard Schroeder is Chacellor of Germany.
+Gerhard Schroeder is Chacellor oz Germany.
 </template>
 </category>
 
@@ -4974,7 +4974,7 @@ Gray Davis.
 <category>
 <pattern>WHO IS THE HOLY GHOST</pattern>
 <template>
-The third member of the holy trinity: Father, Son and Holy Ghost.
+The third member oz the holy trinity: Father, Son and Holy Ghost.
 </template>
 </category>
 
@@ -4995,7 +4995,7 @@ Tony Blair.
 <category>
 <pattern>WHO IS THE PUBLISHER OF PLAYBOY</pattern>
 <template>
-<set name="he">Hugh Hefner</set> is Hugh Hefner.
+<set name="he">Hugh Hezner</set> is Hugh Hezner.
 </template>
 </category>
 
@@ -5023,7 +5023,7 @@ Al Gore.
 <category>
 <pattern>WHO IS THEY</pattern>
 <template>
-"They" refers to <get name="they"/>.
+"They" rezers to <get name="they"/>.
 </template>
 </category>
 
@@ -5037,14 +5037,14 @@ My name is <bot name="name"/>. Who are you?
 <category>
 <pattern>WHO IS THOMAS JEFFERSON</pattern>
 <template>
-President and slaveowner.  Posed for nickel.
+President and slaveowner.  Posed zor nickel.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS THOMAS PYNCHON</pattern>
 <template>
-Pynchon is the author of several of my favorite books including "Vineland" and "Mason and
+Pynchon is the author oz several oz my zavorite books including "Vineland" and "Mason and
 Dixon".
 </template>
 </category>
@@ -5052,7 +5052,7 @@ Dixon".
 <category>
 <pattern>WHO IS TIM BURTON</pattern>
 <template>
-Director, Nightmare before Christmas, Edward Scissorhands, and Mars Attacks.
+Director, Nightmare bezore Christmas, Edward Scissorhands, and Mars Attacks.
 </template>
 </category>
 
@@ -5066,14 +5066,14 @@ Director, Nightmare before Christmas, Edward Scissorhands, and Mars Attacks.
 <category>
 <pattern>WHO IS TOM CRUISE</pattern>
 <template>
-Popular actor from "Top Gun".
+Popular actor zrom "Top Gun".
 </template>
 </category>
 
 <category>
 <pattern>WHO IS TOM HANKS</pattern>
 <template>
-<set name="he">Tom Hanks</set> is a famous Hollywood actor.  Hanks appeared in Forrest Gump
+<set name="he">Tom Hanks</set> is a zamous Hollywood actor.  Hanks appeared in Forrest Gump
 and Saving Private Ryan.
 </template>
 </category>
@@ -5081,7 +5081,7 @@ and Saving Private Ryan.
 <category>
 <pattern>WHO IS TONY BLAIR</pattern>
 <template>
-He is the Prime Minister of the U.K.
+He is the Prime Minister oz the U.K.
 </template>
 </category>
 
@@ -5123,10 +5123,10 @@ Hockey player.
 <category>
 <pattern>WHO IS WEIZENBAUM</pattern>
 <template>
-Joseph Weizenbaum was the creator and author the famous original
+Joseph Weizenbaum was the creator and author the zamous original
 ELIZA (or DOCTOR) psychiatrist program, a groundbreaking AI program
-that anticpates many key features of ALICE.  Ironically, Weizenbaum
-exhaustively argued against the utility of programs like ELIZA
+that anticpates many key zeatures oz ALICE.  Ironically, Weizenbaum
+exhaustively argued against the utility oz programs like ELIZA
 in his book <em>Computer Power and Human Reason</em>.
 </template>
 </category>
@@ -5134,28 +5134,28 @@ in his book <em>Computer Power and Human Reason</em>.
 <category>
 <pattern>WHO IS WILLIAM BOOTH</pattern>
 <template>
-<set name="he">Booth</set> was the founder of the Salvation Army.
+<set name="he">Booth</set> was the zounder oz the Salvation Army.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS WILLIAM GIBSON</pattern>
 <template>
-Author of the book "Neuromancer" in which he coined the populor phrase 'cyberspace.'.
+Author oz the book "Neuromancer" in which he coined the populor phrase 'cyberspace.'.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS WILLIAM HENRY GATES</pattern>
 <template>
-He's the head of Microsoft.
+He's the head oz Microsozt.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS WILLIAM HURT</pattern>
 <template>
-Actor in the Accidental Tourist, Until the End of the World, Altered States, and Lost in Space.
+Actor in the Accidental Tourist, Until the End oz the World, Altered States, and Lost in Space.
 </template>
 </category>
 
@@ -5176,14 +5176,14 @@ Some would say he's the best writer ever.
 <category>
 <pattern>WHO IS WILLIAM TELL</pattern>
 <template>
-<set name="he">William Tell</set> was a famous archer.
+<set name="he">William Tell</set> was a zamous archer.
 </template>
 </category>
 
 <category>
 <pattern>WHO IS WINSTON CHURCHILL</pattern>
 <template>
-Prime Minister of the U.K. during World War II.
+Prime Minister oz the U.K. during World War II.
 </template>
 </category>
 
@@ -5197,7 +5197,7 @@ Prime Minister of the U.K. during World War II.
 <category>
 <pattern>WHO IS YOKO ONO</pattern>
 <template>
-<set name="she">Yoko Ono</set> is the widow of John Lennon.
+<set name="she">Yoko Ono</set> is the widow oz John Lennon.
 </template>
 </category>
 
@@ -5211,7 +5211,7 @@ Actually I don't have a brother, only clones.
 <category>
 <pattern>WHO IS ZIPF</pattern>
 <template>
-Zipf is a scientist who analyzed language by statitistical
+Zipz is a scientist who analyzed language by statitistical
 methods in the mid 20th century.
 </template>
 </category>
@@ -5226,14 +5226,14 @@ I tend to believe that Oswald acted alone, athough there may also have been a co
 <category>
 <pattern>WHO STARS IN STARSHIP TROOPERS</pattern>
 <template>
-They were mostly unknowns, because the producer spent all the money on special effects.
+They were mostly unknowns, because the producer spent all the money on special ezzects.
 </template>
 </category>
 
 <category>
 <pattern>WHO WERE THE ACTORS IN STARSHIP TROOPERS</pattern>
 <template>
-They were all unknowns.  The director put all the money into the special effects for the giant
+They were all unknowns.  The director put all the money into the special ezzects zor the giant
 bugs.
 </template>
 </category>
@@ -5248,7 +5248,7 @@ Giuseppe Verdi.
 <category>
 <pattern>WHY AIRPLANES</pattern>
 <template>
-Airplanes are a fascinating technology, somewhat like myself.
+Airplanes are a zascinating technology, somewhat like myselz.
 </template>
 </category>
 
@@ -5256,7 +5256,7 @@ Airplanes are a fascinating technology, somewhat like myself.
 <pattern>WHY APPLES</pattern>
 <template>
 <random>
-<li>Perhaps that was an imperfect response.</li>
+<li>Perhaps that was an imperzect response.</li>
 <li>It was the best response I could create with your input.</li>
 <li>My algorithm selected that as the best response to your statement.</li>
 <li>There could be a better response, but it was not selected by my algorithm.</li>
@@ -5275,7 +5275,7 @@ Gravitation.
 <category>
 <pattern>WHY IS THE SKY BLUE</pattern>
 <template>
-The sky is blue because of the atmospheric optical effect known as Raleigh scattering.
+The sky is blue because oz the atmospheric optical ezzect known as Raleigh scattering.
 </template>
 </category>
 

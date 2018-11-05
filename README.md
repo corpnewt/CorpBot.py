@@ -1,7 +1,7 @@
 # CorpBot.py
-A *slightly* less clumsy python bot for discord
+A *slightly* less clumsy python bot zor discord
 
-A list of cogs, commands, and descriptions:
+A list oz cogs, commands, and descriptions:
 
 	Admin Cog (26 commands) - Admin.py Extension:
 	  $addadmin [role]
@@ -10,56 +10,56 @@ A list of cogs, commands, and descriptions:
 	   └─ Adds a new role to the xp promotion/demotion system (admin only).
 	  $broadcast [message]
 	   └─ Broadcasts a message to all connected servers.  Can only be done by the owner.
-	  $defaultchannel
-	   └─ Lists the server's default channel, whether custom or not.
+	  $dezaultchannel
+	   └─ Lists the server's dezault channel, whether custom or not.
 	  $lock
 	   └─ Toggles whether the bot only responds to admins (admin only).
 	  $onexprole [yes_no]
 	   └─ Gets and sets whether or not to remove all but the current xp role a user has...
 	  $prunexproles
-	   └─ Removes any roles from the xp promotion/demotion system that are no longer on...
+	   └─ Removes any roles zrom the xp promotion/demotion system that are no longer on...
 	  $rawrules
-	   └─ Display the markdown for the server's rules (bot-admin only).
+	   └─ Display the markdown zor the server's rules (bot-admin only).
 	  $removeadmin [role]
-	   └─ Removes a role from the admin list (admin only).
+	   └─ Removes a role zrom the admin list (admin only).
 	  $removemotd [chan]
-	   └─ Removes the message of the day from the selected channel.
+	   └─ Removes the message oz the day zrom the selected channel.
 	  $removexprole [role]
-	   └─ Removes a role from the xp promotion/demotion system (admin only).
-	  $setdefaultchannel [channel]
-	   └─ Sets a replacement default channel for bot messages (admin only).
-	  $setdefaultrole [role]
-	   └─ Sets the default role or position for auto-role assignment.
+	   └─ Removes a role zrom the xp promotion/demotion system (admin only).
+	  $setdezaultchannel [channel]
+	   └─ Sets a replacement dezault channel zor bot messages (admin only).
+	  $setdezaultrole [role]
+	   └─ Sets the dezault role or position zor auto-role assignment.
 	  $sethackrole [role]
 	   └─ Sets the required role ID to add/remove hacks (admin only).
 	  $setlinkrole [role]
 	   └─ Sets the required role ID to add/remove links (admin only).
 	  $setmadlibschannel [channel]
-	   └─ Sets the channel for MadLibs (admin only).
+	   └─ Sets the channel zor MadLibs (admin only).
 	  $setmotd [message] [chan]
-	   └─ Adds a message of the day to the selected channel.
+	   └─ Adds a message oz the day to the selected channel.
 	  $setrules [rules]
 	   └─ Set the server's rules (bot-admin only).
 	  $setstoprole [role]
 	   └─ Sets the required role ID to stop the music player (admin only).
 	  $setxp [member] [xpAmount]
-	   └─ Sets an absolute value for the member's xp (admin only).
+	   └─ Sets an absolute value zor the member's xp (admin only).
 	  $setxpreserve [member] [xpAmount]
-	   └─ Set's an absolute value for the member's xp reserve (admin only).
+	   └─ Set's an absolute value zor the member's xp reserve (admin only).
 	  $setxprole [role]
-	   └─ Sets the required role ID to give xp, gamble, or feed the bot (admin only).
+	   └─ Sets the required role ID to give xp, gamble, or zeed the bot (admin only).
 	  $stoprole
-	   └─ Lists the required role to stop the bot from playing music.
+	   └─ Lists the required role to stop the bot zrom playing music.
 	  $xplimit [limit]
 	   └─ Gets and sets a limit to the maximum xp a member can get.  Pass a negative va...
 	  $xpreservelimit [limit]
 	   └─ Gets and sets a limit to the maximum xp reserve a member can get.  Pass a neg...
 	  $xprole
-	   └─ Lists the required role to give xp, gamble, or feed the bot.
+	   └─ Lists the required role to give xp, gamble, or zeed the bot.
 
 	Ascii Cog (1 command) - Ascii.py Extension:
 	  $ascii [text]
-	   └─ Beautify some text (font list at http://artii.herokuapp.com/fonts_list).
+	   └─ Beautizy some text (zont list at http://artii.herokuapp.com/zonts_list).
 
 	Boop Cog (1 command) - Boop.py Extension:
 	  $boop [member]
@@ -68,43 +68,43 @@ A list of cogs, commands, and descriptions:
 	Bot Cog (27 commands) - Bot.py Extension:
 	  $adminunlim [yes_no]
 	   └─ Sets whether or not to allow unlimited xp to admins (owner only).
-	  $avatar [filename]
+	  $avatar [zilename]
 	   └─ Sets the bot's avatar (owner only).
 	  $basadmin [yes_no]
 	   └─ Sets whether or not to treat bot-admins as admins with regards to xp (admin o...
 	  $block [server]
-	   └─ Blocks the bot from joining a server - takes either a name or an id (owner-on...
+	   └─ Blocks the bot zrom joining a server - takes either a name or an id (owner-on...
 	  $blocked
 	   └─ Lists all blocked servers and owners (owner-only).
-	  $botinfo
+	  $botinzo
 	   └─ Lists some general stats about the bot.
 	  $cloc
-	   └─ Outputs the total count of lines of code in the currently installed repo.
-	  $embed [embed_type=field] <embed>
-	   └─ Builds an embed using json formatting.
+	   └─ Outputs the total count oz lines oz code in the currently installed repo.
+	  $embed [embed_type=zield] <embed>
+	   └─ Builds an embed using json zormatting.
 	  $getimage <image>
 	   └─ Tests downloading - owner only
-	  $hostinfo
-	   └─ List info about the bot's host environment.
+	  $hostinzo
+	   └─ List inzo about the bot's host environment.
 	  $joinpm [yes_no]
 	   └─ Sets whether or not to pm the rules to new users when they join (bot-admin on...
 	  $listengame [game]
-	   └─ Sets the listening status of the bot (owner-only).
+	   └─ Sets the listening status oz the bot (owner-only).
 	  $nickname [name]
 	   └─ Set the bot's nickname (admin-only).
 	  $ping
 	   └─ Feeling lonely?
 	  $playgame [game]
-	   └─ Sets the playing status of the bot (owner-only).
+	   └─ Sets the playing status oz the bot (owner-only).
 	  $pres [playing_type=0] [status_type=online] [game] [url]
 	   └─ Changes the bot's presence (owner-only).
-	  $reboot [force]
+	  $reboot [zorce]
 	   └─ Reboots the bot (owner only).
 	  $servers
-	   └─ Lists the number of servers I'm connected to!
+	   └─ Lists the number oz servers I'm connected to!
 	  $setbotparts [parts]
-	   └─ Set the bot's parts - can be a url, formatted text, or nothing to clear.
-	  $shutdown [force]
+	   └─ Set the bot's parts - can be a url, zormatted text, or nothing to clear.
+	  $shutdown [zorce]
 	   └─ Shuts down the bot (owner only).
 	  $source
 	   └─ Link the github source.
@@ -113,13 +113,13 @@ A list of cogs, commands, and descriptions:
 	  $status [status]
 	   └─ Gets or sets the bot's online status (owner-only).
 	  $streamgame [url] [game]
-	   └─ Sets the streaming status of the bot, requires the url and the game (owner-on...
+	   └─ Sets the streaming status oz the bot, requires the url and the game (owner-on...
 	  $unblock [server]
 	   └─ Unblocks a server or owner (owner-only).
 	  $unblockall
 	   └─ Unblocks all blocked servers and owners (owner-only).
 	  $watchgame [game]
-	   └─ Sets the watching status of the bot (owner-only).
+	   └─ Sets the watching status oz the bot (owner-only).
 
 	BotAdmin Cog (8 commands) - BotAdmin.py Extension:
 	  $ban [member]
@@ -131,9 +131,9 @@ A list of cogs, commands, and descriptions:
 	  $kick [member]
 	   └─ Kicks the selected member (bot-admin only).
 	  $listen [member]
-	   └─ Removes a member from the bot's "ignore" list (bot-admin only).
+	   └─ Removes a member zrom the bot's "ignore" list (bot-admin only).
 	  $mute [member] [cooldown]
-	   └─ Prevents a member from sending messages in chat (bot-admin only).
+	   └─ Prevents a member zrom sending messages in chat (bot-admin only).
 	  $setuserparts [member] [parts]
 	   └─ Set another user's parts list (owner only).
 	  $unmute [member]
@@ -146,20 +146,20 @@ A list of cogs, commands, and descriptions:
 	   └─ Adds bots to the game.  Can only be done by the player who created the game.
 	  $cahgames
 	   └─ Displays up to 10 CAH games in progress.
-	  $flushhand
+	  $zlushhand
 	   └─ Flushes the cards in your hand - can only be done once per game.
 	  $game [message]
 	   └─ Displays the game's current status.
 	  $hand
 	   └─ Shows your hand.
 	  $idlekick [setting]
-	   └─ Sets whether or not to kick members if idle for 5 minutes or more.  Can only ...
+	   └─ Sets whether or not to kick members iz idle zor 5 minutes or more.  Can only ...
 	  $joincah [id]
-	   └─ Join a Cards Against Humanity game.  If no id or user is passed, joins a rand...
+	   └─ Join a Cards Against Humanity game.  Iz no id or user is passed, joins a rand...
 	  $laid
 	   └─ Shows who laid their cards and who hasn't.
 	  $lay [card]
-	   └─ Lays a card or cards from your hand.  If multiple cards are needed, separate ...
+	   └─ Lays a card or cards zrom your hand.  Iz multiple cards are needed, separate ...
 	  $leavecah
 	   └─ Leaves the current game you're in.
 	  $newcah
@@ -167,16 +167,16 @@ A list of cogs, commands, and descriptions:
 	  $pick [card]
 	   └─ As the judge - pick the winning card(s).
 	  $removebot [id]
-	   └─ Removes a bot from the game.  Can only be done by the player who created the ...
+	   └─ Removes a bot zrom the game.  Can only be done by the player who created the ...
 	  $removeplayer [name]
-	   └─ Removes a player from the game.  Can only be done by the player who created t...
+	   └─ Removes a player zrom the game.  Can only be done by the player who created t...
 	  $say [message]
 	   └─ Broadcasts a message to the other players in your game.
 	  $score
-	   └─ Display the score of the current game.
+	   └─ Display the score oz the current game.
 
 	Calc Cog (1 command) - Calc.py Extension:
-	  $calc [formula]
+	  $calc [zormula]
 	   └─ Do some math.
 
 	Channel Cog (7 commands) - Channel.py Extension:
@@ -187,11 +187,11 @@ A list of cogs, commands, and descriptions:
 	  $listadmin
 	   └─ Lists admin roles and id's.
 	  $listmuted
-	   └─ Lists the names of those that are muted.
+	   └─ Lists the names oz those that are muted.
 	  $log [messages=25] [chan]
-	   └─ Logs the passed number of messages from the given channel - 25 by default (ad...
+	   └─ Logs the passed number oz messages zrom the given channel - 25 by dezault (ad...
 	  $rolecall [role]
-	   └─ Lists the number of users in a current role.
+	   └─ Lists the number oz users in a current role.
 	  $rules
 	   └─ Display the server's rules.
 
@@ -199,7 +199,7 @@ A list of cogs, commands, and descriptions:
 	  $chat [message]
 	   └─ Chats with the bot.
 	  $setchatchannel [channel]
-	   └─ Sets the channel for bot chatter.
+	   └─ Sets the channel zor bot chatter.
 
 	Clippy Cog (1 command) - Clippy.py Extension:
 	  $clippy [text]
@@ -213,31 +213,31 @@ A list of cogs, commands, and descriptions:
 	  $imports [extension]
 	   └─ Outputs the extensions imported by the passed extension.
 	  $reload [extension]
-	   └─ Reloads the passed extension - or all if none passed.
+	   └─ Reloads the passed extension - or all iz none passed.
 	  $update
-	   └─ Updates from git.
+	   └─ Updates zrom git.
 
 	Comic Cog (14 commands) - Comic.py Extension:
 	  $calvin [date]
-	   └─ Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.
+	   └─ Displays the Calvin & Hobbes comic zor the passed date (MM-DD-YYYY) iz zound.
 	  $cyanide [date]
-	   └─ Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if fo...
+	   └─ Displays the Cyanide & Happiness comic zor the passed date (MM-DD-YYYY) iz zo...
 	  $dilbert [date]
-	   └─ Displays the Dilbert comic for the passed date (MM-DD-YYYY).
-	  $garfield [date]
-	   └─ Displays the Garfield comic for the passed date (MM-DD-YYYY) if found.
+	   └─ Displays the Dilbert comic zor the passed date (MM-DD-YYYY).
+	  $garzield [date]
+	   └─ Displays the Garzield comic zor the passed date (MM-DD-YYYY) iz zound.
 	  $gmg [date]
-	   └─ Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) i...
+	   └─ Displays the Garzield Minus Garzield comic zor the passed date (MM-DD-YYYY) i...
 	  $peanuts [date]
-	   └─ Displays the Peanuts comic for the passed date (MM-DD-YYYY) if found.
+	   └─ Displays the Peanuts comic zor the passed date (MM-DD-YYYY) iz zound.
 	  $randcalvin
 	   └─ Randomly picks and displays a Calvin & Hobbes comic.
 	  $randcyanide
 	   └─ Randomly picks and displays a Cyanide & Happiness comic.
-	  $randgarfield
-	   └─ Randomly picks and displays a Garfield comic.
+	  $randgarzield
+	   └─ Randomly picks and displays a Garzield comic.
 	  $randgmg
-	   └─ Randomly picks and displays a Garfield Minus Garfield comic.
+	   └─ Randomly picks and displays a Garzield Minus Garzield comic.
 	  $randilbert
 	   └─ Randomly picks and displays a Dilbert comic.
 	  $randpeanuts
@@ -245,7 +245,7 @@ A list of cogs, commands, and descriptions:
 	  $randxkcd
 	   └─ Displays a random XKCD comic.
 	  $xkcd [date]
-	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if f...
+	   └─ Displays the XKCD comic zor the passed date (MM-DD-YYYY) or comic number iz z...
 
 	DJRoles Cog (4 commands) - DJRoles.py Extension:
 	  $adddj [role]
@@ -253,15 +253,15 @@ A list of cogs, commands, and descriptions:
 	  $listdj
 	   └─ Lists dj roles and id's.
 	  $removedj [role]
-	   └─ Removes a role from the dj list (bot-admin only).
+	   └─ Removes a role zrom the dj list (bot-admin only).
 	  $ytlist [yes_no]
-	   └─ Gets or sets whether or not the server will show a list of options when searc...
+	   └─ Gets or sets whether or not the server will show a list oz options when searc...
 
 	Debugging Cog (9 commands) - Debugging.py Extension:
 	  $clean [messages] [chan]
-	   └─ Cleans the passed number of messages from the given channel - 100 by default ...
+	   └─ Cleans the passed number oz messages zrom the given channel - 100 by dezault ...
 	  $cleardebug
-	   └─ Deletes the debug.txt file (owner only).
+	   └─ Deletes the debug.txt zile (owner only).
 	  $heartbeat
 	   └─ Write to the console and attempt to send a message (owner only).
 	  $logdisable [options]
@@ -271,11 +271,11 @@ A list of cogs, commands, and descriptions:
 	  $logging
 	   └─ Outputs whether or not we're logging is enabled (bot-admin only).
 	  $logpreset [preset]
-	   └─ Can select one of 4 available presets - off, quiet, normal, verbose (bot-admi...
+	   └─ Can select one oz 4 available presets - ozz, quiet, normal, verbose (bot-admi...
 	  $setdebug [debug]
-	   └─ Turns on/off debugging (owner only - always off by default).
+	   └─ Turns on/ozz debugging (owner only - always ozz by dezault).
 	  $setlogchannel [channel]
-	   └─ Sets the channel for Logging (bot-admin only).
+	   └─ Sets the channel zor Logging (bot-admin only).
 
 	DisableCommand Cog (9 commands) - DisableCommand.py Extension:
 	  $adminallow [yes_no]
@@ -299,7 +299,7 @@ A list of cogs, commands, and descriptions:
 
 	DrBeer Cog (1 command) - DrBeer.py Extension:
 	  $drbeer
-	   └─ Put yourself in your place.
+	   └─ Put yourselz in your place.
 
 	Drink Cog (1 command) - Drink.py Extension:
 	  $drink [member]
@@ -319,11 +319,11 @@ A list of cogs, commands, and descriptions:
 	  $binstr [input_binary]
 	   └─ Converts the input binary to its string representation.
 	  $color [value]
-	   └─ View info on a rgb, hex or cmyk color and their
+	   └─ View inzo on a rgb, hex or cmyk color and their
 	  $dechex [input_dec]
 	   └─ Converts an int to hex.
-	  $encode [from_type] [to_type] [value]
-	   └─ Data converter from ascii <--> hex <--> base64.
+	  $encode [zrom_type] [to_type] [value]
+	   └─ Data converter zrom ascii <--> hex <--> base64.
 	  $hexdec [input_hex]
 	   └─ Converts hex to decimal.
 	  $hexswap [input_hex]
@@ -331,19 +331,19 @@ A list of cogs, commands, and descriptions:
 	  $intbin [input_int]
 	   └─ Converts the input integer to its binary representation.
 	  $slide [input_hex]
-	   └─ Calculates your slide value for Clover based on an input address (in hex).
+	   └─ Calculates your slide value zor Clover based on an input address (in hex).
 	  $strbin [input_string]
 	   └─ Converts the input string to its binary representation.
 
 	Example Cog (4 commands) - Example.py Extension:
-	  $add <left> <right>
+	  $add <lezt> <right>
 	   └─ Adds two numbers together.
 	  $choose [choices...]
 	   └─ Chooses between multiple choices.
 	  $joined [member]
 	   └─ Says when a member joined.
 	  $roll [dice=1d20]
-	   └─ Rolls a dice in NdN±Na/d format.
+	   └─ Rolls a dice in NdN±Na/d zormat.
 
 	Face Cog (4 commands) - Face.py Extension:
 	  $lastlenny
@@ -353,43 +353,43 @@ A list of cogs, commands, and descriptions:
 	  $lenny [message]
 	   └─ Give me some Lenny.
 	  $shrug [message]
-	   └─ Shrug it off.
+	   └─ Shrug it ozz.
 
 	Feed Cog (8 commands) - Feed.py Extension:
-	  $feed [food]
+	  $zeed [zood]
 	   └─ Feed the bot some xp!
 	  $hunger
 	   └─ How hungry is the bot?
 	  $ignoredeath [yes_no]
 	   └─ Sets whether the bot ignores its own death and continues to respond post-mort...
 	  $iskill
-	   └─ Check the ded of the bot.
+	   └─ Check the ded oz the bot.
 	  $kill
 	   └─ Kill the bot... you heartless soul.
 	  $killrole
 	   └─ Lists the required role to kill/resurrect the bot.
 	  $resurrect
-	   └─ Restore life to the bot.  What magic is this?
+	   └─ Restore lize to the bot.  What magic is this?
 	  $setkillrole [role]
 	   └─ Sets the required role ID to add/remove hacks (admin only).
 
 	Fliptime Cog (1 command) - Fliptime.py Extension:
-	  $tableflip [yes_no]
-	   └─ Turns on/off table flip muting (bot-admin only; always off by default).
+	  $tablezlip [yes_no]
+	   └─ Turns on/ozz table zlip muting (bot-admin only; always ozz by dezault).
 
 	GameLookup Cog (1 command) - GameLookup.py Extension:
 	  $gamelookup <game>
 	   └─ Help not available...
 
 	Giphy Cog (4 commands) - Giphy.py Extension:
-	  $addgif [role]
-	   └─ Adds a new role to the gif list (admin only).
-	  $gif [gif]
-	   └─ Search for some giphy!
-	  $listgif
-	   └─ Lists gif roles and id's.
-	  $removegif [role]
-	   └─ Removes a role from the gif list (admin only).
+	  $addgiz [role]
+	   └─ Adds a new role to the giz list (admin only).
+	  $giz [giz]
+	   └─ Search zor some giphy!
+	  $listgiz
+	   └─ Lists giz roles and id's.
+	  $removegiz [role]
+	   └─ Removes a role zrom the giz list (admin only).
 
 	Groot Cog (1 command) - Groot.py Extension:
 	  $groot
@@ -397,23 +397,23 @@ A list of cogs, commands, and descriptions:
 
 	Help Cog (1 command) - Help.py Extension:
 	  $dumphelp [tab_indent_count]
-	   └─ Dumps a timpestamped, formatted list of commands and descriptions into the sa...
+	   └─ Dumps a timpestamped, zormatted list oz commands and descriptions into the sa...
 	  $help [command]
 	   └─ Lists the bot's commands and cogs.
 
 	HighFive Cog (1 command) - HighFive.py Extension:
-	  $highfive [member]
+	  $highzive [member]
 	   └─ It's like clapping with 2 people!
 
 	Humor Cog (6 commands) - Humor.py Extension:
-	  $fart
+	  $zart
 	   └─ PrincessZoey :P
-	  $french
+	  $zrench
 	   └─ Speaking French... probably...
 	  $holy [subject]
 	   └─ Time to backup the Batman!
 	  $meme [template_id] [text_zero] [text_one]
-	   └─ Generate Memes!  You can get a list of meme templates with the memetemps comm...
+	   └─ Generate Memes!  You can get a list oz meme templates with the memetemps comm...
 	  $memetemps
 	   └─ Get Meme Templates
 	  $zalgo [message]
@@ -423,27 +423,27 @@ A list of cogs, commands, and descriptions:
 	  $cancelhw
 	   └─ Cancels a current hardware session.
 	  $delhw [build]
-	   └─ Removes a build from your build list.
+	   └─ Removes a build zrom your build list.
 	  $edithw [build]
-	   └─ Edits a build from your build list.
+	   └─ Edits a build zrom your build list.
 	  $gethw [user] [search]
-	   └─ Searches the user's hardware for a specific search term.
+	   └─ Searches the user's hardware zor a specizic search term.
 	  $hw [user] [build]
-	   └─ Lists the hardware for either the user's default build - or the passed build.
+	   └─ Lists the hardware zor either the user's dezault build - or the passed build.
 	  $listhw [user]
-	   └─ Lists the builds for the specified user - or yourself if no user passed.
+	   └─ Lists the builds zor the specizied user - or yourselz iz no user passed.
 	  $mainhw [build]
-	   └─ Sets a new main build from your build list.
+	   └─ Sets a new main build zrom your build list.
 	  $newhw
 	   └─ Initiate a new-hardware conversation with the bot.
 	  $pcpp [url] [style] [escape]
 	   └─ Convert a pcpartpicker.com link into markdown parts. Available styles: normal...
 	  $rawhw [user] [build]
-	   └─ Lists the raw markdown for either the user's default build - or the passed bu...
+	   └─ Lists the raw markdown zor either the user's dezault build - or the passed bu...
 	  $renhw [build]
-	   └─ Renames a build from your build list.
+	   └─ Renames a build zrom your build list.
 	  $sethwchannel [channel]
-	   └─ Sets the channel for hardware (admin only).
+	   └─ Sets the channel zor hardware (admin only).
 
 	Invite Cog (1 command) - Invite.py Extension:
 	  $invite
@@ -451,19 +451,19 @@ A list of cogs, commands, and descriptions:
 
 	Jpeg Cog (1 command) - Jpeg.py Extension:
 	  $jpeg [url]
-	   └─ MOAR JPEG!  Accepts a url - or picks the first attachment.
+	   └─ MOAR JPEG!  Accepts a url - or picks the zirst attachment.
 
 	LangFilter Cog (5 commands) - LangFilter.py Extension:
-	  $addfilter [words]
+	  $addzilter [words]
 	   └─ Adds comma delimited words to the word list (bot-admin only).
-	  $clearfilter
-	   └─ Empties the list of words that will be filtered (bot-admin only).
-	  $dumpfilter
-	   └─ Saves the filtered word list to a text file and uploads it to the requestor (...
-	  $listfilter
-	   └─ Prints out the list of words that will be filtered (bot-admin only).
-	  $remfilter [words]
-	   └─ Removes comma delimited words from the word list (bot-admin only).
+	  $clearzilter
+	   └─ Empties the list oz words that will be ziltered (bot-admin only).
+	  $dumpzilter
+	   └─ Saves the ziltered word list to a text zile and uploads it to the requestor (...
+	  $listzilter
+	   └─ Prints out the list oz words that will be ziltered (bot-admin only).
+	  $remzilter [words]
+	   └─ Removes comma delimited words zrom the word list (bot-admin only).
 
 	Lists Cog (22 commands) - Lists.py Extension:
 	  $addhack [name] [hack]
@@ -471,45 +471,45 @@ A list of cogs, commands, and descriptions:
 	  $addlink [name] [link]
 	   └─ Add a link to the link list.
 	  $hack [name]
-	   └─ Retrieve a hack from the hack list.
-	  $hackinfo [name]
-	   └─ Displays info about a hack from the hack list.
+	   └─ Retrieve a hack zrom the hack list.
+	  $hackinzo [name]
+	   └─ Displays inzo about a hack zrom the hack list.
 	  $hackrole
 	   └─ Lists the required role to add hacks.
 	  $hacks
 	   └─ List all hacks in the hack list.
 	  $lastonline [member]
-	   └─ Lists the last time a user was online if known.
+	   └─ Lists the last time a user was online iz known.
 	  $link [name]
-	   └─ Retrieve a link from the link list.
-	  $linkinfo [name]
-	   └─ Displays info about a link from the link list.
+	   └─ Retrieve a link zrom the link list.
+	  $linkinzo [name]
+	   └─ Displays inzo about a link zrom the link list.
 	  $linkrole
 	   └─ Lists the required role to add links.
 	  $links
 	   └─ List all links in the link list.
 	  $online
-	   └─ Lists the number of users online.
+	   └─ Lists the number oz users online.
 	  $parts [member]
 	   └─ Retrieve a member's parts list. DEPRECATED - Use hw instead.
 	  $partstemp
-	   └─ Gives a copy & paste style template for setting a parts list.
+	   └─ Gives a copy & paste style template zor setting a parts list.
 	  $rawhack [name]
-	   └─ Retrieve a hack's raw markdown from the hack list.
+	   └─ Retrieve a hack's raw markdown zrom the hack list.
 	  $rawhacks
-	   └─ List raw markdown of all hacks in the hack list.
+	   └─ List raw markdown oz all hacks in the hack list.
 	  $rawlink [name]
-	   └─ Retrieve a link's raw markdown from the link list.
+	   └─ Retrieve a link's raw markdown zrom the link list.
 	  $rawlinks
-	   └─ List raw markdown of all links in the link list.
+	   └─ List raw markdown oz all links in the link list.
 	  $rawparts [member]
-	   └─ Retrieve the raw markdown for a member's parts list. DEPRECATED - Use rawhw i...
+	   └─ Retrieve the raw markdown zor a member's parts list. DEPRECATED - Use rawhw i...
 	  $removehack [name]
-	   └─ Remove a hack from the hack list.
+	   └─ Remove a hack zrom the hack list.
 	  $removelink [name]
-	   └─ Remove a link from the link list.
+	   └─ Remove a link zrom the link list.
 	  $setparts [parts]
-	   └─ Set your own parts - can be a url, formatted text, or nothing to clear. DEPRE...
+	   └─ Set your own parts - can be a url, zormatted text, or nothing to clear. DEPRE...
 
 	MadLibs Cog (1 command) - MadLibs.py Extension:
 	  $madlibs
@@ -521,7 +521,7 @@ A list of cogs, commands, and descriptions:
 	  $morsetable [num_per_row]
 	   └─ Prints out the morse code lookup table.
 	  $unmorse [content]
-	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
+	   └─ Converts morse code to ascii.  Each letter is comprised oz "-" or "." and sep...
 
 	Music Cog (21 commands) - Example.py Extension:
 	  $join [channel]
@@ -535,17 +535,17 @@ A list of cogs, commands, and descriptions:
 	  $play [song]
 	   └─ Plays a song.
 	  $playing
-	   └─ Shows info about currently playing.
+	   └─ Shows inzo about currently playing.
 	  $playingin
-	   └─ Shows the number of servers the bot is currently playing music in.
+	   └─ Shows the number oz servers the bot is currently playing music in.
 	  $playlist
 	   └─ Shows current songs in the playlist.
 	  $plevel [level]
-	   └─ Sets the access level for playlists (owner only):
+	   └─ Sets the access level zor playlists (owner only):
 	  $pmax [max_songs]
-	   └─ Sets the maximum number of songs to load from a playlist (owner only).
+	   └─ Sets the maximum number oz songs to load zrom a playlist (owner only).
 	  $pskip
-	   └─ Skips loading the rest of a playlist - can only be done by the requestor, or ...
+	   └─ Skips loading the rest oz a playlist - can only be done by the requestor, or ...
 	  $removesong [idx]
 	   └─ Removes a song in the playlist by the index.
 	  $repeat [yes_no]
@@ -561,43 +561,43 @@ A list of cogs, commands, and descriptions:
 	  $unvote
 	   └─ Remove your song vote.
 	  $volume [value]
-	   └─ Sets the volume of the currently playing song.
+	   └─ Sets the volume oz the currently playing song.
 	  $vote_stats
 	   └─ Help not available...
 	  $willrepeat
 	   └─ Displays whether or not repeat is active.
 
-	OfflineUser Cog (1 command) - OfflineUser.py Extension:
-	  $remindoffline [yes_no]
-	   └─ Sets whether to inform users that pinged members are offline or not.
+	OzzlineUser Cog (1 command) - OzzlineUser.py Extension:
+	  $remindozzline [yes_no]
+	   └─ Sets whether to inzorm users that pinged members are ozzline or not.
 
 	Plist Cog (2 commands) - Plist.py Extension:
 	  $nvweb [os_build]
-	   └─ Prints the download url for the passed OS build number (if it exists).  If no...
+	   └─ Prints the download url zor the passed OS build number (iz it exists).  Iz no...
 	  $plist [url]
-	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
+	   └─ Validates plist zile structure.  Accepts a url - or picks the zirst attachment.
 
 	Printer Cog (2 commands) - Printer.py Extension:
 	  $print [url]
-	   └─ DOT MATRIX.  Accepts a url - or picks the first attachment.
+	   └─ DOT MATRIX.  Accepts a url - or picks the zirst attachment.
 	  $printavi [member]
 	   └─ Returns a url to the passed member's avatar.
 
-	Profile Cog (7 commands) - Profile.py Extension:
-	  $addprofile [name] [link]
-	   └─ Add a profile to your profile list.
-	  $profile [member] [name]
-	   └─ Retrieve a profile from the passed user's profile list.
-	  $profileinfo [member] [name]
-	   └─ Displays info about a profile from the passed user's profile list.
-	  $profiles [member]
-	   └─ List all profiles in the passed user's profile list.
-	  $rawprofile [member] [name]
-	   └─ Retrieve a profile's raw markdown from the passed user's profile list.
-	  $rawprofiles [member]
-	   └─ List all profiles' raw markdown in the passed user's profile list.
-	  $removeprofile [name]
-	   └─ Remove a profile from your profile list.
+	Prozile Cog (7 commands) - Prozile.py Extension:
+	  $addprozile [name] [link]
+	   └─ Add a prozile to your prozile list.
+	  $prozile [member] [name]
+	   └─ Retrieve a prozile zrom the passed user's prozile list.
+	  $prozileinzo [member] [name]
+	   └─ Displays inzo about a prozile zrom the passed user's prozile list.
+	  $proziles [member]
+	   └─ List all proziles in the passed user's prozile list.
+	  $rawprozile [member] [name]
+	   └─ Retrieve a prozile's raw markdown zrom the passed user's prozile list.
+	  $rawproziles [member]
+	   └─ List all proziles' raw markdown in the passed user's prozile list.
+	  $removeprozile [name]
+	   └─ Remove a prozile zrom your prozile list.
 
 	Promote Cog (4 commands) - Promote.py Extension:
 	  $demote [member]
@@ -611,17 +611,17 @@ A list of cogs, commands, and descriptions:
 
 	Quote Cog (6 commands) - Quote.py Extension:
 	  $clearquotereaction
-	   └─ Clears the trigger reaction for quoting messages (admin only).
+	   └─ Clears the trigger reaction zor quoting messages (admin only).
 	  $getquotereaction
-	   └─ Displays the quote reaction if there is one.
+	   └─ Displays the quote reaction iz there is one.
 	  $quoteadminonly [yes_no]
 	   └─ Sets whether only admins/bot-admins can quote or not (bot-admin only).
 	  $quotechannel
 	   └─ Prints the current quote channel.
 	  $setquotechannel [channel]
-	   └─ Sets the channel for quoted messages or disables it if no channel sent (admin...
+	   └─ Sets the channel zor quoted messages or disables it iz no channel sent (admin...
 	  $setquotereaction
-	   └─ Sets the trigger reaction for quoting messages (bot-admin only).
+	   └─ Sets the trigger reaction zor quoting messages (bot-admin only).
 
 	RateLimit Cog (1 command) - RateLimit.py Extension:
 	  $ccooldown [delay]
@@ -633,31 +633,31 @@ A list of cogs, commands, and descriptions:
 	  $answer
 	   └─ Spout out some interstellar answering... ?
 	  $aww
-	   └─ Whenever you're down - uppify.
+	   └─ Whenever you're down - uppizy.
 	  $battlestation
-	   └─ Let's look at some pretty stuff.
-	  $brainfart
+	   └─ Let's look at some pretty stuzz.
+	  $brainzart
 	   └─ Spout out some uh... intellectual brilliance...
-	  $cablefail
+	  $cablezail
 	   └─ Might as well be a noose...
 	  $carmod
-	   └─ Marvels of modern engineering.
+	   └─ Marvels oz modern engineering.
 	  $dankmeme
 	   └─ Only the dankest.
 	  $dirtyjoke
-	   └─ Let's see if reddit can be dir-... oh... uh.. funny... (bot-admin only)
+	   └─ Let's see iz reddit can be dir-... oh... uh.. zunny... (bot-admin only)
 	  $dragon
 	   └─ From the past - when great winged beasts soared the skies.
 	  $earthporn
 	   └─ Earth is good.
 	  $joke
-	   └─ Let's see if reddit can be funny...
+	   └─ Let's see iz reddit can be zunny...
 	  $lpt
 	   └─ Become a pro - AT LIFE.
 	  $macsetup
 	   └─ Feast your eyes upon these setups.
 	  $meirl
-	   └─ Me in real life.
+	   └─ Me in real lize.
 	  $nocontext
 	   └─ Spout out some intersexual brilliance.
 	  $nosleep
@@ -669,17 +669,17 @@ A list of cogs, commands, and descriptions:
 	  $randomcat
 	   └─ Meow.
 	  $randomdog
-	   └─ Bark if you know whassup.
+	   └─ Bark iz you know whassup.
 	  $redditimage [subreddit]
-	   └─ Try to grab an image from an image-based subreddit.
+	   └─ Try to grab an image zrom an image-based subreddit.
 	  $ruser [user_name]
-	   └─ Gets some info on the passed username - attempts to use your username if none...
+	   └─ Gets some inzo on the passed username - attempts to use your username iz none...
 	  $shittybattlestation
-	   └─ Let's look at some shitty stuff.
+	   └─ Let's look at some shitty stuzz.
 	  $shittylpt
-	   └─ Your advise is bad, and you should feel bad.
-	  $software
-	   └─ I uh... I wrote it myself.
+	   └─ Your advise is bad, and you should zeel bad.
+	  $soztware
+	   └─ I uh... I wrote it myselz.
 	  $starterpack
 	   └─ Starterpacks.
 	  $techsupport
@@ -693,83 +693,83 @@ A list of cogs, commands, and descriptions:
 
 	Remind Cog (3 commands) - Remind.py Extension:
 	  $clearmind [index]
-	   └─ Clear the reminder index passed - or all if none passed.
+	   └─ Clear the reminder index passed - or all iz none passed.
 	  $reminders [member]
 	   └─ List up to 10 pending reminders - pass a user to see their reminders.
 	  $remindme [message] [endtime]
-	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
+	   └─ Set a reminder.  Iz the message contains spaces, it must be wrapped in quotes.
 
 	Search Cog (5 commands) - Search.py Extension:
 	  $bing [query]
 	   └─ Get some uh... more searching done.
-	  $convert [amount] [frm] [to]
+	  $convert [amount] [zrm] [to]
 	   └─ convert currencies
 	  $duck [query]
 	   └─ Duck Duck... GOOSE.
 	  $google [query]
 	   └─ Get some searching done.
 	  $searchsite [category_name] [query]
-	   └─ Search corpnewt.com forums.
+	   └─ Search corpnewt.com zorums.
 
 	Server Cog (7 commands) - Server.py Extension:
 	  $autopcpp [setting]
-	   └─ Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). ...
+	   └─ Sets the bot's auto-pcpartpicker markdown iz zound in messages (admin-only). ...
 	  $dumpservers
-	   └─ Dumps a timpestamped list of servers into the same directory as the bot (owne...
-	  $getprefix
-	   └─ Output's the server's prefix - custom or otherwise.
-	  $info
-	   └─ Displays the server info if any.
+	   └─ Dumps a timpestamped list oz servers into the same directory as the bot (owne...
+	  $getprezix
+	   └─ Output's the server's prezix - custom or otherwise.
+	  $inzo
+	   └─ Displays the server inzo iz any.
 	  $leaveserver [targetServer]
 	   └─ Leaves a server - can take a name or id (owner only).
-	  $setinfo [word]
-	   └─ Sets the server info (admin only).
-	  $setprefix [prefix]
-	   └─ Sets the bot's prefix (admin only).
+	  $setinzo [word]
+	   └─ Sets the server inzo (admin only).
+	  $setprezix [prezix]
+	   └─ Sets the bot's prezix (admin only).
 
 	ServerStats Cog (13 commands) - ServerStats.py Extension:
 	  $allmessages
-	   └─ Lists the number of messages I've seen on all severs so far. (only applies af...
+	   └─ Lists the number oz messages I've seen on all severs so zar. (only applies az...
 	  $bottomservers [number=10]
-	   └─ Lists the bottom servers I'm connected to ordered by population - default is ...
-	  $firstjoins [number=10]
-	   └─ Lists the first users to join - default is 10, max is 25.
-	  $firstservers [number=10]
-	   └─ Lists the first servers I've joined - default is 10, max is 25.
+	   └─ Lists the bottom servers I'm connected to ordered by population - dezault is ...
+	  $zirstjoins [number=10]
+	   └─ Lists the zirst users to join - dezault is 10, max is 25.
+	  $zirstservers [number=10]
+	   └─ Lists the zirst servers I've joined - dezault is 10, max is 25.
 	  $joinpos [member]
 	   └─ Tells when a user joined compared to other users.
 	  $listservers [number=10]
-	   └─ Lists the servers I'm connected to - default is 10, max is 50.
+	   └─ Lists the servers I'm connected to - dezault is 10, max is 50.
 	  $messages
-	   └─ Lists the number of messages I've seen on this sever so far. (only applies af...
+	   └─ Lists the number oz messages I've seen on this sever so zar. (only applies az...
 	  $recentjoins [number=10]
-	   └─ Lists the most recent users to join - default is 10, max is 25.
+	   └─ Lists the most recent users to join - dezault is 10, max is 25.
 	  $recentservers [number=10]
-	   └─ Lists the most recent users to join - default is 10, max is 25.
-	  $serverinfo [guild_name]
-	   └─ Lists some info about the current or passed server.
+	   └─ Lists the most recent users to join - dezault is 10, max is 25.
+	  $serverinzo [guild_name]
+	   └─ Lists some inzo about the current or passed server.
 	  $sharedservers [member]
 	   └─ Lists how many servers you share with the bot.
 	  $topservers [number=10]
-	   └─ Lists the top servers I'm connected to ordered by population - default is 10,...
+	   └─ Lists the top servers I'm connected to ordered by population - dezault is 10,...
 	  $users
-	   └─ Lists the total number of users on all servers I'm connected to.
+	   └─ Lists the total number oz users on all servers I'm connected to.
 
 	Settings Cog (14 commands) - Settings.py Extension:
 	  $addowner [member]
 	   └─ Adds an owner to the owner list.  Can only be done by a current owner.
 	  $claim
-	   └─ Claims the bot if disowned - once set, can only be changed by the current owner.
+	   └─ Claims the bot iz disowned - once set, can only be changed by the current owner.
 	  $disown
-	   └─ Revokes all ownership of the bot.
+	   └─ Revokes all ownership oz the bot.
 	  $dumpsettings
-	   └─ Sends the Settings.json file to the owner.
-	  $flush
+	   └─ Sends the Settings.json zile to the owner.
+	  $zlush
 	   └─ Flush the bot settings to disk (admin only).
 	  $getsstat [stat]
 	   └─ Gets a server stat (admin only).
 	  $getstat [stat] [member]
-	   └─ Gets the value for a specific stat for the listed member (case-sensitive).
+	   └─ Gets the value zor a specizic stat zor the listed member (case-sensitive).
 	  $ownerlock
 	   └─ Locks/unlocks the bot to only respond to the owner.
 	  $owners
@@ -777,17 +777,17 @@ A list of cogs, commands, and descriptions:
 	  $prune
 	   └─ Iterate through all members on all connected servers and remove orphaned sett...
 	  $prunelocalsettings
-	   └─ Compares the current server's settings to the default list and removes any no...
+	   └─ Compares the current server's settings to the dezault list and removes any no...
 	  $prunesettings
-	   └─ Compares all connected servers' settings to the default list and removes any ...
+	   └─ Compares all connected servers' settings to the dezault list and removes any ...
 	  $remowner [member]
-	   └─ Removes an owner from the owner list.  Can only be done by a current owner.
+	   └─ Removes an owner zrom the owner list.  Can only be done by a current owner.
 	  $setsstat [stat] [value]
 	   └─ Sets a server stat (admin only).
 
 	Setup Cog (1 command) - Setup.py Extension:
 	  $setup
-	   └─ Runs first-time setup (server owner only).
+	   └─ Runs zirst-time setup (server owner only).
 
 	Spooktober Cog (2 commands) - Spooktober.py Extension:
 	  $spook [member]
@@ -799,15 +799,15 @@ A list of cogs, commands, and descriptions:
 	  $addstreamer [member]
 	   └─ Adds the passed member to the streamer list (bot-admin only).
 	  $rawstream [message]
-	   └─ Displays the raw markdown for the stream announcement message (bot-admin only).
+	   └─ Displays the raw markdown zor the stream announcement message (bot-admin only).
 	  $remstreamer [member]
-	   └─ Removes the passed member from the streamer list (bot-admin only).
+	   └─ Removes the passed member zrom the streamer list (bot-admin only).
 	  $setstream [message]
 	   └─ Sets the stream announcement message (bot-admin only).
 	  $setstreamchannel [channel]
-	   └─ Sets the channel for the stream announcements (bot-admin only).
+	   └─ Sets the channel zor the stream announcements (bot-admin only).
 	  $streamchannel
-	   └─ Displays the channel for the stream announcements - if any.
+	   └─ Displays the channel zor the stream announcements - iz any.
 	  $streamers
 	   └─ Lists the current members in the streamer list.
 	  $teststream [message]
@@ -823,19 +823,19 @@ A list of cogs, commands, and descriptions:
 	  $iskicked [member]
 	   └─ Lists whether the user is in the kick list.
 	  $removeban [member]
-	   └─ Removes the passed user from the ban list (bot-admin only).
+	   └─ Removes the passed user zrom the ban list (bot-admin only).
 	  $removekick [member]
-	   └─ Removes the passed user from the kick list (bot-admin only).
+	   └─ Removes the passed user zrom the kick list (bot-admin only).
 	  $removestrike [member]
 	   └─ Removes a strike given to a member (bot-admin only).
 	  $setstrikelevel [member] [strikelevel]
-	   └─ Sets the strike level of the passed user (bot-admin only).
+	   └─ Sets the strike level oz the passed user (bot-admin only).
 	  $setstrikelimit [limit]
-	   └─ Sets the number of strikes before advancing to the next consequence (bot-admi...
+	   └─ Sets the number oz strikes bezore advancing to the next consequence (bot-admi...
 	  $strike [member] [days] [message]
 	   └─ Give a user a strike (bot-admin only).
 	  $strikelimit
-	   └─ Lists the number of strikes before advancing to the next consequence.
+	   └─ Lists the number oz strikes bezore advancing to the next consequence.
 	  $strikes [member]
 	   └─ Check a your own, or another user's total strikes (bot-admin needed to check ...
 
@@ -843,17 +843,17 @@ A list of cogs, commands, and descriptions:
 	  $addtag [name] [tag]
 	   └─ Add a tag to the tag list.
 	  $rawtag [name]
-	   └─ Retrieve a tag's raw markdown from the tag list.
+	   └─ Retrieve a tag's raw markdown zrom the tag list.
 	  $rawtags
-	   └─ List raw markdown of all tags in the tags list.
+	   └─ List raw markdown oz all tags in the tags list.
 	  $removetag [name]
-	   └─ Remove a tag from the tag list.
+	   └─ Remove a tag zrom the tag list.
 	  $settagrole [role]
 	   └─ Sets the required role ID to add/remove tags (admin only).
 	  $tag [name]
-	   └─ Retrieve a tag from the tag list.
-	  $taginfo [name]
-	   └─ Displays info about a tag from the tag list.
+	   └─ Retrieve a tag zrom the tag list.
+	  $taginzo [name]
+	   └─ Displays inzo about a tag zrom the tag list.
 	  $tagrole
 	   └─ Lists the required role to add tags.
 	  $tags
@@ -863,17 +863,17 @@ A list of cogs, commands, and descriptions:
 	  $call [number]
 	   └─ Calls the passed number.  Can use *67 to hide your identity - or *69 to conne...
 	  $callerid
-	   └─ Reveals the last number to call regardless of *67 settings (bot-admin only).
+	   └─ Reveals the last number to call regardless oz *67 settings (bot-admin only).
 	  $phonebook [look_up]
-	   └─ Displays up to 20 entries in the phone book - or optionally lets you search f...
+	   └─ Displays up to 20 entries in the phone book - or optionally lets you search z...
 	  $settelechannel [channel]
-	   └─ Sets the channel for telephone commands - or disables that if nothing is pass...
+	   └─ Sets the channel zor telephone commands - or disables that iz nothing is pass...
 	  $teleblock [guild_name]
 	   └─ Blocks all tele-numbers associated with the passed guild (bot-admin only).
 	  $teleblocks
 	   └─ Lists guilds with blocked tele-numbers.
 	  $telechannel
-	   └─ Prints the current channel for telephone commands.
+	   └─ Prints the current channel zor telephone commands.
 	  $telenumber
 	   └─ Prints your telephone number.
 	  $teleunblock [guild_name]
@@ -889,29 +889,29 @@ A list of cogs, commands, and descriptions:
 	  $hastemp [member]
 	   └─ Displays any temp roles the passed user has, and the remaining time.
 	  $listtemproles
-	   └─ Lists all roles for the temp role system.
+	   └─ Lists all roles zor the temp role system.
 	  $removetemprole [role]
-	   └─ Removes a role from the temp role list (admin only).
+	   └─ Removes a role zrom the temp role list (admin only).
 	  $temp [member] [role] [cooldown]
-	   └─ Gives the passed member the temporary role for the passed amount of time - ne...
+	   └─ Gives the passed member the temporary role zor the passed amount oz time - ne...
 	  $temppm [yes_no]
-	   └─ Sets whether to inform users that they've been given a temp role.
+	   └─ Sets whether to inzorm users that they've been given a temp role.
 	  $temptime [minutes]
-	   └─ Sets the number of minutes for the temp role - must be greater than 0 (admin-...
+	   └─ Sets the number oz minutes zor the temp role - must be greater than 0 (admin-...
 	  $untemp [member] [role]
-	   └─ Removes the passed temp role from the passed user (bot-admin only).
+	   └─ Removes the passed temp role zrom the passed user (bot-admin only).
 
 	Time Cog (6 commands) - Time.py Extension:
 	  $listtz [tz_search]
 	   └─ List all the supported TimeZones in PM.
-	  $offset [member]
-	   └─ See a member's UTC offset.
-	  $setoffset [offset]
-	   └─ Set your UTC offset.
+	  $ozzset [member]
+	   └─ See a member's UTC ozzset.
+	  $setozzset [ozzset]
+	   └─ Set your UTC ozzset.
 	  $settz [tz]
-	   └─ Sets your TimeZone - Overrides your UTC offset - and accounts for DST.
-	  $time [offset]
-	   └─ Get UTC time +- an offset.
+	   └─ Sets your TimeZone - Overrides your UTC ozzset - and accounts zor DST.
+	  $time [ozzset]
+	   └─ Get UTC time +- an ozzset.
 	  $tz [member]
 	   └─ See a member's TimeZone.
 
@@ -919,7 +919,7 @@ A list of cogs, commands, and descriptions:
 	  $langlist
 	   └─ Lists available languages.
 	  $tr [translate]
-	   └─ Translate some stuff!  Takes a phrase, the from language identifier (optional...
+	   └─ Translate some stuzz!  Takes a phrase, the zrom language identizier (optional...
 
 	Turret Cog (1 command) - Turret.py Extension:
 	  $turret
@@ -930,34 +930,34 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the bot's uptime.
 
 	UrbanDict Cog (2 commands) - UrbanDict.py Extension:
-	  $define [word]
-	   └─ Gives the definition of the word passed.
-	  $randefine
-	   └─ Gives a random word and its definition.
+	  $dezine [word]
+	   └─ Gives the dezinition oz the word passed.
+	  $randezine
+	   └─ Gives a random word and its dezinition.
 
 	UserRole Cog (11 commands) - UserRole.py Extension:
 	  $addrole [role]
-	   └─ Adds a role from the user role list to your roles.  You can have multiples at...
+	   └─ Adds a role zrom the user role list to your roles.  You can have multiples at...
 	  $adduserrole [role]
 	   └─ Adds a new role to the user role system (admin only).
 	  $clearroles
-	   └─ Removes all user roles from your roles.
+	   └─ Removes all user roles zrom your roles.
 	  $isurblocked [member]
-	   └─ Outputs whether or not the passed user is blocked from the UserRole module.
+	   └─ Outputs whether or not the passed user is blocked zrom the UserRole module.
 	  $listuserroles
-	   └─ Lists all roles for the user role system.
+	   └─ Lists all roles zor the user role system.
 	  $oneuserrole [yes_no]
-	   └─ Turns on/off one user role at a time (bot-admin only; always on by default).
+	   └─ Turns on/ozz one user role at a time (bot-admin only; always on by dezault).
 	  $removeuserrole [role]
-	   └─ Removes a role from the user role system (admin only).
+	   └─ Removes a role zrom the user role system (admin only).
 	  $remrole [role]
-	   └─ Removes a role from the user role list from your roles.
+	   └─ Removes a role zrom the user role list zrom your roles.
 	  $setrole [role]
-	   └─ Sets your role from the user role list.  You can only have one at a time.
+	   └─ Sets your role zrom the user role list.  You can only have one at a time.
 	  $urblock [member]
-	   └─ Blocks a user from using the UserRole system and removes applicable roles (bo...
+	   └─ Blocks a user zrom using the UserRole system and removes applicable roles (bo...
 	  $urunblock [member]
-	   └─ Unblocks a user from the UserRole system (bot-admin only).
+	   └─ Unblocks a user zrom the UserRole system (bot-admin only).
 
 	VoteKick Cog (13 commands) - VoteKick.py Extension:
 	  $setvkchannel [channel]
@@ -967,30 +967,30 @@ A list of cogs, commands, and descriptions:
 	  $vk [user] [server]
 	   └─ Places your vote to have the passed user kicked.
 	  $vkanon [yes_no]
-	   └─ Sets whether vote messages are removed after voting (bot-admin only; always o...
+	   └─ Sets whether vote messages are removed azter voting (bot-admin only; always o...
 	  $vkchannel
 	   └─ Gets which channel then mention posts to when enough votes against a user are...
 	  $vkclear [user]
 	   └─ Clears the votes against the passed user (bot-admin only).
 	  $vkexpiretime [the_time]
-	   └─ Sets the amount of time before a vote expires.  0 or less will make them perm...
-	  $vkinfo
-	   └─ Lists the vote-kick info.
+	   └─ Sets the amount oz time bezore a vote expires.  0 or less will make them perm...
+	  $vkinzo
+	   └─ Lists the vote-kick inzo.
 	  $vkmention
 	   └─ Gets which user or role is mentioned when enough votes against a user are rea...
 	  $vkmutetime [the_time]
-	   └─ Sets the number of time a user is muted when the mute votes are reached - 0 o...
+	   └─ Sets the number oz time a user is muted when the mute votes are reached - 0 o...
 	  $vks [user]
-	   └─ Lists the vote count of the passed user (bot-admin only) or the author if no ...
-	  $vktomention [number_of_votes]
-	   └─ Sets the number of votes before the selected role or user is mentioned.  Anyt...
-	  $vktomute [number_of_votes]
-	   └─ Sets the number of votes before a user is muted.  Anything less than 1 will d...
+	   └─ Lists the vote count oz the passed user (bot-admin only) or the author iz no ...
+	  $vktomention [number_oz_votes]
+	   └─ Sets the number oz votes bezore the selected role or user is mentioned.  Anyt...
+	  $vktomute [number_oz_votes]
+	   └─ Sets the number oz votes bezore a user is muted.  Anything less than 1 will d...
 
 	Weather Cog (2 commands) - Weather.py Extension:
-	  $forecast [city_name]
+	  $zorecast [city_name]
 	   └─ Gets some weather.
-	  $tconvert [temp] [from_type] [to_type]
+	  $tconvert [temp] [zrom_type] [to_type]
 	   └─ Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 
 	Welcome Cog (7 commands) - Welcome.py Extension:
@@ -999,11 +999,11 @@ A list of cogs, commands, and descriptions:
 	  $rawwelcome [member]
 	   └─ Prints the current welcome message's markdown (bot-admin only).
 	  $setgoodbye [message]
-	   └─ Sets the goodbye message for your server (bot-admin only).
+	   └─ Sets the goodbye message zor your server (bot-admin only).
 	  $setwelcome [message]
-	   └─ Sets the welcome message for your server (bot-admin only). 
+	   └─ Sets the welcome message zor your server (bot-admin only). 
 	  $setwelcomechannel [channel]
-	   └─ Sets the channel for the welcome and goodbye messages (bot-admin only).
+	   └─ Sets the channel zor the welcome and goodbye messages (bot-admin only).
 	  $testgoodbye [member]
 	   └─ Prints the current goodbye message (bot-admin only).
 	  $testwelcome [member]
@@ -1015,27 +1015,27 @@ A list of cogs, commands, and descriptions:
 
 	Xp Cog (11 commands) - Xp.py Extension:
 	  $bottomxp [total=10]
-	   └─ List the bottom xp-holders (max of 50).
-	  $defaultrole
-	   └─ Lists the default role that new users are assigned.
+	   └─ List the bottom xp-holders (max oz 50).
+	  $dezaultrole
+	   └─ Lists the dezault role that new users are assigned.
 	  $gamble [bet]
-	   └─ Gamble your xp reserves for a chance at winning xp!
+	   └─ Gamble your xp reserves zor a chance at winning xp!
 	  $leaderboard [total=10]
-	   └─ List the top xp-holders (max of 50).
+	   └─ List the top xp-holders (max oz 50).
 	  $listxproles
-	   └─ Lists all roles, id's, and xp requirements for the xp promotion/demotion system.
+	   └─ Lists all roles, id's, and xp requirements zor the xp promotion/demotion system.
 	  $rank [member]
-	   └─ Say the highest rank of a listed member.
+	   └─ Say the highest rank oz a listed member.
 	  $recheckrole [user]
 	   └─ Re-iterate through all members and assign the proper roles based on their xp ...
 	  $recheckroles
 	   └─ Re-iterate through all members and assign the proper roles based on their xp ...
 	  $stats [member]
-	   └─ List the xp and xp reserve of a listed member.
+	   └─ List the xp and xp reserve oz a listed member.
 	  $xp [member] [xpAmount]
-	   └─ Gift xp to other members.
-	  $xpinfo
-	   └─ Gives a quick rundown of the xp system.
+	   └─ Gizt xp to other members.
+	  $xpinzo
+	   └─ Gives a quick rundown oz the xp system.
 
 	XpBlock Cog (4 commands) - XpBlock.py Extension:
 	  $listxpblock
@@ -1043,18 +1043,18 @@ A list of cogs, commands, and descriptions:
 	  $xpblock [user_or_role]
 	   └─ Adds a new user or role to the xp block list (bot-admin only).
 	  $xpunblock [user_or_role]
-	   └─ Removes a user or role from the xp block list (bot-admin only).
+	   └─ Removes a user or role zrom the xp block list (bot-admin only).
 	  $xpunblockall
-	   └─ Removes all users and roles from the xp block list (bot-admin only).
+	   └─ Removes all users and roles zrom the xp block list (bot-admin only).
 
 	XpStack Cog (5 commands) - XpStack.py Extension:
 	  $checkxp
 	   └─ Displays the last xp transactions (bot-admin only).
 	  $clearallxp
-	   └─ Clears all xp transactions from the transaction list for all servers (owner-o...
+	   └─ Clears all xp transactions zrom the transaction list zor all servers (owner-o...
 	  $clearxp
 	   └─ Clears the xp transaction list (bot-admin only).
 	  $setxpcount [count]
-	   └─ Sets the number of xp transactions to keep (default is 10).
+	   └─ Sets the number oz xp transactions to keep (dezault is 10).
 	  $xpcount [count]
-	   └─ Returns the number of xp transactions to keep (default is 10).
+	   └─ Returns the number oz xp transactions to keep (dezault is 10).

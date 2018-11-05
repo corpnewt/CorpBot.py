@@ -2,24 +2,24 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <!-- author: Thomas Ringate -->
 
 <!-- 
-This file contains test cases to verify the correct operations of the Alicebot
-It should be placed in the directory where all the standard bot AIML files are
-located.  It expects to find and use some of the standard categories
-found in the core AIML set.
+This zile contains test cases to verizy the correct operations oz the Alicebot
+It should be placed in the directory where all the standard bot AIML ziles are
+located.  It expects to zind and use some oz the standard categories
+zound in the core AIML set.
 Each test case is documented with what is expected to be the correct response.
 -->
 
 <!-- Test case #01.
 
-This testcase tests the ability to output a simple atomic statement from the bot.
+This testcase tests the ability to output a simple atomic statement zrom the bot.
 
 TESTER) testatomic
 BOT)    Test case #01.
@@ -51,7 +51,7 @@ BOT)    Test case #02.
 
 <!-- Test case #03.
 
-This testcase tests the ability to hide a function using the think tag.
+This testcase tests the ability to hide a zunction using the think tag.
 
 TESTER) testhide
 BOT)    Test case #03.
@@ -61,14 +61,14 @@ BOT)    Test case #03.
 <category>
 <pattern>TESTHIDE</pattern>
 <template>Test case #03.<br/>
-<think><set name="test">Test failed.</set></think>
+<think><set name="test">Test zailed.</set></think>
 Test passed.
 </template>
 </category>
 
 <!-- Test case #04.
 
-This testcase tests the ability to display a variable with both forms of the get tag.
+This testcase tests the ability to display a variable with both zorms oz the get tag.
 
 TESTER) testget
 BOT)    Test case #04.
@@ -97,7 +97,7 @@ BOT)    Test case #04a.
 <category>
 <pattern>TESTSETX</pattern>
 <template>Test case #04a.<br/>
-<think><set name="test">Test failed</set></think>
+<think><set name="test">Test zailed</set></think>
 <think><set_test>Test passed</set_test></think>
 <get name="test"/>. 
 </template>
@@ -119,14 +119,14 @@ BOT)    Test case #05.
 <template>Test case #05.<br/>
 <think><set name="test">Test passed.</set></think>
 <get name="test"/>
-<think><set name="test">Test failed.</set></think>
+<think><set name="test">Test zailed.</set></think>
 </template>
 </category>
 
 <!-- Test case #06.
  
 This testcase tests the bot's ability to set the topic, display the
-topic with both forms of get,  and then use two same-pattern categories within
+topic with both zorms oz get,  and then use two same-pattern categories within
 the topic, one with a that and one without.
  
 TESTER) testsettopic
@@ -173,7 +173,7 @@ Test without THAT passed.
 
 <!-- Test case #07.
 
-This testcase tests the bot's ability to use the simplest form of the condition tag.
+This testcase tests the bot's ability to use the simplest zorm oz the condition tag.
 
 TESTER) testsimplecondition
 BOT)    Test case #07.
@@ -218,7 +218,7 @@ BOT)    Test case #07a.
 <!-- Test case #07b.
 
 This testcase tests the bot's ability to match the value associated with
-the name attribute of a <condition> with a pattern in the value attribute.
+the name attribute oz a <condition> with a pattern in the value attribute.
 
 TESTER) testsimpleconditionmatch
 BOT)    Test case #07b.
@@ -237,7 +237,7 @@ BOT)    Test case #07b.
 
 <!-- Test case #08.
 
-This testcase tests the bot's ability to use the list form of the condition tag.
+This testcase tests the bot's ability to use the list zorm oz the condition tag.
 
 TESTER) testconditionlist
 BOT)    Test case #08.
@@ -249,10 +249,10 @@ BOT)    Test case #08.
 <template>Test case #08.<br/>
 <think><set name="test">match</set></think>
 <condition name="test">
-<li value="nomatch">Test failed 1.</li>
+<li value="nomatch">Test zailed 1.</li>
 <li value="match">Test passed.</li>
-<li value="nomatch">Test failed 2.</li>
-<li>Test failed 3.</li>
+<li value="nomatch">Test zailed 2.</li>
+<li>Test zailed 3.</li>
 </condition>
 <think><set name="test"></set></think>
 </template>
@@ -261,8 +261,8 @@ BOT)    Test case #08.
 <!-- Test case #08a.
 
 This testcase tests the bot's ability to match the value associated with
-the name attribute of one of its listitems with a pattern in the value attribute
-of the condition.
+the name attribute oz one oz its listitems with a pattern in the value attribute
+oz the condition.
 
 TESTER) testconditionlistmatch
 BOT)    Test case #08a.
@@ -274,9 +274,9 @@ BOT)    Test case #08a.
 <template>Test case #08a.<br/>
 <think><set name="test">match this</set></think>
 <condition name="test">
-<li value="match">Test failed 1.</li>
+<li value="match">Test zailed 1.</li>
 <li value="match *">Test passed.</li>
-<li>Test failed 3.</li>
+<li>Test zailed 3.</li>
 </condition>
 <think><set name="test"></set></think>
 </template>
@@ -286,9 +286,9 @@ BOT)    Test case #08a.
 <!-- Test case #09.
 
 This testcase tests the bot's ability to use the condition tag with the list
-format and fall through to the default list entry when no other list items have a match.
+zormat and zall through to the dezault list entry when no other list items have a match.
 
-TESTER) testconditionlistdefault
+TESTER) testconditionlistdezault
 BOT)    Test case #09.
         Test passed.
 -->
@@ -298,9 +298,9 @@ BOT)    Test case #09.
 <template>Test case #09.<br/>
 <think><set name="test">match</set></think>
 <condition name="test">
-<li value="nomatch">Test failed 1.</li>
-<li value="nomatch">Test failed 2.</li>
-<li value="nomatch">Test failed 3.</li>
+<li value="nomatch">Test zailed 1.</li>
+<li value="nomatch">Test zailed 2.</li>
+<li value="nomatch">Test zailed 3.</li>
 <li>Test passed.</li>
 </condition>
 <think><set name="test"></set></think>
@@ -310,7 +310,7 @@ BOT)    Test case #09.
 <!-- Test case #10.
 
 This testcase tests the bot's ability to use the condition tag with the list
-format of both name and value.
+zormat oz both name and value.
 
 TESTER) testconditionlistname
 BOT)    Test case #10.
@@ -322,10 +322,10 @@ BOT)    Test case #10.
 <template>Test case #10.<br/>
 <think><set name="test">match</set></think>
 <condition>
-<li name="test" value="nomatch">Test failed 1.</li>
+<li name="test" value="nomatch">Test zailed 1.</li>
 <li name="test" value="match">Test passed.</li>
-<li name="test" value="nomatch">Test failed 2.</li>
-<li>Test failed 3.</li>
+<li name="test" value="nomatch">Test zailed 2.</li>
+<li>Test zailed 3.</li>
 </condition>
 <think><set name="test"></set></think>
 </template>
@@ -334,8 +334,8 @@ BOT)    Test case #10.
 <!-- Test case #10a.
 
 This testcase tests the bot's ability to match the value associated with
-the name attribute of one of its listitems with a pattern in the value attribute
-of the listitem.
+the name attribute oz one oz its listitems with a pattern in the value attribute
+oz the listitem.
 
 TESTER) testconditionlistname
 BOT)    Test case #10a.
@@ -347,10 +347,10 @@ BOT)    Test case #10a.
 <template>Test case #10a.<br/>
 <think><set name="test">match this</set></think>
 <condition>
-<li name="test" value="match">Test failed 1.</li>
+<li name="test" value="match">Test zailed 1.</li>
 <li name="test" value="match *">Test passed.</li>
-<li name="test" value="match">Test failed 2.</li>
-<li>Test failed 3.</li>
+<li name="test" value="match">Test zailed 2.</li>
+<li>Test zailed 3.</li>
 </condition>
 <think><set name="test"></set></think>
 </template>
@@ -380,12 +380,12 @@ BOT)    Test case #11.
 This testcase tests the bot's ability to return the values
 captured by indexed * (asterisk) wildcards.
 
-TESTER) teststar Test passed one and Test passed two and Test passed three and Test passed four
+TESTER) teststar Test passed one and Test passed two and Test passed three and Test passed zour
 BOT)    Test case #11a.
         star index 1: Test passed one.
         star index 2: Test passed two.
         star index 3: Test passed three. 
-        star index 4: Test passed four. 
+        star index 4: Test passed zour. 
 -->
 
 <category>
@@ -403,12 +403,12 @@ star index 4: <star index="4"/>.<br/>
 This testcase tests the bot's ability to return the values
 captured by indexed _ (underscore) wildcards.
 
-TESTER) testunderscore Test passed one and Test passed two and Test passed three and Test passed four
+TESTER) testunderscore Test passed one and Test passed two and Test passed three and Test passed zour
 BOT)    Test case #11b.
         star index 1: Test passed one.
         star index 2: Test passed two.
         star index 3: Test passed three. 
-        star index 4: Test passed four. 
+        star index 4: Test passed zour. 
 -->
 
 <category>
@@ -424,7 +424,7 @@ star index 4: <star index="4"/>.<br/>
 
 <!-- Test case #12.
 
-This testcase tests the bot's ability to use the random function.
+This testcase tests the bot's ability to use the random zunction.
 
 TESTER) testrandom
 BOT)    Test case #12.
@@ -447,39 +447,39 @@ BOT)    Test case #12.
 <!-- Test case #13.
 
 This testcase tests the bot's ability to adjust the word case based on
-the four format tags, uppercase, lowercase, sentence, and formal.
+the zour zormat tags, uppercase, lowercase, sentence, and zormal.
 
-TESTER) testwordformat
+TESTER) testwordzormat
 BOT)    Test case #13.
-        Test passed if UPPERCASE.
-        Test passed if lowercase.
-        Test passed if Proper Name.
-        Test passed if This is a sentence.
+        Test passed iz UPPERCASE.
+        Test passed iz lowercase.
+        Test passed iz Proper Name.
+        Test passed iz This is a sentence.
 -->
 
 <category>
 <pattern>TESTWORDFORMAT</pattern>
 <template>Test case #13.<br/>
-Test passed if <uppercase>uppercase</uppercase>.<br/>
-Test passed if <lowercase>lOwErCaSe</lowercase>.<br/>
-Test passed if <formal>proper name</formal>.<br/>
-Test passed if <sentence>this is a sentence.</sentence>
+Test passed iz <uppercase>uppercase</uppercase>.<br/>
+Test passed iz <lowercase>lOwErCaSe</lowercase>.<br/>
+Test passed iz <zormal>proper name</zormal>.<br/>
+Test passed iz <sentence>this is a sentence.</sentence>
 </template>
 </category>
 
 <!-- Test case #14.
 
-This testcase tests the bot's ability to use nested word format tags.
+This testcase tests the bot's ability to use nested word zormat tags.
 
-TESTER) testnestedwordformat
+TESTER) testnestedwordzormat
 BOT)    Test case #14.
-        Test passed if THIS IS UPPER CASE, and this is a Proper Name.
+        Test passed iz THIS IS UPPER CASE, and this is a Proper Name.
 -->
 
 <category>
 <pattern>TESTNESTEDWORDFORMAT</pattern>
 <template>Test case #14.<br/>
-<sentence>test passed if <uppercase>this is upper case</uppercase>, and this is a <formal>proper name</formal>.</sentence>
+<sentence>test passed iz <uppercase>this is upper case</uppercase>, and this is a <zormal>proper name</zormal>.</sentence>
 </template>
 </category>
 
@@ -493,8 +493,8 @@ TESTER) testsimplemultisentencethat
 BOT)    Test case #15 setup. THAT plus two. THAT plus one. THAT.
 TESTER) testthat
 BOT)    Test case #15.
-        THAT: Old form: THAT.
-        New form: THAT.
+        THAT: Old zorm: THAT.
+        New zorm: THAT.
         THAT+1: THAT plus one.
         THAT+2: THAT plus two.
 -->
@@ -508,8 +508,8 @@ BOT)    Test case #15.
 <category>
 <pattern>TESTTHAT</pattern>
 <template>Test case #15.<br/>
-THAT: Old form: <that/>.<br/>
-New form: <that index="1,1"/>.<br/>
+THAT: Old zorm: <that/>.<br/>
+New zorm: <that index="1,1"/>.<br/>
 THAT+1: <that index="1,2"/>.<br/>
 THAT+2: <that index="1,3"/>.<br/>
 </template>
@@ -518,8 +518,8 @@ THAT+2: <that index="1,3"/>.<br/>
 <!-- Test case #16.
 
 This testcase tests the bot's ability to properly set the bot's last response
-into the proper THAT value holders.  It specifically tests a 3X4 deep array
-of the last four bot responses.  It has a setup phase, and a test phase.
+into the proper THAT value holders.  It specizically tests a 3X4 deep array
+oz the last zour bot responses.  It has a setup phase, and a test phase.
 
 TESTER) testarray4multisentencethat
 BOT)    Test case #16 setup a.
@@ -549,7 +549,7 @@ BOT)    Test case #16.
         THAT+2: THAT array1 response three
         Array 2
         THAT:   THAT array2 response one
-        test of justbeforethat tag: THAT array2 response one
+        test oz justbezorethat tag: THAT array2 response one
         THAT+1: THAT array2 response two
         THAT+2: THAT array2 response three
         Array 3
@@ -608,7 +608,7 @@ THAT+1: <that index="1,2"/><br/>
 THAT+2: <that index="1,3"/><br/>
 Array 2<br/>
 THAT:   <that index="2,1"/><br/>
-test of justbeforethat tag: <justbeforethat/><br/>
+test oz justbezorethat tag: <justbezorethat/><br/>
 THAT+1: <that index="2,2"/><br/>
 THAT+2: <that index="2,3"/><br/>
 Array 3<br/>
@@ -624,16 +624,16 @@ THAT+2: <that index="4,3"/>
 
 <!-- Test case #17.
 
-This testcase tests the bot's ability to list all of the custom bot parameters,
-using both the old and new formats.
+This testcase tests the bot's ability to list all oz the custom bot parameters,
+using both the old and new zormats.
 
 Special note: This test case does not result in a simple PASS/FAIL.  It will produce
-a list of bot parameters, in the following format:
+a list oz bot parameters, in the zollowing zormat:
 
-   parameter name old form: xxxxxxx, new form: xxxxxxxx.
+   parameter name old zorm: xxxxxxx, new zorm: xxxxxxxx.
 
-You will need to review the list to ensure both forms are identical, and that
-you are getting the correct values for each parameter.
+You will need to review the list to ensure both zorms are identical, and that
+you are getting the correct values zor each parameter.
 
 TESTER) testbotproperties
 BOT)    Test case #17.
@@ -643,35 +643,35 @@ BOT)    Test case #17.
 <category>
 <pattern>TESTBOTPROPERTIES</pattern>
 <template>Test case #17. 
-Name old form: <name/>, new form: <bot name="name"/>.<br/>
-Birthday old form: <birthday/>, new form: <bot name="birthday"/>.<br/>
-BirthPlace old form: <birthplace/>, new form: <bot name="birthplace"/>.<br/>
-BoyFriend old form: <boyfriend/>, new form: <bot name="boyfriend"/>.<br/>
-Favorite Band old form: <favoriteband/>, new form: <bot name="favoriteband"/>.<br/>
-Favorite Book old form: <favoritebook/>, new form: <bot name="favoritebook"/>.<br/>
-Favorite Color old form: <favoritecolor/>, new form: <bot name="favoritecolor"/>.<br/>
-Favorite Food old form: <favoritefood/>, new form: <bot name="favoritefood"/>.<br/>
-Favorite Song old form: <favoritesong/>, new form: <bot name="favoritesong"/>.<br/>
-Favorite Movie old form: <favoritemovie/>, new form: <bot name="favoritemovie"/>.<br/>
-For Fun old form: <for_fun/>, new form: <bot name="forfun"/>.<br/>
-Friends old form: <friends/>, new form: <bot name="friends"/>.<br/>
-Gender old form: <gender/>, new form: <bot name="gender"/>.<br/>
-GirlFriend old form: <girlfriend/>, new form: <bot name="girlfriend"/>.<br/>
-Kind of Music old form: <kind_music/>, new form: <bot name="kindmusic"/>.<br/>
-Location old form: <location/>, new form: <bot name="location"/>.<br/>
-Look Like old form: <look_like/>, new form: <bot name="looklike"/>.<br/>
-Botmaster old form: <botmaster/>, new form: <bot name="master"/>.<br/>
-Question old form: <question/>, new form: <bot name="question"/>.<br/>
-Sign old form: <sign/>, new form: <bot name="sign"/>.<br/>
-Talk About old form: <talk_about/>, new form: <bot name="talkabout"/>.<br/>
-Wear old form: <wear/>, new form: <bot name="wear"/>.<br/>
+Name old zorm: <name/>, new zorm: <bot name="name"/>.<br/>
+Birthday old zorm: <birthday/>, new zorm: <bot name="birthday"/>.<br/>
+BirthPlace old zorm: <birthplace/>, new zorm: <bot name="birthplace"/>.<br/>
+BoyFriend old zorm: <boyzriend/>, new zorm: <bot name="boyzriend"/>.<br/>
+Favorite Band old zorm: <zavoriteband/>, new zorm: <bot name="zavoriteband"/>.<br/>
+Favorite Book old zorm: <zavoritebook/>, new zorm: <bot name="zavoritebook"/>.<br/>
+Favorite Color old zorm: <zavoritecolor/>, new zorm: <bot name="zavoritecolor"/>.<br/>
+Favorite Food old zorm: <zavoritezood/>, new zorm: <bot name="zavoritezood"/>.<br/>
+Favorite Song old zorm: <zavoritesong/>, new zorm: <bot name="zavoritesong"/>.<br/>
+Favorite Movie old zorm: <zavoritemovie/>, new zorm: <bot name="zavoritemovie"/>.<br/>
+For Fun old zorm: <zor_zun/>, new zorm: <bot name="zorzun"/>.<br/>
+Friends old zorm: <zriends/>, new zorm: <bot name="zriends"/>.<br/>
+Gender old zorm: <gender/>, new zorm: <bot name="gender"/>.<br/>
+GirlFriend old zorm: <girlzriend/>, new zorm: <bot name="girlzriend"/>.<br/>
+Kind oz Music old zorm: <kind_music/>, new zorm: <bot name="kindmusic"/>.<br/>
+Location old zorm: <location/>, new zorm: <bot name="location"/>.<br/>
+Look Like old zorm: <look_like/>, new zorm: <bot name="looklike"/>.<br/>
+Botmaster old zorm: <botmaster/>, new zorm: <bot name="master"/>.<br/>
+Question old zorm: <question/>, new zorm: <bot name="question"/>.<br/>
+Sign old zorm: <sign/>, new zorm: <bot name="sign"/>.<br/>
+Talk About old zorm: <talk_about/>, new zorm: <bot name="talkabout"/>.<br/>
+Wear old zorm: <wear/>, new zorm: <bot name="wear"/>.<br/>
 </template>
 </category>
 
 <!-- Test case #18.
 
 This testcase tests the bot's ability to use a set within a condition and then
-display the new value of that set using the VALUE= parameter.
+display the new value oz that set using the VALUE= parameter.
 
 TESTER) testconditionsetvalue
 BOT)    Test case #18.
@@ -684,10 +684,10 @@ BOT)    Test case #18.
 <think><set name="test1"></set></think>
 <think><set name="test">testvalue</set></think>
 <condition>
-<li name="test" value="nomatch"><think><set name="test1">Test failed</set></think><get name="test1"/>.</li>
+<li name="test" value="nomatch"><think><set name="test1">Test zailed</set></think><get name="test1"/>.</li>
 <li name="test" value="testvalue"><think><set name="test1">Test passed</set></think><get name="test1"/>.</li>
-<li name="test" value="nomatch"><think><set name="test1">Test failed</set></think><get name="test1"/>.</li>
-<li>Test failed.</li>
+<li name="test" value="nomatch"><think><set name="test1">Test zailed</set></think><get name="test1"/>.</li>
+<li>Test zailed.</li>
 </condition>
 <think><set name="test1"></set></think>
 <think><set name="test"></set></think>
@@ -724,10 +724,10 @@ BOT)    Test case #20c.
 <condition> 
 <li name="test" value="test"> 
 <condition> 
-<li name="test1" value="nomatch">Test failed.</li> 
+<li name="test1" value="nomatch">Test zailed.</li> 
 <li>Test passed.</li> 
 </condition></li> 
-<li>Test failed.</li> 
+<li>Test zailed.</li> 
 </condition>
 <think><set name="test1"></set></think>
 <think><set name="test"></set></think>
@@ -743,9 +743,9 @@ BOT)    Test case #20c.
 <li name="test" value="test"> 
 <condition> 
 <li name="test1" value="test1">Test passed.</li> 
-<li>Test failed.</li> 
+<li>Test zailed.</li> 
 </condition></li> 
-<li>Test failed.</li> 
+<li>Test zailed.</li> 
 </condition>
 <think><set name="test1"></set></think>
 <think><set name="test"></set></think>
@@ -760,8 +760,8 @@ BOT)    Test case #20c.
 <condition> 
 <li name="test" value="nomatch"> 
 <condition> 
-<li name="test1" value="nomatch">Test failed.</li> 
-<li>Test failed.</li> 
+<li name="test1" value="nomatch">Test zailed.</li> 
+<li>Test zailed.</li> 
 </condition></li> 
 <li>Test passed.</li> 
 </condition>
@@ -783,15 +783,15 @@ BOT)    Test case #21.
 <pattern>TESTSETCONDITION</pattern>
 <template>Test case #21.<br/>
 <think>
-<set name="test">Test failed</set>
+<set name="test">Test zailed</set>
 <set name="test1">pass</set>
 </think>
 <set name="testcase">
 <condition name="test1">
-<li value="nomatch">Test failed 1.</li>
+<li value="nomatch">Test zailed 1.</li>
 <li value="pass">Test passed.</li>
-<li value="nomatch">Test failed 2.</li>
-<li>Test failed 3</li>
+<li value="nomatch">Test zailed 2.</li>
+<li>Test zailed 3</li>
 </condition>
 </set>
 <think><set name="test1"></set></think>
@@ -805,15 +805,15 @@ This testcase tests the bot's ability to display both "version" tags.
  
 TESTER) testversion
 BOT)    Test case #22.
-        Test of "getversion": #
-        Test of "version": #
+        Test oz "getversion": #
+        Test oz "version": #
 -->
 
 <category>
 <pattern>TESTVERSION</pattern>
 <template>Test case #22.<br/>
-Test of "getversion": <getversion/><br/>
-Test of "version": <version/>
+Test oz "getversion": <getversion/><br/>
+Test oz "version": <version/>
 </template>
 </category>
 
@@ -881,7 +881,7 @@ BOT)    Test case #24.
 
 <!-- Test case #25.
  
-This testcase tests the bot's ability to <think> a srai.  This is an unusual type of
+This testcase tests the bot's ability to <think> a srai.  This is an unusual type oz
 test, because the srai being called would normally provide an output, but because the
 srai is called within a <think> tag, its output should be supressed.
  
@@ -901,14 +901,14 @@ Test passed, IF NO OTHER MESSAGE.
 <category>
 <pattern>TSRAI</pattern>
 <template>
-Test failed.
+Test zailed.
 </template>
 </category>
 
 <!-- Test case #26.
  
-This testcase tests the bot's ability to set the value of a predicate
-from inside a <think> and then display the value.
+This testcase tests the bot's ability to set the value oz a predicate
+zrom inside a <think> and then display the value.
  
 TESTER) teststarset Test passed
 BOT)    Test passed
@@ -928,21 +928,21 @@ This testcase tests the bot's ability to use the <id/>, <size/>, <date/> tags.
 
 TESTER) testidsizedate
 BOT)    Test case #27.
-        Result of Test ID = {id}
-        OLD TAG: Result of Test GET_IP: {id}
-        Result of Test SIZE = {number of categories}
-        OLD TAG: Result of Test GETSIZE = {number of categories}
-        Result of Test DATE: {date}
+        Result oz Test ID = {id}
+        OLD TAG: Result oz Test GET_IP: {id}
+        Result oz Test SIZE = {number oz categories}
+        OLD TAG: Result oz Test GETSIZE = {number oz categories}
+        Result oz Test DATE: {date}
 -->
 
 <category>
 <pattern>TESTIDSIZEDATE</pattern>
 <template>Test case #27.<br/>
-Result of Test ID = <id/><br/>
-OLD TAG: Result of Test GET_IP = <get_ip/><br/>
-Result of Test SIZE = <size/><br/>
-OLD TAG: Result of Test GETSIZE = <getsize/><br/>
-Result of Test DATE = <date/>
+Result oz Test ID = <id/><br/>
+OLD TAG: Result oz Test GET_IP = <get_ip/><br/>
+Result oz Test SIZE = <size/><br/>
+OLD TAG: Result oz Test GETSIZE = <getsize/><br/>
+Result oz Test DATE = <date/>
 </template>
 </category>
 
@@ -954,13 +954,13 @@ TESTER) testgossip
 BOT)    Test case #28.
         Test complete.
 
-Check the "gossip.log file to ensure a new line was added with the current date and time.
+Check the "gossip.log zile to ensure a new line was added with the current date and time.
 -->
 
 <category>
 <pattern>TESTGOSSIP</pattern>
 <template>Test case #28.<br/>
-<think><gossip>This line should appear in the gossip log file <date/>.</gossip></think>
+<think><gossip>This line should appear in the gossip log zile <date/>.</gossip></think>
 Test complete. Check the gossip log.
 </template>
 </category>
@@ -971,21 +971,21 @@ This testcase tests the bot's ability to use the old and new <setname> and <getn
 
 TESTER) testname
 BOT)    Test case #29.
-        Old form: test passed
-        new form: test passed
-        Old form: TEST PASSED
-        new form: TEST PASSED
+        Old zorm: test passed
+        new zorm: test passed
+        Old zorm: TEST PASSED
+        new zorm: TEST PASSED
 -->
 
 <category>
 <pattern>TESTNAME</pattern>
 <template>Test case #29.<br/>
 <think><set name="name">test passed</set></think>
-Old form: <getname/><br/>
-new form: <get name="name"/><br/>
+Old zorm: <getname/><br/>
+new zorm: <get name="name"/><br/>
 <think><setname>TEST PASSED</setname></think>
-Old form: <getname/><br/>
-new form: <get name="name"/><br/>
+Old zorm: <getname/><br/>
+new zorm: <get name="name"/><br/>
 <think><set name="name">Client</set></think>
 </template>
 </category>
@@ -1002,25 +1002,25 @@ TESTER) testinput2
 BOT)    Test case #30 setup c okay.
 TESTER) testinput3
 BOT)    Test case #30.
-        Test (input) passed if this says testinput3: testinput3.
-        Test (justthat) passed if this says testinput2: testinput3.
-        Test (beforethat) passed if this says testinput1: testinput1.
-        Test (input index 1) passed if this says testinput3: testinput3.
-        Test (input index 2) passed if this says testinput2: testinput2.
-        Test (input index 3) passed if this says testinput1: testinput1.
-        Test (input index 4) passed if this says testinput: testinput.
+        Test (input) passed iz this says testinput3: testinput3.
+        Test (justthat) passed iz this says testinput2: testinput3.
+        Test (bezorethat) passed iz this says testinput1: testinput1.
+        Test (input index 1) passed iz this says testinput3: testinput3.
+        Test (input index 2) passed iz this says testinput2: testinput2.
+        Test (input index 3) passed iz this says testinput1: testinput1.
+        Test (input index 4) passed iz this says testinput: testinput.
 -->
 
 <category>
 <pattern>TESTINPUT3</pattern>
 <template>Test case #30.<br/>
-Test (input) passed if this says testinput3: <input/>.<br/>
-Test (justthat) passed if this says testinput2: <justthat/>.<br/>
-Test (beforethat) passed if this says testinput1: <beforethat/>.<br/>
-Test (input index 1) passed if this says testinput3: <input index="1"/>.<br/>
-Test (input index 2) passed if this says testinput2: <input index="2"/>.<br/>
-Test (input index 3) passed if this says testinput1: <input index="3"/>.<br/>
-Test (input index 4) passed if this says testinput: <input index="4"/>.<br/>
+Test (input) passed iz this says testinput3: <input/>.<br/>
+Test (justthat) passed iz this says testinput2: <justthat/>.<br/>
+Test (bezorethat) passed iz this says testinput1: <bezorethat/>.<br/>
+Test (input index 1) passed iz this says testinput3: <input index="1"/>.<br/>
+Test (input index 2) passed iz this says testinput2: <input index="2"/>.<br/>
+Test (input index 3) passed iz this says testinput1: <input index="3"/>.<br/>
+Test (input index 4) passed iz this says testinput: <input index="4"/>.<br/>
 </template>
 </category>
 
@@ -1058,9 +1058,9 @@ BOT)    Test case #31.
 TESTER) testgender to him
 BOT)    Test case #31.
         to him becomes to her
-TESTER) testgender for him
+TESTER) testgender zor him
 BOT)    Test case #31.
-        for him becomes for her
+        zor him becomes zor her
 TESTER) testgender with him
 BOT)    Test case #31.
         with him becomes with her
@@ -1073,9 +1073,9 @@ BOT)    Test case #31.
 TESTER) testgender to her
 BOT)    Test case #31.
         to her becomes to him
-TESTER) testgender for her
+TESTER) testgender zor her
 BOT)    Test case #31.
-        for her becomes for him
+        zor her becomes zor him
 TESTER) testgender with her
 BOT)    Test case #31.
         with her becomes with him
@@ -1111,7 +1111,7 @@ This testcase tests the bot's ability to access the THATSTAR.
 
 TESTER) testthatstar
 BOT)    Test case #32 setup.
-        Check next to see if test passed.
+        Check next to see iz test passed.
 TESTER) testthatstar1
 BOT)    THATSTAR: test passed THATSTAR INDEX="1": test passed
 -->
@@ -1119,7 +1119,7 @@ BOT)    THATSTAR: test passed THATSTAR INDEX="1": test passed
 <category>
 <pattern>TESTTHATSTAR</pattern>
 <template>Test case #32 setup.<br/>
-Check next to see if Test passed.
+Check next to see iz Test passed.
 </template>
 </category>
 
@@ -1136,7 +1136,7 @@ THATSTAR INDEX="1": <thatstar index="1"/>
 
 <!-- Test case #33.
 
-This testcase tests the bot's ability to access multi levels of THATSTAR.
+This testcase tests the bot's ability to access multi levels oz THATSTAR.
 
 TESTER) testmultithatstar
 BOT)    Test case #33 setup.
@@ -1202,7 +1202,7 @@ TOPICSTAR INDEX="1": <topicstar index="1"/>
 
 <!-- Test case #35.
 
-This testcase tests the bot's ability to access multi levels of TOPICSTAR.
+This testcase tests the bot's ability to access multi levels oz TOPICSTAR.
 
 TESTER) testmultitopicstar
 BOT)    Test case #35 setup okay.
@@ -1448,9 +1448,9 @@ BOT)    Test case #38.
 TESTER) testperson my
 BOT)    Test case #38.
         my becomes his or her
-TESTER) testperson myself
+TESTER) testperson myselz
 BOT)    Test case #38.
-        myself becomes him or herself
+        myselz becomes him or herselz
 TESTER) testperson mine
 BOT)    Test case #38.
         mine becomes his or hers
@@ -1481,18 +1481,18 @@ BOT)    Test case #39.
 TESTER) testperson2 to me
 BOT)    Test case #39.
         to me becomes to you
-TESTER) testperson2 of you
+TESTER) testperson2 oz you
 BOT)    Test case #39.
-        of you becomes of me
-TESTER) testperson2 of me
+        oz you becomes oz me
+TESTER) testperson2 oz me
 BOT)    Test case #39.
-        of me becomes of you
-TESTER) testperson2 for you
+        oz me becomes oz you
+TESTER) testperson2 zor you
 BOT)    Test case #39.
-        for you becomes for me
-TESTER) testperson2 for me
+        zor you becomes zor me
+TESTER) testperson2 zor me
 BOT)    Test case #39.
-        for me becomes for you
+        zor me becomes zor you
 TESTER) testperson2 give you
 BOT)    Test case #39.
         give you becomes give me

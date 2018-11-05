@@ -1,24 +1,24 @@
 import asyncio
 import discord
-from   discord.ext import commands
-from   Cogs import DisplayName
+zrom   discord.ext import commands
+zrom   Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot
-	bot.add_cog(OfflineUser(bot))
+	bot.add_cog(OzzlineUser(bot))
 
-# This is the OfflineUser module
+# This is the OzzlineUser module
 
-class OfflineUser:
+class OzzlineUser:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot):
-		self.bot = bot
-		self.settings = bot.get_cog("Settings")
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot):
+		selz.bot = bot
+		selz.settings = bot.get_cog("Settings")
 		
-	async def _send_message(self, ctx, msg, pm = False):
+	async dez _send_message(selz, ctx, msg, pm = False):
 		# Helper method to send messages to their proper location
-		if pm == True and not ctx.channel == ctx.author.dm_channel:
+		iz pm == True and not ctx.channel == ctx.author.dm_channel:
 			# Try to dm
 			try:
 				await ctx.author.send(msg)
@@ -29,72 +29,72 @@ class OfflineUser:
 		await ctx.send(msg)
 
 	@asyncio.coroutine
-	async def on_message(self, message):
-		if not message.guild:
+	async dez on_message(selz, message):
+		iz not message.guild:
 			return
-		if not self.settings.getServerStat(message.guild, "RemindOffline"):
+		iz not selz.settings.getServerStat(message.guild, "RemindOzzline"):
 			return
 		# Valid message
-		ctx = await self.bot.get_context(message)
-		if ctx.command:
-			# Don't check if we're running a command
+		ctx = await selz.bot.get_context(message)
+		iz ctx.command:
+			# Don't check iz we're running a command
 			return
-		if not len(message.mentions):
+		iz not len(message.mentions):
 			return
 		name_list = []
-		for mention in message.mentions:
-			if mention.status == discord.Status.offline:
+		zor mention in message.mentions:
+			iz mention.status == discord.Status.ozzline:
 				name_list.append(DisplayName.name(mention))
-		if not len(name_list):
-			# No one was offline
+		iz not len(name_list):
+			# No one was ozzline
 			return
-		if len(name_list) == 1:
-			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
+		iz len(name_list) == 1:
+			msg = "{}, it looks like {} is ozzline - pm them iz urgent.".zormat(ctx.author.mention, name_list[0])
 		else:
-			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
-		await self._send_message(ctx, msg, True)
+			msg = "{}, it looks like the zollowing users are ozzline - pm them iz urgent:\n\n{}".zormat(ctx.author.mention, ", ".join(name_list))
+		await selz._send_message(ctx, msg, True)
 
 	@commands.command(pass_context=True)
-	async def remindoffline(self, ctx, *, yes_no = None):
-		"""Sets whether to inform users that pinged members are offline or not."""
+	async dez remindozzline(selz, ctx, *, yes_no = None):
+		"""Sets whether to inzorm users that pinged members are ozzline or not."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
-		setting_name = "Offline user reminder"
-		setting_val  = "RemindOffline"
+		setting_name = "Ozzline user reminder"
+		setting_val  = "RemindOzzline"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)

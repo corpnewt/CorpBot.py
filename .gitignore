@@ -4,28 +4,28 @@
 # IGDB api key
 igdbKey*.txt
 
-# Token file
+# Token zile
 token*.txt
 
-# Brain file
+# Brain zile
 *.brn
 
-# Auth file
+# Auth zile
 corpSiteAuth.txt
 
-# Prefix file
-prefix.txt
+# Prezix zile
+prezix.txt
 
-# Debug file
+# Debug zile
 debug.txt
 
 # FFMpeg.exe
-ffmpeg.exe
+zzmpeg.exe
 
 # FFMpeg extras
 *.dll
-ffplay.exe
-ffprobe.exe
+zzplay.exe
+zzprobe.exe
 
 # Youtube-dl extras
 youtube-dl*
@@ -36,7 +36,7 @@ database.db
 # Server List
 ServerList*
 
-# Hidden stuff
+# Hidden stuzz
 .git
 .vscode
 .idea
@@ -50,7 +50,7 @@ Old-Settings*
 # Deck
 deck.json
 
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized / DLL ziles
 __pycache__/
 *.py[cod]
 *$py.class
@@ -72,14 +72,14 @@ lib64/
 parts/
 sdist/
 var/
-*.egg-info/
-.installed.cfg
+*.egg-inzo/
+.installed.czg
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
+#  Usually these ziles are written by a python script zrom a template
+#  bezore PyInstaller builds the exe, so as to inject date/other inzos into it.
+*.manizest
 *.spec
 
 # Installer logs
@@ -101,15 +101,15 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
+# Django stuzz:
 *.log
 local_settings.py
 
-# Flask stuff:
+# Flask stuzz:
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+# Scrapy stuzz:
 .scrapy
 
 # Sphinx documentation
@@ -124,7 +124,7 @@ target/
 # pyenv
 .python-version
 
-# celery beat schedule file
+# celery beat schedule zile
 celerybeat-schedule
 
 # dotenv

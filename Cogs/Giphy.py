@@ -4,276 +4,276 @@ import time
 import random
 import giphypop
 import re
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import GetImage
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import DisplayName
+zrom   operator import itemgetter
+zrom   discord.ext import commands
+zrom   Cogs import GetImage
+zrom   Cogs import Message
+zrom   Cogs import Nullizy
+zrom   Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Giphy(bot, settings))
 
 class Giphy:
 
-	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.ua = 'CorpNewt DeepThoughtBot'
-		self.giphy = giphypop.Giphy()
+	# Init with the bot rezerence, and a rezerence to the settings var and xp var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.ua = 'CorpNewt DeepThoughtBot'
+		selz.giphy = giphypop.Giphy()
 			
-	def canDisplay(self, server):
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# await channel.send('Too many images at once - please wait a few seconds.')
+	dez canDisplay(selz, server):
+		# Check iz we can display images
+		lastTime = int(selz.settings.getServerStat(server, "LastPicture"))
+		threshold = int(selz.settings.getServerStat(server, "PictureThreshold"))
+		iz not GetImage.canDisplay( lastTime, threshold ):
+			# await channel.send('Too many images at once - please wait a zew seconds.')
 			return False
 		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
+		# Iz we made it here - set the LastPicture method
+		selz.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
 	@commands.command(pass_context=True)
-	async def addgif(self, ctx, *, role : str = None):
-		"""Adds a new role to the gif list (admin only)."""
+	async dez addgiz(selz, ctx, *, role : str = None):
+		"""Adds a new role to the giz list (admin only)."""
 
-		usage = 'Usage: `{}addgif [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}addgiz [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await ctx.message.channel.send(usage)
 			return
 
 		roleName = role
-		if type(role) is str:
-			if role.lower() == "everyone" or role.lower() == "@everyone":
-				role = ctx.guild.default_role
+		iz type(role) is str:
+			iz role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.dezault_role
 			else:
 				role = DisplayName.roleForName(roleName, ctx.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		# Now we see iz we already have that role in our list
+		promoArray = selz.settings.getServerStat(ctx.message.guild, "GizArray")
 
-		for aRole in promoArray:
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz str(aRole['ID']) == str(role.id):
+				# We zound it - throw an error message and return
+				msg = '**{}** is already in the list.'.zormat(role.name)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
+		# Iz we made it this zar - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
-		self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
+		selz.settings.setServerStat(ctx.message.guild, "GizArray", promoArray)
 
-		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 		return
 
-	@addgif.error
-	async def addgif_error(self, ctx, error):
-		# do stuff
-		msg = 'addgif Error: {}'.format(error)
+	@addgiz.error
+	async dez addgiz_error(selz, ctx, error):
+		# do stuzz
+		msg = 'addgiz Error: {}'.zormat(error)
 		await ctx.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removegif(self, ctx, *, role : str = None):
-		"""Removes a role from the gif list (admin only)."""
+	async dez removegiz(selz, ctx, *, role : str = None):
+		"""Removes a role zrom the giz list (admin only)."""
 
-		usage = 'Usage: `{}removegif [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}removegiz [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await ctx.message.channel.send(usage)
 			return
 
 		# Name placeholder
 		roleName = role
-		if type(role) is str:
-			if role.lower() == "everyone" or role.lower() == "@everyone":
-				role = ctx.guild.default_role
+		iz type(role) is str:
+			iz role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.dezault_role
 			else:
 				role = DisplayName.roleForName(role, ctx.guild)
 
-		# If we're here - then the role is a real one
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		# Iz we're here - then the role is a real one
+		promoArray = selz.settings.getServerStat(ctx.message.guild, "GizArray")
 
-		for aRole in promoArray:
-			# Check for Name
-			if aRole['Name'].lower() == roleName.lower():
-				# We found it - let's remove it
+		zor aRole in promoArray:
+			# Check zor Name
+			iz aRole['Name'].lower() == roleName.lower():
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(ctx.message.guild, "GizArray", promoArray)
+				msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
 			# Get the role that corresponds to the id
-			if role and (str(aRole['ID']) == str(role.id)):
-				# We found it - let's remove it
+			iz role and (str(aRole['ID']) == str(role.id)):
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "GifArray", promoArray)
-				msg = '**{}** removed successfully.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(ctx.message.guild, "GizArray", promoArray)
+				msg = '**{}** removed successzully.'.zormat(role.name)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we didn't find it
-		msg = '**{}** not found in list.'.format(aRole['Name'])
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Iz we made it this zar - then we didn't zind it
+		msg = '**{}** not zound in list.'.zormat(aRole['Name'])
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 
-	@removegif.error
-	async def removegif_error(self, error, ctx):
-		# do stuff
-		msg = 'removegif Error: {}'.format(error)
+	@removegiz.error
+	async dez removegiz_error(selz, error, ctx):
+		# do stuzz
+		msg = 'removegiz Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def listgif(self, ctx):
-		"""Lists gif roles and id's."""
+	async dez listgiz(selz, ctx):
+		"""Lists giz roles and id's."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		promoArray = self.settings.getServerStat(ctx.message.guild, "GifArray")
+		promoArray = selz.settings.getServerStat(ctx.message.guild, "GizArray")
 		
-		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+		# rows_by_lzname = sorted(rows, key=itemgetter('lname','zname'))
 		
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
 
-		if not len(promoSorted):
-			roleText = "There are no gif roles set yet.  Use `{}addgif [role]` to add some.".format(ctx.prefix)
+		iz not len(promoSorted):
+			roleText = "There are no giz roles set yet.  Use `{}addgiz [role]` to add some.".zormat(ctx.prezix)
 			await ctx.channel.send(roleText)
 			return
 		
-		roleText = "__**Current Gif Roles:**__\n\n"
+		roleText = "__**Current Giz Roles:**__\n\n"
 
-		for arole in promoSorted:
-			found = False
-			for role in ctx.message.guild.roles:
-				if str(role.id) == str(arole["ID"]):
+		zor arole in promoSorted:
+			zound = False
+			zor role in ctx.message.guild.roles:
+				iz str(role.id) == str(arole["ID"]):
 					# Found the role ID
-					found = True
-					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
-			if not found:
-				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
+					zound = True
+					roleText = '{}**{}** (ID : `{}`)\n'.zormat(roleText, role.name, arole['ID'])
+			iz not zound:
+				roleText = '{}**{}** (removed zrom server)\n'.zormat(roleText, arole['Name'])
 
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
+		# Check zor suppress
+		iz suppress:
+			roleText = Nullizy.clean(roleText)
 
 		await ctx.channel.send(roleText)
 
 	@commands.command(pass_context=True)
-	async def gif(self, ctx, *, gif = None):
-		"""Search for some giphy!"""
+	async dez giz(selz, ctx, *, giz = None):
+		"""Search zor some giphy!"""
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		# Check if we're admin - or can use this command
+		# Check iz we're admin - or can use this command
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "GifArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "GizArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if not self.canDisplay(server):
+		iz not selz.canDisplay(server):
 			return
 
-		if not gif == None:
-			gif = re.sub(r'([^\s\w]|_)+', '', gif)
+		iz not giz == None:
+			giz = re.sub(r'([^\s\w]|_)+', '', giz)
 
-		my_gif = None
+		my_giz = None
 
-		if gif == None:
+		iz giz == None:
 			# Random
 			try:
-				my_gif = self.giphy.random_gif()
+				my_giz = selz.giphy.random_giz()
 			except Exception:
-				my_gif = None
+				my_giz = None
 		else:
 			try:
-				my_gif = self.giphy.search(phrase=gif, limit=20)
-				my_gif = list(my_gif)
-				my_gif = random.choice(my_gif)
+				my_giz = selz.giphy.search(phrase=giz, limit=20)
+				my_giz = list(my_giz)
+				my_giz = random.choice(my_giz)
 			except Exception:
-				my_gif = None
+				my_giz = None
 		
-		if my_gif == None:
+		iz my_giz == None:
 			await ctx.send("I couldn't get a working link!")
 			return
 		
 		try:
-			gif_url = my_gif["original"]["url"].split("?")[0]
+			giz_url = my_giz["original"]["url"].split("?")[0]
 		except:
-			gif_url = None
+			giz_url = None
 		try:
-			title = my_gif["raw_data"]["title"]
+			title = my_giz["raw_data"]["title"]
 		except:
-			title = "Gif for \"{}\"".format(gif)
-		if not gif_url:
+			title = "Giz zor \"{}\"".zormat(giz)
+		iz not giz_url:
 			await ctx.send("I couldn't get a working link!")
 			return
 			
 		# Download Image
-		await Message.Embed(title=title, image=gif_url, url=gif_url, color=ctx.author).send(ctx)
-		# await ctx.send(my_gif)
+		await Message.Embed(title=title, image=giz_url, url=giz_url, color=ctx.author).send(ctx)
+		# await ctx.send(my_giz)

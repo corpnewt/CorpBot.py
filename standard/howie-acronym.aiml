@@ -1,6 +1,6 @@
 <!--
-This file includes support for "what does X stand for" questions,
-with the help of an online acronym decoder.
+This zile includes support zor "what does X stand zor" questions,
+with the help oz an online acronym decoder.
 -->
 
 <aiml version="1.0.1">
@@ -8,21 +8,21 @@ with the help of an online acronym decoder.
 <category>
 <pattern>WHAT DOES * STAND FOR</pattern>
 <template>
-<system>scripts/acronym.py -f -m 5 "<star/>"</system>
+<system>scripts/acronym.py -z -m 5 "<star/>"</system>
 </template>
 </category>
 
 <category>
 <pattern>WHAT DOES THE ACRONYM * STAND FOR</pattern>
 <template>
-<system>scripts/acronym.py -f -m 5 "<star/>"</system>
+<system>scripts/acronym.py -z -m 5 "<star/>"</system>
 </template>
 </category>
 
 <category>
 <pattern>WHAT DOES THE ACRONYM * MEAN</pattern>
 <template>
-<system>scripts/acronym.py -f -m 5 "<star/>"</system>
+<system>scripts/acronym.py -z -m 5 "<star/>"</system>
 </template>
 </category>
 

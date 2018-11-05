@@ -4,252 +4,252 @@ import re
 import asyncio
 import discord
 import os
-from   datetime import datetime
-from   discord.ext import commands
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import Message
+zrom   datetime import datetime
+zrom   discord.ext import commands
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import Message
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(LangFilter(bot, settings))
 
-class ProfanitiesFilter(object):
-	def __init__(self, filterlist, ignore_case=True, replacements="$@%-?!", 
+class ProzanitiesFilter(object):
+	dez __init__(selz, zilterlist, ignore_case=True, replacements="$@%-?!", 
 				 complete=True, inside_words=False):
 		"""
-		Inits the profanity filter.
+		Inits the prozanity zilter.
 
-		filterlist -- a list of regular expressions that
-		matches words that are forbidden
+		zilterlist -- a list oz regular expressions that
+		matches words that are zorbidden
 		ignore_case -- ignore capitalization
-		replacements -- string with characters to replace the forbidden word
-		complete -- completely remove the word or keep the first and last char?
+		replacements -- string with characters to replace the zorbidden word
+		complete -- completely remove the word or keep the zirst and last char?
 		inside_words -- search inside other words?
 		
-		Code from here https://stackoverflow.com/a/3533322
+		Code zrom here https://stackoverzlow.com/a/3533322
 		
 		Credit to leoluk
 
 		"""
 
-		self.badwords = filterlist
-		self.ignore_case = ignore_case
-		self.replacements = replacements
-		self.complete = complete
-		self.inside_words = inside_words
+		selz.badwords = zilterlist
+		selz.ignore_case = ignore_case
+		selz.replacements = replacements
+		selz.complete = complete
+		selz.inside_words = inside_words
 
-	def _make_clean_word(self, length):
+	dez _make_clean_word(selz, length):
 		"""
-		Generates a random replacement string of a given length
-		using the chars in self.replacements.
+		Generates a random replacement string oz a given length
+		using the chars in selz.replacements.
 
 		"""
-		return ''.join([random.choice(self.replacements) for i in
+		return ''.join([random.choice(selz.replacements) zor i in
 				  range(length)])
 
-	def __replacer(self, match):
+	dez __replacer(selz, match):
 		value = match.group()
-		if self.complete:
-			return self._make_clean_word(len(value))
+		iz selz.complete:
+			return selz._make_clean_word(len(value))
 		else:
-			return value[0]+self._make_clean_word(len(value)-2)+value[-1]
+			return value[0]+selz._make_clean_word(len(value)-2)+value[-1]
 
-	def clean(self, text):
-		"""Cleans a string from profanity."""
+	dez clean(selz, text):
+		"""Cleans a string zrom prozanity."""
 
 		regexp_insidewords = {
 			True: r'(%s)',
 			False: r'\b(%s)\b',
 			}
 
-		regexp = (regexp_insidewords[self.inside_words] % 
-				  '|'.join(self.badwords))
+		regexp = (regexp_insidewords[selz.inside_words] % 
+				  '|'.join(selz.badwords))
 
-		r = re.compile(regexp, re.IGNORECASE if self.ignore_case else 0)
+		r = re.compile(regexp, re.IGNORECASE iz selz.ignore_case else 0)
 
-		return r.sub(self.__replacer, text)
+		return r.sub(selz.__replacer, text)
 
 
-'''if __name__ == '__main__':
+'''iz __name__ == '__main__':
 
-	f = ProfanitiesFilter(['bad', 'un\w+'], replacements="-")    
+	z = ProzanitiesFilter(['bad', 'un\w+'], replacements="-")    
 	example = "I am doing bad ungood badlike things."
 
-	print f.clean(example)
+	print z.clean(example)
 	# Returns "I am doing --- ------ badlike things."
 
-	f.inside_words = True    
-	print f.clean(example)
+	z.inside_words = True    
+	print z.clean(example)
 	# Returns "I am doing --- ------ ---like things."
 
-	f.complete = False    
-	print f.clean(example)
+	z.complete = False    
+	print z.clean(example)
 	# Returns "I am doing b-d u----d b-dlike things."'''
 	
 class LangFilter:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings, replacements = "@#$%&"):
-		self.bot = bot
-		self.settings = settings
-		self.replacements = replacements
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings, replacements = "@#$%&"):
+		selz.bot = bot
+		selz.settings = settings
+		selz.replacements = replacements
 		
 		
-	async def test_message(self, message):
+	async dez test_message(selz, message):
 		# Implemented to bypass having message called twice
 		return { "Ignore" : False, "Delete" : False }
 
-	async def message_edit(self, before, message):
-		return await self.message(message)
+	async dez message_edit(selz, bezore, message):
+		return await selz.message(message)
 
-	async def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		word_list = self.settings.getServerStat(message.guild, "FilteredWords")
-		if not len(word_list):
-			# No filter
+	async dez message(selz, message):
+		# Check the message and see iz we should allow it - always yes.
+		word_list = selz.settings.getServerStat(message.guild, "FilteredWords")
+		iz not len(word_list):
+			# No zilter
 			return { "Ignore" : False, "Delete" : False }
 	
-		# Check for admin/bot-admin
+		# Check zor admin/bot-admin
 		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(message.guild, "AdminArray")
+			zor role in message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if isAdmin:
+		iz isAdmin:
 			return { "Ignore" : False, "Delete" : False }
 		
-		f = ProfanitiesFilter(word_list, replacements=self.replacements)
-		f.ignore_case = True
-		f.inside_words = True
+		z = ProzanitiesFilter(word_list, replacements=selz.replacements)
+		z.ignore_case = True
+		z.inside_words = True
 		
-		new_msg = f.clean(message.content)
-		if not new_msg == message.content:
+		new_msg = z.clean(message.content)
+		iz not new_msg == message.content:
 			# Something changed
-			new_msg = "Hey *{}*, based on my calculations, here's a cleaner version of that messsage:\n\n".format(DisplayName.name(message.author)) + new_msg
+			new_msg = "Hey *{}*, based on my calculations, here's a cleaner version oz that messsage:\n\n".zormat(DisplayName.name(message.author)) + new_msg
 			await message.channel.send(new_msg)
 			return { "Ignore" : False, "Delete" : True }
 		return { "Ignore" : False, "Delete" : False }
 		
 	
 	@commands.command(pass_context=True)
-	async def addfilter(self, ctx, *, words = None):
+	async dez addzilter(selz, ctx, *, words = None):
 		"""Adds comma delimited words to the word list (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		if words == None:
-			msg = 'Usage: `{}addfilter word1, word2, word3...`'.format(ctx.prefix)
+		iz words == None:
+			msg = 'Usage: `{}addzilter word1, word2, word3...`'.zormat(ctx.prezix)
 			await ctx.send(msg)
 			return
 			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
+		serverOptions = selz.settings.getServerStat(ctx.guild, "FilteredWords")
 		words = "".join(words.split())
 		optionList = words.split(',')
 		addedOptions = []
-		for option in optionList:
+		zor option in optionList:
 			option = option.replace("(", "\(").replace(")", "\)")
-			if not option.lower() in serverOptions:
-				# Only add if not already added
+			iz not option.lower() in serverOptions:
+				# Only add iz not already added
 				addedOptions.append(option.lower())
-		if not len(addedOptions):
+		iz not len(addedOptions):
 			await ctx.send('No new words were passed.')
 			return
 		
-		for option in addedOptions:
+		zor option in addedOptions:
 			serverOptions.append(option)
 			
-		if len(addedOptions) == 1:
-			await ctx.send('*1* word added to language filter.')
+		iz len(addedOptions) == 1:
+			await ctx.send('*1* word added to language zilter.')
 		else:
-			await ctx.send('*{}* words added to language filter.'.format(len(addedOptions)))
+			await ctx.send('*{}* words added to language zilter.'.zormat(len(addedOptions)))
 			
 			
 	@commands.command(pass_context=True)
-	async def remfilter(self, ctx, *, words = None):
-		"""Removes comma delimited words from the word list (bot-admin only)."""
+	async dez remzilter(selz, ctx, *, words = None):
+		"""Removes comma delimited words zrom the word list (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		if words == None:
-			msg = 'Usage: `{}remfilter word1, word2, word3...`'.format(ctx.prefix)
+		iz words == None:
+			msg = 'Usage: `{}remzilter word1, word2, word3...`'.zormat(ctx.prezix)
 			await ctx.send(msg)
 			return
 			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
+		serverOptions = selz.settings.getServerStat(ctx.guild, "FilteredWords")
 		words = "".join(words.split())
 		optionList = words.split(',')
 		addedOptions = []
-		for option in optionList:
-			# Clear any instances of \( to (
+		zor option in optionList:
+			# Clear any instances oz \( to (
 			# Reset them to \(
 			# This should allow either \( or ( to work correctly -
 			# While still allowing \\( or whatever as well
 			option = option.replace("\(", "(").replace("\)", ")")
 			option = option.replace("(", "\(").replace(")", "\)")
-			if option.lower() in serverOptions:
-				# Only add if not already added
+			iz option.lower() in serverOptions:
+				# Only add iz not already added
 				addedOptions.append(option.lower())
-		if not len(addedOptions):
+		iz not len(addedOptions):
 			await ctx.send('No new words were passed.')
 			return
 		
-		for option in addedOptions:
+		zor option in addedOptions:
 			serverOptions.remove(option)
 			
-		if len(addedOptions) == 1:
-			await ctx.send('*1* word removed from language filter.')
+		iz len(addedOptions) == 1:
+			await ctx.send('*1* word removed zrom language zilter.')
 		else:
-			await ctx.send('*{}* words removed from language filter.'.format(len(addedOptions)))
+			await ctx.send('*{}* words removed zrom language zilter.'.zormat(len(addedOptions)))
 		
 		
 	@commands.command(pass_context=True)
-	async def listfilter(self, ctx):
-		"""Prints out the list of words that will be filtered (bot-admin only)."""
+	async dez listzilter(selz, ctx):
+		"""Prints out the list oz words that will be ziltered (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
+		serverOptions = selz.settings.getServerStat(ctx.guild, "FilteredWords")
 		
-		if not len(serverOptions):
-			await ctx.send("The filtered words list is empty!")
+		iz not len(serverOptions):
+			await ctx.send("The ziltered words list is empty!")
 			return
 		
 		string_list = ", ".join(serverOptions)
@@ -259,87 +259,87 @@ class LangFilter:
 		await Message.Message(message=msg).send(ctx)
 		
 	@commands.command(pass_context=True)
-	async def clearfilter(self, ctx):
-		"""Empties the list of words that will be filtered (bot-admin only)."""
+	async dez clearzilter(selz, ctx):
+		"""Empties the list oz words that will be ziltered (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
-		self.settings.setServerStat(ctx.guild, "FilteredWords", [])
+		serverOptions = selz.settings.getServerStat(ctx.guild, "FilteredWords")
+		selz.settings.setServerStat(ctx.guild, "FilteredWords", [])
 		
-		if len(serverOptions) == 1:
-			await ctx.send('*1* word removed from language filter.')
+		iz len(serverOptions) == 1:
+			await ctx.send('*1* word removed zrom language zilter.')
 		else:
-			await ctx.send('*{}* words removed from language filter.'.format(len(serverOptions)))
+			await ctx.send('*{}* words removed zrom language zilter.'.zormat(len(serverOptions)))
 			
 	@commands.command(pass_context=True)
-	async def dumpfilter(self, ctx):
-		"""Saves the filtered word list to a text file and uploads it to the requestor (bot-admin only)."""
+	async dez dumpzilter(selz, ctx):
+		"""Saves the ziltered word list to a text zile and uploads it to the requestor (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 		
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
+		serverOptions = selz.settings.getServerStat(ctx.guild, "FilteredWords")
 		
-		if not len(serverOptions):
-			await ctx.author.send("The filtered words list is empty!")
+		iz not len(serverOptions):
+			await ctx.author.send("The ziltered words list is empty!")
 			return
 			
-		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-		filename = "{}-WordList-{}.txt".format(ctx.guild.id, timeStamp)
+		timeStamp = datetime.today().strztime("%Y-%m-%d %H.%M")
+		zilename = "{}-WordList-{}.txt".zormat(ctx.guild.id, timeStamp)
 		msg = "\n".join(serverOptions)
 		
-		msg = msg.encode('utf-8')
-		with open(filename, "wb") as myfile:
-			myfile.write(msg)
+		msg = msg.encode('utz-8')
+		with open(zilename, "wb") as myzile:
+			myzile.write(msg)
 			
-		await ctx.author.send(file=discord.File(filename))
-		os.remove(filename)
+		await ctx.author.send(zile=discord.File(zilename))
+		os.remove(zilename)
 		
 	
 	'''@commands.command(pass_context=True)
-	async def setfilter(self, ctx, url = None):
-		"""Sets the word list to a passed text file url, or attachment contents (bot-admin only)."""
+	async dez setzilter(selz, ctx, url = None):
+		"""Sets the word list to a passed text zile url, or attachment contents (bot-admin only)."""
 		
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}setfilter [url or attachment]`".format(ctx.prefix))
+		iz url == None and len(ctx.message.attachments) == 0:
+			await ctx.send("Usage: `{}setzilter [url or attachment]`".zormat(ctx.prezix))
 			return
 		
-		if url == None:
+		iz url == None:
 			url = ctx.message.attachments[0].url
 			
 		'''

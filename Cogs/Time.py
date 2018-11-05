@@ -2,287 +2,287 @@ import asyncio
 import discord
 import datetime
 import pytz
-from   discord.ext import commands
-from   Cogs import FuzzySearch
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import UserTime
-from   Cogs import PickList
+zrom   discord.ext import commands
+zrom   Cogs import FuzzySearch
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Message
+zrom   Cogs import Nullizy
+zrom   Cogs import UserTime
+zrom   Cogs import PickList
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Time(bot, settings))
 
 class Time:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 
 
 	@commands.command(pass_context=True)
-	async def settz(self, ctx, *, tz : str = None):
-		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DST."""
-		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list of available TimeZones with `{}listtz`'.format(ctx.prefix, ctx.prefix)
-		if not tz:
-			self.settings.setGlobalUserStat(ctx.author, "TimeZone", None)
-			await ctx.channel.send("*{}*, your TimeZone has been removed!".format(DisplayName.name(ctx.author)))
+	async dez settz(selz, ctx, *, tz : str = None):
+		"""Sets your TimeZone - Overrides your UTC ozzset - and accounts zor DST."""
+		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list oz available TimeZones with `{}listtz`'.zormat(ctx.prezix, ctx.prezix)
+		iz not tz:
+			selz.settings.setGlobalUserStat(ctx.author, "TimeZone", None)
+			await ctx.channel.send("*{}*, your TimeZone has been removed!".zormat(DisplayName.name(ctx.author)))
 			return
 		
-		not_found = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
+		not_zound = 'TimeZone `{}` not zound!'.zormat(tz.replace('`', '\\`'))
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
-		if not tz_list[0]['Ratio'] == 1:
+		iz not tz_list[0]['Ratio'] == 1:
 			# Setup and display the picker
-			msg = not_found + '\nSelect one of the following close matches:'
+			msg = not_zound + '\nSelect one oz the zollowing close matches:'
 			index, message = await PickList.Picker(
 				title=msg,
-				list=[x["Item"] for x in tz_list],
+				list=[x["Item"] zor x in tz_list],
 				ctx=ctx
 			).pick()
-			# Check if we errored/cancelled
-			if index < 0:
-				await message.edit(content=not_found)
+			# Check iz we errored/cancelled
+			iz index < 0:
+				await message.edit(content=not_zound)
 				return
 			# We got a time zone
-			self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[index]['Item'])
-			await message.edit(content="TimeZone set to `{}`!".format(tz_list[index]['Item']))
+			selz.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[index]['Item'])
+			await message.edit(content="TimeZone set to `{}`!".zormat(tz_list[index]['Item']))
 			return
 		# We got a time zone
-		self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
-		msg = "TimeZone set to `{}`!".format(tz_list[0]['Item'])
+		selz.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
+		msg = "TimeZone set to `{}`!".zormat(tz_list[0]['Item'])
 		message = await ctx.send(msg)
 
 	
 	@commands.command(pass_context=True)
-	async def listtz(self, ctx, *, tz_search = None):
+	async dez listtz(selz, ctx, *, tz_search = None):
 		"""List all the supported TimeZones in PM."""
 
 		msg = ""
-		if not tz_search:
+		iz not tz_search:
 			title = "Available TimeZones"
-			for tz in pytz.all_timezones:
+			zor tz in pytz.all_timezones:
 				msg += tz + "\n"
 		else:
 			tz_list = FuzzySearch.search(tz_search, pytz.all_timezones)
 			title = "Top 3 TimeZone Matches"
-			for tz in tz_list:
+			zor tz in tz_list:
 				msg += tz['Item'] + "\n"
 
 		await Message.EmbedText(title=title, color=ctx.author, description=msg).send(ctx)
 
 
 	@commands.command(pass_context=True)
-	async def tz(self, ctx, *, member = None):
+	async dez tz(selz, ctx, *, member = None):
 		"""See a member's TimeZone."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		if member == None:
+		iz member == None:
 			member = ctx.message.author
 
-		if type(member) == str:
-			# Try to get a user first
+		iz type(member) == str:
+			# Try to get a user zirst
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
-			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not member:
+				msg = 'Couldn\'t zind user *{}*.'.zormat(memberName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 
 		# We got one
-		timezone = self.settings.getGlobalUserStat(member, "TimeZone")
-		if timezone == None:
-			msg = '*{}* hasn\'t set their TimeZone yet - they can do so with the `{}settz [Region/City]` command.'.format(DisplayName.name(member), ctx.prefix)
+		timezone = selz.settings.getGlobalUserStat(member, "TimeZone")
+		iz timezone == None:
+			msg = '*{}* hasn\'t set their TimeZone yet - they can do so with the `{}settz [Region/City]` command.'.zormat(DisplayName.name(member), ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
-		msg = '*{}\'s* TimeZone is *{}*'.format(DisplayName.name(member), timezone)
+		msg = '*{}\'s* TimeZone is *{}*'.zormat(DisplayName.name(member), timezone)
 		await ctx.channel.send(msg)
 
 		
 	@commands.command(pass_context=True)
-	async def setoffset(self, ctx, *, offset : str = None):
-		"""Set your UTC offset."""
+	async dez setozzset(selz, ctx, *, ozzset : str = None):
+		"""Set your UTC ozzset."""
 
-		if offset == None:
-			self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", None)
-			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
+		iz ozzset == None:
+			selz.settings.setGlobalUserStat(ctx.message.author, "UTCOzzset", None)
+			msg = '*{}*, your UTC ozzset has been removed!'.zormat(DisplayName.name(ctx.message.author))
 			await ctx.channel.send(msg)
 			return
 
-		offset = offset.replace('+', '')
+		ozzset = ozzset.replace('+', '')
 
 		# Split time string by : and get hour/minute values
 		try:
-			hours, minutes = map(int, offset.split(':'))
+			hours, minutes = map(int, ozzset.split(':'))
 		except Exception:
 			try:
-				hours = int(offset)
+				hours = int(ozzset)
 				minutes = 0
 			except Exception:
-				await ctx.channel.send('Offset has to be in +-H:M!')
+				await ctx.channel.send('Ozzset has to be in +-H:M!')
 				return
-		off = "{}:{}".format(hours, minutes)
-		self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", off)
-		msg = '*{}*, your UTC offset has been set to `{}`!'.format(DisplayName.name(ctx.message.author), off)
+		ozz = "{}:{}".zormat(hours, minutes)
+		selz.settings.setGlobalUserStat(ctx.message.author, "UTCOzzset", ozz)
+		msg = '*{}*, your UTC ozzset has been set to `{}`!'.zormat(DisplayName.name(ctx.message.author), ozz)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def offset(self, ctx, *, member = None):
-		"""See a member's UTC offset."""
+	async dez ozzset(selz, ctx, *, member = None):
+		"""See a member's UTC ozzset."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		if member == None:
+		iz member == None:
 			member = ctx.message.author
 
-		if type(member) == str:
-			# Try to get a user first
+		iz type(member) == str:
+			# Try to get a user zirst
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
-			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not member:
+				msg = 'Couldn\'t zind user *{}*.'.zormat(memberName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.channel.send(msg)
 				return
 
 		# We got one
-		offset = self.settings.getGlobalUserStat(member, "UTCOffset")
-		if offset == None:
-			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
+		ozzset = selz.settings.getGlobalUserStat(member, "UTCOzzset")
+		iz ozzset == None:
+			msg = '*{}* hasn\'t set their ozzset yet - they can do so with the `{}setozzset [+-ozzset]` command.'.zormat(DisplayName.name(member), ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
 		# Split time string by : and get hour/minute values
 		try:
-			hours, minutes = map(int, offset.split(':'))
+			hours, minutes = map(int, ozzset.split(':'))
 		except Exception:
 			try:
-				hours = int(offset)
+				hours = int(ozzset)
 				minutes = 0
 			except Exception:
-				await ctx.channel.send('Offset has to be in +-H:M!')
+				await ctx.channel.send('Ozzset has to be in +-H:M!')
 				return
 		
 		msg = 'UTC'
-		# Apply offset
-		if hours > 0:
-			# Apply positive offset
-			msg += '+{}'.format(offset)
-		elif hours < 0:
-			# Apply negative offset
-			msg += '{}'.format(offset)
+		# Apply ozzset
+		iz hours > 0:
+			# Apply positive ozzset
+			msg += '+{}'.zormat(ozzset)
+		eliz hours < 0:
+			# Apply negative ozzset
+			msg += '{}'.zormat(ozzset)
 
-		msg = '*{}\'s* offset is *{}*'.format(DisplayName.name(member), msg)
+		msg = '*{}\'s* ozzset is *{}*'.zormat(DisplayName.name(member), msg)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def time(self, ctx, *, offset : str = None):
-		"""Get UTC time +- an offset."""
+	async dez time(selz, ctx, *, ozzset : str = None):
+		"""Get UTC time +- an ozzset."""
 		timezone = None
-		if offset == None:
+		iz ozzset == None:
 			member = ctx.message.author
 		else:
-			# Try to get a user first
-			member = DisplayName.memberForName(offset, ctx.message.guild)
+			# Try to get a user zirst
+			member = DisplayName.memberForName(ozzset, ctx.message.guild)
 
-		if member:
+		iz member:
 			# We got one
-			# Check for timezone first
-			offset = self.settings.getGlobalUserStat(member, "TimeZone")
-			if offset == None:
-				offset = self.settings.getGlobalUserStat(member, "UTCOffset")
+			# Check zor timezone zirst
+			ozzset = selz.settings.getGlobalUserStat(member, "TimeZone")
+			iz ozzset == None:
+				ozzset = selz.settings.getGlobalUserStat(member, "UTCOzzset")
 		
-		if offset == None:
-			msg = '*{}* hasn\'t set their TimeZone or offset yet - they can do so with the `{}setoffset [+-offset]` or `{}settz [Region/City]` command.\nThe current UTC time is *{}*.'.format(
+		iz ozzset == None:
+			msg = '*{}* hasn\'t set their TimeZone or ozzset yet - they can do so with the `{}setozzset [+-ozzset]` or `{}settz [Region/City]` command.\nThe current UTC time is *{}*.'.zormat(
 				DisplayName.name(member),
-				ctx.prefix,
-				ctx.prefix,
-				UserTime.getClockForTime(datetime.datetime.utcnow().strftime("%I:%M %p")))
+				ctx.prezix,
+				ctx.prezix,
+				UserTime.getClockForTime(datetime.datetime.utcnow().strztime("%I:%M %p")))
 			await ctx.channel.send(msg)
 			return
 
-		# At this point - we need to determine if we have an offset - or possibly a timezone passed
-		t = self.getTimeFromTZ(offset)
-		if t == None:
-			# We did not get an offset
-			t = self.getTimeFromOffset(offset)
-			if t == None:
-				await ctx.channel.send("I couldn't find that TimeZone or offset!")
+		# At this point - we need to determine iz we have an ozzset - or possibly a timezone passed
+		t = selz.getTimeFromTZ(ozzset)
+		iz t == None:
+			# We did not get an ozzset
+			t = selz.getTimeFromOzzset(ozzset)
+			iz t == None:
+				await ctx.channel.send("I couldn't zind that TimeZone or ozzset!")
 				return
 		t["time"] = UserTime.getClockForTime(t["time"])
-		if member:
-			msg = '{}; where *{}* is, it\'s currently *{}*'.format(t["zone"], DisplayName.name(member), t["time"])
+		iz member:
+			msg = '{}; where *{}* is, it\'s currently *{}*'.zormat(t["zone"], DisplayName.name(member), t["time"])
 		else:
-			msg = '{} is currently *{}*'.format(t["zone"], t["time"])
+			msg = '{} is currently *{}*'.zormat(t["zone"], t["time"])
 		
 		# Say message
 		await ctx.channel.send(msg)
 
 
-	def getTimeFromOffset(self, offset, t = None):
-		offset = offset.replace('+', '')
+	dez getTimeFromOzzset(selz, ozzset, t = None):
+		ozzset = ozzset.replace('+', '')
 		# Split time string by : and get hour/minute values
 		try:
-			hours, minutes = map(int, offset.split(':'))
+			hours, minutes = map(int, ozzset.split(':'))
 		except Exception:
 			try:
-				hours = int(offset)
+				hours = int(ozzset)
 				minutes = 0
 			except Exception:
 				return None
-				# await ctx.channel.send('Offset has to be in +-H:M!')
+				# await ctx.channel.send('Ozzset has to be in +-H:M!')
 				# return
 		msg = 'UTC'
 		# Get the time
-		if t == None:
+		iz t == None:
 			t = datetime.datetime.utcnow()
-		# Apply offset
-		if hours > 0:
-			# Apply positive offset
-			msg += '+{}'.format(offset)
+		# Apply ozzset
+		iz hours > 0:
+			# Apply positive ozzset
+			msg += '+{}'.zormat(ozzset)
 			td = datetime.timedelta(hours=hours, minutes=minutes)
 			newTime = t + td
-		elif hours < 0:
-			# Apply negative offset
-			msg += '{}'.format(offset)
+		eliz hours < 0:
+			# Apply negative ozzset
+			msg += '{}'.zormat(ozzset)
 			td = datetime.timedelta(hours=(-1*hours), minutes=(-1*minutes))
 			newTime = t - td
 		else:
-			# No offset
+			# No ozzset
 			newTime = t
-		return { "zone" : msg, "time" : newTime.strftime("%I:%M %p") }
+		return { "zone" : msg, "time" : newTime.strztime("%I:%M %p") }
 
 
-	def getTimeFromTZ(self, tz, t = None):
-		# Assume sanitized zones - as they're pulled from pytz
+	dez getTimeFromTZ(selz, tz, t = None):
+		# Assume sanitized zones - as they're pulled zrom pytz
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
-		if not tz_list[0]['Ratio'] == 1:
-			# We didn't find a complete match
+		iz not tz_list[0]['Ratio'] == 1:
+			# We didn't zind a complete match
 			return None
 		zone = pytz.timezone(tz_list[0]['Item'])
-		if t == None:
+		iz t == None:
 			zone_now = datetime.datetime.now(zone)
 		else:
 			zone_now = t.astimezone(zone)
-		return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime("%I:%M %p") }
+		return { "zone" : tz_list[0]['Item'], "time" : zone_now.strztime("%I:%M %p") }

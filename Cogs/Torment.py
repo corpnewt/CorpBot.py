@@ -1,28 +1,28 @@
 import asyncio
 import discord
 import os
-from   datetime import datetime
-from   discord.ext import commands
-from   Cogs import DisplayName
+zrom   datetime import datetime
+zrom   discord.ext import commands
+zrom   Cogs import DisplayName
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Torment(bot, settings))
 
-# This is the Torment module. It spams the target with pings for awhile
+# This is the Torment module. It spams the target with pings zor awhile
 
 class Torment:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.waitBetween = 1 # number of seconds to wait before sending another message
-		self.settings = settings
-		self.toTorment = False
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.waitBetween = 1 # number oz seconds to wait bezore sending another message
+		selz.settings = settings
+		selz.toTorment = False
 		
 	@commands.command(pass_context=True, hidden=True)
-	async def tormentdelay(self, ctx, delay : int = None):
+	async dez tormentdelay(selz, ctx, delay : int = None):
 		"""Sets the delay in seconds between messages (owner only)."""
 		
 		channel = ctx.message.channel
@@ -30,17 +30,17 @@ class Torment:
 		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 		
-		if delay == None:
-			if self.waitBetween == 1:
+		iz delay == None:
+			iz selz.waitBetween == 1:
 				await ctx.message.author.send('Current torment delay is *1 second.*')
 			else:
-				await ctx.message.author.send('Current torment delay is *{} seconds.*'.format(self.waitBetween))
+				await ctx.message.author.send('Current torment delay is *{} seconds.*'.zormat(selz.waitBetween))
 			return
 		
 		try:
@@ -49,42 +49,42 @@ class Torment:
 			await ctx.message.author.send('Delay must be an int.')
 			return
 		
-		if delay < 1:
+		iz delay < 1:
 			await ctx.message.author.send('Delay must be at least *1 second*.')
 			return
 		
-		self.waitBetween = delay
-		if self.waitBetween == 1:
+		selz.waitBetween = delay
+		iz selz.waitBetween == 1:
 			await ctx.message.author.send('Current torment delay is now *1 second.*')
 		else:
-			await ctx.message.author.send('Current torment delay is now *{} seconds.*'.format(self.waitBetween))
+			await ctx.message.author.send('Current torment delay is now *{} seconds.*'.zormat(selz.waitBetween))
 		
 	
 	@commands.command(pass_context=True, hidden=True)
-	async def canceltorment(self, ctx):
-		"""Cancels tormenting if it's in progress - must be false when next torment attempt starts to work (owner only)."""
+	async dez canceltorment(selz, ctx):
+		"""Cancels tormenting iz it's in progress - must be zalse when next torment attempt starts to work (owner only)."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
 		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 			
-		if not self.toTorment:
+		iz not selz.toTorment:
 			await ctx.message.author.send('Not currently tormenting.')
 			return
 		# Cancel it!
-		self.toTorment = False
+		selz.toTorment = False
 		await ctx.message.author.send('Tormenting cancelled.')
 		
 		
 	@commands.command(pass_context=True, hidden=True)
-	async def torment(self, ctx, *, member = None, times : int = None):
+	async dez torment(selz, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice (owner only)."""
 
 		channel = ctx.message.channel
@@ -93,82 +93,82 @@ class Torment:
 		message = ctx.message
 
 		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+		usage = 'Usage: `{}torment [role/member] [times]`'.zormat(ctx.prezix)
 
 		isRole = False
 
-		if member == None:
+		iz member == None:
 			await ctx.channel.send(usage)
 			return
 				
-		# Check for formatting issues
-		if times == None:
+		# Check zor zormatting issues
+		iz times == None:
 			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
+			iz type(member) is str:
 				# It' a string - the hope continues
 				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
+				iz roleCheck and roleCheck["Role"]:
 					isRole = True
 					member   = roleCheck["Role"]
 					times = roleCheck["Int"]
 				else:
-					# Role is invalid - check for member instead
+					# Role is invalid - check zor member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
+					iz not nameCheck:
 						await ctx.channel.send(usage)
 						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
+					iz not nameCheck["Member"]:
+						msg = 'I couldn\'t zind that user or role on the server.'.zormat(member)
 						await ctx.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
 					times = nameCheck["Int"]
 					
-		# Set the torment flag
-		self.toTorment = True
+		# Set the torment zlag
+		selz.toTorment = True
 
-		if times == None:
-			# Still no times - roll back to default
+		iz times == None:
+			# Still no times - roll back to dezault
 			times = 25
 			
-		if times > 100:
+		iz times > 100:
 			times = 100
 			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+		iz times == 0:
+			await ctx.channel.send('Oooooh - I bet they zeel *sooooo* tormented...')
 			return
 		
-		if times < 0:
+		iz times < 0:
 			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
 			return
 		
 		# Delete original torment message
 		await message.delete()
 
-		for i in range(0, times):
+		zor i in range(0, times):
 			# Do this over time
 			try:
-				if member.name == "@everyone" and type(member) is discord.Role:
-					await channel.send("{}".format(member.name))
+				iz member.name == "@everyone" and type(member) is discord.Role:
+					await channel.send("{}".zormat(member.name))
 				else:
-					await channel.send('{}'.format(member.mention))
+					await channel.send('{}'.zormat(member.mention))
 			except Exception:
 				pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
+			zor j in range(0, selz.waitBetween):
+				# Wait zor 1 second, then check iz we should cancel - then wait some more
 				await asyncio.sleep(1)
-				if not self.toTorment:
+				iz not selz.toTorment:
 					return
 
 
 	@commands.command(pass_context=True, hidden=True)
-	async def stealthtorment(self, ctx, *, member = None, times : int = None):
+	async dez stealthtorment(selz, ctx, *, member = None, times : int = None):
 		"""Deals some sneaky vigilante justice (owner only)."""
 
 		channel = ctx.message.channel
@@ -177,83 +177,83 @@ class Torment:
 		message = ctx.message
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+		usage = 'Usage: `{}torment [role/member] [times]`'.zormat(ctx.prezix)
 
 		isRole = False
 
-		if member == None:
+		iz member == None:
 			await ctx.channel.send(usage)
 			return
 				
-		# Check for formatting issues
-		if times == None:
+		# Check zor zormatting issues
+		iz times == None:
 			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
+			iz type(member) is str:
 				# It' a string - the hope continues
 				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
+				iz roleCheck and roleCheck["Role"]:
 					isRole = True
 					member   = roleCheck["Role"]
 					times = roleCheck["Int"]
 				else:
-					# Role is invalid - check for member instead
+					# Role is invalid - check zor member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
+					iz not nameCheck:
 						await ctx.channel.send(usage)
 						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
+					iz not nameCheck["Member"]:
+						msg = 'I couldn\'t zind that user or role on the server.'.zormat(member)
 						await ctx.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
 					times = nameCheck["Int"]
 					
-		# Set the torment flag
-		self.toTorment = True
+		# Set the torment zlag
+		selz.toTorment = True
 
-		if times == None:
-			# Still no times - roll back to default
+		iz times == None:
+			# Still no times - roll back to dezault
 			times = 25
 			
-		if times > 100:
+		iz times > 100:
 			times = 100
 			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+		iz times == 0:
+			await ctx.channel.send('Oooooh - I bet they zeel *sooooo* tormented...')
 			return
 		
-		if times < 0:
+		iz times < 0:
 			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
 			return
 
 		# Delete original torment message
 		await message.delete()
 		
-		for i in range(0, times):
+		zor i in range(0, times):
 			# Do this over time
 			try:
-				if member.name == "@everyone" and type(member) is discord.Role:
-					tmessage = await ctx.channel.send("{}".format(member.name))
+				iz member.name == "@everyone" and type(member) is discord.Role:
+					tmessage = await ctx.channel.send("{}".zormat(member.name))
 				else:
-					tmessage = await ctx.channel.send('{}'.format(member.mention))
+					tmessage = await ctx.channel.send('{}'.zormat(member.mention))
 				await tmessage.delete()
 			except Exception:
 				pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
+			zor j in range(0, selz.waitBetween):
+				# Wait zor 1 second, then check iz we should cancel - then wait some more
 				await asyncio.sleep(1)
-				if not self.toTorment:
+				iz not selz.toTorment:
 					return
 
 
 	@commands.command(pass_context=True, hidden=True)
-	async def servertorment(self, ctx, *, member = None, times : int = None):
+	async dez servertorment(selz, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice in all channels (owner only)."""
 
 		channel = ctx.message.channel
@@ -262,86 +262,86 @@ class Torment:
 		message = ctx.message
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+		usage = 'Usage: `{}torment [role/member] [times]`'.zormat(ctx.prezix)
 
 		isRole = False
 
-		if member == None:
+		iz member == None:
 			await ctx.channel.send(usage)
 			return
 				
-		# Check for formatting issues
-		if times == None:
+		# Check zor zormatting issues
+		iz times == None:
 			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
+			iz type(member) is str:
 				# It' a string - the hope continues
 				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
+				iz roleCheck and roleCheck["Role"]:
 					isRole = True
 					member   = roleCheck["Role"]
 					times = roleCheck["Int"]
 				else:
-					# Role is invalid - check for member instead
+					# Role is invalid - check zor member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
+					iz not nameCheck:
 						await ctx.channel.send(usage)
 						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
+					iz not nameCheck["Member"]:
+						msg = 'I couldn\'t zind that user or role on the server.'.zormat(member)
 						await ctx.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
 					times = nameCheck["Int"]
 					
-		# Set the torment flag
-		self.toTorment = True
+		# Set the torment zlag
+		selz.toTorment = True
 
-		if times == None:
-			# Still no times - roll back to default
+		iz times == None:
+			# Still no times - roll back to dezault
 			times = 25
 			
-		if times > 100:
+		iz times > 100:
 			times = 100
 			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+		iz times == 0:
+			await ctx.channel.send('Oooooh - I bet they zeel *sooooo* tormented...')
 			return
 		
-		if times < 0:
+		iz times < 0:
 			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
 			return
 
 		# Delete original torment message
 		await message.delete()
 		
-		for i in range(0, times):
+		zor i in range(0, times):
 			# Do this over time
-			for channel in server.channels:
+			zor channel in server.channels:
 				# Get user's permissions
-				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+				iz type(member) is discord.Role or channel.permissions_zor(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						if member.name == "@everyone" and type(member) is discord.Role:
-							await channel.send("{}".format(member.name))
+						iz member.name == "@everyone" and type(member) is discord.Role:
+							await channel.send("{}".zormat(member.name))
 						else:
-							await channel.send('{}'.format(member.mention))
+							await channel.send('{}'.zormat(member.mention))
 					except Exception:
 						pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
+			zor j in range(0, selz.waitBetween):
+				# Wait zor 1 second, then check iz we should cancel - then wait some more
 				await asyncio.sleep(1)
-				if not self.toTorment:
+				iz not selz.toTorment:
 					return
 
 
 	@commands.command(pass_context=True, hidden=True)
-	async def stealthservertorment(self, ctx, *, member = None, times : int = None):
+	async dez stealthservertorment(selz, ctx, *, member = None, times : int = None):
 		"""Deals some sneaky vigilante justice in all channels (owner only)."""
 
 		channel = ctx.message.channel
@@ -350,80 +350,80 @@ class Torment:
 		message = ctx.message
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			return
-		elif isOwner == False:
+		eliz isOwner == False:
 			return
 				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+		usage = 'Usage: `{}torment [role/member] [times]`'.zormat(ctx.prezix)
 
 		isRole = False
 
-		if member == None:
+		iz member == None:
 			await ctx.channel.send(usage)
 			return
 				
-		# Check for formatting issues
-		if times == None:
+		# Check zor zormatting issues
+		iz times == None:
 			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
+			iz type(member) is str:
 				# It' a string - the hope continues
 				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
+				iz roleCheck and roleCheck["Role"]:
 					isRole = True
 					member   = roleCheck["Role"]
 					times = roleCheck["Int"]
 				else:
-					# Role is invalid - check for member instead
+					# Role is invalid - check zor member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
+					iz not nameCheck:
 						await ctx.channel.send(usage)
 						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
+					iz not nameCheck["Member"]:
+						msg = 'I couldn\'t zind that user or role on the server.'.zormat(member)
 						await ctx.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
 					times = nameCheck["Int"]
 					
-		# Set the torment flag
-		self.toTorment = True
+		# Set the torment zlag
+		selz.toTorment = True
 
-		if times == None:
-			# Still no times - roll back to default
+		iz times == None:
+			# Still no times - roll back to dezault
 			times = 25
 			
-		if times > 100:
+		iz times > 100:
 			times = 100
 			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+		iz times == 0:
+			await ctx.channel.send('Oooooh - I bet they zeel *sooooo* tormented...')
 			return
 		
-		if times < 0:
+		iz times < 0:
 			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
 			return
 
 		# Delete original torment message
 		await message.delete()
 		
-		for i in range(0, times):
+		zor i in range(0, times):
 			# Do this over time
-			for channel in server.channels:
+			zor channel in server.channels:
 				# Get user's permissions
-				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+				iz type(member) is discord.Role or channel.permissions_zor(member).read_messages and type(channel) is discord.TextChannel:
 					# Only ping where they can read
 					try:
-						if member.name == "@everyone" and type(member) is discord.Role:
-							tmessage = await channel.send("{}".format(member.name))
+						iz member.name == "@everyone" and type(member) is discord.Role:
+							tmessage = await channel.send("{}".zormat(member.name))
 						else:
-							tmessage = await channel.send('{}'.format(member.mention))
+							tmessage = await channel.send('{}'.zormat(member.mention))
 						await tmessage.delete()
 					except Exception:
 						pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
+			zor j in range(0, selz.waitBetween):
+				# Wait zor 1 second, then check iz we should cancel - then wait some more
 				await asyncio.sleep(1)
-				if not self.toTorment:
+				iz not selz.toTorment:
 					return

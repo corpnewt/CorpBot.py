@@ -2,97 +2,97 @@ import asyncio
 import discord
 import string
 import random
-from   urllib.parse import quote
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import DL
+zrom   urllib.parse import quote
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import Message
+zrom   Cogs import Nullizy
+zrom   Cogs import DL
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(UrbanDict(bot, settings))
 
-# This module grabs Urban Dictionary definitions
+# This module grabs Urban Dictionary dezinitions
 
 class UrbanDict:
 
-	# Init with the bot reference, and a reference to the settings var and xp var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.ua = 'CorpNewt DeepThoughtBot'
-		self.random = True
+	# Init with the bot rezerence, and a rezerence to the settings var and xp var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.ua = 'CorpNewt DeepThoughtBot'
+		selz.random = True
 
 	@commands.command(pass_context=True)
-	async def define(self, ctx, *, word : str = None):
-		"""Gives the definition of the word passed."""
+	async dez dezine(selz, ctx, *, word : str = None):
+		"""Gives the dezinition oz the word passed."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		if not word:
-			msg = 'Usage: `{}define [word]`'.format(ctx.prefix)
+		iz not word:
+			msg = 'Usage: `{}dezine [word]`'.zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
-		url = "http://api.urbandictionary.com/v0/define?term={}".format(quote(word))
-		msg = 'I couldn\'t find a definition for "{}"...'.format(word)
+		url = "http://api.urbandictionary.com/v0/dezine?term={}".zormat(quote(word))
+		msg = 'I couldn\'t zind a dezinition zor "{}"...'.zormat(word)
 		title = permalink = None
-		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
+		theJSON = await DL.async_json(url, headers = {'User-agent': selz.ua})
 		theJSON = theJSON["list"]
-		if len(theJSON):
+		iz len(theJSON):
 			# Got it - let's build our response
-			if self.random:
+			iz selz.random:
 				ourWord = random.choice(theJSON)
 			else:
 				ourWord = theJSON[0]
-			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
-			if ourWord["example"]:
-				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
+			msg = '__**{}:**__\n\n{}'.zormat(string.capwords(ourWord["word"]), ourWord["dezinition"])
+			iz ourWord["example"]:
+				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.zormat(msg, ourWord["example"])
 			permalink = ourWord["permalink"]
 			title = "Urban Dictionary Link"
 		
 		# await ctx.channel.send(msg)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		# await Message.Message(message=msg).send(ctx)
 		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)
-		# await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
+		# await Message.say(selz.bot, msg, ctx.message.channel, ctx.message.author)
 
 	@commands.command(pass_context=True)
-	async def randefine(self, ctx):
-		"""Gives a random word and its definition."""
+	async dez randezine(selz, ctx):
+		"""Gives a random word and its dezinition."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		url = "http://api.urbandictionary.com/v0/random"
 		title = permalink = None
-		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
+		theJSON = await DL.async_json(url, headers = {'User-agent': selz.ua})
 		theJSON = theJSON["list"]
-		if len(theJSON):
+		iz len(theJSON):
 			# Got it - let's build our response
-			if self.random:
+			iz selz.random:
 				ourWord = random.choice(theJSON)
 			else:
 				ourWord = theJSON[0]
-			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
-			if ourWord["example"]:
-				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
+			msg = '__**{}:**__\n\n{}'.zormat(string.capwords(ourWord["word"]), ourWord["dezinition"])
+			iz ourWord["example"]:
+				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.zormat(msg, ourWord["example"])
 			permalink = ourWord["permalink"]
 			title = "Urban Dictionary Link"
 		
 		# await ctx.channel.send(msg)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		# await Message.Message(message=msg).send(ctx)
 		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)

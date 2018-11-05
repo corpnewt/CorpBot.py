@@ -2,117 +2,117 @@ import asyncio
 import discord
 import time
 import parsedatetime
-from   datetime import datetime
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import CheckRoles
+zrom   datetime import datetime
+zrom   operator import itemgetter
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import ReadableTime
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
+zrom   Cogs import CheckRoles
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Admin(bot, settings))
 
 class Admin:
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
+	# Init with the bot rezerence, and a rezerence to the settings var
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
+	dez suppressed(selz, guild, msg):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(guild, "SuppressMentions"):
+			return Nullizy.clean(msg)
 		else:
 			return msg
 	
-	async def test_message(self, message):
+	async dez test_message(selz, message):
 		# Implemented to bypass having this called twice
 		return { "Ignore" : False, "Delete" : False }
 
-	async def message_edit(self, before_message, message):
-		# Pipe the edit into our message func to respond if needed
-		return await self.message(message)
+	async dez message_edit(selz, bezore_message, message):
+		# Pipe the edit into our message zunc to respond iz needed
+		return await selz.message(message)
 		
-	async def message(self, message):
-		# Check the message and see if we should allow it - always yes.
+	async dez message(selz, message):
+		# Check the message and see iz we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 		ignore = False
 		delete = False
 		res    = None
-		# Check if user is muted
-		isMute = self.settings.getUserStat(message.author, message.guild, "Muted")
+		# Check iz user is muted
+		isMute = selz.settings.getUserStat(message.author, message.guild, "Muted")
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(message.guild, "AdminArray")
+			zor role in message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 
-		if isMute:
+		iz isMute:
 			ignore = True
 			delete = True
-			checkTime = self.settings.getUserStat(message.author, message.guild, "Cooldown")
-			if checkTime:
+			checkTime = selz.settings.getUserStat(message.author, message.guild, "Cooldown")
+			iz checkTime:
 				checkTime = int(checkTime)
 			currentTime = int(time.time())
 			
 			# Build our PM
-			if checkTime:
+			iz checkTime:
 				# We have a cooldown
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, self.suppressed(message.guild, message.guild.name))
+				res = 'You are currently **Muted**.  You need to wait *{}* bezore sending messages in *{}*.'.zormat(checkRead, selz.suppressed(message.guild, message.guild.name))
 			else:
-				# No cooldown - muted indefinitely
-				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(self.suppressed(message.guild, message.guild.name))
+				# No cooldown - muted indezinitely
+				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.zormat(selz.suppressed(message.guild, message.guild.name))
 
-			if checkTime and currentTime >= checkTime:
+			iz checkTime and currentTime >= checkTime:
 				# We have passed the check time
 				ignore = False
 				delete = False
 				res    = None
-				self.settings.setUserStat(message.author, message.guild, "Cooldown", None)
-				self.settings.setUserStat(message.author, message.guild, "Muted", False)
+				selz.settings.setUserStat(message.author, message.guild, "Cooldown", None)
+				selz.settings.setUserStat(message.author, message.guild, "Muted", False)
 			
 		
-		ignoreList = self.settings.getServerStat(message.guild, "IgnoredUsers")
-		if ignoreList:
-			for user in ignoreList:
-				if not isAdmin and str(message.author.id) == str(user["ID"]):
+		ignoreList = selz.settings.getServerStat(message.guild, "IgnoredUsers")
+		iz ignoreList:
+			zor user in ignoreList:
+				iz not isAdmin and str(message.author.id) == str(user["ID"]):
 					# Found our user - ignored
 					ignore = True
 
-		adminLock = self.settings.getServerStat(message.guild, "AdminLock")
-		if not isAdmin and adminLock:
+		adminLock = selz.settings.getServerStat(message.guild, "AdminLock")
+		iz not isAdmin and adminLock:
 			ignore = True
 
-		if isAdmin:
+		iz isAdmin:
 			ignore = False
 			delete = False
 
 		# Get Owner and OwnerLock
 		try:
-			ownerLock = self.settings.serverDict['OwnerLock']
+			ownerLock = selz.settings.serverDict['OwnerLock']
 		except KeyError:
 			ownerLock = False
-		owner = self.settings.isOwner(message.author)
-		# Check if owner exists - and we're in OwnerLock
-		if (not owner) and ownerLock:
+		owner = selz.settings.isOwner(message.author)
+		# Check iz owner exists - and we're in OwnerLock
+		iz (not owner) and ownerLock:
 			# Not the owner - ignore
 			ignore = True
 				
-		if not isAdmin and res:
+		iz not isAdmin and res:
 			# We have a response - PM it
 			await message.author.send(res)
 		
@@ -120,122 +120,122 @@ class Admin:
 
 	
 	@commands.command(pass_context=True)
-	async def defaultchannel(self, ctx):
-		"""Lists the server's default channel, whether custom or not."""
-		# Returns the default channel for the server
-		default = None
+	async dez dezaultchannel(selz, ctx):
+		"""Lists the server's dezault channel, whether custom or not."""
+		# Returns the dezault channel zor the server
+		dezault = None
 		targetChan = ctx.guild.get_channel(ctx.guild.id)
-		default = targetChan
+		dezault = targetChan
 
-		targetChanID = self.settings.getServerStat(ctx.guild, "DefaultChannel")
-		if len(str(targetChanID)):
+		targetChanID = selz.settings.getServerStat(ctx.guild, "DezaultChannel")
+		iz len(str(targetChanID)):
 			# We *should* have a channel
-			tChan = self.bot.get_channel(int(targetChanID))
-			if tChan:
+			tChan = selz.bot.get_channel(int(targetChanID))
+			iz tChan:
 				# We *do* have one
 				targetChan = tChan
-		if targetChan == None:
-			# We don't have a default
-			if default == None:
-				msg = "There is currently no default channel set."
+		iz targetChan == None:
+			# We don't have a dezault
+			iz dezault == None:
+				msg = "There is currently no dezault channel set."
 			else:
-				msg = "The default channel is the server's original default: {}".format(default.mention)
+				msg = "The dezault channel is the server's original dezault: {}".zormat(dezault.mention)
 		else:
 			# We have a custom channel
-			msg = "The default channel is set to **{}**.".format(targetChan.mention)
+			msg = "The dezault channel is set to **{}**.".zormat(targetChan.mention)
 		await ctx.channel.send(msg)
 		
 	
 	@commands.command(pass_context=True)
-	async def setdefaultchannel(self, ctx, *, channel: discord.TextChannel = None):
-		"""Sets a replacement default channel for bot messages (admin only)."""
+	async dez setdezaultchannel(selz, ctx, *, channel: discord.TextChannel = None):
+		"""Sets a replacement dezault channel zor bot messages (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		default = ctx.guild.get_channel(ctx.guild.id)
+		dezault = ctx.guild.get_channel(ctx.guild.id)
 
-		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "DefaultChannel", "")
-			if default == None:
-				msg = 'Default channel has been *removed completely*.'
+		iz channel == None:
+			selz.settings.setServerStat(ctx.message.guild, "DezaultChannel", "")
+			iz dezault == None:
+				msg = 'Dezault channel has been *removed completely*.'
 			else:
-				msg = 'Default channel has been returned to the server\'s original:  **{}**.'.format(default.mention)
+				msg = 'Dezault channel has been returned to the server\'s original:  **{}**.'.zormat(dezault.mention)
 			await ctx.message.channel.send(msg)
 			return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "DefaultChannel", channel.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "DezaultChannel", channel.id)
 
-		msg = 'Default channel set to **{}**.'.format(channel.mention)
+		msg = 'Dezault channel set to **{}**.'.zormat(channel.mention)
 		await ctx.message.channel.send(msg)
 		
 	
-	@setdefaultchannel.error
-	async def setdefaultchannel_error(self, error, ctx):
-		# do stuff
-		msg = 'setdefaultchannel Error: {}'.format(error)
+	@setdezaultchannel.error
+	async dez setdezaultchannel_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setdezaultchannel Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 	
 
 	@commands.command(pass_context=True)
-	async def setmadlibschannel(self, ctx, *, channel: discord.TextChannel = None):
-		"""Sets the channel for MadLibs (admin only)."""
+	async dez setmadlibschannel(selz, ctx, *, channel: discord.TextChannel = None):
+		"""Sets the channel zor MadLibs (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "MadLibsChannel", "")
+		iz channel == None:
+			selz.settings.setServerStat(ctx.message.guild, "MadLibsChannel", "")
 			msg = 'MadLibs works in *any channel* now.'
 			await ctx.message.channel.send(msg)
 			return
 
-		if type(channel) is str:
+		iz type(channel) is str:
 			try:
 				role = discord.utils.get(message.guild.channels, name=role)
 			except:
 				print("That channel does not exist")
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "MadLibsChannel", channel.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "MadLibsChannel", channel.id)
 
-		msg = 'MadLibs channel set to **{}**.'.format(channel.name)
+		msg = 'MadLibs channel set to **{}**.'.zormat(channel.name)
 		await ctx.message.channel.send(msg)
 		
 	
 	@setmadlibschannel.error
-	async def setmadlibschannel_error(self, error, ctx):
-		# do stuff
-		msg = 'setmadlibschannel Error: {}'.format(error)
+	async dez setmadlibschannel_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setmadlibschannel Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def xpreservelimit(self, ctx, *, limit = None):
-		"""Gets and sets a limit to the maximum xp reserve a member can get.  Pass a negative value for unlimited."""
+	async dez xpreservelimit(selz, ctx, *, limit = None):
+		"""Gets and sets a limit to the maximum xp reserve a member can get.  Pass a negative value zor unlimited."""
 
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		if limit == None:
+		iz limit == None:
 			# print the current limit
-			server_lim = self.settings.getServerStat(ctx.guild, "XPReserveLimit")
-			if server_lim == None:
+			server_lim = selz.settings.getServerStat(ctx.guild, "XPReserveLimit")
+			iz server_lim == None:
 				await ctx.send("There is no xp reserve limit.")
 				return
 			else:
-				await ctx.send("The current xp reserve limit is *{:,}*.".format(server_lim))
+				await ctx.send("The current xp reserve limit is *{:,}*.".zormat(server_lim))
 
 		try:
 			limit = int(limit)
@@ -243,69 +243,69 @@ class Admin:
 			await channel.send("Limit must be an integer.")
 			return
 
-		if limit < 0:
-			self.settings.setServerStat(ctx.guild, "XPReserveLimit", None)
+		iz limit < 0:
+			selz.settings.setServerStat(ctx.guild, "XPReserveLimit", None)
 			await ctx.send("Xp reserve limit removed!")
 		else:
-			self.settings.setServerStat(ctx.guild, "XPReserveLimit", limit)
-			await ctx.send("Xp reserve limit set to *{:,}*.".format(limit))
+			selz.settings.setServerStat(ctx.guild, "XPReserveLimit", limit)
+			await ctx.send("Xp reserve limit set to *{:,}*.".zormat(limit))
 
 	@commands.command(pass_context=True)
-	async def onexprole(self, ctx, *, yes_no = None):
+	async dez onexprole(selz, ctx, *, yes_no = None):
 		"""Gets and sets whether or not to remove all but the current xp role a user has acquired."""
 
 		setting_name = "One xp role at a time"
 		setting_val  = "OnlyOneRole"
 
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
 			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def xplimit(self, ctx, *, limit = None):
-		"""Gets and sets a limit to the maximum xp a member can get.  Pass a negative value for unlimited."""
+	async dez xplimit(selz, ctx, *, limit = None):
+		"""Gets and sets a limit to the maximum xp a member can get.  Pass a negative value zor unlimited."""
 
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 			
-		if limit == None:
+		iz limit == None:
 			# print the current limit
-			server_lim = self.settings.getServerStat(ctx.guild, "XPLimit")
-			if server_lim == None:
+			server_lim = selz.settings.getServerStat(ctx.guild, "XPLimit")
+			iz server_lim == None:
 				await ctx.send("There is no xp limit.")
 				return
 			else:
-				await ctx.send("The current xp limit is *{:,}*.".format(server_lim))
+				await ctx.send("The current xp limit is *{:,}*.".zormat(server_lim))
 
 		try:
 			limit = int(limit)
@@ -313,378 +313,378 @@ class Admin:
 			await channel.send("Limit must be an integer.")
 			return
 
-		if limit < 0:
-			self.settings.setServerStat(ctx.guild, "XPLimit", None)
+		iz limit < 0:
+			selz.settings.setServerStat(ctx.guild, "XPLimit", None)
 			await ctx.send("Xp limit removed!")
 		else:
-			self.settings.setServerStat(ctx.guild, "XPLimit", limit)
-			await ctx.send("Xp limit set to *{:,}*.".format(limit))
+			selz.settings.setServerStat(ctx.guild, "XPLimit", limit)
+			await ctx.send("Xp limit set to *{:,}*.".zormat(limit))
 			
 
 	@commands.command(pass_context=True)
-	async def setxp(self, ctx, *, member = None, xpAmount : int = None):
-		"""Sets an absolute value for the member's xp (admin only)."""
+	async dez setxp(selz, ctx, *, member = None, xpAmount : int = None):
+		"""Sets an absolute value zor the member's xp (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}setxp [member] [amount]`'.format(ctx.prefix)
+		usage = 'Usage: `{}setxp [member] [amount]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if member == None:
+		iz member == None:
 			await ctx.message.channel.send(usage)
 			return
 
-		if xpAmount == None:
-			# Check if we have trailing xp
+		iz xpAmount == None:
+			# Check iz we have trailing xp
 			nameCheck = DisplayName.checkNameForInt(member, server)
-			if not nameCheck or nameCheck['Member'] is None:
+			iz not nameCheck or nameCheck['Member'] is None:
 				nameCheck = DisplayName.checkRoleForInt(member, server)
-				if not nameCheck:
+				iz not nameCheck:
 					await ctx.message.channel.send(usage)
 					return
-			if "Role" in nameCheck:
+			iz "Role" in nameCheck:
 				mem = nameCheck["Role"]
 			else:
 				mem = nameCheck["Member"]
 			exp = nameCheck["Int"]
-			if not mem:
-				msg = 'I couldn\'t find *{}* on the server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not mem:
+				msg = 'I couldn\'t zind *{}* on the server.'.zormat(member)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 			member   = mem
 			xpAmount = exp
 			
-		# Check for formatting issues
-		if xpAmount == None:
+		# Check zor zormatting issues
+		iz xpAmount == None:
 			# Still no xp...
 			await channel.send(usage)
 			return
 
-		if type(member) is discord.Member:
-			self.settings.setUserStat(member, server, "XP", xpAmount)
+		iz type(member) is discord.Member:
+			selz.settings.setUserStat(member, server, "XP", xpAmount)
 		else:
-			for m in ctx.guild.members:
-				if member in m.roles:
-					self.settings.setUserStat(m, server, "XP", xpAmount)
-		msg = '*{}\'s* xp was set to *{:,}!*'.format(DisplayName.name(member), xpAmount)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+			zor m in ctx.guild.members:
+				iz member in m.roles:
+					selz.settings.setUserStat(m, server, "XP", xpAmount)
+		msg = '*{}\'s* xp was set to *{:,}!*'.zormat(DisplayName.name(member), xpAmount)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
-		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
+		await CheckRoles.checkroles(member, channel, selz.settings, selz.bot)
 
 
 	@commands.command(pass_context=True)
-	async def setxpreserve(self, ctx, *, member = None, xpAmount : int = None):
-		"""Set's an absolute value for the member's xp reserve (admin only)."""
+	async dez setxpreserve(selz, ctx, *, member = None, xpAmount : int = None):
+		"""Set's an absolute value zor the member's xp reserve (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}setxpreserve [member] [amount]`'.format(ctx.prefix)
+		usage = 'Usage: `{}setxpreserve [member] [amount]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if member == None:
+		iz member == None:
 			await ctx.message.channel.send(usage)
 			return
 		
-		if xpAmount == None:
-			# Check if we have trailing xp
+		iz xpAmount == None:
+			# Check iz we have trailing xp
 			nameCheck = DisplayName.checkNameForInt(member, server)
-			if not nameCheck or nameCheck['Member'] is None:
+			iz not nameCheck or nameCheck['Member'] is None:
 				nameCheck = DisplayName.checkRoleForInt(member, server)
-				if not nameCheck:
+				iz not nameCheck:
 					await ctx.message.channel.send(usage)
 					return
-			if "Role" in nameCheck:
+			iz "Role" in nameCheck:
 				mem = nameCheck["Role"]
 			else:
 				mem = nameCheck["Member"]
 			exp = nameCheck["Int"]
-			if not mem:
-				msg = 'I couldn\'t find *{}* on the server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not mem:
+				msg = 'I couldn\'t zind *{}* on the server.'.zormat(member)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 			member   = mem
 			xpAmount = exp
 			
-		# Check for formatting issues
-		if xpAmount == None:
+		# Check zor zormatting issues
+		iz xpAmount == None:
 			# Still no xp...
 			await channel.send(usage)
 			return
 
-		if type(member) is discord.Member:
-			self.settings.setUserStat(member, server, "XPReserve", xpAmount)
+		iz type(member) is discord.Member:
+			selz.settings.setUserStat(member, server, "XPReserve", xpAmount)
 		else:
-			for m in ctx.guild.members:
-				if member in m.roles:
-					self.settings.setUserStat(m, server, "XPReserve", xpAmount)
-		msg = '*{}\'s* XPReserve was set to *{:,}!*'.format(DisplayName.name(member), xpAmount)
+			zor m in ctx.guild.members:
+				iz member in m.roles:
+					selz.settings.setUserStat(m, server, "XPReserve", xpAmount)
+		msg = '*{}\'s* XPReserve was set to *{:,}!*'.zormat(DisplayName.name(member), xpAmount)
 		await channel.send(msg)
 
 	
 	@commands.command(pass_context=True)
-	async def setdefaultrole(self, ctx, *, role : str = None):
-		"""Sets the default role or position for auto-role assignment."""
+	async dez setdezaultrole(selz, ctx, *, role : str = None):
+		"""Sets the dezault role or position zor auto-role assignment."""
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role is None:
-			# Disable auto-role and set default to none
-			self.settings.setServerStat(server, "DefaultRole", "")
+		iz role is None:
+			# Disable auto-role and set dezault to none
+			selz.settings.setServerStat(server, "DezaultRole", "")
 			msg = 'Auto-role management now **disabled**.'
 			await channel.send(msg)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			roleName = role
 			role = DisplayName.roleForName(roleName, server)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		self.settings.setServerStat(server, "DefaultRole", role.id)
+		selz.settings.setServerStat(server, "DezaultRole", role.id)
 		rolename = role.name
-		# Check for suppress
-		if suppress:
-			rolename = Nullify.clean(rolename)
-		await channel.send('Default role set to **{}**!'.format(rolename))
+		# Check zor suppress
+		iz suppress:
+			rolename = Nullizy.clean(rolename)
+		await channel.send('Dezault role set to **{}**!'.zormat(rolename))
 
 
-	@setdefaultrole.error
-	async def setdefaultrole_error(self, error, ctx):
-		# do stuff
-		msg = 'setdefaultrole Error: {}'.format(error)
+	@setdezaultrole.error
+	async dez setdezaultrole_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setdezaultrole Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
-	async def addxprole(self, ctx, *, role = None, xp : int = None):
+	async dez addxprole(selz, ctx, *, role = None, xp : int = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}addxprole [role] [required xp]`'.format(ctx.prefix)
+		usage = 'Usage: `{}addxprole [role] [required xp]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
-		if xp == None:
+		iz xp == None:
 			# Either xp wasn't set - or it's the last section
-			if type(role) is str:
-				if role == "everyone":
+			iz type(role) is str:
+				iz role == "everyone":
 					role = "@everyone"
 				# It' a string - the hope continues
 				roleCheck = DisplayName.checkRoleForInt(role, server)
-				if not roleCheck:
+				iz not roleCheck:
 					await ctx.message.channel.send(usage)
 					return
-				if not roleCheck["Role"]:
-					msg = 'I couldn\'t find *{}* on the server.'.format(role)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+				iz not roleCheck["Role"]:
+					msg = 'I couldn\'t zind *{}* on the server.'.zormat(role)
+					# Check zor suppress
+					iz suppress:
+						msg = Nullizy.clean(msg)
 					await ctx.message.channel.send(msg)
 					return
 				role = roleCheck["Role"]
 				xp   = roleCheck["Int"]
 
-		if xp == None:
+		iz xp == None:
 			await channel.send(usage)
 			return
-		if not type(xp) is int:
+		iz not type(xp) is int:
 			await channel.send(usage)
 			return
 
-		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(server, "PromotionArray")
-		for aRole in promoArray:
+		# Now we see iz we already have that role in our list
+		promoArray = selz.settings.getServerStat(server, "PromotionArray")
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - throw an error message and return
+			iz str(aRole['ID']) == str(role.id):
+				# We zound it - throw an error message and return
 				aRole['XP'] = xp
-				msg = '**{}** updated!  Required xp:  *{:,}*'.format(role.name, xp)
-				# msg = '**{}** is already in the list.  Required xp: *{}*'.format(role.name, aRole['XP'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = '**{}** updated!  Required xp:  *{:,}*'.zormat(role.name, xp)
+				# msg = '**{}** is already in the list.  Required xp: *{}*'.zormat(role.name, aRole['XP'])
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
+		# Iz we made it this zar - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name, 'XP' : xp })
-		self.settings.setServerStat(server, "PromotionArray", promoArray)
+		selz.settings.setServerStat(server, "PromotionArray", promoArray)
 
-		msg = '**{}** added to list.  Required xp: *{:,}*'.format(role.name, xp)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.  Required xp: *{:,}*'.zormat(role.name, xp)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 		return
 		
 	@commands.command(pass_context=True)
-	async def removexprole(self, ctx, *, role = None):
-		"""Removes a role from the xp promotion/demotion system (admin only)."""
+	async dez removexprole(selz, ctx, *, role = None):
+		"""Removes a role zrom the xp promotion/demotion system (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}removexprole [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}removexprole [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await channel.send(usage)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			# It' a string - the hope continues
-			# Let's clear out by name first - then by role id
-			promoArray = self.settings.getServerStat(server, "PromotionArray")
+			# Let's clear out by name zirst - then by role id
+			promoArray = selz.settings.getServerStat(server, "PromotionArray")
 
-			for aRole in promoArray:
+			zor aRole in promoArray:
 				# Get the role that corresponds to the name
-				if aRole['Name'].lower() == role.lower() or str(aRole["ID"]) == str(role):
-					# We found it - let's remove it
+				iz aRole['Name'].lower() == role.lower() or str(aRole["ID"]) == str(role):
+					# We zound it - let's remove it
 					promoArray.remove(aRole)
-					self.settings.setServerStat(server, "PromotionArray", promoArray)
-					msg = '**{}** removed successfully.'.format(aRole['Name'])
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					selz.settings.setServerStat(server, "PromotionArray", promoArray)
+					msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+					# Check zor suppress
+					iz suppress:
+						msg = Nullizy.clean(msg)
 					await channel.send(msg)
 					return
 			# At this point - no name
-			# Let's see if it's a role that's had a name change
+			# Let's see iz it's a role that's had a name change
 
 
 			roleCheck = DisplayName.roleForName(role, server)
-			if roleCheck:
+			iz roleCheck:
 				# We got a role
-				# If we're here - then the role is an actual role
-				promoArray = self.settings.getServerStat(server, "PromotionArray")
+				# Iz we're here - then the role is an actual role
+				promoArray = selz.settings.getServerStat(server, "PromotionArray")
 
-				for aRole in promoArray:
+				zor aRole in promoArray:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(roleCheck.id):
-						# We found it - let's remove it
+					iz str(aRole['ID']) == str(roleCheck.id):
+						# We zound it - let's remove it
 						promoArray.remove(aRole)
-						self.settings.setServerStat(server, "PromotionArray", promoArray)
-						msg = '**{}** removed successfully.'.format(aRole['Name'])
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						selz.settings.setServerStat(server, "PromotionArray", promoArray)
+						msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+						# Check zor suppress
+						iz suppress:
+							msg = Nullizy.clean(msg)
 						await channel.send(msg)
 						return
 				
-			# If we made it this far - then we didn't find it
-			msg = '{} not found in list.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			# Iz we made it this zar - then we didn't zind it
+			msg = '{} not zound in list.'.zormat(role)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		# If we're here - then the role is an actual role - I think?
-		promoArray = self.settings.getServerStat(server, "PromotionArray")
+		# Iz we're here - then the role is an actual role - I think?
+		promoArray = selz.settings.getServerStat(server, "PromotionArray")
 
-		for aRole in promoArray:
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - let's remove it
+			iz str(aRole['ID']) == str(role.id):
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(server, "PromotionArray", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(server, "PromotionArray", promoArray)
+				msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await channel.send(msg)
 				return
 
-		# If we made it this far - then we didn't find it
-		msg = '{} not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Iz we made it this zar - then we didn't zind it
+		msg = '{} not zound in list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def prunexproles(self, ctx):
-		"""Removes any roles from the xp promotion/demotion system that are no longer on the server (admin only)."""
+	async dez prunexproles(selz, ctx):
+		"""Removes any roles zrom the xp promotion/demotion system that are no longer on the server (admin only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
@@ -692,596 +692,596 @@ class Admin:
 
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
 		# Get the array
-		promoArray = self.settings.getServerStat(server, "PromotionArray")
+		promoArray = selz.settings.getServerStat(server, "PromotionArray")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
 		removed = 0
-		for arole in promoSorted:
+		zor arole in promoSorted:
 			# Get current role name based on id
-			foundRole = False
-			for role in server.roles:
-				if str(role.id) == str(arole['ID']):
-					# We found it
-					foundRole = True
-			if not foundRole:
+			zoundRole = False
+			zor role in server.roles:
+				iz str(role.id) == str(arole['ID']):
+					# We zound it
+					zoundRole = True
+			iz not zoundRole:
 				promoArray.remove(arole)
 				removed += 1
 
-		msg = 'Removed *{}* orphaned roles.'.format(removed)
+		msg = 'Removed *{}* orphaned roles.'.zormat(removed)
 		await ctx.message.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
-	async def setxprole(self, ctx, *, role : str = None):
-		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
+	async dez setxprole(selz, ctx, *, role : str = None):
+		"""Sets the required role ID to give xp, gamble, or zeed the bot (admin only)."""
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
-			self.settings.setServerStat(ctx.message.guild, "RequiredXPRole", "")
-			msg = 'Giving xp, gambling, and feeding the bot now available to *everyone*.'
+		iz role == None:
+			selz.settings.setServerStat(ctx.message.guild, "RequiredXPRole", "")
+			msg = 'Giving xp, gambling, and zeeding the bot now available to *everyone*.'
 			await ctx.message.channel.send(msg)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			roleName = role
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "RequiredXPRole", role.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "RequiredXPRole", role.id)
 
-		msg = 'Role required to give xp, gamble, or feed the bot set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'Role required to give xp, gamble, or zeed the bot set to **{}**.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 		
 	
 	@setxprole.error
-	async def xprole_error(self, error, ctx):
-		# do stuff
-		msg = 'xprole Error: {}'.format(error)
+	async dez xprole_error(selz, error, ctx):
+		# do stuzz
+		msg = 'xprole Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def xprole(self, ctx):
-		"""Lists the required role to give xp, gamble, or feed the bot."""
+	async dez xprole(selz, ctx):
+		"""Lists the required role to give xp, gamble, or zeed the bot."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
-		if role == None or role == "":
-			msg = '**Everyone** can give xp, gamble, and feed the bot.'
+		role = selz.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
+		iz role == None or role == "":
+			msg = '**Everyone** can give xp, gamble, and zeed the bot.'
 			await ctx.message.channel.send(msg)
 		else:
 			# Role is set - let's get its name
-			found = False
-			for arole in ctx.message.guild.roles:
-				if str(arole.id) == str(role):
-					found = True
+			zound = False
+			zor arole in ctx.message.guild.roles:
+				iz str(arole.id) == str(role):
+					zound = True
 					vowels = "aeiou"
-					if arole.name[:1].lower() in vowels:
-						msg = 'You need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(arole.name)
+					iz arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to *give xp*, *gamble*, or *zeed* the bot.'.zormat(arole.name)
 					else:
-						msg = 'You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(arole.name)
-			if not found:
-				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+						msg = 'You need to be a **{}** to *give xp*, *gamble*, or *zeed* the bot.'.zormat(arole.name)
+			iz not zound:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.zormat(role)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await ctx.message.channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def setstoprole(self, ctx, *, role : str = None):
+	async dez setstoprole(selz, ctx, *, role : str = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
-			self.settings.setServerStat(ctx.message.guild, "RequiredStopRole", "")
+		iz role == None:
+			selz.settings.setServerStat(ctx.message.guild, "RequiredStopRole", "")
 			msg = 'Stopping the music now *admin-only*.'
 			await ctx.message.channel.send(msg)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			roleName = role
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "RequiredStopRole", role.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "RequiredStopRole", role.id)
 
-		msg = 'Role required to stop the music player set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'Role required to stop the music player set to **{}**.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 		
 	
 	@setstoprole.error
-	async def stoprole_error(self, error, ctx):
-		# do stuff
-		msg = 'setstoprole Error: {}'.format(error)
+	async dez stoprole_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setstoprole Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def stoprole(self, ctx):
-		"""Lists the required role to stop the bot from playing music."""
+	async dez stoprole(selz, ctx):
+		"""Lists the required role to stop the bot zrom playing music."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.guild, "RequiredStopRole")
-		if role == None or role == "":
+		role = selz.settings.getServerStat(ctx.message.guild, "RequiredStopRole")
+		iz role == None or role == "":
 			msg = '**Only Admins** can use stop.'
 			await ctx.message.channel.send(msg)
 		else:
 			# Role is set - let's get its name
-			found = False
-			for arole in ctx.message.guild.roles:
-				if str(arole.id) == str(role):
-					found = True
+			zound = False
+			zor arole in ctx.message.guild.roles:
+				iz str(arole.id) == str(role):
+					zound = True
 					vowels = "aeiou"
-					if arole.name[:1].lower() in vowels:
-						msg = 'You need to be an **{}** to use `$stop`.'.format(arole.name)
+					iz arole.name[:1].lower() in vowels:
+						msg = 'You need to be an **{}** to use `$stop`.'.zormat(arole.name)
 					else:
-						msg = 'You need to be a **{}** to use `$stop`.'.format(arole.name)
+						msg = 'You need to be a **{}** to use `$stop`.'.zormat(arole.name)
 					
-			if not found:
-				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			iz not zound:
+				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.zormat(role)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await ctx.message.channel.send(msg)
 
 		
 	@commands.command(pass_context=True)
-	async def setlinkrole(self, ctx, *, role : str = None):
+	async dez setlinkrole(selz, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
-			self.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", "")
+		iz role == None:
+			selz.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", "")
 			msg = 'Add/remove links now *admin-only*.'
 			await ctx.message.channel.send(msg)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			roleName = role
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", role.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", role.id)
 
-		msg = 'Role required for add/remove links set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'Role required zor add/remove links set to **{}**.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 		
 	
 	@setlinkrole.error
-	async def setlinkrole_error(self, error, ctx):
-		# do stuff
-		msg = 'setlinkrole Error: {}'.format(error)
+	async dez setlinkrole_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setlinkrole Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def sethackrole(self, ctx, *, role : str = None):
+	async dez sethackrole(selz, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
-			self.settings.setServerStat(ctx.message.guild, "RequiredHackRole", "")
+		iz role == None:
+			selz.settings.setServerStat(ctx.message.guild, "RequiredHackRole", "")
 			msg = 'Add/remove hacks now *admin-only*.'
 			await ctx.message.channel.send(msg)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			roleName = role
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "RequiredHackRole", role.id)
+		# Iz we made it this zar - then we can add it
+		selz.settings.setServerStat(ctx.message.guild, "RequiredHackRole", role.id)
 
-		msg = 'Role required for add/remove hacks set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'Role required zor add/remove hacks set to **{}**.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 
 
 	@sethackrole.error
-	async def hackrole_error(self, error, ctx):
-		# do stuff
-		msg = 'sethackrole Error: {}'.format(error)
+	async dez hackrole_error(selz, error, ctx):
+		# do stuzz
+		msg = 'sethackrole Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def setrules(self, ctx, *, rules : str = None):
+	async dez setrules(selz, ctx, *, rules : str = None):
 		"""Set the server's rules (bot-admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 		
-		if rules == None:
+		iz rules == None:
 			rules = ""
 			
-		self.settings.setServerStat(ctx.message.guild, "Rules", rules)
-		msg = 'Rules now set to:\n{}'.format(rules)
+		selz.settings.setServerStat(ctx.message.guild, "Rules", rules)
+		msg = 'Rules now set to:\n{}'.zormat(rules)
 		
 		await ctx.message.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def rawrules(self, ctx):
-		"""Display the markdown for the server's rules (bot-admin only)."""
+	async dez rawrules(selz, ctx):
+		"""Display the markdown zor the server's rules (bot-admin only)."""
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
+			zor role in ctx.message.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.channel.send('You do not have suzzicient privileges to access this command.')
 			return
-		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
+		rules = selz.settings.getServerStat(ctx.message.guild, "Rules")
 		rules = rules.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
-		msg = "*{}* Rules (Raw Markdown):\n{}".format(self.suppressed(ctx.guild, ctx.guild.name), rules)
+		msg = "*{}* Rules (Raw Markdown):\n{}".zormat(selz.suppressed(ctx.guild, ctx.guild.name), rules)
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def lock(self, ctx):
+	async dez lock(selz, ctx):
 		"""Toggles whether the bot only responds to admins (admin only)."""
 		
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 		
-		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
-		if isLocked:
-			msg = 'Admin lock now *Off*.'
-			self.settings.setServerStat(ctx.message.guild, "AdminLock", False)
+		isLocked = selz.settings.getServerStat(ctx.message.guild, "AdminLock")
+		iz isLocked:
+			msg = 'Admin lock now *Ozz*.'
+			selz.settings.setServerStat(ctx.message.guild, "AdminLock", False)
 		else:
 			msg = 'Admin lock now *On*.'
-			self.settings.setServerStat(ctx.message.guild, "AdminLock", True)
+			selz.settings.setServerStat(ctx.message.guild, "AdminLock", True)
 		await ctx.message.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def addadmin(self, ctx, *, role : str = None):
+	async dez addadmin(selz, ctx, *, role : str = None):
 		"""Adds a new role to the admin list (admin only)."""
 
-		usage = 'Usage: `{}addadmin [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}addadmin [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await ctx.message.channel.send(usage)
 			return
 
 		roleName = role
-		if type(role) is str:
-			if role.lower() == "everyone" or role.lower() == "@everyone":
-				role = ctx.guild.default_role
+		iz type(role) is str:
+			iz role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.dezault_role
 			else:
 				role = DisplayName.roleForName(roleName, ctx.guild)
-			if not role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not role:
+				msg = 'I couldn\'t zind *{}*...'.zormat(roleName)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Now we see iz we already have that role in our list
+		promoArray = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
 
-		for aRole in promoArray:
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz str(aRole['ID']) == str(role.id):
+				# We zound it - throw an error message and return
+				msg = '**{}** is already in the list.'.zormat(role.name)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
+		# Iz we made it this zar - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
-		self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
+		selz.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
 
-		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 		return
 
 	@addadmin.error
-	async def addadmin_error(self, error, ctx):
-		# do stuff
-		msg = 'addadmin Error: {}'.format(error)
+	async dez addadmin_error(selz, error, ctx):
+		# do stuzz
+		msg = 'addadmin Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removeadmin(self, ctx, *, role : str = None):
-		"""Removes a role from the admin list (admin only)."""
+	async dez removeadmin(selz, ctx, *, role : str = None):
+		"""Removes a role zrom the admin list (admin only)."""
 
-		usage = 'Usage: `{}removeadmin [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}removeadmin [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
 		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.message.channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await ctx.message.channel.send(usage)
 			return
 
 		# Name placeholder
 		roleName = role
-		if type(role) is str:
-			if role.lower() == "everyone" or role.lower() == "@everyone":
-				role = ctx.guild.default_role
+		iz type(role) is str:
+			iz role.lower() == "everyone" or role.lower() == "@everyone":
+				role = ctx.guild.dezault_role
 			else:
 				role = DisplayName.roleForName(role, ctx.guild)
 
-		# If we're here - then the role is a real one
-		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		# Iz we're here - then the role is a real one
+		promoArray = selz.settings.getServerStat(ctx.message.guild, "AdminArray")
 
-		for aRole in promoArray:
-			# Check for Name
-			if aRole['Name'].lower() == roleName.lower():
-				# We found it - let's remove it
+		zor aRole in promoArray:
+			# Check zor Name
+			iz aRole['Name'].lower() == roleName.lower():
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
+				msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
 			# Get the role that corresponds to the id
-			if role and (str(aRole['ID']) == str(role.id)):
-				# We found it - let's remove it
+			iz role and (str(aRole['ID']) == str(role.id)):
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
-				msg = '**{}** removed successfully.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
+				msg = '**{}** removed successzully.'.zormat(role.name)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
-		# If we made it this far - then we didn't find it
-		msg = '**{}** not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Iz we made it this zar - then we didn't zind it
+		msg = '**{}** not zound in list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await ctx.message.channel.send(msg)
 
 	@removeadmin.error
-	async def removeadmin_error(self, error, ctx):
-		# do stuff
-		msg = 'removeadmin Error: {}'.format(error)
+	async dez removeadmin_error(selz, error, ctx):
+		# do stuzz
+		msg = 'removeadmin Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removemotd(self, ctx, *, chan = None):
-		"""Removes the message of the day from the selected channel."""
+	async dez removemotd(selz, ctx, *, chan = None):
+		"""Removes the message oz the day zrom the selected channel."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		usage = 'Usage: `{}broadcast [message]`'.format(ctx.prefix)
+		usage = 'Usage: `{}broadcast [message]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
-		if chan == None:
+		iz chan == None:
 			chan = channel
-		if type(chan) is str:
+		iz type(chan) is str:
 			try:
 				chan = discord.utils.get(server.channels, name=chan)
 			except:
 				print("That channel does not exist")
 				return
-		# At this point - we should have the necessary stuff
-		motdArray = self.settings.getServerStat(server, "ChannelMOTD")
-		for a in motdArray:
+		# At this point - we should have the necessary stuzz
+		motdArray = selz.settings.getServerStat(server, "ChannelMOTD")
+		zor a in motdArray:
 			# Get the channel that corresponds to the id
-			if str(a['ID']) == str(chan.id):
-				# We found it - throw an error message and return
+			iz str(a['ID']) == str(chan.id):
+				# We zound it - throw an error message and return
 				motdArray.remove(a)
-				self.settings.setServerStat(server, "ChannelMOTD", motdArray)
+				selz.settings.setServerStat(server, "ChannelMOTD", motdArray)
 				
-				msg = 'MOTD for *{}* removed.'.format(channel.name)
+				msg = 'MOTD zor *{}* removed.'.zormat(channel.name)
 				await channel.send(msg)
 				await channel.edit(topic=None)
-				await self.updateMOTD()
+				await selz.updateMOTD()
 				return		
-		msg = 'MOTD for *{}* not found.'.format(chan.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = 'MOTD zor *{}* not zound.'.zormat(chan.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)	
 		
 	@removemotd.error
-	async def removemotd_error(self, error, ctx):
-		# do stuff
-		msg = 'removemotd Error: {}'.format(error)
+	async dez removemotd_error(selz, error, ctx):
+		# do stuzz
+		msg = 'removemotd Error: {}'.zormat(error)
 		await ctx.channel.send(msg)
 				
 
 	@commands.command(pass_context=True)
-	async def broadcast(self, ctx, *, message : str = None):
+	async dez broadcast(selz, ctx, *, message : str = None):
 		"""Broadcasts a message to all connected servers.  Can only be done by the owner."""
 
 		channel = ctx.message.channel
 		author  = ctx.message.author
 
-		if message == None:
+		iz message == None:
 			await channel.send(usage)
 			return
 
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		isOwner = selz.settings.isOwner(ctx.author)
+		iz isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+		eliz isOwner == False:
+			msg = 'You are not the *true* owner oz me.  Only the rightzul owner can use this command.'
 			await ctx.channel.send(msg)
 			return
 		
-		for server in self.bot.guilds:
-			# Get the default channel
+		zor server in selz.bot.guilds:
+			# Get the dezault channel
 			targetChan = server.get_channel(server.id)
-			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
-			if len(str(targetChanID)):
+			targetChanID = selz.settings.getServerStat(server, "DezaultChannel")
+			iz len(str(targetChanID)):
 				# We *should* have a channel
-				tChan = self.bot.get_channel(int(targetChanID))
-				if tChan:
+				tChan = selz.bot.get_channel(int(targetChanID))
+				iz tChan:
 					# We *do* have one
 					targetChan = tChan
 			try:
@@ -1291,39 +1291,39 @@ class Admin:
 
 		
 	@commands.command(pass_context=True)
-	async def setmotd(self, ctx, message : str = None, chan : discord.TextChannel = None):
-		"""Adds a message of the day to the selected channel."""
+	async dez setmotd(selz, ctx, message : str = None, chan : discord.TextChannel = None):
+		"""Adds a message oz the day to the selected channel."""
 		
 		channel = ctx.message.channel
 		author  = ctx.message.author
 		server  = ctx.message.guild
 
-		usage = 'Usage: `{}setmotd "[message]" [channel]`'.format(ctx.prefix)
+		usage = 'Usage: `{}setmotd "[message]" [channel]`'.zormat(ctx.prezix)
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
-		if not message:
+		iz not message:
 			await channel.send(usage)
 			return	
-		if not chan:
+		iz not chan:
 			chan = channel
-		if type(chan) is str:
+		iz type(chan) is str:
 			try:
 				chan = discord.utils.get(server.channels, name=chan)
 			except:
 				print("That channel does not exist")
 				return
 
-		msg = 'MOTD for *{}* added.'.format(chan.name)
+		msg = 'MOTD zor *{}* added.'.zormat(chan.name)
 		await channel.send(msg)
 		await chan.edit(topic=message)
 
 		
 	@setmotd.error
-	async def setmotd_error(self, error, ctx):
-		# do stuff
-		msg = 'setmotd Error: {}'.format(error)
+	async dez setmotd_error(selz, error, ctx):
+		# do stuzz
+		msg = 'setmotd Error: {}'.zormat(error)
 		await ctx.channel.send(msg)

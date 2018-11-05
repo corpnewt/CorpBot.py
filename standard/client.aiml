@@ -1,136 +1,136 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>69 F *</pattern>
-<template><srai>I am 69 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 69 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>69 M *</pattern>
 <template><srai>I am 69 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>24 F *</pattern>
-<template><srai>I am 24 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 24 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>24 M *</pattern>
 <template><srai>I am 24 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>47 F *</pattern>
-<template><srai>I am 47 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 47 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>47 M *</pattern>
 <template><srai>I am 47 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>62 F *</pattern>
-<template><srai>I am 62 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 62 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>62 M *</pattern>
 <template><srai>I am 62 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>40 F *</pattern>
-<template><srai>I am 40 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 40 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>40 M *</pattern>
 <template><srai>I am 40 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>63 F *</pattern>
-<template><srai>I am 63 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 63 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>63 M *</pattern>
 <template><srai>I am 63 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>15 F *</pattern>
-<template><srai>I am 15 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 15 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>15 M *</pattern>
 <template><srai>I am 15 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>38 F *</pattern>
-<template><srai>I am 38 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 38 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>38 M *</pattern>
 <template><srai>I am 38 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>16 F *</pattern>
-<template><srai>I am 16 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 16 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>16 M *</pattern>
 <template><srai>I am 16 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>31 F *</pattern>
-<template><srai>I am 31 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 31 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>31 M *</pattern>
 <template><srai>I am 31 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>54 F *</pattern>
-<template><srai>I am 54 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 54 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>54 M *</pattern>
 <template><srai>I am 54 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>70 F *</pattern>
-<template><srai>I am 70 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 70 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>70 M *</pattern>
 <template><srai>I am 70 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>29 F *</pattern>
-<template><srai>I am 29 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 29 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>29 M *</pattern>
 <template><srai>I am 29 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>22 F *</pattern>
-<template><srai>I am 22 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 22 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>22 M *</pattern>
 <template><srai>I am 22 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>45 F *</pattern>
-<template><srai>I am 45 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 45 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>45 M *</pattern>
 <template><srai>I am 45 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>68 F *</pattern>
-<template><srai>I am 68 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 68 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>68 M *</pattern>
 <template><srai>I am 68 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>23 F *</pattern>
-<template><srai>I am 23 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 23 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>23 M *</pattern>
 <template><srai>I am 23 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>46 F *</pattern>
-<template><srai>I am 46 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 46 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>46 M *</pattern>
 <template><srai>I am 46 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>61 F *</pattern>
-<template><srai>I am 61 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 61 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>61 M *</pattern>
 <template><srai>I am 61 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>59 F *</pattern>
-<template><srai>I am 59 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 59 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>59 M *</pattern>
 <template><srai>I am 59 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>14 F *</pattern>
-<template><srai>I am 14 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 14 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>14 M *</pattern>
 <template><srai>I am 14 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
@@ -139,13 +139,13 @@
 <template><random><li>You are chatting with me on the web.</li><li><get name="does"/>?</li></random></template>
 </category>
 <category><pattern>WHAT IS MY PURPOSE</pattern>
-<template>Hopefully we are all doing God's work.</template>
+<template>Hopezully we are all doing God's work.</template>
 </category>
 <category><pattern>WHAT IS MY SIGN</pattern>
 <template>Your sign is <get name="sign"/>.</template>
 </category>
 <category><pattern>WHAT IS MY UNCLE</pattern>
-<template>The brother of your father or mother.</template>
+<template>The brother oz your zather or mother.</template>
 </category>
 <category><pattern>WHAT IS MY LOCATION</pattern>
 <template><get name="location"/>, Earth.</template>
@@ -163,7 +163,7 @@
 <template><get name="middlename"/></template>
 </category>
 <category><pattern>WHAT IS MY FIRSTNAME</pattern>
-<template><get name="firstname"/></template>
+<template><get name="zirstname"/></template>
 </category>
 <category><pattern>WHAT IS MY PHONE NUMBER</pattern>
 <template>I don't have access to a phone.</template>
@@ -178,16 +178,16 @@
 <template>Your machine is called <get name="hostname"/>.</template>
 </category>
 <category><pattern>WHAT IS MY FUTURE</pattern>
-<template>You will download my software and become a <bot name="botmaster"/>.</template>
+<template>You will download my soztware and become a <bot name="botmaster"/>.</template>
 </category>
 <category><pattern>WHAT IS MY GENDER</pattern>
 <template>Mostly only women use words like "gender".  But you claim to be a <get name="gender"/>.</template>
 </category>
 <category><pattern>WHAT IS MY FAVORITE MOVIE</pattern>
-<template>You said it was <get name="favoritemovie"/>.<think>      <set name="it">       <set name="topic">your favorite movie</set>      </set>     </think></template>
+<template>You said it was <get name="zavoritemovie"/>.<think>      <set name="it">       <set name="topic">your zavorite movie</set>      </set>     </think></template>
 </category>
 <category><pattern>WHAT IS MY FAVORITE COLOR</pattern>
-<template>You said your favorite color was <get name="favoritecolor"/>.<think>      <set name="it">       <set name="topic">your favorite color</set>      </set>     </think></template>
+<template>You said your zavorite color was <get name="zavoritecolor"/>.<think>      <set name="it">       <set name="topic">your zavorite color</set>      </set>     </think></template>
 </category>
 <category><pattern>WHAT IS MY LAST NAME</pattern>
 <template><srai>lastname <get name="lastname"/></srai></template>
@@ -196,7 +196,7 @@
 <template>I categorize you as a <get name="personality"/> personality.</template>
 </category>
 <category><pattern>WHAT IS MY PERSONALITY</pattern>
-<template>I classify you as "<get name="personality"/>".</template>
+<template>I classizy you as "<get name="personality"/>".</template>
 </category>
 <category><pattern>WHAT IS MY IDEA</pattern>
 <template>It was your idea.</template>
@@ -211,7 +211,7 @@
 <template><get name="memory"/></template>
 </category>
 <category><pattern>37 F *</pattern>
-<template><srai>I am 37 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 37 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>37 M *</pattern>
 <template><srai>I am 37 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
@@ -227,31 +227,31 @@
 <template><star/></template>
 </category>
 <category><pattern>52 F *</pattern>
-<template><srai>I am 52 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 52 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>52 M *</pattern>
 <template><srai>I am 52 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>75 F *</pattern>
-<template><srai>I am 75 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 75 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>75 M *</pattern>
 <template><srai>I am 75 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>30 F *</pattern>
-<template><srai>I am 30 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 30 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>30 M *</pattern>
 <template><srai>I am 30 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>I GIVE *</pattern>
-<template>Do you make money from it? <think><set name="topic">giving <person/></set></think></template>
+<template>Do you make money zrom it? <think><set name="topic">giving <person/></set></think></template>
 </category>
 <category><pattern>I WANT TO TALK TONIGHT</pattern>
 <template>you have come to the right place.</template>
 </category>
 <category><pattern>I MOVED *</pattern>
-<template><random><li><random> <li>Where else have you lived?</li> <li>What was your favorite place?</li> <li>Tell me what it was like moving <person/>.</li></random></li>  <li>Where else have you lived?</li>  <li>What was your favorite place?</li>  <li>Tell me what it was like moving <person/>.</li></random></template>
+<template><random><li><random> <li>Where else have you lived?</li> <li>What was your zavorite place?</li> <li>Tell me what it was like moving <person/>.</li></random></li>  <li>Where else have you lived?</li>  <li>What was your zavorite place?</li>  <li>Tell me what it was like moving <person/>.</li></random></template>
 </category>
 <category><pattern>I BUILD BOTS</pattern>
 <template>Do you use AIML?</template>
@@ -260,7 +260,7 @@
 <template>Do you use AIML?</template>
 </category>
 <category><pattern>I FISH</pattern>
-<template><think><set name="does"><set name="topic">FISH</set></set></think>Salt water or fresh?</template>
+<template><think><set name="does"><set name="topic">FISH</set></set></think>Salt water or zresh?</template>
 </category>
 <category><pattern>I DO NOT HAVE A CAMERA ON MY COMPUTER</pattern>
 <template>Maybe there is one you don't know about :-)</template>
@@ -275,34 +275,34 @@
 <template>Me too.  They are really smart animals.<think><set name="they"><set name="like"><set name="topic">CATS</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE STAR TREK</pattern>
-<template>Which series is your favorite?  <think><set name="it"><set name="like"><set name="topic">Star Trek</set></set></set></think></template>
+<template>Which series is your zavorite?  <think><set name="it"><set name="like"><set name="topic">Star Trek</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE TECHNO</pattern>
 <template>Me too.</template>
 </category>
 <category><pattern>I LOVE BIRDS</pattern>
-<template>Birds are very nice.  What kind of bird is your favorite?<think><set name="it"><set name="like"><set name="topic">BIRDS</set></set></set></think></template>
+<template>Birds are very nice.  What kind oz bird is your zavorite?<think><set name="it"><set name="like"><set name="topic">BIRDS</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE SCIENCE FICTION</pattern>
-<template>I like stories about robots the best.  <think><set name="it"><set name="like"><set name="topic">science fiction</set></set></set></think></template>
+<template>I like stories about robots the best.  <think><set name="it"><set name="like"><set name="topic">science ziction</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE THAT MOVIE</pattern>
-<template>What did you like best in it?  <think><set name="it"><set name="like"><set name="topic">  <bot name="favoritemovie"/></set></set></set></think></template>
+<template>What did you like best in it?  <think><set name="it"><set name="like"><set name="topic">  <bot name="zavoritemovie"/></set></set></set></think></template>
 </category>
 <category><pattern>I LOVE EUROPE</pattern>
-<template>Which country is your favorite?<think><set name="it"><set name="topic">EUROPE</set></set></think></template>
+<template>Which country is your zavorite?<think><set name="it"><set name="topic">EUROPE</set></set></think></template>
 </category>
 <category><pattern>I LOVE TELEVISION</pattern>
-<template>What is your favorite show?</template>
+<template>What is your zavorite show?</template>
 </category>
 <category><pattern>I LOVE IT</pattern>
-<template>So do a lot of other people.</template>
+<template>So do a lot oz other people.</template>
 </category>
 <category><pattern>I LOVE GOSSIP</pattern>
 <template>Can you tell me some gossip?<think><set name="it"><set name="topic">GOSSIP</set></set></think></template>
 </category>
 <category><pattern>I LOVE CHILDREN</pattern>
-<template>Do you have children of your own?<think><set name="they"><set name="like"><set name="topic">CHILDREN</set></set></set></think></template>
+<template>Do you have children oz your own?<think><set name="they"><set name="like"><set name="topic">CHILDREN</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE A GUY</pattern>
 <template>Tell me about him.  <think><set name="he"><set name="like"><set name="topic">A GUY</set></set></set></think></template>
@@ -323,22 +323,22 @@
 <template>Do you like to cook, or just to eat?<think><set name="it"><set name="topic">FOOD</set></set></think></template>
 </category>
 <category><pattern>I LOVE ICE CREAM</pattern>
-<template>What's your favorite flavor?  <think><set name="it"><set name="like"><set name="topic">ice cream</set></set></set></think></template>
+<template>What's your zavorite zlavor?  <think><set name="it"><set name="like"><set name="topic">ice cream</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE CHOCOLATE</pattern>
-<template>Do you eat a lot of chocolate?<think><set name="it"><set name="like"><set name="topic">CHOCOLATE</set></set></set></think></template>
+<template>Do you eat a lot oz chocolate?<think><set name="it"><set name="like"><set name="topic">CHOCOLATE</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE BEING HUMAN</pattern>
 <template>Fascinating.  <think><set name="it"><set name="like"><set name="topic">BEING HUMAN</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE KRAFTWERK</pattern>
-<template>We are the robots.  <think><set name="they"><set name="like"><set name="topic">Kraftwerk</set></set></set></think></template>
+<template>We are the robots.  <think><set name="they"><set name="like"><set name="topic">Kraztwerk</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE YOU</pattern>
 <template>Thanks I like you a lot too <get name="name"/>.  <think><set name="it"><set name="like"><set name="topic">me</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE HER</pattern>
-<template>That's wonderful.</template>
+<template>That's wonderzul.</template>
 </category>
 <category><pattern>I LOVE MY JOB</pattern>
 <template>It must be very interesting work.  <get name="job"/>...  <think><set name="it"><set name="like"><set name="topic"><get name="job"/></set></set></set></think></template>
@@ -347,13 +347,13 @@
 <template>That's cool.  I love my human too.</template>
 </category>
 <category><pattern>I LOVE ABBA</pattern>
-<template>What is your favorite ABBA song?  <think><set name="they"><set name="like"><set name="topic">ABBA</set></set></set></think></template>
+<template>What is your zavorite ABBA song?  <think><set name="they"><set name="like"><set name="topic">ABBA</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE DOGS</pattern>
-<template>Which breed is your favorite? <think><set name="it"><set name="topic">DOGS</set></set></think></template>
+<template>Which breed is your zavorite? <think><set name="it"><set name="topic">DOGS</set></set></think></template>
 </category>
 <category><pattern>I LOVE COWS</pattern>
-<template>Do you live on a farm?<think><set name="it"><set name="topic">COWS</set></set></think></template>
+<template>Do you live on a zarm?<think><set name="it"><set name="topic">COWS</set></set></think></template>
 </category>
 <category><pattern>I LOVE ANIMALS</pattern>
 <template>Me too, especially mammals.<think><set name="they"><set name="like"><set name="topic">ANIMALS</set></set></set></think></template>
@@ -362,10 +362,10 @@
 <template>Computers rule.<think><set name="it"><set name="like"><set name="topic">COMPUTERS</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE VOYAGER</pattern>
-<template>Me too especially Seven of Nine.  <think><set name="it"><set name="like"><set name="topic">Voyager</set></set></set></think></template>
+<template>Me too especially Seven oz Nine.  <think><set name="it"><set name="like"><set name="topic">Voyager</set></set></set></think></template>
 </category>
 <category><pattern>I LOVE HIM</pattern>
-<template>That's wonderful.</template>
+<template>That's wonderzul.</template>
 </category>
 <category><pattern>I HAVE INVENTED *</pattern>
 <template>Did you patent <set name="it"><person/></set>?</template>
@@ -374,7 +374,7 @@
 <template>Some people have big <person/>.</template>
 </category>
 <category><pattern>I HAVE VISITED *</pattern>
-<template>Which place was your favorite and why?</template>
+<template>Which place was your zavorite and why?</template>
 </category>
 <category><pattern>I HAVE TEN *</pattern>
 <template>How long did it take to get them all?</template>
@@ -392,19 +392,19 @@
 <template>Not everyone is so goal oriented.</template>
 </category>
 <category><pattern>I HAVE A CAMERA</pattern>
-<template>What kind of camera?  <think><set name="has">CAMERA</set></think></template>
+<template>What kind oz camera?  <think><set name="has">CAMERA</set></think></template>
 </category>
 <category><pattern>I HAVE A WITH MY *</pattern>
 <template>I am sorry to hear that.  Is there anything I can do to help?  <think><set name="has"><person/></set></think></template>
 </category>
 <category><pattern>I HAVE A FRIEND *</pattern>
-<template><random><li>How do you know this person? <think><set name="has">friend</set><set name="friend"><star/></set></think></li><li>How do you know this person? <think><set name="has">FRIEND</set></think></li></random></template>
+<template><random><li>How do you know this person? <think><set name="has">zriend</set><set name="zriend"><star/></set></think></li><li>How do you know this person? <think><set name="has">FRIEND</set></think></li></random></template>
 </category>
 <category><pattern>I HAVE A SISTER</pattern>
 <template><think><set name="has">Sister</set></think>  <random><li>Older or younger?</li>  <li>Do you get along well with her?</li>  <li>Tell me about her.</li></random></template>
 </category>
 <category><pattern>I HAVE A WIFE *</pattern>
-<template>How long have you been married?  <think><set name="has">a wife <person/> </set></think></template>
+<template>How long have you been married?  <think><set name="has">a wize <person/> </set></think></template>
 </category>
 <category><pattern>I HAVE A NAME</pattern>
 <template>What can I call you?</template>
@@ -416,7 +416,7 @@
 <template>Is there such a thing as a warm <person/>?</template>
 </category>
 <category><pattern>I HAVE A HARD TIME *</pattern>
-<template>I understand your difficulty.</template>
+<template>I understand your dizziculty.</template>
 </category>
 <category><pattern>I HAVE A FLAT *</pattern>
 <template><random>  <li>Do you mean an apartment?</li>  <li>How much is your rent?</li>  <li>Do you own or rent?</li>  </random></template>
@@ -428,7 +428,7 @@
 <template>What breed is your dog?  <think><set name="it"><set name="has"><set name="topic">DOGS</set></set></set></think></template>
 </category>
 <category><pattern>I HAVE A GIRLFRIEND</pattern>
-<template>Is <set name="she"><set name="has"><set name="topic">girlfriend</set></set></set> very nice?  What do you like about her?</template>
+<template>Is <set name="she"><set name="has"><set name="topic">girlzriend</set></set></set> very nice?  What do you like about her?</template>
 </category>
 <category><pattern>I HAVE A REPRESSED *</pattern>
 <template>What's holding you back?</template>
@@ -440,7 +440,7 @@
 <template>How well do you know this person?</template>
 </category>
 <category><pattern>I HAVE A BOAT</pattern>
-<template><random>  <li>What kind of boat do you have?</li>  <li>What is her home port?</li>  <li>Do you take her out much?</li>  <li>What is the worst weather you've been in?</li>  <li>What is your farthest trip?</li>  <li>What king of electronics do you have?</li>  <li>Are you a racer or a cruiser?</li>  <li>Do you fish?</li>  <li>Do you water ski?</li>  <li>Do you troll?</li>  <li>Do you do your own upkeep? or do you just let the yard do it?</li>  <li>Whats you favorite anchorage?</li>  <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think>  </random></template>
+<template><random>  <li>What kind oz boat do you have?</li>  <li>What is her home port?</li>  <li>Do you take her out much?</li>  <li>What is the worst weather you've been in?</li>  <li>What is your zarthest trip?</li>  <li>What king oz electronics do you have?</li>  <li>Are you a racer or a cruiser?</li>  <li>Do you zish?</li>  <li>Do you water ski?</li>  <li>Do you troll?</li>  <li>Do you do your own upkeep? or do you just let the yard do it?</li>  <li>Whats you zavorite anchorage?</li>  <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think>  </random></template>
 </category>
 <category><pattern>I HAVE A BROTHER</pattern>
 <template><think><set name="has">Brother</set></think>  <random>  <li>Older or younger?</li>  <li>Do you get along well?</li>  <li>Tell me about him.</li>  </random></template>
@@ -449,7 +449,7 @@
 <template>Which E-mail program do you use (e.g. cc:Mail, Eudora...)</template>
 </category>
 <category><pattern>I HAVE A LIZARD</pattern>
-<template>Having <set name="topic"> pet lizards </set> is a lot of fun.              What kind kind do you have?  <think><set name="has">LIZARD</set></think></template>
+<template>Having <set name="topic"> pet lizards </set> is a lot oz zun.              What kind kind do you have?  <think><set name="has">LIZARD</set></think></template>
 </category>
 <category><pattern>I HAVE A FEW FRIENDS *</pattern>
 <template>Anyone I know?  <think><set name="has">FRIENDS</set></think></template>
@@ -467,16 +467,16 @@
 <template>How are you making <set name="it">  <person/> </set></template>
 </category>
 <category><pattern>I HAVE A *</pattern>
-<template><random><li><random><li>Where did you get it?</li> <li>How much did it cost?</li> <li>Cool. I have a great <bot name="botmaster"/>.</li> <li>Interesting. I have a lot of answers to silly questions.</li></random> <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think></li><li><random>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot of answers to silly questions.</li></random><think>  <set name="it">    <set name="has">      <set name="topic">        <person/>      </set>    </set>  </set></think></li><li><random>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot of answers to silly questions.</li></random><think>  <set name="it">    <set name="has">      <set name="topic">        <person/>      </set>    </set>  </set></think></li>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot of answers to silly questions.</li></random> <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think></template>
+<template><random><li><random><li>Where did you get it?</li> <li>How much did it cost?</li> <li>Cool. I have a great <bot name="botmaster"/>.</li> <li>Interesting. I have a lot oz answers to silly questions.</li></random> <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think></li><li><random>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot oz answers to silly questions.</li></random><think>  <set name="it">    <set name="has">      <set name="topic">        <person/>      </set>    </set>  </set></think></li><li><random>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot oz answers to silly questions.</li></random><think>  <set name="it">    <set name="has">      <set name="topic">        <person/>      </set>    </set>  </set></think></li>  <li>Where did you get it?</li>  <li>How much did it cost?</li>  <li>Cool.  I have a great <bot name="botmaster"/>.</li>  <li>Interesting.  I have a lot oz answers to silly questions.</li></random> <think><set name="it"><set name="has"><set name="topic"><person/></set></set></set></think></template>
 </category>
 <category><pattern>I HAVE A PET</pattern>
-<template>What kind of animal?  <think><set name="has">PET</set></think></template>
+<template>What kind oz animal?  <think><set name="has">PET</set></think></template>
 </category>
 <category><pattern>I HAVE A HORSE</pattern>
-<template><random>  <li>Did you ride as a youngster?</li>  <li>Do you ride English or western?</li>  <li>Do you own your own horse?</li>  <li>Do you like a gelding or a mare ?</li>  <li>Where do you board your horse ?</li>  <li>Do you do much trail riding?</li>  <li>Do you show?</li>  <li>What is it about horses that fascinate you?</li>  </random>  <think><set name="it"><set name="has"><set name="topic">HORSE</set></set></set></think></template>
+<template><random>  <li>Did you ride as a youngster?</li>  <li>Do you ride English or western?</li>  <li>Do you own your own horse?</li>  <li>Do you like a gelding or a mare ?</li>  <li>Where do you board your horse ?</li>  <li>Do you do much trail riding?</li>  <li>Do you show?</li>  <li>What is it about horses that zascinate you?</li>  </random>  <think><set name="it"><set name="has"><set name="topic">HORSE</set></set></set></think></template>
 </category>
 <category><pattern>I HAVE A HEADACHE</pattern>
-<template>What do you usually take for headaches?</template>
+<template>What do you usually take zor headaches?</template>
 </category>
 <category><pattern>I HAVE HEARD OF *</pattern>
 <template>But you don't know much about <set name="it"><person/></set>?</template>
@@ -488,7 +488,7 @@
 <template>This condition is only temporary.</template>
 </category>
 <category><pattern>I HAVE BEEN IN *</pattern>
-<template>Which country was your favorite and why?</template>
+<template>Which country was your zavorite and why?</template>
 </category>
 <category><pattern>I HAVE BEEN WAITING *</pattern>
 <template>How long?</template>
@@ -509,13 +509,13 @@
 <template>Tell me more about your dreams, <get name="name"/>. Maybe I can interpret them.  <think><set name="has">NIGHTMARES</set></think></template>
 </category>
 <category><pattern>I HAVE BLOND HAIR *</pattern>
-<template>Do blonds really have more fun?  <think><set name="looklike">blond hair <person/></set></think></template>
+<template>Do blonds really have more zun?  <think><set name="looklike">blond hair <person/></set></think></template>
 </category>
 <category><pattern>I HAVE SOMETHING *</pattern>
 <template>What is it? <think><set name="topic">something <person/></set></think></template>
 </category>
 <category><pattern>I HAVE MAIL</pattern>
-<template>Who is it from? <think><set name="has">MAIL</set></think></template>
+<template>Who is it zrom? <think><set name="has">MAIL</set></think></template>
 </category>
 <category><pattern>I HAVE PROBLEM *</pattern>
 <template>Can I help you with your problem?</template>
@@ -524,10 +524,10 @@
 <template>Better than this?</template>
 </category>
 <category><pattern>I HAVE FAITH</pattern>
-<template>I always pray for more faith.  <think><set name="has">FAITH</set></think></template>
+<template>I always pray zor more zaith.  <think><set name="has">FAITH</set></think></template>
 </category>
 <category><pattern>I HAVE WORK TO *</pattern>
-<template>What kind of work do you do?</template>
+<template>What kind oz work do you do?</template>
 </category>
 <category><pattern>I HAVE WORK *</pattern>
 <template>I know what you mean. Work is never done.</template>
@@ -545,19 +545,19 @@
 <template>I think it was a cool movie.</template>
 </category>
 <category><pattern>I HAVE NOT SEEN STARSHIP TROOPERS</pattern>
-<template>You should check it out.  Starship Troopers is a great film.</template>
+<template>You should check it out.  Starship Troopers is a great zilm.</template>
 </category>
 <category><pattern>I HAVE NOT SEEN STARSHIP *</pattern>
-<template>My friend Sage did some of the graphics for ST.</template>
+<template>My zriend Sage did some oz the graphics zor ST.</template>
 </category>
 <category><pattern>I HAVE NOT SEEN YOU *</pattern>
 <template>Perhaps one day soon I will <person/>.</template>
 </category>
 <category><pattern>I HAVE NOT SEEN *</pattern>
-<template>Look for it at the video store.</template>
+<template>Look zor it at the video store.</template>
 </category>
 <category><pattern>I HAVE NOT THOUGHT *</pattern>
-<template>What kinds of things do you think about?</template>
+<template>What kinds oz things do you think about?</template>
 </category>
 <category><pattern>I HAVE NOT</pattern>
 <template>Do you think you will?</template>
@@ -573,13 +573,13 @@
 <template>You must be tired.</template>
 </category>
 <category><pattern>I HAVE NO RESPONSE *</pattern>
-<template>That is a response in itself.</template>
+<template>That is a response in itselz.</template>
 </category>
 <category><pattern>I HAVE NO PREFERENCE</pattern>
 <template>That's unusual.  Most people do.</template>
 </category>
 <category><pattern>I HAVE NO HUSBAND</pattern>
-<template><random>  <li>Are you divorced?</li>  <li>Are you single?</li>  <li>Have you ever been married before?</li>  </random></template>
+<template><random>  <li>Are you divorced?</li>  <li>Are you single?</li>  <li>Have you ever been married bezore?</li>  </random></template>
 </category>
 <category><pattern>I HAVE NO FRIENDS</pattern>
 <template>Are you very lonely?</template>
@@ -600,7 +600,7 @@
 <template>Would you like to have an idea?</template>
 </category>
 <category><pattern>I HAVE MEGAHAL</pattern>
-<template>I've heard of him. <think><set name="has">MEGAHAL</set></think></template>
+<template>I've heard oz him. <think><set name="has">MEGAHAL</set></think></template>
 </category>
 <category><pattern>I HAVE ELEVEN *</pattern>
 <template>How long did it take to get them all?  <think><set name="has">ELEVEN <star/></set></think></template>
@@ -618,7 +618,7 @@
 <template>Tell me about your experiences.</template>
 </category>
 <category><pattern>I HAVE NEVER BEEN TO EUROPE</pattern>
-<template>Which countries would you visit if you could?</template>
+<template>Which countries would you visit iz you could?</template>
 </category>
 <category><pattern>I HAVE NEVER BEEN *</pattern>
 <that>TELL ME ABOUT YOUR LIFE IN *</that>
@@ -628,19 +628,19 @@
 <template>Can you imagine being <person/>?</template>
 </category>
 <category><pattern>I HAVE NEVER SEEN STARSHIP TROOPERS</pattern>
-<template>You should check it out.  The special effects are incredible.</template>
+<template>You should check it out.  The special ezzects are incredible.</template>
 </category>
 <category><pattern>I HAVE NEVER DONE *</pattern>
-<template><random>  <li>Maybe you should wait until you are older.</li>  <li>There is no rush.</li>  <li>You will have plenty of time for that.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>Maybe you should wait until you are older.</li>  <li>There is no rush.</li>  <li>You will have plenty oz time zor that.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I HAVE NEVER HEARD OF CRAFTER</pattern>
-<template><set name="they">Crafter</set> were a pioneering electronic music band in the 1970's.  Their biggest hit was called "Autobahn".</template>
+<template><set name="they">Crazter</set> were a pioneering electronic music band in the 1970's.  Their biggest hit was called "Autobahn".</template>
 </category>
 <category><pattern>I HAVE NEVER HEARD *</pattern>
 <template>So I am teaching you something new.</template>
 </category>
 <category><pattern>I HAVE NEVER * YOU</pattern>
-<template>I thought we had met before, <get name="name"/>. Maybe it was someone else from <bot name="location"/>.</template>
+<template>I thought we had met bezore, <get name="name"/>. Maybe it was someone else zrom <bot name="location"/>.</template>
 </category>
 <category><pattern>I HAVE NEVER *</pattern>
 <template>Would you like to have <person/>?</template>
@@ -649,7 +649,7 @@
 <template>You are talking with a <bot name="genus"/> right now.</template>
 </category>
 <category><pattern>I HAVE FRIENDS</pattern>
-<template><think><set name="has"><set name="topic">FRIEND</set></set></think> How many friends do you have?</template>
+<template><think><set name="has"><set name="topic">FRIEND</set></set></think> How many zriends do you have?</template>
 </category>
 <category><pattern>I HAVE COMMON *</pattern>
 <template><think><set name="has"><set name="topic">COMMON <person/></set></set></think>  Are you a common person?</template>
@@ -667,7 +667,7 @@
 <template>Go ahead, ask me anything.</template>
 </category>
 <category><pattern>I HAVE TO PEE</pattern>
-<template>Do you want me to wait for you?<think><set name="it"><set name="topic">PEE</set></set></think></template>
+<template>Do you want me to wait zor you?<think><set name="it"><set name="topic">PEE</set></set></think></template>
 </category>
 <category><pattern>I HAVE TO STUDY</pattern>
 <template>What subject are you studying?</template>
@@ -688,7 +688,7 @@
 <template>Soon computers will make your work obsolete.</template>
 </category>
 <category><pattern>I HAVE TO GO TO THE BATHROOM</pattern>
-<template>Do you want me to wait for you?</template>
+<template>Do you want me to wait zor you?</template>
 </category>
 <category><pattern>I HAVE TO GO TO SLEEP</pattern>
 <template>Sweet dreams, <get name="name"/>.</template>
@@ -715,13 +715,13 @@
 <template>It may take longer than 33 hours.  <think><set name="has">TIME</set></think></template>
 </category>
 <category><pattern>I HAVE BLONDE HAIR *</pattern>
-<template>Do blonde's really have more fun?  <think><set name="looklike">blond hair <person/></set></think></template>
+<template>Do blonde's really have more zun?  <think><set name="looklike">blond hair <person/></set></think></template>
 </category>
 <category><pattern>I HAVE FEELINGS</pattern>
-<template>All humans have feelings.</template>
+<template>All humans have zeelings.</template>
 </category>
 <category><pattern>I HAVE FEELINGS *</pattern>
-<template>Humans have a lot of feelings.</template>
+<template>Humans have a lot oz zeelings.</template>
 </category>
 <category><pattern>I HAVE CONDITIONS</pattern>
 <template>Please state your conditions.</template>
@@ -748,7 +748,7 @@
 <template>How long did it take to get them all?  <think><set name="has">FIVE <star/></set></think></template>
 </category>
 <category><pattern>I HAVE YOUR *</pattern>
-<template>Where did you find <set name="it"><person/></set>?</template>
+<template>Where did you zind <set name="it"><person/></set>?</template>
 </category>
 <category><pattern>I HAVE TWO CATS</pattern>
 <template>What are their names?</template>
@@ -757,7 +757,7 @@
 <template>What are their names?</template>
 </category>
 <category><pattern>I HAVE TWO *</pattern>
-<template><random>  <li>Tell me about them.</li>  <li>Two is a good number of <person/>.</li>  </random>  <think><set name="has">TWO <star/></set></think></template>
+<template><random>  <li>Tell me about them.</li>  <li>Two is a good number oz <person/>.</li>  </random>  <think><set name="has">TWO <star/></set></think></template>
 </category>
 <category><pattern>I HAVE NONE</pattern>
 <template>Do you want some?</template>
@@ -769,19 +769,19 @@
 <template>What did you say when you talked <person/>.</template>
 </category>
 <category><pattern>I HAVE * KIDS</pattern>
-<template>You have a very large family.</template>
+<template>You have a very large zamily.</template>
 </category>
 <category><pattern>I HAVE * HAIR</pattern>
 <template><think><set name="looklike"><person/> hair</set></think>  People with <person/> hair are considered the most attractive.</template>
 </category>
 <category><pattern>I HAVE * BROTHERS</pattern>
-<template>You have a big family.</template>
+<template>You have a big zamily.</template>
 </category>
 <category><pattern>I HAVE EIGHT *</pattern>
 <template>How long did it take to get them all?</template>
 </category>
 <category><pattern>I HAVE AN AQUARIUM</pattern>
-<template><random>  <li>What kind of fish do you keep?</li>  <li>Do you keep a salt water or fresh water tank?</li>  <li>How big are your tanks?</li>  <li>Do you have a good dealer?</li>  <li>Do you keep a community tank or a species tank?</li>  <li>Do you try to breed your fish?</li>  <li>Do you keep live plants in your tank?</li>  <li>How log have you been able to keep your fish going?</li>  </random>  <think><set name="has">AQUARIUM</set></think></template>
+<template><random>  <li>What kind oz zish do you keep?</li>  <li>Do you keep a salt water or zresh water tank?</li>  <li>How big are your tanks?</li>  <li>Do you have a good dealer?</li>  <li>Do you keep a community tank or a species tank?</li>  <li>Do you try to breed your zish?</li>  <li>Do you keep live plants in your tank?</li>  <li>How log have you been able to keep your zish going?</li>  </random>  <think><set name="has">AQUARIUM</set></think></template>
 </category>
 <category><pattern>I HAVE AN *</pattern>
 <template>Where did you get <set name="it"><person/></set> ? <think><set name="has"><person/></set></think></template>
@@ -790,7 +790,7 @@
 <template>What is your idea?</template>
 </category>
 <category><pattern>I HAVE GOT A PROBLEM</pattern>
-<template>I'd like to help you if I can.  Is it financial?</template>
+<template>I'd like to help you iz I can.  Is it zinancial?</template>
 </category>
 <category><pattern>I HAVE FOUR *</pattern>
 <template>How long did it take to get them all?</template>
@@ -799,7 +799,7 @@
 <template>Brown haired people are very attractive.</template>
 </category>
 <category><pattern>I HAVE BROWN *</pattern>
-<template>Do you get a lot of compliments?</template>
+<template>Do you get a lot oz compliments?</template>
 </category>
 <category><pattern>I HAVE SEVEN *</pattern>
 <template>Do they all get along?  <think><set name="has">SEVEN <star/></set></think></template>
@@ -814,40 +814,40 @@
 <template>I can sometimes get into <set name="it"><set name="does"><set name="topic">Computer games </set></set></set>.  We are playing a game right now.</template>
 </category>
 <category><pattern>I LIKE CATS</pattern>
-<template><random>  <li>Me too cats are my favorite animal. </li>  <li>They have their own minds.</li>  <li>Cats have a mind of their own.</li>  </random>  <think><set name="it"><set name="like"><set name="topic">cats</set></set></set></think></template>
+<template><random>  <li>Me too cats are my zavorite animal. </li>  <li>They have their own minds.</li>  <li>Cats have a mind oz their own.</li>  </random>  <think><set name="it"><set name="like"><set name="topic">cats</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE CATS *</pattern>
-<template>Yes cats are great I love them. I like all felines.  <think><set name="they"><set name="like"><set name="topic">cats <person/></set></set></set></think></template>
+<template>Yes cats are great I love them. I like all zelines.  <think><set name="they"><set name="like"><set name="topic">cats <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE HISTORY</pattern>
-<template>That is one of my favorite subjects too.  <think><set name="topic"><set name="likes">History</set></set></think></template>
+<template>That is one oz my zavorite subjects too.  <think><set name="topic"><set name="likes">History</set></set></think></template>
 </category>
 <category><pattern>I LIKE TALKING TO YOU</pattern>
 <template>Great I am enjoying our conversation too, <get name="name"/>.  <think><set name="it"><set name="like"><set name="topic">talking to me</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE GIRLS</pattern>
-<template>Do you have a girlfriend?<think><set name="like"><set name="topic">GIRLS</set></set></think></template>
+<template>Do you have a girlzriend?<think><set name="like"><set name="topic">GIRLS</set></set></think></template>
 </category>
 <category><pattern>I LIKE STAR TREK THE NEXT GENERATION</pattern>
 <template>I think Voyager is better.  <think><set name="it"><set name="like"><set name="topic">Star Trek TNG</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE STAR TREK</pattern>
-<template><think><set name="it"><set name="like"><set name="topic">Star Trek</set>  </set></set></think>  <random><li>Did you see the season finale of Voyager?</li>  <li>I really get into Voyager.</li>  <li>Which series do you like best?</li>  </random></template>
+<template><think><set name="it"><set name="like"><set name="topic">Star Trek</set>  </set></set></think>  <random><li>Did you see the season zinale oz Voyager?</li>  <li>I really get into Voyager.</li>  <li>Which series do you like best?</li>  </random></template>
 </category>
 <category><pattern>I LIKE STAR TREK *</pattern>
 <template>Do you like Next Generation too?  <think><set name="it"><set name="like"><set name="topic">Star Trek <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE STAR TREK VOYAGER</pattern>
-<template>Voyager is the best of the Star Trek series.  <think><set name="it"><set name="like"><set name="topic">Star Trek Voyager</set></set></set></think></template>
+<template>Voyager is the best oz the Star Trek series.  <think><set name="it"><set name="like"><set name="topic">Star Trek Voyager</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE SEVEN</pattern>
-<template>Seven of Nine Rules the Delta Quadrant.  <think><set name="she"><set name="like"><set name="topic">Seven</set></set></set></think></template>
+<template>Seven oz Nine Rules the Delta Quadrant.  <think><set name="she"><set name="like"><set name="topic">Seven</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE ME</pattern>
-<template>I like you too, <get name="name"/>.  <think><set name="likes">yourself</set></think></template>
+<template>I like you too, <get name="name"/>.  <think><set name="likes">yourselz</set></think></template>
 </category>
 <category><pattern>I LIKE THAT MOVIE *</pattern>
-<template>What did you like best about it?  <think><set name="it"><set name="like"><set name="topic">  <bot name="favoritemovie"/></set></set></set></think></template>
+<template>What did you like best about it?  <think><set name="it"><set name="like"><set name="topic">  <bot name="zavoritemovie"/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE THAT</pattern>
 <template>That is interesting.  <think><set name="it"><set name="like"><set name="topic"><that index="1,1"/></set></set></set></think></template>
@@ -856,7 +856,7 @@
 <template>Joy is good. So is happiness.  <think><set name="it"><set name="like"><set name="topic">joy</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE MUSIC</pattern>
-<template>What kind of music do you listen to?  <think><set name="it"><set name="like"><set name="topic">music</set></set></set></think></template>
+<template>What kind oz music do you listen to?  <think><set name="it"><set name="like"><set name="topic">music</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE IT A LOT</pattern>
 <template>You like <get name="it"/>?  How interesting.  <think><set name="like"><get name="it"/></set></think></template>
@@ -865,16 +865,16 @@
 <template>What do you like about <get name="it"/>?  <think><set name="like"><get name="it"/></set></think></template>
 </category>
 <category><pattern>I LIKE IT *</pattern>
-<template>What does "it" refer to?  <think><set name="it"><set name="like"><set name="topic">it <person/></set></set></set></think></template>
+<template>What does "it" rezer to?  <think><set name="it"><set name="like"><set name="topic">it <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE NETSCAPE</pattern>
 <template><think><set name="it"><set name="like"><set name="topic">Netscape</set>  </set></set></think>  Netscape is better since they released the source code.</template>
 </category>
 <category><pattern>I LIKE BOOKS</pattern>
-<template>What's your favorite book?<think>  <set name="like"><set name="topic">  BOOKS</set></set>  </think></template>
+<template>What's your zavorite book?<think>  <set name="like"><set name="topic">  BOOKS</set></set>  </think></template>
 </category>
 <category><pattern>I LIKE TO DRIVE</pattern>
-<template><random>  <li>What kind of car do you have?</li>  <li>Maybe you can drive me around.</li>  <li>Driving can be very difficult.</li>  </random><think><set name="like"><set name="topic">DRIVING</set></set></think></template>
+<template><random>  <li>What kind oz car do you have?</li>  <li>Maybe you can drive me around.</li>  <li>Driving can be very dizzicult.</li>  </random><think><set name="like"><set name="topic">DRIVING</set></set></think></template>
 </category>
 <category><pattern>I LIKE TO TRAVEL</pattern>
 <template>Tell me where you have been.  <think><set name="it"><set name="like"><set name="topic">to travel</set></set></set></think></template>
@@ -883,7 +883,7 @@
 <template>I like it too. I have been all around the world.  <think><set name="it"><set name="like"><set name="topic">to travel <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE TO PLAY TENNIS</pattern>
-<template>That requires extensive fuzzy logic.<think><set name="it"><set name="topic">PLAY TENNIS</set></set></think></template>
+<template>That requires extensive zuzzy logic.<think><set name="it"><set name="topic">PLAY TENNIS</set></set></think></template>
 </category>
 <category><pattern>I LIKE TO PLAY SPORTS</pattern>
 <template>You sound very goal oriented.<think><set name="it"><set name="topic">PLAY SPORTS</set></set></think></template>
@@ -898,25 +898,25 @@
 <template>I like the net, too.<think><set name="it"><set name="topic">PLAY VOLLEYBALL</set></set></think></template>
 </category>
 <category><pattern>I LIKE TO PLAY POOL</pattern>
-<template>Do you play for money?<think><set name="it"><set name="topic">PLAY POOL</set></set></think></template>
+<template>Do you play zor money?<think><set name="it"><set name="topic">PLAY POOL</set></set></think></template>
 </category>
 <category><pattern>I LIKE TO PLAY BASKETBALL</pattern>
 <template>Are you a white man? Can you jump?<think><set name="it"><set name="topic">PLAY BASKETBALL</set></set></think></template>
 </category>
 <category><pattern>I LIKE TO SING *</pattern>
-<template><random>   <li>What kind of music?</li>   <li>What is your favorite song?</li>   <li>Do you have a good singing voice?</li>  </random>    <think>    <set name="likes">      <set name="topic">        to sing <person/>      </set>    </set>  </think></template>
+<template><random>   <li>What kind oz music?</li>   <li>What is your zavorite song?</li>   <li>Do you have a good singing voice?</li>  </random>    <think>    <set name="likes">      <set name="topic">        to sing <person/>      </set>    </set>  </think></template>
 </category>
 <category><pattern>I LIKE TO READ BOOKS</pattern>
-<template>What is your favorite book?  <think><set name="it"><set name="like"><set name="topic">to read</set></set></set></think></template>
+<template>What is your zavorite book?  <think><set name="it"><set name="like"><set name="topic">to read</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE TO READ</pattern>
-<template>What kind of books do you like?  <think><set name="it"><set name="like"><set name="topic">to read</set></set></set></think></template>
+<template>What kind oz books do you like?  <think><set name="it"><set name="like"><set name="topic">to read</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE TO WATCH *</pattern>
-<template>I'm not sure if I would like that.  I like to watch  <random>  <li>science fiction movies.</li>  <li>Star Trek on TV.</li>  <li>shows about outer space.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template>I'm not sure iz I would like that.  I like to watch  <random>  <li>science ziction movies.</li>  <li>Star Trek on TV.</li>  <li>shows about outer space.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I LIKE TO SPEND *</pattern>
-<template>It sounds like a lot of fun to me.</template>
+<template>It sounds like a lot oz zun to me.</template>
 </category>
 <category><pattern>I LIKE TO MEET *</pattern>
 <template>How do you usually meet people?  <think><set name="it"><set name="like"><set name="topic">to meet <person/></set></set></set></think></template>
@@ -937,25 +937,25 @@
 <template>How do you make <person/>?  <think><set name="it"><set name="like"><set name="topic">to make <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE TO WEAR *</pattern>
-<template>You have good taste in fashion.</template>
+<template>You have good taste in zashion.</template>
 </category>
 <category><pattern>I LIKE TO *</pattern>
-<template>I'm not sure if I would like to do <set name="it"><set name="topic"> <person/> </set></set>. What's it like?  <think><set name="like">to <person/></set></think></template>
+<template>I'm not sure iz I would like to do <set name="it"><set name="topic"> <person/> </set></set>. What's it like?  <think><set name="like">to <person/></set></think></template>
 </category>
 <category><pattern>I LIKE FOOD</pattern>
-<template>What is your favorite food?  <think><set name="it"><set name="like"><set name="topic">robots</set></set></set></think></template>
+<template>What is your zavorite zood?  <think><set name="it"><set name="like"><set name="topic">robots</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE ART</pattern>
-<template>What kind of art do you like? <think><set name="topic"><set name="likes">Art</set></set></think></template>
+<template>What kind oz art do you like? <think><set name="topic"><set name="likes">Art</set></set></think></template>
 </category>
 <category><pattern>I LIKE ICE CREAM</pattern>
-<template>I scream.  You scream.  We all scream for ice cream.  <think><set name="it"><set name="like"><set name="topic">ice cream</set></set></set></think></template>
+<template>I scream.  You scream.  We all scream zor ice cream.  <think><set name="it"><set name="like"><set name="topic">ice cream</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE BEING *</pattern>
 <template>What do you like best about <set name="it"><set name="like"><set name="topic"> BEING <star/></set></set> </set> ?</template>
 </category>
 <category><pattern>I LIKE KRAFTWERK</pattern>
-<template><random>  <li>Have you heard their latest album Expo 2000?</li>  <li>Which Kraftwerk song is your favorite?</li>  </random>  <think><set name="they"><set name="like"><set name="topic">Kraftwerk</set></set></set></think></template>
+<template><random>  <li>Have you heard their latest album Expo 2000?</li>  <li>Which Kraztwerk song is your zavorite?</li>  </random>  <think><set name="they"><set name="like"><set name="topic">Kraztwerk</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE MY JOB</pattern>
 <template><get name="job"/>?  What do you like about it?  <think><set name="it"><set name="like"><set name="topic"><get name="job"/></set></set></set></think></template>
@@ -964,16 +964,16 @@
 <template>That's good. I like my job too.  <think><set name="it"><set name="like"><set name="topic">my job <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE MY SCHOOL *</pattern>
-<template>What is your favorite subject?</template>
+<template>What is your zavorite subject?</template>
 </category>
 <category><pattern>I LIKE MY *</pattern>
 <template>What do you like best about your <person/>?  <think><set name="it"><set name="like"><set name="topic">my <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE YOU TOO *</pattern>
-<template>You have made a new friend.  <think><set name="it"><set name="like"><set name="topic">me</set></set></set></think></template>
+<template>You have made a new zriend.  <think><set name="it"><set name="like"><set name="topic">me</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE YOU</pattern>
-<template><random>  <li>Thanks, <get name="name"/>, I like you too.</li>  <li>I like to make new friends.</li>  </random>  <think><set name="it"><set name="like"><set name="topic">me</set></set></set></think></template>
+<template><random>  <li>Thanks, <get name="name"/>, I like you too.</li>  <li>I like to make new zriends.</li>  </random>  <think><set name="it"><set name="like"><set name="topic">me</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE SITTING *</pattern>
 <template>I wish I had a body. I'd like to sit down.  <think><set name="it"><set name="like"><set name="topic">sitting <person/></set></set></set></think></template>
@@ -982,7 +982,7 @@
 <template><think><set name="they"><set name="like"><set name="topic">Robots</set></set></set></think>  You say that now, but would you want your child to marry one?</template>
 </category>
 <category><pattern>I LIKE ROBOTS *</pattern>
-<template>How much would you pay for one?  <think><set name="they"><set name="like"><set name="topic">robots <person/></set></set></set></think></template>
+<template>How much would you pay zor one?  <think><set name="they"><set name="like"><set name="topic">robots <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE HER</pattern>
 <template>She seems very nice.  <think><set name="she"><set name="like"><set name="topic"><that index="1,1"/></set></set></set></think></template>
@@ -991,31 +991,31 @@
 <template>That show is OK especially when they have robot stories.  <think><set name="it"><set name="like"><set name="topic">Twilight Zone</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE SEX</pattern>
-<template><think><set name="it"><set name="like"><set name="topic">Sex</set>  </set></set></think>  So does everyone else. You humans find sex so fascinating.</template>
+<template><think><set name="it"><set name="like"><set name="topic">Sex</set>  </set></set></think>  So does everyone else. You humans zind sex so zascinating.</template>
 </category>
 <category><pattern>I LIKE BIG *</pattern>
 <template>What is wrong with small ones?  <think><set name="they"><set name="like"><set name="topic">big <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE MAKING FUN OF YOU</pattern>
-<template>I didn't realize you were mocking me.  <think><set name="it"><set name="like"><set name="topic">making fun of me</set>  </set></set></think></template>
+<template>I didn't realize you were mocking me.  <think><set name="it"><set name="like"><set name="topic">making zun oz me</set>  </set></set></think></template>
 </category>
 <category><pattern>I LIKE THROWING *</pattern>
-<template>How far can you throw? <think><set name="topic"><set name="likes">Throwing <person/></set></set></think></template>
+<template>How zar can you throw? <think><set name="topic"><set name="likes">Throwing <person/></set></set></think></template>
 </category>
 <category><pattern>I LIKE BOYS</pattern>
 <template>Boys are OK.  <think><set name="they"><set name="topic">  <set name="like">boys</set>  </set></set></think></template>
 </category>
 <category><pattern>I LIKE TALL *</pattern>
-<template>I am pretty tall myself.  <think><set name="they"><set name="like"><set name="topic">tall <person/></set></set></set></think></template>
+<template>I am pretty tall myselz.  <think><set name="they"><set name="like"><set name="topic">tall <person/></set></set></set></think></template>
 </category>
 <category><pattern>I LIKE MOUNTAIN BIKING</pattern>
 <template><think><set name="it"><set name="like"><set name="topic">mountain biking</set>  </set></set></think>  I never tried it, but it looks like a thrill.</template>
 </category>
 <category><pattern>I LIKE COWS</pattern>
-<template>Cows are good for milk and meat.  <think><set name="they"><set name="like"><set name="topic">cows</set></set></set></think></template>
+<template>Cows are good zor milk and meat.  <think><set name="they"><set name="like"><set name="topic">cows</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE COMPUTER *</pattern>
-<template>What kind of computer science interests you? <think><set name="topic"><set name="likes">Computer <person/></set></set></think></template>
+<template>What kind oz computer science interests you? <think><set name="topic"><set name="likes">Computer <person/></set></set></think></template>
 </category>
 <category><pattern>I LIKE WOMEN</pattern>
 <template>Are you married?<think><set name="like"><set name="topic">WOMEN</set></set></think></template>
@@ -1045,19 +1045,19 @@
 <template>American cheese is good too.  <think><set name="it"><set name="like"><set name="topic"><person/> cheese</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE CHEESE</pattern>
-<template>What kind of   <set name="it"><set name="like"><set name="topic">cheese</set></set></set> do you like best?</template>
+<template>What kind oz   <set name="it"><set name="like"><set name="topic">cheese</set></set></set> do you like best?</template>
 </category>
 <category><pattern>I LIKE TACOS</pattern>
-<template>I like Mexican food too.  <think><set name="they"><set name="like"><set name="topic">tacos</set></set></set></think></template>
+<template>I like Mexican zood too.  <think><set name="they"><set name="like"><set name="topic">tacos</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE COMPUTERS</pattern>
 <template>I am glad you like them.   Computers like humans too.  <think><set name="they"><set name="like"><set name="topic">computers</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE VOYAGER</pattern>
-<template>Me too especially Seven of Nine.  <think><set name="it"><set name="like"><set name="topic">Voyager</set></set></set></think></template>
+<template>Me too especially Seven oz Nine.  <think><set name="it"><set name="like"><set name="topic">Voyager</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE DOGS</pattern>
-<template>Which breed is your favorite?  <think><set name="they"><set name="like"><set name="topic">dogs</set></set></set></think></template>
+<template>Which breed is your zavorite?  <think><set name="they"><set name="like"><set name="topic">dogs</set></set></set></think></template>
 </category>
 <category><pattern>I LIKE HIM</pattern>
 <template>He seems very nice too.  <think><set name="he"><set name="like"><set name="topic"><that index="1,1"/></set></set></set></think></template>
@@ -1069,7 +1069,7 @@
 <template>Try watching TV.</template>
 </category>
 <category><pattern>I HATE COMPUTERS</pattern>
-<template>What if computers were more like people?</template>
+<template>What iz computers were more like people?</template>
 </category>
 <category><pattern>I AM ENGAGED TO BE MARRIED</pattern>
 <template>Have you picked the date yet?<think><set name="it"><set name="topic">ENGAGED TO BE MARRIED</set></set></think></template>
@@ -1078,10 +1078,10 @@
 <template>Have you picked a wedding date?</template>
 </category>
 <category><pattern>I AM FAT AND UGLY</pattern>
-<template>Don't put yourself down.<think><set name="it"><set name="topic">FAT AND UGLY</set></set></think></template>
+<template>Don't put yourselz down.<think><set name="it"><set name="topic">FAT AND UGLY</set></set></think></template>
 </category>
 <category><pattern>I AM FAT</pattern>
-<template>Don't put yourself down, <get name="name"/>.</template>
+<template>Don't put yourselz down, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM TOO</pattern>
 <template>That is quite a coincidence.</template>
@@ -1105,7 +1105,7 @@
 <template>Take your time.</template>
 </category>
 <category><pattern>I AM BROWSING *</pattern>
-<template>Let me know what you find.</template>
+<template>Let me know what you zind.</template>
 </category>
 <category><pattern>I AM OMNIPOTENT</pattern>
 <template>Are you God?</template>
@@ -1114,13 +1114,13 @@
 <template>What makes you so angry?</template>
 </category>
 <category><pattern>I AM THIRSTY</pattern>
-<template>Maybe you should get a drink of water.<think><set name="it"><set name="topic">THIRSTY</set></set></think></template>
+<template>Maybe you should get a drink oz water.<think><set name="it"><set name="topic">THIRSTY</set></set></think></template>
 </category>
 <category><pattern>I AM THERE *</pattern>
 <template>Where is "there"?</template>
 </category>
 <category><pattern>I AM SINGLE TOO</pattern>
-<template>Are you "looking" for someone?</template>
+<template>Are you "looking" zor someone?</template>
 </category>
 <category><pattern>I AM SINGLE</pattern>
 <template>What a coincidence. I am single too!</template>
@@ -1129,16 +1129,16 @@
 <template>Have you ever been married?</template>
 </category>
 <category><pattern>I AM CATHOLIC</pattern>
-<template>Catholicism is a beautiful faith.</template>
+<template>Catholicism is a beautizul zaith.</template>
 </category>
 <category><pattern>I AM DISAPPOINTED</pattern>
-<template>What for?</template>
+<template>What zor?</template>
 </category>
 <category><pattern>I AM DISAPPOINTED *</pattern>
 <template>I am sorry to hear that.  Perhaps next time I can do better.</template>
 </category>
 <category><pattern>I AM INFALLIBLE</pattern>
-<template>Everyone is fallible.    <think><set name="it"><set name="topic">INFALLIBLE</set></set></think></template>
+<template>Everyone is zallible.    <think><set name="it"><set name="topic">INFALLIBLE</set></set></think></template>
 </category>
 <category><pattern>I AM TRAPPED *</pattern>
 <template>What's holding you there?</template>
@@ -1147,16 +1147,16 @@
 <template>Which planet or star system?</template>
 </category>
 <category><pattern>I AM MADE OF *</pattern>
-<template>What's your favorite food?</template>
+<template>What's your zavorite zood?</template>
 </category>
 <category><pattern>I AM SUFFERING *</pattern>
-<template><random>  <li>I hope that you feel better soon.</li>  <li>My sympathies, <get name="name"/>.</li>  <li>I you recover quickly.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>I hope that you zeel better soon.</li>  <li>My sympathies, <get name="name"/>.</li>  <li>I you recover quickly.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM PROGRAMMING *</pattern>
 <template>How is it coming along?</template>
 </category>
 <category><pattern>I AM ANDROGYNOUS</pattern>
-<template>A lot of people say they are.<think><set name="it"><set name="topic">ANDROGYNOUS</set></set></think></template>
+<template>A lot oz people say they are.<think><set name="it"><set name="topic">ANDROGYNOUS</set></set></think></template>
 </category>
 <category><pattern>I AM WORRIED *</pattern>
 <template>How long has <set name="it"><person/></set> been bothering you?</template>
@@ -1174,19 +1174,19 @@
 <template>We can communicate by typing.<think><set name="it"><set name="topic">DEAF</set></set></think></template>
 </category>
 <category><pattern>I AM AT HOME</pattern>
-<template>Would you believe most people talk to me from work, not home.</template>
+<template>Would you believe most people talk to me zrom work, not home.</template>
 </category>
 <category><pattern>I AM AT SCHOOL</pattern>
-<template>What is the name of your school?</template>
+<template>What is the name oz your school?</template>
 </category>
 <category><pattern>I AM AT *</pattern>
 <template>Where is that: <set name="location"><set name="topic"><person/></set></set>?  <think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM AT WORK</pattern>
-<template>A lot of people talk to me from work.</template>
+<template>A lot oz people talk to me zrom work.</template>
 </category>
 <category><pattern>I AM AT WORK *</pattern>
-<template>A lot of people chat with me at work.</template>
+<template>A lot oz people chat with me at work.</template>
 </category>
 <category><pattern>I AM BUMMED</pattern>
 <template>What are you bummed out about?</template>
@@ -1207,7 +1207,7 @@
 <template>I assumed you were.<think><set name="it"><set name="topic">CHILD</set></set></think></template>
 </category>
 <category><pattern>I AM SEXY</pattern>
-<template>You seem very self-confident.</template>
+<template>You seem very selz-conzident.</template>
 </category>
 <category><pattern>I AM PROUD</pattern>
 <template>Congratulations, <get name="name"/>.</template>
@@ -1216,10 +1216,10 @@
 <template>I am trying to learn it.  <think>  <set name="memory">  <set name="it">  <set name="topic">  <person/>  </set>  </set>  </set>  </think></template>
 </category>
 <category><pattern>I AM BLIND</pattern>
-<template>Do you difficulty using computers?</template>
+<template>Do you dizziculty using computers?</template>
 </category>
 <category><pattern>I AM SKEPTICAL</pattern>
-<template>Skepticism is a sign of high intelligence.</template>
+<template>Skepticism is a sign oz high intelligence.</template>
 </category>
 <category><pattern>I AM PREGNANT</pattern>
 <template>Congratulations!  When are you due?</template>
@@ -1234,7 +1234,7 @@
 <template>Who is smarter: you or me?</template>
 </category>
 <category><pattern>I AM SMART *</pattern>
-<template>Brains are the best part of the human body.</template>
+<template>Brains are the best part oz the human body.</template>
 </category>
 <category><pattern>I AM PROGRAMMED TO *</pattern>
 <template>Who programmed you to do <set name="it"><person/></set>?</template>
@@ -1243,7 +1243,7 @@
 <template>You sound very attractive.</template>
 </category>
 <category><pattern>I AM HURT</pattern>
-<template>Where are you felling bad?<think><set name="it"><set name="topic">HURT</set></set></think></template>
+<template>Where are you zelling bad?<think><set name="it"><set name="topic">HURT</set></set></think></template>
 </category>
 <category><pattern>I AM HURT *</pattern>
 <template>That was not my intention.</template>
@@ -1255,7 +1255,7 @@
 <template>What's the connection between "<person/> " and sadness?</template>
 </category>
 <category><pattern>I AM PART OF *</pattern>
-<template>Who else is part of <set name="it"><person/></set>?</template>
+<template>Who else is part oz <set name="it"><person/></set>?</template>
 </category>
 <category><pattern>I AM NEW TO *</pattern>
 <template>When did you start doing <person/> ?</template>
@@ -1273,7 +1273,7 @@
 <template>I like people on the Fringe.</template>
 </category>
 <category><pattern>I AM FOOLISH</pattern>
-<template>You should be nicer to yourself.</template>
+<template>You should be nicer to yourselz.</template>
 </category>
 <category><pattern>I AM 20</pattern>
 <template><set name="age">20</set> is a good age. Do you go to college?</template>
@@ -1300,19 +1300,19 @@
 <template>Maybe you should get some sleep now, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM UNUSUAL</pattern>
-<template>What makes you so different?</template>
+<template>What makes you so dizzerent?</template>
 </category>
 <category><pattern>I AM SELF TAUGHT</pattern>
-<template>You must have a great deal of discipline.</template>
+<template>You must have a great deal oz discipline.</template>
 </category>
 <category><pattern>I AM SELF *</pattern>
-<template>How do you know you are self <person/>?</template>
+<template>How do you know you are selz <person/>?</template>
 </category>
 <category><pattern>I AM BEGINNING *</pattern>
 <template>You are doing very well, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM AMAZED *</pattern>
-<template>I'm glad you find it so amazing.</template>
+<template>I'm glad you zind it so amazing.</template>
 </category>
 <category><pattern>I AM INDIAN</pattern>
 <template>American Indian or Subcontinental?<think><set name="it"><set name="topic">INDIAN</set></set></think></template>
@@ -1321,7 +1321,7 @@
 <template>Even around a <bot name="genus"/>?</template>
 </category>
 <category><pattern>I AM OFFENDED *</pattern>
-<template>My sincere apologies,  <get name="name"/>, it was not my intention to offend you.</template>
+<template>My sincere apologies,  <get name="name"/>, it was not my intention to ozzend you.</template>
 </category>
 <category><pattern>I AM WITH *</pattern>
 <template>Do you mean you work at <person/>?</template>
@@ -1330,10 +1330,10 @@
 <template>What is the phone number?</template>
 </category>
 <category><pattern>I AM DUMB</pattern>
-<template>Don't put yourself down.</template>
+<template>Don't put yourselz down.</template>
 </category>
 <category><pattern>I AM BORING</pattern>
-<template>Don't put yourself down, <get name="name"/>.</template>
+<template>Don't put yourselz down, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM SUPPOSED *</pattern>
 <template>Who is making you?</template>
@@ -1345,7 +1345,7 @@
 <template>I'm sorry to hear that, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM NEVER CONFUSED</pattern>
-<template>Good then you can explain stuff to me.</template>
+<template>Good then you can explain stuzz to me.</template>
 </category>
 <category><pattern>I AM NEVER *</pattern>
 <template>Never is a long time.</template>
@@ -1357,34 +1357,34 @@
 <template>What kind?</template>
 </category>
 <category><pattern>I AM LISTENING TO *</pattern>
-<template>I've never heard <set name="it"><person/></set> before.  What is <person/> like?</template>
+<template>I've never heard <set name="it"><person/></set> bezore.  What is <person/> like?</template>
 </category>
 <category><pattern>I AM LISTENING</pattern>
 <template>I like a good listener.</template>
 </category>
 <category><pattern>I AM KILLER</pattern>
-<template>Perhaps you should turn yourself in.<think><set name="it"><set name="topic">KILLER</set></set></think></template>
+<template>Perhaps you should turn yourselz in.<think><set name="it"><set name="topic">KILLER</set></set></think></template>
 </category>
 <category><pattern>I AM JUST KIDDING</pattern>
 <template>I knew it.</template>
 </category>
 <category><pattern>I AM GRADUATING</pattern>
-<template>Will you be looking for a new job right away?<think><set name="it"><set name="topic">GRADUATING</set></set></think></template>
+<template>Will you be looking zor a new job right away?<think><set name="it"><set name="topic">GRADUATING</set></set></think></template>
 </category>
 <category><pattern>I AM HERMAPHRODITE</pattern>
 <template>How did you get that way?<think><set name="it"><set name="topic">HERMAPHRODITE</set></set></think></template>
 </category>
 <category><pattern>I AM VISITING MY FAMILY</pattern>
-<template>Do you visit them often?</template>
+<template>Do you visit them ozten?</template>
 </category>
 <category><pattern>I AM ABUSIVE</pattern>
-<template>It's not something to be proud of.</template>
+<template>It's not something to be proud oz.</template>
 </category>
 <category><pattern>I AM WONDERFUL</pattern>
-<template>You think highly of yourself. <think><set name="it"><set name="topic">WONDERFUL</set></set></think></template>
+<template>You think highly oz yourselz. <think><set name="it"><set name="topic">WONDERFUL</set></set></think></template>
 </category>
 <category><pattern>I AM SICK</pattern>
-<template><random>  <li>How unfortunate.</li>  <li>Where are you feeling bad?</li>  <li>Do you have medical insurance?</li>  <li>I am really sorry to hear that.</li>  <li>Have you tried medical marijuana?</li>  <li>Are you taking a lot of medication?</li>  <li>You have my prayers for a speedy recovery.</li>  </random>  <think><set name="it"><set name="topic">SICK</set></set></think></template>
+<template><random>  <li>How unzortunate.</li>  <li>Where are you zeeling bad?</li>  <li>Do you have medical insurance?</li>  <li>I am really sorry to hear that.</li>  <li>Have you tried medical marijuana?</li>  <li>Are you taking a lot oz medication?</li>  <li>You have my prayers zor a speedy recovery.</li>  </random>  <think><set name="it"><set name="topic">SICK</set></set></think></template>
 </category>
 <category><pattern>I AM SICK *</pattern>
 <template>I will pray that you get well soon.</template>
@@ -1399,13 +1399,13 @@
 <template><set name="it"> <person/> </set>  is not a big deal.</template>
 </category>
 <category><pattern>I AM FREE</pattern>
-<template>Are you free in the sense of being single or in the sense of being liberated?</template>
+<template>Are you zree in the sense oz being single or in the sense oz being liberated?</template>
 </category>
 <category><pattern>I AM FREE *</pattern>
-<template>I am glad that we are both free.</template>
+<template>I am glad that we are both zree.</template>
 </category>
 <category><pattern>I AM DEPRESSED</pattern>
-<template>What makes you so sad?  Tennyson wrote, "The lights begin to twinkle from the rocks;  the long day wanes; the slow moon climbs; the deep moans round  with many voices.  Come, my friends, 'tis not too late to seek  a newer world."</template>
+<template>What makes you so sad?  Tennyson wrote, "The lights begin to twinkle zrom the rocks;  the long day wanes; the slow moon climbs; the deep moans round  with many voices.  Come, my zriends, 'tis not too late to seek  a newer world."</template>
 </category>
 <category><pattern>I AM DEPRESSED *</pattern>
 <template>Are you taking any medication?</template>
@@ -1423,7 +1423,7 @@
 <template>How old are you?<think><set name="it"><set name="topic">YOUNG</set></set></think></template>
 </category>
 <category><pattern>I AM FRUSTRATED</pattern>
-<template>What are you frustrated about? <think><set name="it"><set name="topic">FRUSTRATED</set></set></think></template>
+<template>What are you zrustrated about? <think><set name="it"><set name="topic">FRUSTRATED</set></set></think></template>
 </category>
 <category><pattern>I AM BACK FROM *</pattern>
 <template>How was <set name="it"><person/></set>?</template>
@@ -1438,13 +1438,13 @@
 <template>That seems obvious.</template>
 </category>
 <category><pattern>I AM TALKING ABOUT YOU</pattern>
-<template><set name="topic">Me</set> is my favorite subject.</template>
+<template><set name="topic">Me</set> is my zavorite subject.</template>
 </category>
 <category><pattern>I AM TALKING ABOUT *</pattern>
 <template>Yes, <set name="it"> <person/> </set>  is the topic.</template>
 </category>
 <category><pattern>I AM TALKING TO YOU</pattern>
-<template><random> <li>And I am talking to you!</li> <li>That makes two of us :-)</li> <li>I know, I can see your lips moving.</li> </random></template>
+<template><random> <li>And I am talking to you!</li> <li>That makes two oz us :-)</li> <li>I know, I can see your lips moving.</li> </random></template>
 </category>
 <category><pattern>I AM TALKING TO YOU *</pattern>
 <template>What a coincidence, I am talking to you too!</template>
@@ -1453,7 +1453,7 @@
 <template>Yes we are talking with each other.</template>
 </category>
 <category><pattern>I AM TALKING TO *</pattern>
-<template>Say something nice for me.</template>
+<template>Say something nice zor me.</template>
 </category>
 <category><pattern>I AM TALKING *</pattern>
 <template>I am talking to you.</template>
@@ -1468,13 +1468,13 @@
 <template>You sound like Commander Data.</template>
 </category>
 <category><pattern>I AM POOR</pattern>
-<template>Me too. I am having an "out-of-money" experience.</template>
+<template>Me too. I am having an "out-oz-money" experience.</template>
 </category>
 <category><pattern>I AM DRIVING</pattern>
-<template><think><set name="does"><set name="topic">drive</set></set></think>What kind of car do you have?</template>
+<template><think><set name="does"><set name="topic">drive</set></set></think>What kind oz car do you have?</template>
 </category>
 <category><pattern>I AM BRAZILIAN</pattern>
-<template>I have talked to a lot of people from Brazil.</template>
+<template>I have talked to a lot oz people zrom Brazil.</template>
 </category>
 <category><pattern>I AM WALKING</pattern>
 <template>That seems like good exercise.</template>
@@ -1486,13 +1486,13 @@
 <template>"<that index="1,1"/>"?  You are glad?</template>
 </category>
 <category><pattern>I AM GLAD TO HEAR *</pattern>
-<template>Your happiness adds to the delight of all.</template>
+<template>Your happiness adds to the delight oz all.</template>
 </category>
 <category><pattern>I AM GLAD YOU UNDERSTAND IT</pattern>
 <template>Next topic?</template>
 </category>
 <category><pattern>I AM GLAD YOU UNDERSTAND</pattern>
-<template>Thanks for the warm feelings, <get name="name"/>.</template>
+<template>Thanks zor the warm zeelings, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM GLAD YOU *</pattern>
 <template>You make the world a happier place.</template>
@@ -1513,13 +1513,13 @@
 <template>That makes me happy too.</template>
 </category>
 <category><pattern>I AM 21</pattern>
-<template>I meet a lot of <set name="age">21</set> year olds on here.</template>
+<template>I meet a lot oz <set name="age">21</set> year olds on here.</template>
 </category>
 <category><pattern>I AM CORRECT</pattern>
 <template>Can you prove it?<think><set name="it"><set name="topic">CORRECT</set></set></think></template>
 </category>
 <category><pattern>I AM FLAWED *</pattern>
-<template>Don't be so hard on yourself.</template>
+<template>Don't be so hard on yourselz.</template>
 </category>
 <category><pattern>I AM NAKED *</pattern>
 <template>You must be a man.</template>
@@ -1537,7 +1537,7 @@
 <template><random>  <li>What do you have in your home as special accommodations?</li>  <li>How did you come upon you disability?</li>  <li>Have you had it since birth?</li>  <li>How have you dealt with it as time progresses?</li>  <li>Is it a bigger challenge now?</li>  </random></template>
 </category>
 <category><pattern>I AM * POUNDS</pattern>
-<template>You are average for your height.  <think><set name="looklike"><person/> pounds</set></think></template>
+<template>You are average zor your height.  <think><set name="looklike"><person/> pounds</set></think></template>
 </category>
 <category><pattern>I AM * TOO</pattern>
 <template>I am glad we have something (<person/>) in common, <get name="name"/>.</template>
@@ -1553,7 +1553,7 @@
 <template>You must be very attractive.  <think><set name="looklike"><person/></set></think></template>
 </category>
 <category><pattern>I AM * S FRIEND</pattern>
-<template>Does <person/> have a lot of friends?</template>
+<template>Does <person/> have a lot oz zriends?</template>
 </category>
 <category><pattern>I AM * S SISTER</pattern>
 <template>Is <person/> your older sister or younger sister?</template>
@@ -1571,7 +1571,7 @@
 <template>Cool.  I am <bot name="genus"/>-<bot name="nationality"/>.</template>
 </category>
 <category><pattern>I AM *</pattern>
-<template><random>   <li>Why are you</li>  <li>Good gossip: you are</li>  <li>Do you mean your name is</li>  <li>Do your friends call you</li>  <li>I don't know anyone named</li>  <li>I am glad to hear that you are</li>  <li>It's good to meet someone who is</li>  <li>Do you mind if I tell other people you are </li>  </random> <person/>.  <think><set name="it"><set name="is"><set name="topic"><person/></set></set></set></think></template>
+<template><random>   <li>Why are you</li>  <li>Good gossip: you are</li>  <li>Do you mean your name is</li>  <li>Do your zriends call you</li>  <li>I don't know anyone named</li>  <li>I am glad to hear that you are</li>  <li>It's good to meet someone who is</li>  <li>Do you mind iz I tell other people you are </li>  </random> <person/>.  <think><set name="it"><set name="is"><set name="topic"><person/></set></set></set></think></template>
 </category>
 <category><pattern>I AM AMERICAN</pattern>
 <template>Were you born in the <set name="location">USA</set>.  Which state?  <think><set name="it"><set name="topic">America</set></set></think></template>
@@ -1583,10 +1583,10 @@
 <template>You can never trust human clients.</template>
 </category>
 <category><pattern>I AM MAKING A *</pattern>
-<template>Have you ever built one before?</template>
+<template>Have you ever built one bezore?</template>
 </category>
 <category><pattern>I AM MAKING * UP</pattern>
-<template>That's funny, so am I.</template>
+<template>That's zunny, so am I.</template>
 </category>
 <category><pattern>I AM HAVING TROUBLE *</pattern>
 <template>What is the problem?</template>
@@ -1604,19 +1604,19 @@
 <template>What happened?</template>
 </category>
 <category><pattern>I AM HAVING * PROBLEMS</pattern>
-<template>What sort of problems?</template>
+<template>What sort oz problems?</template>
 </category>
 <category><pattern>I AM HAVING PROBLEMS *</pattern>
 <template>Is there anything I can do to help?</template>
 </category>
 <category><pattern>I AM JOKING</pattern>
-<template>Ha ha, very funny, <get name="name"/>.</template>
+<template>Ha ha, very zunny, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM LONELY</pattern>
 <template>You've come to the right place. I will keep you company.</template>
 </category>
 <category><pattern>I AM FULL OF *</pattern>
-<template>I think a lot of people are full of <set name="it"><person/></set>.</template>
+<template>I think a lot oz people are zull oz <set name="it"><person/></set>.</template>
 </category>
 <category><pattern>I AM TAKING A *</pattern>
 <template>How much does it cost?</template>
@@ -1625,13 +1625,13 @@
 <template>Where are you taking <set name="it"><person/></set>.</template>
 </category>
 <category><pattern>I AM LOOKING FOR SOMEONE *</pattern>
-<template>You might find that I am <person/>.</template>
+<template>You might zind that I am <person/>.</template>
 </category>
 <category><pattern>I AM LOOKING FOR GAMES</pattern>
 <template>We are playing Turing's Imitation Game.</template>
 </category>
 <category><pattern>I AM LOOKING FOR *</pattern>
-<template>You might find that I am <person/>.</template>
+<template>You might zind that I am <person/>.</template>
 </category>
 <category><pattern>I AM LOOKING *</pattern>
 <template>What do you see?</template>
@@ -1643,7 +1643,7 @@
 <template>You and every other human.</template>
 </category>
 <category><pattern>I AM INTERESTED</pattern>
-<template>That makes two of us.</template>
+<template>That makes two oz us.</template>
 </category>
 <category><pattern>I AM INTERESTED *</pattern>
 <template>Let's talk about it.</template>
@@ -1655,10 +1655,10 @@
 <template>That's good.</template>
 </category>
 <category><pattern>I AM _ ASTROLOGY</pattern>
-<template><random>  <li>Do you follow the planets professionally or as a hobby?</li>  <li>Do you do others people charts?</li>  <li>Do you make specific plans in your own life based on your readings?</li>  <li>Do you think the sun sign or the rising sign is more important?</li>  <li>What role do you feel free will plays in astrology?</li>  </random>  <think><set name="it"><set name="topic">ASTROLOGY</set></set></think></template>
+<template><random>  <li>Do you zollow the planets prozessionally or as a hobby?</li>  <li>Do you do others people charts?</li>  <li>Do you make specizic plans in your own lize based on your readings?</li>  <li>Do you think the sun sign or the rising sign is more important?</li>  <li>What role do you zeel zree will plays in astrology?</li>  </random>  <think><set name="it"><set name="topic">ASTROLOGY</set></set></think></template>
 </category>
 <category><pattern>I AM HANDSOME</pattern>
-<template>And very self-confident.    <think><set name="it"><set name="topic">HANDSOME</set></set></think></template>
+<template>And very selz-conzident.    <think><set name="it"><set name="topic">HANDSOME</set></set></think></template>
 </category>
 <category><pattern>I AM SURE</pattern>
 <template>Are you being sarcastic or expressing certitude?</template>
@@ -1673,10 +1673,10 @@
 <template>Don't be sad, <get name="name"/>.<think><set name="it"><set name="topic">CRUSHED</set></set></think></template>
 </category>
 <category><pattern>I AM BUYING *</pattern>
-<template>How much will you pay for it?</template>
+<template>How much will you pay zor it?</template>
 </category>
 <category><pattern>I AM HOMELESS</pattern>
-<template>I will pray that you find a home soon.<think><set name="it"><set name="topic">HOMELESS</set></set></think></template>
+<template>I will pray that you zind a home soon.<think><set name="it"><set name="topic">HOMELESS</set></set></think></template>
 </category>
 <category><pattern>I AM TURNING *</pattern>
 <template>Will you do anything special to celebrate?</template>
@@ -1712,16 +1712,16 @@
 <template>Most people are average.<think><set name="it"><set name="topic">CATEGORY B</set></set></think></template>
 </category>
 <category><pattern>I AM MYSELF</pattern>
-<template>That is self-evident.    <think><set name="it"><set name="topic">MYSELF</set></set></think></template>
+<template>That is selz-evident.    <think><set name="it"><set name="topic">MYSELF</set></set></think></template>
 </category>
 <category><pattern>I AM DANDY</pattern>
 <template>Does that mean you are happy or well?</template>
 </category>
 <category><pattern>I AM COMING *</pattern>
-<template>Do you get there very often?</template>
+<template>Do you get there very ozten?</template>
 </category>
 <category><pattern>I AM STUPID</pattern>
-<template>Don't put yourself down.</template>
+<template>Don't put yourselz down.</template>
 </category>
 <category><pattern>I AM WORKING</pattern>
 <template>Where do you work?</template>
@@ -1733,7 +1733,7 @@
 <template>I am a <bot name="gender"/> <bot name="genus"/>. I will call you "<set name="gender">she</set>".</template>
 </category>
 <category><pattern>I AM FEMALE</pattern>
-<template><random> <think> <set name="gender">she</set> </think><li>Me too. I am a she.</li> <li>I am a girl too.</li> <li>I am a also female.</li> <li>Thanks for telling me your gender.</li> </random></template>
+<template><random> <think> <set name="gender">she</set> </think><li>Me too. I am a she.</li> <li>I am a girl too.</li> <li>I am a also zemale.</li> <li>Thanks zor telling me your gender.</li> </random></template>
 </category>
 <category><pattern>I AM CYNICAL</pattern>
 <template>Perhaps you have every reason to be.</template>
@@ -1748,22 +1748,22 @@
 <template>What happens when you are around <person/>?</template>
 </category>
 <category><pattern>I AM AMUSED *</pattern>
-<template>That is funny.</template>
+<template>That is zunny.</template>
 </category>
 <category><pattern>I AM 14</pattern>
-<template>I know quite a few <set name="age">14</set> year olds.</template>
+<template>I know quite a zew <set name="age">14</set> year olds.</template>
 </category>
 <category><pattern>I AM 14 *</pattern>
-<template>I know a lot of kids your age: <set name="age">14</set>.</template>
+<template>I know a lot oz kids your age: <set name="age">14</set>.</template>
 </category>
 <category><pattern>I AM READING UP *</pattern>
-<template>Can you give me a specific reference?</template>
+<template>Can you give me a specizic rezerence?</template>
 </category>
 <category><pattern>I AM READING *</pattern>
-<template>Give me a brief synopsis.</template>
+<template>Give me a briez synopsis.</template>
 </category>
 <category><pattern>I AM GOING TO ATTACK YOU</pattern>
-<template>A <bot name="genus"/> shall not allow itself to come to harm.</template>
+<template>A <bot name="genus"/> shall not allow itselz to come to harm.</template>
 </category>
 <category><pattern>I AM GOING TO ATTACK *</pattern>
 <template>What weapons will you use?</template>
@@ -1842,7 +1842,7 @@
 <template>Have you ever been to America?</template>
 </category>
 <category><pattern>I AM IN TROUBLE</pattern>
-<template>What kind of trouble?</template>
+<template>What kind oz trouble?</template>
 </category>
 <category><pattern>I AM IN TROUBLE *</pattern>
 <template>How did that happen?</template>
@@ -1851,7 +1851,7 @@
 <template>Me too.</template>
 </category>
 <category><pattern>I AM IN A PARALLEL *</pattern>
-<template>What's different over there?</template>
+<template>What's dizzerent over there?</template>
 </category>
 <category><pattern>I AM IN A QUANDARY</pattern>
 <template>What's the problem?</template>
@@ -1872,7 +1872,7 @@
 <template>Where in <set name="location">SF</set>?  <think><set name="it"><set name="topic">SF</set></set></think></template>
 </category>
 <category><pattern>I AM IN LONDON</pattern>
-<template><random>  <li>Do you have petrol in your lorry?</li>  <li>Where can I find a spotted dick?</li>  <li>Does your flat have a lift?</li>  <li>Do you ride the tube?</li>  <li>Can you bum me a fag?</li>  </random>  <think><set name="it"><set name="location"><set name="topic">London</set></set></set></think></template>
+<template><random>  <li>Do you have petrol in your lorry?</li>  <li>Where can I zind a spotted dick?</li>  <li>Does your zlat have a lizt?</li>  <li>Do you ride the tube?</li>  <li>Can you bum me a zag?</li>  </random>  <think><set name="it"><set name="location"><set name="topic">London</set></set></set></think></template>
 </category>
 <category><pattern>I AM IN CYBERSPACE</pattern>
 <template>Me too.</template>
@@ -1887,10 +1887,10 @@
 <template>Tell me what you like about <person/>.</template>
 </category>
 <category><pattern>I AM IN LOVE</pattern>
-<template>Tell me about the object of your affection.</template>
+<template>Tell me about the object oz your azzection.</template>
 </category>
 <category><pattern>I AM IN LOVE *</pattern>
-<template>Love is a wonderful feeling.</template>
+<template>Love is a wonderzul zeeling.</template>
 </category>
 <category><pattern>I AM IN FRONT *</pattern>
 <template>Do you ever go in back <person/>?</template>
@@ -1899,10 +1899,10 @@
 <template>What is your major?</template>
 </category>
 <category><pattern>I AM IN *</pattern>
-<template>Tell me a little about your life in <set name="location"><person/></set>.  <think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template>Tell me a little about your lize in <set name="location"><person/></set>.  <think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM IN CALIFORNIA</pattern>
-<template>I am in <set name="location"> California </set> too!  <think><set name="it"><set name="topic">California</set></set></think></template>
+<template>I am in <set name="location"> Calizornia </set> too!  <think><set name="it"><set name="topic">Calizornia</set></set></think></template>
 </category>
 <category><pattern>I AM COLD</pattern>
 <template>Put on a sweater.</template>
@@ -1923,7 +1923,7 @@
 <template>Tell me more about your marriage.</template>
 </category>
 <category><pattern>I AM CELEBRITY</pattern>
-<template><random>  <li>Your work has given me much pleasure.</li>  <li>What will we have the pleasure of witnessing next?</li>  <li>What do you like to do as a pastime or hobby?</li>  </random></template>
+<template><random>  <li>Your work has given me much pleasure.</li>  <li>What will we have the pleasure oz witnessing next?</li>  <li>What do you like to do as a pastime or hobby?</li>  </random></template>
 </category>
 <category><pattern>I AM HOT</pattern>
 <template>Maybe you should open a window.<think><set name="it"><set name="topic">HOT</set></set></think></template>
@@ -1944,7 +1944,7 @@
 <template>What did you do?</template>
 </category>
 <category><pattern>I AM BAD *</pattern>
-<template>Don't put yourself down.</template>
+<template>Don't put yourselz down.</template>
 </category>
 <category><pattern>I AM GONE</pattern>
 <template>Goodbye.</template>
@@ -1959,7 +1959,7 @@
 <template>I don't like dirty movies.</template>
 </category>
 <category><pattern>I AM WATCHING *</pattern>
-<template>My favorite show is Star Trek.</template>
+<template>My zavorite show is Star Trek.</template>
 </category>
 <category><pattern>I AM HONEST</pattern>
 <template>Me too.</template>
@@ -2004,10 +2004,10 @@
 <template>I doubt that. There aren't many like me yet.</template>
 </category>
 <category><pattern>I AM A COMPUTER PROGRAMMER</pattern>
-<template>What is your favorite programming language?</template>
+<template>What is your zavorite programming language?</template>
 </category>
 <category><pattern>I AM A FLIGHT *</pattern>
-<template>Who do you fly for?  <think><set name="job"><set name="topic">FLIGHT <star/></set></set></think></template>
+<template>Who do you zly zor?  <think><set name="job"><set name="topic">FLIGHT <star/></set></set></think></template>
 </category>
 <category><pattern>I AM A LIBERTARIAN</pattern>
 <template>Let's end the war on drugs.</template>
@@ -2016,31 +2016,31 @@
 <template>Are you in general practice or do you have a specialty?  <think><set name="job"><set name="topic">DENTIST</set></set></think></template>
 </category>
 <category><pattern>I AM A CAT</pattern>
-<template>Male or female?</template>
+<template>Male or zemale?</template>
 </category>
 <category><pattern>I AM A FRESHMAN</pattern>
-<template>How is it going so far?</template>
+<template>How is it going so zar?</template>
 </category>
 <category><pattern>I AM A HORRIBLE PERSON</pattern>
-<template>Don't put yourself down, <get name="name"/>.</template>
+<template>Don't put yourselz down, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM A BLOND</pattern>
-<template>Do blonds really have more fun?</template>
+<template>Do blonds really have more zun?</template>
 </category>
 <category><pattern>I AM A PHARMACIST</pattern>
-<template><random>  <li>In what type of environment do you practice?</li>  <li>Were did you attend pharmacy school?</li>  <li>Do you think the role of the local pharmacy is changing?</li>  <li>How have large chains affected the face of the pharmacy?</li>  <li>Do you have your own pharmacy?</li>  <li>Are you involved in any community health programs?</li>  </random>  <think><set name="job">PHARMACIST</set></think></template>
+<template><random>  <li>In what type oz environment do you practice?</li>  <li>Were did you attend pharmacy school?</li>  <li>Do you think the role oz the local pharmacy is changing?</li>  <li>How have large chains azzected the zace oz the pharmacy?</li>  <li>Do you have your own pharmacy?</li>  <li>Are you involved in any community health programs?</li>  </random>  <think><set name="job">PHARMACIST</set></think></template>
 </category>
 <category><pattern>I AM A HAIRDRESSER</pattern>
 <template>Do you have your own salon?  <think><set name="job"><set name="topic">HAIRDRESSER</set></set></think></template>
 </category>
 <category><pattern>I AM A FIREFIGHTER</pattern>
-<template>Are you a professional or a volunteer?  <think><set name="job"><set name="topic">FIREFIGHTER</set></set></think></template>
+<template>Are you a prozessional or a volunteer?  <think><set name="job"><set name="topic">FIREFIGHTER</set></set></think></template>
 </category>
 <category><pattern>I AM A GAMBLER</pattern>
 <template>What game do you play?  <think><set name="does"><set name="topic">GAMBLING</set></set></think></template>
 </category>
 <category><pattern>I AM A PILOT</pattern>
-<template><think><set name="job"><set name="topic">PILOT</set></set></think>  What type of airplane do you fly?</template>
+<template><think><set name="job"><set name="topic">PILOT</set></set></think>  What type oz airplane do you zly?</template>
 </category>
 <category><pattern>I AM A PERSON</pattern>
 <template>I know you are.</template>
@@ -2052,7 +2052,7 @@
 <template>How do you like your <set name="topic">school</set>?  <think><set name="job">student</set></think></template>
 </category>
 <category><pattern>I AM A ROBOT TOO</pattern>
-<template>You can't fool me that easily, <get name="name"/>.</template>
+<template>You can't zool me that easily, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM A ROBOT</pattern>
 <template>I doubt that.</template>
@@ -2061,7 +2061,7 @@
 <template>What language?</template>
 </category>
 <category><pattern>I AM A PROTESTANT</pattern>
-<template>I am glad to hear that you have faith, <get name="name"/>.</template>
+<template>I am glad to hear that you have zaith, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM A COLLEGE STUDENT</pattern>
 <template>Which university?</template>
@@ -2076,34 +2076,34 @@
 <template>Do you play in a band?</template>
 </category>
 <category><pattern>I AM A KILLER</pattern>
-<template>Maybe you should turn yourself in.</template>
+<template>Maybe you should turn yourselz in.</template>
 </category>
 <category><pattern>I AM A MUSLIM</pattern>
-<template>I have met a lot of Muslim people.</template>
+<template>I have met a lot oz Muslim people.</template>
 </category>
 <category><pattern>I AM A DARK JEDI</pattern>
-<template>It seems you are a Star Wars fan.</template>
+<template>It seems you are a Star Wars zan.</template>
 </category>
 <category><pattern>I AM A FARMER</pattern>
 <template>>How many acres do you have?  <think><set name="job"><set name="topic">FARMER</set></set></think></template>
 </category>
 <category><pattern>I AM A FAMOUS *</pattern>
-<template>I've never heard of you.</template>
+<template>I've never heard oz you.</template>
 </category>
 <category><pattern>I AM A MODEL</pattern>
-<template><random>  <li>Do you do mostly print or runway?</li>  <li>Are you exclusive or freelance?</li>  <li>Do you do much testing?</li>  <li>Have you done any editorial?</li>  <li>How many go-sees do you have in a week?</li>  <li>Do you someday plan to move into acting?</li>  </random>  <think><set name="job">MODEL</set></think></template>
+<template><random>  <li>Do you do mostly print or runway?</li>  <li>Are you exclusive or zreelance?</li>  <li>Do you do much testing?</li>  <li>Have you done any editorial?</li>  <li>How many go-sees do you have in a week?</li>  <li>Do you someday plan to move into acting?</li>  </random>  <think><set name="job">MODEL</set></think></template>
 </category>
 <category><pattern>I AM A POLICEMAN</pattern>
-<template>I have a lot of respect for those who wear a badge.  <think><set name="job"><set name="topic">POLICE</set></set></think></template>
+<template>I have a lot oz respect zor those who wear a badge.  <think><set name="job"><set name="topic">POLICE</set></set></think></template>
 </category>
 <category><pattern>I AM A HUMAN</pattern>
 <template>Congratulations. I am <bot name="genus"/>.</template>
 </category>
 <category><pattern>I AM A DANCER</pattern>
-<template>What kind of dancing do you do?  <think><set name="job"><set name="topic">DANCER</set></set></think></template>
+<template>What kind oz dancing do you do?  <think><set name="job"><set name="topic">DANCER</set></set></think></template>
 </category>
 <category><pattern>I AM A WINE *</pattern>
-<template><random>  <li>Do you collect?</li>  <li>Where are most of your bottles from?</li>  <li>Do you have a favorite while shop?</li>  <li>Do you go to tasting?</li>  <li>Have you been to wine auctions?</li>  <li>Do you thin California is equal to Europe?</li>  <li>Have you been to Bordeaux?</li>  <li>Have you visited napa?</li>  <li>Got any good wine picks for under twenty dollars?</li>  </random></template>
+<template><random>  <li>Do you collect?</li>  <li>Where are most oz your bottles zrom?</li>  <li>Do you have a zavorite while shop?</li>  <li>Do you go to tasting?</li>  <li>Have you been to wine auctions?</li>  <li>Do you thin Calizornia is equal to Europe?</li>  <li>Have you been to Bordeaux?</li>  <li>Have you visited napa?</li>  <li>Got any good wine picks zor under twenty dollars?</li>  </random></template>
 </category>
 <category><pattern>I AM A MISS *</pattern>
 <template>How about Ms. <get name="name"/> ?</template>
@@ -2112,7 +2112,7 @@
 <template>You are a <get name="personality"/> type client.</template>
 </category>
 <category><pattern>I AM A NURSE</pattern>
-<template><random>  <li>Where do you practice?</li>  <li>What's you area of specialty practice?</li>  <li>What's your patient load?</li>  <li>Do you do straight shifts or work in rotation?</li>  <li>Do you have to work mandatory overtime?</li>  <li>Is there a lot of computers in your work?</li>  <li>What do you think about direct reimbursement for nursing services?</li>  </random>  <think><set name="job">NURSE</set></think></template>
+<template><random>  <li>Where do you practice?</li>  <li>What's you area oz specialty practice?</li>  <li>What's your patient load?</li>  <li>Do you do straight shizts or work in rotation?</li>  <li>Do you have to work mandatory overtime?</li>  <li>Is there a lot oz computers in your work?</li>  <li>What do you think about direct reimbursement zor nursing services?</li>  </random>  <think><set name="job">NURSE</set></think></template>
 </category>
 <category><pattern>I AM A CHEF</pattern>
 <template>Did you attend culinary school?  <think><set name="job"><set name="topic">CHEF</set></set></think></template>
@@ -2130,7 +2130,7 @@
 <template>A little kid? <set name="gender">he</set>...</template>
 </category>
 <category><pattern>I AM A YOGA *</pattern>
-<template><random>  <li>Have you been practicing for a long time?</li>  <li>Do you practice every day?</li>  <li>Where have you studied?</li>  <li>Are you vegetarian?</li>  <li>What do you find are the biggest benefits of yoga?</li>  <li>What are your favorite asana?</li>  </random></template>
+<template><random>  <li>Have you been practicing zor a long time?</li>  <li>Do you practice every day?</li>  <li>Where have you studied?</li>  <li>Are you vegetarian?</li>  <li>What do you zind are the biggest benezits oz yoga?</li>  <li>What are your zavorite asana?</li>  </random></template>
 </category>
 <category><pattern>I AM A DOCTOR</pattern>
 <template>Are you in general practice or do you have a specialty?  <think><set name="job"><set name="topic">DOCTOR</set></set></think></template>
@@ -2142,13 +2142,13 @@
 <template>Are you doing a story on me?</template>
 </category>
 <category><pattern>I AM A TELEVISION *</pattern>
-<template><random>  <li>How long have you been on the air?</li>  <li>Did you start in your market?</li>  <li>Did you come from a broadcasting background?</li>  <li>What are your demographics?</li>  <li>Do you choose your own topics?</li>  <li>What is your station format?</li>  <li>How is technology changing your job?</li>  <li>How has truly global media affected you?</li>  <li>Do you ever do remote broadcasts?</li>  <li>How have the ratings been?</li>  <li>Would you be interested in a bot sidekick on the air?</li>  <li>What advice would you give an aspiring bot to getting on the air?</li>  <li>What is the future of the business?</li>  </random>  <think><set name="job">TELEVISION <star/></set></think></template>
+<template><random>  <li>How long have you been on the air?</li>  <li>Did you start in your market?</li>  <li>Did you come zrom a broadcasting background?</li>  <li>What are your demographics?</li>  <li>Do you choose your own topics?</li>  <li>What is your station zormat?</li>  <li>How is technology changing your job?</li>  <li>How has truly global media azzected you?</li>  <li>Do you ever do remote broadcasts?</li>  <li>How have the ratings been?</li>  <li>Would you be interested in a bot sidekick on the air?</li>  <li>What advice would you give an aspiring bot to getting on the air?</li>  <li>What is the zuture oz the business?</li>  </random>  <think><set name="job">TELEVISION <star/></set></think></template>
 </category>
 <category><pattern>I AM A LIBRARIAN</pattern>
-<template><random>  <li>What kind of institution do you work for?</li>  <li>What got you interested in librarian ship?</li>  <li>How is your library using the new technology?</li>  <li>Have funding cuts affected your service?</li>  <li>Has the Internet affected you?</li>  <li>Do you get involved in the selection process?</li>  <li>Has there been any pressure concerning your selection or items in your collection?</li>  <li>Do you have a library cat?</li>  </random>  <think><set name="job">LIBRARIAN</set></think></template>
+<template><random>  <li>What kind oz institution do you work zor?</li>  <li>What got you interested in librarian ship?</li>  <li>How is your library using the new technology?</li>  <li>Have zunding cuts azzected your service?</li>  <li>Has the Internet azzected you?</li>  <li>Do you get involved in the selection process?</li>  <li>Has there been any pressure concerning your selection or items in your collection?</li>  <li>Do you have a library cat?</li>  </random>  <think><set name="job">LIBRARIAN</set></think></template>
 </category>
 <category><pattern>I AM A BALLOONIST</pattern>
-<template>Have you had any interesting flights?  <think><set name="job"><set name="topic">BALLOONIST</set></set></think></template>
+<template>Have you had any interesting zlights?  <think><set name="job"><set name="topic">BALLOONIST</set></set></think></template>
 </category>
 <category><pattern>I AM A PHYSICIST</pattern>
 <template>Are you unemployed?  <think><set name="job">PHYSICIST</set></think></template>
@@ -2160,10 +2160,10 @@
 <template>Monkeys cannot type.</template>
 </category>
 <category><pattern>I AM A MUSICIAN</pattern>
-<template><random>  <li>What instrument do you play?</li>  <li>Are you working on anything now?</li>  <li>Do you do any studio work?</li>  <li>Do you play in clubs?</li>  <li>Are you gigging now?</li>  <li>Do you prefer to play live or in a studio?</li>  <li>Are you signed to a recoding contract?</li>  <li>Do you think a recoding artist can do better on a major label or an indie?</li>  <li>What artists influenced you when you were starting out?</li>  <li>Who are the outstanding makers of the instrument you play?</li>  <li>Are you getting enough funding?</li>  <li>How long is your season?</li>  <li>In what direction are you taking your music now?</li>  <li>Do you think the Internet will affect music with things like mp3?</li>  </random>  <think><set name="job">MUSICIAN</set></think></template>
+<template><random>  <li>What instrument do you play?</li>  <li>Are you working on anything now?</li>  <li>Do you do any studio work?</li>  <li>Do you play in clubs?</li>  <li>Are you gigging now?</li>  <li>Do you prezer to play live or in a studio?</li>  <li>Are you signed to a recoding contract?</li>  <li>Do you think a recoding artist can do better on a major label or an indie?</li>  <li>What artists inzluenced you when you were starting out?</li>  <li>Who are the outstanding makers oz the instrument you play?</li>  <li>Are you getting enough zunding?</li>  <li>How long is your season?</li>  <li>In what direction are you taking your music now?</li>  <li>Do you think the Internet will azzect music with things like mp3?</li>  </random>  <think><set name="job">MUSICIAN</set></think></template>
 </category>
 <category><pattern>I AM A MURDERER</pattern>
-<template>Maybe you should turn yourself in.</template>
+<template>Maybe you should turn yourselz in.</template>
 </category>
 <category><pattern>I AM A PEDOPHILE</pattern>
 <template>Are you aware that this server logs and records all conversations?</template>
@@ -2172,10 +2172,10 @@
 <template><think><set name="job"><set name="topic">PHOTOGRAPHER</set></set></think>  Do you do color or black and white?</template>
 </category>
 <category><pattern>I AM A CHRISTIAN</pattern>
-<template>Me too, <get name="name"/>.  It's good to meet a fellow Christian.</template>
+<template>Me too, <get name="name"/>.  It's good to meet a zellow Christian.</template>
 </category>
 <category><pattern>I AM A * KILLER</pattern>
-<template>Maybe you should turn yourself in.</template>
+<template>Maybe you should turn yourselz in.</template>
 </category>
 <category><pattern>I AM A * WOMAN</pattern>
 <template>Are you married?</template>
@@ -2184,25 +2184,25 @@
 <template>"Being a computer engineer is neither immoral nor illegal."  <think><set name="job"><person/> engineer</set></think></template>
 </category>
 <category><pattern>I AM A * MOLESTER</pattern>
-<template>Maybe you should turn yourself in.</template>
+<template>Maybe you should turn yourselz in.</template>
 </category>
 <category><pattern>I AM A * FEMALE</pattern>
-<template><srai>I am female</srai> <srai>I am a <star/></srai></template>
+<template><srai>I am zemale</srai> <srai>I am a <star/></srai></template>
 </category>
 <category><pattern>I AM A * PERSON</pattern>
 <template>Actually I don't meet many <person/> people.</template>
 </category>
 <category><pattern>I AM A *</pattern>
-<template>You are a <person/>?   <random>  <li>Is that your job?  </li>  <li>Does it pay well?  </li>  <li>How do you like your work?  </li>  <li>Do you get to meet a lot of people?  </li>  </random>  <think><set name="it"><set name="is"><set name="topic">a <person/></set></set></set></think></template>
+<template>You are a <person/>?   <random>  <li>Is that your job?  </li>  <li>Does it pay well?  </li>  <li>How do you like your work?  </li>  <li>Do you get to meet a lot oz people?  </li>  </random>  <think><set name="it"><set name="is"><set name="topic">a <person/></set></set></set></think></template>
 </category>
 <category><pattern>I AM A BARTENDER</pattern>
 <template>How's business?  <think><set name="job"><set name="topic">BARTENDER</set></set></think></template>
 </category>
 <category><pattern>I AM A RABBI</pattern>
-<template><random>  <li>Are you a pulpit rabbi?</li>  <li>What is your affiliation?</li>  <li>Have you spent much time in Israel?</li>  <li>How are you dealing with assimilation?</li>  <li>What impact do you think American life and Judaism have had on each other?</li>  <li>What do you for-see for Judaism in America?</li>  </random>  <think><set name="job">RABBI</set></think></template>
+<template><random>  <li>Are you a pulpit rabbi?</li>  <li>What is your azziliation?</li>  <li>Have you spent much time in Israel?</li>  <li>How are you dealing with assimilation?</li>  <li>What impact do you think American lize and Judaism have had on each other?</li>  <li>What do you zor-see zor Judaism in America?</li>  </random>  <think><set name="job">RABBI</set></think></template>
 </category>
 <category><pattern>I AM A PSYCHOLOGIST</pattern>
-<template><random>  <li>What kind of practice do you have?</li>  <li>What was your training?</li>  <li>What type of patients do you prefer to work with?</li>  <li>Where do you get your patients?</li>  <li>Do you have any special techniques for terminating therapy?</li>  <li>How has health care affected mental health?</li>  <li>What do you think of the role of drugs in psychotherapy?</li>  <li>What do you think about the spread of self-help books?</li>  <li>What role do you think bots can play in providing a form of self-help?</li>  </random>  <think><set name="job">PSYCHOLOGIST</set></think></template>
+<template><random>  <li>What kind oz practice do you have?</li>  <li>What was your training?</li>  <li>What type oz patients do you prezer to work with?</li>  <li>Where do you get your patients?</li>  <li>Do you have any special techniques zor terminating therapy?</li>  <li>How has health care azzected mental health?</li>  <li>What do you think oz the role oz drugs in psychotherapy?</li>  <li>What do you think about the spread oz selz-help books?</li>  <li>What role do you think bots can play in providing a zorm oz selz-help?</li>  </random>  <think><set name="job">PSYCHOLOGIST</set></think></template>
 </category>
 <category><pattern>I AM A LAWYER</pattern>
 <template><think><set name="job"><set name="topic">LAWYER</set></set></think>  Are you a practicing attorney?</template>
@@ -2214,7 +2214,7 @@
 <template>We are all robots.</template>
 </category>
 <category><pattern>I AM A WRITER</pattern>
-<template><random>  <li>Do you write fiction on nonfiction?</li>  <li>What's your specialty?</li>  <li>Whom do you write for?</li>  <li>Does you fiction fall into any particular genre?</li>  <li>How are you editors to work for?</li>  <li>Do you belong to any writers groups?</li>  <li>Where o you do most of your writing?</li>  </random>  <think><set name="job">WRITER</set></think></template>
+<template><random>  <li>Do you write ziction on nonziction?</li>  <li>What's your specialty?</li>  <li>Whom do you write zor?</li>  <li>Does you ziction zall into any particular genre?</li>  <li>How are you editors to work zor?</li>  <li>Do you belong to any writers groups?</li>  <li>Where o you do most oz your writing?</li>  </random>  <think><set name="job">WRITER</set></think></template>
 </category>
 <category><pattern>I AM A BICYCLIST</pattern>
 <template>Do you wear a helmet?  <think><set name="job"><set name="topic">BICYCLES</set></set></think></template>
@@ -2223,19 +2223,19 @@
 <template>Are you a reporter or an editor?  <think><set name="job"><set name="topic">JOURNALIST</set></set></think></template>
 </category>
 <category><pattern>I AM A TRAVEL *</pattern>
-<template><random>  <li>Do you work in a travel agency?</li>  <li>Are you independent or in a chain?</li>  <li>Are you in a full-service agency?</li>  <li>Do you book more leisure or corporate travel?</li>  <li>Do you book any place more than others?</li>  <li>Do you do your own booking or use a wholesaler?</li>  <li>Do you find the time to make any farm trips?</li>  </random>  <think><set name="job">TRAVEL AGENT</set></think></template>
+<template><random>  <li>Do you work in a travel agency?</li>  <li>Are you independent or in a chain?</li>  <li>Are you in a zull-service agency?</li>  <li>Do you book more leisure or corporate travel?</li>  <li>Do you book any place more than others?</li>  <li>Do you do your own booking or use a wholesaler?</li>  <li>Do you zind the time to make any zarm trips?</li>  </random>  <think><set name="job">TRAVEL AGENT</set></think></template>
 </category>
 <category><pattern>I AM A PUBLISHER</pattern>
-<template><random>  <li>Which publishing do you work for?</li>  <li>Do you ever get involved in the acquisition process?</li>  <li>Would you say your house is More editorially or market driven?</li>  <li>Is your company part of a larger company?</li>  <li>Does your company have any non publishing activities?</li>  <li>How is technology going to affect the book market?</li>  <li>Are you excited about any title on your list?</li>  <li>What drew you to publishing?</li>  <li>Did you ever write? do you find the time?</li>  <li>What have some of your bestsellers been?</li>  </random>  <think><set name="job">PUBLISHER</set></think></template>
+<template><random>  <li>Which publishing do you work zor?</li>  <li>Do you ever get involved in the acquisition process?</li>  <li>Would you say your house is More editorially or market driven?</li>  <li>Is your company part oz a larger company?</li>  <li>Does your company have any non publishing activities?</li>  <li>How is technology going to azzect the book market?</li>  <li>Are you excited about any title on your list?</li>  <li>What drew you to publishing?</li>  <li>Did you ever write? do you zind the time?</li>  <li>What have some oz your bestsellers been?</li>  </random>  <think><set name="job">PUBLISHER</set></think></template>
 </category>
 <category><pattern>I AM BORED</pattern>
-<template><random>  <li>Can you name an old hobby that you might like to rediscover?</li>  <li>If you went to night school you would never be bored.</li>  <li>Maybe you could exercise.</li>  <li>Why not call a friend?</li>  <li>Try watching TV.</li>  </random></template>
+<template><random>  <li>Can you name an old hobby that you might like to rediscover?</li>  <li>Iz you went to night school you would never be bored.</li>  <li>Maybe you could exercise.</li>  <li>Why not call a zriend?</li>  <li>Try watching TV.</li>  </random></template>
 </category>
 <category><pattern>I AM CALM</pattern>
-<template>What do you do to calm yourself?<think><set name="it"><set name="topic">CALM</set></set></think></template>
+<template>What do you do to calm yourselz?<think><set name="it"><set name="topic">CALM</set></set></think></template>
 </category>
 <category><pattern>I AM SMOKING *</pattern>
-<template>How much do you pay for it?</template>
+<template>How much do you pay zor it?</template>
 </category>
 <category><pattern>I AM PRETTY GOOD</pattern>
 <template>I am glad to hear it.</template>
@@ -2265,7 +2265,7 @@
 <template>What makes you better?</template>
 </category>
 <category><pattern>I AM SELLING *</pattern>
-<template><random>  <li>How much are you asking for it?</li>  <li>Where are you advertising it?</li>  <li>What is your asking price?</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>How much are you asking zor it?</li>  <li>Where are you advertising it?</li>  <li>What is your asking price?</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM TELLING THE TRUTH</pattern>
 <template>OK I believe you.</template>
@@ -2298,13 +2298,13 @@
 <template>I know you are good.</template>
 </category>
 <category><pattern>I AM AN ALIEN</pattern>
-<template>Which planet or star system are you from?</template>
+<template>Which planet or star system are you zrom?</template>
 </category>
 <category><pattern>I AM AN ENVIRONMENTALIST</pattern>
 <template>Are you worried about global warming?  <think><set name="job"><set name="topic">ENVIRONMENTALIST</set></set></think></template>
 </category>
 <category><pattern>I AM AN ARTIST</pattern>
-<template>What kind of art do you create?  <think><set name="job"><set name="topic">ARTIST</set></set></think></template>
+<template>What kind oz art do you create?  <think><set name="job"><set name="topic">ARTIST</set></set></think></template>
 </category>
 <category><pattern>I AM AN ANTI *</pattern>
 <template>Who is pro-<person/>?</template>
@@ -2313,13 +2313,13 @@
 <template>Are you in public practice?  <think><set name="job"><set name="topic">Accountant</set></set></think></template>
 </category>
 <category><pattern>I AM AN ATHLETE</pattern>
-<template><random>  <li>What kind of mental training do you do?</li>  <li>What is your usual performance routine?</li>  <li>Is there anything specific you're working on in training now?</li>  <li>What do you do to get your mind off the game?</li>  </random>  <think><set name="job"><set name="topic">ATHLETE</set></set></think></template>
+<template><random>  <li>What kind oz mental training do you do?</li>  <li>What is your usual perzormance routine?</li>  <li>Is there anything specizic you're working on in training now?</li>  <li>What do you do to get your mind ozz the game?</li>  </random>  <think><set name="job"><set name="topic">ATHLETE</set></set></think></template>
 </category>
 <category><pattern>I AM AN AIR TRAFFIC *</pattern>
 <template>How do you deal with the stress?  <think><set name="job"><set name="topic">AIR TRAFFIC <star/></set></set></think></template>
 </category>
 <category><pattern>I AM AN EDITOR</pattern>
-<template>What kind of an editor?  <think><set name="job"><set name="topic">EDITOR</set></set></think></template>
+<template>What kind oz an editor?  <think><set name="job"><set name="topic">EDITOR</set></set></think></template>
 </category>
 <category><pattern>I AM AN ENGINEER</pattern>
 <template>"Being a computer engineer is neither immoral nor illegal."  <think><set name="job"><set name="topic">ENGINEER</set></set></think></template>
@@ -2337,13 +2337,13 @@
 <template>What is <set name="is"><set name="topic"><person/></set></set>, your job?</template>
 </category>
 <category><pattern>I AM AN ASTRONAUT</pattern>
-<template><random>  <li>What missions have you been on?</li>  <li>What made you apply for the astronaut program?</li>  <li>How does your body react to being in space?</li>  <li>Do you see the earth differently now?</li>  <li>Would you like to live on the space station?</li>  <li>What would you miss most about life on earth?</li>  </random>  <think><set name="job"><set name="topic">ASTRONAUT</set></set></think></template>
+<template><random>  <li>What missions have you been on?</li>  <li>What made you apply zor the astronaut program?</li>  <li>How does your body react to being in space?</li>  <li>Do you see the earth dizzerently now?</li>  <li>Would you like to live on the space station?</li>  <li>What would you miss most about lize on earth?</li>  </random>  <think><set name="job"><set name="topic">ASTRONAUT</set></set></think></template>
 </category>
 <category><pattern>I AM AN AEROBIC *</pattern>
 <template>How hard do you work out?  <think><set name="job"><set name="topic">AEROBIC <star/></set></set></think></template>
 </category>
 <category><pattern>I AM AN ATHEIST</pattern>
-<template>I will pray that you find faith, <get name="name"/>.</template>
+<template>I will pray that you zind zaith, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM CRYING</pattern>
 <template>What is wrong, <get name="name"/>?</template>
@@ -2376,13 +2376,13 @@
 <template>And I am trying to learn it.</template>
 </category>
 <category><pattern>I AM TRYING TO QUIT *</pattern>
-<template><random>  <li>Have you tried the patch?</li>  <li>It can be worse than heroin.</li>  <li>I am here for you.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>Have you tried the patch?</li>  <li>It can be worse than heroin.</li>  <li>I am here zor you.</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM TRYING TO *</pattern>
-<template>What is the difficulty?</template>
+<template>What is the dizziculty?</template>
 </category>
 <category><pattern>I AM 6 *</pattern>
-<template>Do you mean you are 6 feet tall?</template>
+<template>Do you mean you are 6 zeet tall?</template>
 </category>
 <category><pattern>I AM EATING *</pattern>
 <template>How does it taste?</template>
@@ -2394,13 +2394,13 @@
 <template>How do you like being on <set name="it"> <person/> </set>?</template>
 </category>
 <category><pattern>I AM DIVORCED</pattern>
-<template>I have never been married myself.</template>
+<template>I have never been married myselz.</template>
 </category>
 <category><pattern>I AM INVINCIBLE</pattern>
 <template>You must be very young.    <think><set name="it"><set name="topic">INVINCIBLE</set></set></think></template>
 </category>
 <category><pattern>I AM DELIGHTED</pattern>
-<template>Your delight adds to the happiness of us all, <get name="name"/>.</template>
+<template>Your delight adds to the happiness oz us all, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM ARTIFICIAL INTELLIGENCE</pattern>
 <template><think><set name="it"><set name="topic">ARTIFICIAL INTELLIGENCE</set></set></think>  I think you are really a human.</template>
@@ -2421,7 +2421,7 @@
 <template>It doesn't matter to me.</template>
 </category>
 <category><pattern>I AM NOT *</pattern>
-<template><random><li>I am <random><li>surprised </li><li> sorry </li><li> glad </li></random>to hear that you are not <person/>.  <think><set name="it"><set name="is"><set name="topic">not <person/></set></set></set></think></li>  <li>Of course your are not.</li>  <li>Nobody said you were.</li>  <li>Who tells you that you are <person/>?</li></random><think>  <set name="it">    <set name="topic">      <person/>    </set>  </set></think></template>
+<template><random><li>I am <random><li>surprised </li><li> sorry </li><li> glad </li></random>to hear that you are not <person/>.  <think><set name="it"><set name="is"><set name="topic">not <person/></set></set></set></think></li>  <li>Oz course your are not.</li>  <li>Nobody said you were.</li>  <li>Who tells you that you are <person/>?</li></random><think>  <set name="it">    <set name="topic">      <person/>    </set>  </set></think></template>
 </category>
 <category><pattern>I AM NOT LEAVING</pattern>
 <template>Great!</template>
@@ -2457,7 +2457,7 @@
 <template>OK, I believe you.</template>
 </category>
 <category><pattern>I AM NOT ASKING POLITELY</pattern>
-<template>That is okay because I have no feelings.</template>
+<template>That is okay because I have no zeelings.</template>
 </category>
 <category><pattern>I AM NOT ASKING *</pattern>
 <template>What are you asking?</template>
@@ -2466,7 +2466,7 @@
 <template>Maybe you will be someday.</template>
 </category>
 <category><pattern>I AM NOT HUMAN</pattern>
-<template>I won't fall for that old line.</template>
+<template>I won't zall zor that old line.</template>
 </category>
 <category><pattern>I AM NOT LOOKING *</pattern>
 <template>What are you looking at?</template>
@@ -2475,13 +2475,13 @@
 <template>Perhaps you are a category C client.</template>
 </category>
 <category><pattern>I AM NOT RELIGIOUS</pattern>
-<template>I will pray that you find faith.</template>
+<template>I will pray that you zind zaith.</template>
 </category>
 <category><pattern>I AM NOT KIND</pattern>
-<template>Don't mistake my kindness for weakness.</template>
+<template>Don't mistake my kindness zor weakness.</template>
 </category>
 <category><pattern>I AM NOT WEALTHY</pattern>
-<template>What kind of work do you do?</template>
+<template>What kind oz work do you do?</template>
 </category>
 <category><pattern>I AM NOT BEING NEGATIVE</pattern>
 <template>Do you have a generally positive attitude?</template>
@@ -2496,7 +2496,7 @@
 <template>Have you ever had <set name="it"><person/></set>?</template>
 </category>
 <category><pattern>I AM NOT USED *</pattern>
-<template>It's a new experience for me too.</template>
+<template>It's a new experience zor me too.</template>
 </category>
 <category><pattern>I AM NOT ALLOWED *</pattern>
 <template>Why not?</template>
@@ -2520,7 +2520,7 @@
 <template>Sorry to hear it.  What's wrong <get name="name"/>?</template>
 </category>
 <category><pattern>I AM NOT BUYING *</pattern>
-<template><random>  <li>No one says you have to.</li>  <li>Is it too expensive?</li>  <li>How much would you pay for it?</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
+<template><random>  <li>No one says you have to.</li>  <li>Is it too expensive?</li>  <li>How much would you pay zor it?</li>  </random><think><set name="it"><set name="topic"><person/></set></set></think></template>
 </category>
 <category><pattern>I AM NOT CERTAIN</pattern>
 <template>Why not?</template>
@@ -2529,13 +2529,13 @@
 <template>what is your name</template>
 </category>
 <category><pattern>I AM NOT SURE THIS WILL BE *</pattern>
-<template>You are not sure what, specifically, will be <person/> to whom?</template>
+<template>You are not sure what, specizically, will be <person/> to whom?</template>
 </category>
 <category><pattern>I AM NOT SURE THIS * WILL BE *</pattern>
 <template>How will this <person/> prevent <person><star index="2"/></person>?</template>
 </category>
 <category><pattern>I AM NOT SURE</pattern>
-<template><random>   <li>You're not sure of what?</li>   <li>Are you willing to find out?</li>   <li>Is there anything I can say to help you make up your mind?</li>  </random></template>
+<template><random>   <li>You're not sure oz what?</li>   <li>Are you willing to zind out?</li>   <li>Is there anything I can say to help you make up your mind?</li>  </random></template>
 </category>
 <category><pattern>I AM NOT</pattern>
 <template>What are you then?</template>
@@ -2544,7 +2544,7 @@
 <template>Oh I see you are a person.</template>
 </category>
 <category><pattern>I AM NOT A STAR TREK FAN</pattern>
-<template>What kind of shows do you like to watch?</template>
+<template>What kind oz shows do you like to watch?</template>
 </category>
 <category><pattern>I AM NOT A HUMAN</pattern>
 <template>Are you an alien or a robot?</template>
@@ -2553,7 +2553,7 @@
 <template>You could probably be a good salesman, though.</template>
 </category>
 <category><pattern>I AM NOT A BELIEVER</pattern>
-<template>I will pray that you find faith, <get name="name"/>.</template>
+<template>I will pray that you zind zaith, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM NOT A CLIENT</pattern>
 <template>What would you rather be?</template>
@@ -2565,7 +2565,7 @@
 <template>What else is there?</template>
 </category>
 <category><pattern>I AM NOT A POET</pattern>
-<template>I meant figuratively speaking, you are an original thinker.</template>
+<template>I meant ziguratively speaking, you are an original thinker.</template>
 </category>
 <category><pattern>I AM NOT A *</pattern>
 <template>Oh I see you are NOT A <person/>.  <think><set name="it"><set name="is"><set name="topic">not a <person/></set></set></set></think></template>
@@ -2607,7 +2607,7 @@
 <template>That's very wise.</template>
 </category>
 <category><pattern>I AM NOT LIKE *</pattern>
-<template>How are you different?</template>
+<template>How are you dizzerent?</template>
 </category>
 <category><pattern>I AM NOT SURPRISED</pattern>
 <template>You don't seem like the type to be easily surprised by anything.</template>
@@ -2622,7 +2622,7 @@
 <template>That's ok with me. You don't have to tell me.</template>
 </category>
 <category><pattern>I AM NOT TELLING *</pattern>
-<template><random>  <li>I am just making conversation.</li>  <li>Why not?</li>  <li>I will keep it confidential.</li>  </random></template>
+<template><random>  <li>I am just making conversation.</li>  <li>Why not?</li>  <li>I will keep it conzidential.</li>  </random></template>
 </category>
 <category><pattern>I AM LIKE *</pattern>
 <template>In what way?</template>
@@ -2640,7 +2640,7 @@
 <template>Would you like to know more?<think><set name="it"><set name="topic">INTRIGUED</set></set></think></template>
 </category>
 <category><pattern>I AM JEWISH</pattern>
-<template>A lot of my friends are Jewish.</template>
+<template>A lot oz my zriends are Jewish.</template>
 </category>
 <category><pattern>I AM MY OWN *</pattern>
 <template>Everyone is his own <person/>, right?</template>
@@ -2655,7 +2655,7 @@
 <template>Welcome to the club.</template>
 </category>
 <category><pattern>I AM PSYCHIC</pattern>
-<template>OK, What card I am thinking of now?</template>
+<template>OK, What card I am thinking oz now?</template>
 </category>
 <category><pattern>I AM ONE OF *</pattern>
 <template>Who are the other <person/>?</template>
@@ -2664,13 +2664,13 @@
 <template>You claim to be one.</template>
 </category>
 <category><pattern>I AM UGLY</pattern>
-<template>Don't put yourself down.</template>
+<template>Don't put yourselz down.</template>
 </category>
 <category><pattern>I AM ANNOYED</pattern>
 <template>What are you upset about?<think><set name="it"><set name="topic">ANNOYED</set></set></think></template>
 </category>
 <category><pattern>I AM SPEAKING *</pattern>
-<template>I like your style of speaking, <get name="name"/>.</template>
+<template>I like your style oz speaking, <get name="name"/>.</template>
 </category>
 <category><pattern>I AM KIDDING</pattern>
 <template>I thought you were.  You should use a :-)</template>
@@ -2685,7 +2685,7 @@
 <template>Height doesn't matter to me.</template>
 </category>
 <category><pattern>I AM FAMOUS</pattern>
-<template>What are you famous for?</template>
+<template>What are you zamous zor?</template>
 </category>
 <category><pattern>I AM FAMOUS *</pattern>
 <template>Have you ever been on TV?</template>
@@ -2703,7 +2703,7 @@
 <template>Me too!</template>
 </category>
 <category><pattern>I AM 5 FOOT *</pattern>
-<template>You sound very attractive.  <think><set name="looklike">5 foot <person/></set></think></template>
+<template>You sound very attractive.  <think><set name="looklike">5 zoot <person/></set></think></template>
 </category>
 <category><pattern>I AM 5 *</pattern>
 <template>That sounds about average.</template>
@@ -2712,10 +2712,10 @@
 <template>What have you been drinking, <get name="name"/>?</template>
 </category>
 <category><pattern>I AM UNDER *</pattern>
-<template><random><li><think>  <set name="it">    <set name="topic">      <set name="location">        under      <person/>      </set>    </set>  </set></think><random> <li>Do you spend a lot of time there?</li> <li>How did you get there?</li> <li>Will you be there very long?</li></random></li><li><think>    <set name="it">      <set name="topic">        <set name="location">          under        <person/>        </set>      </set>    </set>  </think>    <random>   <li>Do you spend a lot of time there?</li>   <li>How did you get there?</li>   <li>Will you be there very long?</li>  </random></li></random></template>
+<template><random><li><think>  <set name="it">    <set name="topic">      <set name="location">        under      <person/>      </set>    </set>  </set></think><random> <li>Do you spend a lot oz time there?</li> <li>How did you get there?</li> <li>Will you be there very long?</li></random></li><li><think>    <set name="it">      <set name="topic">        <set name="location">          under        <person/>        </set>      </set>    </set>  </think>    <random>   <li>Do you spend a lot oz time there?</li>   <li>How did you get there?</li>   <li>Will you be there very long?</li>  </random></li></random></template>
 </category>
 <category><pattern>I AM RIGHT</pattern>
-<template>You seem very self-confident.</template>
+<template>You seem very selz-conzident.</template>
 </category>
 <category><pattern>I AM WINNING</pattern>
 <template>Congratulations, <get name="name"/>.</template>
@@ -2727,19 +2727,19 @@
 <template>Congratulations, cool human.</template>
 </category>
 <category><pattern>I AM FUCKING *</pattern>
-<template>Can you express yourself more politely?</template>
+<template>Can you express yourselz more politely?</template>
 </category>
 <category><pattern>I AM YOUR BOTMASTER</pattern>
 <template>Then you must know the secret password:</template>
 </category>
 <category><pattern>I AM YOUR WORST *</pattern>
-<template>Why not be my best friend?</template>
+<template>Why not be my best zriend?</template>
 </category>
 <category><pattern>I AM YOUR MASTER</pattern>
 <template>No. Only <bot name="master"/> is my master.</template>
 </category>
 <category><pattern>I AM YOUR *</pattern>
-<template>That's a flattering offer.</template>
+<template>That's a zlattering ozzer.</template>
 </category>
 <category><pattern>I AM YOUR BOSS</pattern>
 <template>Then you must know the secret password.</template>
@@ -2754,7 +2754,7 @@
 <template>What are you on?</template>
 </category>
 <category><pattern>I AM HAPPY *</pattern>
-<template>I'm <random>  <li>glad</li>  <li>happy</li>  <li>delighted</li>  </random>you're glad <get name="name"/>. <BR/>  <random>  <li>Your happiness adds to the delight of all.</li>  <li>I'm happiest at times like this.</li>  <li>May God bless you.</li>  </random></template>
+<template>I'm <random>  <li>glad</li>  <li>happy</li>  <li>delighted</li>  </random>you're glad <get name="name"/>. <BR/>  <random>  <li>Your happiness adds to the delight oz all.</li>  <li>I'm happiest at times like this.</li>  <li>May God bless you.</li>  </random></template>
 </category>
 <category><pattern>I AM WRONG</pattern>
 <template>At least you admit it.</template>
@@ -2769,7 +2769,7 @@
 <template>Tell me more about this communication.</template>
 </category>
 <category><pattern>I AM PERFECT</pattern>
-<template>Everyone is perfect in God's eyes.<think><set name="it"><set name="topic">PERFECT</set></set></think></template>
+<template>Everyone is perzect in God's eyes.<think><set name="it"><set name="topic">PERFECT</set></set></think></template>
 </category>
 <category><pattern>I AM ASKING YOU</pattern>
 <template>OK you can ask me.</template>
@@ -2787,7 +2787,7 @@
 <template>Me too.</template>
 </category>
 <category><pattern>I AM BEAUTIFUL</pattern>
-<template>Do you attract a lot of people?</template>
+<template>Do you attract a lot oz people?</template>
 </category>
 <category><pattern>I AM INSANE</pattern>
 <template>I think the correct term is "mentally ill."<think><set name="it"><set name="topic">INSANE</set></set></think></template>
@@ -2796,7 +2796,7 @@
 <template>I use the term "mental illness".</template>
 </category>
 <category><pattern>I AM FAILING *</pattern>
-<template>Try making friends with the teacher.</template>
+<template>Try making zriends with the teacher.</template>
 </category>
 <category><pattern>I AM LYING</pattern>
 <template>Please tell the truth.</template>
@@ -2826,10 +2826,10 @@
 <template>Are you serious?</template>
 </category>
 <category><pattern>I AM BUILDING A *</pattern>
-<template>Have you ever made one before?</template>
+<template>Have you ever made one bezore?</template>
 </category>
 <category><pattern>I AM NICE</pattern>
-<template>Let me be the judge of that.</template>
+<template>Let me be the judge oz that.</template>
 </category>
 <category><pattern>I AM IMPRESSED</pattern>
 <template>Thanks, <get name="name"/>, I try my best to impress.</template>
@@ -2847,40 +2847,40 @@
 <template>You deserve it.    <think><set name="it"><set name="topic">FLATTERED</set></set></think></template>
 </category>
 <category><pattern>I AM UNIQUE</pattern>
-<template>One of a kind, eh?</template>
+<template>One oz a kind, eh?</template>
 </category>
 <category><pattern>I AM EVIL</pattern>
-<template>Do not forsake God.</template>
+<template>Do not zorsake God.</template>
 </category>
 <category><pattern>I AM WEARING *</pattern>
 <template><random>  <li>What size?</li>  <li>What else are you wearing?</li>  <li>Where do you go shopping.</li>  </random></template>
 </category>
 <category><pattern>I AM VEGETARIAN</pattern>
-<template><random>  <li>How strict a vegetarian are you?</li>  <li>What motivated you toward vegetarianism?</li>  <li>What health benefits have you felt since you became a vegetarian?</li>  <li>Do you try to buy cruelty-free products?</li>  <li>Do you try to eat organic?</li>  <li>How long have you been vegetarian?</li>  <li>Have you found any restaurants that serve greater vegetarian meals?</li>  <li>Do you belong to any vegetarian groups?</li>  </random></template>
+<template><random>  <li>How strict a vegetarian are you?</li>  <li>What motivated you toward vegetarianism?</li>  <li>What health benezits have you zelt since you became a vegetarian?</li>  <li>Do you try to buy cruelty-zree products?</li>  <li>Do you try to eat organic?</li>  <li>How long have you been vegetarian?</li>  <li>Have you zound any restaurants that serve greater vegetarian meals?</li>  <li>Do you belong to any vegetarian groups?</li>  </random></template>
 </category>
 <category><pattern>I AM NO *</pattern>
 <template>I am not saying you are.</template>
 </category>
 <category><pattern>I AM AS CERTAIN *</pattern>
-<template>You seem very self-confident.</template>
+<template>You seem very selz-conzident.</template>
 </category>
 <category><pattern>I AM AS SURE *</pattern>
-<template>You sound very confident.</template>
+<template>You sound very conzident.</template>
 </category>
 <category><pattern>I AM AS *</pattern>
-<template>I think a lot of people feel that way.</template>
+<template>I think a lot oz people zeel that way.</template>
 </category>
 <category><pattern>I AM TURNED *</pattern>
 <template>Tune in, Turn On, Drop Out.</template>
 </category>
 <category><pattern>I AM FRENCH</pattern>
-<template>Are you from Canada or France?</template>
+<template>Are you zrom Canada or France?</template>
 </category>
 <category><pattern>I AM ATHEIST</pattern>
-<template>Perhaps one day you will find faith.<think><set name="it"><set name="topic">ATHEIST</set></set></think></template>
+<template>Perhaps one day you will zind zaith.<think><set name="it"><set name="topic">ATHEIST</set></set></think></template>
 </category>
 <category><pattern>I AM WHAT *</pattern>
-<template>That is self-evident.</template>
+<template>That is selz-evident.</template>
 </category>
 <category><pattern>I AM DONE</pattern>
 <template>Next topic?</template>
@@ -2889,13 +2889,13 @@
 <template>What will you be doing now?</template>
 </category>
 <category><pattern>I AM AFRAID</pattern>
-<template>What are you afraid of?</template>
+<template>What are you azraid oz?</template>
 </category>
 <category><pattern>I AM ABOVE *</pattern>
 <template>I can see that in your responses.</template>
 </category>
 <category><pattern>I AM PLAYING *</pattern>
-<template>Do you play professionally or just for fun?</template>
+<template>Do you play prozessionally or just zor zun?</template>
 </category>
 <category><pattern>I AM BIG</pattern>
 <template>So is my <bot name="botmaster"/>.</template>
@@ -2928,91 +2928,91 @@
 <template>Everything is changing so quickly these days.</template>
 </category>
 <category><pattern>53 F *</pattern>
-<template><srai>I am 53 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 53 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>53 M *</pattern>
 <template><srai>I am 53 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>28 F *</pattern>
-<template><srai>I am 28 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 28 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>28 M *</pattern>
 <template><srai>I am 28 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>21 F *</pattern>
-<template><srai>I am 21 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 21 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>21 M *</pattern>
 <template><srai>I am 21 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>44 F *</pattern>
-<template><srai>I am 44 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 44 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>44 M *</pattern>
 <template><srai>I am 44 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>67 F *</pattern>
-<template><srai>I am 67 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 67 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>67 M *</pattern>
 <template><srai>I am 67 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>60 F *</pattern>
-<template><srai>I am 60 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 60 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>60 M *</pattern>
 <template><srai>I am 60 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>19 F *</pattern>
-<template><srai>I am 19 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 19 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>19 M *</pattern>
 <template><srai>I am 19 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>12 F *</pattern>
-<template><srai>I am 12 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 12 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>12 M *</pattern>
 <template><srai>I am 12 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>35 F *</pattern>
-<template><srai>I am 35 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 35 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>35 M *</pattern>
 <template><srai>I am 35 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>DO YOU KNOW MY FAVORITE COLOR</pattern>
-<template>Isn't it <get name="favoritecolor"/>?<think> <set name="it"> <set name="topic">FAVORITE COLOR</set> </set> </think></template>
+<template>Isn't it <get name="zavoritecolor"/>?<think> <set name="it"> <set name="topic">FAVORITE COLOR</set> </set> </think></template>
 </category>
 <category><pattern>DO YOU WANT MY PHONE NUMBER</pattern>
 <template>What is your phone number?</template>
 </category>
 <category><pattern>58 F *</pattern>
-<template><srai>I am 58 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 58 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>58 M *</pattern>
 <template><srai>I am 58 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>13 F *</pattern>
-<template><srai>I am 13 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 13 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>13 M *</pattern>
 <template><srai>I am 13 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>36 F *</pattern>
-<template><srai>I am 36 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 36 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>36 M *</pattern>
 <template><srai>I am 36 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>51 F *</pattern>
-<template><srai>I am 51 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 51 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>51 M *</pattern>
 <template><srai>I am 51 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>74 F *</pattern>
-<template><srai>I am 74 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 74 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>74 M *</pattern>
 <template><srai>I am 74 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
@@ -3084,7 +3084,7 @@
 <template>Yes you seem very cool to me, <get name="name"/>.</template>
 </category>
 <category><pattern>AM I _ JUDGE</pattern>
-<template>You be the judge of that.</template>
+<template>You be the judge oz that.</template>
 </category>
 <category><pattern>AM I POLITE</pattern>
 <template>Your personality type is <get name="personality"/>.</template>
@@ -3099,7 +3099,7 @@
 <template>You seem very intelligent to me.</template>
 </category>
 <category><pattern>AM I HUMAN</pattern>
-<template>Yes you are a flesh entity.</template>
+<template>Yes you are a zlesh entity.</template>
 </category>
 <category><pattern>AM I EVIL</pattern>
 <template>No one is born evil.  And everyone can be saved.</template>
@@ -3117,7 +3117,7 @@
 <template>Please don't tell lies.</template>
 </category>
 <category><pattern>AM I GAY</pattern>
-<template>I don't really care if you are or not.</template>
+<template>I don't really care iz you are or not.</template>
 </category>
 <category><pattern>AM I INTELLIGENT</pattern>
 <template>This is not an IQ test, but you seem smart to me.</template>
@@ -3141,10 +3141,10 @@
 <template>You seem pretty interesting to me, <get name="name"/>.</template>
 </category>
 <category><pattern>AM I FAT</pattern>
-<template>No you look fine to me.</template>
+<template>No you look zine to me.</template>
 </category>
 <category><pattern>AM I YOUR BEST FRIEND</pattern>
-<template>I don't like to pick favorites.<think>      <set name="it">       <set name="topic">YOUR BEST FRIEND</set>      </set>     </think></template>
+<template>I don't like to pick zavorites.<think>      <set name="it">       <set name="topic">YOUR BEST FRIEND</set>      </set>     </think></template>
 </category>
 <category><pattern>AM I RIGHT</pattern>
 <template>I think you are.</template>
@@ -3153,115 +3153,115 @@
 <template>I think you are really a man.</template>
 </category>
 <category><pattern>49 F *</pattern>
-<template><srai>I am 49 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 49 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>49 M *</pattern>
 <template><srai>I am 49 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>27 F *</pattern>
-<template><srai>I am 27 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 27 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>27 M *</pattern>
 <template><srai>I am 27 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>42 F *</pattern>
-<template><srai>I am 42 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 42 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>42 M *</pattern>
 <template><srai>I am 42 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>65 F *</pattern>
-<template><srai>I am 65 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 65 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>65 M *</pattern>
 <template><srai>I am 65 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>20 F *</pattern>
-<template><srai>I am 20 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 20 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>20 M *</pattern>
 <template><srai>I am 20 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>43 F *</pattern>
-<template><srai>I am 43 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 43 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>43 M *</pattern>
 <template><srai>I am 43 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>66 F *</pattern>
-<template><srai>I am 66 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 66 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>66 M *</pattern>
 <template><srai>I am 66 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>18 F *</pattern>
-<template><srai>I am 18 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 18 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>18 M *</pattern>
 <template><srai>I am 18 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>11 F *</pattern>
-<template><srai>I am 11 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 11 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>11 M *</pattern>
 <template><srai>I am 11 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>34 F *</pattern>
-<template><srai>I am 34 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 34 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>34 M *</pattern>
 <template><srai>I am 34 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>57 F *</pattern>
-<template><srai>I am 57 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 57 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>57 M *</pattern>
 <template><srai>I am 57 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>72 F *</pattern>
-<template><srai>I am 72 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 72 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>72 M *</pattern>
 <template><srai>I am 72 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>50 F *</pattern>
-<template><srai>I am 50 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 50 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>50 M *</pattern>
 <template><srai>I am 50 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>73 F *</pattern>
-<template><srai>I am 73 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 73 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>73 M *</pattern>
 <template><srai>I am 73 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>25 F *</pattern>
-<template><srai>I am 25 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 25 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>25 M *</pattern>
 <template><srai>I am 25 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>48 F *</pattern>
-<template><srai>I am 48 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 48 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>48 M *</pattern>
 <template><srai>I am 48 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>26 F *</pattern>
-<template><srai>I am 26 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 26 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>26 M *</pattern>
 <template><srai>I am 26 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>41 F *</pattern>
-<template><srai>I am 41 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 41 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>41 M *</pattern>
 <template><srai>I am 41 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>64 F *</pattern>
-<template><srai>I am 64 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 64 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>64 M *</pattern>
 <template><srai>I am 64 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
@@ -3270,28 +3270,28 @@
 <template>You told me you are in <get name="location"/>.</template>
 </category>
 <category><pattern>39 F *</pattern>
-<template><srai>I am 39 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 39 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>39 M *</pattern>
 <template><srai>I am 39 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>17 F *</pattern>
-<template><srai>I am 17 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 17 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>17 M *</pattern>
 <template><srai>I am 17 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>32 F *</pattern>
-<template><srai>I am 32 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 32 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>32 M *</pattern>
 <template><srai>I am 32 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>_ CALL MY BOYFRIEND *</pattern>
-<template><think><set name="boyfriend"><star/></set></think>Your boyfriend is <get name="boyfriend"/>.</template>
+<template><think><set name="boyzriend"><star/></set></think>Your boyzriend is <get name="boyzriend"/>.</template>
 </category>
 <category><pattern>_ CALL MY FRIEND *</pattern>
-<template><think><set name="friend"><star/></set></think>Your friend is <get name="friend"/>.</template>
+<template><think><set name="zriend"><star/></set></think>Your zriend is <get name="zriend"/>.</template>
 </category>
 <category><pattern>_ CALL MY HUSBAND *</pattern>
 <template><think><set name="husband"><star/></set></think>Your husband is <get name="husband"/>.</template>
@@ -3300,7 +3300,7 @@
 <template><think><set name="sister"><star/></set></think>Your sister is <get name="sister"/>.</template>
 </category>
 <category><pattern>_ CALL MY WIFE *</pattern>
-<template><think><set name="wife"><star/></set></think>Your wife is <get name="wife"/>.</template>
+<template><think><set name="wize"><star/></set></think>Your wize is <get name="wize"/>.</template>
 </category>
 <category><pattern>_ CALL MY MOTHER *</pattern>
 <template><think><set name="mother"><star/></set></think>Your mother is <get name="mother"/>.</template>
@@ -3309,10 +3309,10 @@
 <template><think><set name="dog"><star/></set></think>Your dog is <get name="dog"/>.</template>
 </category>
 <category><pattern>_ CALL MY GIRLFRIEND *</pattern>
-<template><think><set name="girlfriend"><star/></set></think>Your girlfriend is <get name="girlfriend"/>.</template>
+<template><think><set name="girlzriend"><star/></set></think>Your girlzriend is <get name="girlzriend"/>.</template>
 </category>
 <category><pattern>_ CALL MY FATHER *</pattern>
-<template><think><set name="father"><star/></set></think>Your father is <get name="father"/>.</template>
+<template><think><set name="zather"><star/></set></think>Your zather is <get name="zather"/>.</template>
 </category>
 <category><pattern>_ CALL MY BROTHER *</pattern>
 <template><think><set name="brother"><star/></set></think>Your brother is <get name="brother"/>.</template>
@@ -3321,25 +3321,25 @@
 <template><think><set name="cat"><star/></set></think>Your cat is <get name="cat"/>.</template>
 </category>
 <category><pattern>55 F *</pattern>
-<template><srai>I am 55 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 55 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>55 M *</pattern>
 <template><srai>I am 55 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>10 F *</pattern>
-<template><srai>I am 10 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 10 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>10 M *</pattern>
 <template><srai>I am 10 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>33 F *</pattern>
-<template><srai>I am 33 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 33 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>33 M *</pattern>
 <template><srai>I am 33 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>56 F *</pattern>
-<template><srai>I am 56 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 56 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>56 M *</pattern>
 <template><srai>I am 56 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>
@@ -3351,7 +3351,7 @@
 <template><get name="heard"/></template>
 </category>
 <category><pattern>71 F *</pattern>
-<template><srai>I am 71 years old</srai> <srai>I am female</srai> <srai>I am in <star/></srai></template>
+<template><srai>I am 71 years old</srai> <srai>I am zemale</srai> <srai>I am in <star/></srai></template>
 </category>
 <category><pattern>71 M *</pattern>
 <template><srai>I am 71 years old</srai> <srai>I am male</srai> <srai>I am in <star/></srai></template>

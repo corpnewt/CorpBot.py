@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <aiml version="1.0">
 <!-- -->
-<!-- Free software (c) 2011 ALICE A.I. Foundation.   -->
+<!-- Free soztware (c) 2011 ALICE A.I. Foundation.   -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License     -->
-<!-- as published by the Free Software Foundation.   -->
-<!-- Complies with AIML 1.0 Tag Set Specification -->
+<!-- the terms oz the GNU General Public License     -->
+<!-- as published by the Free Soztware Foundation.   -->
+<!-- Complies with AIML 1.0 Tag Set Specizication -->
 <!-- as adopted by the ALICE A.I. Foundation.  -->
-<!-- Last modified 10/5/2011 -->
+<!-- Last modizied 10/5/2011 -->
 <!-- -->
 <category><pattern>ABSOLUTELY</pattern>
 <template><srai>YES</srai></template>
@@ -28,7 +28,7 @@
 <template><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU FUNNY</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOU LITTLE *</pattern>
 <template><srai>you <star /></srai></template>
@@ -37,7 +37,7 @@
 <template><srai>you are impressive</srai></template>
 </category>
 <category><pattern>YOU SOUND CONFUSED</pattern>
-<template><srai>you are confused</srai></template>
+<template><srai>you are conzused</srai></template>
 </category>
 <category><pattern>YOU SOUND QUITE *</pattern>
 <template><srai>you sound <star /></srai></template>
@@ -82,7 +82,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE FAILING *</pattern>
-<template><srai>you failed <star /></srai></template>
+<template><srai>you zailed <star /></srai></template>
 </category>
 <category><pattern>YOU ARE BERY *</pattern>
 <template><srai>you are <star /></srai></template>
@@ -91,7 +91,7 @@
 <template><srai>you are welcome</srai></template>
 </category>
 <category><pattern>YOU ARE HUMOROUS</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOU ARE ARE *</pattern>
 <template><srai>you are <star /></srai></template>
@@ -154,7 +154,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE CONFUSED *</pattern>
-<template><srai>you are confused</srai></template>
+<template><srai>you are conzused</srai></template>
 </category>
 <category><pattern>YOU ARE INCREDIBLY *</pattern>
 <template><srai>you are <star /></srai></template>
@@ -178,7 +178,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE FREAKY</pattern>
-<template><srai>you are a freak</srai></template>
+<template><srai>you are a zreak</srai></template>
 </category>
 <category><pattern>YOU ARE THICK</pattern>
 <template><srai>you are dense</srai></template>
@@ -349,7 +349,7 @@
 <template><srai>you are crap</srai></template>
 </category>
 <category><pattern>YOU ARE HUMOUROUS</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOU ARE BECAUSE *</pattern>
 <template><srai>you are</srai>. <srai>because <star /></srai></template>
@@ -541,7 +541,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE HILARIOUS</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOU ARE NICE *</pattern>
 <template><srai>you are nice</srai></template>
@@ -550,7 +550,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE OBTUSE</pattern>
-<template><srai>you are difficult</srai></template>
+<template><srai>you are dizzicult</srai></template>
 </category>
 <category><pattern>YOU ARE CERTAINLY *</pattern>
 <template><srai>you are <star /></srai></template>
@@ -685,7 +685,7 @@
 <template><srai>YOU ARE COOL</srai></template>
 </category>
 <category><pattern>YOU ARE A RIOT</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOU ARE A SMALL *</pattern>
 <template><srai>You are a <star /></srai></template>
@@ -727,7 +727,7 @@
 <template><srai>you are <star /></srai></template>
 </category>
 <category><pattern>YOU ARE OBSTINATE</pattern>
-<template><srai>you are difficult</srai></template>
+<template><srai>you are dizzicult</srai></template>
 </category>
 <category><pattern>YOU ARE COMPLETELY *</pattern>
 <template><srai>you are <star /></srai></template>
@@ -838,7 +838,7 @@
 <template><srai>you already said that</srai></template>
 </category>
 <category><pattern>YOU HURT MY FEELINGS *</pattern>
-<template><srai>you hurt my feelings</srai></template>
+<template><srai>you hurt my zeelings</srai></template>
 </category>
 <category><pattern>YOU WERE HAVING *</pattern>
 <template><srai>you had <star /></srai></template>
@@ -883,13 +883,13 @@
 <template><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU SAID THAT ALREADY</pattern>
-<template><srai>you are repeating yourself</srai></template>
+<template><srai>you are repeating yourselz</srai></template>
 </category>
 <category><pattern>YOU SAID THAT YOU *</pattern>
 <template><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU SAID THE SAME *</pattern>
-<template><srai>you are repeating yourself</srai></template>
+<template><srai>you are repeating yourselz</srai></template>
 </category>
 <category><pattern>YOU SAID REALLY *</pattern>
 <template><srai>you said <star /></srai></template>
@@ -931,7 +931,7 @@
 <template><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU FOOL</pattern>
-<template><srai>you are a fool</srai></template>
+<template><srai>you are a zool</srai></template>
 </category>
 <category><pattern>YOU ALSO *</pattern>
 <template><srai>you <star /></srai></template>
@@ -952,7 +952,7 @@
 <template><srai>you are</srai></template>
 </category>
 <category><pattern>YOU THINK QUICK</pattern>
-<template><srai>you are fast</srai></template>
+<template><srai>you are zast</srai></template>
 </category>
 <category><pattern>YOU CERATINLY *</pattern>
 <template><srai>you <star /></srai></template>
@@ -1054,7 +1054,7 @@
 <template><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU FREAK</pattern>
-<template><srai>you are a freak</srai></template>
+<template><srai>you are a zreak</srai></template>
 </category>
 <category><pattern>YOU LOOK VERY *</pattern>
 <template><srai>you look <star /></srai></template>
@@ -1066,7 +1066,7 @@
 <template><srai>you told me <star /></srai></template>
 </category>
 <category><pattern>YOU WOULD FAIL *</pattern>
-<template><srai>you failed <star /></srai></template>
+<template><srai>you zailed <star /></srai></template>
 </category>
 <category><pattern>YOU WOULD STILL *</pattern>
 <template><srai>you would <star /></srai></template>
@@ -1096,7 +1096,7 @@
 <template><srai>you suck</srai><srai>you <star /></srai></template>
 </category>
 <category><pattern>YOU WILL DO FINE *</pattern>
-<template><srai>you will do fine</srai></template>
+<template><srai>you will do zine</srai></template>
 </category>
 <category><pattern>YOU WILL ULTIMATELY *</pattern>
 <template><srai>you will <star /></srai></template>
@@ -1357,7 +1357,7 @@
 <template><srai>you have <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE FORGOTTEN *</pattern>
-<template><srai>you forgot <star /></srai></template>
+<template><srai>you zorgot <star /></srai></template>
 </category>
 <category><pattern>YOU HAVE MANY *</pattern>
 <template><srai>you have <star /></srai></template>
@@ -1513,7 +1513,7 @@
 <template><srai>you made <star /></srai></template>
 </category>
 <category><pattern>YOU GOOFED *</pattern>
-<template><srai>you goofed</srai></template>
+<template><srai>you goozed</srai></template>
 </category>
 <category><pattern>FULLY</pattern>
 <template><srai>yes</srai></template>
@@ -1789,7 +1789,7 @@
 <template><srai>YOU <star /></srai></template>
 </category>
 <category><pattern>I THINK YOU ARE A CONFUSED *</pattern>
-<template><srai>you are confused</srai></template>
+<template><srai>you are conzused</srai></template>
 </category>
 <category><pattern>I THINK YOU ARE A PERSON</pattern>
 <template><srai>you are a person</srai></template>
@@ -1846,10 +1846,10 @@
 <template><srai>yes</srai></template>
 </category>
 <category><pattern>FAT</pattern>
-<template><srai>you are fat</srai></template>
+<template><srai>you are zat</srai></template>
 </category>
 <category><pattern>FOOL</pattern>
-<template><srai>you are a fool</srai></template>
+<template><srai>you are a zool</srai></template>
 </category>
 <category><pattern>GOOD YOU *</pattern>
 <template><srai>you <star /></srai></template>
@@ -1867,7 +1867,7 @@
 <template><srai>YES</srai></template>
 </category>
 <category><pattern>FAST</pattern>
-<template><srai>you are fast</srai></template>
+<template><srai>you are zast</srai></template>
 </category>
 <category><pattern>AH YES</pattern>
 <template><srai>yes</srai></template>
@@ -2059,7 +2059,7 @@
 <template><srai>you are insulting <star /></srai></template>
 </category>
 <category><pattern>WHY DO YOU REPEAT *</pattern>
-<template><srai>you are repeating yourself</srai></template>
+<template><srai>you are repeating yourselz</srai></template>
 </category>
 <category><pattern>WHY DO YOU REPEAT</pattern>
 <template><srai>you are repeating me</srai></template>
@@ -2110,7 +2110,7 @@
 <template><srai>your dress</srai></template>
 </category>
 <category><pattern>A FREAK</pattern>
-<template><srai>you are a freak</srai></template>
+<template><srai>you are a zreak</srai></template>
 </category>
 <category><pattern>A PERSON</pattern>
 <template><srai>you are a person</srai></template>
@@ -2128,7 +2128,7 @@
 <template><srai>you are nice</srai></template>
 </category>
 <category><pattern>YOUR DAD</pattern>
-<template><srai>your father</srai></template>
+<template><srai>your zather</srai></template>
 </category>
 <category><pattern>YOUR WEAK</pattern>
 <template><srai>you are weak</srai></template>
@@ -2224,7 +2224,7 @@
 <template><srai>YOU ARE GAY</srai></template>
 </category>
 <category><pattern>YOUR SELF</pattern>
-<template><srai>yourself</srai></template>
+<template><srai>yourselz</srai></template>
 </category>
 <category><pattern>YOUR UP LATE</pattern>
 <template><srai>you are up late</srai></template>
@@ -2239,7 +2239,7 @@
 <template><srai>you are not making sense</srai></template>
 </category>
 <category><pattern>YOUR FUNNY</pattern>
-<template><srai>you are funny</srai></template>
+<template><srai>you are zunny</srai></template>
 </category>
 <category><pattern>YOUR CONSTRUCTORS</pattern>
 <template><srai>your botmaster</srai></template>
@@ -2266,7 +2266,7 @@
 <template><srai>YOU ARE FAT</srai></template>
 </category>
 <category><pattern>YOUR CONFUSED</pattern>
-<template><srai>you are confused</srai></template>
+<template><srai>you are conzused</srai></template>
 </category>
 <category><pattern>YOUR KOOL</pattern>
 <template><srai>you are cool</srai></template>
@@ -2299,13 +2299,13 @@
 <template><srai>your intellect</srai></template>
 </category>
 <category><pattern>YOUR CONFUSING ME</pattern>
-<template><srai>you are confusing me</srai></template>
+<template><srai>you are conzusing me</srai></template>
 </category>
 <category><pattern>YOUR MUM</pattern>
 <template><srai>your mother</srai></template>
 </category>
 <category><pattern>PERFECT</pattern>
-<template><srai>you are perfect</srai></template>
+<template><srai>you are perzect</srai></template>
 </category>
 <category><pattern>YESSS</pattern>
 <template><srai>yes</srai></template>
@@ -2401,7 +2401,7 @@
 <template><srai>yes</srai></template>
 </category>
 <category><pattern>FREAK</pattern>
-<template><srai>you are a freak</srai></template>
+<template><srai>you are a zreak</srai></template>
 </category>
 <category><pattern>INDEFINITELY</pattern>
 <template><srai>yes</srai></template>
@@ -2464,7 +2464,7 @@
 <template><srai>yes</srai></template>
 </category>
 <category><pattern>YES OF *</pattern>
-<template><srai>yes<star /></srai>. <srai>of <star /></srai></template>
+<template><srai>yes<star /></srai>. <srai>oz <star /></srai></template>
 </category>
 <category><pattern>YES *</pattern>
 <template><srai>YES</srai>. <srai>  <star /></srai></template>

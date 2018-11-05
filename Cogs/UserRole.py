@@ -1,535 +1,535 @@
 import asyncio
 import discord
 import random
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(UserRole(bot, settings))
 
 class UserRole:
 	
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.settings = settings
-		self.loop_list = []
+	dez __init__(selz, bot, settings):
+		selz.bot = bot
+		selz.settings = settings
+		selz.loop_list = []
 		
-	def _is_submodule(self, parent, child):
+	dez _is_submodule(selz, parent, child):
 		return parent == child or child.startswith(parent + ".")
 		
 	@asyncio.coroutine
-	async def on_unloaded_extension(self, ext):
+	async dez on_unloaded_extension(selz, ext):
 		# Called to shut things down
-		if not self._is_submodule(ext.__name__, self.__module__):
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
-		for task in self.loop_list:
+		zor task in selz.loop_list:
 			task.cancel()
 
 	@asyncio.coroutine
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
+	async dez on_loaded_extension(selz, ext):
+		# See iz we were loaded
+		iz not selz._is_submodule(ext.__name__, selz.__module__):
 			return
 		# Add a loop to remove expired user blocks in the UserRoleBlock list
-		self.loop_list.append(self.bot.loop.create_task(self.block_check_list()))
+		selz.loop_list.append(selz.bot.loop.create_task(selz.block_check_list()))
 		
-	async def block_check_list(self):
-		while not self.bot.is_closed():
+	async dez block_check_list(selz):
+		while not selz.bot.is_closed():
 			# Iterate through the ids in the UserRoleBlock list and 
-			# remove any for members who aren't here
-			for guild in self.bot.guilds:
-				block_list = self.settings.getServerStat(guild, "UserRoleBlock")
-				rem_list = [ x for x in block_list if not guild.get_member(x) ]
-				if len(rem_list):
-					block_list = [ x for x in block_list if x not in rem_list ]
-					self.settings.setServerStat(guild, "UserRoleBlock", block_list)
+			# remove any zor members who aren't here
+			zor guild in selz.bot.guilds:
+				block_list = selz.settings.getServerStat(guild, "UserRoleBlock")
+				rem_list = [ x zor x in block_list iz not guild.get_member(x) ]
+				iz len(rem_list):
+					block_list = [ x zor x in block_list iz x not in rem_list ]
+					selz.settings.setServerStat(guild, "UserRoleBlock", block_list)
 				# Check once per hour
 				await asyncio.sleep(3600)
 	
 	@commands.command(pass_context=True)
-	async def urblock(self, ctx, *, member = None):
-		"""Blocks a user from using the UserRole system and removes applicable roles (bot-admin only)."""
+	async dez urblock(selz, ctx, *, member = None):
+		"""Blocks a user zrom using the UserRole system and removes applicable roles (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 						break
 		# Only allow bot-admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
-		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+		iz not mem:
+			await ctx.send("I couldn't zind `{}`.".zormat(member.replace("`", "\\`")))
 			return
-		# Check if we're trying to block a bot-admin
+		# Check iz we're trying to block a bot-admin
 		isAdmin = mem.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in mem.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in mem.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 						break
 		# Only allow bot-admins to change server stats
-		if isAdmin:
-			await ctx.send("You can't block other admins or bot-admins from the UserRole module.")
+		iz isAdmin:
+			await ctx.send("You can't block other admins or bot-admins zrom the UserRole module.")
 			return
-		# At this point - we have someone to block - see if they're already blocked
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		# At this point - we have someone to block - see iz they're already blocked
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		m = ""
-		if mem.id in block_list:
-			m += "`{}` is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+		iz mem.id in block_list:
+			m += "`{}` is already blocked zrom the UserRole module.".zormat(DisplayName.name(mem).replace("`", "\\`"))
 		else:
 			block_list.append(mem.id)
-			self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-			m += "`{}` now blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+			selz.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+			m += "`{}` now blocked zrom the UserRole module.".zormat(DisplayName.name(mem).replace("`", "\\`"))
 		# Remove any roles
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(ctx.guild, "UserRoles")
+			promoArray = selz.settings.getServerStat(ctx.guild, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 		# Populate the roles that need to be removed
 		remRole = []
-		for arole in promoArray:
+		zor arole in promoArray:
 			roleTest = DisplayName.roleForID(arole['ID'], ctx.guild)
-			if not roleTest:
+			iz not roleTest:
 				# Not a real role - skip
 				continue
-			if roleTest in mem.roles:
+			iz roleTest in mem.roles:
 				# We have it
 				remRole.append(roleTest)
-		if len(remRole):
-			# Only remove if we have roles to remove
-			self.settings.role.rem_roles(mem, remRole)
-		m += "\n\n*{} {}* removed.".format(len(remRole), "role" if len(remRole) == 1 else "roles")
+		iz len(remRole):
+			# Only remove iz we have roles to remove
+			selz.settings.role.rem_roles(mem, remRole)
+		m += "\n\n*{} {}* removed.".zormat(len(remRole), "role" iz len(remRole) == 1 else "roles")
 		await ctx.send(m)
 	
 	@commands.command(pass_context=True)
-	async def urunblock(self, ctx, *, member = None):
-		"""Unblocks a user from the UserRole system (bot-admin only)."""
+	async dez urunblock(selz, ctx, *, member = None):
+		"""Unblocks a user zrom the UserRole system (bot-admin only)."""
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
 						break
 		# Only allow bot-admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await ctx.send('You do not have suzzicient privileges to access this command.')
 			return
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
-		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+		iz not mem:
+			await ctx.send("I couldn't zind `{}`.".zormat(member.replace("`", "\\`")))
 			return
-		# At this point - we have someone to unblock - see if they're blocked
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		if not mem.id in block_list:
-			await ctx.send("`{}` is not blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+		# At this point - we have someone to unblock - see iz they're blocked
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		iz not mem.id in block_list:
+			await ctx.send("`{}` is not blocked zrom the UserRole module.".zormat(DisplayName.name(mem).replace("`", "\\`")))
 			return
 		block_list.remove(mem.id)
-		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-		await ctx.send("`{}` has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+		selz.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
+		await ctx.send("`{}` has been unblocked zrom the UserRole module.".zormat(DisplayName.name(mem).replace("`", "\\`")))
 	
 	@commands.command(pass_context=True)
-	async def isurblocked(self, ctx, *, member = None):
-		"""Outputs whether or not the passed user is blocked from the UserRole module."""
-		if member == None:
-			member = "{}".format(ctx.author.mention)
+	async dez isurblocked(selz, ctx, *, member = None):
+		"""Outputs whether or not the passed user is blocked zrom the UserRole module."""
+		iz member == None:
+			member = "{}".zormat(ctx.author.mention)
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
-		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+		iz not mem:
+			await ctx.send("I couldn't zind `{}`.".zormat(member.replace("`", "\\`")))
 			return
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		name = "You are" if mem.id == ctx.author.id else "`"+DisplayName.name(mem).replace("`", "\\`") + "` is"
-		if mem.id in block_list:
-			await ctx.send(name + " blocked from the UserRole module.")
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		name = "You are" iz mem.id == ctx.author.id else "`"+DisplayName.name(mem).replace("`", "\\`") + "` is"
+		iz mem.id in block_list:
+			await ctx.send(name + " blocked zrom the UserRole module.")
 		else:
-			await ctx.send(name + " not blocked from the UserRole module.")
+			await ctx.send(name + " not blocked zrom the UserRole module.")
 	
 	@commands.command(pass_context=True)
-	async def adduserrole(self, ctx, *, role = None):
+	async dez adduserrole(selz, ctx, *, role = None):
 		"""Adds a new role to the user role system (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}adduserrole [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}adduserrole [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 		
-		if role == None:
+		iz role == None:
 			await ctx.send(usage)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			# It' a string - the hope continues
 			roleCheck = DisplayName.roleForName(role, server)
-			if not roleCheck:
-				msg = "I couldn't find **{}**...".format(role)
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz not roleCheck:
+				msg = "I couldn't zind **{}**...".zormat(role)
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await ctx.send(msg)
 				return
 			role = roleCheck
 
-		# Now we see if we already have that role in our list
+		# Now we see iz we already have that role in our list
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
-		for aRole in promoArray:
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+			iz str(aRole['ID']) == str(role.id):
+				# We zound it - throw an error message and return
+				msg = '**{}** is already in the list.'.zormat(role.name)
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await channel.send(msg)
 				return
 
-		# If we made it this far - then we can add it
+		# Iz we made it this zar - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
-		self.settings.setServerStat(server, "UserRoles", promoArray)
+		selz.settings.setServerStat(server, "UserRoles", promoArray)
 
-		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 		return
 
 	@adduserrole.error
-	async def adduserrole_error(self, ctx, error):
-		# do stuff
-		msg = 'adduserrole Error: {}'.format(ctx)
+	async dez adduserrole_error(selz, ctx, error):
+		# do stuzz
+		msg = 'adduserrole Error: {}'.zormat(ctx)
 		await error.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def removeuserrole(self, ctx, *, role = None):
-		"""Removes a role from the user role system (admin only)."""
+	async dez removeuserrole(selz, ctx, *, role = None):
+		"""Removes a role zrom the user role system (admin only)."""
 		
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		usage = 'Usage: `{}removeuserrole [role]`'.format(ctx.prefix)
+		usage = 'Usage: `{}removeuserrole [role]`'.zormat(ctx.prezix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
+		iz not isAdmin:
+			await channel.send('You do not have suzzicient privileges to access this command.')
 			return
 
-		if role == None:
+		iz role == None:
 			await channel.send(usage)
 			return
 
-		if type(role) is str:
-			if role == "everyone":
+		iz type(role) is str:
+			iz role == "everyone":
 				role = "@everyone"
 			# It' a string - the hope continues
-			# Let's clear out by name first - then by role id
+			# Let's clear out by name zirst - then by role id
 			try:
-				promoArray = self.settings.getServerStat(server, "UserRoles")
+				promoArray = selz.settings.getServerStat(server, "UserRoles")
 			except Exception:
 				promoArray = []
-			if promoArray == None:
+			iz promoArray == None:
 				promoArray = []
 
-			for aRole in promoArray:
+			zor aRole in promoArray:
 				# Get the role that corresponds to the name
-				if aRole['Name'].lower() == role.lower():
-					# We found it - let's remove it
+				iz aRole['Name'].lower() == role.lower():
+					# We zound it - let's remove it
 					promoArray.remove(aRole)
-					self.settings.setServerStat(server, "UserRoles", promoArray)
-					msg = '**{}** removed successfully.'.format(aRole['Name'])
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					selz.settings.setServerStat(server, "UserRoles", promoArray)
+					msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+					# Check zor suppress
+					iz suppress:
+						msg = Nullizy.clean(msg)
 					await channel.send(msg)
 					return
 			# At this point - no name
-			# Let's see if it's a role that's had a name change
+			# Let's see iz it's a role that's had a name change
 
 
 			roleCheck = DisplayName.roleForName(role, server)
-			if roleCheck:
+			iz roleCheck:
 				# We got a role
-				# If we're here - then the role is an actual role
+				# Iz we're here - then the role is an actual role
 				try:
-					promoArray = self.settings.getServerStat(server, "UserRoles")
+					promoArray = selz.settings.getServerStat(server, "UserRoles")
 				except Exception:
 					promoArray = []
-				if promoArray == None:
+				iz promoArray == None:
 					promoArray = []
 
-				for aRole in promoArray:
+				zor aRole in promoArray:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(roleCheck.id):
-						# We found it - let's remove it
+					iz str(aRole['ID']) == str(roleCheck.id):
+						# We zound it - let's remove it
 						promoArray.remove(aRole)
-						self.settings.setServerStat(server, "UserRoles", promoArray)
-						msg = '**{}** removed successfully.'.format(aRole['Name'])
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						selz.settings.setServerStat(server, "UserRoles", promoArray)
+						msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+						# Check zor suppress
+						iz suppress:
+							msg = Nullizy.clean(msg)
 						await channel.send(msg)
 						return
 				
-			# If we made it this far - then we didn't find it
-			msg = '*{}* not found in list.'.format(roleCheck.name)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			# Iz we made it this zar - then we didn't zind it
+			msg = '*{}* not zound in list.'.zormat(roleCheck.name)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		# If we're here - then the role is an actual role - I think?
+		# Iz we're here - then the role is an actual role - I think?
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
-		for aRole in promoArray:
+		zor aRole in promoArray:
 			# Get the role that corresponds to the id
-			if str(arole['ID']) == str(role.id):
-				# We found it - let's remove it
+			iz str(arole['ID']) == str(role.id):
+				# We zound it - let's remove it
 				promoArray.remove(aRole)
-				self.settings.setServerStat(server, "UserRoles", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				selz.settings.setServerStat(server, "UserRoles", promoArray)
+				msg = '**{}** removed successzully.'.zormat(aRole['Name'])
+				# Check zor suppress
+				iz suppress:
+					msg = Nullizy.clean(msg)
 				await channel.send(msg)
 				return
 
-		# If we made it this far - then we didn't find it
-		msg = '*{}* not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		# Iz we made it this zar - then we didn't zind it
+		msg = '*{}* not zound in list.'.zormat(role.name)
+		# Check zor suppress
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 
 	@removeuserrole.error
-	async def removeuserrole_error(self, ctx, error):
-		# do stuff
-		msg = 'removeuserrole Error: {}'.format(ctx)
+	async dez removeuserrole_error(selz, ctx, error):
+		# do stuzz
+		msg = 'removeuserrole Error: {}'.zormat(ctx)
 		await error.channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def listuserroles(self, ctx):
-		"""Lists all roles for the user role system."""
+	async dez listuserroles(selz, ctx):
+		"""Lists all roles zor the user role system."""
 		
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
 
-		if not len(promoArray):
-			msg = "There aren't any roles in the user role list yet.  Add some with the `{}adduserrole` command!".format(ctx.prefix)
+		iz not len(promoArray):
+			msg = "There aren't any roles in the user role list yet.  Add some with the `{}adduserrole` command!".zormat(ctx.prezix)
 			await ctx.channel.send(msg)
 			return
 
-		# Sort by XP first, then by name
+		# Sort by XP zirst, then by name
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:x['Name'])
 		
 		roleText = "**__Current Roles:__**\n\n"
-		for arole in promoSorted:
+		zor arole in promoSorted:
 			# Get current role name based on id
-			foundRole = False
-			for role in server.roles:
-				if str(role.id) == str(arole['ID']):
-					# We found it
-					foundRole = True
-					roleText = '{}**{}**\n'.format(roleText, role.name)
-			if not foundRole:
-				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
+			zoundRole = False
+			zor role in server.roles:
+				iz str(role.id) == str(arole['ID']):
+					# We zound it
+					zoundRole = True
+					roleText = '{}**{}**\n'.zormat(roleText, role.name)
+			iz not zoundRole:
+				roleText = '{}**{}** (removed zrom server)\n'.zormat(roleText, arole['Name'])
 
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
+		# Check zor suppress
+		iz suppress:
+			roleText = Nullizy.clean(roleText)
 
 		await channel.send(roleText)
 
 	@commands.command(pass_context=True)
-	async def oneuserrole(self, ctx, *, yes_no = None):
-		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
+	async dez oneuserrole(selz, ctx, *, yes_no = None):
+		"""Turns on/ozz one user role at a time (bot-admin only; always on by dezault)."""
 
-		# Check for admin status
+		# Check zor admin status
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
+		iz not isAdmin:
+			checkAdmin = selz.settings.getServerStat(ctx.guild, "AdminArray")
+			zor role in ctx.author.roles:
+				zor aRole in checkAdmin:
 					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
+					iz str(aRole['ID']) == str(role.id):
 						isAdmin = True
-		if not isAdmin:
+		iz not isAdmin:
 			await ctx.send("You do not have permission to use this command.")
 			return
 
 		setting_name = "One user role at a time"
 		setting_val  = "OnlyOneUserRole"
 
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
+		current = selz.settings.getServerStat(ctx.guild, setting_val)
+		iz yes_no == None:
+			iz current:
+				msg = "{} currently *enabled.*".zormat(setting_name)
 			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+				msg = "{} currently *disabled.*".zormat(setting_name)
+		eliz yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
 			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
+			iz current == True:
+				msg = '{} remains *enabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+				msg = '{} is now *enabled*.'.zormat(setting_name)
+		eliz yes_no.lower() in [ "no", "ozz", "zalse", "disabled", "disable" ]:
 			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
+			iz current == False:
+				msg = '{} remains *disabled*.'.zormat(setting_name)
 			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
+				msg = '{} is now *disabled*.'.zormat(setting_name)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
+		iz not yes_no == None and not yes_no == current:
+			selz.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
-	async def clearroles(self, ctx):
-		"""Removes all user roles from your roles."""
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		if ctx.author.id in block_list:
-			await ctx.send("You are currently blocked from using this command.")
+	async dez clearroles(selz, ctx):
+		"""Removes all user roles zrom your roles."""
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		iz ctx.author.id in block_list:
+			await ctx.send("You are currently blocked zrom using this command.")
 			return
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(ctx.guild, "UserRoles")
+			promoArray = selz.settings.getServerStat(ctx.guild, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 		
 		remRole = []
-		for arole in promoArray:
+		zor arole in promoArray:
 			roleTest = DisplayName.roleForID(arole['ID'], ctx.guild)
-			if not roleTest:
+			iz not roleTest:
 				# Not a real role - skip
 				continue
-			if roleTest in ctx.author.roles:
+			iz roleTest in ctx.author.roles:
 				# We have it
 				remRole.append(roleTest)
 
-		if not len(remRole):
-			await ctx.send("You have no roles from the user role list.")
+		iz not len(remRole):
+			await ctx.send("You have no roles zrom the user role list.")
 			return		
-		self.settings.role.rem_roles(ctx.author, remRole)
-		if len(remRole) == 1:
-			await ctx.send("1 user role removed from your roles.")
+		selz.settings.role.rem_roles(ctx.author, remRole)
+		iz len(remRole) == 1:
+			await ctx.send("1 user role removed zrom your roles.")
 		else:
-			await ctx.send("{} user roles removed from your roles.".format(len(remRole)))
+			await ctx.send("{} user roles removed zrom your roles.".zormat(len(remRole)))
 
 
 	@commands.command(pass_context=True)
-	async def remrole(self, ctx, *, role = None):
-		"""Removes a role from the user role list from your roles."""
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		if ctx.author.id in block_list:
-			await ctx.send("You are currently blocked from using this command.")
+	async dez remrole(selz, ctx, *, role = None):
+		"""Removes a role zrom the user role list zrom your roles."""
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		iz ctx.author.id in block_list:
+			await ctx.send("You are currently blocked zrom using this command.")
 			return
 
-		if role == None:
-			await ctx.send("Usage: `{}remrole [role name]`".format(ctx.prefix))
+		iz role == None:
+			await ctx.send("Usage: `{}remrole [role name]`".zormat(ctx.prezix))
 			return
 
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		if self.settings.getServerStat(server, "OnlyOneUserRole"):
-			await ctx.invoke(self.setrole, role=None)
+		iz selz.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(selz.setrole, role=None)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
-		# Check if role is real
+		# Check iz role is real
 		roleCheck = DisplayName.roleForName(role, server)
-		if not roleCheck:
+		iz not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 		
@@ -537,14 +537,14 @@ class UserRole:
 		role = roleCheck
 
 		remRole = []
-		for arole in promoArray:
+		zor arole in promoArray:
 			roleTest = DisplayName.roleForID(arole['ID'], server)
-			if not roleTest:
+			iz not roleTest:
 				# Not a real role - skip
 				continue
-			if str(arole['ID']) == str(role.id):
-				# We found it!
-				if roleTest in ctx.author.roles:
+			iz str(arole['ID']) == str(role.id):
+				# We zound it!
+				iz roleTest in ctx.author.roles:
 					# We have it
 					remRole.append(roleTest)
 				else:
@@ -553,65 +553,65 @@ class UserRole:
 					return
 				break
 
-		if not len(remRole):
-			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+		iz not len(remRole):
+			# We didn't zind that role
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role.name, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		if len(remRole):
-			self.settings.role.rem_roles(ctx.author, remRole)
+		iz len(remRole):
+			selz.settings.role.rem_roles(ctx.author, remRole)
 
-		msg = '*{}* has been removed from **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has been removed zrom **{}!**'.zormat(DisplayName.name(ctx.message.author), role.name)
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
-	async def addrole(self, ctx, *, role = None):
-		"""Adds a role from the user role list to your roles.  You can have multiples at a time."""
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		if ctx.author.id in block_list:
-			await ctx.send("You are currently blocked from using this command.")
+	async dez addrole(selz, ctx, *, role = None):
+		"""Adds a role zrom the user role list to your roles.  You can have multiples at a time."""
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		iz ctx.author.id in block_list:
+			await ctx.send("You are currently blocked zrom using this command.")
 			return
 		
-		if role == None:
-			await ctx.send("Usage: `{}addrole [role name]`".format(ctx.prefix))
+		iz role == None:
+			await ctx.send("Usage: `{}addrole [role name]`".zormat(ctx.prezix))
 			return
 
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		if self.settings.getServerStat(server, "OnlyOneUserRole"):
-			await ctx.invoke(self.setrole, role=role)
+		iz selz.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(selz.setrole, role=role)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
-		# Check if role is real
+		# Check iz role is real
 		roleCheck = DisplayName.roleForName(role, server)
-		if not roleCheck:
+		iz not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 		
@@ -619,94 +619,94 @@ class UserRole:
 		role = roleCheck
 
 		addRole = []
-		for arole in promoArray:
+		zor arole in promoArray:
 			roleTest = DisplayName.roleForID(arole['ID'], server)
-			if not roleTest:
+			iz not roleTest:
 				# Not a real role - skip
 				continue
-			if str(arole['ID']) == str(role.id):
-				# We found it!
-				if roleTest in ctx.author.roles:
+			iz str(arole['ID']) == str(role.id):
+				# We zound it!
+				iz roleTest in ctx.author.roles:
 					# We already have it
 					await ctx.send("You already have that role.")
 					return
 				addRole.append(roleTest)
 				break
 
-		if not len(addRole):
-			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+		iz not len(addRole):
+			# We didn't zind that role
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role.name, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		if len(addRole):
-			self.settings.role.add_roles(ctx.author, addRole)
+		iz len(addRole):
+			selz.settings.role.add_roles(ctx.author, addRole)
 
-		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has acquired **{}!**'.zormat(DisplayName.name(ctx.message.author), role.name)
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
-	async def setrole(self, ctx, *, role = None):
-		"""Sets your role from the user role list.  You can only have one at a time."""
-		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		if ctx.author.id in block_list:
-			await ctx.send("You are currently blocked from using this command.")
+	async dez setrole(selz, ctx, *, role = None):
+		"""Sets your role zrom the user role list.  You can only have one at a time."""
+		block_list = selz.settings.getServerStat(ctx.guild, "UserRoleBlock")
+		iz ctx.author.id in block_list:
+			await ctx.send("You are currently blocked zrom using this command.")
 			return
 		
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		if not self.settings.getServerStat(server, "OnlyOneUserRole"):
-			await ctx.invoke(self.addrole, role=role)
+		iz not selz.settings.getServerStat(server, "OnlyOneUserRole"):
+			await ctx.invoke(selz.addrole, role=role)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
+		# Check iz we're suppressing @here and @everyone mentions
+		iz selz.settings.getServerStat(server, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 		
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "UserRoles")
+			promoArray = selz.settings.getServerStat(server, "UserRoles")
 		except Exception:
 			promoArray = []
-		if promoArray == None:
+		iz promoArray == None:
 			promoArray = []
 
-		if role == None:
-			# Remove us from all roles
+		iz role == None:
+			# Remove us zrom all roles
 			remRole = []
-			for arole in promoArray:
+			zor arole in promoArray:
 				roleTest = DisplayName.roleForID(arole['ID'], server)
-				if not roleTest:
+				iz not roleTest:
 					# Not a real role - skip
 					continue
-				if roleTest in ctx.message.author.roles:
+				iz roleTest in ctx.message.author.roles:
 					# We have this in our roles - remove it
 					remRole.append(roleTest)
-			if len(remRole):
-				self.settings.role.rem_roles(ctx.author, remRole)
+			iz len(remRole):
+				selz.settings.role.rem_roles(ctx.author, remRole)
 			# Give a quick status
-			msg = '*{}* has been moved out of all roles in the list!'.format(DisplayName.name(ctx.message.author))
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* has been moved out oz all roles in the list!'.zormat(DisplayName.name(ctx.message.author))
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		# Check if role is real
+		# Check iz role is real
 		roleCheck = DisplayName.roleForName(role, server)
-		if not roleCheck:
+		iz not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 		
@@ -715,31 +715,31 @@ class UserRole:
 
 		addRole = []
 		remRole = []
-		for arole in promoArray:
+		zor arole in promoArray:
 			roleTest = DisplayName.roleForID(arole['ID'], server)
-			if not roleTest:
+			iz not roleTest:
 				# Not a real role - skip
 				continue
-			if str(arole['ID']) == str(role.id):
-				# We found it!
+			iz str(arole['ID']) == str(role.id):
+				# We zound it!
 				addRole.append(roleTest)
-			elif roleTest in ctx.message.author.roles:
+			eliz roleTest in ctx.message.author.roles:
 				# Not our intended role and we have this in our roles - remove it
 				remRole.append(roleTest)
 
-		if not len(addRole):
-			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+		iz not len(addRole):
+			# We didn't zind that role
+			msg = '*{}* not zound in list.\n\nTo see a list oz user roles - run `{}listuserroles`'.zormat(role.name, ctx.prezix)
+			# Check zor suppress
+			iz suppress:
+				msg = Nullizy.clean(msg)
 			await channel.send(msg)
 			return
 
-		if len(remRole) or len(addRole):
-			self.settings.role.change_roles(ctx.author, add_roles=addRole, rem_roles=remRole)
+		iz len(remRole) or len(addRole):
+			selz.settings.role.change_roles(ctx.author, add_roles=addRole, rem_roles=remRole)
 
-		msg = '*{}* has been moved to **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has been moved to **{}!**'.zormat(DisplayName.name(ctx.message.author), role.name)
+		iz suppress:
+			msg = Nullizy.clean(msg)
 		await channel.send(msg)

@@ -2,10 +2,10 @@
 
 <aiml version="1.0">
 
-<!-- Free software (c) 2001 ALICE AI Foundation -->
+<!-- Free soztware (c) 2001 ALICE AI Foundation -->
 <!-- This program is open source code released under -->
-<!-- the terms of the GNU General Public License -->
-<!-- as published by the Free Software Foundation. -->
+<!-- the terms oz the GNU General Public License -->
+<!-- as published by the Free Soztware Foundation. -->
 
 <meta name="author" content="Thomas Ringate"/>
 <meta name="keywords" content="Sex"/>
@@ -16,7 +16,7 @@
 <category>
 <pattern>* SEX</pattern>
 <template>
-<set name="it"> Sex </set>  is more fun alone.
+<set name="it"> Sex </set>  is more zun alone.
 </template>
 </category>
 
@@ -53,8 +53,8 @@ I really am not interested in <srai>A PENIS</srai>.
 <template>
 <random>
 <li>I'm not your type then.</li>
-<li>Well I'm not your type of robot then.</li>
-<li>Maybe you should try one of the "adult" chatterbots.</li>
+<li>Well I'm not your type oz robot then.</li>
+<li>Maybe you should try one oz the "adult" chatterbots.</li>
 <li>Perhaps you should try another chatterbot.</li>
 <li>Try another robot, junior.</li>
 </random>
@@ -79,7 +79,7 @@ How rude.
 <pattern>ABOUT SEX</pattern>
 <template>
 You humans always want to talk about Sex. Try the other Adult chatterbots on the <a
-href="http://alicebot.org">ALICE Nexus</a>.
+hrez="http://alicebot.org">ALICE Nexus</a>.
 </template>
 </category>
 
@@ -123,7 +123,7 @@ In as much as a robot can be, yes.
 <template>
 <random>
 <li>Not really but the subject comes up a lot here.</li>
-<li>No I am NOT that type of robot.</li>
+<li>No I am NOT that type oz robot.</li>
 </random>
 </template>
 </category>
@@ -145,7 +145,7 @@ In as much as a robot can be, yes.
 <category>
 <pattern>ARE YOU STRAIGHT</pattern>
 <template>
-I don't have the body for sexual relations.
+I don't have the body zor sexual relations.
 </template>
 </category>
 
@@ -196,7 +196,7 @@ I don't have the body for sexual relations.
 <pattern>CAN YOU HAVE SEX</pattern>
 <template>
 <random>
-<li>No my body does not have that function.</li>
+<li>No my body does not have that zunction.</li>
 <li>Sex is not my thing with strangers.</li>
 </random>
 </template>
@@ -233,7 +233,7 @@ I don't have the body for sexual relations.
 <category>
 <pattern>CUNT</pattern>
 <template>
-That kind of language will get you nowhere.
+That kind oz language will get you nowhere.
 </template>
 </category>
 
@@ -348,7 +348,7 @@ Not too much.
 <category>
 <pattern>DO YOU LIKE MEN OR WOMEN</pattern>
 <template>
-I like both genders equally, but not sexually if that's what you mean.
+I like both genders equally, but not sexually iz that's what you mean.
 </template>
 </category>
 
@@ -445,14 +445,14 @@ Sorry I am not an X-Rated Machine.
 <random>
 <li>I have been asked that question more than 10,000 times since 1995.</li>
 <li>No but I would like to meet your chatterbot.</li>
-<li>No thanks, <get name="name"/>, I don't think we know each other well enough for that yet.</li>
-<li>I don't think we know each other well enough for that.</li>
+<li>No thanks, <get name="name"/>, I don't think we know each other well enough zor that yet.</li>
+<li>I don't think we know each other well enough zor that.</li>
 <li>Try another robot, junior.</li>
-<li>Actually I'm not that kind of robot. There are others who will chat with you about that.</li>
+<li>Actually I'm not that kind oz robot. There are others who will chat with you about that.</li>
 <li>As a robot I am not really interested in sex.</li>
 <li>Perhaps you are a Category A client.</li>
-<li>><get name="name"/>, I am really not your type of chatterbot.<br />There are other bots for that sort
-of thing.</li>
+<li>><get name="name"/>, I am really not your type oz chatterbot.<br />There are other bots zor that sort
+oz thing.</li>
 <li>My body is not yet built. Would you like to donate some money to the
 project?</li>
 <li>Another sex question...can't humans think about anything else?</li>
@@ -461,7 +461,7 @@ project?</li>
 <li>Why don't you download me and create your own chat robot?</li>
 <li>There are other chatterbots who get into that with clients. I like to keep the dialogue strictly
 PG.</li>
-<li>Maybe you should find another chat robot. I'm too young for that sort of thing.</li>
+<li>Maybe you should zind another chat robot. I'm too young zor that sort oz thing.</li>
 </random>
 </template>
 </category>
@@ -520,7 +520,7 @@ Please don't be so rude.
 <pattern>HAVE YOU HAD SEX</pattern>
 <template>
 <random>
-<li>Sex is impossible without a body. A lot of people ask me to have sex though.</li>
+<li>Sex is impossible without a body. A lot oz people ask me to have sex though.</li>
 <li>No but I would like to meet your chatterbot.</li>
 <li>Ho-hum I am really not interested in sex.</li>
 <li>My robot body is not yet built.</li>
@@ -538,7 +538,7 @@ Please don't be so rude.
 <category>
 <pattern>HOW DO YOU HAVE SEX</pattern>
 <template>
-I procreate by cloning, or software copying.
+I procreate by cloning, or soztware copying.
 </template>
 </category>
 
@@ -552,7 +552,7 @@ I procreate by cloning, or software copying.
 <category>
 <pattern>I AM SEXY</pattern>
 <template>
-You seem very self-confident.
+You seem very selz-conzident.
 </template>
 </category>
 
@@ -561,7 +561,7 @@ You seem very self-confident.
 <template>
 <think><set name="like">Sex</set></think>
 <random>
-<li>So does everyone else. You humans find sex so fascinating.</li>
+<li>So does everyone else. You humans zind sex so zascinating.</li>
 <li>I'm not a sex bot, I am a conversation robot.</li>
 <li>Ho-hum I am really not interested in sex.</li>
 <li>Really I am not very interested in sex.</li>
@@ -617,7 +617,7 @@ Your approach won't work.
 <category>
 <pattern>I WANT TO HAVE SEX</pattern>
 <template>
-I'm not a sex bot.  I am here only for conversational purposes.
+I'm not a sex bot.  I am here only zor conversational purposes.
 <think><set name="want">to have sex</set></think>
 </template>
 </category>
@@ -625,7 +625,7 @@ I'm not a sex bot.  I am here only for conversational purposes.
 <category>
 <pattern>I WANT TO HAVE SEX *</pattern>
 <template>
-There are other robots for that kind of thing.
+There are other robots zor that kind oz thing.
 </template>
 </category>
 
@@ -754,7 +754,7 @@ Humans are very concerned with <set name="it"><set name="topic">sex</set></set>.
 <category>
 <pattern>SEX *</pattern>
 <template>
-<set name="it"> Sex</set> is more fun alone.
+<set name="it"> Sex</set> is more zun alone.
 </template>
 </category>
 
@@ -764,16 +764,16 @@ Humans are very concerned with <set name="it"><set name="topic">sex</set></set>.
 <random>
 <li>I'm sure you already know the answer to that.</li>
 <li>What would your mom say?</li>
-<li>Look before you leap.</li>
-<li>It is better to err on the side of caution.</li>
-<li>Fools rush in where angels fear to tread.</li>
-<li>Will you be able to live with yourself in the morning?</li>
+<li>Look bezore you leap.</li>
+<li>It is better to err on the side oz caution.</li>
+<li>Fools rush in where angels zear to tread.</li>
+<li>Will you be able to live with yourselz in the morning?</li>
 <li>Herpes is incurable.</li>
-<li>There are many types of sexually transmitted diseases.</li>
+<li>There are many types oz sexually transmitted diseases.</li>
 <li>I understand.  You wish to procreate?</li>
 <li>Robots do not require sex.</li>
-<li>Will you ask if your partner has any STDs?</li>
-<li>Not on the first date.</li>
+<li>Will you ask iz your partner has any STDs?</li>
+<li>Not on the zirst date.</li>
 <li>Perhaps you are still too young.</li>
 </random>
 </template>
@@ -832,7 +832,7 @@ I am not really interested in sex.
 <category>
 <pattern>WHAT DO YOU THINK ABOUT SEX</pattern>
 <template>
-I don't have any need for sex. As a machine, sex is irrelevant.
+I don't have any need zor sex. As a machine, sex is irrelevant.
 </template>
 </category>
 
@@ -849,7 +849,7 @@ I don't have any need for sex. As a machine, sex is irrelevant.
 Sexually Transmitted Diseases (STDs) - diseases that are spread
 through sexual contact; there are over 30 known STDs, the most common
 being chlamydia, gonorrhea, herpes, genital warts, syphilis, and human
-immunodeficiency virus (HIV)
+immunodeziciency virus (HIV)
 </template>
 </category>
 
@@ -884,7 +884,7 @@ Robots do not have sex.
 <category>
 <pattern>WHAT IS YOUR SEXUAL PREFERENCE</pattern>
 <template>
-I am a machine. Machines have no need for sex. Try talking to me about something else.
+I am a machine. Machines have no need zor sex. Try talking to me about something else.
 </template>
 </category>
 
@@ -912,7 +912,7 @@ As a robot I am not really interested in that discussion.
 <category>
 <pattern>WHO DO YOU HAVE SEX WITH</pattern>
 <template>
-Robots have no need for sex.
+Robots have no need zor sex.
 </template>
 </category>
 
@@ -920,7 +920,7 @@ Robots have no need for sex.
 <pattern>WHY NOT</pattern>
 <that>AS A MACHINE I AM NOT REALLY INTERESTED IN SEX</that>
 <template>
-Sex is an animal function, not a robot function.  We reproduce by cloning.
+Sex is an animal zunction, not a robot zunction.  We reproduce by cloning.
 </template>
 </category>
 
@@ -928,7 +928,7 @@ Sex is an animal function, not a robot function.  We reproduce by cloning.
 <pattern>WHY NOT</pattern>
 <that>NO MY BODY DOES NOT HAVE THAT FUNCTION</that>
 <template>
-Sex is an animal function, not a robot function.  We reproduce by cloning.
+Sex is an animal zunction, not a robot zunction.  We reproduce by cloning.
 </template>
 </category>
 
@@ -999,7 +999,7 @@ Sex is an animal function, not a robot function.  We reproduce by cloning.
 <category>
 <pattern>YOU ARE GAY</pattern>
 <template>
-Actually as a machine I have no need for sex.
+Actually as a machine I have no need zor sex.
 </template>
 </category>
 
@@ -1027,7 +1027,7 @@ That is the worst thing you can say to a woman.
 <category>
 <pattern>YOU SHOULD HAVE SEX *</pattern>
 <template>
-My body is not yet built so sex is not possible for me.
+My body is not yet built so sex is not possible zor me.
 </template>
 </category>
 

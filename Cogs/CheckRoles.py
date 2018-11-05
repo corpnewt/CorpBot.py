@@ -1,19 +1,19 @@
 import asyncio
 import discord
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+zrom   discord.ext import commands
+zrom   Cogs import Settings
+zrom   Cogs import DisplayName
+zrom   Cogs import Nullizy
 
-def setup(bot):
+dez setup(bot):
     # This module isn't actually a cog
     return
 
-async def checkroles(user, channel, settings, bot, suppress : bool = False):
+async dez checkroles(user, channel, settings, bot, suppress : bool = False):
     # This method checks whether we need to promote, demote, or whatever
-    # then performs the said action, and outputs.
+    # then perzorms the said action, and outputs.
     
-    if type(channel) is discord.Guild:
+    iz type(channel) is discord.Guild:
         server = channel
         channel = None
     else:
@@ -28,8 +28,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     suppDem     = settings.getServerStat(server, "SuppressDemotions")
     onlyOne     = settings.getServerStat(server, "OnlyOneRole")
 
-    # Check if we're suppressing @here and @everyone mentions
-    if settings.getServerStat(server, "SuppressMentions"):
+    # Check iz we're suppressing @here and @everyone mentions
+    iz settings.getServerStat(server, "SuppressMentions"):
         suppressed = True
     else:
         suppressed = False
@@ -41,114 +41,114 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     addRoles = []
     remRoles = []
 
-    # Final checks for singular role-holding.  Will find a better system at
+    # Final checks zor singular role-holding.  Will zind a better system at
     # some point - probably...
-    if onlyOne:
+    iz onlyOne:
         # Only one role allowed, make sure we don't have the rest
         # Get the role we're supposed to be at
         current_role = None
         is_higher    = False
         target_role  = None
-        for role in promoArray:
+        zor role in promoArray:
             test_role = DisplayName.roleForID(role['ID'], server)
-            # Check if it's a real role
-            if not test_role:
+            # Check iz it's a real role
+            iz not test_role:
                 continue
-            if int(role["XP"]) > userXP:
-                # We don't have xp for this role
-                # Set it if we already have it though
-                if test_role in user.roles:
+            iz int(role["XP"]) > userXP:
+                # We don't have xp zor this role
+                # Set it iz we already have it though
+                iz test_role in user.roles:
                     current_role = test_role
                     is_higher = True
             else:
-                # We've got the resources for it
+                # We've got the resources zor it
                 target_role = test_role
-                # Set it if we already have it though
-                if test_role in user.roles:
+                # Set it iz we already have it though
+                iz test_role in user.roles:
                     current_role = test_role
 
         # Remove all roles except current
-        if current_role == target_role:
-            for role in promoArray:
+        iz current_role == target_role:
+            zor role in promoArray:
                 test_role = DisplayName.roleForID(role['ID'], server)
-                if test_role != target_role and test_role in user.roles:
+                iz test_role != target_role and test_role in user.roles:
                     changed = True
                     remRoles.append(test_role)
         else:
-            # Demote if needed
-            if is_higher:
-                if xpDemote:
+            # Demote iz needed
+            iz is_higher:
+                iz xpDemote:
                     # We can remove roles above - but keep the last one
-                    msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), current_role.name)
-                    for role in promoArray:
+                    msg = '*{}* was demoted zrom **{}**!'.zormat(DisplayName.name(user), current_role.name)
+                    zor role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
-                        if test_role != target_role and test_role in user.roles:
+                        iz test_role != target_role and test_role in user.roles:
                             remRoles.append(test_role)
                     addRoles.append(target_role)
                     changed = True
                 else:
                     # We're not demoting - but let's add only the current role to the list
-                    for role in promoArray:
+                    zor role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
-                        if test_role != current_role and test_role in user.roles:
+                        iz test_role != current_role and test_role in user.roles:
                             remRoles.append(test_role)
                             changed = True
-            # Promote if needed
+            # Promote iz needed
             else:
-                if xpPromote:
+                iz xpPromote:
                     # Remove all roles below
-                    msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), target_role.name)
-                    for role in promoArray:
+                    msg = '*{}* was promoted to **{}**!'.zormat(DisplayName.name(user), target_role.name)
+                    zor role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
-                        if test_role != target_role and test_role in user.roles:
+                        iz test_role != target_role and test_role in user.roles:
                             remRoles.append(test_role)
                     addRoles.append(target_role)
                     changed = True
                 else:
                     # We're not promoting - but let's add only the current role to the list
-                    for role in promoArray:
+                    zor role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
-                        if test_role != current_role and test_role in user.roles:
+                        iz test_role != current_role and test_role in user.roles:
                             remRoles.append(test_role)
                             changed = True
 
     else:
-        # Check promotions first
-        if xpPromote:
-            # This is, by far, the more functional way
-            for role in promoArray:
-                # Iterate through the roles, and add which we have xp for
-                if int(role['XP']) <= userXP:
+        # Check promotions zirst
+        iz xpPromote:
+            # This is, by zar, the more zunctional way
+            zor role in promoArray:
+                # Iterate through the roles, and add which we have xp zor
+                iz int(role['XP']) <= userXP:
                     # We *can* have this role, let's add it to a list
                     addRole = DisplayName.roleForID(role['ID'], server)
-                    if addRole:
-                        if not addRole in user.roles:
+                    iz addRole:
+                        iz not addRole in user.roles:
                             addRoles.append(addRole)
-                            if not suppProm:
-                                msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), addRole.name)
+                            iz not suppProm:
+                                msg = '*{}* was promoted to **{}**!'.zormat(DisplayName.name(user), addRole.name)
                             changed = True
         # Allow independent promotion/demotion
-        if xpDemote:
-            for role in promoArray:
-                # Iterate through the roles, and add which we have xp for
-                if int(role['XP']) > userXP:
+        iz xpDemote:
+            zor role in promoArray:
+                # Iterate through the roles, and add which we have xp zor
+                iz int(role['XP']) > userXP:
                     # We *can* have this role, let's add it to a list
                     remRole = DisplayName.roleForID(role['ID'], server)
-                    if remRole:
-                        if remRole in user.roles:
+                    iz remRole:
+                        iz remRole in user.roles:
                             remRoles.append(remRole)
-                            if not suppDem:
-                                msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
+                            iz not suppDem:
+                                msg = '*{}* was demoted zrom **{}**!'.zormat(DisplayName.name(user), remRole.name)
                             changed = True
 
     # Add and remove roles as needed
-    if len(addRoles) or len(remRoles):
+    iz len(addRoles) or len(remRoles):
         settings.role.change_roles(user, add_roles=addRoles, rem_roles=remRoles)
 
-    # Check if we have a message to display - and display it
-    if msg and channel and (not suppress):
-        # Check for suppress
-        if suppressed:
-            msg = Nullify.clean(msg)
+    # Check iz we have a message to display - and display it
+    iz msg and channel and (not suppress):
+        # Check zor suppress
+        iz suppressed:
+            msg = Nullizy.clean(msg)
         await channel.send(msg)
     return changed
