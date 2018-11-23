@@ -45,7 +45,7 @@ class Picker:
         current_reactions.append(self.reactions[0])
         if self.message:
             message = self.message
-            await message.edit(content=msg)
+            await message.edit(content=msg, embed=None)
         else:
             message = await self.ctx.send(msg)
         # Add our reactions
