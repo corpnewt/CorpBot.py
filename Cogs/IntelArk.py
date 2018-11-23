@@ -97,7 +97,7 @@ class IntelArk:
 				response = response[0:5]
 			index, message = await PickList.Picker(
 				message=message,
-				title="Multiple Matches Returned For {}:".format(text.replace("`","")),
+				title="Multiple Matches Returned For `{}`:".format(text.replace("`","")),
 				list=[x["label"] for x in response],
 				ctx=ctx
 			).pick()
