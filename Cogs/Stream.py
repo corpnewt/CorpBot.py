@@ -32,9 +32,16 @@ class Stream:
         if not before.id in stream_list:
             # We're not watching for them
             return
-        if after.activity == None or after.activity.type != 1:
+        # Find out if we weren't streaming before - and display it
+        s_before = next((x for x in list(before.activities) if x.type is discord.ActivityType.streaming), None)
+        if s_before:
+            # Already streaming - ignore it.
             return
-
+        # Not streaming before, see if we are now
+        s_after = next((x for x in list(after.activities) if x.type is discord.ActivityType.streaming), None)
+        if not s_after:
+            # Not streaming - ignore it.
+            return
         # We're STREAMING
         chan = self.settings.getServerStat(before.guild, "StreamChannel")
         channel = before.guild.get_channel(chan)
@@ -138,14 +145,24 @@ class Stream:
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
         message = re.sub(self.regexServer,   "{}".format(dest.guild.name.replace("@here", "@​here").replace("@everyone", "@​everyone")), message)
+        # Get the activity info
+        act = next((x for x in list(member.activities) if x.type is discord.ActivityType.streaming), None)
+        try:
+            name = act.name
+        except:
+            name = "Mystery Game"
+        try:
+            url = act.url
+        except:
+            url = "Mystery URL"
         if test:
             message = re.sub(self.regexUrl,      "GameURL", message)
             message = re.sub(self.regexGame,     "GameName", message)
             message = re.sub(self.regexHere,     "@​here", message)
             message = re.sub(self.regexEveryone, "@​everyone", message)
         else:
-            message = re.sub(self.regexUrl,      "{}".format(member.activity.url), message)
-            message = re.sub(self.regexGame,     "{}".format(member.activity.name), message)
+            message = re.sub(self.regexUrl,      "{}".format(url), message)
+            message = re.sub(self.regexGame,     "{}".format(name), message)
             message = re.sub(self.regexHere,     "@here", message)
             message = re.sub(self.regexEveryone, "@everyone", message)
         await dest.send(message)
