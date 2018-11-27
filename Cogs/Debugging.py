@@ -169,7 +169,38 @@ class Debugging:
 		# A member left
 		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, "", title=msg, color=discord.Color.light_grey())
-		
+
+	def type_to_string(self, activity_type):
+		# Returns the string associated with the passed activity type
+		if activity_type is discord.ActivityType.unknown:
+			return "None"
+		if activity_type is discord.ActivityType.playing:
+			return "Playing"
+		if activity_type is discord.ActivityType.streaming:
+			return "Streaming"
+		if activity_type is discord.ActivityType.listening:
+			return "Listening"
+		if activity_type is discord.ActivityType.watching:
+			return "Watching"
+		return "None"
+
+	def activity_to_dict(self, activity):
+		# Only gathers name, url, and type
+		d = {}
+		try:
+			d["name"] = activity.name
+		except:
+			d["name"] = None
+		try:
+			d["url"] = activity.url
+		except:
+			d["url"] = None
+		try:
+			d["type"] = self.type_to_string(activity.type)
+		except:
+			d["type"] = "Unknown"
+		return d
+
 	@asyncio.coroutine
 	async def on_member_update(self, before, after):
 		if before.bot:
@@ -179,40 +210,43 @@ class Debugging:
 		if not before.status == after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
-		if not before.activity == after.activity:
+		if not before.activities == after.activities:
 			# Something changed
 			msg = ''
+			# We need to explore the activities and see if any changed
+			# we plan to ignore Spotify song changes though - as those don't matter.
+			# 
+			# First let's gather a list of activity changes, then find out which changed
+			bact = [x for x in list(before.activities) if not x in list(after.activities)]
+			aact = [x for x in list(after.activities) if not x in list(before.activities)]
+			# Now we format
+			changes = {}
+			for x in bact:
+				# Get the type, check if it exists already,
+				# and update if need be - or add it if it doesn't
+				t = self.type_to_string(x.type)
+				# Verify that it has name, url, and type
+				changes[t] = {"before":x}
+			for y in aact:
+				# Same as above, but from the after standpoint
+				t = self.type_to_string(y.type)
+				changes[t] = {"after":y}
+			# Format the data
+			for k in changes:
+				# We need to gather our changed values and print the changes if logging
+				b = self.activity_to_dict(changes[k].get("before",discord.Activity(name=None,url=None,type=None)))
+				a = self.activity_to_dict(changes[k].get("after",discord.Activity(name=None,url=None,type=None)))
+				# Check the name, url, and type
+				if not b["name"] == a["name"] and self.shouldLog('user.game.name', server):
+					# Name change
+					msg += 'Name:\n   {}\n   --->\n   {}\n'.format(b["name"], a["name"])
+				if not b["url"] == a["url"] and self.shouldLog('user.game.url', server):
+					# URL changed
+					msg += 'URL:\n   {}\n   --->\n   {}\n'.format(b["url"], a["url"])
+				if not b["type"] == a["type"] and self.shouldLog('user.game.type', server):
+					# URL changed
+					msg += 'Type:\n   {}\n   --->\n   {}\n'.format(b["type"], a["type"])
 
-			if before.activity == None:
-				before.activity = discord.Activity(name=None, url=None, type=0)
-
-			if after.activity == None:
-				after.activity = discord.Activity(name=None, url=None, type=0)
-
-			# Setup some prelim vars
-			bname = before.activity.name if hasattr(before.activity, "name") else None
-			burl  = before.activity.url  if hasattr(before.activity, "url")  else None
-			btype = before.activity.type if hasattr(before.activity, "type") else 0
-
-			aname = after.activity.name if hasattr(after.activity, "name") else None
-			aurl  = after.activity.url  if hasattr(after.activity, "url")  else None
-			atype = after.activity.type if hasattr(after.activity, "type") else 0
-
-			if not bname == aname and self.shouldLog('user.game.name', server):
-				# Name change
-				msg += 'Name:\n   {}\n   --->\n   {}\n'.format(bname, aname)
-			if not burl == aurl and self.shouldLog('user.game.url', server):
-				# URL changed
-				msg += 'URL:\n   {}\n   --->\n   {}\n'.format(burl, aurl)
-			if not btype == atype and self.shouldLog('user.game.type', server):
-				# Type changed
-				play_list = [ "Playing", "Streaming", "Listening", "Watching" ]
-				try:
-					b_string = play_list[btype]
-					a_string = play_list[atype]
-				except:
-					b_string = a_string = "Playing"
-				msg += 'Type:\n   {}\n   --->\n   {}\n'.format(b_string, a_string)
 			if len(msg):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
