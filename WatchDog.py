@@ -15,7 +15,7 @@ wait_before_restart = 3
 def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var
     if os.name == 'nt':
-        # Check for py 3
+        # Check OS (Windows/Unix)
         command = "where"
     else:
         command = "which"
