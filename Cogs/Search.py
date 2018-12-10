@@ -45,7 +45,7 @@ class Search:
 			await self.bot.send_message(ctx.message.channel, msg)
 			return
 
-		lmgtfy = "http://letmebingthatforyou.com/?q={}".format(quote(query))
+		lmgtfy = "http://lmgtfy.com/?s=b&q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
 		msg = '*{}*, you can find your answers here:\n\n{}'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
