@@ -714,10 +714,12 @@ class Settings:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			return None
-		if str(user.id) in userList:
+		# Test for speed improvements
+		return userList.get(str(user.id),{}).get(stat,None)
+		'''if str(user.id) in userList:
 			if stat in userList[str(user.id)]:
 				return userList[str(user.id)][stat]
-		return None
+		return None'''
 	
 	
 	# Set the provided stat
