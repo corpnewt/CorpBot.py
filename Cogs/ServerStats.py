@@ -321,48 +321,40 @@ class ServerStats:
     @commands.command(pass_context=True)
     async def users(self, ctx):
         """Lists the total number of users on all servers I'm connected to."""
-        
         message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
-        servers = members = membersOnline = bots = botsOnline = 0
-        counted_users = []
-        counted_bots  = []
-        for server in self.bot.guilds:
-            servers += 1
-            for member in server.members:
-                if member.bot:
-                    bots += 1
-                    if not member.id in counted_bots:
-                        counted_bots.append(member.id)
-                    if not member.status == discord.Status.offline:
-                        botsOnline += 1
-                else:
-                    members += 1
-                    if not member.id in counted_users:
-                        counted_users.append(member.id)
-                    if not member.status == discord.Status.offline:
-                        membersOnline += 1
+        # Let's try to do this more efficiently
+        users         = [x for x in self.bot.get_all_members() if not x.bot]
+        users_online  = [x for x in users if x.status != discord.Status.offline]
+        unique_users  = set([x.id for x in users])
+        bots          = [x for x in self.bot.get_all_members() if x.bot]
+        bots_online   = [x for x in bots if x.status != discord.Status.offline]
+        unique_bots   = set([x.id for x in bots])
         await Message.Embed(
             title="Member Stats",
-            description="Current User Information".format(server.name),
+            description="Current User Information",
             fields=[
-                { "name" : "Servers", "value" : "└─ {:,}".format(servers), "inline" : False },
-                { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2), len(counted_users), round((len(counted_users)/members)*100, 2)), "inline" : False},
-                { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2), len(counted_bots), round(len(counted_bots)/bots*100, 2)), "inline" : False},
-                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, members+bots, round(((membersOnline + botsOnline)/(members+bots))*100, 2)), "inline" : False}
+                { "name" : "Servers", "value" : "└─ {:,}".format(len(self.bot.guilds)), "inline" : False },
+                { "name" : "Users", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(
+                    len(users_online),
+                    len(users),
+                    round((len(users_online)/len(users))*100, 2),
+                    len(unique_users),
+                    round((len(unique_users)/len(users))*100, 2)
+                ),"inline" : False},
+                { "name" : "Bots", "value" : "└─ {:,}/{:,} online ({:,g}%) - {:,} unique ({:,g}%)".format(
+                    len(bots_online),
+                    len(bots),
+                    round((len(bots_online)/len(bots))*100, 2),
+                    len(unique_bots),
+                    round(len(unique_bots)/len(bots)*100, 2)
+                ), "inline" : False},
+                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(
+                    len(users_online)+len(bots_online),
+                    len(users)+len(bots),
+                    round(((len(users_online)+len(bots_online))/(len(users)+len(bots)))*100, 2)
+                ), "inline" : False}
             ],
             color=ctx.message.author).edit(ctx, message)
-        
-        '''userCount = 0
-        serverCount = 0
-        counted_users = []
-        message = await ctx.send("Counting users...")
-        for server in self.bot.guilds:
-            serverCount += 1
-            userCount += len(server.members)
-            for member in server.members:
-                if not member.id in counted_users:
-                    counted_users.append(member.id)
-        await message.edit(content='There are *{:,} users* (*{:,}* unique) on the *{:,} servers* I am currently a part of!'.format(userCount, len(counted_users), serverCount))'''
 
 	
     @commands.command(pass_context=True)
