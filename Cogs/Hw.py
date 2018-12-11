@@ -45,10 +45,10 @@ class Hw:
 		try:
 			userList = self.settings.serverDict['GlobalMembers']
 		except:
-			userList = []
+			userList = {}
 		for user in userList:
-			if 'HWActive' in user and user['HWActive'] == True:
-				user['HWActive'] = False
+			if userList[user].get("HWActive",False):
+				userList[user]['HWActive'] = False
 		self.settings.serverDict['GlobalMembers'] = userList
 
 
