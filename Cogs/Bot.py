@@ -89,19 +89,14 @@ class Bot:
 		
 		# Get guild count
 		guild_count = "{:,}".format(len(self.bot.guilds))
-			
-		# Get member count *and* unique member count
-		userCount = 0
-		counted_users = []
-		for server in self.bot.guilds:
-			userCount += len(server.members)
-			for member in server.members:
-				if not member.id in counted_users:
-					counted_users.append(member.id)
-		if userCount == len(counted_users):
-			member_count = "{:,}".format(userCount)
+		
+		# Try to do this more efficiently, and faster
+		total_members = [x.id for x in self.bot.get_all_members()]
+		unique_members = set(total_members)
+		if len(total_members) == len(unique_members):
+			member_count = "{:,}".format(len(total_members))
 		else:
-			member_count = "{:,} ({:,} unique)".format(userCount, len(counted_users))
+			member_count = "{:,} ({:,} unique)".format(len(total_members), len(unique_members))
 			
 		# Get commands/cogs count
 		cog_amnt  = 0
