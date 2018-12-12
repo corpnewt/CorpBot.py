@@ -147,7 +147,7 @@ class Settings:
 		self.backupWait = 10 # initial wait time before first backup
 		self.settingsDump = 3600 # runs every hour
 		self.databaseDump = 300 # runs every 5 minutes
-		self.jsonOnlyDump = 300 # runs every 5 minutes if no database
+		self.jsonOnlyDump = 600 # runs every 10 minutes if no database
 		self.bot = bot
 		self.prefix = prefix
 		self.loop_list = []
@@ -1028,12 +1028,6 @@ class Settings:
 
 		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
 		await channel.send(msg)
-
-	'''# Catch errors for stat
-	@getstat.error
-	async def getstat_error(self, error, ctx):
-		msg = 'getstat Error: {}'.format(error)
-		await ctx.channel.send(msg)'''
 		
 
 	@commands.command(pass_context=True)
@@ -1099,9 +1093,12 @@ class Settings:
 			await ctx.channel.send(msg)
 			return
 		# Flush settings
-		self.flushSettings(self.file, True)
+		message = await ctx.send("Flushing settings to disk...")
+		# Actually flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
 		msg = 'Flushed settings to disk.'
-		await ctx.channel.send(msg)
+		await message.edit(content=msg)
 				
 
 	# Flush loop - run every 10 minutes
@@ -1111,14 +1108,18 @@ class Settings:
 		print('Starting flush loop for database - runs every {} seconds.'.format(self.databaseDump))
 		while not self.bot.is_closed():
 			await asyncio.sleep(self.databaseDump)
-			self.flushSettings()
+			# Flush settings asynchronously here
+			l = asyncio.get_event_loop()
+			await self.bot.loop.run_in_executor(None, self.flushSettings)
 				
-	# Flush loop database - run every 10 minutes
+	# Flush loop json - run every 10 minutes
 	async def flushLoop(self):
 		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
 		while not self.bot.is_closed():
 			await asyncio.sleep(self.settingsDump)
-			self.flushSettings(self.file)
+			# Flush settings asynchronously here
+			l = asyncio.get_event_loop()
+			await self.bot.loop.run_in_executor(None, self.flushSettings, self.file)
 				
 	# Flush settings to disk
 	def flushSettings(self, _file = None, both = False):
@@ -1195,6 +1196,8 @@ class Settings:
 			await ctx.channel.send(msg)
 			return
 
+		message = await ctx.send("Pruning local settings...")
+
 		removedSettings = 0
 		settingsWord = "settings"
 
@@ -1211,10 +1214,14 @@ class Settings:
 		if removedSettings is 1:
 			settingsWord = "setting"
 		
+		await message.edit(content="Flushing settings to disk...", embed=None)
+		
+		# Actually flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
+
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
-		await ctx.channel.send(msg)
-		# Flush settings
-		self.flushSettings(self.file, True)
+		await message.edit(content=msg, embed=None)
 
 	def _prune_servers(self):
 		# Remove any orphaned servers
@@ -1309,6 +1316,8 @@ class Settings:
 		removedSettings = 0
 		settingsWord = "settings"
 
+		message = await ctx.send("Pruning settings...")
+
 		for serv in self.serverDict["Servers"]:
 			# Found it - let's check settings
 			removeKeys = []
@@ -1324,11 +1333,15 @@ class Settings:
 
 		if removedSettings is 1:
 			settingsWord = "setting"
+
+		await message.edit(content="Flushing settings to disk...")
+		# Actually flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
 		
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
-		await ctx.channel.send(msg)
-		# Flush settings
-		self.flushSettings(self.file, True)
+		await message.edit(content=msg)
+
 
 	@commands.command(pass_context=True)
 	async def prune(self, ctx):
@@ -1348,6 +1361,8 @@ class Settings:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
 			await ctx.channel.send(msg)
 			return
+
+		message = await ctx.send("Pruning all orphaned members and settings...")
 
 		ser = self._prune_servers()
 		sst = self._prune_settings()
@@ -1371,9 +1386,11 @@ class Settings:
 		#	cha_str = "channel"
 		if glo == 1:
 			glo_str = "global user"
+
+		await message.edit(content="Flushing settings to disk...")
+		# Actually flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
 		
 		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
-		await ctx.channel.send(msg)
-
-		# Flush settings
-		self.flushSettings(self.file, True)		
+		await message.edit(content=msg)
