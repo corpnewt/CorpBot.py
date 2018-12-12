@@ -591,6 +591,21 @@ class Settings:
 						x["ChannelMOTD"].remove(y)
 	
 	
+	###
+	# TODO:  Work through this method to make things more efficient
+	#        Maybe don't set default values for each user - but make sure
+	#        they have an empty dict in the Members dict, then keep a
+	#        member_defaults dict with default values that could be set like:
+	#
+	#        return self.serverDict["Servers"].get(str(server.id),{"Members":{}})["Members"].get(str(user.id),{}).get(stat, member_defaults.get(stat, None))
+	#
+	#        As that would fall back on the default stat if the passed stat didn't exist
+	#        and fall back on None if the stat itself isn't in the defaults
+	#
+	#        This may also be a useful technique for adding servers, although
+	#        that happens way less frequently.
+	###
+
 	# Let's make sure the user is in the specified server
 	def checkUser(self, user, server):
 		# Make sure our server exists in the list
@@ -677,15 +692,21 @@ class Settings:
 
 
 	def checkGlobalUsers(self):
+		# This whole method should be reworked to not require
+		# a couple loops to remove users - but since it's not
+		# something that's run all the time, it's probably not
+		# a big issue for now
 		try:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			userList = {}
 		remove_users = []
+		check_list = [str(x.id) for x in self.bot.get_all_members()]
 		for u in userList:
-			if not self.bot.get_user(int(u)):
-				# Can't find... delete!
-				remove_users.append(u)
+			if u in check_list:
+				continue
+			# Can't find... delete!
+			remove_users.append(u)
 		for u in remove_users:
 			userList.pop(u, None)
 		self.serverDict['GlobalMembers'] = userList
@@ -703,9 +724,7 @@ class Settings:
 	def getUserStat(self, user, server, stat):
 		# Make sure our user and server exists in the list
 		self.checkUser(user, server)
-		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
-			return self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat]
-		return None
+		return self.serverDict["Servers"].get(str(server.id),{}).get("Members",{}).get(str(user.id),{}).get(stat,None)
 	
 	
 	def getGlobalUserStat(self, user, stat):
@@ -714,12 +733,7 @@ class Settings:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			return None
-		# Test for speed improvements
 		return userList.get(str(user.id),{}).get(stat,None)
-		'''if str(user.id) in userList:
-			if stat in userList[str(user.id)]:
-				return userList[str(user.id)][stat]
-		return None'''
 	
 	
 	# Set the provided stat
@@ -749,21 +763,17 @@ class Settings:
 	def incrementStat(self, user, server, stat, incrementAmount):
 		# Make sure our user and server exist
 		self.checkUser(user, server)
-		# Check for our username
-		if stat in self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)]:
-			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] += incrementAmount
-		else:
-			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = incrementAmount
-		return self.getUserStat(user, server, stat)
+		# Get initial value - set to 0 if doesn't exist
+		value = self.serverDict["Servers"].get(str(server.id),{}).get("Members",{}).get(str(user.id),{}).get(stat,0)
+		self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = value+incrementAmount
+		return value+incrementAmount
 	
 	
 	# Get the requested stat
 	def getServerStat(self, server, stat):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		if stat in self.serverDict["Servers"][str(server.id)]:
-			return self.serverDict["Servers"][str(server.id)][stat]
-		return None
+		return self.serverDict["Servers"].get(str(server.id),{}).get(stat,None)
 	
 	
 	# Set the provided stat
