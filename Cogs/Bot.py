@@ -700,17 +700,20 @@ class Bot:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
 			await ctx.channel.send(msg)
 			return
-		
-		# Save the return channel and flush settings
-		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
-		self.settings.flushSettings(self.settings.file, True)
 
 		quiet = False
 		if force and force.lower() == 'force':
-			quiet = True
+			quiet = True		
+		# Save the return channel and flush settings
+		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
+		if not quiet:
+			message = await ctx.send("Flushing settings to disk...")
+		# Flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
 		if not quiet:
 			msg = 'Flushed settings to disk.\nRebooting...'
-			await ctx.channel.send(msg)
+			await message.edit(content=msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
@@ -745,15 +748,19 @@ class Bot:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
 			await ctx.channel.send(msg)
 			return
-		
-		self.settings.flushSettings(self.settings.file, True)
 
 		quiet = False
 		if force and force.lower() == 'force':
 			quiet = True
 		if not quiet:
+			message = await ctx.send("Flushing settings to disk...")
+		# Flush settings asynchronously here
+		l = asyncio.get_event_loop()
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
+
+		if not quiet:
 			msg = 'Flushed settings to disk.\nShutting down...'
-			await ctx.channel.send(msg)
+			await message.edit(content=msg)
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
