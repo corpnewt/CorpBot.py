@@ -149,6 +149,7 @@ class Settings:
 		self.databaseDump = 300 # runs every 5 minutes
 		self.jsonOnlyDump = 600 # runs every 10 minutes if no database
 		self.bot = bot
+		self.flush_lock   = False # locked when flushing settings - so we can't flush multiple times
 		self.prefix = prefix
 		self.loop_list = []
 		self.role = RoleManager(bot)
@@ -1123,59 +1124,86 @@ class Settings:
 				
 	# Flush settings to disk
 	def flushSettings(self, _file = None, both = False):
-		def flush_db():
-			global_collection = self.db.get_collection("Global").find_one()
-			old_data = copy.deepcopy(global_collection)
+		if self.flush_lock:
+			print("Flush locked")
+			l = 0
+			while True:
+				l += 1
+				# Let's loop (up to 100 times) until the settings have been flushed
+				# to ensure that all commands calling this return
+				# properly when flushing settings
+				if not self.flush_lock:
+					# unlocked - return
+					return
+				# Still locked - make sure we're not over 100, and then sleep for 3 seconds
+				if l > 100:
+					self.flush_lock = False
+					return
+				time.sleep(3)
+		try:
+			# Lock the settings
+			self.flush_lock = True
+			def flush_db():
+				global_collection = self.db.get_collection("Global").find_one()
+				old_data = copy.deepcopy(global_collection)
 
-			for key, value in self.serverDict.items():
-				if key == "Servers":
-					continue
+				for key, value in self.serverDict.items():
+					if key == "Servers":
+						continue
 
-				if not global_collection:
-					self.db["Global"].insert_one({key:value})
+					if not global_collection:
+						self.db["Global"].insert_one({key:value})
+						self.flush_lock = False
+						return
+
+					global_collection[key] = value
+
+				self.db["Global"].replace_one(old_data, global_collection)
+				
+				for key, value in self.serverDict["Servers"].items():
+					collection = self.db.get_collection(key).find_one()
+					if not collection:
+						self.db[key].insert_one(value)
+					else:
+						new_data = self.serverDict["Servers"][key]
+						self.db[key].delete_many({})
+						self.db[key].insert_one(new_data)
+
+			if not _file:
+				if not self.using_db:
+					# Not using a database, so we can't flush ;)
+					self.flush_lock = False
 					return
 
-				global_collection[key] = value
+				# We *are* using a database, let's flush
+				flush_db()
+				print("Flushed to DB!")
+			elif (both or not self.using_db) and _file:
+				if os.path.exists(_file):
+					# Delete file - then flush new settings
+					os.remove(_file)
 
-			self.db["Global"].replace_one(old_data, global_collection)
-			
-			for key, value in self.serverDict["Servers"].items():
-				collection = self.db.get_collection(key).find_one()
-				if not collection:
-					self.db[key].insert_one(value)
-				else:
-					new_data = self.serverDict["Servers"][key]
-					self.db[key].delete_many({})
-					self.db[key].insert_one(new_data)
+				# Get a pymongo object out of the dict
+				json_ready = self.serverDict
+				json_ready.pop("_id", None)
+				json_ready["mongodb_migrated"] = True
 
-		if not _file:
-			if not self.using_db:
+				json.dump(json_ready, open(_file, 'w'), indent=2)
+
 				# Not using a database, so we can't flush ;)
-				return
+				if not self.using_db:
+					print("Flushed to {}!".format(_file))
+					self.flush_lock = False
+					return
 
-			# We *are* using a database, let's flush
-			flush_db()
-			print("Flushed to DB!")
-		elif (both or not self.using_db) and _file:
-			if os.path.exists(_file):
-				# Delete file - then flush new settings
-				os.remove(_file)
-
-			# Get a pymongo object out of the dict
-			json_ready = self.serverDict
-			json_ready.pop("_id", None)
-			json_ready["mongodb_migrated"] = True
-
-			json.dump(json_ready, open(_file, 'w'), indent=2)
-
-			# Not using a database, so we can't flush ;)
-			if not self.using_db:
-				print("Flushed to {}!".format(_file))
-				return
-
-			# We *are* using a database, let's flush!
-			flush_db()
-			print("Flushed to DB and {}!".format(_file))
+				# We *are* using a database, let's flush!
+				flush_db()
+				print("Flushed to DB and {}!".format(_file))
+		except Exception as e:
+			# Something terrible happened - let's make sure our file is unlocked
+			print("Error flushing settings:\n"+str(e))
+			pass
+		self.flush_lock = False
 
 	@commands.command(pass_context=True)
 	async def prunelocalsettings(self, ctx):
