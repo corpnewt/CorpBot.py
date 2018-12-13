@@ -5,7 +5,7 @@ A *slightly* less clumsy python bot for discord
 
 # WARNING
 
-This branch of CorpBot requires a Redis database server running to function correctly.  For Windows users, you can download the following and just run the `redis-server.exe` with the default settings for the bot to connect to the db.
+This branch of CorpBot requires a Redis database server running to function correctly.  For Windows users, you can download the release [here](https://github.com/MicrosoftArchive/redis/releases) and just run the `redis-server.exe` with the default settings after unzipping the archive for the bot to connect to the db.
 
 ***
 
