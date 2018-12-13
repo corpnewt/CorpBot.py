@@ -585,12 +585,19 @@ class Settings:
 		# use the keys("prefix:*") loop to remove keys with our server:id: prefix
 		for key in self.r.keys("server:{}:*".format(server.id)):
 			self.r.delete(key)
+		# Verify that we've removed the global members as well
+		self.checkGlobalUsers()
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
 		# use the keys("prefix:*") loop to remove keys with our server:id:member:id prefix
 		for key in self.r.keys("server:{}:member:{}*".format(server.id, user.id)):
 			self.r.delete(key)
+		check_members = set([x.id for x in self.bot.get_all_members()])
+		if not user.id in check_members:
+			# Remove globally
+			for key in self.r.keys("globalmember:{}*".format(user.id)):
+				self.r.delete(key)
 
 	def checkGlobalUsers(self):
 		# Let's iterate over all globalmember:id values
