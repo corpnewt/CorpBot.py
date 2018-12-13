@@ -102,10 +102,7 @@ class Admin:
 			delete = False
 
 		# Get Owner and OwnerLock
-		try:
-			ownerLock = self.settings.serverDict['OwnerLock']
-		except KeyError:
-			ownerLock = False
+		ownerLock = self.settings.getGlobalStat("OwnerLock",False)
 		owner = self.settings.isOwner(message.author)
 		# Check if owner exists - and we're in OwnerLock
 		if (not owner) and ownerLock:

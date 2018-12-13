@@ -39,10 +39,7 @@ class RateLimit:
 		ignore = False
 
 		# Get current delay
-		try:
-			currDelay = self.settings.serverDict['CommandCooldown']
-		except KeyError:
-			currDelay = self.commandCooldown
+		currDelay = self.settings.getGlobalStat("CommandCooldown",self.commandCooldown)
 		
 		# Check if we can run commands
 		try:
@@ -84,10 +81,7 @@ class RateLimit:
 			return
 
 		# Get current delay
-		try:
-			currDelay = self.settings.serverDict['CommandCooldown']
-		except KeyError:
-			currDelay = self.commandCooldown
+		currDelay = self.settings.getGlobalStat("CommandCooldown",self.commandCooldown)
 		
 		if delay == None:
 			if currDelay == 1:
@@ -113,7 +107,7 @@ class RateLimit:
 				await ctx.channel.send('Cooldown cannot be more than *{} seconds*.'.format(self.maxCooldown))
 			return
 		
-		self.settings.serverDict['CommandCooldown'] = delay
+		self.settings.setGlobalStat("CommandCooldown",delay)
 		if delay == 1:
 			await ctx.channel.send('Current command cooldown is now *1 second.*')
 		else:

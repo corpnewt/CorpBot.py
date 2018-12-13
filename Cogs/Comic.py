@@ -180,6 +180,8 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
+		if not imageURL.lower().startswith("http"):
+			imageURL = "https:"+imageURL
 		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		
@@ -231,6 +233,8 @@ class Comic:
 			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
 		
 		# Download Image
+		if not imageURL.lower().startswith("http"):
+			imageURL = "https:"+imageURL
 		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, imageURL, imageDisplayName)
 		

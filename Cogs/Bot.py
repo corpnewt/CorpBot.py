@@ -57,11 +57,7 @@ class Bot:
 
 
 	async def onserverjoin(self, server):
-		try:
-			serverList = self.settings.serverDict['BlockedServers']
-		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+		serverList = self.settings.getGlobalStat('BlockedServers',[])
 		for serv in serverList:
 			serverName = str(serv).lower()
 			try:
@@ -141,7 +137,7 @@ class Bot:
 		prefix = ", ".join(prefix)
 
 		# Get the owners
-		ownerList = self.settings.serverDict['Owner']
+		ownerList = self.settings.getGlobalStat('Owner',[])
 		owners = "Unclaimed..."
 		if len(ownerList):
 			userList = []
@@ -178,7 +174,8 @@ class Bot:
 			{"name":"Joined","value":joined_at,"inline":True},
 			{"name":"Owners","value":owners,"inline":True},
 			{"name":"Prefixes","value":prefix,"inline":True},
-			{"name":"Status","value":status_text,"inline":True}
+			{"name":"Status","value":status_text,"inline":True},
+			{"name":"Shard Count","value":self.bot.shard_count,"inline":True}
 		]
 		if bot_member.activity and bot_member.activity.name:
 			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
@@ -705,12 +702,12 @@ class Bot:
 		if force and force.lower() == 'force':
 			quiet = True		
 		# Save the return channel and flush settings
-		self.settings.serverDict["ReturnChannel"] = ctx.channel.id
+		self.settings.setGlobalStat("ReturnChannel",ctx.channel.id)
 		if not quiet:
 			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
 		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
 		if not quiet:
 			msg = 'Flushed settings to disk.\nRebooting...'
 			await message.edit(content=msg)
@@ -756,7 +753,7 @@ class Bot:
 			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
 		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
 
 		if not quiet:
 			msg = 'Flushed settings to disk.\nShutting down...'
@@ -798,10 +795,10 @@ class Bot:
 	async def _update_status(self):
 		# Helper method to update the status based on the server dict
 		# Get ready - play game!
-		game   = self.settings.serverDict.get("Game", None)
-		url    = self.settings.serverDict.get("Stream", None)
-		t      = self.settings.serverDict.get("Type", 0)
-		status = self.settings.serverDict.get("Status", None)
+		game   = self.settings.getGlobalStat("Game", None)
+		url    = self.settings.getGlobalStat("Stream", None)
+		t      = self.settings.getGlobalStat("Type", 0)
+		status = self.settings.getGlobalStat("Status", None)
 		# Set status
 		if status == "2":
 			s = discord.Status.idle
@@ -899,10 +896,10 @@ class Bot:
 		
 		# Here, we assume that everything is A OK.  Peachy keen.
 		# Set the shiz and move along
-		self.settings.serverDict["Game"]   = game
-		self.settings.serverDict["Stream"] = url
-		self.settings.serverDict["Status"] = stat
-		self.settings.serverDict["Type"]   = play
+		self.settings.setGlobalStat("Game",game)
+		self.settings.setGlobalStat("Stream",url)
+		self.settings.setGlobalStat("Status",stat)
+		self.settings.setGlobalStat("Type",play)
 		
 		# Actually update our shit
 		await self._update_status()
@@ -966,7 +963,7 @@ class Bot:
 			await ctx.send("That is not a valid status.")
 			return
 
-		self.settings.serverDict["Status"] = stat_string
+		self.settings.setGlobalStat("Status",stat_string)
 		await self._update_status()
 		await ctx.send("Status changed to *{}!*".format(stat_name))
 			
@@ -997,9 +994,9 @@ class Bot:
 			return
 
 		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+			self.settings.setGlobalStat('Game',None)
+			self.settings.setGlobalStat('Stream',None)
+			self.settings.setGlobalStat('Type',0)
 			msg = 'Removing my playing status...'
 			status = await channel.send(msg)
 
@@ -1008,9 +1005,9 @@ class Bot:
 			await status.edit(content='Playing status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 0
+		self.settings.setGlobalStat('Game',game)
+		self.settings.setGlobalStat('Stream',None)
+		self.settings.setGlobalStat('Type',0)
 		msg = 'Setting my playing status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
@@ -1049,9 +1046,9 @@ class Bot:
 			return
 
 		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+			self.settings.setGlobalStat('Game',None)
+			self.settings.setGlobalStat('Stream',None)
+			self.settings.setGlobalStat('Type',0)
 			msg = 'Removing my watching status...'
 			status = await channel.send(msg)
 
@@ -1060,9 +1057,9 @@ class Bot:
 			await status.edit(content='Watching status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 3
+		self.settings.setGlobalStat('Game',game)
+		self.settings.setGlobalStat('Stream',None)
+		self.settings.setGlobalStat('Type',3)
 		msg = 'Setting my watching status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
@@ -1101,9 +1098,9 @@ class Bot:
 			return
 
 		if game == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+			self.settings.setGlobalStat('Game',None)
+			self.settings.setGlobalStat('Stream',None)
+			self.settings.setGlobalStat('Type',0)
 			msg = 'Removing my listening status...'
 			status = await channel.send(msg)
 
@@ -1112,9 +1109,9 @@ class Bot:
 			await status.edit(content='Listening status removed!')
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = None
-		self.settings.serverDict['Type'] = 2
+		self.settings.setGlobalStat('Game',game)
+		self.settings.setGlobalStat('Stream',None)
+		self.settings.setGlobalStat('Type',2)
 		msg = 'Setting my listening status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
@@ -1154,9 +1151,9 @@ class Bot:
 			return
 
 		if url == None:
-			self.settings.serverDict['Game'] = None
-			self.settings.serverDict['Stream'] = None
-			self.settings.serverDict['Type'] = 0
+			self.settings.setGlobalStat('Game',None)
+			self.settings.setGlobalStat('Stream',None)
+			self.settings.setGlobalStat('Type',0)
 			msg = 'Removing my streaming status...'
 			status = await channel.send(msg)
 
@@ -1182,9 +1179,9 @@ class Bot:
 			await ctx.send("Url is invalid!")
 			return
 
-		self.settings.serverDict['Game'] = game
-		self.settings.serverDict['Stream'] = url
-		self.settings.serverDict['Type'] = 1
+		self.settings.setGlobalStat('Game',game)
+		self.settings.setGlobalStat('Stream',url)
+		self.settings.setGlobalStat('Type',1)
 		msg = 'Setting my streaming status to *{}*...'.format(game)
 		# Check for suppress
 		if suppress:
@@ -1266,11 +1263,7 @@ class Bot:
 			await ctx.send("Usage: `{}block [server name/id or owner name#desc/id]`".format(ctx.prefix))
 			return
 		
-		try:
-			serverList = self.settings.serverDict['BlockedServers']
-		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+		serverList = self.settings.getGlobalStat('BlockedServers',[])
 
 		for serv in serverList:
 			if str(serv).lower() == server.lower():
@@ -1282,7 +1275,8 @@ class Bot:
 				return
 		
 		# Not blocked
-		self.settings.serverDict['BlockedServers'].append(server)
+		serverList.append(server)
+		self.settings.setGlobalStat("BlockedServers",serverList)
 		msg = "*{}* now blocked!".format(server)
 		# Check for suppress
 		if suppress:
@@ -1315,29 +1309,22 @@ class Bot:
 			await ctx.send("Usage: `{}unblock [server name/id or owner name#desc/id]`".format(ctx.prefix))
 			return
 		
-		try:
-			serverList = self.settings.serverDict['BlockedServers']
-		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
-
-		for serv in serverList:
-			if str(serv).lower() == server.lower():
-				# Found a match - already blocked.
-				self.settings.serverDict['BlockedServers'].remove(serv)
-				msg = "*{}* unblocked!".format(serv)
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
-				return
-		
+		serverList = self.settings.getGlobalStat('BlockedServers',[])
+		serverTest = [x for x in serverList if not str(x).lower() == server.lower()]
+		if len(serverList) != len(serverTest):
+			# Something changed
+			self.settings.setGlobalStat("BlockedServers",serverTest)
+			msg = "*{}* unblocked!".format(serv)
+			if suppress:
+				msg = Nullify.clean(msg)
+			await ctx.channel.send(msg)
+			return
 		# Not found
 		msg = "I couldn't find *{}* in my blocked list.".format(server)
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
 		await ctx.channel.send(msg)
-
 
 	@commands.command(pass_context=True)
 	async def unblockall(self, ctx):
@@ -1359,7 +1346,7 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 		
-		self.settings.serverDict['BlockedServers'] = []
+		self.settings.setGlobalStat('BlockedServers',[])
 
 		await ctx.channel.send("*All* servers and owners unblocked!")
 
@@ -1384,11 +1371,7 @@ class Bot:
 			await ctx.channel.send(msg)
 			return
 
-		try:
-			serverList = self.settings.serverDict['BlockedServers']
-		except KeyError:
-			self.settings.serverDict['BlockedServers'] = []
-			serverList = self.settings.serverDict['BlockedServers']
+		serverList = self.settings.getGlobalStat('BlockedServers',[])
 
 		if not len(serverList):
 			msg = "There are no blocked servers or owners!"

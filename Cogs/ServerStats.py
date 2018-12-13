@@ -98,6 +98,7 @@ class ServerStats:
         server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
+        server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id, self.bot.shard_count), inline=True)
 	# Find out where in our join position this server is
         joinedList = []
         popList    = []

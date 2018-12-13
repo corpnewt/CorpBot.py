@@ -10,7 +10,7 @@ bot = "Main.py"
 dir_path = os.path.dirname(os.path.realpath(__file__))
 bot_path = dir_path + "/" + bot
 restart_on_error = True
-wait_before_restart = 3
+wait_before_restart = 1
 
 def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var

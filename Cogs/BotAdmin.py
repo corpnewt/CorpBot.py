@@ -41,8 +41,6 @@ class BotAdmin:
 		else:
 			suppress = False
 
-		serverDict = self.settings.serverDict
-
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
 		if isOwner == None:
