@@ -584,13 +584,13 @@ class Settings:
 	def removeServer(self, server):
 		# use the keys("prefix:*") loop to remove keys with our server:id: prefix
 		for key in self.r.keys("server:{}:*".format(server.id)):
-			r.delete(key)
+			self.r.delete(key)
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
 		# use the keys("prefix:*") loop to remove keys with our server:id:member:id prefix
 		for key in self.r.keys("server:{}:member:{}*".format(server.id, user.id)):
-			r.delete(key)
+			self.r.delete(key)
 
 	def checkGlobalUsers(self):
 		# Let's iterate over all globalmember:id values
