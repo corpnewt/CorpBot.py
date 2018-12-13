@@ -71,7 +71,6 @@ class IntelArk:
 		# Let's see if we have one match that reeeeeaaallly matches
 		# We're going to split the label at Processor, and again at ( to try to isolate
 		if len(response) > 1:
-			print("Got responses")
 			got = None
 			for x in response:
 				try:
