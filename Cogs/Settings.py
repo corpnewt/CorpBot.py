@@ -756,7 +756,7 @@ class Settings:
 			# Claim it up
 			self.setGlobalStat("Owner",self.getGlobalStat("Owner",[]).append(ctx.author.id))
 			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(ctx.author))
-		await channel.send(msg)
+		await ctx.send(msg)
 	
 	@commands.command(pass_context=True)
 	async def addowner(self, ctx, *, member : str = None):
