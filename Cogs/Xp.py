@@ -816,7 +816,12 @@ class Xp:
 	@commands.command(pass_context=True)
 	async def leaderboard(self, ctx, total : int = 10):
 		"""List the top xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
+		message = await ctx.send("Counting xp...")
+		promoArray = {}
+		for x in self.bot.get_all_members():
+			if not x.guild.id == ctx.guild.id:
+				continue
+			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
 		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
@@ -851,15 +856,19 @@ class Xp:
 
 			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
-		await ctx.message.channel.send(msg)
+		await message.edit(content=msg)
 
 		
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
 	async def bottomxp(self, ctx, total : int = 10):
 		"""List the bottom xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
-		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		message = await ctx.send("Counting xp...")
+		promoArray = {}
+		for x in self.bot.get_all_members():
+			if not x.guild.id == ctx.guild.id:
+				continue
+			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
 		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
@@ -892,7 +901,7 @@ class Xp:
 				cMemberDisplay = promoSorted[index]
 			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
-		await ctx.message.channel.send(msg)
+		await message.edit(content=msg)
 		
 		
 	# List the xp and xp reserve of a user
