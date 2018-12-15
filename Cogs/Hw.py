@@ -357,6 +357,7 @@ class Hw:
 					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 					break
 			mainBuild['Hardware'] = parts.content
+			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			break
 		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
 		self.settings.delGlobalUserStat(ctx.author, "HWActive")
