@@ -24,7 +24,7 @@ class Xp:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.loop_list = []
+		self.is_current = False # Used for stopping loops
 
 	def _can_xp(self, user, server):
 		# Checks whether or not said user has access to the xp system
@@ -54,15 +54,15 @@ class Xp:
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		for task in self.loop_list:
-			task.cancel()
+		self.is_current = False
 
 	@asyncio.coroutine
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		self.loop_list.append(self.bot.loop.create_task(self.addXP()))
+		self.is_current = True
+		self.bot.loop.create_task(self.addXP())
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -76,6 +76,9 @@ class Xp:
 		while not self.bot.is_closed():
 			try:
 				await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
+				if not self.is_current:
+					# Bail if we're not the current instance
+					return
 				updates = await self.bot.loop.run_in_executor(None, self.update_xp)
 				t = time.time()
 				for update in updates:
