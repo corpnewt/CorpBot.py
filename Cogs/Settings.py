@@ -554,8 +554,7 @@ class Settings:
 		# Retrieves and loads the json data passed
 		if not self.r.exists(key):
 			return default
-		out = self.r.get(key)
-		return None if out == None else json.loads(out)
+		return json.loads(self.r.get(key))
 
 	def jset(self, key, value):
 		# Sets the key to the json-serialized value
@@ -582,21 +581,27 @@ class Settings:
 
 	# Let's make sure the user is in the specified server
 	def removeServer(self, server):
+		if isinstance(server, discord.Guild):
+			server = server.id
 		# use the keys("prefix:*") loop to remove keys with our server:id: prefix
-		for key in self.r.keys("server:{}:*".format(server.id)):
+		for key in self.r.keys("server:{}:*".format(server)):
 			self.r.delete(key)
 		# Verify that we've removed the global members as well
 		self.checkGlobalUsers()
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		if isinstance(server, discord.Guild):
+			server = server.id
 		# use the keys("prefix:*") loop to remove keys with our server:id:member:id prefix
-		for key in self.r.keys("server:{}:member:{}*".format(server.id, user.id)):
+		for key in self.r.keys("server:{}:member:{}*".format(server, user)):
 			self.r.delete(key)
 		check_members = set([x.id for x in self.bot.get_all_members()])
-		if not user.id in check_members:
+		if not int(user) in check_members:
 			# Remove globally
-			for key in self.r.keys("globalmember:{}*".format(user.id)):
+			for key in self.r.keys("globalmember:{}*".format(user)):
 				self.r.delete(key)
 
 	def checkGlobalUsers(self):
@@ -622,7 +627,11 @@ class Settings:
 	# Return the requested stat
 	def getUserStat(self, user, server, stat, default = None):
 		# Get user stat - but set up a default in case of some settings
-		out = self.jget("server:{}:member:{}:{}".format(server.id, user.id, stat), default)
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		if isinstance(server, discord.Guild):
+			server = server.id
+		out = self.jget("server:{}:member:{}:{}".format(server, user, stat), default)
 		if out != None:
 			return out
 		# Check if we need defaults
@@ -640,7 +649,9 @@ class Settings:
 	
 	def getGlobalUserStat(self, user, stat, default = None):
 		# Get our global user stat if exists
-		return self.jget("globalmember:{}:{}".format(user.id, stat), default)
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		return self.jget("globalmember:{}:{}".format(user, stat), default)
 
 	def getGlobalStat(self, stat, default = None):
 		return self.jget(stat, default)
@@ -653,29 +664,43 @@ class Settings:
 			self.r.delete(stat)
 	
 	def setUserStat(self, user, server, stat, value):
-		self.jset("server:{}:member:{}:{}".format(server.id, user.id, stat), value)
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		if isinstance(server, discord.Guild):
+			server = server.id
+		self.jset("server:{}:member:{}:{}".format(server, user, stat), value)
 						
 	# Set a provided global stat
 	def setGlobalUserStat(self, user, stat, value):
-		self.jset("globalmember:{}:{}".format(user.id, stat), value)
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		self.jset("globalmember:{}:{}".format(user, stat), value)
 
 	def delGlobalUserStat(self, user, stat):
-		if self.r.exists("globalmember:{}:{}".format(user.id, stat)):
-			self.r.delete("globalmember:{}:{}".format(user.id, stat))
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		if self.r.exists("globalmember:{}:{}".format(user, stat)):
+			self.r.delete("globalmember:{}:{}".format(user, stat))
 					
 	# Increment a specified user stat by a provided amount
 	# returns the stat post-increment, or None if error
 	def incrementStat(self, user, server, stat, incrementAmount):
 		# Get initial value - set to 0 if doesn't exist
-		out = self.jget("server:{}:member:{}:{}".format(server.id, user.id, stat))
+		if isinstance(user, (discord.User, discord.Member)):
+			user = user.id
+		if isinstance(server, discord.Guild):
+			server = server.id
+		out = self.jget("server:{}:member:{}:{}".format(server, user, stat))
 		out = 0 if not out else out
-		self.jset("server:{}:member:{}:{}".format(server.id, user.id, stat), out+incrementAmount)
+		self.jset("server:{}:member:{}:{}".format(server, user, stat), out+incrementAmount)
 		return out+incrementAmount
 	
 	# Get the requested stat
 	def getServerStat(self, server, stat, default = None):
 		# Get server stat - but set up a default in case of some settings
-		out = self.jget("server:{}:{}".format(server.id, stat), default)
+		if isinstance(server, discord.Guild):
+			server = server.id
+		out = self.jget("server:{}:{}".format(server, stat), default)
 		if out != None:
 			return out
 		test = self.defaultServer.get(stat,out)
@@ -688,7 +713,9 @@ class Settings:
 	
 	# Set the provided stat
 	def setServerStat(self, server, stat, value):
-		self.jset("server:{}:{}".format(server.id, stat), value)
+		if isinstance(server, discord.Guild):
+			server = server.id
+		self.jset("server:{}:{}".format(server, stat), value)
 
 	@commands.command(pass_context=True)
 	async def ownerlock(self, ctx):
