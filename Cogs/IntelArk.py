@@ -23,6 +23,7 @@ class IntelArk:
 			"CoreCount": "Cores",
 			"ThreadCount": "Threads",
 			"MaxMem": "Max Memory",
+			"MaxTDP": "Max TDP",
 			"GraphicsModel": "Onboard Graphics",
 			"InstructionSet": "Instruction Set",
 			"InstructionSetExtensions": "Extensions"
