@@ -135,7 +135,7 @@ class IntelArk:
 
 		await Message.Embed(
 			thumbnail=response.get("BrandBadge",None),
-			pm_after=11,
+			pm_after=12,
 			title=response.get("ProductName","Intel Ark Search"),
 			fields=fields,
 			url=response.get("Link",None),
