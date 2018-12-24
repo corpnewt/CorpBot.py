@@ -17,7 +17,7 @@ class IntelArk:
 		self.fields = {
 			"ProcessorNumber": "Processor Name",
 			"ProcessorBrandName": "Processor Brand String",
-			"BornOnData": "Release Date",
+			"BornOnDate": "Release Date",
 			"ClockSpeed": "Base Clock",
 			"ClockSpeedMax": "Max Clock",
 			"CoreCount": "Cores",
