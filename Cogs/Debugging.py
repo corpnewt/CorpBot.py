@@ -576,7 +576,7 @@ class Debugging:
 					logText = ', '.join(logVars)
 				else:
 					logText = '*Nothing*'
-				msg = 'Logging is *enabled* in *{}*.\nCurrently logging: {}'.format(channel.name, logText)
+				msg = 'Logging is *enabled* in *{}*.\nCurrently logging: {}'.format(channel.mention, logText)
 				await ctx.channel.send(msg)
 				return
 		await ctx.channel.send('Logging is currently *disabled*.')
@@ -623,6 +623,9 @@ class Debugging:
 		for option in addedOptions:
 			serverOptions.append(option)
 		
+		# Save the updated options
+		self.settings.setServerStat(server, "LogVars", serverOptions)
+		
 		if len(addedOptions) == 1:
 			await ctx.channel.send('*1* logging option enabled.')
 		else:
@@ -668,6 +671,9 @@ class Debugging:
 		if not len(addedOptions):
 			await ctx.channel.send('No valid or enabled options were passed.  Nothing to disable.')
 			return
+
+		# Save the updated options
+		self.settings.setServerStat(server, "LogVars", serverOptions)
 		
 		if len(addedOptions) == 1:
 			await ctx.channel.send('*1* logging option disabled.')
@@ -701,7 +707,7 @@ class Debugging:
 		# If we made it this far - then we can add it
 		self.settings.setServerStat(ctx.message.guild, "LogChannel", channel.id)
 
-		msg = 'Logging is now *enabled* in **{}**.'.format(channel.name)
+		msg = 'Logging is now *enabled* in **{}**.'.format(channel.mention)
 		await ctx.channel.send(msg)
 		
 	
