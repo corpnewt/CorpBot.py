@@ -164,6 +164,7 @@ class Hw:
 				else:
 					b['Main'] = False
 			msg = "{} set as main!".format(mainBuild['Name'])
+			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
 			await ctx.channel.send(msg)
@@ -184,6 +185,7 @@ class Hw:
 				else:
 					b['Main'] = False
 			msg = "{} set as main!".format(mainBuild['Name'])
+			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
 			await ctx.channel.send(msg)
