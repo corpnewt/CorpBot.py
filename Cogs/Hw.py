@@ -155,6 +155,7 @@ class Hw:
 					b['Main'] = True
 				else:
 					b['Main'] = False
+			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
@@ -175,6 +176,7 @@ class Hw:
 					b['Main'] = True
 				else:
 					b['Main'] = False
+			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
 			if self.checkSuppress(ctx):
 				msg = Nullify.clean(msg)
