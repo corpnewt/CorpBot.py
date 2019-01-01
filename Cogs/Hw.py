@@ -205,9 +205,9 @@ class Hw:
 			if b['Name'].lower() == build.lower():
 				# Found it
 				buildList.remove(b)
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				if b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
+				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
 				if self.checkSuppress(ctx):
 					msg = Nullify.clean(msg)
@@ -217,9 +217,9 @@ class Hw:
 			build = int(build)-1
 			if build >= 0 and build < len(buildList):
 				b = buildList.pop(build)
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				if b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
+				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
 				if self.checkSuppress(ctx):
 					msg = Nullify.clean(msg)
