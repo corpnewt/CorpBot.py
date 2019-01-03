@@ -166,6 +166,10 @@ class Search:
 		
 		# Format the numbers
 		val = o[list(o)[0]]["val"]
+		# Strip any commas
+		amount = amount.replace(",","")
+		val    = val.replace(",","")
+		# Calculate the results
 		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
 		output = float(amount)*float(val)
 		output = "{:,}".format(int(output)) if int(output) == float(output) else "{:,f}".format(output).rstrip("0")
