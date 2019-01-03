@@ -121,7 +121,7 @@ class Search:
 		hasError = False
 
 		try:
-			amount = float(amount.replace(",",""))
+			amount = float(amount)
 		except:
 			hasError = True
 
@@ -166,11 +166,9 @@ class Search:
 		
 		# Format the numbers
 		val = o[list(o)[0]]["val"]
-		# Strip any commas
-		val    = val.replace(",","")
 		# Calculate the results
-		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
 		output = float(amount)*float(val)
+		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
 		output = "{:,}".format(int(output)) if int(output) == float(output) else "{:,f}".format(output).rstrip("0")
 		await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(), output, str(to).upper()))
 
