@@ -180,6 +180,8 @@ class Mute:
         if not found:
             muteList.append({ 'ID': member.id, 'Cooldown': cooldown, 'Added' : int(time.time()) })
         
+        self.settings.setServerStat(server, "MuteList", muteList)
+        
         if not cooldown == None:
             # We have a cooldown - set a timer
             self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
@@ -221,3 +223,4 @@ class Mute:
             if str(entry['ID']) == str(member.id):
                 # Found them - remove from the mutelist
                 muteList.remove(entry)
+        self.settings.setServerStat(server, "MuteList", muteList)
