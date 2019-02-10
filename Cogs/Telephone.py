@@ -22,6 +22,9 @@ class Telephone:
 		self.bot = bot
 		self.settings = settings
 		self.switchboard = []
+		# Regex for extracting urls from strings
+		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.dregex =  re.compile(r"(?i)(discord\.gg\/)([^\s]+)")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -668,6 +671,15 @@ class Telephone:
 				return
 			else:
 				talk_msg = Nullify.clean(talk.content)
+				# Let's make sure we strip links out - and nullify discord.gg links to patch a spam loophole
+				# Create a set of all matches (to avoid duplicates in case of spam)
+				matches = [x.group(0) for x in re.finditer(self.regex, talk_msg)]
+				dmatches = [x.group(0) for x in re.finditer(self.dregex, talk_msg)]
+				matches.extend(dmatches)
+				matches = set(matches)
+				# Now we iterate that list and replace all links with `link removed`
+				for x in matches:
+					talk_msg = talk_msg.replace(x,"`link removed`")
 				# Must be conversation
 				if talk.channel == caller_chan:
 					# Coming from the talking channel
