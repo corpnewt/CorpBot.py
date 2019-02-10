@@ -766,7 +766,7 @@ class TempRole:
 			temp_role["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
 			temp_role["AddedBy"] = ctx.author.id
 			user_roles.append(temp_role)
-			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
+		self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
 		if not role_from_name in member_from_name.roles:
 			self.settings.role.add_roles(member_from_name, [role_from_name])
 		if not cooldown == None:
