@@ -19,6 +19,7 @@ class TempRole:
 	def __init__(self, bot):
 		self.bot = bot
 		self.settings = self.bot.get_cog("Settings")
+		self.is_current = False # Used for stopping loops
 		self.loop_list = []
 
 	def _is_submodule(self, parent, child):
@@ -29,6 +30,7 @@ class TempRole:
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		self.is_current = False
 		for task in self.loop_list:
 			task.cancel()
 
@@ -69,9 +71,22 @@ class TempRole:
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		self.is_current = True
+		self.bot.loop.create_task(self.start_loading())
+
+	async def start_loading(self):
+		await self.bot.wait_until_ready()
+		await self.bot.loop.run_in_executor(None, self.check_temp)
+		
+	def check_temp(self):
 		# Check if we need to set any role removal timers
+		t = time.time()
+		print("Verifying Temp Roles...")
 		for server in self.bot.guilds:
 			for member in server.members:
+				if not self.is_current:
+					# Bail if we're not the current instance
+					return
 				temp_roles = self.settings.getUserStat(member, server, "TempRoles")
 				if len(temp_roles):
 					# We have a list
@@ -93,6 +108,7 @@ class TempRole:
 					if len(remove_temps):
 						for temp in remove_temps:
 							temp_roles.remove(temp)
+		print("Temp Roles Done - took {} seconds.".format(time.time() - t))
 							
 	def _remove_task(self, task):
 		if task in self.loop_list:
