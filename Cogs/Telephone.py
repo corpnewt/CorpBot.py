@@ -24,7 +24,7 @@ class Telephone:
 		self.switchboard = []
 		# Regex for extracting urls from strings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-		self.dregex =  re.compile(r"(?i)(discord\.gg\/)([^\s]+)")
+		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
