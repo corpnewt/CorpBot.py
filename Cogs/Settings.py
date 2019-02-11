@@ -11,6 +11,7 @@ import subprocess
 import redis
 from   Cogs        import DisplayName
 from   Cogs        import Nullify
+from   Cogs        import PandorasDB
 
 
 def setup(bot):
@@ -141,11 +142,12 @@ class Settings:
 		self.settingsDump = 3600 # runs every hour
 		self.bot = bot
 		self.prefix = prefix
-		self.loop_list = []
+		self.is_current = False # Used for stopping loops
 		self.role = RoleManager(bot)
+		self.pd = PandorasDB.PandorasDB()
 		
 		# Database time!!!!!
-		self.r = redis.Redis(host="localhost",port=6379,db=0,decode_responses=True)
+		# self.r = redis.Redis(host="localhost",port=6379,db=0,decode_responses=True)
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position
@@ -255,7 +257,8 @@ class Settings:
 				"StreamChannel"			: None, 	# None or channel id
 				"StreamList"			: [],		# List of user id's to watch for
 				"StreamMessage"			: "Hey everyone! *[[user]]* started streaming *[[game]]!* Check it out here: [[url]]",
-				"MuteList"				: []}		# List of muted members
+				"MuteList"				: [],		# List of muted members
+				"ID"					: ""}		# Placeholder to store the server's id
 		
 		self.default_member = { 					# Default member vars - any dynamic vars will return None if not initialized
 				"XP" : 0, 							# Will be overridden to the server's default XP
@@ -277,141 +280,8 @@ class Settings:
 				"VerificationTime" : 0
 		}
 
-		# Here we determine if we have a Settings.json file - if so
-		# we load it, and migrate it to the Redis db, then rename
-		# the file to Settings-migrated.json to avoid confusion
-		# or double-migration.
-		if os.path.exists(self.file):
-			self.migrate_json(self.file)
-
-
 	def migrate_json(self, f):
-		# Function to migrate from a flat json file to a redis db
-		# this will clear the redis db, load the json data, then
-		# migrate all settings over.  There will be a logical order
-		# to the naming of the keys:
-		#
-		# Global, top level values:
-		#
-		# PlistMax
-		# PlistLevel
-		# OwnerLock
-		# Status
-		# Type
-		# Game
-		# Stream
-		# BlockedServers
-		# ReturnChannel
-		# CommandCooldown
-		# Owner
-		#
-		# Global member stats formatting:
-		#
-		# globalmember:0123456789:statname
-		#
-		# HWActive
-		# TimeZone
-		# UTCOffset
-		# Parts
-		# Hardware
-		#
-		# Server-level stats formatting (see defaultServer):
-		#
-		# server:0123456789:statname
-		#
-		# Member stats per-server (see default_member):
-		#
-		# server:0123456789:member:0123456789:statname
-		#
-		start = time.time()
-		print("")
-		print("Located {} - preparing for migration...".format(f))
-		print(" - Loading {}...".format(f))
-		try:
-			oldset = json.load(open(f))
-		except Exception as e:
-			print(" --> Failed to open, attempting to rename...")
-			print(" ----> {}".format(e))
-			try:
-				parts = f.split(".")
-				if len(parts) == 1:
-					parts.append("json")
-				name = ".".join(parts[0:-1]) + "-Error-{:%Y-%m-%d %H.%M.%S}".format(datetime.now()) + "." + parts[-1]
-				os.rename(f, name)
-				print(" ----> Renamed to {}".format(name))
-			except Exception as e:
-				print(" ----> Rename failed... wut... Bail.")
-				print(" ------> {}".format(e))
-				return
-		# We should have the loaded json doc now
-		# We first need to flush our db so we can import the settings
-		print(" - Flushing current db...")
-		self.r.flushall()
-		# Let's go over all the parts and add them to our db
-		glob_count = 0
-		serv_count = 0
-		memb_count = 0
-		stat_count = 0
-		print(" - Parsing GlobalMembers...")
-		glob = oldset.get("GlobalMembers",{})
-		glob_count = len(glob)
-		# Walk the globs and move them over using the above format
-		for g in glob:
-			stat_count += len(glob[g])
-			for stat in glob[g]:
-				if stat == "HWActive":
-					# This doesn't need to persist
-					continue
-				self.jset("globalmember:{}:{}".format(g, stat),glob[g][stat])
-		
-		# Walk the servers - and members when found in the same fashion
-		print(" - Parsing Servers/Members...")
-		servs = oldset.get("Servers",{})
-		serv_count = len(servs)
-		for s in servs:
-			# Get the stats
-			for t in servs[s]:
-				if not t.lower() == "members":
-					stat_count += 1
-					# Not members, we just need to add the stat
-					self.jset("server:{}:{}".format(s,t),servs[s][t])
-				else:
-					# Membertime!
-					memb_count += len(servs[s][t])
-					for m in servs[s][t]:
-						# Iterate each member, and their subsequent stats
-						stat_count += len(servs[s][t][m])
-						for stat in servs[s][t][m]:
-							# LOOPS FOR DAYS
-							self.jset("server:{}:member:{}:{}".format(s,m,stat),servs[s][t][m][stat])
-		# Iterate through any settings that aren't Servers or GlobalMembers
-		print(" - Parsing remaining Global settings")
-		for s in oldset:
-			if s in ["GlobalMembers","Servers"]:
-				continue
-			stat_count += 1
-			# Save the global setting!
-			self.jset("{}".format(s), oldset[s])
-		# Now we need to rename the file
-		print(" - Renaming {}...".format(f))
-		try:
-			parts = f.split(".")
-			if len(parts) == 1:
-				parts.append("json")
-			name = ".".join(parts[0:-1]) + "-Migrated-{:%Y-%m-%d %H.%M.%S}".format(datetime.now()) + "." + parts[-1]
-			os.rename(f, name)
-			print(" --> Renamed to {}".format(name))
-		except Exception as e:
-			print(" --> Rename failed... wut...")
-			print(" ----> {}".format(e))
-		print("Migrated {:,} GlobalMembers, {:,} Servers, {:,} Members, and {:,} total stats.".format(
-			glob_count,
-			serv_count,
-			memb_count,
-			stat_count
-		))
-		print("Migration took {:,} seconds.".format(time.time() - start))
-		print("")
+		self.pd.migrate(f)
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -422,6 +292,11 @@ class Settings:
 
 	async def onjoin(self, member, server):
 		# Welcome - and initialize timers
+		try:
+			vt = time.time() + int(self.getServerStat(server,"VerificationTime",0)) * 60
+		except:
+			vt = 0
+		self.setUserStat(member,server,"VerificationTime",vt)
 		self.bot.loop.create_task(self.giveRole(member, server))
 
 	# Proof of concept stuff for reloading cog/extension
@@ -437,8 +312,9 @@ class Settings:
 		self.flushSettings()
 		# Shutdown role manager loop
 		self.role.clean_up()
-		for task in self.loop_list:
-			task.cancel()
+		self.is_current = False
+		#for task in self.loop_list:
+		#	task.cancel()
 
 	@asyncio.coroutine
 	async def on_loaded_extension(self, ext):
@@ -446,16 +322,34 @@ class Settings:
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		# Check all verifications - and start timers if needed
-		self.loop_list.append(self.bot.loop.create_task(self.checkAll()))
+		# self.bot.loop.create_task(self.checkAll())
 		# Start the backup loop
-		self.loop_list.append(self.bot.loop.create_task(self.backup()))
+		# self.bot.loop.create_task(self.backup())
 		# Start the settings loop
-		self.loop_list.append(self.bot.loop.create_task(self.flushLoop()))
+		self.is_current = True
+		# Here we determine if we have a Settings.json file - if so
+		# we load it, and migrate it to the Redis db, then rename
+		# the file to Settings-migrated.json to avoid confusion
+		# or double-migration.
+		if os.path.exists(self.file):
+			await self.bot.loop.run_in_executor(None, self.migrate_json, self.file)
+		# After that's done, we can do other shit
+		self.bot.loop.create_task(self.flushLoop())
+		print("Verifying default roles...")
+		t = time.time()
+		await self.bot.loop.run_in_executor(None, self.check_all)
+		print("Verified default roles in {} seconds.".format(time.time() - t))
 
-	async def checkAll(self):
+	def check_all(self):
 		# Check all verifications - and start timers if needed
-		for server in self.bot.guilds:
+		guilds = {}
+		for x in self.bot.get_all_members():
+			mems = guilds.get(str(x.guild.id),[])
+			mems.append(x)
+			guilds[str(x.guild.id)] = mems
+		for server_id in guilds:
 			# Check if we can even manage roles here
+			server = self.bot.get_guild(int(server_id))
 			if not server.me.guild_permissions.manage_roles:
 				continue
 			# Get default role
@@ -463,13 +357,13 @@ class Settings:
 			defRole = DisplayName.roleForID(defRole, server)
 			if defRole:
 				# We have a default - check for it
-				for member in server.members:
+				for member in guilds[server_id]:
 					if member.bot:
 						# skip bots
 						continue
 					if not defRole in member.roles:
 						# We don't have the role - set a timer
-						self.loop_list.append(self.bot.loop.create_task(self.giveRole(member, server)))
+						self.bot.loop.create_task(self.giveRole(member, server))
 
 	async def giveRole(self, member, server):
 		# Let the api settle
@@ -489,6 +383,10 @@ class Settings:
 		if timeRemain > 0:
 			# We have to wait for verification still
 			await asyncio.sleep(timeRemain)
+
+		if not self.is_current:
+			# Not current anymore, bail
+			return
 		
 		# We're already verified - make sure we have the role
 		defRole = self.getServerStat(server, "DefaultRole")
@@ -507,8 +405,8 @@ class Settings:
 					await member.send(fmt)
 				except Exception:
 					pass
-		if task in self.loop_list:
-			self.loop_list.remove(task)
+		'''if task in self.loop_list:
+			self.loop_list.remove(task)'''
 
 	async def backup(self):
 		# Works only for JSON files, not for database yet... :(
@@ -516,6 +414,9 @@ class Settings:
 		# Works only for JSON files, not for database yet... :(
 
 		# Temporarily avoid this until I have a better strategy
+		# will probably only enable this for sqlite - which means
+		# the PandorasDB module should handle this.  Any other db
+		# should be managed by the db server.
 		return
 
 		# Wait initial time - then start loop
@@ -550,20 +451,11 @@ class Settings:
 				print("Settings Backed Up: {}".format(timeStamp))
 			await asyncio.sleep(self.backupTime)
 
-	def jget(self, key, default = None):
-		# Retrieves and loads the json data passed
-		if not self.r.exists(key):
-			return default
-		return json.loads(self.r.get(key))
-
-	def jset(self, key, value):
-		# Sets the key to the json-serialized value
-		return self.r.set(key, json.dumps(value))
-
 	def isOwner(self, member):
 		# This method converts prior, string-only ownership to a list,
 		# then searches the list for the passed member
 		ownerList = self.getGlobalStat("Owner",[])
+		ownerList = [] if ownerList == None else ownerList
 		if not len(ownerList):
 			return None
 		if not type(ownerList) is list:
@@ -575,132 +467,55 @@ class Settings:
 		owners = [x for x in ownerList if x in all_members]
 		# Update the setting if there were changes
 		if len(owners) != len(ownerList):
-			self.jset("Owner", owners)
+			self.setGlobalStat("Owner", owners)
 		# Let us know if we're an owner
 		return member.id in owners
 
 	# Let's make sure the user is in the specified server
 	def removeServer(self, server):
-		if isinstance(server, discord.Guild):
-			server = server.id
-		# use the keys("prefix:*") loop to remove keys with our server:id: prefix
-		for key in self.r.keys("server:{}:*".format(server)):
-			self.r.delete(key)
+		self.pd.del_servers(server.id)
 		# Verify that we've removed the global members as well
 		self.checkGlobalUsers()
 
 	# Let's make sure the user is in the specified server
 	def removeUser(self, user, server):
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		if isinstance(server, discord.Guild):
-			server = server.id
-		# use the keys("prefix:*") loop to remove keys with our server:id:member:id prefix
-		for key in self.r.keys("server:{}:member:{}*".format(server, user)):
-			self.r.delete(key)
-		check_members = set([x.id for x in self.bot.get_all_members()])
-		if not int(user) in check_members:
-			# Remove globally
-			for key in self.r.keys("globalmember:{}*".format(user)):
-				self.r.delete(key)
+		self.pd.del_users(user.id, server)
+		# Verify that we've removed the global members as well
+		self.checkGlobalUsers()
 
-	def checkGlobalUsers(self):
-		# Let's iterate over all globalmember:id values
-		# and add them to a set
-		total_members = []
-		for key in self.r.keys("globalmember:*"):
-			total_members.append(key.split(":")[1])
-		# Strip out dupes
-		total_members = set(total_members)
-		check_members = set([str(x.id) for x in self.bot.get_all_members()])
-		# Iterate through total_members, find out if exists - and if not,
-		# remove all associated keys
-		rem_count = 0
-		for m in total_members:
-			if m in check_members:
-				continue
-			rem_count += 1
-			for key in self.r.keys("globalmember:{}*".format(m)):
-				self.r.delete(key)
-		return rem_count
-	
-	# Return the requested stat
-	def getUserStat(self, user, server, stat, default = None):
-		# Get user stat - but set up a default in case of some settings
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		if isinstance(server, discord.Guild):
-			server = server.id
-		out = self.jget("server:{}:member:{}:{}".format(server, user, stat), default)
-		if out != None:
-			return out
-		# Check if we need defaults
-		if stat == "XP":
-			return self.jget("server:{}:DefaultXP", self.defaultServer["DefaultXP"])
-		if stat == "XPReserve":
-			return self.jget("server:{}:DefaultXPReserve", self.defaultServer["DefaultXPReserve"])
-		test = self.default_member.get(stat,out)
-		if isinstance(test, list):
-			return []
-		elif isinstance(test, dict):
-			return {}
-		# Return whatever we've got
-		return test
-	
-	def getGlobalUserStat(self, user, stat, default = None):
-		# Get our global user stat if exists
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		return self.jget("globalmember:{}:{}".format(user, stat), default)
+	# Global Stat
 
 	def getGlobalStat(self, stat, default = None):
-		return self.jget(stat, default)
+		return self.pd.get_global(stat, default)
 
 	def setGlobalStat(self, stat, value):
-		self.jset(stat, value)
+		return self.pd.set_global(stat, value)
 
 	def delGlobalStat(self, stat):
-		if self.r.exists(stat):
-			self.r.delete(stat)
-	
-	def setUserStat(self, user, server, stat, value):
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		if isinstance(server, discord.Guild):
-			server = server.id
-		self.jset("server:{}:member:{}:{}".format(server, user, stat), value)
+		return self.pd.del_global(stat)
+
+	# Global Users Stat
+
+	def getGlobalUserStat(self, user, stat, default = None):
+		# Get our global user stat if exists
+		return self.pd.get_guser(user, stat, default)
 						
-	# Set a provided global stat
 	def setGlobalUserStat(self, user, stat, value):
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		self.jset("globalmember:{}:{}".format(user, stat), value)
+		return self.pd.set_guser(user,stat,value)
 
 	def delGlobalUserStat(self, user, stat):
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		if self.r.exists("globalmember:{}:{}".format(user, stat)):
-			self.r.delete("globalmember:{}:{}".format(user, stat))
-					
-	# Increment a specified user stat by a provided amount
-	# returns the stat post-increment, or None if error
-	def incrementStat(self, user, server, stat, incrementAmount):
-		# Get initial value - set to 0 if doesn't exist
-		if isinstance(user, (discord.User, discord.Member)):
-			user = user.id
-		if isinstance(server, discord.Guild):
-			server = server.id
-		out = self.jget("server:{}:member:{}:{}".format(server, user, stat))
-		out = 0 if not out else out
-		self.jset("server:{}:member:{}:{}".format(server, user, stat), out+incrementAmount)
-		return out+incrementAmount
-	
-	# Get the requested stat
+		return self.pd.del_guser(user,stat)
+
+	def checkGlobalUsers(self):
+		total_members = self.pd.all_guser()
+		check_members = set([str(x.id) for x in self.bot.get_all_members()])
+		return self.pd.del_gusers([x for x in total_members if not x in check_members])
+
+	# Server Stats
+
 	def getServerStat(self, server, stat, default = None):
 		# Get server stat - but set up a default in case of some settings
-		if isinstance(server, discord.Guild):
-			server = server.id
-		out = self.jget("server:{}:{}".format(server, stat), default)
+		out = self.pd.get_server(server, stat, default)
 		if out != None:
 			return out
 		test = self.defaultServer.get(stat,out)
@@ -711,11 +526,43 @@ class Settings:
 		# Return whatever we've got
 		return test
 	
-	# Set the provided stat
 	def setServerStat(self, server, stat, value):
-		if isinstance(server, discord.Guild):
-			server = server.id
-		self.jset("server:{}:{}".format(server, stat), value)
+		return self.pd.set_server(server, stat, value)
+	
+	# User Stats
+
+	def getUserStat(self, user, server, stat, default = None):
+		# Get user stat - but set up a default in case of some settings
+		out = self.pd.get_user(user, server, stat, default)
+		if out != None:
+			return out
+		# Check if we need defaults
+		if stat == "XP":
+			return self.getServerStat(server,"DefaultXP",self.defaultServer["DefaultXP"])
+		if stat == "XPReserve":
+			return self.getServerStat(server,"DefaultXPReserve",self.defaultServer["DefaultXPReserve"])
+		test = self.default_member.get(stat,out)
+		if isinstance(test, list):
+			return []
+		elif isinstance(test, dict):
+			return {}
+		# Return whatever we've got
+		return test
+
+	def setUserStat(self, user, server, stat, value):
+		return self.pd.set_user(user, server, stat, value)
+
+	def delUserStat(self, user, server, stat):
+		return self.pd.del_user(user, server, stat)
+					
+	# Increment a specified user stat by a provided amount
+	# returns the stat post-increment, or None if error
+	def incrementStat(self, user, server, stat, incrementAmount):
+		# Get initial value - set to 0 if doesn't exist
+		out = self.getUserStat(user, server, stat)
+		out = 0 if not out else out
+		self.setUserStat(user, server, stat, out+incrementAmount)
+		return out+incrementAmount
 
 	@commands.command(pass_context=True)
 	async def ownerlock(self, ctx):
@@ -742,7 +589,12 @@ class Settings:
 		else:
 			self.setGlobalStat("OwnerLock",False)
 			msg = 'Owner lock **Disabled**.'
-			await self.bot.change_presence(activity=discord.Activity(status=self.jget("Status"), name=self.jget("Game"), url=self.jget("Stream"), type=self.jget("Type", 0)))
+			await self.bot.change_presence(activity=discord.Activity(
+				status=self.getGlobalStat("Status"), 
+				name=self.getGlobalStat("Game"), 
+				url=self.getGlobalStat("Stream"), 
+				type=self.getGlobalStat("Type", 0)
+			))
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
@@ -781,7 +633,7 @@ class Settings:
 			msg = "I've already been claimed."
 		else:
 			# Claim it up
-			self.setGlobalStat("Owner",self.getGlobalStat("Owner",[]).append(ctx.author.id))
+			self.setGlobalStat("Owner",[ctx.author.id])
 			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(ctx.author))
 		await ctx.send(msg)
 	
@@ -950,12 +802,21 @@ class Settings:
 		print('Starting flush loop - runs every {} seconds.'.format(self.settingsDump))
 		while not self.bot.is_closed():
 			await asyncio.sleep(self.settingsDump)
+			if not self.is_current:
+				# We're not longer the active instance - bail
+				return
 			# Actually flush settings
-			self.flushSettings()
+			try:
+				await self.bot.loop.run_in_executor(None, self.flushSettings)
+			except:
+				pass
 				
 	# Flush settings to disk
 	def flushSettings(self):
-		self.r.bgsave()
+		try:
+			self.pd.save_db()
+		except:
+			print("Failed to save - likely already saving.")
 
 	@commands.command(pass_context=True)
 	async def prunelocalsettings(self, ctx):
@@ -971,72 +832,51 @@ class Settings:
 			await ctx.send(msg)
 			return
 		message = await ctx.send("Pruning local settings...")
-		removedSettings = 0
 		settingsWord = "settings"
-		for entry in self.r.keys("server:{}:[^member]*".format(ctx.guild.id)):
-			name = entry.split(":")[-1]
-			if not name in self.defaultServer:
-				self.r.delete(entry)
-				removedSettings += 1
+		removedSettings = self._prune_settings(ctx.guild)
 		if removedSettings is 1:
 			settingsWord = "setting"
-		await message.edit(content="Flushing settings to disk...", embed=None)
-		# Actually flush settings
-		# self.flushSettings()
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
 		await message.edit(content=msg, embed=None)
 
 	def _prune_servers(self):
 		# Remove any orphaned servers
-		removed = 0
-		server_list = [str(x.id) for x in self.bot.guilds]
-		server_db   = self.r.keys("server:*")
-		current     = set([x.split(":")[1] for x in server_db])
-		# We now have a list of all the servers in our settings,
-		# as well as a list of all servers the bot is connected to
-		for s in current:
-			if not s in server_list:
-				# Remove
-				removed += 1
-				for x in self.r.keys("server:{}*".format(s)):
-					self.r.delete(x)
-		return removed
+		server_list = set([str(x.guild.id) for x in self.bot.get_all_members()])
+		server_db   = set([x.split(":")[1] for x in self.pd.all_server()])
+		remove      = [x for x in server_db if not x in server_list]
+		return self.pd.del_servers(remove)
 
 	def _prune_users(self):
 		# Remove any orphaned members
 		removed = 0
-		server_list = ["{}:{}".format(x.guild.id, x.id) for x in self.bot.get_all_members()]
-		server_db   = self.r.keys("server:*:member:*")
-		current     = set([":".join(x.split(":")[1:4:2]) for x in server_db])
-		for s in current:
-			if not s in server_list:
-				# Remove
-				removed += 1
-				sp = s.split(":")
-				for x in self.r.keys("server:{}:member:{}*".format(sp[0],sp[1])):
-					self.r.delete(x)
+		server_list = set([str(x.guild.id) for x in self.bot.get_all_members()])
+		for s in server_list:
+			ukeys = self.pd.all_user(s)
+			u_set = set([x.split(":")[0] for x in ukeys])
+			member_list = set([str(x.id) for x in self.bot.get_all_members() if str(x.guild.id)==s])
+			for u in u_set:
+				if not u in member_list:
+					removed += self.pd.del_users(u,s)		
 		return removed
 
-	def _prune_settings(self):
+	def _prune_settings(self, guild = None):
 		# Remove orphaned settings
 		removed = 0
-		for g in self.bot.guilds:
-			for entry in self.r.keys("server:{}:[^member]*".format(g.id)):
+		if not guild:
+			guilds = set([x.guild.id for x in self.bot.get_all_members()])
+		else:
+			guilds = [guild]
+		for g in guilds:
+			for entry in self.pd.get_smatch(g,"[^member]"):
 				name = entry.split(":")[-1]
 				if not name in self.defaultServer:
-					self.r.delete(entry)
+					self.pd.del_server(g, entry)
 					removed += 1
 		return removed
-
 
 	@commands.command(pass_context=True)
 	async def prunesettings(self, ctx):
 		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
-
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
 		if isOwner == None:
@@ -1048,23 +888,11 @@ class Settings:
 			await ctx.channel.send(msg)
 			return
 
-		removedSettings = 0
 		settingsWord = "settings"
 
 		message = await ctx.send("Pruning settings...")
 
-		for serv in self.serverDict["Servers"]:
-			# Found it - let's check settings
-			removeKeys = []
-			for key in self.serverDict["Servers"][serv]:
-				if not key in self.defaultServer:
-					if key == "Name" or key == "ID":
-						continue
-					# Key isn't in default list - clear it
-					removeKeys.append(key)
-					removedSettings += 1
-			for key in removeKeys:
-				self.serverDict["Servers"][serv].pop(key, None)
+		removedSettings = await self.bot.loop.run_in_executor(None, self._prune_settings)
 
 		if removedSettings is 1:
 			settingsWord = "setting"
@@ -1096,12 +924,14 @@ class Settings:
 			await ctx.channel.send(msg)
 			return
 
-		message = await ctx.send("Pruning all orphaned members and settings...")
-
+		message = await ctx.send("Pruning orphaned servers...")
 		l = asyncio.get_event_loop()
 		ser = await self.bot.loop.run_in_executor(None, self._prune_servers)
+		await message.edit(content="Pruning orphaned settings...")
 		sst = await self.bot.loop.run_in_executor(None, self._prune_settings)
+		await message.edit(content="Pruning orphaned users...")
 		mem = await self.bot.loop.run_in_executor(None, self._prune_users)
+		await message.edit(content="Pruning orphaned global users...")
 		glo = await self.bot.loop.run_in_executor(None, self.checkGlobalUsers)
 
 		ser_str = "servers"
