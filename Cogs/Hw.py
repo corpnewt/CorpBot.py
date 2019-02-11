@@ -2,6 +2,7 @@ import asyncio
 import discord
 import time
 import argparse
+import random
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
@@ -23,7 +24,11 @@ class Hw:
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.hwactive = []
+		self.hwactive = {}
+		self.charset = "0123456789"
+
+	def gen_id(self, length = 8):
+		return ''.join(random.choice(self.charset) for i in range(length))
 
 	def checkSuppress(self, ctx):
 		if not ctx.guild:
@@ -49,15 +54,15 @@ class Hw:
 	@commands.command(pass_context=True)
 	async def cancelhw(self, ctx):
 		"""Cancels a current hardware session."""
-		if ctx.author.id in self.hwactive:
+		if str(ctx.author.id) in self.hwactive:
 			self._stop_hw(ctx.author)
 			await ctx.send("You've left your current hardware session!".format(ctx.prefix))
 			return
 		await ctx.send("You're not in a current hardware session.")
 
 	def _stop_hw(self, author):
-		if author.id in self.hwactive:
-			self.hwactive.remove(author.id)
+		if str(author.id) in self.hwactive:
+			del self.hwactive[str(author.id)]
 
 	@commands.command(pass_context=True)
 	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
@@ -80,7 +85,6 @@ class Hw:
 
 		msg = 'Hardware channel set to **{}**.'.format(channel.name)
 		await ctx.channel.send(msg)
-		
 	
 	@sethwchannel.error
 	async def sethwchannel_error(self, error, ctx):
@@ -295,7 +299,8 @@ class Hw:
 			return
 
 		# Set our HWActive flag
-		self.hwactive.append(ctx.author.id)
+		hw_id = self.gen_id()
+		self.hwactive[str(ctx.author.id)] = hw_id
 
 		# Here, we have a build
 		bname = mainBuild['Name']
@@ -316,14 +321,14 @@ class Hw:
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
 				self._stop_hw(ctx.author)
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(ctx, parts, hwChannel, msg)
+				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
 				if test == None:
 					self._stop_hw(ctx.author)
 					return
@@ -348,7 +353,7 @@ class Hw:
 						self._stop_hw(ctx.author)
 						return
 					# Make sure
-					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
+					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
 					if conf == None:
 						# Timed out
 						self._stop_hw(ctx.author)
@@ -429,7 +434,8 @@ class Hw:
 			return
 
 		# Set our HWActive flag
-		self.hwactive.append(ctx.author.id)
+		hw_id = self.gen_id()
+		self.hwactive[str(ctx.author.id)] = hw_id
 
 		# Post the dm reaction
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
@@ -442,7 +448,7 @@ class Hw:
 
 		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not buildName:
 				self._stop_hw(ctx.author)
 				return
@@ -885,7 +891,8 @@ class Hw:
 			return
 
 		# Set our HWActive flag
-		self.hwactive.append(ctx.author.id)
+		hw_id = self.gen_id()
+		self.hwactive[str(ctx.author.id)] = hw_id
 
 		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
 		if len(buildList) == 1:
@@ -910,7 +917,7 @@ class Hw:
 		# Get the build name
 		newBuild = { 'Main': True }
 		while True:
-			buildName = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not buildName:
 				self._stop_hw(ctx.author)
 				return
@@ -933,14 +940,14 @@ class Hw:
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
 		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
 		while True:
-			parts = await self.prompt(ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
 				self._stop_hw(ctx.author)
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(ctx, parts, hwChannel, msg)
+				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
 				if test == None:
 					self._stop_hw(ctx.author)
 					return
@@ -966,7 +973,7 @@ class Hw:
 						self._stop_hw(ctx.author)
 						return
 					# Make sure
-					conf = await self.confirm(ctx, output, hwChannel, None, ctx.author)
+					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
 					if conf == None:
 						# Timed out
 						self._stop_hw(ctx.author)
@@ -1026,7 +1033,7 @@ class Hw:
 	# Makes sure we're still editing - if this gets set to False,
 	# that means the user stopped editing/newhw
 	def stillHardwaring(self, author):
-		return author.id in self.hwactive
+		return str(author.id) in self.hwactive
 
 	def confirmCheck(self, msg, dest = None):
 		if not self.channelCheck(msg, dest):
@@ -1040,7 +1047,7 @@ class Hw:
 			return True
 		return False
 
-	async def confirm(self, ctx, message, dest = None, m = None, author = None):
+	async def confirm(self, hw_id, ctx, message, dest = None, m = None, author = None):
 		# Get author name
 		authorName = None
 		if author:
@@ -1095,6 +1102,10 @@ class Hw:
 			except Exception:
 				talk = None
 
+			# See if we're still in the right context
+			if not hw_id == self.hwactive.get(str(ctx.author.id),None):
+				return None
+
 			# Hardware ended
 			if not self.stillHardwaring(ctx.author):
 				return None
@@ -1120,7 +1131,7 @@ class Hw:
 				else:
 					return False
 
-	async def prompt(self, ctx, message, dest = None, author = None):
+	async def prompt(self, hw_id, ctx, message, dest = None, author = None):
 		# Get author name
 		authorName = None
 		if author:
@@ -1155,6 +1166,10 @@ class Hw:
 			except Exception:
 				talk = None
 
+			# See if we're still in the right context
+			if not hw_id == self.hwactive.get(str(ctx.author.id),None):
+				return None
+
 			# Hardware ended
 			if not self.stillHardwaring(ctx.author):
 				return None
@@ -1170,13 +1185,13 @@ class Hw:
 					await dest.send(msg)
 					return None
 				# Make sure
-				conf = await self.confirm(ctx, talk, dest, "", author)
+				conf = await self.confirm(hw_id, ctx, talk, dest, "", author)
 				if conf == True:
 					# We're sure - return the value
 					return talk
 				elif conf == False:
 					# Not sure - ask again
-					return await self.prompt(ctx, message, dest, author)
+					return await self.prompt(hw_id, ctx, message, dest, author)
 				else:
 					# Timed out
 					return None
