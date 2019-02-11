@@ -9,6 +9,12 @@ This branch of CorpBot requires a Redis database server running to function corr
 
 ***
 
+# !Breaking Changes!
+
+As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368d36d4385aaf6d8a8f6ff13f588), the database backend has changed.  I uploaded a [convenience script](https://gist.github.com/corpnewt/131548261eb4981e8f4a666d628e861d) that can dump the old redis db format to a Settings.json file which can be placed in CorpBot's folder so that it will be migrated to the new db format on restart.
+
+***
+
 # Command List
 
 A list of cogs, commands, and descriptions:
