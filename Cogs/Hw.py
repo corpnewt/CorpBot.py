@@ -2,7 +2,6 @@ import asyncio
 import discord
 import time
 import argparse
-import random
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
@@ -27,8 +26,10 @@ class Hw:
 		self.hwactive = {}
 		self.charset = "0123456789"
 
-	def gen_id(self, length = 8):
-		return ''.join(random.choice(self.charset) for i in range(length))
+	def gen_id(self):
+		# Just use the current time as that shouldn't ever be the same (unless a user
+		# manages to do this twice in < 1 second)
+		return str(time.time())
 
 	def checkSuppress(self, ctx):
 		if not ctx.guild:
@@ -268,7 +269,7 @@ class Hw:
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if ctx.author.id in self.hwactive:
+		if str(ctx.author.id) in self.hwactive:
 			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
@@ -403,7 +404,7 @@ class Hw:
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if ctx.author.id in self.hwactive:
+		if str(ctx.author.id) in self.hwactive:
 			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
@@ -886,7 +887,7 @@ class Hw:
 			hwChannel = ctx.author
 
 		# Make sure we're not already in a parts transaction
-		if ctx.author.id in self.hwactive:
+		if str(ctx.author.id) in self.hwactive:
 			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 			return
 
