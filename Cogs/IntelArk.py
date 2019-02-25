@@ -10,7 +10,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(IntelArk(bot))
 	
-class IntelArk:
+class IntelArk(commands.Cog):
     
 	def __init__(self, bot):
 		self.bot = bot

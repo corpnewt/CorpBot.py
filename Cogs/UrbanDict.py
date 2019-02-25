@@ -16,7 +16,7 @@ def setup(bot):
 
 # This module grabs Urban Dictionary definitions
 
-class UrbanDict:
+class UrbanDict(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):

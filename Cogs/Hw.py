@@ -17,7 +17,7 @@ def setup(bot):
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
-class Hw:
+class Hw(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -43,7 +43,7 @@ class Hw:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	'''@asyncio.coroutine
+	'''@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

@@ -11,7 +11,7 @@ def setup(bot):
     settings = bot.get_cog("Settings")
     bot.add_cog(Stream(bot, settings))
 
-class Stream:
+class Stream(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
@@ -26,7 +26,7 @@ class Stream:
         self.regexEveryone = re.compile(r"\[\[[everyone]+\]\]", re.IGNORECASE)
 
     # Check for events!
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_member_update(self, before, after):
         stream_list = self.settings.getServerStat(before.guild, "StreamList")
         if not before.id in stream_list:

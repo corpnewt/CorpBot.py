@@ -19,7 +19,7 @@ def setup(bot):
 
 # This module is for random funny things I guess...
 
-class Humor:
+class Humor(commands.Cog):
 
 	def __init__(self, bot, settings, listName = "Adjectives.txt"):
 		self.bot = bot

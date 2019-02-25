@@ -18,7 +18,7 @@ def setup(bot):
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
 
-class Channel:
+class Channel(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

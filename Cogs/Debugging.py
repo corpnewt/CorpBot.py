@@ -16,7 +16,7 @@ def setup(bot):
 
 # This is the Debugging module. It keeps track of how long the bot's been up
 
-class Debugging:
+class Debugging(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, debug = False):
@@ -41,7 +41,7 @@ class Debugging:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -107,7 +107,7 @@ class Debugging:
 		return False
 
 	# Catch custom xp event
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
 		server = from_user.guild
 		if not self.shouldLog('xp', server):
@@ -118,7 +118,7 @@ class Debugging:
 			msg = "🌟 {}#{} ({}) gave {} xp to {}#{} ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
 		await self._logEvent(server, "", title=msg, color=discord.Color.blue())
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_member_ban(self, guild, member):
 		server = guild
 		if not self.shouldLog('user.ban', server):
@@ -127,7 +127,7 @@ class Debugging:
 		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, "", title=msg, color=discord.Color.red())
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_member_unban(self, server, member):
 		if not self.shouldLog('user.unban', server):
 			return
@@ -135,7 +135,7 @@ class Debugging:
 		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, self.suppressed(server, server.name))
 		await self._logEvent(server, "", title=msg, color=discord.Color.green())
 
-	@asyncio.coroutine	
+	@commands.Cog.listener()	
 	async def on_member_join(self, member):
 		server = member.guild
 		# Try and determine which invite was used
@@ -161,7 +161,7 @@ class Debugging:
 			log_msg += "\nInvite Created By: {}#{}".format(invite.inviter.name, invite.inviter.discriminator)
 		await self._logEvent(server, log_msg, title=msg, color=discord.Color.teal())
 		
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		server = member.guild
 		if not self.shouldLog('user.leave', server):
@@ -201,7 +201,7 @@ class Debugging:
 			d["type"] = "Unknown"
 		return d
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
 		if before.bot:
 			return
@@ -265,7 +265,7 @@ class Debugging:
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_message(self, message):
 		# context = await self.bot.get_context(message)
 		# print(context)
@@ -289,7 +289,7 @@ class Debugging:
 		await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey())
 		return
 		
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
 
 		if not before.guild:
@@ -318,7 +318,7 @@ class Debugging:
 		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple())
 		return
 		
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_message_delete(self, message):
 
 		if not message.guild:

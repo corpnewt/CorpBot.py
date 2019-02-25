@@ -5,7 +5,7 @@ import random
 def setup(bot):
     bot.add_cog(Turret(bot))
 
-class Turret:
+class Turret(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

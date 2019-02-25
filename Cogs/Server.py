@@ -17,7 +17,7 @@ def setup(bot):
 
 # This module sets/gets some server info
 
-class Server:
+class Server(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):

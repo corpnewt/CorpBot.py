@@ -88,7 +88,7 @@ class ProfanitiesFilter(object):
 	print f.clean(example)
 	# Returns "I am doing b-d u----d b-dlike things."'''
 	
-class LangFilter:
+class LangFilter(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, replacements = "@#$%&"):

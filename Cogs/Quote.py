@@ -9,7 +9,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Quote(bot, settings))
 
-class Quote:
+class Quote(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -28,7 +28,7 @@ class Quote:
 							isAdmin = True
 			return isAdmin
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction, member):
 		# Catch reactions and see if they match our list
 		if not type(member) is discord.Member:

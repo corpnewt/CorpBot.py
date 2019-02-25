@@ -13,7 +13,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Jpeg(bot, settings))
 
-class Jpeg:
+class Jpeg(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, settings):

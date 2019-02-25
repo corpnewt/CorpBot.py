@@ -28,7 +28,7 @@ if not discord.opus.is_loaded():
     # note that on windows this DLL is automatically provided for you
     discord.opus.load_opus('opus')
 
-class Example:
+class Example(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
@@ -459,7 +459,7 @@ class VoiceState:
             entry = VoiceEntry(ctx.message, self.voice, title, duration, ctx)
             return entry
 
-class Music:
+class Music(commands.Cog):
     """Voice related commands.
 
     Works in multiple servers at once.
@@ -476,7 +476,7 @@ class Music:
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_loaded_extension(self, ext):
         # See if we were loaded
         if not self._is_submodule(ext.__name__, self.__module__):
@@ -566,7 +566,7 @@ class Music:
         # If we're here - we're not admin, and not in the same channel, deny
         return False
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_voice_state_update(self, user, beforeState, afterState):
         if not user.guild:
             return

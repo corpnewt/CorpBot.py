@@ -12,7 +12,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Morse(bot, settings))
 
-class Morse:
+class Morse(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, settings):

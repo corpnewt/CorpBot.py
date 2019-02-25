@@ -126,7 +126,7 @@ class RoleManager:
 # This is the settings module - it allows the other modules to work with
 # a global settings variable and to make changes
 
-class Settings:
+class Settings(commands.Cog):
 	"""The Doorway To The Server Settings"""
 	# Let's initialize with a file location
 	def __init__(self, bot, prefix = "$", file : str = None):
@@ -303,7 +303,7 @@ class Settings:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -316,7 +316,7 @@ class Settings:
 		#for task in self.loop_list:
 		#	task.cancel()
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

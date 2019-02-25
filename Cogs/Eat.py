@@ -9,7 +9,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(Eat(bot))
 
-class Eat:
+class Eat(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

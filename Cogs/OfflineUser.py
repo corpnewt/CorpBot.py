@@ -9,7 +9,7 @@ def setup(bot):
 
 # This is the OfflineUser module
 
-class OfflineUser:
+class OfflineUser(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
@@ -28,7 +28,7 @@ class OfflineUser:
 			return
 		await ctx.send(msg)
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_message(self, message):
 		if not message.guild:
 			return

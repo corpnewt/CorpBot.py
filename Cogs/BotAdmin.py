@@ -16,7 +16,7 @@ def setup(bot):
 	mute     = bot.get_cog("Mute")
 	bot.add_cog(BotAdmin(bot, settings, mute))
 
-class BotAdmin:
+class BotAdmin(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, muter):

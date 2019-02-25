@@ -14,7 +14,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(XpBlock(bot, settings))
 
-class XpBlock:
+class XpBlock(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):

@@ -19,7 +19,7 @@ def setup(bot):
 
 # This is the Help module. It replaces the built-in help command
 
-class Help:
+class Help(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
@@ -76,13 +76,13 @@ class Help:
 			embed_list = { "title" : "Current Categories", "fields" : [] }
 			command_list = []
 			for cog in sorted(self.bot.cogs):
-				if not len(self.bot.get_cog_commands(cog)):
+				if not len(self.bot.get_cog(cog).get_commands()):
 					# Skip empty cogs
 					continue
 				# Make sure there are non-hidden commands here
 				visible = []
 				disabled = 0
-				for command in self.bot.get_cog_commands(cog):
+				for command in self.bot.get_cog(cog).get_commands():
 					if not command.hidden:
 						visible.append(command)
 					if command.name in disabled_list:
@@ -108,8 +108,7 @@ class Help:
 				if not cog == com:
 					continue
 				# Found the cog - let's build our text
-				cog_commands = self.bot.get_cog_commands(cog)
-				cog_commands = sorted(cog_commands, key=lambda x:x.name)
+				cog_commands = sorted(self.bot.get_cog(cog).get_commands(), key=lambda x:x.name)
 				# Get the extension
 				the_cog = self.bot.get_cog(cog)
 				embed_list = None
@@ -137,8 +136,7 @@ class Help:
 				return embed_list
 			# If we're here, we didn't find the cog - check for the command
 			for cog in self.bot.cogs:
-				cog_commands = self.bot.get_cog_commands(cog)
-				cog_commands = sorted(cog_commands, key=lambda x:x.name)
+				cog_commands = sorted(self.bot.get_cog(cog).get_commands(), key=lambda x:x.name)
 				for command in cog_commands:
 					if not command.name == com:
 						continue
@@ -193,13 +191,13 @@ class Help:
 		
 		# Get and format the help
 		for cog in sorted(self.bot.cogs):
-			cog_commands = sorted(self.bot.get_cog_commands(cog), key=lambda x:x.name)
+			cog_commands = sorted(self.bot.get_cog(cog).get_commands(), key=lambda x:x.name)
 			cog_string = ""
 			# Get the extension
 			the_cog = self.bot.get_cog(cog)
 			# Make sure there are non-hidden commands here
 			visible = []
-			for command in self.bot.get_cog_commands(cog):
+			for command in self.bot.get_cog(cog).get_commands():
 				if not command.hidden:
 					visible.append(command)
 			if not len(visible):
@@ -258,10 +256,10 @@ class Help:
 			
 			for cog in self.bot.cogs:
 				if not cog in cog_name_list:
-					if not len(self.bot.get_cog_commands(cog)):
+					if not len(self.bot.get_cog(cog).get_commands()):
 						# Skip empty cogs
 						continue
-				cog_commands = self.bot.get_cog_commands(cog)
+				cog_commands = self.bot.get_cog(cog).get_commands()
 				hid = True
 				for comm in cog_commands:
 					if comm.hidden:

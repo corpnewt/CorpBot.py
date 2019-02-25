@@ -1,6 +1,9 @@
 # Anythings starting with .
 .*
 
+# Ignore redis stuff
+Redis*
+
 # IGDB api key
 igdbKey*.txt
 

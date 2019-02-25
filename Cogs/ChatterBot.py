@@ -18,7 +18,7 @@ def setup(bot):
 	bot.add_cog(c_bot)
 	
 
-class ChatterBot:
+class ChatterBot(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, prefix : str = '$'):

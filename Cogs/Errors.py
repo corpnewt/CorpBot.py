@@ -9,12 +9,12 @@ from   Cogs import Message
 def setup(bot):
 	bot.add_cog(Errors())
 
-class Errors:
+class Errors(commands.Cog):
 
 	def __init__(self):
 		pass
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_command_error(self, context, exception):
 		if type(exception) is commands.CommandInvokeError and type(exception.original) is discord.Forbidden:
 			await Message.EmbedText(

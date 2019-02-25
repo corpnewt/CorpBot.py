@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the Face module. It sends faces.
 
-class Wiki:
+class Wiki(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

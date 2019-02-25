@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the RateLimit module. It keeps users from being able to spam commands
 
-class RateLimit:
+class RateLimit(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

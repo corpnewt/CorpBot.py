@@ -16,7 +16,7 @@ def setup(bot):
 
 # This is the profiles module.
 
-class Profile:
+class Profile(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

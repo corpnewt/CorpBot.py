@@ -17,7 +17,7 @@ def setup(bot):
 
 # This is the xp module.  It's likely to be retarded.
 
-class XpStack:
+class XpStack(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -220,7 +220,7 @@ class XpStack:
 
 
 	# Catch custom xp event
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
 		server = from_user.guild
 		num = self.settings.getServerStat(server, "XP Count")

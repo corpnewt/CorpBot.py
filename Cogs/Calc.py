@@ -117,7 +117,7 @@ class NumericStringParser(object):
         val=self.evaluateStack( self.exprStack[:] )
         return val
 
-class Calc:
+class Calc(commands.Cog):
 
     # Init with the bot reference, and a reference to the settings var
     def __init__(self, bot):

@@ -18,7 +18,7 @@ def setup(bot):
 		settings = None
 	bot.add_cog(CogManager(bot, settings))
 
-class CogManager:
+class CogManager(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -49,7 +49,7 @@ class CogManager:
 				discord.Color.greyple()
 				]
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_ready(self):
 		# Load cogs when bot is ready
 		return
@@ -232,7 +232,7 @@ class CogManager:
 			if len(cog_list):
 				total_commands = 0
 				for cog in cog_list:
-					total_commands += len(self.bot.get_cog_commands(cog))
+					total_commands += len(self.bot.get_cog(cog).get_commands())
 				if len(cog_list) > 1:
 					comm = "total command"
 				else:

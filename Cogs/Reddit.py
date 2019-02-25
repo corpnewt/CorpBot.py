@@ -45,7 +45,7 @@ class MLStripper(HTMLParser):
 		return ''.join(self.fed)
 
 
-class Reddit:
+class Reddit(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings, posts : int = 100):

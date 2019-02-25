@@ -18,7 +18,7 @@ def setup(bot):
 
 # This is the xp module.  It's likely to be retarded.
 
-class Xp:
+class Xp(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -49,14 +49,14 @@ class Xp:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		self.is_current = False
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -72,6 +72,7 @@ class Xp:
 			return msg
 		
 	async def addXP(self):
+		print("Starting XP loop...")
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
 			try:

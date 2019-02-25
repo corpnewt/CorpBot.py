@@ -13,7 +13,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(TempRole(bot))
 
-class TempRole:
+class TempRole(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
@@ -25,7 +25,7 @@ class TempRole:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -66,7 +66,7 @@ class TempRole:
 		self.settings.role.add_roles(member, [role])
 		self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

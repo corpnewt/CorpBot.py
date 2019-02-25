@@ -9,7 +9,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(Boop(bot))
 
-class Boop:
+class Boop(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

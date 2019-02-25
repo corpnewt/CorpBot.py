@@ -16,7 +16,7 @@ def setup(bot):
 	auth = "corpSiteAuth.txt"
 	bot.add_cog(Search(bot, auth))
 
-class Search:
+class Search(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, auth_file: str = None):

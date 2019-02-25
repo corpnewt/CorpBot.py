@@ -34,7 +34,7 @@ def setup(bot):
 
 # This is the Bot module - it contains things like nickname, status, etc
 
-class Bot:
+class Bot(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, path = None, pypath = None):
@@ -48,7 +48,7 @@ class Bot:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -99,7 +99,7 @@ class Bot:
 		empty_cog = 0
 		for cog in self.bot.cogs:
 			visible = []
-			for c in self.bot.get_cog_commands(cog):
+			for c in self.bot.get_cog(cog).get_commands():
 				if c.hidden:
 					continue
 				visible.append(c)

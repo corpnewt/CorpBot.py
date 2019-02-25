@@ -5,7 +5,7 @@ from Cogs import GetImage
 def setup(bot):
     bot.add_cog(Emoji(bot))
 
-class Emoji:
+class Emoji(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

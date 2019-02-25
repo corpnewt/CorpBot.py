@@ -12,7 +12,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(Ascii(bot))
 	
-class Ascii:
+class Ascii(commands.Cog):
     
 	def __init__(self, bot):
 		self.bot = bot
