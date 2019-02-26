@@ -25,6 +25,7 @@ class Search(commands.Cog):
 		if os.path.isfile(auth_file):
 		        with open(auth_file, 'r') as f:
 		                self.site_auth = f.read()
+		self.key = "3a337666060f628a0a91"
 
 	@commands.command(pass_context=True)
 	async def google(self, ctx, *, query = None):
@@ -129,7 +130,7 @@ class Search(commands.Cog):
 			hasError = True
 
 		# Get the list of currencies
-		r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies")
+		r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies?apiKey="+self.key)
 
 		if hasError:
 			# Gather our currency list
@@ -158,14 +159,14 @@ class Search(commands.Cog):
 			return
 
 		# At this point, we should be able to convert
-		o = await DL.async_json("http://free.currencyconverterapi.com/api/v5/convert?q={}_{}&compact=y".format(frm.upper(), to.upper()))
-
+		o = await DL.async_json("http://free.currencyconverterapi.com/api/v6/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
+		
 		if not o:
 			await ctx.send("Whoops!  I couldn't get that :(")
 			return
 		
 		# Format the numbers
-		val = o[list(o)[0]]["val"]
+		val = o[list(o)[0]]
 		# Calculate the results
 		output = float(amount)*float(val)
 		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
