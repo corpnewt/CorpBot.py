@@ -9,7 +9,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(HighFive(bot))
 
-class HighFive:
+class HighFive(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot):

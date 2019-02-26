@@ -17,7 +17,7 @@ def setup(bot):
 
 # This module grabs Reddit posts and selects one at random
 
-class Cats:
+class Cats(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings, posts : int = 100):

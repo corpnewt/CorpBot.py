@@ -14,7 +14,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(MadLibs(bot, settings))
 
-class MadLibs:
+class MadLibs(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -30,7 +30,7 @@ class MadLibs:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

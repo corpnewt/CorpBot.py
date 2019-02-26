@@ -8,7 +8,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(EightBall(bot))
 
-class EightBall:
+class EightBall(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

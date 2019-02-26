@@ -5,7 +5,7 @@ import random
 def setup(bot):
     bot.add_cog(Groot(bot))
 
-class Groot:
+class Groot(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

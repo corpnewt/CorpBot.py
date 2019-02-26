@@ -17,7 +17,7 @@ def setup(bot):
 # This is the feed module.  It allows the bot to be fed,
 # get hungry, die, be resurrected, etc.
 
-class Feed:
+class Feed(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):
@@ -48,7 +48,7 @@ class Feed:
 				break
 		return False
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -56,7 +56,7 @@ class Feed:
 		for task in self.loop_list:
 			task.cancel()
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

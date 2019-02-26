@@ -15,7 +15,7 @@ def setup(bot):
 
 # Requires the mtranslate module be installed
 
-class Translate:
+class Translate(commands.Cog):
             
     def __init__(self, bot, settings, language_file = "Languages.json"):
         self.bot = bot

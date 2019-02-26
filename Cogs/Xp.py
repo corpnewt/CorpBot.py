@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import datetime
+import time
 import random
 from   discord.ext import commands
 from   operator import itemgetter
@@ -17,13 +18,13 @@ def setup(bot):
 
 # This is the xp module.  It's likely to be retarded.
 
-class Xp:
+class Xp(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.loop_list = []
+		self.is_current = False # Used for stopping loops
 
 	def _can_xp(self, user, server):
 		# Checks whether or not said user has access to the xp system
@@ -48,20 +49,20 @@ class Xp:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		for task in self.loop_list:
-			task.cancel()
+		self.is_current = False
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		self.loop_list.append(self.bot.loop.create_task(self.addXP()))
+		self.is_current = True
+		self.bot.loop.create_task(self.addXP())
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -71,121 +72,137 @@ class Xp:
 			return msg
 		
 	async def addXP(self):
+		print("Starting XP loop...")
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
-			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
-			print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
-			for server in self.bot.guilds:
-				# Iterate through the servers and add them
-				xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
-				xpAmount   = float(xpAmount/6)
-				xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
-				xpRAmount  = float(xpRAmount/6)
+			try:
+				await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
+				if not self.is_current:
+					# Bail if we're not the current instance
+					return
+				updates = await self.bot.loop.run_in_executor(None, self.update_xp)
+				t = time.time()
+				for update in updates:
+					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot)
+				# Sleep after for testing
+			except Exception as e:
+				print(str(e))
 
-				xpLimit    = self.settings.getServerStat(server, "XPLimit")
-				xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
+	def update_xp(self):
+		responses = []
+		t = time.time()
+		print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
+		# Get some values that don't require immediate query
+		server_dict = {}
+		for x in self.bot.get_all_members():
+			memlist = server_dict.get(str(x.guild.id), [])
+			memlist.append(x)
+			server_dict[str(x.guild.id)] = memlist
+		for server in server_dict:
+			# Iterate through the servers and add them
+			server = self.bot.get_guild(int(server))
+			xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
+			xpAmount   = float(xpAmount/6)
+			xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
+			xpRAmount  = float(xpRAmount/6)
+			
+			xpLimit    = self.settings.getServerStat(server, "XPLimit")
+			xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
+			
+			onlyOnline = self.settings.getServerStat(server, "RequireOnline")
+			requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
+			
+			for user in server_dict[server]:
 				
-				onlyOnline = self.settings.getServerStat(server, "RequireOnline")
-				requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-				
-				for user in server.members:
-					
-					if not self._can_xp(user, server):
-						continue
+				if not self._can_xp(user, server):
+					continue
 
-					bumpXP = False
-					if onlyOnline == False:
+				bumpXP = False
+				if onlyOnline == False:
+					bumpXP = True
+				else:
+					if user.status == discord.Status.online:
 						bumpXP = True
-					else:
-						if user.status == discord.Status.online:
-							bumpXP = True
 
-					# Check if we're blocked
-					xpblock = self.settings.getServerStat(server, "XpBlockArray")
-					if user.id in xpblock:
-						# No xp for you
-						continue
+				# Check if we're blocked
+				xpblock = self.settings.getServerStat(server, "XpBlockArray")
+				if user.id in xpblock:
+					# No xp for you
+					continue
 
-					for role in user.roles:
-						if role.id in xpblock:
-							bumpXP = False
-							break
-							
-					if bumpXP:
-						if xpAmount > 0:
-							# User is online add hourly xp reserve
-							
-							# First we check if we'll hit our limit
-							skip = False
-							if not xprLimit == None:
-								# Get the current values
-								newxp = self.settings.getUserStat(user, server, "XPReserve")
-								# Make sure it's this xpr boost that's pushing us over
-								# This would only push us up to the max, but not remove
-								# any we've already gotten
-								if newxp + xpAmount > xprLimit:
-									skip = True
-									if newxp < xprLimit:
-										self.settings.setUserStat(user, server, "XPReserve", xprLimit)
-							if not skip:
-								xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
-
-								if xpLeftover == None:
-									xpLeftover = 0
-								else:
-									xpLeftover = float(xpLeftover)
-								gainedXp = xpLeftover+xpAmount
-								gainedXpInt = int(gainedXp) # Strips the decimal point off
-								xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
-								self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
-								self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
+				for role in user.roles:
+					if role.id in xpblock:
+						bumpXP = False
+						break
 						
-						if xpRAmount > 0:
-							# User is online add hourly xp
-
-							# First we check if we'll hit our limit
-							skip = False
-							if not xpLimit == None:
-								# Get the current values
-								newxp = self.settings.getUserStat(user, server, "XP")
-								# Make sure it's this xpr boost that's pushing us over
-								# This would only push us up to the max, but not remove
-								# any we've already gotten
-								if newxp + xpRAmount > xpLimit:
-									skip = True
-									if newxp < xpLimit:
-										self.settings.setUserStat(user, server, "XP", xpLimit)
-							if not skip:
-								xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
-								if xpRLeftover == None:
-									xpRLeftover = 0
-								else:
-									xpRLeftover = float(xpRLeftover)
-								gainedXpR = xpRLeftover+xpRAmount
-								gainedXpRInt = int(gainedXpR) # Strips the decimal point off
-								xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
-								self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
-								self.settings.incrementStat(user, server, "XP", gainedXpRInt)
-
-							# Check our default channels
-							targetChan = server.get_channel(server.id)
-							targetChanID = self.settings.getServerStat(server, "DefaultChannel")
-							if len(str(targetChanID)):
-								# We *should* have a channel
-								tChan = self.bot.get_channel(int(targetChanID))
-								if tChan:
-									# We *do* have one
-									targetChan = tChan
+				if bumpXP:
+					if xpAmount > 0:
+						# User is online add hourly xp reserve
 						
-							# Check for promotion/demotion
-							try:
-								if targetChan:
-									await CheckRoles.checkroles(user, targetChan, self.settings, self.bot)
-								else:
-									# No channel - just pass the server, and we'll do without messages
-									await CheckRoles.checkroles(user, server, self.settings, self.bot)
-							except Exception:
-								continue
+						# First we check if we'll hit our limit
+						skip = False
+						if not xprLimit == None:
+							# Get the current values
+							newxp = self.settings.getUserStat(user, server, "XPReserve")
+							# Make sure it's this xpr boost that's pushing us over
+							# This would only push us up to the max, but not remove
+							# any we've already gotten
+							if newxp + xpAmount > xprLimit:
+								skip = True
+								if newxp < xprLimit:
+									self.settings.setUserStat(user, server, "XPReserve", xprLimit)
+						if not skip:
+							xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
+
+							if xpLeftover == None:
+								xpLeftover = 0
+							else:
+								xpLeftover = float(xpLeftover)
+							gainedXp = xpLeftover+xpAmount
+							gainedXpInt = int(gainedXp) # Strips the decimal point off
+							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
+							self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
+							self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
+					
+					if xpRAmount > 0:
+						# User is online add hourly xp
+
+						# First we check if we'll hit our limit
+						skip = False
+						if not xpLimit == None:
+							# Get the current values
+							newxp = self.settings.getUserStat(user, server, "XP")
+							# Make sure it's this xpr boost that's pushing us over
+							# This would only push us up to the max, but not remove
+							# any we've already gotten
+							if newxp + xpRAmount > xpLimit:
+								skip = True
+								if newxp < xpLimit:
+									self.settings.setUserStat(user, server, "XP", xpLimit)
+						if not skip:
+							xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
+							if xpRLeftover == None:
+								xpRLeftover = 0
+							else:
+								xpRLeftover = float(xpRLeftover)
+							gainedXpR = xpRLeftover+xpRAmount
+							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
+							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
+							self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
+							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
+
+						# Check our default channels
+						targetChan = None
+						targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+						if len(str(targetChanID)):
+							# We *should* have a channel
+							tChan = self.bot.get_channel(int(targetChanID))
+							if tChan:
+								# We *do* have one
+								targetChan = tChan
+						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server))})
+		print("XP Done - took {} seconds.".format(time.time() - t))
+		return responses
 
 	@commands.command(pass_context=True)
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
@@ -804,7 +821,12 @@ class Xp:
 	@commands.command(pass_context=True)
 	async def leaderboard(self, ctx, total : int = 10):
 		"""List the top xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
+		message = await ctx.send("Counting xp...")
+		promoArray = {}
+		for x in self.bot.get_all_members():
+			if not x.guild.id == ctx.guild.id:
+				continue
+			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
 		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
@@ -839,15 +861,19 @@ class Xp:
 
 			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
-		await ctx.message.channel.send(msg)
+		await message.edit(content=msg)
 
 		
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
 	async def bottomxp(self, ctx, total : int = 10):
 		"""List the bottom xp-holders (max of 50)."""
-		promoArray = self.settings.getServerStat(ctx.message.guild, "Members")
-		# promoSorted = sorted(promoArray, key=itemgetter('XP'))
+		message = await ctx.send("Counting xp...")
+		promoArray = {}
+		for x in self.bot.get_all_members():
+			if not x.guild.id == ctx.guild.id:
+				continue
+			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
 		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
 
 		startIndex = 0
@@ -880,7 +906,7 @@ class Xp:
 				cMemberDisplay = promoSorted[index]
 			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
 
-		await ctx.message.channel.send(msg)
+		await message.edit(content=msg)
 		
 		
 	# List the xp and xp reserve of a user

@@ -10,19 +10,20 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(IntelArk(bot))
 	
-class IntelArk:
+class IntelArk(commands.Cog):
     
 	def __init__(self, bot):
 		self.bot = bot
 		self.fields = {
 			"ProcessorNumber": "Processor Name",
 			"ProcessorBrandName": "Processor Brand String",
-			"BornOnData": "Release Date",
+			"BornOnDate": "Release Date",
 			"ClockSpeed": "Base Clock",
 			"ClockSpeedMax": "Max Clock",
 			"CoreCount": "Cores",
 			"ThreadCount": "Threads",
 			"MaxMem": "Max Memory",
+			"MaxTDP": "Max TDP",
 			"GraphicsModel": "Onboard Graphics",
 			"InstructionSet": "Instruction Set",
 			"InstructionSetExtensions": "Extensions"
@@ -55,6 +56,7 @@ class IntelArk:
 
 		# Process the search terms
 		search_url = "https://ark.intel.com/search/AutoComplete?term={}".format(urllib.parse.quote(text))
+		print(search_url)
 		try:
 			# Get the response
 			response = await DL.async_json(search_url)
@@ -71,7 +73,6 @@ class IntelArk:
 		# Let's see if we have one match that reeeeeaaallly matches
 		# We're going to split the label at Processor, and again at ( to try to isolate
 		if len(response) > 1:
-			print("Got responses")
 			got = None
 			for x in response:
 				try:
@@ -135,7 +136,7 @@ class IntelArk:
 
 		await Message.Embed(
 			thumbnail=response.get("BrandBadge",None),
-			pm_after=11,
+			pm_after=12,
 			title=response.get("ProductName","Intel Ark Search"),
 			fields=fields,
 			url=response.get("Link",None),

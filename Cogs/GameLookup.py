@@ -186,7 +186,7 @@ def setup(bot):
     settings = bot.get_cog("Settings")
     bot.add_cog(GameLookup(bot, settings, key))
 
-class GameLookup:
+class GameLookup(commands.Cog):
     def __init__(self, bot, settings, key):
         self.bot = bot
         self.settings = settings

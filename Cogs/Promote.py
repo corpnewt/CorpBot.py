@@ -16,7 +16,7 @@ def setup(bot):
 
 # This module is for auto promoting/demoting of roles - admin only
 
-class Promote:
+class Promote(commands.Cog):
 
     # Init with the bot reference, and a reference to the settings var
     def __init__(self, bot, settings):

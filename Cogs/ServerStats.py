@@ -13,7 +13,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(ServerStats(bot, settings))
 
-class ServerStats:
+class ServerStats(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
@@ -98,6 +98,7 @@ class ServerStats:
         server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
+        server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id+1, self.bot.shard_count), inline=True)
 	# Find out where in our join position this server is
         joinedList = []
         popList    = []

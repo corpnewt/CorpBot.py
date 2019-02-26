@@ -14,7 +14,7 @@ def setup(bot):
     settings = bot.get_cog("Settings")
     bot.add_cog(Plist(bot, settings))
 
-class Plist:
+class Plist(commands.Cog):
 
     # Init with the bot reference
     def __init__(self, bot, settings):

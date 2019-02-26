@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+from discord.ext import commands
 from Cogs import DisplayName
 from Cogs import Nullify
 
@@ -9,7 +10,7 @@ def setup(bot):
     settings = bot.get_cog("Settings")
     bot.add_cog(Mute(bot, settings))
 
-class Mute:
+class Mute(commands.Cog):
 
     # Init with the bot reference, and a reference to the settings var
     def __init__(self, bot, settings):
@@ -29,7 +30,7 @@ class Mute:
                 cd = mem["Cooldown"]
                 await self.mute(member, server, cd)
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_unloaded_extension(self, ext):
         # Called to shut things down
         if not self._is_submodule(ext.__name__, self.__module__):
@@ -37,7 +38,7 @@ class Mute:
         for task in self.loop_list:
             task.cancel()
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_loaded_extension(self, ext):
         # See if we were loaded
         if not self._is_submodule(ext.__name__, self.__module__):
@@ -180,6 +181,8 @@ class Mute:
         if not found:
             muteList.append({ 'ID': member.id, 'Cooldown': cooldown, 'Added' : int(time.time()) })
         
+        self.settings.setServerStat(server, "MuteList", muteList)
+        
         if not cooldown == None:
             # We have a cooldown - set a timer
             self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
@@ -221,3 +224,4 @@ class Mute:
             if str(entry['ID']) == str(member.id):
                 # Found them - remove from the mutelist
                 muteList.remove(entry)
+        self.settings.setServerStat(server, "MuteList", muteList)

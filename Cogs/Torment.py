@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the Torment module. It spams the target with pings for awhile
 
-class Torment:
+class Torment(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

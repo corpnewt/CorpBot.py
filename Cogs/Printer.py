@@ -16,7 +16,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Printer(bot, settings))
 
-class Printer:
+class Printer(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, settings):
@@ -96,7 +96,7 @@ class Printer:
 		url = member.avatar_url
 		if not len(url):
 			url = member.default_avatar_url
-		url = url.split("?size=")[0]
+		# url = url.split("?size=")[0]
 		name = DisplayName.name(member)
 		if name[-1].lower() == "s":
 			name += "' Avatar"
@@ -124,7 +124,7 @@ class Printer:
 			url = test_user.avatar_url
 			if not len(url):
 				url = test_user.default_avatar_url
-			url = url.split("?size=")[0]
+			# url = url.split("?size=")[0]
 
 		message = await ctx.send("Downloading...")
 		

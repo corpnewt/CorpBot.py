@@ -11,7 +11,7 @@ def setup(bot):
     settings = bot.get_cog("Settings")
     bot.add_cog(Spooktober(bot, settings))
 
-class Spooktober:
+class Spooktober(commands.Cog):
     
     def __init__(self, bot, settings):
         self.bot = bot

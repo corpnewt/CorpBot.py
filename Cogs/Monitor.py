@@ -11,7 +11,7 @@ def setup(bot):
 
 # This is the Monitor module. It keeps track of how many messages fail
 
-class Monitor:
+class Monitor(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, settings):

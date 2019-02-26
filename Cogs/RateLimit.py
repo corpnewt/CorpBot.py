@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the RateLimit module. It keeps users from being able to spam commands
 
-class RateLimit:
+class RateLimit(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -39,10 +39,7 @@ class RateLimit:
 		ignore = False
 
 		# Get current delay
-		try:
-			currDelay = self.settings.serverDict['CommandCooldown']
-		except KeyError:
-			currDelay = self.commandCooldown
+		currDelay = self.settings.getGlobalStat("CommandCooldown",self.commandCooldown)
 		
 		# Check if we can run commands
 		try:
@@ -84,10 +81,7 @@ class RateLimit:
 			return
 
 		# Get current delay
-		try:
-			currDelay = self.settings.serverDict['CommandCooldown']
-		except KeyError:
-			currDelay = self.commandCooldown
+		currDelay = self.settings.getGlobalStat("CommandCooldown",self.commandCooldown)
 		
 		if delay == None:
 			if currDelay == 1:
@@ -113,7 +107,7 @@ class RateLimit:
 				await ctx.channel.send('Cooldown cannot be more than *{} seconds*.'.format(self.maxCooldown))
 			return
 		
-		self.settings.serverDict['CommandCooldown'] = delay
+		self.settings.setGlobalStat("CommandCooldown",delay)
 		if delay == 1:
 			await ctx.channel.send('Current command cooldown is now *1 second.*')
 		else:

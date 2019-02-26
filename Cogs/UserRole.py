@@ -11,7 +11,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(UserRole(bot, settings))
 
-class UserRole:
+class UserRole(commands.Cog):
 	
 	def __init__(self, bot, settings):
 		self.bot = bot
@@ -21,7 +21,7 @@ class UserRole:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 		
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -29,7 +29,7 @@ class UserRole:
 		for task in self.loop_list:
 			task.cancel()
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

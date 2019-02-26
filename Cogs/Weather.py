@@ -12,7 +12,7 @@ def setup(bot):
 	bot.add_cog(Weather(bot))
 
 # This is the Weather module
-class Weather:
+class Weather(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

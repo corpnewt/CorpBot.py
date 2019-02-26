@@ -17,7 +17,7 @@ def setup(bot):
 
 # This is the lists module.
 
-class Lists:
+class Lists(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

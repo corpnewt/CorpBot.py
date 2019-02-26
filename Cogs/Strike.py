@@ -26,7 +26,7 @@ def setup(bot):
 # 2 = Already been kicked (id in kick list)
 # 3 = Already been banned (auto-mute)
 
-class Strike:
+class Strike(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, mute):
@@ -62,7 +62,7 @@ class Strike:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
@@ -70,7 +70,7 @@ class Strike:
 		for task in self.loop_list:
 			task.cancel()
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

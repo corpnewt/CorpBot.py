@@ -34,7 +34,8 @@ async def get_prefix(bot, message):
 	return (serverPrefix, "<@!{}> ".format(bot.user.id), "<@{}> ".format(bot.user.id))
 
 # This should be the main soul of the bot - everything should load from here
-bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
+# bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
+bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
 # Initialize some things
 jsonFile = "Settings.json"
 deckFile = "deck.json"

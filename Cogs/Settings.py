@@ -132,7 +132,7 @@ class RoleManager:
 # This is the settings module - it allows the other modules to work with
 # a global settings variable and to make changes
 
-class Settings:
+class Settings(commands.Cog):
 	"""The Doorway To The Server Settings"""
 	# Let's initialize with a file location
 	def __init__(self, bot, prefix = "$", file : str = None):
@@ -682,6 +682,17 @@ class Settings:
 			if not newUser["XPReserve"]:
 				newUser["XPReserve"] = 0
 			self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)] = newUser
+
+	# Global Stat
+
+	def getGlobalStat(self, stat, default = None):
+		return self.serverDict.get(stat, default)
+
+	def setGlobalStat(self, stat, value):
+		self.self.serverDict[stat] = value
+
+	def delGlobalStat(self, stat):
+		return self.serverDict.pop(stat,None)
 
 
 	# Let's make sure the user is in the specified server

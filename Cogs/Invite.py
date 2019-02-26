@@ -7,7 +7,7 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(Invite(bot))
 
-class Invite:
+class Invite(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):

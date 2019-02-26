@@ -175,7 +175,7 @@ class SenCheck:
             total += self.check(s, pers)
         return total
 
-class CAH:
+class CAH(commands.Cog):
 
     # Init with the bot reference, and a reference to the deck file
     def __init__(self, bot, prefix = "$", file = None):
@@ -223,7 +223,7 @@ class CAH:
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_unloaded_extension(self, ext):
         # Called to shut things down
         if not self._is_submodule(ext.__name__, self.__module__):
@@ -231,7 +231,7 @@ class CAH:
         for task in self.loop_list:
             task.cancel()
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_loaded_extension(self, ext):
         # See if we were loaded
         if not self._is_submodule(ext.__name__, self.__module__):

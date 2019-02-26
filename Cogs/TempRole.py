@@ -13,22 +13,24 @@ def setup(bot):
 	# Add the bot
 	bot.add_cog(TempRole(bot))
 
-class TempRole:
+class TempRole(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
 		self.settings = self.bot.get_cog("Settings")
+		self.is_current = False # Used for stopping loops
 		self.loop_list = []
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_unloaded_extension(self, ext):
 		# Called to shut things down
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		self.is_current = False
 		for task in self.loop_list:
 			task.cancel()
 
@@ -64,14 +66,27 @@ class TempRole:
 		self.settings.role.add_roles(member, [role])
 		self.loop_list.append(self.bot.loop.create_task(self.check_temp_roles(member, temp_role)))
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		self.is_current = True
+		self.bot.loop.create_task(self.start_loading())
+
+	async def start_loading(self):
+		await self.bot.wait_until_ready()
+		await self.bot.loop.run_in_executor(None, self.check_temp)
+		
+	def check_temp(self):
 		# Check if we need to set any role removal timers
+		t = time.time()
+		print("Verifying Temp Roles...")
 		for server in self.bot.guilds:
 			for member in server.members:
+				if not self.is_current:
+					# Bail if we're not the current instance
+					return
 				temp_roles = self.settings.getUserStat(member, server, "TempRoles")
 				if len(temp_roles):
 					# We have a list
@@ -93,6 +108,7 @@ class TempRole:
 					if len(remove_temps):
 						for temp in remove_temps:
 							temp_roles.remove(temp)
+		print("Temp Roles Done - took {} seconds.".format(time.time() - t))
 							
 	def _remove_task(self, task):
 		if task in self.loop_list:
@@ -766,7 +782,7 @@ class TempRole:
 			temp_role["Cooldown"] = cooldown + int(time.time()) if cooldown != None else cooldown
 			temp_role["AddedBy"] = ctx.author.id
 			user_roles.append(temp_role)
-			self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
+		self.settings.setUserStat(member_from_name, ctx.guild, "TempRoles", user_roles)
 		if not role_from_name in member_from_name.roles:
 			self.settings.role.add_roles(member_from_name, [role_from_name])
 		if not cooldown == None:

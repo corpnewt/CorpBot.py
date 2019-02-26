@@ -28,7 +28,7 @@ if not discord.opus.is_loaded():
     # note that on windows this DLL is automatically provided for you
     discord.opus.load_opus('opus')
 
-class Example:
+class Example(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
@@ -459,7 +459,7 @@ class VoiceState:
             entry = VoiceEntry(ctx.message, self.voice, title, duration, ctx)
             return entry
 
-class Music:
+class Music(commands.Cog):
     """Voice related commands.
 
     Works in multiple servers at once.
@@ -476,7 +476,7 @@ class Music:
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_loaded_extension(self, ext):
         # See if we were loaded
         if not self._is_submodule(ext.__name__, self.__module__):
@@ -566,7 +566,7 @@ class Music:
         # If we're here - we're not admin, and not in the same channel, deny
         return False
 
-    @asyncio.coroutine
+    @commands.Cog.listener()
     async def on_voice_state_update(self, user, beforeState, afterState):
         if not user.guild:
             return
@@ -622,11 +622,7 @@ class Music:
             return
         
         if max_songs == None:
-            lev = 25
-            try:
-                lev = self.settings.serverDict['PlistMax']
-            except KeyError:
-                pass
+            lev = self.settings.getGlobalStat("PlistMax",25)
             if lev == -1:
                 await ctx.channel.send("The current playlist max is set to: *All songs*")
             elif lev == 1:
@@ -641,7 +637,7 @@ class Music:
                 return
             if max_songs < -1:
                 max_songs = -1
-            self.settings.serverDict['PlistMax'] = max_songs
+            self.settings.setGlobalStat("PlistMax",max_songs)
             if max_songs == -1:
                 await ctx.channel.send("The playlist max is now set to: *All songs*")
             elif max_songs == 1:
@@ -667,11 +663,7 @@ class Music:
             return
         
         if delay == None:
-            lev = 3
-            try:
-                lev = self.settings.serverDict['PlistDelay']
-            except KeyError:
-                pass
+            lev = self.settings.getGlobalStat("PlistDelay",3)
             if lev == 1:
                 await ctx.channel.send("The current playlist load delay is set to: *1 second*")
             else:
@@ -684,7 +676,7 @@ class Music:
                 return
             if delay < 0:
                 delay = 0
-            self.settings.serverDict['PlistDelay'] = delay
+            self.settings.setGlobalStat("PlistDelay",delay)
             if delay == 1:
                 await ctx.channel.send("The playlist load delay is now set to: *1 second*")
             else:
@@ -713,13 +705,8 @@ class Music:
 
         if level == None:
             # Get the current level
-            lev = 4
             pword = "Disabled"
-            try:
-                lev = self.settings.serverDict['PlistLevel']
-            except KeyError:
-                pass
-
+            lev = self.settings.getGlobalStat("PlistLevel",4)
             if lev == 0:
                 pword = "Everyone"
             elif lev == 1:
@@ -747,7 +734,7 @@ class Music:
                 pword = "Admins"
             elif level == 3:
                 pword = "Owner"
-            self.settings.serverDict['PlistLevel'] = level
+            self.settings.setGlobalStat("PlistLevel",level)
             await ctx.channel.send("Playlist level is now set to: *{} ({})*".format(pword, level))
 
     @commands.command(pass_context=True, no_pm=True)
@@ -995,21 +982,9 @@ class Music:
             author_perms = 3
 
         # Get server info
-        playlist_level = 4
-        try:
-            playlist_level = self.settings.serverDict['PlistLevel']
-        except KeyError:
-            pass
-        playlist_max = 25
-        try:
-            playlist_max = self.settings.serverDict['PlistMax']
-        except KeyError:
-            pass
-        playlist_delay = 3
-        try:
-            playlist_delay = self.settings.serverDict['PlistDelay']
-        except KeyError:
-            pass
+        playlist_level = self.settings.getGlobalStat("PlistLevel",4)
+        playlist_max   = self.settings.getGlobalStat("PlistMax", 25)
+        playlist_delay = self.settings.getGlobalStat("PlistDelay",3)
         
         if author_perms >= playlist_level:
             plist = True

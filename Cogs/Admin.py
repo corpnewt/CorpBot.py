@@ -19,7 +19,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Admin(bot, settings))
 
-class Admin:
+class Admin(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -102,10 +102,7 @@ class Admin:
 			delete = False
 
 		# Get Owner and OwnerLock
-		try:
-			ownerLock = self.settings.serverDict['OwnerLock']
-		except KeyError:
-			ownerLock = False
+		ownerLock = self.settings.getGlobalStat("OwnerLock",False)
 		owner = self.settings.isOwner(message.author)
 		# Check if owner exists - and we're in OwnerLock
 		if (not owner) and ownerLock:

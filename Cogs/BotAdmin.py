@@ -16,7 +16,7 @@ def setup(bot):
 	mute     = bot.get_cog("Mute")
 	bot.add_cog(BotAdmin(bot, settings, mute))
 
-class BotAdmin:
+class BotAdmin(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings, muter):
@@ -40,8 +40,6 @@ class BotAdmin:
 			suppress = True
 		else:
 			suppress = False
-
-		serverDict = self.settings.serverDict
 
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
@@ -335,6 +333,7 @@ class BotAdmin:
 		if not found:
 			# Let's ignore someone
 			ignoreList.append({ "Name" : member.name, "ID" : member.id })
+			self.settings.setServerStat(ctx.message.guild, "IgnoredUsers", ignoreList)
 			msg = '*{}* is now being ignored.'.format(DisplayName.name(member))
 
 		await ctx.channel.send(msg)
@@ -394,6 +393,7 @@ class BotAdmin:
 				found = True
 				msg = '*{}* no longer being ignored.'.format(DisplayName.name(member))
 				ignoreList.remove(user)
+				self.settings.setServerStat(ctx.message.guild, "IgnoredUsers", ignoreList)
 
 		if not found:
 			# Whatchu talkin bout Willis?

@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the DisableCommand module. It allows servers to enable/disable specific commands
 
-class DisableCommand:
+class DisableCommand(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -63,7 +63,7 @@ class DisableCommand:
 		# Get our cog
 		our_cog = self.__module__.split(".")[1]
 		# Build a list of commands
-		our_comm_list = [c.name for c in self.bot.get_cog_commands(our_cog)]
+		our_comm_list = [c.name for c in self.bot.get_cog(our_cog).get_commands()]
 		# Add our cog name to the list
 		our_comm_list.append(our_cog)
 		return our_comm_list
@@ -83,7 +83,7 @@ class DisableCommand:
 			if cog in self.exceptions:
 				# Skip exceptions
 				continue
-			for c in self.bot.get_cog_commands(cog):
+			for c in self.bot.get_cog(cog).get_commands():
 				if c.name == command:
 					if c.hidden or c in self.exceptions:
 						return None
@@ -98,7 +98,7 @@ class DisableCommand:
 		if cog in self.exceptions:
 			return None
 		command_list = []
-		for c in self.bot.get_cog_commands(cog):
+		for c in self.bot.get_cog(cog).get_commands():
 			if not c.hidden and not c in self.exceptions:
 				command_list.append(c.name)
 		return command_list
@@ -109,7 +109,7 @@ class DisableCommand:
 		for cog in self.bot.cogs:
 			if cog in self.exceptions:
 				continue
-			for c in self.bot.get_cog_commands(cog):
+			for c in self.bot.get_cog(cog).get_commands():
 				if not c.hidden and not c in self.exceptions:
 					command_list.append(c.name)
 		return command_list

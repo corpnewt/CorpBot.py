@@ -11,7 +11,7 @@ def setup(bot):
 
 # This is the message xp module.  It's also likely to be retarded.
 
-class MessageXp:
+class MessageXp(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

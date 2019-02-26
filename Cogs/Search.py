@@ -16,7 +16,7 @@ def setup(bot):
 	auth = "corpSiteAuth.txt"
 	bot.add_cog(Search(bot, auth))
 
-class Search:
+class Search(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, auth_file: str = None):
@@ -166,8 +166,9 @@ class Search:
 		
 		# Format the numbers
 		val = o[list(o)[0]]["val"]
-		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
+		# Calculate the results
 		output = float(amount)*float(val)
+		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
 		output = "{:,}".format(int(output)) if int(output) == float(output) else "{:,f}".format(output).rstrip("0")
 		await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(), output, str(to).upper()))
 

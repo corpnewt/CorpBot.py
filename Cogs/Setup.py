@@ -12,7 +12,7 @@ def setup(bot):
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
-class Setup:
+class Setup(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

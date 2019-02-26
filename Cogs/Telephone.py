@@ -15,7 +15,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Telephone(bot, settings))
 
-class Telephone:
+class Telephone(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
@@ -34,12 +34,12 @@ class Telephone:
 			return msg
 
 	# Proof-of-concept placeholders
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_message_context(self, ctx, message):
 		return
 
 	# Now in Main.py
-	"""@asyncio.coroutine
+	"""@commands.Cog.listener()
 	async def on_message(self, message):
 		context = await self.bot.get_context(message)
 		self.bot.dispatch("message_context", context, message)
@@ -49,7 +49,7 @@ class Telephone:
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 
-	@asyncio.coroutine
+	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):

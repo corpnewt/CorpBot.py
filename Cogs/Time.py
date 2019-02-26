@@ -16,7 +16,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Time(bot, settings))
 
-class Time:
+class Time(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):

@@ -11,7 +11,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Encode(bot, settings))
 
-class Encode:
+class Encode(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, settings):

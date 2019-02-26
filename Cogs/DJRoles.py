@@ -10,7 +10,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(DJRoles(bot, settings))
 
-class DJRoles:
+class DJRoles(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var and xp var
 	def __init__(self, bot, settings):
