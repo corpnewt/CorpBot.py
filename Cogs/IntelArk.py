@@ -49,91 +49,56 @@ class IntelArk(commands.Cog):
 			await Message.EmbedText(**args).send(ctx)
 			return
 
+		# Strip single quotes
+		text = text.replace("'","")
+		if not len(text):
+			await Message.EmbedText(**args).send(ctx)
+			return
+
 		# message = await Message.EmbedText(title="Intel Ark Search",description="Gathering info...",color=ctx.author,footer="Powered by http://ark.intel.com").send(ctx)
 
 		args["description"] = "Gathering info..."
 		message = await Message.EmbedText(**args).send(ctx)
 
-		# Process the search terms
-		search_url = "https://ark.intel.com/search/AutoComplete?term={}".format(urllib.parse.quote(text))
-		print(search_url)
-		try:
-			# Get the response
-			response = await DL.async_json(search_url)
-		except:
-			response = []
-
-		# Strip out those without a category
-		response = [x for x in response if x.get("category","") != ""]
+		search_url = "https://odata.intel.com/API/v1_0/Products/Processors()?&$filter=substringof(%27{}%27,ProductName)&$format=json&$top=3".format(urllib.parse.quote(text))
+		#try:
+		# Get the response
+		response = await DL.async_json(search_url)
+		response = response["d"]
+		#except:
+		#	response = []
+		# Check if we got nothing
 		if not len(response):
 			args["description"] = "No results returned for `{}`.".format(text.replace("`",""))
 			await Message.EmbedText(**args).edit(ctx, message)
 			return
-
-		# Let's see if we have one match that reeeeeaaallly matches
-		# We're going to split the label at Processor, and again at ( to try to isolate
-		if len(response) > 1:
-			got = None
-			for x in response:
-				try:
-					if "Core" in x["label"]:
-						# Core [model] Processor
-						match_string = x["label"].split("Core™ ")[1].split(" Processor")[0].lower()
-					else:
-						# Processor [model] (...
-						match_string = x["label"].split("Processor ")[1].split(" (")[0].lower()
-					if match_string == text.lower() or match_string.split("-")[1].lower() == text.lower():
-						# Exact match!
-						got = x
-						break
-				except:
-					# Probably incorrect formatting - bail
-					pass
-			response = [got] if got else response
-
-		# Set to our first match
-		if len(response) > 1:
-			# Trim to a max of 5
-			if len(response) > 5:
-				response = response[0:5]
-			index, message = await PickList.Picker(
-				message=message,
-				title="Multiple Matches Returned For `{}`:".format(text.replace("`","")),
-				list=[x["label"] for x in response],
-				ctx=ctx
-			).pick()
-			if index < 0:
-				args["description"] = "Search cancelled."
-				await Message.EmbedText(**args).edit(ctx, message)
-				return
-			# Got something
-			response = response[index]
-			args["description"] = "Gathering info for `{}`...".format(response["label"])
-			message = await Message.EmbedText(**args).edit(ctx, message)
-		else:
+		elif len(response) == 1:
+			# Set it to the first item
 			response = response[0]
-		
-		# Get the product id - if it exists
-		if "id" in response:
-			# Gather a new query
-			prod_url = "https://odata.intel.com/API/v1_0/Products/Processors()?&$filter={}&$format=json".format(urllib.parse.quote("ProductId eq "+str(response["id"])))
-			try:
-				# Get the product info
-				res = await DL.async_json(prod_url)
-				# Grab the first result
-				response = res["d"][0]
-			except:
-				pass
-		
-		if not any([x for x in self.fields if x in response]):
-			# None of our fields match - return no results error
-			args["description"] = "No results returned for `{}`.".format(text.replace("`",""))
-			await Message.EmbedText(**args).edit(ctx, message)
-			return
-
-		# Setup for embed
+		# Check if we got more than one result (either not exact, or like 4790 vs 4790k)
+		elif len(response) > 1:
+			# Check the top result - and if the ProcessorNumber == our search term - we good
+			proc_num = response[0].get("ProcessorNumber","")
+			if proc_num.lower().strip() == text.lower().strip():
+				# found it
+				response = response[0]
+			else:
+				# Not exact - let's give options
+				index, message = await PickList.Picker(
+					message=message,
+					title="Multiple Matches Returned For `{}`:".format(text.replace("`","")),
+					list=[x["ProcessorNumber"] for x in response],
+					ctx=ctx
+				).pick()
+				if index < 0:
+					args["description"] = "Search cancelled."
+					await Message.EmbedText(**args).edit(ctx, message)
+					return
+				# Got something
+				response = response[index]
+		# At this point - we should have a single response
+		# Let's format and display.
 		fields = [{"name":self.fields[x], "value":response.get(x,None), "inline":True} for x in self.fields]
-
 		await Message.Embed(
 			thumbnail=response.get("BrandBadge",None),
 			pm_after=12,
