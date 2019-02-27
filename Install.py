@@ -167,10 +167,10 @@ if __name__ == '__main__':
         {"name":"mtranslate"},
         {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
-        {"name":"weather-api"},
         {"name":"pymongo"},
         {"name":"igdb_api_python"},
-        {"name":"redis"}
+        {"name":"redis"},
+        {"name":"geopy"}
     ]
     item = 0
     for module in modules:
