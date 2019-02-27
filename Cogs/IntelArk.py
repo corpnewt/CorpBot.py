@@ -60,7 +60,7 @@ class IntelArk(commands.Cog):
 		args["description"] = "Gathering info..."
 		message = await Message.EmbedText(**args).send(ctx)
 
-		search_url = "https://odata.intel.com/API/v1_0/Products/Processors()?&$filter=substringof(%27{}%27,ProductName)&$format=json&$top=3".format(urllib.parse.quote(text))
+		search_url = "https://odata.intel.com/API/v1_0/Products/Processors()?&$filter=substringof(%27{}%27,ProductName)&$format=json&$top=5".format(urllib.parse.quote(text))
 		#try:
 		# Get the response
 		response = await DL.async_json(search_url)
