@@ -1,11 +1,12 @@
 import asyncio
 import discord
-import weather
+from geopy.geocoders import Nominatim
 import re
 from   discord.ext import commands
 from   Cogs import Message
 from   Cogs import PickList
 from   Cogs import Nullify
+from   Cogs import DL
 
 def setup(bot):
 	# Add the bot
@@ -17,7 +18,8 @@ class Weather(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-		self.weather = weather.Weather()
+		self.key = "412efff445b9e3ba1f1e80b083b6b3d4"
+		self.geo = Nominatim(user_agent="CorpBot")
 
 	def _get_output(self, w_text):
 		if "tornado" in w_text.lower():
@@ -123,35 +125,46 @@ class Weather(commands.Cog):
 			return
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		location = self.weather.lookup_by_location(city_name)
-		if not location:
+		location = self.geo.geocode(city_name)
+		r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
+			self.key,
+			location.latitude,
+			location.longitude
+		))
+		if r["cod"] == "404":
 			await ctx.send("I couldn't find that city...")
 			return
-		location_info = location.location
-		title = "{}, {} ({})".format(location_info.city, location_info.country, location_info.region[1:])
-		
-		response_list = ["Current Weather", "10-Day Forecast", "Both"]
-		index, message = await PickList.Picker(
-			list=response_list, 
-			title="Please select an option for `{}`:".format(title.replace('`', '\\`')),
-			ctx=ctx
-			).pick()
+		# Gather the city info - and parse the weather info
+		main    = r["main"]
+		weath   = r["weather"]
+		# Make sure we get the temps in both F and C
+		tc   = self._k_to_c(main["temp"])
+		tf   = self._c_to_f(tc)
+		minc = self._k_to_c(main["temp_min"])
+		minf = self._c_to_f(minc)
+		maxc = self._k_to_c(main["temp_max"])
+		maxf = self._c_to_f(maxc)
 
-		if index < 0:
-			# Aborted!
-			await message.edit(content="Forecast cancelled!")
-			return
-		if index == 0 or index == 2:
-			# Build the public response
-			current = "__**Current Weather**__:\n\n{}, {} °F ({} °C)".format(self._get_output(location.condition.text), int(self._c_to_f(location.condition.temp)), location.condition.temp)
-			await Message.EmbedText(title=title, description=current, color=ctx.author, footer="Powered by Yahoo Weather").edit(ctx, message)
-		if index == 1 or index == 2:
-			current = "__**Future Forecast:**__"
-			fields = []
-			for f in location.forecast:
-				fields.append({ "name" : f.date, "value" : self._get_output(f.text) + ", {}/{} °F ({}/{} °C)".format(self._c_to_f(f.high), self._c_to_f(f.low), f.high, f.low), "inline" : False })
-			mess = await Message.Embed(title=title, description=current, fields=fields, color=ctx.author, pm_after=0, footer="Powered by Yahoo Weather").send(ctx)
-			if mess.channel == ctx.author.dm_channel and not index == 2:
-				await message.edit(content="Forecast sent to you in dm!")
-				return
-		await message.edit(content=" ")
+		title = location.address
+		# Gather the formatted conditions
+		weath_list = []
+		for x,y in enumerate(weath):
+			d = y["description"]
+			if x == 0:
+				d = d.capitalize()
+			weath_list.append(self._get_output(d))
+		condition = ", ".join(weath_list)
+		# Format the description
+		desc = "__**Current Forecast:**__\n\n{}, {} °F ({} °C)\n\n__**High/Low:**__\n\n{} °F ({} °C) / {} °F ({} °C)".format(
+			condition,
+			tf, tc,
+			maxf, maxc,
+			minf, minc
+		)
+		# Let's post it!
+		await Message.EmbedText(
+			title=title,
+			description=desc,
+			color=ctx.author,
+			footer="Powered by OpenWeatherMap"
+		).send(ctx)
