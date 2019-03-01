@@ -4,8 +4,16 @@ import re
 from   discord.ext import commands
 from   Cogs import Nullify
 
-def setup(bot):
-	# This module isn't actually a cog
+# Stupid global vars because I didn't plan this
+# out correctly... sigh...
+bot = None
+
+def setup(bot_start):
+	# This module isn't actually a cog - but it is a place
+    # we can start small fires and watch them burn the entire
+    # house to the ground.
+    global bot
+    bot = bot_start
     return
 
 def clean_message(message, *, bot = None, server = None, nullify = True):
@@ -69,23 +77,37 @@ def name(member : discord.Member):
     return None
 
 def memberForID(checkid, server):
+    if server == None:
+        mems = bot.users
+    else:
+        mems = server.members
     try:
         checkid = int(checkid)
     except:
         return None
-    for member in server.members:
+    for member in mems:
         if member.id == checkid:
             return member
     return None
 
 def memberForName(name, server):
+    if server == None:
+        # No server passed - this is likely happening
+        # in dm - let's get a user as-is.
+        mems = bot.users
+    else:
+        # We got a server - let's get that server's members
+        mems = server.members
     # Check nick first - then name
     name = str(name)
-    for member in server.members:
+    for member in mems:
+        if not hasattr(member,"nick"):
+            # No nick property - must be a user, bail
+            break
         if member.nick:
             if member.nick.lower() == name.lower():
                 return member
-    for member in server.members:
+    for member in mems:
         if member.name.lower() == name.lower():
             return member
     mem_parts = name.split("#")
@@ -97,7 +119,7 @@ def memberForName(name, server):
         except:
             mem_name = mem_disc = None
         if mem_name:
-            for member in server.members:
+            for member in mems:
                 if member.name.lower() == mem_name.lower() and int(member.discriminator) == mem_disc:
                     return member
     mem_id = re.sub(r'\W+', '', name)
