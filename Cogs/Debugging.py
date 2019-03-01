@@ -46,6 +46,7 @@ class Debugging(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		await self.bot.wait_until_ready()
 		print("Gathering invites...")
 		for guild in self.bot.guilds:
 			try:
