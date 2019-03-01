@@ -331,10 +331,14 @@ class Settings(commands.Cog):
 		# we load it, and migrate it to the Redis db, then rename
 		# the file to Settings-migrated.json to avoid confusion
 		# or double-migration.
+		await self.bot.wait_until_ready()
 		if os.path.exists(self.file):
 			await self.bot.loop.run_in_executor(None, self.migrate_json, self.file)
 		# After that's done, we can do other shit
 		self.bot.loop.create_task(self.flushLoop())
+		self.bot.loop.create_task(self.start_loading())
+
+	async def start_loading(self):
 		print("Verifying default roles...")
 		t = time.time()
 		await self.bot.loop.run_in_executor(None, self.check_all)
