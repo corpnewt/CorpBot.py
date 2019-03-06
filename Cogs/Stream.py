@@ -183,11 +183,11 @@ class Stream(commands.Cog):
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if mem.id in stream_list:
-            await ctx.send("I'm already watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "\\`")))
+            await ctx.send("I'm already watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
             return
         stream_list.append(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` added to the stream list!".format(DisplayName.name(mem).replace("`", "\\`")))
+        await ctx.send("`{}` added to the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
 
     @commands.command(pass_context=True)
     async def remstreamer(self, ctx, *, member = None):
@@ -200,16 +200,16 @@ class Stream(commands.Cog):
             return
         mem = DisplayName.memberForName(member, ctx.guild)
         if not mem:
-            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "\\`")))
+            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "").replace("\\","")))
             return
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if not mem.id in stream_list:
-            await ctx.send("I'm not currently watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "\\`")))
+            await ctx.send("I'm not currently watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
             return
         stream_list.remove(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` removed from the stream list!".format(DisplayName.name(mem).replace("`", "\\`")))
+        await ctx.send("`{}` removed from the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
 
     @commands.command(pass_context=True)
     async def streamers(self, ctx):

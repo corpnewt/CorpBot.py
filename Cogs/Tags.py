@@ -249,7 +249,7 @@ class Tags(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
+				other_names.append(Nullify.clean(ctx.prefix + i["command"] + " " + name))
 				
 		if not tagList or tagList == []:
 			no_tags = 'No tags in list!  You can add some with the `{}addtag "[tag name]" [tag]` command!'.format(ctx.prefix)
@@ -281,7 +281,9 @@ class Tags(commands.Cog):
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
-		
+		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
+		if suppress:
+			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):

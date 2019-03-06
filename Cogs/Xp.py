@@ -100,12 +100,11 @@ class Xp(commands.Cog):
 			server_dict[str(x.guild.id)] = memlist
 		for server in server_dict:
 			# Iterate through the servers and add them
-			server = self.bot.get_guild(int(server))
 			xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
 			xpAmount   = float(xpAmount/6)
 			xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
 			xpRAmount  = float(xpRAmount/6)
-			
+
 			xpLimit    = self.settings.getServerStat(server, "XPLimit")
 			xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
 			

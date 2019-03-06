@@ -201,7 +201,7 @@ class Lists(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
+				other_names.append(Nullify.clean(ctx.prefix + i["command"] + " " + name))
 				
 		if not linkList or linkList == []:
 			no_links = 'No links in list!  You can add some with the `{}addlink "[link name]" [url]` command!'.format(ctx.prefix)
@@ -235,6 +235,8 @@ class Lists(commands.Cog):
 				return
 				
 		not_found = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		if suppress:
+			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
@@ -693,7 +695,7 @@ class Lists(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(ctx.prefix + i["command"] + " " + name.replace('`', ''))
+				other_names.append(Nullify.clean(ctx.prefix + i["command"] + " " + name))
 				
 		if not linkList or linkList == []:
 			no_links = 'No hacks in list!  You can add some with the `{}addhack "[hack name]" [hack]` command!'.format(ctx.prefix)
@@ -727,6 +729,8 @@ class Lists(commands.Cog):
 				return
 		
 		not_found = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		if suppress:
+			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):

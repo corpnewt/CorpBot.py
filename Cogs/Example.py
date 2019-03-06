@@ -469,22 +469,10 @@ class Music(commands.Cog):
         self.voice_states = {}
         self.settings = settings
         self.downloader = downloader.Downloader()
+        self.playlisting = {}
+        self.playlist_requestor = {}
         # Regex for extracting urls from strings
         self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-
-    # Proof of concept stuff for reloading cog/extension
-    def _is_submodule(self, parent, child):
-        return parent == child or child.startswith(parent + ".")
-
-    @commands.Cog.listener()
-    async def on_loaded_extension(self, ext):
-        # See if we were loaded
-        if not self._is_submodule(ext.__name__, self.__module__):
-            return
-        # Clear any previous playlist settings
-        for guild in self.bot.guilds:
-            self.settings.setServerStat(guild, "Playlisting", None)
-            self.settings.setServerStat(guild, "PlaylistRequestor", None)
 
     async def _check_role(self, ctx):
         isAdmin = ctx.author.permissions_in(ctx.channel).administrator
@@ -749,12 +737,8 @@ class Music(commands.Cog):
         elif chk == None:
             return
 
-        try:
-            playlisting = self.settings.getServerStat(ctx.guild, "Playlisting")
-            requestor   = self.settings.getServerStat(ctx.guild, "PlaylistRequestor")
-        except Exception:
-            playlisting = None
-            requestor   = None
+        playlisting = self.playlisting.get(str(ctx.guild.id),None)
+        requestor   = self.playlist_requestor.get(str(ctx.guild.id),None)
 
         if playlisting == None:
             await ctx.channel.send("I'm not currently adding a playlist.")
@@ -785,8 +769,8 @@ class Music(commands.Cog):
             return
 
         # At this point - we *should* have everything we need to cancel - so do it
-        self.settings.setServerStat(ctx.guild, "Playlisting", None)
-        self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
+        self.playlisting.pop(str(ctx.guild.id),None)
+        self.playlist_requestor.pop(str(ctx.guild.id),None)
 
         await ctx.send("Playlist loading canceled!")
 
@@ -949,10 +933,7 @@ class Music(commands.Cog):
                 return
         else:
             # Check if we're already adding a playlist
-            try:
-                playlisting = self.settings.getServerStat(ctx.guild, "Playlisting")
-            except Exception:
-                playlisting = None
+            playlisting = self.playlisting.get(str(ctx.guild.id),None)
             if playlisting:
                 await ctx.channel.send("I'm currently importing a playlist - please wait for that to finish before enqueuing more songs.")
                 return
@@ -1085,9 +1066,9 @@ class Music(commands.Cog):
                     total_songs = len(entries) - index
 
                 # Lock our playlisting
-                self.settings.setServerStat(ctx.guild, "Playlisting", True)
+                self.playlisting[str(ctx.guild.id)] = True
                 # Add requestor's id
-                self.settings.setServerStat(ctx.guild, "PlaylistRequestor", ctx.author.id)
+                self.playlist_requestor[str(ctx.guild.id)] = ctx.author.id
 
                 checkIndex = 0
                 for entry in entries:
@@ -1139,15 +1120,15 @@ class Music(commands.Cog):
                     await asyncio.sleep(playlist_delay)
                     # Check if we're still playing
                     state = self.get_voice_state(ctx.message.guild)
-                    if state.voice == None or self.settings.getServerStat(ctx.guild, "Playlisting") == None:
+                    if state.voice == None or self.playlisting.get(str(ctx.guild.id),None) == None:
                         if entries_added == 1:
                             await message.edit(content="*{}* Cancelled - *1* song loaded.".format(info['title']))
                         else:
                             await message.edit(content="*{}* Cancelled - *{}* songs loaded.".format(info['title'], entries_added))
                         return
                 # Unlock our playlisting
-                self.settings.setServerStat(ctx.guild, "Playlisting", None)
-                self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
+                self.playlisting.pop(str(ctx.guild.id),None)
+                self.playlist_requestor.pop(str(ctx.guild.id),None)
 
                 if entries_added-entries_skipped == 1:
                     await message.edit(content="Enqueued *{}* song from `{}` - (*{}* skipped)".format(entries_added-entries_skipped, info['title'].replace('`', '\\`'), entries_skipped))
@@ -1411,8 +1392,8 @@ class Music(commands.Cog):
         self.settings.setServerStat(ctx.message.guild, "Volume", None)
 
         # Reset our playlist-related vars
-        self.settings.setServerStat(ctx.guild, "Playlisting", None)
-        self.settings.setServerStat(ctx.guild, "PlaylistRequestor", None)
+        self.playlisting.pop(str(ctx.guild.id),None)
+        self.playlist_requestor.pop(str(ctx.guild.id),None)
 
         if state.is_playing():
             player = state.voice

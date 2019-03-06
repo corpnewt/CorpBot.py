@@ -343,12 +343,14 @@ class CogManager(commands.Cog):
 			await message.edit(content=res_str)
 			return
 
+		message = await ctx.send("Reloading extensions related to `{}`...".format(extension.replace("`","").replace("\\","")))
 		result = self._load_extension(extension)
+		
 		if result[1] == 0:
-			await ctx.send("I couldn't find that extension.")
+			await message.edit(content="I couldn't find that extension.")
 		else:
 			e_string = "extension" if result[1] == 1 else "extensions"
-			await ctx.send("{}/{} connected {} reloaded!".format(result[0], result[1], e_string))
+			await message.edit(content="{}/{} connected {} reloaded!".format(result[0], result[1], e_string))
 				
 	@commands.command(pass_context=True)
 	async def update(self, ctx):

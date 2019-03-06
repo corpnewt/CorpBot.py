@@ -53,6 +53,7 @@ class Bot(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		await self.bot.wait_until_ready()
 		await self._update_status()
 
 
@@ -82,7 +83,7 @@ class Bot(commands.Cog):
 		"""Lists some general stats about the bot."""
 		bot_member = ctx.guild.get_member(self.bot.user.id)
 		message = await Message.EmbedText(title="Gathering info...", color=bot_member).send(ctx)
-
+		
 		# Get guild count
 		guild_count = "{:,}".format(len(self.bot.guilds))
 		
@@ -707,7 +708,7 @@ class Bot(commands.Cog):
 			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
 		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
 		if not quiet:
 			msg = 'Flushed settings to disk.\nRebooting...'
 			await message.edit(content=msg)
@@ -753,7 +754,7 @@ class Bot(commands.Cog):
 			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
 		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings, self.settings.file, True)
+		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
 
 		if not quiet:
 			msg = 'Flushed settings to disk.\nShutting down...'

@@ -183,7 +183,7 @@ class CAH(commands.Cog):
         self.bot = bot
         self.games = []
         self.maxBots = 5 # Max number of bots that can be added to a game - don't count toward max players
-        self.maxPlayers = 10 # Max players for ranjom joins
+        self.maxPlayers = 10 # Max players for random joins
         self.maxDeadTime = 3600 # Allow an hour of dead time before killing a game
         self.checkTime = 300 # 5 minutes between dead time checks
         self.winAfter = 10 # 10 wins for the game

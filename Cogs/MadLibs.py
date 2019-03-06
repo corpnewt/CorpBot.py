@@ -25,19 +25,7 @@ class MadLibs(commands.Cog):
 		#self.botPrefix = "$"
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
-
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
-		return parent == child or child.startswith(parent + ".")
-
-	@commands.Cog.listener()
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
-			return
-		# Clear any previous games
-		for guild in self.bot.guilds:
-			self.settings.setServerStat(guild, "PlayingMadLibs", False)
+		self.playing_madlibs = {}
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
@@ -84,12 +72,12 @@ class MadLibs(commands.Cog):
 			return
 		
 		# Check if we're already in a game
-		if self.settings.getServerStat(server, "PlayingMadLibs"):
+		if self.playing_madlibs.get(str(server.id),False):
 			msg = 'I\'m already playing MadLibs - use `{}{} [your word]` to submit answers.'.format(ctx.prefix, self.prefix)
 			await channel.send(msg)
 			return
 		
-		self.settings.setServerStat(server, "PlayingMadLibs", True)
+		self.playing_madlibs[str(server.id)] = True
 
 		# Get a random madlib from those available
 		randnum = random.randint(0, (len(choices)-1))
@@ -138,7 +126,7 @@ class MadLibs(commands.Cog):
 				# We timed out - leave the loop
 				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
 				await channel.send(msg)
-				self.settings.setServerStat(server, "PlayingMadLibs", False)
+				self.playing_madlibs.pop(str(server.id),None)
 				return
 
 			# Check if the message is to leave
@@ -146,7 +134,7 @@ class MadLibs(commands.Cog):
 				if talk.author is author:
 					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
 					await channel.send(msg)
-					self.settings.setServerStat(server, "PlayingMadLibs", False)
+					self.playing_madlibs.pop(str(server.id),None)
 					return
 				else:
 					# Not the originator
@@ -177,7 +165,7 @@ class MadLibs(commands.Cog):
 			# Only replace the first occurence
 			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
 
-		self.settings.setServerStat(server, "PlayingMadLibs", False)
+		self.playing_madlibs.pop(str(server.id),None)
 		
 		# Check for suppress
 		if suppress:
@@ -188,6 +176,6 @@ class MadLibs(commands.Cog):
 	@madlibs.error
 	async def madlibs_error(self, ctx, error):
 		# Reset playing status and display error
-		self.settings.setServerStat(error.channel.guild, "PlayingMadLibs", False)
+		self.playing_madlibs.pop(str(error.guild.id),None)
 		msg = 'madlibs Error: {}'.format(ctx)
 		await error.send(msg)

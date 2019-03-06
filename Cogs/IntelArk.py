@@ -61,15 +61,15 @@ class IntelArk(commands.Cog):
 		message = await Message.EmbedText(**args).send(ctx)
 
 		search_url = "https://odata.intel.com/API/v1_0/Products/Processors()?&$filter=substringof(%27{}%27,ProductName)&$format=json&$top=5".format(urllib.parse.quote(text))
-		#try:
-		# Get the response
-		response = await DL.async_json(search_url)
-		response = response["d"]
-		#except:
-		#	response = []
+		try:
+			# Get the response
+			response = await DL.async_json(search_url)
+			response = response["d"]
+		except:
+			response = []
 		# Check if we got nothing
 		if not len(response):
-			args["description"] = "No results returned for `{}`.".format(text.replace("`",""))
+			args["description"] = "No results returned for `{}`.".format(text.replace("`","").replace("\\",""))
 			await Message.EmbedText(**args).edit(ctx, message)
 			return
 		elif len(response) == 1:
@@ -86,7 +86,7 @@ class IntelArk(commands.Cog):
 				# Not exact - let's give options
 				index, message = await PickList.Picker(
 					message=message,
-					title="Multiple Matches Returned For `{}`:".format(text.replace("`","")),
+					title="Multiple Matches Returned For `{}`:".format(text.replace("`","").replace("\\","")),
 					list=[x["ProcessorNumber"] for x in response],
 					ctx=ctx
 				).pick()
