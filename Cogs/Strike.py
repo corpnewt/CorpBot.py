@@ -75,6 +75,13 @@ class Strike(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		self.bot.loop.create_task(self.start_loading())
+
+	async def start_loading(self):
+		await self.bot.wait_until_ready()
+		await self.bot.loop.run_in_executor(None, self.check_strikes)
+
+	def check_strikes(self):
 		# Check all strikes - and start timers
 		print("Checking strikes...")
 		t = time.time()
