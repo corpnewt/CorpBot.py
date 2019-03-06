@@ -53,6 +53,7 @@ class Bot(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
+		await self.bot.wait_until_ready()
 		await self._update_status()
 
 

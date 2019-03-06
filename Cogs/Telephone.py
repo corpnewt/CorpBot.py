@@ -44,19 +44,6 @@ class Telephone(commands.Cog):
 		context = await self.bot.get_context(message)
 		self.bot.dispatch("message_context", context, message)
 		return"""
-
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
-		return parent == child or child.startswith(parent + ".")
-
-	@commands.Cog.listener()
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
-			return
-		# Clear any previous games
-		for guild in self.bot.guilds:
-			self.settings.setServerStat(guild, "TeleConnected", False)
 			
 	async def killcheck(self, message):
 		ignore = False

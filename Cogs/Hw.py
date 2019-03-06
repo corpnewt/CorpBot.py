@@ -39,19 +39,6 @@ class Hw(commands.Cog):
 		else:
 			return False
 
-	# Proof of concept stuff for reloading cog/extension
-	def _is_submodule(self, parent, child):
-		return parent == child or child.startswith(parent + ".")
-
-	'''@commands.Cog.listener()
-	async def on_loaded_extension(self, ext):
-		# See if we were loaded
-		if not self._is_submodule(ext.__name__, self.__module__):
-			return
-		# Clear any previous hw setting
-		for key in self.settings.r.keys("globalmember:*:HWActive"):
-			self.settings.r.delete(key)'''
-
 	@commands.command(pass_context=True)
 	async def cancelhw(self, ctx):
 		"""Cancels a current hardware session."""
@@ -515,7 +502,7 @@ class Hw(commands.Cog):
 					for line in bParts.splitlines():
 						if buildStr.lower() in line.lower():
 							foundCt += 1
-							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
+							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", "").replace("\\",""))
 
 				if len(foundStr):
 					# We're in business
@@ -553,7 +540,7 @@ class Hw(commands.Cog):
 			for line in bParts.splitlines():
 				if buildStr.lower() in line.lower():
 					foundCt += 1
-					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", ""))
+					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", "").replace("\\",""))
 
 		if len(foundStr):
 			# We're in business

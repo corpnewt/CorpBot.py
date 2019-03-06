@@ -51,6 +51,8 @@ class Remind(commands.Cog):
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		# Check all reminders - and start timers
+		print("Checking reminders...")
+		t = time.time()
 		for server in self.bot.guilds:
 			for member in server.members:
 				reminders = self.settings.getUserStat(member, server, "Reminders")
@@ -58,6 +60,7 @@ class Remind(commands.Cog):
 					# We have a list
 					for reminder in reminders:
 						self.loop_list.append(self.bot.loop.create_task(self.checkRemind(member, reminder)))
+		print("Reminders checked - took {} seconds.".format(time.time() - t))
 
 	async def checkRemind(self, member, reminder):
 		# Get our current task

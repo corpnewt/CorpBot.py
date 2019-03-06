@@ -2,6 +2,7 @@ import asyncio
 import discord
 import os
 import textwrap
+import time
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
@@ -48,12 +49,13 @@ class Debugging(commands.Cog):
 			return
 		await self.bot.wait_until_ready()
 		print("Gathering invites...")
+		t = time.time()
 		for guild in self.bot.guilds:
 			try:
 				self.invite_list[str(guild.id)] = await guild.invites()
 			except:
 				pass
-		print("Invites gathered.")
+		print("Invites gathered - took {} seconds.".format(time.time() - t))
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions

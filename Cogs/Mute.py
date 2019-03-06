@@ -44,6 +44,8 @@ class Mute(commands.Cog):
         if not self._is_submodule(ext.__name__, self.__module__):
             return
         # Check all mutes and start timers
+        print("Checking mutes...")
+        t = time.time()
         for server in self.bot.guilds:
             muteList = self.settings.getServerStat(server, "MuteList")
             for entry in muteList:
@@ -56,6 +58,7 @@ class Mute(commands.Cog):
                     self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
         # Add a loop to remove expired mutes in the MuteList
         self.loop_list.append(self.bot.loop.create_task(self.mute_list_check()))
+        print("Mutes checked - took {} seconds.".format(time.time() - t))
                     
         
     def suppressed(self, guild, msg):

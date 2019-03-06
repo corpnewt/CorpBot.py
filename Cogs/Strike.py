@@ -76,6 +76,8 @@ class Strike(commands.Cog):
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		# Check all strikes - and start timers
+		print("Checking strikes...")
+		t = time.time()
 		for server in self.bot.guilds:
 			for member in server.members:
 				strikes = self.settings.getUserStat(member, server, "Strikes")
@@ -87,6 +89,7 @@ class Strike(commands.Cog):
 						# Make sure it's a strike that *can* roll off
 						if not strike['Time'] == -1:
 							self.loop_list.append(self.bot.loop.create_task(self.checkStrike(member, strike)))
+		print("Strikes checked - took {} seconds.".format(time.time() - t))
 
 	async def checkStrike(self, member, strike):
 		# Start our countdown
