@@ -126,6 +126,9 @@ class Weather(commands.Cog):
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
 		location = self.geo.geocode(city_name)
+		if location == None:
+			await ctx.send("I couldn't find that city...")
+			return
 		r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
 			self.key,
 			location.latitude,
