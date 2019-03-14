@@ -73,7 +73,8 @@ class Lists(commands.Cog):
 				if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)):
 					await channel.send('You do not have sufficient privileges to access this command.')
 					return
-				
+		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
+		name = name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		# Passed role requirements!
 		if name == None or link == None:
 			msg = 'Usage: `{}addlink "[link name]" [url]`'.format(ctx.prefix)
@@ -566,7 +567,8 @@ class Lists(commands.Cog):
 				if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)):
 					await channel.send('You do not have sufficient privileges to access this command.')
 					return
-				
+		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
+		name = name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		# Passed role requirements!
 		if name == None or hack == None:
 			msg = 'Usage: `{}addhack "[hack name]" [hack]`'.format(ctx.prefix)
