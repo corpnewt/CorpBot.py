@@ -126,9 +126,9 @@ class Help(commands.Cog):
 						continue
 					command_help = self._get_help(command, 80)
 					if command.name in disabled_list:
-						name = "~~" + prefix + command.signature + "~~ (Disabled)"
+						name = "~~" + prefix + command.name + " " + command.signature + "~~ (Disabled)"
 					else:
-						name = prefix + command.signature
+						name = prefix + command.name + " " + command.signature
 					embed_list["fields"].append({ "name" : name, "value" : "`└─ " + command_help + "`", "inline" : False })
 				# If all commands are hidden - pretend it doesn't exist
 				if not len(embed_list["fields"]):
@@ -150,13 +150,11 @@ class Help(commands.Cog):
 							embed_list = {"title" : "{} Cog - {}.py Extension".format(cog, e[5:]), "fields" : [] }
 							break
 					if not embed_list:
-						# embed_list = {"title" : cog, "fields" : [] }
 						embed_list = { "title" : cog }
-					# embed_list["fields"].append({ "name" : prefix + command.signature, "value" : command.help, "inline" : False })
 					if command.name in disabled_list:
-						embed_list["description"] = "~~**{}**~~ (Disabled)\n```\n{}```".format(prefix + command.signature, command.help)
+						embed_list["description"] = "~~**{}**~~ (Disabled)\n```\n{}```".format(prefix + command.name + " " + command.signature, command.help)
 					else:
-						embed_list["description"] = "**{}**\n```\n{}```".format(prefix + command.signature, command.help) 
+						embed_list["description"] = "**{}**\n```\n{}```".format(prefix + command.name + " " + command.signature, command.help) 
 					return embed_list
 		# At this point - we got nothing...
 		return None
@@ -222,7 +220,7 @@ class Help(commands.Cog):
 					cog_count
 				)
 			for command in cog_commands:
-				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.signature)
+				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.name + " " + command.signature)
 				cog_string += "{}  {}└─ {}\n".format(
 					"	"*tab_indent_count,
 					" "*len(prefix),
