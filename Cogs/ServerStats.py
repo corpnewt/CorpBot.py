@@ -35,6 +35,41 @@ class ServerStats(commands.Cog):
         return { 'Ignore' : False, 'Delete' : False}
 
     @commands.command(pass_context=True)
+    async def listbots(self, ctx, *, guild_name = None):
+        """Lists up to the first 20 bots of the current or passed server."""
+        # Check if we passed another guild
+        guild = None
+        if guild_name == None:
+            guild = ctx.guild
+        else:
+            for g in self.bot.guilds:
+                if g.name.lower() == guild_name.lower():
+                    guild = g
+                    break
+                if str(g.id) == str(guild_name):
+                    guild = g
+                    break
+        if guild == None:
+            # We didn't find it
+            await ctx.send("I couldn't find that guild...")
+            return
+        bot_list = [x for x in guild.members if x.bot]
+        if not len(bot_list):
+            # No bots - should... never... happen.
+            await Message.EmbedText(title=guild.name, description="This server has no bots.", color=ctx.author).send(ctx)
+        else:
+            # Got some bots!
+            bot_text_list = []
+            last = 0
+            for y,x in enumerate(bot_list,1):
+                if y > 20:
+                    break
+                last = y
+                bot_text_list.append({"name":"{}#{} ({})".format(x.name,x.discriminator,x.id),"value":x.mention,"inline":True})
+            header = "__**Showing {} of {} bot{}:**__".format(last, len(bot_list), "" if len(bot_list) == 1 else "s")
+            await Message.Embed(title=guild.name, description="{}".format(header), fields=bot_text_list, color=ctx.author).send(ctx)
+
+    @commands.command(pass_context=True)
     async def serverinfo(self, ctx, *, guild_name = None):
         """Lists some info about the current or passed server."""
         
