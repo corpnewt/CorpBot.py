@@ -65,7 +65,7 @@ class ServerStats(commands.Cog):
                 if y > 20:
                     break
                 last = y
-                bot_text_list.append({"name":"{}#{} ({})".format(x.name,x.discriminator,x.id),"value":x.mention,"inline":True})
+                bot_text_list.append({"name":"{}#{} ({})".format(x.name,x.discriminator,x.id),"value":x.mention,"inline":False})
             header = "__**Showing {} of {} bot{}:**__".format(last, len(bot_list), "" if len(bot_list) == 1 else "s")
             await Message.Embed(title=guild.name, description="{}".format(header), fields=bot_text_list, color=ctx.author).send(ctx)
 
