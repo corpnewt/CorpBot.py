@@ -177,7 +177,7 @@ class Weather(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def forecast(self, ctx, *, city_name = None):
-		"""Gets some weather."""
+		"""Gets some weather, for 5 days or whatever."""
 		if city_name == None:
 			await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
 			return
