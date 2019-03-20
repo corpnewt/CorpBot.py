@@ -195,7 +195,7 @@ class Weather(commands.Cog):
 			location.longitude
 		))
 		days = {}
-		for x in sorted(r["list"], key=lambda x:x["dt_txt"]):
+		for x in sorted(r["list"], key=lambda date:date["dt_txt"]):
 			# Check if the day exists - if not, we set up a pre-day
 			day = x["dt_txt"].split(" ")[0]
 			is_noon = "12:00:00" in x["dt_txt"]
