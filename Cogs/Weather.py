@@ -195,7 +195,7 @@ class Weather(commands.Cog):
 			location.longitude
 		))
 		days = {}
-		for x in sorted(r["list"], key=lambda date:date["dt_txt"]):
+		for x in r["list"]:
 			# Check if the day exists - if not, we set up a pre-day
 			day = x["dt_txt"].split(" ")[0]
 			is_noon = "12:00:00" in x["dt_txt"]
@@ -218,7 +218,7 @@ class Weather(commands.Cog):
 			if is_noon:
 				days[day]["weather"] = x["weather"]
 		fields = []
-		for day in days:
+		for day in sorted(days):
 			# Average the temp, strip weather duplicates
 			days[day]["main"]["temp"]/=days[day]["day_count"]
 			fields.append({
