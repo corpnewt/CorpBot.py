@@ -176,3 +176,9 @@ if __name__ == '__main__':
         item+=1
         print("\n\nUpdating {} - {} of {}\n\n".format(module["name"], item, len(modules)))
         r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
+    # Prompt for the users to press enter to exit
+    prompt = "Done.\n\nPress [enter] to leave the script..."
+    if sys.version_info >= (3, 0):
+        return input(prompt)
+    else:
+        return str(raw_input(prompt))
