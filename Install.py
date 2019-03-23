@@ -180,6 +180,6 @@ if __name__ == '__main__':
     # Prompt for the users to press enter to exit
     prompt = "Done.\n\nPress [enter] to leave the script..."
     if sys.version_info >= (3, 0):
-        return input(prompt)
+        input(prompt)
     else:
-        return str(raw_input(prompt))
+        raw_input(prompt)
