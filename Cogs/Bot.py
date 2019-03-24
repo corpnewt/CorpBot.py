@@ -75,7 +75,7 @@ class Bot(commands.Cog):
 				await self._update_status()
 			except Exception as e:
 				print(str(e))
-			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
+			await asyncio.sleep(3600) # runs only every 60 minutes (3600 seconds)
 
 
 	async def onserverjoin(self, server):
