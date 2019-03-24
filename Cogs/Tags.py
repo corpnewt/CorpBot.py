@@ -117,7 +117,7 @@ class Tags(commands.Cog):
 					await channel.send('You do not have sufficient privileges to access this command.')
 					return
 		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
-		name = name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
+		name = None if name == None else name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		# Passed role requirements!
 		if name == None or tag == None:
 			msg = 'Usage: `{}addtag "[tag name]" [tag]`'.format(ctx.prefix)
