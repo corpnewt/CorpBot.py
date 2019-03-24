@@ -44,9 +44,17 @@ class Bot(commands.Cog):
 		self.path = path
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.is_current = False
 		
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		self.is_current = False
 
 	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
@@ -54,7 +62,20 @@ class Bot(commands.Cog):
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		await self.bot.wait_until_ready()
-		await self._update_status()
+		self.is_current = True
+		self.bot.loop.create_task(self.status_loop())
+
+	async def status_loop(self):
+		# Helper method to loop through and ensure the status remains
+		while not self.bot.is_closed():
+			try:
+				if not self.is_current:
+					# Bail if we're not the current instance
+					return
+				await self._update_status()
+			except Exception as e:
+				print(str(e))
+			await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
 
 
 	async def onserverjoin(self, server):
