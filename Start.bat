@@ -182,4 +182,5 @@ if "%*"=="" (
 ) else (
     "!python!" "!thisDir!!script_name!" %*
 )
+pause > nul
 goto :EOF
