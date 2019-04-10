@@ -26,10 +26,13 @@ class Xp(commands.Cog):
 		self.settings = settings
 		self.is_current = False # Used for stopping loops
 
-	def _can_xp(self, user, server):
+	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
 		# Checks whether or not said user has access to the xp system
-		requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
-		promoArray  = self.settings.getServerStat(server, "PromotionArray")
+		if requiredXP == None:
+			requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
+		if promoArray == None:
+			promoArray  = self.settings.getServerStat(server, "PromotionArray")
+
 		userXP      = self.settings.getUserStat(user, server, "XP")
 		if not requiredXP:
 			return True
@@ -72,7 +75,7 @@ class Xp(commands.Cog):
 			return msg
 		
 	async def addXP(self):
-		print("Starting XP loop...")
+		print("Starting XP loop: {}".format(datetime.datetime.now().time().isoformat()))
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
 			try:
@@ -110,6 +113,7 @@ class Xp(commands.Cog):
 			
 			onlyOnline = self.settings.getServerStat(server, "RequireOnline")
 			requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
+			promoArray  = self.settings.getServerStat(server, "PromotionArray")
 
 			xpblock = self.settings.getServerStat(server, "XpBlockArray")
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
@@ -121,7 +125,7 @@ class Xp(commands.Cog):
 					print("XP Interrupted, no longer current - took {} seconds.".format(time.time() - t))
 					return responses
 				
-				if not self._can_xp(user, server):
+				if not self._can_xp(user, server, requiredXP, promoArray):
 					continue
 
 				bumpXP = False
