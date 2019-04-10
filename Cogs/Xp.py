@@ -110,8 +110,16 @@ class Xp(commands.Cog):
 			
 			onlyOnline = self.settings.getServerStat(server, "RequireOnline")
 			requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
+
+			xpblock = self.settings.getServerStat(server, "XpBlockArray")
+			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 			
 			for user in server_dict[server]:
+
+				# First see if we're current - we want to bail quickly
+				if not self.is_current:
+					print("XP Interrupted, no longer current - took {} seconds.".format(time.time() - t))
+					return responses
 				
 				if not self._can_xp(user, server):
 					continue
@@ -124,7 +132,6 @@ class Xp(commands.Cog):
 						bumpXP = True
 
 				# Check if we're blocked
-				xpblock = self.settings.getServerStat(server, "XpBlockArray")
 				if user.id in xpblock:
 					# No xp for you
 					continue
@@ -192,7 +199,6 @@ class Xp(commands.Cog):
 
 						# Check our default channels
 						targetChan = None
-						targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 						if len(str(targetChanID)):
 							# We *should* have a channel
 							tChan = self.bot.get_channel(int(targetChanID))
