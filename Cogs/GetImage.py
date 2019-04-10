@@ -38,7 +38,7 @@ def canDisplay( firstTime, threshold ):
 
 async def download(url, ext : str = "jpg", sizeLimit : int = 8000000, ua : str = 'CorpNewt DeepThoughtBot'):
 	"""Download the passed URL and return the file path."""
-	url = url.strip("<>")
+	url = str(url).strip("<>")
 	# Set up a temp directory
 	dirpath = tempfile.mkdtemp()
 	tempFileName = url.rsplit('/', 1)[-1]

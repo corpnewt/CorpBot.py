@@ -96,14 +96,12 @@ class Printer(commands.Cog):
 		url = member.avatar_url
 		if not len(url):
 			url = member.default_avatar_url
-		# url = url.split("?size=")[0]
 		name = DisplayName.name(member)
 		if name[-1].lower() == "s":
 			name += "' Avatar"
 		else:
 			name += "'s Avatar"
 		await Message.Embed(title=name, image=url, color=ctx.author).send(ctx)
-		# await ctx.send(url)
 
 	@commands.command(pass_context=True)
 	async def print(self, ctx, *, url = None):
@@ -124,7 +122,6 @@ class Printer(commands.Cog):
 			url = test_user.avatar_url
 			if not len(url):
 				url = test_user.default_avatar_url
-			# url = url.split("?size=")[0]
 
 		message = await ctx.send("Downloading...")
 		

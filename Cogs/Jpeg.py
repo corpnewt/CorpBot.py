@@ -68,7 +68,6 @@ class Jpeg(commands.Cog):
 		if test_user:
 			# Got a user!
 			url = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
-			url = url.split("?size=")[0]
 		
 		message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 		
