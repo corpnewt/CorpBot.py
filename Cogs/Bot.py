@@ -625,7 +625,6 @@ class Bot(commands.Cog):
 		if test_user:
 			# Got a user!
 			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
-			filename = filename.split("?size=")[0]
 
 		# Check if we created a temp folder for this image
 		isTemp = False

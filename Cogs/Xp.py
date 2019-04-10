@@ -936,7 +936,6 @@ class Xp(commands.Cog):
 		url = member.avatar_url
 		if not len(url):
 			url = member.default_avatar_url
-		url = url.split("?size=")[0]
 
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
