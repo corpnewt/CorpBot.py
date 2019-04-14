@@ -140,6 +140,8 @@ def channelForID(checkid, server, typeCheck = None):
                 continue
             if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
                 continue
+            if typeCheck.lower() == "category" and not type(channel) is discord.CategoryChannel:
+                continue
         if channel.id == checkid:
             return channel
     return None
@@ -151,6 +153,8 @@ def channelForName(name, server, typeCheck = None):
             if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
                 continue
             if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+                continue
+            if typeCheck.lower() == "category" and not type(channel) is discord.CategoryChannel:
                 continue
         if channel.name.lower() == name.lower():
             return channel
