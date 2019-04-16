@@ -1405,7 +1405,10 @@ class Music(commands.Cog):
             del self.voice_states[server.id]
             state.playlist = []
             state.repeat = False
-            await state.voice.disconnect(force=True)
+            if ctx.voice_client is not None:
+                # Disconnect using the ctx
+                await ctx.voice_client.disconnect(force=True)
+            # await state.voice.disconnect(force=True)
             await message.edit(content="I've left the voice channel!")
         except Exception as e:
             print("Stop exception: {}".format(e))
