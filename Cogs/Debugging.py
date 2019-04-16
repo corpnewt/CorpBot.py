@@ -255,7 +255,7 @@ class Debugging(commands.Cog):
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
 					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
-		if not before.avatar_url == after.avatar_url and self.shouldLog('user.avatar', server):
+		if not str(before.avatar_url) == str(after.avatar_url) and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
