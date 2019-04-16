@@ -689,7 +689,7 @@ class Settings(commands.Cog):
 		return self.serverDict.get(stat, default)
 
 	def setGlobalStat(self, stat, value):
-		self.self.serverDict[stat] = value
+		self.serverDict[stat] = value
 
 	def delGlobalStat(self, stat):
 		return self.serverDict.pop(stat,None)
