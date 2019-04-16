@@ -6,7 +6,7 @@ shopt -s nocasematch
 shopt -s extglob
 
 py_path="python3"
-bot="install.py"
+bot="Install.py"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
