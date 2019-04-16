@@ -86,6 +86,14 @@ class CogManager(commands.Cog):
 		# starts with Settings, then Mute
 		if extension == None:
 			# Load them all!
+			if "Cogs.Settings" in self.bot.extensions:
+				# Unload first
+				self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs.Settings"))
+				self.bot.unload_extension("Cogs.Settings")
+			if "Cogs.Mute" in self.bot.extensions:
+				# Unload first
+				self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs.Mute"))
+				self.bot.unload_extension("Cogs.Mute")
 			self.bot.load_extension("Cogs.Settings")
 			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Settings"))
 			self.bot.load_extension("Cogs.Mute")
