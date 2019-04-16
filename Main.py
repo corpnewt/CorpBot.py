@@ -35,7 +35,9 @@ async def get_prefix(bot, message):
 
 # This should be the main soul of the bot - everything should load from here
 # bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
+# Let's SHARD!
 bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
+# bot = discord.AutoShardedClient(command_previs=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
 # Initialize some things
 jsonFile = "Settings.json"
 deckFile = "deck.json"
@@ -44,40 +46,18 @@ corpSiteAuth = "corpSiteAuth.txt"
 with open('token.txt', 'r') as f:
 	token = f.read().strip()
 
-# Main bot events
-@bot.event
-async def on_ready():
-	print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
-	print("Invite Link:\nhttps://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8\n".format(bot.user.id))
-	
-	# Load extensions - Bypassed for now
-	# _load_extensions()
-	
-	# Let's try to use the CogManager class to load things
-	bot.load_extension("Cogs.CogManager")
-	cg_man = bot.get_cog("CogManager")
-	
-	# Load up the rest of the extensions
-	cog_loaded, cog_count = cg_man._load_extension()
-	
+async def return_message():
 	# Set the settings var up
 	settings = bot.get_cog("Settings")
-	
-	# Output the load counts
-	if cog_count == 1:
-		print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
-	else:
-		print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
-
-	# Return the dict key or None if it doesn't exist
-	# Also deletes said key
-	return_channel = settings.serverDict.pop("ReturnChannel", None)
-
+	if not settings:
+		return
+	return_channel = settings.getGlobalStat("ReturnChannel",None)
 	if not return_channel == None:
 		message_to = bot.get_channel(return_channel)
 		if message_to == None:
 			# No channel
 			return
+		settings.delGlobalStat("ReturnChannel")
 		return_options = [
 			"I'm back!",
 			"I have returned!",
@@ -86,6 +66,26 @@ async def on_ready():
 			"I'm alive!"
 		]
 		await message_to.send(random.choice(return_options))
+
+# Main bot events
+@bot.event
+async def on_ready():
+	if not bot.get_cog("CogManager"):
+		# We need to load shiz!
+		print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
+		print("Invite Link:\nhttps://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8\n".format(bot.user.id))
+		# Let's try to use the CogManager class to load things
+		print("Loading CogManager...")
+		bot.load_extension("Cogs.CogManager")
+		cg_man = bot.get_cog("CogManager")
+		# Load up the rest of the extensions
+		cog_loaded, cog_count = cg_man._load_extension()
+		# Output the load counts
+		if cog_count == 1:
+			print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
+		else:
+			print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
+	await return_message()
 
 '''@bot.event
 async def on_command_error(context, exception):
@@ -175,7 +175,6 @@ async def on_guild_join(server):
 		return
 	# Set the settings var up
 	settings = bot.get_cog("Settings")
-	settings.checkServer(server)
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello there! Thanks for having me on your server! ({})\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.\n\n'.format(server.name, prefix)
@@ -192,18 +191,10 @@ async def on_guild_remove(server):
 	settings.removeServer(server)
 
 @bot.event
-async def on_channel_delete(channel):
-	# Set the settings var up
-	settings = bot.get_cog("Settings")
-	settings.removeChannelID(channel.id, channel.guild)
-
-@bot.event
 async def on_member_join(member):
 	server = member.guild
 	# Set the settings var up
 	settings = bot.get_cog("Settings")
-	# Initialize the user
-	settings.checkUser(member, server)
 
 	rules = settings.getServerStat(server, "Rules")
 	
