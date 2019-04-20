@@ -38,6 +38,7 @@ class UserRole(commands.Cog):
 		self.loop_list.append(self.bot.loop.create_task(self.block_check_list()))
 		
 	async def block_check_list(self):
+		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
 			# Iterate through the ids in the UserRoleBlock list and 
 			# remove any for members who aren't here
@@ -47,8 +48,8 @@ class UserRole(commands.Cog):
 				if len(rem_list):
 					block_list = [ x for x in block_list if x not in rem_list ]
 					self.settings.setServerStat(guild, "UserRoleBlock", block_list)
-				# Check once per hour
-				await asyncio.sleep(3600)
+			# Check once per hour
+			await asyncio.sleep(3600)
 	
 	@commands.command(pass_context=True)
 	async def urblock(self, ctx, *, member = None):
