@@ -733,19 +733,19 @@ class Settings(commands.Cog):
 
 	
 	# Return the requested stat
-	def getUserStat(self, user, server, stat):
+	def getUserStat(self, user, server, stat, default = None):
 		# Make sure our user and server exists in the list
 		self.checkUser(user, server)
-		return self.serverDict["Servers"].get(str(server.id),{}).get("Members",{}).get(str(user.id),{}).get(stat,None)
+		return self.serverDict["Servers"].get(str(server.id),{}).get("Members",{}).get(str(user.id),{}).get(stat,default)
 	
 	
-	def getGlobalUserStat(self, user, stat):
+	def getGlobalUserStat(self, user, stat, default = None):
 		# Loop through options, and get the most common
 		try:
 			userList = self.serverDict['GlobalMembers']
 		except:
 			return None
-		return userList.get(str(user.id),{}).get(stat,None)
+		return userList.get(str(user.id),{}).get(stat,default)
 	
 	
 	# Set the provided stat
@@ -782,10 +782,10 @@ class Settings(commands.Cog):
 	
 	
 	# Get the requested stat
-	def getServerStat(self, server, stat):
+	def getServerStat(self, server, stat, default = None):
 		# Make sure our server exists in the list
 		self.checkServer(server)
-		return self.serverDict["Servers"].get(str(server.id),{}).get(stat,None)
+		return self.serverDict["Servers"].get(str(server.id),{}).get(stat,default)
 	
 	
 	# Set the provided stat
