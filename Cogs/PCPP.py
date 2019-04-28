@@ -128,56 +128,51 @@ async def getMarkdown( url, style = None, escape = False):
 		response = await DL.async_text(url)
 	except Exception:
 		return None
-	dom = pq(response)
-	
-	# Experimental crap because developing while not at home
-	table = dom('table.manual-zebra').children('tbody').children()
+	# Let's walk the lines of the file and gather based on cues
 	names = []
 	types = []
-	for i in range(0, len(table)):
-		child = table.eq(i)
-		try:
-			children = child.children()
-		except AttributeError:
+	current_name = current_type = None
+	primed = name_primed = False
+	for i in response.split("\n"):
+		if i.strip() == "":
+			# skip empty lines
 			continue
-		if len(children) < 3:
+		if "tr__product" in i:
+			# Clear and prime
+			current_name = current_type = None
+			primed = True
 			continue
-		# We should have enough
-		type = children[0].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		name = children[2].text_content().strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		if not len(name):
-			# Didn't get a name
+		if not primed:
 			continue
-		# We got a name - awesome
-		if name.lower().startswith('note:'):
-			# Not a part
+		if "</tr>" in i:
+			# Closing bracket for our stuff - dump name and type if we have them
+			if current_name and current_type:
+				names.append(current_name)
+				types.append(current_type)
+				primed = name_primed = False
+				current_name = current_type = None
 			continue
-		if "From parametric filter" in name:
-			# Got a parametric filter - strip that out
-			name_list = name.split("From parametric filter")
-			if not len(name_list):
-				# Only a parametric filter - skip
-				continue
-			# Name should be everything *prior* to the parametric filter
-			name = name_list[0].strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-		if "From parametric selection" in name:
-			# Got a parametric filter - strip that out
-			name_list = name.split("From parametric selection")
-			if not len(name_list):
-				# Only a parametric filter - skip
-				continue
-			# Name should be everything *prior* to the parametric filter
-			name = name_list[0].strip().replace('\r', '').replace('\n', ' ').replace('\t', ' ')
-
-		names.append(name)
-		if not len(type):
-			if not len(types):
-				# Nothing yet - this is weird
-				types.append('-')
-			else:
-				types.append(types[len(types)-1])
-		else:
-			types.append(type)
+		# Should be primed here - and checking for name and type
+		if name_primed:
+			name_primed = False
+			# Assume we should be pulling the name here
+			try:
+				current_name = i.split('">')[1].split("</a>")[0]
+			except:
+				pass
+			continue
+		if "td__component" in i:
+			# Got the type
+			try:
+				current_type = i.split("</a></td>")[-2].split('">')[-1]
+			except:
+				# bad type
+				pass
+			continue
+		if "td__name" in i:
+			# Primed for name
+			name_primed = True
+			continue
 	
 	if not len(types):
 		return None
