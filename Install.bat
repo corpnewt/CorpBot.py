@@ -2,7 +2,7 @@
 setlocal enableDelayedExpansion
 
 REM Setup initial vars
-set "script_name=Install.py"
+set "script_name=%~n0.py"
 set "thisDir=%~dp0"
 set /a tried=0
 set "toask=yes"
@@ -24,7 +24,7 @@ goto checkpy
 
 :checkpy
 REM Get python location
-FOR /F "tokens=* USEBACKQ" %%F IN (`where python 2^> nul`) DO (
+FOR /F "tokens=* USEBACKQ" %%F IN (`python -V 2^> nul`) DO (
     SET "python=%%F"
 )
 
@@ -178,8 +178,8 @@ echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
 if "%*"=="" (
-    "!python!" "!thisDir!!script_name!"
+    python "!thisDir!!script_name!"
 ) else (
-    "!python!" "!thisDir!!script_name!" %*
+    python "!thisDir!!script_name!" %*
 )
 goto :EOF
