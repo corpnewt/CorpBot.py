@@ -24,7 +24,7 @@ goto checkpy
 
 :checkpy
 REM Get python location
-FOR /F "tokens=* USEBACKQ" %%F IN (`where python 2^> nul`) DO (
+FOR /F "tokens=* USEBACKQ" %%F IN (`python -V 2^> nul`) DO (
     SET "python=%%F"
 )
 
@@ -178,9 +178,9 @@ echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
 if "%*"=="" (
-    "!python!" "!thisDir!!script_name!"
+    python "!thisDir!!script_name!"
 ) else (
-    "!python!" "!thisDir!!script_name!" %*
+    python "!thisDir!!script_name!" %*
 )
 pause > nul
 goto :EOF
