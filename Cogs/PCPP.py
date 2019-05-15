@@ -125,7 +125,7 @@ async def getMarkdown( url, style = None, escape = False):
 	if not style:
 		style = 'normal'
 	try:
-		response = await DL.async_text(url)
+		response = await DL.async_text(url,{"user-agent":"Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"})
 	except Exception:
 		return None
 	# Let's walk the lines of the file and gather based on cues
