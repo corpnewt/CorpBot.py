@@ -46,14 +46,14 @@ async def async_dl(url, headers = None):
 
 async def async_text(url, headers = None):
     data = await async_dl(url, headers)
-    if data:
+    if data != None:
         return data.decode("utf-8", "replace")
     else:
         return data
 
 async def async_json(url, headers = None):
     data = await async_dl(url, headers)
-    if data:
+    if data != None:
         return json.loads(data.decode("utf-8", "replace"))
     else:
         return data
