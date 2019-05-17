@@ -1,5 +1,7 @@
 from pyquery import PyQuery as pq
-from Cogs import DL 
+from xml.sax.saxutils import unescape
+from Cogs import DL
+from Cogs import Nullify
 
 def setup(bot):
 	# Not a cog
@@ -132,7 +134,7 @@ async def getMarkdown( url, style = None, escape = False):
 	names = []
 	types = []
 	current_name = current_type = None
-	primed = name_primed = False
+	primed = name_primed = type_primed = False
 	for i in response.split("\n"):
 		if i.strip() == "":
 			# skip empty lines
@@ -147,9 +149,10 @@ async def getMarkdown( url, style = None, escape = False):
 		if "</tr>" in i:
 			# Closing bracket for our stuff - dump name and type if we have them
 			if current_name and current_type:
-				names.append(current_name)
-				types.append(current_type)
-				primed = name_primed = False
+				names.append(unescape(current_name,{"&apos;": "'", "&quot;": '"', "&#8203;": ""}))
+				types.append(unescape(current_type,{"&apos;": "'", "&quot;": '"', "&#8203;": ""}))
+				primed = name_primed = type_primed = False
+				type_primed = 0
 				current_name = current_type = None
 			continue
 		# Should be primed here - and checking for name and type
@@ -157,17 +160,31 @@ async def getMarkdown( url, style = None, escape = False):
 			name_primed = False
 			# Assume we should be pulling the name here
 			try:
-				current_name = i.split('">')[1].split("</a>")[0]
-			except:
+				if i.strip().startswith("<"):
+					# Try to format it
+					current_name = i.split('">')[1].split("</a>")[0]
+				else:
+					current_name = i.strip()
+			except Exception as e:
 				pass
+			continue
+		if type_primed == 1:
+			# If it's a custom part - we have to skip an extra line
+			type_primed = 2
+			continue
+		if type_primed == 2:
+			type_primed = False
+			# Try to get the type from the text
+			current_type = i.strip()
 			continue
 		if "td__component" in i:
 			# Got the type
 			try:
 				current_type = i.split("</a></td>")[-2].split('">')[-1]
+				type_primed = False
 			except:
-				# bad type
-				pass
+				# bad type - prime it though
+				type_primed = 1
 			continue
 		if "td__name" in i:
 			# Primed for name
@@ -193,4 +210,4 @@ async def getMarkdown( url, style = None, escape = False):
 	else:
 		# No style present
 		return None
-	return partout
+	return Nullify.clean(partout)
