@@ -1,8 +1,10 @@
+
 # CorpBot.py
 A *slightly* less clumsy python bot for discord
 
 A list of cogs, commands, and descriptions:
 
+# Admin	
 	Admin Cog (26 commands) - Admin.py Extension:
 	  $addadmin [role]
 	   └─ Adds a new role to the admin list (admin only).
@@ -57,15 +59,16 @@ A list of cogs, commands, and descriptions:
 	  $xprole
 	   └─ Lists the required role to give xp, gamble, or feed the bot.
 
+### ASCII	
 	Ascii Cog (1 command) - Ascii.py Extension:
 	  $ascii [text]
 	   └─ Beautify some text (font list at http://artii.herokuapp.com/fonts_list).
 
-	Boop Cog (1 command) - Boop.py Extension:
+####	Boop Cog (1 command) - Boop.py Extension:
 	  $boop [member]
 	   └─ Boop da snoot.
 
-	Bot Cog (27 commands) - Bot.py Extension:
+####	Bot Cog (27 commands) - Bot.py Extension:
 	  $adminunlim [yes_no]
 	   └─ Sets whether or not to allow unlimited xp to admins (owner only).
 	  $avatar [filename]
@@ -121,7 +124,7 @@ A list of cogs, commands, and descriptions:
 	  $watchgame [game]
 	   └─ Sets the watching status of the bot (owner-only).
 
-	BotAdmin Cog (8 commands) - BotAdmin.py Extension:
+#### BotAdmin Cog (8 commands) - BotAdmin.py Extension:
 	  $ban [member]
 	   └─ Bans the selected member (bot-admin only).
 	  $ignore [member]
@@ -139,7 +142,7 @@ A list of cogs, commands, and descriptions:
 	  $unmute [member]
 	   └─ Allows a muted member to send messages in chat (bot-admin only).
 
-	CAH Cog (17 commands) - CAH.py Extension:
+####	CAH Cog (17 commands) - CAH.py Extension:
 	  $addbot
 	   └─ Adds a bot to the game.  Can only be done by the player who created the game.
 	  $addbots [number]
@@ -175,11 +178,11 @@ A list of cogs, commands, and descriptions:
 	  $score
 	   └─ Display the score of the current game.
 
-	Calc Cog (1 command) - Calc.py Extension:
+####	Calc Cog (1 command) - Calc.py Extension:
 	  $calc [formula]
 	   └─ Do some math.
 
-	Channel Cog (7 commands) - Channel.py Extension:
+####	Channel Cog (7 commands) - Channel.py Extension:
 	  $islocked
 	   └─ Says whether the bot only responds to admins.
 	  $ismuted [member]
@@ -195,17 +198,17 @@ A list of cogs, commands, and descriptions:
 	  $rules
 	   └─ Display the server's rules.
 
-	ChatterBot Cog (2 commands) - ChatterBot.py Extension:
+####	ChatterBot Cog (2 commands) - ChatterBot.py Extension:
 	  $chat [message]
 	   └─ Chats with the bot.
 	  $setchatchannel [channel]
 	   └─ Sets the channel for bot chatter.
 
-	Clippy Cog (1 command) - Clippy.py Extension:
+####	Clippy Cog (1 command) - Clippy.py Extension:
 	  $clippy [text]
 	   └─ I *know* you wanted some help with something - what was it?
 
-	CogManager Cog (5 commands) - CogManager.py Extension:
+####	CogManager Cog (5 commands) - CogManager.py Extension:
 	  $extension [extension]
 	   └─ Outputs the cogs attatched to the passed extension.
 	  $extensions
@@ -217,7 +220,7 @@ A list of cogs, commands, and descriptions:
 	  $update
 	   └─ Updates from git.
 
-	Comic Cog (14 commands) - Comic.py Extension:
+####	Comic Cog (14 commands) - Comic.py Extension:
 	  $calvin [date]
 	   └─ Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.
 	  $cyanide [date]
@@ -247,7 +250,7 @@ A list of cogs, commands, and descriptions:
 	  $xkcd [date]
 	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if f...
 
-	DJRoles Cog (4 commands) - DJRoles.py Extension:
+####	DJRoles Cog (4 commands) - DJRoles.py Extension:
 	  $adddj [role]
 	   └─ Adds a new role to the dj list (bot-admin only).
 	  $listdj
@@ -257,7 +260,7 @@ A list of cogs, commands, and descriptions:
 	  $ytlist [yes_no]
 	   └─ Gets or sets whether or not the server will show a list of options when searc...
 
-	Debugging Cog (9 commands) - Debugging.py Extension:
+####	Debugging Cog (9 commands) - Debugging.py Extension:
 	  $clean [messages] [chan]
 	   └─ Cleans the passed number of messages from the given channel - 100 by default ...
 	  $cleardebug
@@ -277,7 +280,7 @@ A list of cogs, commands, and descriptions:
 	  $setlogchannel [channel]
 	   └─ Sets the channel for Logging (bot-admin only).
 
-	DisableCommand Cog (9 commands) - DisableCommand.py Extension:
+####	DisableCommand Cog (9 commands) - DisableCommand.py Extension:
 	  $adminallow [yes_no]
 	   └─ Sets whether admins can access disabled commands (admin-only).
 	  $badminallow [yes_no]
@@ -297,23 +300,23 @@ A list of cogs, commands, and descriptions:
 	  $listdisabled
 	   └─ Lists all disabled commands (admin-only).
 
-	DrBeer Cog (1 command) - DrBeer.py Extension:
+####	DrBeer Cog (1 command) - DrBeer.py Extension:
 	  $drbeer
 	   └─ Put yourself in your place.
 
-	Drink Cog (1 command) - Drink.py Extension:
+####	Drink Cog (1 command) - Drink.py Extension:
 	  $drink [member]
 	   └─ Drink like a boss.
 
-	Eat Cog (1 command) - Eat.py Extension:
+####	Eat Cog (1 command) - Eat.py Extension:
 	  $eat [member]
 	   └─ Eat like a boss.
 
-	EightBall Cog (1 command) - EightBall.py Extension:
+####	EightBall Cog (1 command) - EightBall.py Extension:
 	  $eightball [question]
 	   └─ Get some answers.
 
-	Encode Cog (10 commands) - Encode.py Extension:
+####	Encode Cog (10 commands) - Encode.py Extension:
 	  $binint [input_binary]
 	   └─ Converts the input binary to its integer representation.
 	  $binstr [input_binary]
@@ -335,7 +338,7 @@ A list of cogs, commands, and descriptions:
 	  $strbin [input_string]
 	   └─ Converts the input string to its binary representation.
 
-	Example Cog (4 commands) - Example.py Extension:
+####	Example Cog (4 commands) - Example.py Extension:
 	  $add <left> <right>
 	   └─ Adds two numbers together.
 	  $choose [choices...]
@@ -345,7 +348,7 @@ A list of cogs, commands, and descriptions:
 	  $roll [dice=1d20]
 	   └─ Rolls a dice in NdN±Na/d format.
 
-	Face Cog (4 commands) - Face.py Extension:
+####	Face Cog (4 commands) - Face.py Extension:
 	  $lastlenny
 	   └─ Who Lenny'ed last?
 	  $lastshrug
@@ -355,7 +358,7 @@ A list of cogs, commands, and descriptions:
 	  $shrug [message]
 	   └─ Shrug it off.
 
-	Feed Cog (8 commands) - Feed.py Extension:
+####	Feed Cog (8 commands) - Feed.py Extension:
 	  $feed [food]
 	   └─ Feed the bot some xp!
 	  $hunger
@@ -373,15 +376,15 @@ A list of cogs, commands, and descriptions:
 	  $setkillrole [role]
 	   └─ Sets the required role ID to add/remove hacks (admin only).
 
-	Fliptime Cog (1 command) - Fliptime.py Extension:
+####	Fliptime Cog (1 command) - Fliptime.py Extension:
 	  $tableflip [yes_no]
 	   └─ Turns on/off table flip muting (bot-admin only; always off by default).
 
-	GameLookup Cog (1 command) - GameLookup.py Extension:
+####	GameLookup Cog (1 command) - GameLookup.py Extension:
 	  $gamelookup <game>
 	   └─ Help not available...
 
-	Giphy Cog (4 commands) - Giphy.py Extension:
+####	Giphy Cog (4 commands) - Giphy.py Extension:
 	  $addgif [role]
 	   └─ Adds a new role to the gif list (admin only).
 	  $gif [gif]
@@ -391,21 +394,21 @@ A list of cogs, commands, and descriptions:
 	  $removegif [role]
 	   └─ Removes a role from the gif list (admin only).
 
-	Groot Cog (1 command) - Groot.py Extension:
+####	Groot Cog (1 command) - Groot.py Extension:
 	  $groot
 	   └─ Who... who are you?
 
-	Help Cog (1 command) - Help.py Extension:
+####	Help Cog (1 command) - Help.py Extension:
 	  $dumphelp [tab_indent_count]
 	   └─ Dumps a timpestamped, formatted list of commands and descriptions into the sa...
 	  $help [command]
 	   └─ Lists the bot's commands and cogs.
 
-	HighFive Cog (1 command) - HighFive.py Extension:
+####	HighFive Cog (1 command) - HighFive.py Extension:
 	  $highfive [member]
 	   └─ It's like clapping with 2 people!
 
-	Humor Cog (6 commands) - Humor.py Extension:
+####	Humor Cog (6 commands) - Humor.py Extension:
 	  $fart
 	   └─ PrincessZoey :P
 	  $french
@@ -419,7 +422,7 @@ A list of cogs, commands, and descriptions:
 	  $zalgo [message]
 	   └─ Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂e...
 
-	Hw Cog (12 commands) - Hw.py Extension:
+####	Hw Cog (12 commands) - Hw.py Extension:
 	  $cancelhw
 	   └─ Cancels a current hardware session.
 	  $delhw [build]
@@ -445,15 +448,15 @@ A list of cogs, commands, and descriptions:
 	  $sethwchannel [channel]
 	   └─ Sets the channel for hardware (admin only).
 
-	Invite Cog (1 command) - Invite.py Extension:
+####	Invite Cog (1 command) - Invite.py Extension:
 	  $invite
 	   └─ Outputs a url you can use to invite me to your server.
 
-	Jpeg Cog (1 command) - Jpeg.py Extension:
+####	Jpeg Cog (1 command) - Jpeg.py Extension:
 	  $jpeg [url]
 	   └─ MOAR JPEG!  Accepts a url - or picks the first attachment.
 
-	LangFilter Cog (5 commands) - LangFilter.py Extension:
+####	LangFilter Cog (5 commands) - LangFilter.py Extension:
 	  $addfilter [words]
 	   └─ Adds comma delimited words to the word list (bot-admin only).
 	  $clearfilter
@@ -465,7 +468,7 @@ A list of cogs, commands, and descriptions:
 	  $remfilter [words]
 	   └─ Removes comma delimited words from the word list (bot-admin only).
 
-	Lists Cog (22 commands) - Lists.py Extension:
+####	Lists Cog (22 commands) - Lists.py Extension:
 	  $addhack [name] [hack]
 	   └─ Add a hack to the hack list.
 	  $addlink [name] [link]
@@ -511,11 +514,11 @@ A list of cogs, commands, and descriptions:
 	  $setparts [parts]
 	   └─ Set your own parts - can be a url, formatted text, or nothing to clear. DEPRE...
 
-	MadLibs Cog (1 command) - MadLibs.py Extension:
+####	MadLibs Cog (1 command) - MadLibs.py Extension:
 	  $madlibs
 	   └─ Let's play MadLibs!
 
-	Morse Cog (3 commands) - Morse.py Extension:
+####	Morse Cog (3 commands) - Morse.py Extension:
 	  $morse [content]
 	   └─ Converts ascii to morse code.  Accepts a-z and 0-9.  Each letter is comprised...
 	  $morsetable [num_per_row]
@@ -523,7 +526,7 @@ A list of cogs, commands, and descriptions:
 	  $unmorse [content]
 	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
 
-	Music Cog (21 commands) - Example.py Extension:
+####	Music Cog (21 commands) - Example.py Extension:
 	  $join [channel]
 	   └─ Joins a voice channel.
 	  $keep
@@ -567,23 +570,23 @@ A list of cogs, commands, and descriptions:
 	  $willrepeat
 	   └─ Displays whether or not repeat is active.
 
-	OfflineUser Cog (1 command) - OfflineUser.py Extension:
+####	OfflineUser Cog (1 command) - OfflineUser.py Extension:
 	  $remindoffline [yes_no]
 	   └─ Sets whether to inform users that pinged members are offline or not.
 
-	Plist Cog (2 commands) - Plist.py Extension:
+####	Plist Cog (2 commands) - Plist.py Extension:
 	  $nvweb [os_build]
 	   └─ Prints the download url for the passed OS build number (if it exists).  If no...
 	  $plist [url]
 	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
 
-	Printer Cog (2 commands) - Printer.py Extension:
+####	Printer Cog (2 commands) - Printer.py Extension:
 	  $print [url]
 	   └─ DOT MATRIX.  Accepts a url - or picks the first attachment.
 	  $printavi [member]
 	   └─ Returns a url to the passed member's avatar.
 
-	Profile Cog (7 commands) - Profile.py Extension:
+####	Profile Cog (7 commands) - Profile.py Extension:
 	  $addprofile [name] [link]
 	   └─ Add a profile to your profile list.
 	  $profile [member] [name]
@@ -599,7 +602,7 @@ A list of cogs, commands, and descriptions:
 	  $removeprofile [name]
 	   └─ Remove a profile from your profile list.
 
-	Promote Cog (4 commands) - Promote.py Extension:
+####	Promote Cog (4 commands) - Promote.py Extension:
 	  $demote [member]
 	   └─ Auto-removes the required xp to demote the passed user to the previous role (...
 	  $demoteto [member] [role]
@@ -609,7 +612,7 @@ A list of cogs, commands, and descriptions:
 	  $promoteto [member] [role]
 	   └─ Auto-adds the required xp to promote the passed user to the passed role (admi...
 
-	Quote Cog (6 commands) - Quote.py Extension:
+####	Quote Cog (6 commands) - Quote.py Extension:
 	  $clearquotereaction
 	   └─ Clears the trigger reaction for quoting messages (admin only).
 	  $getquotereaction
@@ -623,11 +626,11 @@ A list of cogs, commands, and descriptions:
 	  $setquotereaction
 	   └─ Sets the trigger reaction for quoting messages (bot-admin only).
 
-	RateLimit Cog (1 command) - RateLimit.py Extension:
+####	RateLimit Cog (1 command) - RateLimit.py Extension:
 	  $ccooldown [delay]
 	   └─ Sets the cooldown in seconds between each command (owner only).
 
-	Reddit Cog (31 commands) - Reddit.py Extension:
+####	Reddit Cog (31 commands) - Reddit.py Extension:
 	  $abandoned
 	   └─ Get something abandoned to look at.
 	  $answer
@@ -691,15 +694,16 @@ A list of cogs, commands, and descriptions:
 	  $withcontext
 	   └─ Spout out some contextual brilliance.
 
-	Remind Cog (3 commands) - Remind.py Extension:
+####	Remind Cog (3 commands) - Remind.py Extension:
 	  $clearmind [index]
 	   └─ Clear the reminder index passed - or all if none passed.
 	  $reminders [member]
 	   └─ List up to 10 pending reminders - pass a user to see their reminders.
 	  $remindme [message] [endtime]
 	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
+	   
 
-	Search Cog (5 commands) - Search.py Extension:
+####	Search Cog (5 commands) - Search.py Extension:
 	  $bing [query]
 	   └─ Get some uh... more searching done.
 	  $convert [amount] [frm] [to]
@@ -711,7 +715,7 @@ A list of cogs, commands, and descriptions:
 	  $searchsite [category_name] [query]
 	   └─ Search corpnewt.com forums.
 
-	Server Cog (7 commands) - Server.py Extension:
+####	Server Cog (7 commands) - Server.py Extension:
 	  $autopcpp [setting]
 	   └─ Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). ...
 	  $dumpservers
@@ -727,7 +731,7 @@ A list of cogs, commands, and descriptions:
 	  $setprefix [prefix]
 	   └─ Sets the bot's prefix (admin only).
 
-	ServerStats Cog (13 commands) - ServerStats.py Extension:
+####	ServerStats Cog (13 commands) - ServerStats.py Extension:
 	  $allmessages
 	   └─ Lists the number of messages I've seen on all severs so far. (only applies af...
 	  $bottomservers [number=10]
@@ -755,7 +759,7 @@ A list of cogs, commands, and descriptions:
 	  $users
 	   └─ Lists the total number of users on all servers I'm connected to.
 
-	Settings Cog (14 commands) - Settings.py Extension:
+####	Settings Cog (14 commands) - Settings.py Extension:
 	  $addowner [member]
 	   └─ Adds an owner to the owner list.  Can only be done by a current owner.
 	  $claim
@@ -785,17 +789,17 @@ A list of cogs, commands, and descriptions:
 	  $setsstat [stat] [value]
 	   └─ Sets a server stat (admin only).
 
-	Setup Cog (1 command) - Setup.py Extension:
+####	Setup Cog (1 command) - Setup.py Extension:
 	  $setup
 	   └─ Runs first-time setup (server owner only).
 
-	Spooktober Cog (2 commands) - Spooktober.py Extension:
+####	Spooktober Cog (2 commands) - Spooktober.py Extension:
 	  $spook [member]
 	   └─ spooky time
 	  $spooking [yes_no]
 	   └─ Enables/Disables reacting 🎃 to every message on Halloween
 
-	Stream Cog (8 commands) - Stream.py Extension:
+####	Stream Cog (8 commands) - Stream.py Extension:
 	  $addstreamer [member]
 	   └─ Adds the passed member to the streamer list (bot-admin only).
 	  $rawstream [message]
@@ -839,7 +843,7 @@ A list of cogs, commands, and descriptions:
 	  $strikes [member]
 	   └─ Check a your own, or another user's total strikes (bot-admin needed to check ...
 
-	Tags Cog (9 commands) - Tags.py Extension:
+####	Tags Cog (9 commands) - Tags.py Extension:
 	  $addtag [name] [tag]
 	   └─ Add a tag to the tag list.
 	  $rawtag [name]
@@ -859,7 +863,7 @@ A list of cogs, commands, and descriptions:
 	  $tags
 	   └─ List all tags in the tags list.
 
-	Telephone Cog (9 commands) - Telephone.py Extension:
+####	Telephone Cog (9 commands) - Telephone.py Extension:
 	  $call [number]
 	   └─ Calls the passed number.  Can use *67 to hide your identity - or *69 to conne...
 	  $callerid
@@ -879,7 +883,7 @@ A list of cogs, commands, and descriptions:
 	  $teleunblock [guild_name]
 	   └─ Unblocks all tele-numbers associated with the passed guild (bot-admin only).
 
-	TempRole Cog (10 commands) - TempRole.py Extension:
+####	TempRole Cog (10 commands) - TempRole.py Extension:
 	  $addtemprole [role]
 	   └─ Adds a new role to the temp role list (admin only).
 	  $autotemp [role]
@@ -901,7 +905,7 @@ A list of cogs, commands, and descriptions:
 	  $untemp [member] [role]
 	   └─ Removes the passed temp role from the passed user (bot-admin only).
 
-	Time Cog (6 commands) - Time.py Extension:
+####	Time Cog (6 commands) - Time.py Extension:
 	  $listtz [tz_search]
 	   └─ List all the supported TimeZones in PM.
 	  $offset [member]
@@ -915,27 +919,27 @@ A list of cogs, commands, and descriptions:
 	  $tz [member]
 	   └─ See a member's TimeZone.
 
-	Translate Cog (2 commands) - Translate.py Extension:
+####	Translate Cog (2 commands) - Translate.py Extension:
 	  $langlist
 	   └─ Lists available languages.
 	  $tr [translate]
 	   └─ Translate some stuff!  Takes a phrase, the from language identifier (optional...
 
-	Turret Cog (1 command) - Turret.py Extension:
+####	Turret Cog (1 command) - Turret.py Extension:
 	  $turret
 	   └─ Now you're thinking with - wait... uh.. turrets?
 
-	Uptime Cog (1 command) - Uptime.py Extension:
+####	Uptime Cog (1 command) - Uptime.py Extension:
 	  $uptime
 	   └─ Lists the bot's uptime.
 
-	UrbanDict Cog (2 commands) - UrbanDict.py Extension:
+####	UrbanDict Cog (2 commands) - UrbanDict.py Extension:
 	  $define [word]
 	   └─ Gives the definition of the word passed.
 	  $randefine
 	   └─ Gives a random word and its definition.
 
-	UserRole Cog (11 commands) - UserRole.py Extension:
+####	UserRole Cog (11 commands) - UserRole.py Extension:
 	  $addrole [role]
 	   └─ Adds a role from the user role list to your roles.  You can have multiples at...
 	  $adduserrole [role]
@@ -959,7 +963,7 @@ A list of cogs, commands, and descriptions:
 	  $urunblock [member]
 	   └─ Unblocks a user from the UserRole system (bot-admin only).
 
-	VoteKick Cog (13 commands) - VoteKick.py Extension:
+####	VoteKick Cog (13 commands) - VoteKick.py Extension:
 	  $setvkchannel [channel]
 	   └─ Sets which channel then mention posts to when enough votes against a user are...
 	  $setvkmention [user_or_role]
@@ -987,13 +991,13 @@ A list of cogs, commands, and descriptions:
 	  $vktomute [number_of_votes]
 	   └─ Sets the number of votes before a user is muted.  Anything less than 1 will d...
 
-	Weather Cog (2 commands) - Weather.py Extension:
+####	Weather Cog (2 commands) - Weather.py Extension:
 	  $forecast [city_name]
 	   └─ Gets some weather.
 	  $tconvert [temp] [from_type] [to_type]
 	   └─ Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 
-	Welcome Cog (7 commands) - Welcome.py Extension:
+####	Welcome Cog (7 commands) - Welcome.py Extension:
 	  $rawgoodbye [member]
 	   └─ Prints the current goodbye message's markdown (bot-admin only).
 	  $rawwelcome [member]
@@ -1009,11 +1013,11 @@ A list of cogs, commands, and descriptions:
 	  $testwelcome [member]
 	   └─ Prints the current welcome message (bot-admin only).
 
-	Wiki Cog (1 command) - Wiki.py Extension:
+####	Wiki Cog (1 command) - Wiki.py Extension:
 	  $wiki [search]
 	   └─ Search Wikipedia!
 
-	Xp Cog (11 commands) - Xp.py Extension:
+####	Xp Cog (11 commands) - Xp.py Extension:
 	  $bottomxp [total=10]
 	   └─ List the bottom xp-holders (max of 50).
 	  $defaultrole
@@ -1037,7 +1041,7 @@ A list of cogs, commands, and descriptions:
 	  $xpinfo
 	   └─ Gives a quick rundown of the xp system.
 
-	XpBlock Cog (4 commands) - XpBlock.py Extension:
+####	XpBlock Cog (4 commands) - XpBlock.py Extension:
 	  $listxpblock
 	   └─ Lists xp blocked users and roles.
 	  $xpblock [user_or_role]
@@ -1047,7 +1051,7 @@ A list of cogs, commands, and descriptions:
 	  $xpunblockall
 	   └─ Removes all users and roles from the xp block list (bot-admin only).
 
-	XpStack Cog (5 commands) - XpStack.py Extension:
+####	XpStack Cog (5 commands) - XpStack.py Extension:
 	  $checkxp
 	   └─ Displays the last xp transactions (bot-admin only).
 	  $clearallxp
