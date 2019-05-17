@@ -240,6 +240,76 @@ class Help(commands.Cog):
 		await message.edit(content='Uploaded *{}!*'.format(serverFile))
 		os.remove(serverFile)
 
+	@commands.command(pass_context=True, hidden=True)
+	async def dumpmarkdown(self, ctx):
+		"""Dumps a timpestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
+		tab_indent_count = 1
+
+		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
+		serverFile = 'HelpMarkdown-{}.md'.format(timeStamp)
+		message = await ctx.send('Saving help list to *{}*...'.format(serverFile))
+		prefix = self._get_prefix(ctx)
+		
+		#msg = "\n".join(["* [{}](#{})".format(x,x.lower()) for x in sorted(self.bot.cogs)])
+		#msg += "\n\n"
+		cog_list = []
+		msg = ""
+		# Get and format the help
+		for cog in sorted(self.bot.cogs):
+			cog_commands = sorted(self.bot.get_cog(cog).get_commands(), key=lambda x:x.name)
+			cog_string = ""
+			# Get the extension
+			the_cog = self.bot.get_cog(cog)
+			# Make sure there are non-hidden commands here
+			visible = []
+			for command in self.bot.get_cog(cog).get_commands():
+				if not command.hidden:
+					visible.append(command)
+			if not len(visible):
+				# All hidden - skip
+				continue
+			cog_list.append(cog)
+			cog_count = "1 command" if len(visible) == 1 else "{} commands".format(len(visible))
+			for e in self.bot.extensions:
+				b_ext = self.bot.extensions.get(e)
+				if self._is_submodule(b_ext.__name__, the_cog.__module__):
+					# It's a submodule
+					cog_string += "## {}\n".format(cog)
+					cog_string += "####{}{} Cog ({}) - {}.py Extension:\n".format(
+						"	"*tab_indent_count,
+						cog,
+						cog_count,
+						e[5:]
+					)
+					break
+			if cog_string == "":
+				cog_string += "## {}\n".format(cog)
+				cog_string += "####{}{} Cog ({}):\n".format(
+					"	"*tab_indent_count,
+					cog,
+					cog_count
+				)
+			for command in cog_commands:
+				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.name + " " + command.signature)
+				cog_string += "{}  {}└─ {}\n".format(
+					"	"*tab_indent_count,
+					" "*len(prefix),
+					self._get_help(command, 80)
+				)
+			cog_string += "\n"
+			msg += cog_string
+		msg = ", ".join(["[{}](#{})".format(x,x.lower()) for x in sorted(cog_list)])+"\n\n"+msg
+		# Encode to binary
+		# Trim the last 2 newlines
+		msg = msg[:-2].encode("utf-8")
+		with open(serverFile, "wb") as myfile:
+			myfile.write(msg)
+
+		await message.edit(content='Uploading *{}*...'.format(serverFile))
+		await ctx.send(file=discord.File(serverFile))
+		await message.edit(content='Uploaded *{}!*'.format(serverFile))
+		os.remove(serverFile)
+
 	@commands.command(pass_context=True)
 	async def help(self, ctx, *, command = None):
 		"""Lists the bot's commands and cogs.
