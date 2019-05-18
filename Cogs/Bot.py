@@ -156,7 +156,7 @@ class Bot(commands.Cog):
 		
 		# Get the current prefix
 		prefix = await self.bot.command_prefix(self.bot, ctx.message)
-		prefix = ", ".join(prefix)
+		prefix = ", ".join([x for x in prefix if not x == "<@!{}> ".format(self.bot.user.id)])
 
 		# Get the owners
 		ownerList = self.settings.getGlobalStat('Owner',[])
