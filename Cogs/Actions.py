@@ -14,7 +14,7 @@ class Actions(commands.Cog):
 	## class that handles storing and computing action messages
 	class actionable:
 		## these should be filled in the override class. any {} are replaced with target member's name
-		nothinglist = [] # when you call without any arguments
+		nothingList = [] # when you call without any arguments
 		botList = [] # when the action is done at the bot
 		selfList = [] # when the action is done at the user who called it
 		memberList = [] # when the action is done toward another member
@@ -192,7 +192,7 @@ class Actions(commands.Cog):
 					'like an open-handed piston of ferocity - you drive your palm into *{}*.']
 
 	class petting(actionable): # meow
-		nothinglist = [ 'you absentmindedly wave your hand in the air.',
+		nothingList = [ 'you absentmindedly wave your hand in the air.',
 						'you could have sworn there was a cat there!',
 						'you remember that there are no cats here.',
 						'you try to pet the cat, but miss because the cat is gone.']
