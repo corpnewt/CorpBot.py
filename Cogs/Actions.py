@@ -142,6 +142,54 @@ class Actions(commands.Cog):
 					'*{}* feels annoyed from your booping.',
 					'*{}* starts resembling a happy pupper.']
 
+	class spooky(actionable):
+		nothingList = [ 'you spook no one but yourself',
+						'you spook nothing, sp00py...',
+						'sadly, no one got spooked',
+						'it is sp00... you can\t spook air']
+		botList = [ 'you scared the living pumpkin out of me!',
+					'you spooked me so hard, I got the Heebie-jeebies...', # https://www.myenglishteacher.eu/blog/idioms-for-being-afraid/
+					'you sp00p me? But I\'m a bot... I can\'t be spooked!',
+					'sorry, but I cannot let you spook me; My digital emotions will get all messed up!'
+					'aaaaaaaaaah! Don\t you scare me like that again!']
+		selfList = ['go watch a scary movie to be absolutely sp00ped!',
+					'boo! Did you scare you?',
+					'you look yourself in the mirror and get a little scared...',
+					'get spooked by... yourself?',
+					'sp00py, but why spook yourself?']
+		memberList = [  'you sp00p *{}* so hard that they start screaming!',
+						'you tried to sneak up on *{}*, but they heard you sneakin\' and fail...',
+						'it is sp00py time! Hey *{}*, boo!',
+						'congrats, *{}* dun sp00ked.',
+						'get spook3d *{}*!']
+		itemList = ['you spook *{}* with no reaction, leaving you looking weird...',
+					'*{}* got sp00p3d so hard, it ran away!',
+					'you trick or treat *{}* without any reaction...',
+					'you do your best to sp00p *{}*, but fail...',
+					'sp00py time! *{}* gets sp00ped harder than you thought and starts crying!']
+
+	class highfives(actionable):
+		nothingList = [ 'you stand alone for an eternity, hand raised up - desperate for any sort of recognition...',
+						'with a wild swing you throw your hand forward - the momentum carries you to the ground and you just lay there - high fiveless...',
+						'the only sound you hear as a soft *whoosh* as your hand connects with nothing...']
+		botList = [ 'the sky erupts with 1\'s and 0\'s as our hands meet in an epic high five of glory!',
+					'you beam up to the cloud and receive a quick high five from me before downloading back to Earth.',
+					'I unleash a fork-bomb of high five processes!',
+					'01001000011010010110011101101000001000000100011001101001011101100110010100100001']
+		selfList = ['ahh - high fiving yourself, classy...',
+					'that\'s uh... that\'s just clapping...',
+					'you run in a large circle - *totally* high fiving all your friends...',
+					'now you\'re at both ends of a high five!']
+		memberList = [  'you and *{}* jump up for an epic high five - freeze-framing as the credits roll and some wicked 80s synth plays out.',
+						'you and *{}* elevate to a higher plane of existence in wake of that tremendous high five!',
+						'a 2 hour, 3 episode anime-esque fight scene unfolds as you and *{}* engage in a world-ending high five!',
+						'it *was* tomorrow - before you and *{}* high fived with enough force to spin the Earth in reverse!',
+						'like two righteous torpedoes - you and *{}* connect palms, subsequently deafening everyone in a 300-mile radius!']
+		itemList = ['neat... you just high fived *{}*.',
+					'your hand flops through the air - hitting *{}* with a soft thud.',
+					'you reach out a hand, gently pressing your palm to *{}*.  A soft *"high five"* escapes your lips as a tear runs down your cheek...',
+					'like an open-handed piston of ferocity - you drive your palm into *{}*.']
+
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
@@ -164,8 +212,27 @@ class Actions(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def boop(self, ctx, *, member : str = None):
-		"""Drink like a boss."""
+		"""Boop da snoot."""
 
 		msg = booping.computeAction(self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def spook(self, ctx, *, member : str = None):
+		"""sp00ktober by camiel."""
+
+		if datetime.today().month == 10:
+			# make it extra sp00py because it is spooktober
+			await ctx.message.add_reaction("🎃")
+		msg = spooky.computeAction(self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def highfive(self, ctx, *, member : str = None):
+		"""High five like a boss."""
+
+		msg = highfives.computeAction(self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
