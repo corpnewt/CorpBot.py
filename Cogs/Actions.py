@@ -19,7 +19,7 @@ class Actions(commands.Cog):
 		memberList = [] # when the action is done toward another member
 		itemList = [] # when the action is done on a string of text that is not a member
 
-		def computeAction(self, ctx, target):
+		def computeAction(self, bot, ctx, target):
 			'''return a message based on the context and argument of the command'''
 			mesg = None
 
@@ -29,9 +29,9 @@ class Actions(commands.Cog):
 			targetMember = DisplayName.memberForName(target, ctx.message.guild)
 
 			if targetMember:
-				if targetMember.id == self.bot.user.id: # actioning the bot
-					mesg = random.choice(self.botList)
-				elif targetmember.id == ctx.message.author.id: # actioning themselves
+				if self.botList and targetMember.id == bot.user.id: # actioning the bot
+					mesg = random.choice(self.botList) # if botList is empty we fail over to the member list
+				elif self.selfList and targetmember.id == ctx.message.author.id: # actioning themselves
 					mesg = random.choice(self.selfList)
 				else: # actioning another user
 					mesg = random.choice(self.memberList)
@@ -71,6 +71,7 @@ class Actions(commands.Cog):
 						'you rip hungrily into *{}*, tearing it to bits!',
 						'you just can\'t bring yourself to eat *{}* - so you just hold it for awhile...',
 						'you attempt to bite into *{}*, but you\'re clumsier than you remember - and fail...']
+
 	class drinking(actionable):
 		nothingList = [ 'you stare at your glass full of *nothing*...',
 						'that cup must\'ve had something in it, so you drink *nothing*...',
@@ -108,6 +109,39 @@ class Actions(commands.Cog):
 					'you drink *{}*.',
 					'*{}* dries up from your drinking.',
 					'*{}* starts resembling the Aral Sea.']
+
+	class booping(actionable):
+		nothingList = [ 'you stretch out your hand in the air, but there\'s nothing there...',
+						'you try and find someone to boop, but there\'s no one there.',
+						'you look around the channel for someone to boop.',
+						'you eye all the heads in the room, just waiting to be booped.',
+						'are you sure you have someone to boop?',
+						'I get it. You want to boop *someone*.']
+		selfList = ['you boop yourself on the nose with your finger.',
+					'you try to boop your head, but your hand gets lost along the way.',
+					'you happily boop yourself, but you are now very giddy.',
+					'wait - are you sure you want to boop yourself?',
+					'you might not be the smartest...',
+					'you might have some issues.',
+					'you try to boop yourself.',
+					'why would you boop yourself?']
+		memberList = [  'you outstretch your lucky finger and boop *{}* in one go.',
+						'you try to boop *{}*, but you just can\'t quite do it - you miss their head, the taste of failure hanging stuck to your hand...',
+						'you sneak a boop onto *{}*.  They probably didn\'t even notice.',
+						'you poke your hand onto *{}\'s* hand - You run away as they run after you.',
+						'you happily drum your fingers away - *{}* starts to look annoyed.',
+						'you\'re feeling boopy - *{}* sacrifices themself involuntarily.',
+						'somehow you end up booping *{}*.',
+						'you climb *{}*\'s head and  use it as a bouncy castle... they feel amused.']
+		itemList = ['you put your hand onto *{}*\'s head. *Bliss.*',
+					'your hand touches *{}*\'s snoot - it feels satisfying.',
+					'you happily boop *{}*, it\'s lovely!',
+					'you just can\'t bring yourself to boop *{}* - so you just let your hand linger...',
+					'you attempt to boop *{}*, but you\'re clumsier than you remember - and fail...',
+					'you boop *{}*.',
+					'*{}* feels annoyed from your booping.',
+					'*{}* starts resembling a happy pupper.']
+
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
@@ -116,17 +150,22 @@ class Actions(commands.Cog):
 	async def eat(self, ctx, *, member : str = None):
 		"""Eat like a boss."""
 
-		msg = eating.computeAction(ctx, member)
+		msg = eating.computeAction(self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
-
-
-
 
 	@commands.command(pass_context=True)
 	async def drink(self, ctx, *, member : str = None):
 		"""Drink like a boss."""
 
-		
+		msg = drinking.computeAction(self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def boop(self, ctx, *, member : str = None):
+		"""Drink like a boss."""
+
+		msg = booping.computeAction(self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
