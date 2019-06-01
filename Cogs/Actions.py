@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import random
+import datetime
 from   discord.ext import commands
 from   Cogs import DisplayName
 from   Cogs import Nullify
@@ -25,22 +26,22 @@ class Actions(commands.Cog):
 
 			if not target: # no arguments
 				mesg = random.choice(self.nothingList)
+			else:
+				targetMember = DisplayName.memberForName(target, ctx.message.guild)
 
-			targetMember = DisplayName.memberForName(target, ctx.message.guild)
-
-			if targetMember:
-				if self.botList and targetMember.id == bot.user.id: # actioning the bot
-					mesg = random.choice(self.botList) # if botList is empty we fail over to the member list
-				elif self.selfList and targetmember.id == ctx.message.author.id: # actioning themselves
-					mesg = random.choice(self.selfList)
-				else: # actioning another user
-					mesg = random.choice(self.memberList)
+				if targetMember:
+					if self.botList and targetMember.id == bot.user.id: # actioning the bot
+						mesg = random.choice(self.botList) # if botList is empty we fail over to the member list
+					elif self.selfList and targetMember.id == ctx.message.author.id: # actioning themselves
+						mesg = random.choice(self.selfList)
+					else: # actioning another user
+						mesg = random.choice(self.memberList)
+						if '{}' in mesg:
+							mesg = mesg.format(DisplayName.name(targetMember))
+				else: # actioning an item
+					mesg = random.choice(self.itemList)
 					if '{}' in mesg:
-						mesg = mesg.format(DisplayName.name(memberCheck))
-			else: # actioning an item
-				mesg = random.choice(self.itemList)
-				if '{}' in mesg:
-					mesg = mesg.format(target)
+						mesg = mesg.format(target)
 
 			mesgFull = '*{}*, {}'.format(DisplayName.name(ctx.message.author), mesg)
 			mesgFull = Nullify.clean(mesgFull)
@@ -190,6 +191,29 @@ class Actions(commands.Cog):
 					'you reach out a hand, gently pressing your palm to *{}*.  A soft *"high five"* escapes your lips as a tear runs down your cheek...',
 					'like an open-handed piston of ferocity - you drive your palm into *{}*.']
 
+	class petting(actionable): # meow
+		nothinglist = [ 'you absentmindedly wave your hand in the air.',
+						'you could have sworn there was a cat there!',
+						'you remember that there are no cats here.',
+						'you try to pet the cat, but miss because the cat is gone.']
+		botList = [ 'I may be electronic but I still appreciate pets.',
+					'*purrrrrrrrrrrrrrr*.',
+					'you electrocute yourself trying to pet a computer.']
+		selfList = ['you give yourself a nice pat on the head.',
+					'too bad there\'s no one else to pet you.',
+					'in lieu of anything else to pet, you pet yourself.',
+					'your hair is warm and soft.']
+		memberList = [  'you give *{}* a pat on the head.',
+						'you rub your hand through *{}\s* hair.',
+						'*{}* smiles from your petting.'
+						'you try to pet *{}*, but miss because they hid under the bed.',
+						'*{}* purrs from your petting.',
+						'you pet *{}* but they bite your hand',
+						'you try to pet *{}* but they hiss and run away.']
+		itemList = ['you rub *{}* but it doesn\'t feel like a cat.',
+					'you don\'t hear any purring from *{}*.',
+					'you hurt your hand trying to pet *{}*.']
+
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
@@ -198,7 +222,7 @@ class Actions(commands.Cog):
 	async def eat(self, ctx, *, member : str = None):
 		"""Eat like a boss."""
 
-		msg = eating.computeAction(self.bot, ctx, member)
+		msg = self.eating.computeAction(self.eating, self.bot, ctx, member) #python is silly and makes me do this for uninitialized classes
 		await ctx.channel.send(msg)
 		return
 
@@ -206,7 +230,7 @@ class Actions(commands.Cog):
 	async def drink(self, ctx, *, member : str = None):
 		"""Drink like a boss."""
 
-		msg = drinking.computeAction(self.bot, ctx, member)
+		msg = self.drinking.computeAction(self.drinking, self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
 
@@ -214,7 +238,7 @@ class Actions(commands.Cog):
 	async def boop(self, ctx, *, member : str = None):
 		"""Boop da snoot."""
 
-		msg = booping.computeAction(self.bot, ctx, member)
+		msg = self.booping.computeAction(self.booping, self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
 
@@ -222,10 +246,10 @@ class Actions(commands.Cog):
 	async def spook(self, ctx, *, member : str = None):
 		"""sp00ktober by camiel."""
 
-		if datetime.today().month == 10:
+		if datetime.date.today().month == 10:
 			# make it extra sp00py because it is spooktober
 			await ctx.message.add_reaction("🎃")
-		msg = spooky.computeAction(self.bot, ctx, member)
+		msg = self.spooky.computeAction(self.spooky, self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
 
@@ -233,6 +257,14 @@ class Actions(commands.Cog):
 	async def highfive(self, ctx, *, member : str = None):
 		"""High five like a boss."""
 
-		msg = highfives.computeAction(self.bot, ctx, member)
+		msg = self.highfives.computeAction(self.highfives, self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
+
+	@commands.command(pass_context=True)
+	async def pet(self, ctx, *, member : str = None):
+		"""pet kitties."""
+
+		msg = self.petting.computeAction(self.petting, self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
