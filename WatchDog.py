@@ -14,29 +14,12 @@ wait_before_restart = 1
 
 def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var
-    if os.name == 'nt':
-        # Check OS (Windows/Unix)
-        command = "where"
-    else:
-        command = "which"
+    command = "where" if os.name == "nt" else "which"
     try:
         p = subprocess.run(command+" "+binary, shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
         return p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
     except:
         return None
-
-def get_python():
-    # Returns the local instance of python - if any
-    # Check if python -V returns a version or not
-    for python in ["python3","python"]:
-        try:
-            p = subprocess.run(python + " -V", shell=True, check=True, stdout=subprocess.PIPE)
-            out = p.stdout.decode("utf-8").replace("\n","").replace("\r","")
-            if len(out):
-                return python
-        except:
-            pass
-    return None
     
 def get_git():
     # Returns the local instance of git - if any
@@ -60,7 +43,7 @@ def main():
     # Here we have our deps checked - let's go into a loop
     while True:
         # Start the bot and wait for it to exit
-        bot_process = subprocess.Popen([python, bot_path])
+        bot_process = subprocess.Popen([sys.executable, bot_path])
         bot_process.wait()
         # Return code time!  Here's what they'll mean:
         # 1 = Error - restart the bot without updating
@@ -74,21 +57,12 @@ def main():
         if bot_process.returncode == 3:
             print("\nShut down.")
             exit(0)
-        # Removed to force a restart
-        # elif bot_process.returncode == 1:
-        #     print("\nERROR LEVEL 1 - Exiting.")
-        #     exit(1)
         elif bot_process.returncode == 2:
             print("\nRebooting...")
             update()
         time.sleep(wait_before_restart)
 
-# Check requirements
-python = get_python()
 git = get_git()
-if python == None:
-    print("Python is not found in your PATH var!")
-    exit(1)
 if git == None:
     print("Git is not found in your PATH var!\nUpdates will be disabled!")
 
