@@ -213,7 +213,7 @@ class Xp(commands.Cog):
 							if tChan:
 								# We *do* have one
 								targetChan = tChan
-						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server))})
+						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server_id))})
 		print("XP Done - took {} seconds.".format(time.time() - t))
 		return responses
 
