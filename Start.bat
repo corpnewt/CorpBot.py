@@ -6,7 +6,6 @@ set "script_name=WatchDog.py"
 set "thisDir=%~dp0"
 set /a tried=0
 set "toask=yes"
-set "python="
 
 goto checkscript
 
@@ -25,10 +24,15 @@ goto checkpy
 
 :checkpy
 REM Get python location
-set "dummypath=%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\python.exe"
-FOR /F "tokens=* USEBACKQ" %%F IN (`where python`) DO (
-    if /i not "%%F" == "!dummypath!" (
-        set "python=%%F"
+set "python="
+FOR /F "tokens=* USEBACKQ" %%F IN (`python -V 2^>^&1`) DO (
+    set "t=%%F"
+    if /i "!t:~0,6!" == "python" (
+        REM Might have python installed - let's check for the store message
+        if /i "!t:was not found=!" == "!t!" (
+            REM There was no change - we found it.
+            set "python=%%F"
+        )
     )
 )
 
@@ -182,9 +186,9 @@ echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
 if "%*"=="" (
-    "!python!" "!thisDir!!script_name!"
+    python "!thisDir!!script_name!"
 ) else (
-    "!python!" "!thisDir!!script_name!" %*
+    python "!thisDir!!script_name!" %*
 )
 pause > nul
 goto :EOF
