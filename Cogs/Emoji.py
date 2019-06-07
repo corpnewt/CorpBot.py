@@ -17,7 +17,7 @@ class Emoji(commands.Cog):
         if not len(emojiparts) == 3:
             await ctx.send("Usage: `{}emoji [emoji]` - must be a CUSTOM emoji, and not just the name.".format(ctx.prefix))
             return
-        emoji_obj = discord.PartialEmoji(len(emojiparts[0]) > 0, emojiparts[1], emojiparts[2])
+        emoji_obj = discord.PartialEmoji(animated=len(emojiparts[0]) > 0, name=emojiparts[1], id=emojiparts[2])
         if not emoji_obj.url:
             await ctx.send("Could not find url for emoji :(")
             return

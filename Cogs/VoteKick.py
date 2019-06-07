@@ -94,9 +94,9 @@ class VoteKick(commands.Cog):
 
 		msg = "__**Current Vote-Kick Settings For {}:**__\n```\n".format(Nullify.clean(ctx.guild.name))
 
-		msg += "   Votes To Mute: {}\n".format(mute_votes)
+		msg += "   Votes To Mute: {}\n".format(int(mute_votes))
 		msg += "       Muted For: {}\n".format(ReadableTime.getReadableTimeBetween(0, mute_time))
-		msg += "Votes to Mention: {}\n".format(ment_votes)
+		msg += "Votes to Mention: {}\n".format(int(ment_votes))
 		if vote_ment:
 			role_check = DisplayName.roleForName(vote_ment, ctx.guild)
 			if not role_check:
@@ -586,6 +586,8 @@ class VoteKick(commands.Cog):
 			"Mentioned" : False,
 			"Kicks" : [ { "ID" : ctx.author.id, "Added" : time.time() } ]
 			})
+		# Set the list
+		self.settings.setServerStat(guild, "VoteKickArray", vote_list)
 		await ctx.send("Vote kick added for *{}*{}!".format(DisplayName.name(check_user), server_msg))
 		await self._check_votes(ctx, check_user)
 
@@ -619,6 +621,7 @@ class VoteKick(commands.Cog):
 		for member in vote_list:
 			if member["ID"] == check_user.id:
 				vote_list.remove(member)
+				self.settings.setServerStat(ctx.guild, "VoteKickArray", vote_list)
 				await ctx.send("All votes against *{}* have been removed.".format(DisplayName.name(check_user)))
 				return
 		await ctx.send("*{}* has no votes against them - nothing to clear.".format(DisplayName.name(check_user)))
@@ -686,9 +689,9 @@ class VoteKick(commands.Cog):
 					# Disabled
 					continue
 				cd = self.settings.getUserStat(member, guild, "Cooldown")
-				isMute = self.settings.getUserStat(member, guild, "Muted")
+				isMute = self.settings.getUserStat(member, guild, "Muted", False)
 				if cd == None:
-					if isMute.lower() == 'yes':
+					if isMute:
 						# We're now muted permanently
 						continue
 				# Check our cooldowns

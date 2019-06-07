@@ -127,10 +127,10 @@ class Mute(commands.Cog):
         # We've waited it out - unmute if needed
         # But check if the mute time has changed
         cd = self.settings.getUserStat(member, server, "Cooldown")
-        isMute = self.settings.getUserStat(member, server, "Muted")
+        isMute = self.settings.getUserStat(member, server, "Muted", False)
         
         if cd == None:
-            if isMute.lower() == 'yes':
+            if isMute:
                 # We're now muted permanently
                 self._remove_task(task)
                 return
@@ -143,7 +143,7 @@ class Mute(commands.Cog):
                 return
 
         # Here - we either have surpassed our cooldown - or we're not muted anymore
-        isMute = self.settings.getUserStat(member, server, "Muted")
+        isMute = self.settings.getUserStat(member, server, "Muted", False)
         if isMute:
             await self.unmute(member, server)
             pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(self.suppressed(server, server.name))
