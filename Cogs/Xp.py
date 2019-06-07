@@ -102,7 +102,10 @@ class Xp(commands.Cog):
 			memlist = server_dict.get(str(x.guild.id), [])
 			memlist.append(x)
 			server_dict[str(x.guild.id)] = memlist
-		for server in server_dict:
+		for server_id in server_dict:
+			server = self.bot.get_guild(int(server_id))
+			if not server:
+				continue
 			# Iterate through the servers and add them
 			xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
 			xpAmount   = float(xpAmount/6)
@@ -119,7 +122,7 @@ class Xp(commands.Cog):
 			xpblock = self.settings.getServerStat(server, "XpBlockArray")
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
 			
-			for user in server_dict[server]:
+			for user in server_dict[server_id]:
 
 				# First see if we're current - we want to bail quickly
 				if not self.is_current:
