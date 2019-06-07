@@ -17,6 +17,29 @@ class MessageXp(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+
+	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
+		# Checks whether or not said user has access to the xp system
+		if requiredXP == None:
+			requiredXP = self.settings.getServerStat(server, "RequiredXPRole", None)
+		if promoArray == None:
+			promoArray = self.settings.getServerStat(server, "PromotionArray", [])
+
+		if not requiredXP:
+			return True
+
+		for checkRole in user.roles:
+			if str(checkRole.id) == str(requiredXP):
+				return True
+				
+		# Still check if we have enough xp
+		userXP = self.settings.getUserStat(user, server, "XP")
+		for role in promoArray:
+			if str(role["ID"]) == str(requiredXP):
+				if userXP >= role["XP"]:
+					return True
+				break
+		return False
 		
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -32,6 +55,10 @@ class MessageXp(commands.Cog):
 		for role in message.author.roles:
 			if role.id in xpblock:
 				return { 'Ignore' : False, 'Delete' : False}
+
+		if not self._can_xp(message.author, server):
+			# Can't apply - bail
+			return { 'Ignore' : False, 'Delete' : False}
 
 		xpAmount   = int(self.settings.getServerStat(server, "XPPerMessage"))
 		xpRAmount  = int(self.settings.getServerStat(server, "XPRPerMessage"))

@@ -29,18 +29,19 @@ class Xp(commands.Cog):
 	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
 		# Checks whether or not said user has access to the xp system
 		if requiredXP == None:
-			requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
+			requiredXP = self.settings.getServerStat(server, "RequiredXPRole", None)
 		if promoArray == None:
-			promoArray  = self.settings.getServerStat(server, "PromotionArray")
+			promoArray = self.settings.getServerStat(server, "PromotionArray", [])
 
-		userXP      = self.settings.getUserStat(user, server, "XP")
 		if not requiredXP:
 			return True
 
 		for checkRole in user.roles:
 			if str(checkRole.id) == str(requiredXP):
 				return True
+				
 		# Still check if we have enough xp
+		userXP = self.settings.getUserStat(user, server, "XP")
 		for role in promoArray:
 			if str(role["ID"]) == str(requiredXP):
 				if userXP >= role["XP"]:
