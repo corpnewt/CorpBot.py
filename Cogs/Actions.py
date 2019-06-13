@@ -35,9 +35,7 @@ class Actions(commands.Cog):
 					elif self.selfList and targetMember.id == ctx.message.author.id: # actioning themselves
 						mesg = random.choice(self.selfList)
 					else: # actioning another user
-						mesg = random.choice(self.memberList)
-						if '{}' in mesg:
-							mesg = mesg.format(DisplayName.name(targetMember))
+						mesg = random.choice(self.memberList).replace("{}",DisplayName.name(targetMember))
 				else: # actioning an item
 					mesg = random.choice(self.itemList)
 					if '{}' in mesg:
@@ -204,7 +202,7 @@ class Actions(commands.Cog):
 					'in lieu of anything else to pet, you pet yourself.',
 					'your hair is warm and soft.']
 		memberList = [  'you give *{}* a pat on the head.',
-						'you rub your hand through *{}\s* hair.',
+						'you rub your hand through *{}\'s* hair.',
 						'*{}* smiles from your petting.'
 						'you try to pet *{}*, but miss because they hid under the bed.',
 						'*{}* purrs from your petting.',
