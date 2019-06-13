@@ -79,6 +79,12 @@ class Bot(commands.Cog):
 
 
 	async def onserverjoin(self, server):
+		# First verify if we're joining servers
+		if not self.settings.getGlobalStat("AllowServerJoin",True):
+			# Not joining - bail
+			await server.leave()
+			return True
+		# Iterate the blocked list and see if we are blocked
 		serverList = self.settings.getGlobalStat('BlockedServers',[])
 		for serv in serverList:
 			serverName = str(serv).lower()
@@ -1257,6 +1263,49 @@ class Bot(commands.Cog):
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def canjoin(self, ctx, *, yes_no = None):
+		"""Sets whether the bot is allowed to join new servers (owner-only and enabled by default)."""
+
+		# Only allow owner
+		isOwner = self.settings.isOwner(ctx.author)
+		if isOwner == None:
+			msg = 'I have not been claimed, *yet*.'
+			await ctx.channel.send(msg)
+			return
+		elif isOwner == False:
+			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+			await ctx.channel.send(msg)
+			return
+
+		setting_name = "Allow new server joins"
+		setting_val  = "AllowServerJoin"
+
+		current = self.settings.getGlobalStat(setting_val, True)
+		if yes_no == None:
+			if current:
+				msg = "{} currently *enabled.*".format(setting_name)
+			else:
+				msg = "{} currently *disabled.*".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains *enabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *enabled*.'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains *disabled*.'.format(setting_name)
+			else:
+				msg = '{} is now *disabled*.'.format(setting_name)
+		else:
+			msg = "That's not a valid setting."
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.settings.setGlobalStat(setting_val, yes_no)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def block(self, ctx, *, server : str = None):
