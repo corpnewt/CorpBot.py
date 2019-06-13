@@ -203,7 +203,7 @@ class Actions(commands.Cog):
 					'your hair is warm and soft.']
 		memberList = [  'you give *{}* a pat on the head.',
 						'you rub your hand through *{}\'s* hair.',
-						'*{}* smiles from your petting.'
+						'*{}* smiles from your petting.',
 						'you try to pet *{}*, but miss because they hid under the bed.',
 						'*{}* purrs from your petting.',
 						'you pet *{}* but they bite your hand',
