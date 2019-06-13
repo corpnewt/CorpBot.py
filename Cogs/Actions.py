@@ -22,7 +22,7 @@ class Actions(commands.Cog):
 
 		def computeAction(self, bot, ctx, target):
 			'''return a message based on the context and argument of the command'''
-			mesg = None
+			mesg = ""
 
 			if not target: # no arguments
 				mesg = random.choice(self.nothingList)
