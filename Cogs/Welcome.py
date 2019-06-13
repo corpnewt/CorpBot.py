@@ -227,7 +227,7 @@ class Welcome(commands.Cog):
             await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
             return
         # Escape the markdown
-        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        message = discord.utils.escape_markdown(message)
         await ctx.send(message)
         # Print the welcome channel
         welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")
@@ -400,7 +400,7 @@ class Welcome(commands.Cog):
             await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
             return
         # Escape the markdown
-        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        message = discord.utils.escape_markdown(message)
         await ctx.send(message)
         # Print the goodbye channel
         welcomeChannel = self.settings.getServerStat(ctx.message.guild, "WelcomeChannel")

@@ -803,11 +803,7 @@ class Hw(commands.Cog):
 				return
 		
 		# At this point - we *should* have a user and a build
-		# Escape all \ with \\
-		p = buildParts['Hardware'].replace('\\', '\\\\')
-		p = p.replace('*', '\\*')
-		p = p.replace('`', '\\`')
-		p = p.replace('_', '\\_')
+		p = discord.utils.escape_markdown(buildParts['Hardware'])
 		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
 		if self.checkSuppress(ctx):
 			msg = Nullify.clean(msg)
