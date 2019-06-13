@@ -235,7 +235,7 @@ class Lists(commands.Cog):
 				await channel.send(msg)
 				return
 				
-		not_found = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Link `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		if suppress:
 			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
@@ -271,7 +271,7 @@ class Lists(commands.Cog):
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Link `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -305,14 +305,14 @@ class Lists(commands.Cog):
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				msg = '**{}:**\n{}'.format(alink['Name'], discord.utils.escape_markdown(alink['URL']))
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
 				
-		not_found = 'Link `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Link `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
@@ -330,14 +330,14 @@ class Lists(commands.Cog):
 			# Display the link
 			for alink in linkList:
 				if alink["Name"] == potentialList[index]["Item"]["Name"]:
-					msg = '**{}:**\n{}'.format(alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+					msg = '**{}:**\n{}'.format(alink['Name'], discord.utils.escape_markdown(alink['URL']))
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Link `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -443,17 +443,13 @@ class Lists(commands.Cog):
 			return
 			
 		# Sort by link name
-		sep = "\n"
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
-		for alink in linkList:
-			linkText = '{}*{}*{}'.format(linkText, alink['Name'], sep)
-
-		# Speak the link list while cutting off the end ", "
+		linkText += "\n".join([x["Name"] for x in linkList])
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-len(sep)]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -475,12 +471,8 @@ class Lists(commands.Cog):
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('`', '\\`')
-			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}link {}`?'.format(extraArgs, ctx.prefix, extraArgs)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await channel.send(msg)
+			# Invoke this command again with the right name
+			await ctx.invoke(self.rawlink, name=extraArgs)
 			return
 		
 		linkList = self.settings.getServerStat(server, "Links")
@@ -492,14 +484,11 @@ class Lists(commands.Cog):
 		# Sort by link name
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Links:\n\n"
-		for alink in linkList:
-			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
-
-		# Speak the link list while cutting off the end ", "
+		linkText += discord.utils.escape_markdown("\n".join([x["Name"] for x in linkList]))
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -657,7 +646,7 @@ class Lists(commands.Cog):
 				await ctx.channel.send(msg)
 				return
 
-		msg = '*{}* not found in hack list!'.format(name)
+		msg = '`{}` not found in hack list!'.format(name.replace("`", "").replace("\\",""))
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
@@ -730,7 +719,7 @@ class Lists(commands.Cog):
 				await channel.send(msg)
 				return
 		
-		not_found = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Hack `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		if suppress:
 			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
@@ -766,7 +755,7 @@ class Lists(commands.Cog):
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Hack `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -800,14 +789,14 @@ class Lists(commands.Cog):
 
 		for alink in linkList:
 			if alink['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				msg = '**{}:**\n{}'.format(alink['Name'], discord.utils.escape_markdown(alink['Hack']))
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
 		
-		not_found = 'Hack `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Hack `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, linkList, 'Name')
 		if len(potentialList):
@@ -825,14 +814,14 @@ class Lists(commands.Cog):
 			# Display the link
 			for alink in linkList:
 				if alink["Name"] == potentialList[index]["Item"]["Name"]:
-					msg = '**{}:**\n{}'.format(alink['Name'], alink['Hack'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+					msg = '**{}:**\n{}'.format(alink['Name'], discord.utils.escape_markdown(alink['Hack']))
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Hack `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -937,19 +926,14 @@ class Lists(commands.Cog):
 			await channel.send(msg)
 			return
 
-		# Sort by link name
-		sep = "\n"
+		# Sort by hack name
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
-
-		for alink in linkList:
-			linkText = '{}*{}*{}'.format(linkText, alink['Name'], sep)
-
-		# Speak the hack list while cutting off the end ", "
+		linkText += "\n".join([x["Name"] for x in linkList])
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-len(sep)]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -971,12 +955,7 @@ class Lists(commands.Cog):
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('`', '\\`')
-			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}hack {}`?'.format(extraArgs, ctx.prefix, extraArgs)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await channel.send(msg)
+			await ctx.invoke(self.rawhack, name=extraArgs)
 			return
 
 		linkList = self.settings.getServerStat(server, "Hacks")
@@ -985,18 +964,14 @@ class Lists(commands.Cog):
 			await channel.send(msg)
 			return
 
-		# Sort by link name
+		# Sort by hack name
 		linkList = sorted(linkList, key=lambda x:x['Name'].lower())
 		linkText = "Current Hacks:\n\n"
-
-		for alink in linkList:
-			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
-
-		# Speak the hack list while cutting off the end ", "
+		linkText += discord.utils.escape_markdown("\n".join([x["Name"] for x in linkList]))
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -1115,10 +1090,7 @@ class Lists(commands.Cog):
 			await channel.send(msg)
 			return
 
-		p = parts.replace('\\', '\\\\')
-		p = p.replace('*', '\\*')
-		p = p.replace('`', '\\`')
-		p = p.replace('_', '\\_')
+		p = discord.utils.escape_markdown(parts)
 
 		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, p)
 		# Check for suppress

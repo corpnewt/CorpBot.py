@@ -248,7 +248,7 @@ class Profile(commands.Cog):
 						for alink in linkList:
 							if alink['Name'].lower() == profileStr.lower():
 								# Found the link - return it.
-								msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(memFromName), alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+								msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(memFromName), alink['Name'], discord.utils.escape_markdown(alink['URL']))
 								# Check for suppress
 								if suppress:
 									msg = Nullify.clean(msg)
@@ -262,7 +262,7 @@ class Profile(commands.Cog):
 		for alink in linkList:
 			if alink['Name'].lower() == member.lower():
 				# Found the link - return it.
-				msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(author), alink['Name'], alink['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(author), alink['Name'], discord.utils.escape_markdown(alink['URL']))
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
@@ -404,15 +404,11 @@ class Profile(commands.Cog):
 		# Sort by link name
 		linkList = sorted(linkList, key=itemgetter('Name'))
 		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
-		for alink in linkList:
-			linkText = '{}*{}*, '.format(linkText, alink['Name'])
-
+		linkText += "\n".join([x["Name"] for x in linkList])
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-
-		# Speak the link list while cutting off the end ", "
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)
 		
 	@commands.command(pass_context=True)
 	async def rawprofiles(self, ctx, *, member : str = None):
@@ -454,12 +450,8 @@ class Profile(commands.Cog):
 		# Sort by link name
 		linkList = sorted(linkList, key=itemgetter('Name'))
 		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
-		for alink in linkList:
-			linkText += '`{}`, '.format(alink['Name'].replace('`', '\\`'))
-
+		linkText += discord.utils.escape_markdown("\n".join([x["Name"] for x in linkList]))
 		# Check for suppress
 		if suppress:
 			linkText = Nullify.clean(linkText)
-
-		# Speak the link list while cutting off the end ", "
-		await Message.Message(message=linkText[:-2]).send(ctx)
+		await Message.Message(message=linkText).send(ctx)

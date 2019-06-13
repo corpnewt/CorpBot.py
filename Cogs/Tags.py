@@ -238,7 +238,7 @@ class Tags(commands.Cog):
 			return
 
 		tagList = self.settings.getServerStat(server, our_list)
-		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Tag `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		# Check others
 		other_commands = []
 		other_names    = []
@@ -282,7 +282,7 @@ class Tags(commands.Cog):
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
-		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Tag `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		if suppress:
 			not_found = Nullify.clean(not_found)
 		# No tag - let's fuzzy search
@@ -318,7 +318,7 @@ class Tags(commands.Cog):
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Tag `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -352,14 +352,14 @@ class Tags(commands.Cog):
 
 		for atag in tagList:
 			if atag['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+				msg = '**{}:**\n{}'.format(atag['Name'], discord.utils.escape_markdown(atag['URL']))
 				# Check for suppress
 				if suppress:
 					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				return
 				
-		not_found = 'Tag `{}` not found!'.format(name.replace('`', '\\`'))
+		not_found = 'Tag `{}` not found!'.format(name.replace("`", "").replace("\\",""))
 		# No tag - let's fuzzy search
 		potentialList = FuzzySearch.search(name, tagList, 'Name')
 		if len(potentialList):
@@ -377,14 +377,14 @@ class Tags(commands.Cog):
 			# Display the tag
 			for atag in tagList:
 				if atag["Name"] == potentialList[index]["Item"]["Name"]:
-					msg = '**{}:**\n{}'.format(atag['Name'], atag['URL'].replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
+					msg = '**{}:**\n{}'.format(atag['Name'], discord.utils.escape_markdown(atag['URL']))
 					# Check for suppress
 					if suppress:
 						msg = Nullify.clean(msg)
 					await message.edit(content=msg)
 					return
 			await message.edit(content="Tag `{}` no longer exists!".format(
-				potentialList[index]["Item"]["Name"].replace('`', '\\`'))
+				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
 			)
 			return
 		# Here we have no potentials
@@ -490,17 +490,13 @@ class Tags(commands.Cog):
 			return
 			
 		# Sort by tag name
-		sep = "\n"
 		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
-		for atag in tagList:
-			tagText = '{}*{}*{}'.format(tagText, atag['Name'], sep)
-
-		# Speak the tag list while cutting off the end ", "
+		tagText += "\n".join([x["Name"] for x in tagList])
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		await Message.Message(message=tagText[:-len(sep)]).send(ctx)
+		await Message.Message(message=tagText).send(ctx)
 		
 		
 	@commands.command(pass_context=True)
@@ -522,12 +518,7 @@ class Tags(commands.Cog):
 		if len(argList) > 1:
 			extraArgs = ' '.join(argList[1:len(argList)])
 			# We have a random attempt at a passed variable - Thanks Sydney!
-			extraArgs = extraArgs.replace('`', '\\`')
-			msg = 'You passed `{}` to this command - are you sure you didn\'t mean `{}tag {}`?'.format(extraArgs, ctx.prefix, extraArgs)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await channel.send(msg)
+			await ctx.invoke(self.rawtag, name=extraArgs)
 			return
 		
 		tagList = self.settings.getServerStat(server, "Tags")
@@ -537,17 +528,13 @@ class Tags(commands.Cog):
 			return
 			
 		# Sort by tag name
-		sep = "\n"
 		tagList = sorted(tagList, key=lambda x:x['Name'].lower())
 		tagText = "Current Tags:\n\n"
-		for atag in tagList:
-			tagText +='`{}`{}'.format(atag['Name'].replace('`', '\\`'), sep)
-
-		# Speak the tag list while cutting off the end ", "
+		tagText += discord.utils.escape_markdown("\n".join([x["Name"] for x in tagList]))
 		# Check for suppress
 		if suppress:
 			tagText = Nullify.clean(tagText)
-		await Message.Message(message=tagText[:-len(sep)]).send(ctx)
+		await Message.Message(message=tagText).send(ctx)
 
 
 	@commands.command(pass_context=True)
