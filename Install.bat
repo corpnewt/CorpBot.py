@@ -172,7 +172,9 @@ echo   ###                ###
 echo  # CorpBot - CorpNewt #
 echo ###                ###
 echo.
-if "%*"=="" (
+set "args=%*"
+set "args=!args:"=!"
+if "!args!"=="" (
     python "!thisDir!!script_name!"
 ) else (
     python "!thisDir!!script_name!" %*
