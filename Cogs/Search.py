@@ -51,7 +51,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "http://letmebingthatforyou.com/?q={}".format(quote(query))
+		lmgtfy = "https://lmgtfy.com/?s=b&q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
 		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
@@ -66,7 +66,52 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmddgtfy.net/?q={}".format(quote(query))
+		lmgtfy = "https://lmgtfy.com/?s=d&q={}".format(quote(query))
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		# Say message
+		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def yahoo(self, ctx, *, query = None):
+		"""Let Yahoo! answer your questions."""
+
+		if query == None:
+			msg = 'You need a topic for me to Yahoo.'
+			await ctx.channel.send(msg)
+			return
+
+		lmgtfy = "https://lmgtfy.com/?s=y&q={}".format(quote(query))
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		# Say message
+		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def aol(self, ctx, *, query = None):
+		"""The OG search engine."""
+
+		if query == None:
+			msg = 'You need a topic for me to AOL.'
+			await ctx.channel.send(msg)
+			return
+
+		lmgtfy = "https://lmgtfy.com/?s=a&q={}".format(quote(query))
+		lmgtfyT = TinyURL.tiny_url(lmgtfy)
+		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		# Say message
+		await ctx.channel.send(msg)
+
+	@commands.command(pass_context=True)
+	async def ask(self, ctx, *, query = None):
+		"""Jeeves, please answer these questions."""
+
+		if query == None:
+			msg = 'You need a topic for me to Ask Jeeves.'
+			await ctx.channel.send(msg)
+			return
+
+		lmgtfy = "https://lmgtfy.com/?s=k&q={}".format(quote(query))
 		lmgtfyT = TinyURL.tiny_url(lmgtfy)
 		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		# Say message
