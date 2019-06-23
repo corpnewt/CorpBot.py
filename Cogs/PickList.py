@@ -20,6 +20,17 @@ class Picker:
         for r in react_list:
             await message.add_reaction(r)
 
+    async def _remove_reactions(self, message, react_list = []):
+        # Try to remove all reactions - if that fails, iterate and remove our own
+        try:
+            await message.clear_reactions()
+        except:
+            pass
+            # The following "works", but is super slow - and if we can't clear
+            # all reactions, it's probably just best to leave them there and bail.
+            '''for r in react_list:
+                await message.remove_reaction(r,message.author)'''
+
     async def pick(self):
         # This actually brings up the pick list and handles the nonsense
         # Returns a tuple of (return_code, message)
@@ -60,7 +71,7 @@ class Picker:
             await message.clear_reactions()
             return (-2, message)
         
-        await message.clear_reactions()
+        await self._remove_reactions(message, current_reactions)
         # Get the adjusted index
         ind = current_reactions.index(str(reaction.emoji))
         if ind == len(current_reactions)-1:
