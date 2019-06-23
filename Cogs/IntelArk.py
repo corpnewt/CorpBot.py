@@ -40,11 +40,6 @@ class IntelArk(commands.Cog):
 			"color":ctx.author
 		}
 
-		if isinstance(ctx.channel, discord.DMChannel):
-			args["description"] = "Please search in the main channel."
-			await Message.EmbedText(**args).send(ctx)
-			return
-
 		if text == None:
 			await Message.EmbedText(**args).send(ctx)
 			return
