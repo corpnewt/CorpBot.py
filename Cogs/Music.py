@@ -114,7 +114,7 @@ def setup(bot):
 
 class Music(commands.Cog):
 
-	__slots__ = ("bot","settings","folder","delay","queue","skips","vol","regex")
+	__slots__ = ("bot","settings","folder","delay","queue","skips","vol","loop","data","regex")
 
 	def __init__(self, bot, settings):
 		self.bot      = bot
@@ -127,6 +127,8 @@ class Music(commands.Cog):
 		self.queue    = {}
 		self.skips    = {}
 		self.vol      = {}
+		self.loop     = False
+		self.data     = None
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
@@ -288,15 +290,20 @@ class Music(commands.Cog):
 		task = "playing"
 		if error:
 			print(error)
+		queue = self.queue.get(str(ctx.guild.id),[])
+		if self.loop and self.data:
+			# Re-add the track to the end of the playlist
+			queue.append(self.data)
 		# Try to cleanup before starting
 		if ctx.voice_client:
 			ctx.voice_client.stop()
-		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
 			# Nothing to play, bail
 			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
+		# Save the current data in case of repeats
+		self.data = data
 		async with ctx.typing():
 			if data.get("duration",0) == 0:
 				# No idea how long this one is, stream it
@@ -307,13 +314,7 @@ class Music(commands.Cog):
 				player = await YTDLSource.from_url(ctx, data, loop=self.bot.loop, folder=self.folder)
 			# Set the last volume level
 			player.volume = self.vol.get(str(ctx.guild.id),0.5)
-			#try:
 			ctx.voice_client.play(player, after=lambda e: self.bot.dispatch("next_song",ctx,e if e else None))
-			#except Exception as e:
-			#	# Failed to enqueue
-			#	print(e)
-			#	queue.insert(0,data)
-			#	return
 		await Message.Embed(
 			title="♫ Now {}: {}".format(task.capitalize(), data.get("title","Unknown")),
 			fields=[
@@ -477,6 +478,8 @@ class Music(commands.Cog):
 			pl_string = " (10/{} shown)".format(len(queue)+1)
 		else:
 			pl_string = ""
+		if self.loop:
+			pl_string += " - Repeat Enabled"
 		await Message.Embed(
 			title="♫ Current Playlist{}".format(pl_string),
 			color=ctx.author,
@@ -555,6 +558,38 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=self.delay).send(ctx)
 
 	@commands.command()
+	async def repeat(self, ctx, *, yes_no = None):
+		"""Checks or sets whether to repeat or not."""
+
+		if ctx.voice_client is None:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+		current = self.loop
+		setting_name = "Repeat"
+		if yes_no == None:
+			if current:
+				msg = "{} currently enabled!".format(setting_name)
+			else:
+				msg = "{} currently disabled!".format(setting_name)
+		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+			yes_no = True
+			if current == True:
+				msg = '{} remains enabled!'.format(setting_name)
+			else:
+				msg = '{} is now enabled!'.format(setting_name)
+		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+			yes_no = False
+			if current == False:
+				msg = '{} remains disabled!'.format(setting_name)
+			else:
+				msg = '{} is now disabled!'.format(setting_name)
+		else:
+			msg = "That's not a valid setting!"
+			yes_no = current
+		if not yes_no == None and not yes_no == current:
+			self.loop = yes_no
+		await Message.EmbedText(title="♫ "+msg,color=ctx.author,delete_after=self.delay).send(ctx)
+
+	@commands.command()
 	async def stop(self, ctx):
 		"""Stops and disconnects the bot from voice"""
 		
@@ -570,6 +605,7 @@ class Music(commands.Cog):
 	@skip.before_invoke
 	@stop.before_invoke
 	@volume.before_invoke
+	@repeat.before_invoke
 	async def ensure_roles(self, ctx):
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
