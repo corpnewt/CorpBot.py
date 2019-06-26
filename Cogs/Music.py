@@ -310,6 +310,28 @@ class Music(commands.Cog):
 		).edit(ctx,message)
 
 	@commands.command()
+	async def unplay(self, ctx, *, song_number = None):
+		"""Removes the passed song number from the queue.  You must be the requestor, or an admin to remove it."""
+		if ctx.voice_client is None:
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+		queue = self.queue.get(str(ctx.guild.id))
+		if not len(queue):
+			# No songs in queue
+			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=self.delay).send(ctx)
+		try:
+			song_number = int(song_number)-1
+		except:
+			return await Message.EmbedText(title="♫ Not a valid song number!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if song_number < 0 or song_number > len(queue):
+			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=self.delay).send(ctx)
+		# Get the song at the index
+		song = queue[song_number]
+		if song.get("added_by",None) == ctx.author or ctx.author.permissions_in(ctx.channel).administrator:
+			queue.pop(song_number)
+			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=self.delay).send(ctx)
+
+	@commands.command()
 	async def playing(self, ctx):
 		"""Lists the currently playing song if any."""
 
@@ -354,21 +376,24 @@ class Music(commands.Cog):
 				delete_after=self.delay
 			).send(ctx)
 		data = ctx.voice_client.source.data
-		fields = [{"name":"1. {}".format(data.get("title")),"value":"Currently Playing - at {} - Requested by {}".format(
+		queue = self.queue.get(str(ctx.guild.id))
+		fields = [{"name":"{}".format(data.get("title")),"value":"Currently Playing - at {} - Requested by {}".format(
 			self.format_duration(int(time.time())-data["started_at"],True),
-			data["added_by"].mention),"inline":False
-			}]
-		for x,y in enumerate(self.queue.get(str(ctx.guild.id))):
-			if x >= 9:
+			data["added_by"].mention),"inline":False}
+		]
+		if len(queue):
+			fields.append({"name":"♫ Up Next","value":"-- {} Song{} In Queue --".format(len(queue), "" if len(queue) == 1 else "s"),"inline":False})
+		for x,y in enumerate(queue):
+			if x >= 10:
 				# We have 10 values already - bail
 				break
-			x += 2 # brings this up to the proper numbering
+			x += 1 # brings this up to the proper numbering
 			fields.append({
 				"name":"{}. {}".format(x,y.get("title")),
 				"value":"{} - Requested by {}".format(self.format_duration(y.get("duration",0)),y["added_by"].mention),
 				"inline":False})
-		if len(self.queue.get(str(ctx.guild.id))) > 9:
-			pl_string = " (10/{} shown)".format(len(self.queue.get(str(ctx.guild.id)))+1)
+		if len(queue) > 9:
+			pl_string = " (10/{} shown)".format(len(queue)+1)
 		else:
 			pl_string = ""
 		await Message.Embed(
