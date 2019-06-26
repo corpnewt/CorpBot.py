@@ -196,6 +196,61 @@ class Music(commands.Cog):
 		seconds = dur % 60
 		return "{:02d}h:{:02d}m:{:02d}s".format(hours, minutes, seconds)
 
+	def format_elapsed(self, data):
+		progress = int(time.time())-data.get("started_at",0)
+		total    = data.get("duration",0)
+		return "{} -- {}".format(self.format_duration(progress),self.format_duration(total))
+
+	def progress_bar(self,data,bar_width=27,show_percent=True,include_time=False):
+		# Returns a [#####-----] XX.x% style progress bar
+		progress = int(time.time())-data.get("started_at",0)
+		total    = data.get("duration",0)
+		bar = ""
+		# Account for the brackets
+		bar_width = 10 if bar_width-2 < 10 else bar_width-2
+		if total == 0:
+			# We don't know how long the song is - or it's a stream
+			# return a progress bar of [//////////////] instead
+			bar = "[{}]".format("/"*bar_width)
+		else:
+			# Calculate the progress vs total
+			p = int(round((progress/total*bar_width)))
+			bar = "[{}{}]".format("■"*p,"□"*(bar_width-p))
+		if show_percent:
+			bar += " --%" if total == 0 else " {}%".format(int(round(progress/total*100)))
+		if include_time:
+			time_prefix = "{} - {}\n".format(self.format_duration(progress),self.format_duration(total))
+			bar = time_prefix + bar
+		return bar
+
+	def progress_moon(self,data,moon_count=10,show_percent=True,include_time=False):
+		# Make some shitty moon memes or something... thanks Midi <3
+		progress = int(time.time())-data.get("started_at",0)
+		total    = data.get("duration",0)
+		if total == 0:
+			# No idea how long this song is - let's make a repeating pattern
+			# of moons - keeping this rotating moon code in, because it's kinda cool
+			# moon_list = ["🌑","🌘","🌗","🌖","🌕","🌔","🌓","🌒"]*math.ceil(moon_count/8)
+			moon_list = ["🌕","🌑"]*math.ceil(moon_count/2)
+			moon_list = moon_list[:moon_count]
+			bar = "".join(moon_list)
+		else:
+			# Each moon can be broken into 25% chunks
+			moon_max = 100/moon_count
+			percent  = progress/total*100
+			full_moons = int(percent/moon_max)
+			leftover   = percent%moon_max
+			remaining  = int(leftover/(moon_max/4))
+			bar = "🌕"*full_moons
+			bar += ["🌑","🌘","🌗","🌖","🌕"][remaining]
+			bar += "🌑"*(moon_count-full_moons-1)
+		if show_percent:
+			bar += " --%" if total == 0 else " {}%".format(int(round(progress/total*100)))
+		if include_time:
+			time_prefix = "{} - {}\n".format(self.format_duration(progress),self.format_duration(total))
+			bar = time_prefix + bar
+		return bar
+
 	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
@@ -358,7 +413,7 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=self.delay).send(ctx)
 
 	@commands.command()
-	async def playing(self, ctx):
+	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
 
 		if not ctx.voice_client or not ctx.voice_client.is_playing():
@@ -374,8 +429,8 @@ class Music(commands.Cog):
 			description="Requested by {}".format(data["added_by"].mention),
 			color=ctx.author,
 			fields=[
-				{"name":"Elapsed","value":"{}".format(self.format_duration(int(time.time())-data["started_at"],True)),"inline":False},
-				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False}
+				{"name":"Elapsed","value":self.format_elapsed(data),"inline":False},
+				{"name":"Progress","value":self.progress_moon(data) if moons and moons.lower() == "moons" else self.progress_bar(data),"inline":False}
 			],
 			url=data.get("webpage_url",None),
 			thumbnail=data.get("thumbnail",None),
@@ -440,12 +495,16 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Check for added by first, then check admin
 		data = ctx.voice_client.source.data
-		if data.get("added_by",None) == ctx.author:
-			self.skip_pop(ctx)
-			return await Message.EmbedText(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if ctx.author.permissions_in(ctx.channel).administrator:
 			self.skip_pop(ctx)
 			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)	
+		if data.get("added_by",None) == ctx.author:
+			self.skip_pop(ctx)
+			return await Message.EmbedText(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)
+		# At this point, we're not admin, and not the requestor, let's make sure we're in the same vc
+		if not ctx.author.voice or not ctx.author.voice.channel == ctx.voice_client.channel:
+			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
+		
 		# Do the checking here to validate we can use this and etc.
 		skips = self.skips.get(str(ctx.guild.id),[])
 		# Relsolve the skips
