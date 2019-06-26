@@ -448,6 +448,11 @@ class Music(commands.Cog):
 	@skip.before_invoke
 	@stop.before_invoke
 	@volume.before_invoke
+	async def ensure_roles(self, ctx):
+		if not await self._check_role(ctx):
+			raise commands.CommandError("Missing DJ roles.")
+
+	@play.before_invoke
 	async def ensure_voice(self, ctx):
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
