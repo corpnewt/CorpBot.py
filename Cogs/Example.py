@@ -8,7 +8,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import Nullify
-from   Cogs import downloader
+# from   Cogs import downloader
 from   Cogs import UserTime
 from   Cogs import PickList
 import youtube_dl
@@ -18,7 +18,7 @@ def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Example(bot, settings))
-    bot.add_cog(Music(bot, settings))
+    # bot.add_cog(Music(bot, settings))
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -251,7 +251,6 @@ class Example(commands.Cog):
             # Reset back to our totals
             continue
 
-        
 
     @commands.command(description='For when you wanna settle the score some other way')
     async def choose(self, ctx, *choices : str):
@@ -289,7 +288,7 @@ class Example(commands.Cog):
         time_str = "{} {}".format(local_time['time'], local_time['zone'])
             
         await ctx.channel.send('*{}* joined *{}*'.format(DisplayName.name(member), time_str))
-
+'''
 class VoiceEntry:
     def __init__(self, message, player, title, duration, ctx):
         self.requester = message.author
@@ -1723,3 +1722,4 @@ class Music(commands.Cog):
                 return
         await ctx.channel.send('Deleted `{}` from playlist'.format(str(current["song"]).replace('`', '\\`')))
         del state.playlist[idx]
+'''
