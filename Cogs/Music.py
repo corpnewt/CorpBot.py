@@ -478,6 +478,8 @@ class Music(commands.Cog):
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if not ctx.voice_client.is_playing():
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
 			cv = int(ctx.voice_client.source.volume*100)
@@ -487,8 +489,8 @@ class Music(commands.Cog):
 		except:
 			return await Message.EmbedText(title="♫ Volume must be an integer between 0-100.",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Ensure our volume is between 0 and 100
-		volume = 100 if volume > 100 else volume
-		volume = 0 if volume < 0 else volume
+		if not -1 < volume < 101:
+			volume = 100 if volume > 100 else 0
 		self.vol[str(ctx.guild.id)] = volume / 100
 		ctx.voice_client.source.volume = volume / 100
 		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=self.delay).send(ctx)
