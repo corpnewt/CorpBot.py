@@ -399,8 +399,7 @@ class Music(commands.Cog):
 				title="♫ Current Playlist",
 				color=ctx.author,
 				description="Not playing anything.",
-				delete_after=self.delay,
-				pm_after=-1
+				delete_after=self.delay
 			).send(ctx)
 		data = ctx.voice_client.source.data
 		queue = self.queue.get(str(ctx.guild.id))
@@ -427,7 +426,8 @@ class Music(commands.Cog):
 			title="♫ Current Playlist{}".format(pl_string),
 			color=ctx.author,
 			fields=fields,
-			delete_after=self.delay
+			delete_after=self.delay,
+			pm_after=15
 		).send(ctx)
 
 	@commands.command()
