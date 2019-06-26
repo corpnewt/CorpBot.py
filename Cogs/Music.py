@@ -1,6 +1,7 @@
 import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid
 from   discord.ext import commands
 from   Cogs import Message
+from   Cogs import DisplayName
 
 # This file is modified from Rapptz's basic_voice.py:
 # https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
@@ -284,9 +285,14 @@ class Music(commands.Cog):
 			await user.guild.voice_client.disconnect()
 
 	@commands.command()
-	async def join(self, ctx, *, channel: discord.VoiceChannel):
+	async def join(self, ctx, *, channel = None):
 		"""Joins a voice channel"""
 
+		if channel == None:
+			return await Message.EmbedText(title="♫ You need to pass a voice channel for me to join!",color=ctx.author,delete_after=self.delay).send(ctx)
+		channel = DisplayName.channelForName(channel, ctx.guild, "voice")
+		if not channel:
+			return await Message.EmbedText(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if ctx.voice_client:
 			if not (ctx.voice_client.is_paused() or ctx.voice_client.is_playing()):
 				await ctx.voice_client.move_to(channel)
