@@ -379,6 +379,8 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Check for admin first
 		if ctx.author.permissions_in(ctx.channel).administrator:
+			self.skips.pop(str(ctx.guild.id),None)
+			self.bot.dispatch("next_song",ctx)
 			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)	
 		# Do the checking here to validate we can use this and etc.
 		skips = self.skips.get(str(ctx.guild.id),[])
