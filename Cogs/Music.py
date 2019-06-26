@@ -291,6 +291,9 @@ class Music(commands.Cog):
 		await Message.Embed(
 			title="♫ Enqueued: {}".format(data.get("title","Unknown")),
 			description="Requested by {}".format(ctx.author.mention),
+			fields=[
+				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False}
+			],
 			color=ctx.author,
 			thumbnail=data.get("thumbnail",None),
 			url=data.get("webpage_url",None),
