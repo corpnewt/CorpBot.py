@@ -317,7 +317,7 @@ class Embed:
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None)
+                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
@@ -437,9 +437,9 @@ class EmbedText(Embed):
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None)
+                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
-            await message.edit(content=None, embed=em)
+            await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
