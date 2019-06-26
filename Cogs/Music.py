@@ -223,7 +223,6 @@ class Music(commands.Cog):
 	@commands.Cog.listener()
 	async def on_next_song(self,ctx,error=None):
 		if self.skipping:
-			# Already trying to skip
 			return
 		self.skipping = True
 		task = "playing"
@@ -235,6 +234,7 @@ class Music(commands.Cog):
 		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
 			# Nothing to play, bail
+			self.skipping = False
 			return
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
@@ -248,12 +248,14 @@ class Music(commands.Cog):
 				player = await YTDLSource.from_url(ctx, data, loop=self.bot.loop, folder=self.folder)
 				# Set the last volume level
 				player.volume = self.vol.get(str(ctx.guild.id),0.5)
-			try:
-				ctx.voice_client.play(player, after=lambda e: self.bot.dispatch("next_song",ctx,e if e else None))
-			except Exception as e:
-				print(e)
-				self.skipping = False
-				return
+				try:
+					ctx.voice_client.play(player, after=lambda e: self.bot.dispatch("next_song",ctx,e if e else None))
+				except Exception as e:
+					# Failed to enqueue
+					print(e)
+					queue.insert(0,data)
+					self.skipping = False
+					return
 		await Message.Embed(
 			title="♫ Now {}: {}".format(task.capitalize(), data.get("title","Unknown")),
 			fields=[
@@ -428,7 +430,7 @@ class Music(commands.Cog):
 		"""Adds your vote to skip the current song. 50% or more of the non-bot users need to vote to skip a song."""
 
 		if self.skipping:
-			# Ignore any skips that don't apply
+			# Already skipping - bail
 			return
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
