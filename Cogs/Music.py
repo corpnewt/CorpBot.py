@@ -297,11 +297,13 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=self.delay).send(ctx)
 
 	@commands.command()
-	async def play(self, ctx, *, url):
+	async def play(self, ctx, *, url = None):
 		"""Plays from a url (almost anything youtube_dl supports)"""
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if url == None:
+			return await Message.EmbedText(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Add our url to the queue
 		message = await Message.EmbedText(
 			title="♫ Searching For: {}...".format(url.strip("<>")),
