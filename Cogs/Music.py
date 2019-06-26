@@ -127,8 +127,8 @@ class Music(commands.Cog):
 		self.queue    = {}
 		self.skips    = {}
 		self.vol      = {}
-		self.loop     = False
-		self.data     = None
+		self.loop     = {}
+		self.data     = {}
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
@@ -142,6 +142,8 @@ class Music(commands.Cog):
 		self.queue.pop(str(ctx.guild.id),None)
 		self.vol.pop(str(ctx.guild.id),None)
 		self.skips.pop(str(ctx.guild.id),None)
+		self.loop.pop(str(ctx.guild.id),None)
+		self.data.pop(str(ctx.guild.id),None)
 
 	async def _check_role(self, ctx):
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
@@ -290,20 +292,23 @@ class Music(commands.Cog):
 		task = "playing"
 		if error:
 			print(error)
-		queue = self.queue.get(str(ctx.guild.id),[])
-		if self.loop and self.data:
-			# Re-add the track to the end of the playlist
-			queue.append(self.data)
 		# Try to cleanup before starting
-		if ctx.voice_client:
+		if not ctx.voice_client:
+			# Stopped - or late-fired signal
+			return
+		else:
 			ctx.voice_client.stop()
+		queue = self.queue.get(str(ctx.guild.id),[])
+		if self.loop.get(str(ctx.guild.id),False) and self.data.get(str(ctx.guild.id),None):
+			# Re-add the track to the end of the playlist
+			queue.append(self.data.get(str(ctx.guild.id),None))
 		if not len(queue):
 			# Nothing to play, bail
 			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
 		# Save the current data in case of repeats
-		self.data = data
+		self.data[str(ctx.guild.id)] = data
 		async with ctx.typing():
 			if data.get("duration",0) == 0:
 				# No idea how long this one is, stream it
@@ -478,7 +483,7 @@ class Music(commands.Cog):
 			pl_string = " (10/{} shown)".format(len(queue)+1)
 		else:
 			pl_string = ""
-		if self.loop:
+		if self.loop.get(str(ctx.guild.id),False):
 			pl_string += " - Repeat Enabled"
 		await Message.Embed(
 			title="♫ Current Playlist{}".format(pl_string),
@@ -563,7 +568,7 @@ class Music(commands.Cog):
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
-		current = self.loop
+		current = self.loop.get(str(ctx.guild.id),False)
 		setting_name = "Repeat"
 		if yes_no == None:
 			if current:
@@ -586,7 +591,7 @@ class Music(commands.Cog):
 			msg = "That's not a valid setting!"
 			yes_no = current
 		if not yes_no == None and not yes_no == current:
-			self.loop = yes_no
+			self.loop[str(ctx.guild.id)] = yes_no
 		await Message.EmbedText(title="♫ "+msg,color=ctx.author,delete_after=self.delay).send(ctx)
 
 	@commands.command()
