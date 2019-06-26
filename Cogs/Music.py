@@ -129,6 +129,17 @@ class Music(commands.Cog):
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
+	def skip_pop(self, ctx):
+		# Pops the current skip list and dispatches the "next_song" event
+		self.skips.pop(str(ctx.guild.id),None)
+		self.bot.dispatch("next_song",ctx)
+
+	def dict_pop(self, ctx):
+		# Pops the current guild id from all the class dicts
+		self.queue.pop(str(ctx.guild.id),None)
+		self.vol.pop(str(ctx.guild.id),None)
+		self.skips.pop(str(ctx.guild.id),None)
+
 	async def _check_role(self, ctx):
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
@@ -257,9 +268,7 @@ class Music(commands.Cog):
 			# At least one non-bot user
 			return
 		# if we made it here - then we're alone - disconnect
-		self.queue.pop(str(user.guild.id),None)
-		self.vol.pop(str(user.guild.id),None)
-		self.skips.pop(str(user.guild.id),None)
+		self.dict_pop(user)
 		if user.guild.voice_client:
 			await user.guild.voice_client.disconnect()
 
@@ -377,10 +386,13 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_playing():
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
-		# Check for admin first
+		# Check for added by first, then check admin
+		data = ctx.voice_client.source.data
+		if data.get("added_by",None) == ctx.author:
+			self.skip_pop(ctx)
+			return await Message.EmbedText(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if ctx.author.permissions_in(ctx.channel).administrator:
-			self.skips.pop(str(ctx.guild.id),None)
-			self.bot.dispatch("next_song",ctx)
+			self.skip_pop(ctx)
 			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)	
 		# Do the checking here to validate we can use this and etc.
 		skips = self.skips.get(str(ctx.guild.id),[])
@@ -402,8 +414,7 @@ class Music(commands.Cog):
 		needed_skips = math.ceil(len(skippers)/2)
 		if len(new_skips) >= needed_skips:
 			# Got it!
-			self.skips.pop(str(ctx.guild.id),None)
-			self.bot.dispatch("next_song",ctx)
+			self.skip_pop(ctx)
 			return await Message.EmbedText(title="♫ Skip threshold met ({}/{}) - skipping!".format(len(new_skips),needed_skips),color=ctx.author,delete_after=self.delay).send(ctx)
 		# Update the skips
 		self.skips[str(ctx.guild.id)] = new_skips
@@ -435,9 +446,7 @@ class Music(commands.Cog):
 		"""Stops and disconnects the bot from voice"""
 		
 		# Remove the per-server temp settings
-		self.queue.pop(str(ctx.guild.id),None)
-		self.vol.pop(str(ctx.guild.id),None)
-		self.skips.pop(str(ctx.guild.id),None)
+		self.dict_pop(ctx)
 		if ctx.voice_client:
 			await ctx.voice_client.disconnect()
 			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
