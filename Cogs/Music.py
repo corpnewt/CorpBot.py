@@ -351,7 +351,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def join(self, ctx, *, channel = None):
-		"""Joins a voice channel"""
+		"""Joins a voice channel."""
 
 		if channel == None:
 			if not ctx.author.voice:
@@ -372,7 +372,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def play(self, ctx, *, url = None):
-		"""Plays from a url (almost anything youtube_dl supports)"""
+		"""Plays from a url (almost anything youtube_dl supports) or resumes a currently paused song."""
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
@@ -592,7 +592,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def skip(self, ctx):
-		"""Adds your vote to skip the current song. 50% or more of the non-bot users need to vote to skip a song."""
+		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requestors and admins can skip without voting."""
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
@@ -638,7 +638,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def volume(self, ctx, volume = None):
-		"""Changes the player's volume"""
+		"""Changes the player's volume (0-100)."""
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
@@ -661,7 +661,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def repeat(self, ctx, *, yes_no = None):
-		"""Checks or sets whether to repeat or not."""
+		"""Checks or sets whether to repeat the current playlist."""
 
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
@@ -693,7 +693,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def stop(self, ctx):
-		"""Stops and disconnects the bot from voice"""
+		"""Stops and disconnects the bot from voice."""
 		
 		# Remove the per-server temp settings
 		self.dict_pop(ctx)
