@@ -469,7 +469,23 @@ class Music(commands.Cog):
 			data["added_by"].mention),"inline":False}
 		]
 		if len(queue):
-			fields.append({"name":"♫ Up Next","value":"-- {} Song{} In Queue --".format(len(queue), "" if len(queue) == 1 else "s"),"inline":False})
+			total_time = 0
+			total_streams = 0
+			time_string = stream_string = ""
+			for x in queue:
+				t = x.get("duration",0)
+				if t:
+					total_time+=t
+				else:
+					total_streams+=1
+			if total_time:
+				# Got time at least
+				time_string += "{} total -- ".format(self.format_duration(total_time))
+			if total_streams:
+				# Got at least one stream
+				time_string += "{:,} Stream{} -- ".format(total_streams, "" if total_streams == 1 else "s") 
+			q_text = "-- {:,} Song{} in Queue -- {}".format(len(queue), "" if len(queue) == 1 else "s", time_string)
+			fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
 		for x,y in enumerate(queue):
 			if x >= 10:
 				# We have 10 values already - bail
@@ -480,7 +496,7 @@ class Music(commands.Cog):
 				"value":"{} - Requested by {}".format(self.format_duration(y.get("duration",0)),y["added_by"].mention),
 				"inline":False})
 		if len(queue) > 9:
-			pl_string = " (10/{} shown)".format(len(queue)+1)
+			pl_string = " (10/{:,} shown)".format(len(queue)+1)
 		else:
 			pl_string = ""
 		if self.loop.get(str(ctx.guild.id),False):
