@@ -422,9 +422,9 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ Paused: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=self.delay).send(ctx)
 
 	@commands.command()
-	async def paused(self, ctx):
+	async def paused(self, ctx, *, moons = None):
 		"""Lists whether or not the player is paused.  Synonym of the playing command."""
-		await ctx.invoke(self.playing)
+		await ctx.invoke(self.playing,moons=moons)
 
 	@commands.command()
 	async def resume(self, ctx):
