@@ -27,6 +27,22 @@ class Search(commands.Cog):
 		                self.site_auth = f.read()
 		self.key = "3a337666060f628a0a91"
 
+	def quote(self, query):
+		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
+		return quote(query.replace("+","%2B").replace("\t","+").replace("\r","+").replace("\n","+").replace(" ","+"))
+
+	async def get_search(self, ctx, query, service=""):
+		# Searches in the passed service
+		service = "s={}&".format(service) if service else ""
+		lmgtfy = "http://lmgtfy.com/?{}q={}".format(service, self.quote(query))
+		try:
+			lmgtfyT = await TinyURL.tiny_url(lmgtfy)
+		except:
+			msg = "It looks like I couldn't search for that... :("
+		else:
+			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		return msg
+
 	@commands.command(pass_context=True)
 	async def google(self, ctx, *, query = None):
 		"""Get some searching done."""
@@ -36,9 +52,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "http://lmgtfy.com/?q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query)
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -51,9 +65,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmgtfy.com/?s=b&q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query,"b")
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -66,9 +78,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmgtfy.com/?s=d&q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query,"d")
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -81,9 +91,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmgtfy.com/?s=y&q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query,"y")
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -96,9 +104,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmgtfy.com/?s=a&q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query,"a")
 		# Say message
 		await ctx.channel.send(msg)
 
@@ -111,9 +117,7 @@ class Search(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		lmgtfy = "https://lmgtfy.com/?s=k&q={}".format(quote(query))
-		lmgtfyT = TinyURL.tiny_url(lmgtfy)
-		msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = await self.get_search(ctx, query,"k")
 		# Say message
 		await ctx.channel.send(msg)
 
