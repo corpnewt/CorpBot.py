@@ -722,15 +722,22 @@ class Music(commands.Cog):
 	@volume.before_invoke
 	@pause.before_invoke
 	@resume.before_invoke
+	@stop.before_invoke
+	@repeat.before_invoke
+	@skip.before_invoke
+	@play.before_invoke
 	async def ensure_same_channel(self, ctx):
 		if self.is_admin(ctx):
 			return
 		if not ctx.author.voice:
-			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
-			raise commands.CommandError("Author not connected to the bot's voice channel.")
+			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			raise commands.CommandError("Author not connected to a voice channel..")
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 			raise commands.CommandError("Bot not connected to a voice channel.")
+		if ctx.author.voice.channel != ctx.voice_client.channel:
+			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
+			raise commands.CommandError("Author not connected to the bot's voice channel.")
 
 	@play.before_invoke
 	async def ensure_voice(self, ctx):
