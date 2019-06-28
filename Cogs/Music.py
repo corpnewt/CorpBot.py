@@ -420,6 +420,8 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_playing():
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if not (ctx.author.voice or ctx.voice.author.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Pause the track and save the currently elapsed time
 		ctx.voice_client.pause()
 		data = self.data.get(str(ctx.guild.id))
@@ -438,6 +440,8 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_paused():
 			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if not (ctx.author.voice or ctx.voice.author.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# We're trying to resume
 		ctx.voice_client.resume()
 		data = self.data.get(str(ctx.guild.id))
@@ -649,6 +653,8 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_playing():
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
+		if not (ctx.author.voice or ctx.voice.author.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
 			cv = int(ctx.voice_client.source.volume*100)
