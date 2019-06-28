@@ -145,7 +145,7 @@ class Music(commands.Cog):
 		self.loop.pop(str(ctx.guild.id),None)
 		self.data.pop(str(ctx.guild.id),None)
 
-	async def _check_role(self, ctx):
+	def is_admin(self, ctx):
 		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
 		if not isAdmin:
 			for role in self.settings.getServerStat(ctx.guild,"AdminArray",[]):
@@ -154,6 +154,11 @@ class Music(commands.Cog):
 					break
 		if isAdmin:
 			# Admin and bot-admin override
+			return True
+		return False
+
+	async def _check_role(self, ctx):
+		if self.is_admin(ctx):
 			return True
 		promoArray = self.settings.getServerStat(ctx.guild, "DJArray", [])
 		if not len(promoArray):
@@ -457,7 +462,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=self.delay).send(ctx)
 		# Get the song at the index
 		song = queue[song_number]
-		if song.get("added_by",None) == ctx.author or ctx.author.permissions_in(ctx.channel).administrator:
+		if song.get("added_by",None) == ctx.author or self.is_admin(ctx):
 			queue.pop(song_number)
 			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=self.delay).send(ctx)
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=self.delay).send(ctx)
@@ -475,7 +480,7 @@ class Music(commands.Cog):
 		removed = 0
 		new_queue = []
 		for song in queue:
-			if song.get("added_by",None) == ctx.author or ctx.author.permissions_in(ctx.channel).administrator:
+			if song.get("added_by",None) == ctx.author or self.is_admin(ctx):
 				removed += 1
 			else:
 				new_queue.append(song)
@@ -600,7 +605,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Check for added by first, then check admin
 		data = self.data.get(str(ctx.guild.id))
-		if ctx.author.permissions_in(ctx.channel).administrator:
+		if self.is_admin(ctx):
 			self.skip_pop(ctx)
 			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)	
 		if data.get("added_by",None) == ctx.author:
@@ -718,11 +723,9 @@ class Music(commands.Cog):
 	async def ensure_voice(self, ctx):
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
+		if not ctx.author.voice and not self.is_admin(ctx):
+			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			raise commands.CommandError("Author not connected to a voice channel.")
 		if ctx.voice_client is None:
 			if ctx.author.voice:
 				await ctx.author.voice.channel.connect()
-			elif ctx.author.permissions_in(ctx.channel).administrator:
-				pass
-			else:
-				await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
-				raise commands.CommandError("Author not connected to a voice channel.")
