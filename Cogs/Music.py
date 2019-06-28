@@ -508,9 +508,10 @@ class Music(commands.Cog):
 			# paused - update the progress
 			data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
 			play_text = "Paused"
+		cv = int(ctx.voice_client.source.volume*100)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,data.get("title","Unknown")),
-			description="Requested by {}".format(data["added_by"].mention),
+			description="Requested by {} -- Volume at {}%".format(data["added_by"].mention,cv),
 			color=ctx.author,
 			fields=[
 				{"name":"Elapsed","value":self.format_elapsed(data),"inline":False},
