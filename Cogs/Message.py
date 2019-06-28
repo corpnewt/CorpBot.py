@@ -22,6 +22,7 @@ class Message:
         self.message = kwargs.get("message", None)
         self.file = kwargs.get("file", None) # Accepts a file path
         self.max_pages = 0
+        self.delete_after = kwargs.get("delete_after",None)
 
     def _get_file(self, file_path):
         if not os.path.exists(file_path):
@@ -51,7 +52,7 @@ class Message:
         if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
             # More than 2 pages - try to dm
             try:
-                message = await ctx.author.send(message, file=send_file)
+                message = await ctx.author.send(message, file=send_file, delete_after=self.delete_after)
                 await ctx.message.add_reaction(self.pm_react)
                 return message
             except discord.Forbidden:
@@ -64,7 +65,7 @@ class Message:
                         pass
                     return None
                 pass
-        return await ctx.send(message, file=send_file)
+        return await ctx.send(message, file=send_file, delete_after=self.delete_after)
 
     async def send(self, ctx):
         if not ctx or not self.message or not len(self.message):
@@ -115,6 +116,7 @@ class Embed:
         self.author = kwargs.get("author", None)
         self.fields = kwargs.get("fields", [])
         self.file = kwargs.get("file", None) # Accepts a file path
+        self.delete_after = kwargs.get("delete_after",None)
         self.colors = [ 
             discord.Color.teal(),
             discord.Color.dark_teal(),
@@ -186,9 +188,9 @@ class Embed:
             # More than 2 pages and targeting context - try to dm
             try:
                 if send_file:
-                    message = await ctx.author.send(embed=embed, file=send_file)
+                    message = await ctx.author.send(embed=embed, file=send_file, delete_after=self.delete_after)
                 else:
-                    message = await ctx.author.send(embed=embed)
+                    message = await ctx.author.send(embed=embed, delete_after=self.delete_after)
                 await ctx.message.add_reaction(self.pm_react)
                 return message
             except discord.Forbidden:
@@ -202,9 +204,9 @@ class Embed:
                     return None
                 pass
         if send_file:
-            return await ctx.send(embed=embed, file=send_file)
+            return await ctx.send(embed=embed, file=send_file, delete_after=self.delete_after)
         else:
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=embed, delete_after=self.delete_after)
 
     def _truncate_string(self, value, max_chars):
         if not type(value) is str:
@@ -315,17 +317,17 @@ class Embed:
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None)
+                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
-            await message.edit(content=None, embed=em)
+            await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(content=None, embed=em)
+            await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            await message.edit(content=" ", embed=None)
+            await message.edit(content=" ", embed=None, delete_after=self.delete_after)
         return new_message
 
     async def send(self, ctx):
@@ -435,17 +437,17 @@ class EmbedText(Embed):
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None)
+                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
-            await message.edit(content=None, embed=em)
+            await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(content=None, embed=em)
+            await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            await message.edit(content=" ", embed=None)
+            await message.edit(content=" ", embed=None, delete_after=self.delete_after)
         return new_message
 
     async def send(self, ctx):
