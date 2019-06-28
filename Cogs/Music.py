@@ -420,7 +420,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_playing():
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
-		if not (ctx.author.voice or ctx.author.voice.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+		if not self.is_admin(ctx) and not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
 			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# Pause the track and save the currently elapsed time
 		ctx.voice_client.pause()
@@ -440,7 +440,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_paused():
 			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=self.delay).send(ctx)
-		if not (ctx.author.voice or ctx.author.voice.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+		if not self.is_admin(ctx) and not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
 			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		# We're trying to resume
 		ctx.voice_client.resume()
@@ -653,7 +653,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if not ctx.voice_client.is_playing():
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
-		if not (ctx.author.voice or ctx.author.voice.channel == ctx.voice_client.channel) and not self.is_admin(ctx):
+		if not self.is_admin(ctx) and not ctx.author.voice or ctx.author.voice.channel != ctx.voice_client.channel:
 			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
