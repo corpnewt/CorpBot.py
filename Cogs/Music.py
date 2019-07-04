@@ -515,7 +515,7 @@ class Music(commands.Cog):
 			color=ctx.author,
 			fields=[
 				{"name":"Elapsed","value":self.format_elapsed(data),"inline":False},
-				{"name":"Progress","value":self.progress_moon(data) if moons and moons.lower() == "moons" else self.progress_bar(data),"inline":False}
+				{"name":"Progress","value":self.progress_moon(data) if moons and moons.lower() in ["moon","moons","moonme","moon me"] else self.progress_bar(data),"inline":False}
 			],
 			url=data.get("webpage_url",None),
 			thumbnail=data.get("thumbnail",None),
