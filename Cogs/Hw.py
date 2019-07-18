@@ -144,6 +144,7 @@ class Hw(commands.Cog):
 			if b['Name'].lower() == build.lower():
 				# Found it
 				mainBuild = b
+				break
 
 		if mainBuild:
 			# Found it!
@@ -232,10 +233,6 @@ class Hw(commands.Cog):
 	@commands.command(pass_context=True)
 	async def edithw(self, ctx, *, build = None):
 		"""Edits a build from your build list."""
-		if not build:
-			await ctx.channel.send("Usage: `{}edithw [build name or number]`".format(ctx.prefix))
-			return
-
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
@@ -263,23 +260,36 @@ class Hw(commands.Cog):
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
+		if not len(buildList):
+			# No parts!
+			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
 		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
-				# Found it
-				mainBuild = b
+		if build is not None:
+			for b in buildList:
+				if b['Name'].lower() == build.lower():
+					# Found it
+					mainBuild = b
+					break
 
-		if not mainBuild:
-			try:
-				build = int(build)-1
-				if build >= 0 and build < len(buildList):
-					mainBuild = buildList[build]
-			except:
-				pass
+			if not mainBuild:
+				try:
+					build = int(build)-1
+					if build >= 0 and build < len(buildList):
+						mainBuild = buildList[build]
+				except:
+					pass
+		else:
+			# No build passed - get the main if it exists
+			for b in buildList:
+				if b['Main']:
+					mainBuild = b
+					break
 
 		if not mainBuild:
 			msg = "I couldn't find that build or number."
@@ -367,10 +377,6 @@ class Hw(commands.Cog):
 	@commands.command(pass_context=True)
 	async def renhw(self, ctx, *, build = None):
 		"""Renames a build from your build list."""
-		if not build:
-			await ctx.channel.send("Usage: `{}renhw [build name or number]`".format(ctx.prefix))
-			return
-
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
@@ -398,23 +404,36 @@ class Hw(commands.Cog):
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
+		if not len(buildList):
+			# No parts!
+			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
+			await ctx.channel.send(msg)
+			return
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
 
 		# Get build by name first - then by number
-		for b in buildList:
-			if b['Name'].lower() == build.lower():
-				# Found it
-				mainBuild = b
+		if build is not None:
+			for b in buildList:
+				if b['Name'].lower() == build.lower():
+					# Found it
+					mainBuild = b
+					break
 
-		if not mainBuild:
-			try:
-				build = int(build)-1
-				if build >= 0 and build < len(buildList):
-					mainBuild = buildList[build]
-			except:
-				pass
+			if not mainBuild:
+				try:
+					build = int(build)-1
+					if build >= 0 and build < len(buildList):
+						mainBuild = buildList[build]
+				except:
+					pass
+		else:
+			# No build passed - get the main if it exists
+			for b in buildList:
+				if b['Main']:
+					mainBuild = b
+					break
 
 		if not mainBuild:
 			msg = "I couldn't find that build or number."
