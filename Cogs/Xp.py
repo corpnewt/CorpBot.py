@@ -452,6 +452,8 @@ class Xp(commands.Cog):
 					await channel.send(msg)
 				else:
 					msg = 'There are no eligible members in *{}!*'.format(member.name)
+					if suppress:
+						msg = Nullify.clean(msg)
 					await channel.send(msg)
 
 			else:
