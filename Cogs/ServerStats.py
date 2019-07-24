@@ -453,6 +453,20 @@ class ServerStats(commands.Cog):
             msg += "\n\n{} joined after.".format(after)
         await ctx.send(msg)
 
+    @commands.command(pass_context=True)
+    async def joinedatpos(self, ctx, *, position):
+        """Lists the user that joined at the passed position."""
+        try:
+            position = int(position)-1
+            assert -1<position<len(ctx.guild.members) 
+        except:
+            return await ctx.send("Position must be an int between 1 and {}".format(len(ctx.guild.members)))
+        joinedList = [{"member":mem,"joined":mem.joined_at} for mem in ctx.guild.members]
+        # sort the users by join date
+        joinedList = sorted(joinedList, key=lambda x:x['joined'])
+        join = joinedList[position]
+        msg = "*{}* joined at position **{}**.".format(DisplayName.name(join["member"]),position+1)
+        await ctx.send(msg)
 
     @commands.command(pass_context=True)
     async def firstjoins(self, ctx, number : int = 10):
