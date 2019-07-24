@@ -657,7 +657,7 @@ class Telephone(commands.Cog):
 					await receiver_chan.send(":telephone: You have hung up.")
 				return
 			else:
-				talk_msg = Nullify.clean(talk.content)
+				talk_msg = talk.content # Nullify.clean(talk.content)
 				# Let's make sure we strip links out - and nullify discord.gg links to patch a spam loophole
 				# Create a set of all matches (to avoid duplicates in case of spam)
 				matches = [x.group(0) for x in re.finditer(self.regex, talk_msg)]
@@ -667,14 +667,16 @@ class Telephone(commands.Cog):
 				# Now we iterate that list and replace all links with `link removed`
 				for x in matches:
 					talk_msg = talk_msg.replace(x,"`link removed`")
+				# Clean out mentions from the message
+				talk_msg = DisplayName.clean_message(talk_msg, bot=self.bot, server=talk.guild)
 				# Must be conversation
 				if talk.channel == caller_chan:
 					# Coming from the talking channel
 					if hidden:
 						await receiver_chan.send(":telephone_receiver: " + talk_msg)
 					else:
-						user = DisplayName.name(talk.author)
-						await receiver_chan.send(":telephone_receiver: *{}:* {}".format(user, talk_msg))
+						user = Nullify.clean(DisplayName.name(talk.author)).replace("`","") # Remove @here and @everyone mentions in username
+						await receiver_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))
 				else:
-					user = DisplayName.name(talk.author)
-					await caller_chan.send(":telephone_receiver: *{}:* {}".format(user, talk_msg))
+					user = Nullify.clean(DisplayName.name(talk.author)).replace("`","") # Remove @here and @everyone mentions in username
+					await caller_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))
