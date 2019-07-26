@@ -151,7 +151,7 @@ class Humor(commands.Cog):
 			de_sentence.append(random.choice(de_list))
 		if random.randint(0,1):
 			# Toss "rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz" in there somewhere
-			de_sentence.insert(random.randint(0,len(de_sentence)-1),"rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz")
+			de_sentence[random.randint(0,len(de_sentence)-1)] = "rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz"
 		# Capitalize the first letter of the first word
 		de_sentence[0] = de_sentence[0][:1].upper() + de_sentence[0][1:]
 		totally_german = " ".join(de_sentence) + random.choice(punct)
