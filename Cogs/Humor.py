@@ -136,11 +136,26 @@ class Humor(commands.Cog):
 		fr_sentence = []
 		for i in range(random.randint(3, 20)):
 			fr_sentence.append(random.choice(fr_list))
-			if len(fr_sentence) == 1:
-				# Capitalize the first letter of the first word
-				fr_sentence[0] = fr_sentence[0][:1].upper() + fr_sentence[0][1:]
+		# Capitalize the first letter of the first word
+		fr_sentence[0] = fr_sentence[0][:1].upper() + fr_sentence[0][1:]
 		totally_french = " ".join(fr_sentence) + random.choice(punct)
 		await ctx.send(totally_french)
+
+	@commands.command(pass_context=True)
+	async def german(self, ctx):
+		"""Speaking German... probably..."""
+		de_list = [ "BIER", "sauerkraut", "auto", "weisswurst", "KRANKENWAGEN" ]
+		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
+		de_sentence = []
+		for i in range(random.randint(3, 20)):
+			de_sentence.append(random.choice(de_list))
+		if random.randint(0,1):
+			# Toss "rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz" in there somewhere
+			de_sentence.insert(random.randint(0,len(de_sentence)-1),"rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz")
+		# Capitalize the first letter of the first word
+		de_sentence[0] = de_sentence[0][:1].upper() + de_sentence[0][1:]
+		totally_german = " ".join(de_sentence) + random.choice(punct)
+		await ctx.send(totally_german)
 
 	def canDisplay(self, server):
 		# Check if we can display images
