@@ -144,7 +144,7 @@ class Humor(commands.Cog):
 	@commands.command(pass_context=True)
 	async def german(self, ctx):
 		"""Speaking German... probably..."""
-		de_list = [ "BIER", "sauerkraut", "auto", "weisswurst", "KRANKENWAGEN" ]
+		de_list = [ "BIER", "sauerkraut", "auto", "weißwurst", "KRANKENWAGEN" ]
 		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
 		de_sentence = []
 		for i in range(random.randint(3, 20)):
