@@ -120,7 +120,7 @@ class Music(commands.Cog):
 		self.bot      = bot
 		self.settings = settings
 		self.folder   = os.path.join(".","Music")
-		self.delay    = 20 # Set to None to keep all messages
+		# self.delay    = 20 # Set to None to keep all messages
 		if not os.path.exists(self.folder):
 			# Create our music folder
 			os.mkdir(self.folder)
@@ -161,13 +161,14 @@ class Music(commands.Cog):
 		if self.is_admin(ctx):
 			return True
 		promoArray = self.settings.getServerStat(ctx.guild, "DJArray", [])
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not len(promoArray):
-			await Message.EmbedText(title="♫ There are no DJ roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix),color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ There are no DJ roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 			return None
 		for role in promoArray:
 			if ctx.guild.get_role(int(role["ID"])) in ctx.author.roles:
 				return True
-		await Message.EmbedText(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=delay).send(ctx)
 		return False
 
 	async def get_song_info(self, url, search=False):
@@ -294,6 +295,7 @@ class Music(commands.Cog):
 	
 	@commands.Cog.listener()
 	async def on_next_song(self,ctx,error=None):
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		task = "playing"
 		if error:
 			print(error)
@@ -309,7 +311,7 @@ class Music(commands.Cog):
 			queue.append(self.data.get(str(ctx.guild.id),None))
 		if not len(queue):
 			# Nothing to play, bail
-			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
 		# Save the current data in case of repeats
@@ -334,7 +336,7 @@ class Music(commands.Cog):
 			color=ctx.author,
 			url=data.get("webpage_url",None),
 			thumbnail=data.get("thumbnail",None),
-			delete_after=self.delay
+			delete_after=delay
 		).send(ctx)
 
 	@commands.Cog.listener()
@@ -358,37 +360,39 @@ class Music(commands.Cog):
 	async def join(self, ctx, *, channel = None):
 		"""Joins a voice channel."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if channel == None:
 			if not ctx.author.voice:
-				return await Message.EmbedText(title="♫ You need to pass a voice channel for me to join!",color=ctx.author,delete_after=self.delay).send(ctx)
+				return await Message.EmbedText(title="♫ You need to pass a voice channel for me to join!",color=ctx.author,delete_after=delay).send(ctx)
 			channel = ctx.author.voice.channel
 		else:
 			channel = DisplayName.channelForName(channel, ctx.guild, "voice")
 		if not channel:
-			return await Message.EmbedText(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if ctx.voice_client:
 			if not (ctx.voice_client.is_paused() or ctx.voice_client.is_playing()):
 				await ctx.voice_client.move_to(channel)
-				return await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=self.delay).send(ctx)
+				return await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=delay).send(ctx)
 			else:
-				return await Message.EmbedText(title="♫ I'm already playing music in {}!".format(ctx.voice_client.channel),color=ctx.author,delete_after=self.delay).send(ctx)
+				return await Message.EmbedText(title="♫ I'm already playing music in {}!".format(ctx.voice_client.channel),color=ctx.author,delete_after=delay).send(ctx)
 		await channel.connect()
-		await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def play(self, ctx, *, url = None):
 		"""Plays from a url (almost anything youtube_dl supports) or resumes a currently paused song."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if ctx.voice_client.is_paused():
 			# We're trying to resume
 			ctx.voice_client.resume()
 			data = self.data.get(str(ctx.guild.id))
 			data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
-			return await Message.EmbedText(title="♫ Resumed: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Resumed: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=delay).send(ctx)
 		if url == None:
-			return await Message.EmbedText(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
 		# Add our url to the queue
 		message = await Message.EmbedText(
 			title="♫ Searching For: {}...".format(url.strip("<>")),
@@ -397,7 +401,7 @@ class Music(commands.Cog):
 		data = await self.add_to_queue(ctx, url)
 		if not data:
 			# Nothing found
-			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=self.delay).edit(ctx,message)
+			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await Message.Embed(
 			title="♫ Enqueued: {}".format(data.get("title","Unknown")),
 			description="Requested by {}".format(ctx.author.mention),
@@ -407,24 +411,25 @@ class Music(commands.Cog):
 			color=ctx.author,
 			thumbnail=data.get("thumbnail",None),
 			url=data.get("webpage_url",None),
-			delete_after=self.delay
+			delete_after=delay
 		).edit(ctx,message)
 
 	@commands.command()
 	async def pause(self, ctx):
 		"""Pauses the currently playing song."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if ctx.voice_client.is_paused():
-			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=delay).send(ctx)
 		if not ctx.voice_client.is_playing():
-			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Pause the track and save the currently elapsed time
 		ctx.voice_client.pause()
 		data = self.data.get(str(ctx.guild.id))
 		data["elapsed_time"] = int(time.time()-data.get("started_at",0))
-		await Message.EmbedText(title="♫ Paused: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ Paused: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def paused(self, ctx, *, moons = None):
@@ -434,49 +439,53 @@ class Music(commands.Cog):
 	@commands.command()
 	async def resume(self, ctx):
 		"""Resumes the song if paused."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not ctx.voice_client.is_paused():
-			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=delay).send(ctx)
 		# We're trying to resume
 		ctx.voice_client.resume()
 		data = self.data.get(str(ctx.guild.id))
 		data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
-		await Message.EmbedText(title="♫ Resumed: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ Resumed: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def unplay(self, ctx, *, song_number = None):
 		"""Removes the passed song number from the queue.  You must be the requestor, or an admin to remove it.  Does not include the currently playing song."""
 		
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		queue = self.queue.get(str(ctx.guild.id))
 		if not len(queue):
 			# No songs in queue
-			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 		try:
 			song_number = int(song_number)-1
 		except:
-			return await Message.EmbedText(title="♫ Not a valid song number!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not a valid song number!",color=ctx.author,delete_after=delay).send(ctx)
 		if song_number < 0 or song_number > len(queue):
-			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=delay).send(ctx)
 		# Get the song at the index
 		song = queue[song_number]
 		if song.get("added_by",None) == ctx.author or self.is_admin(ctx):
 			queue.pop(song_number)
-			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=self.delay).send(ctx)
-		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def unqueue(self, ctx):
 		"""Removes all songs you've added from the queue (does not include the currently playing song).  Admins remove all songs from the queue."""
-		
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		queue = self.queue.get(str(ctx.guild.id))
 		if not len(queue):
 			# No songs in queue
-			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 		removed = 0
 		new_queue = []
 		for song in queue:
@@ -486,20 +495,21 @@ class Music(commands.Cog):
 				new_queue.append(song)
 		self.queue[str(ctx.guild.id)] = new_queue
 		if removed > 0:
-			return await Message.EmbedText(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=self.delay).send(ctx)
-		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not ctx.voice_client or not (ctx.voice_client.is_playing() or ctx.voice_client.is_paused()):
 			# No client - and we're not playing or paused
 			return await Message.EmbedText(
 				title="♫ Currently Playing",
 				color=ctx.author,
 				description="Not playing anything.",
-				delete_after=self.delay
+				delete_after=delay
 			).send(ctx)
 		data = self.data.get(str(ctx.guild.id))
 		if ctx.voice_client.is_playing():
@@ -519,29 +529,31 @@ class Music(commands.Cog):
 			],
 			url=data.get("webpage_url",None),
 			thumbnail=data.get("thumbnail",None),
-			delete_after=self.delay
+			delete_after=delay
 		).send(ctx)
 
 	@commands.command()
 	async def playingin(self, ctx):
 		"""Shows the number of servers the bot is currently playing music in."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		playing_list = [x for x in self.bot.guilds if x.voice_client and (x.voice_client.is_playing() or x.voice_client.is_paused())]
 		playing_in = len(playing_list)
 		paused_in  = len([x for x in playing_list if x.voice_client.is_paused()])
 		msg = "♫ Playing music in {:,} of {:,} server{} ({:,} paused).".format(playing_in, len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s", paused_in)
-		await Message.EmbedText(title=msg,color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def playlist(self, ctx):
 		"""Lists the queued songs in the playlist."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not ctx.voice_client or not (ctx.voice_client.is_playing() or ctx.voice_client.is_paused()):
 			return await Message.EmbedText(
 				title="♫ Current Playlist",
 				color=ctx.author,
 				description="Not playing anything.",
-				delete_after=self.delay
+				delete_after=delay
 			).send(ctx)
 		data = self.data.get(str(ctx.guild.id))
 		if ctx.voice_client.is_playing():
@@ -592,7 +604,7 @@ class Music(commands.Cog):
 			title="♫ Current Playlist{}".format(pl_string),
 			color=ctx.author,
 			fields=fields,
-			delete_after=self.delay,
+			delete_after=delay,
 			pm_after=15
 		).send(ctx)
 
@@ -600,21 +612,22 @@ class Music(commands.Cog):
 	async def skip(self, ctx):
 		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requestors and admins can skip without voting."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not ctx.voice_client.is_playing():
-			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Check for added by first, then check admin
 		data = self.data.get(str(ctx.guild.id))
 		if self.is_admin(ctx):
 			self.skip_pop(ctx)
-			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)	
+			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=delay).send(ctx)	
 		if data.get("added_by",None) == ctx.author:
 			self.skip_pop(ctx)
-			return await Message.EmbedText(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=delay).send(ctx)
 		# At this point, we're not admin, and not the requestor, let's make sure we're in the same vc
 		if not ctx.author.voice or not ctx.author.voice.channel == ctx.voice_client.channel:
-			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 		
 		# Do the checking here to validate we can use this and etc.
 		skips = self.skips.get(str(ctx.guild.id),[])
@@ -637,40 +650,42 @@ class Music(commands.Cog):
 		if len(new_skips) >= needed_skips:
 			# Got it!
 			self.skip_pop(ctx)
-			return await Message.EmbedText(title="♫ Skip threshold met ({}/{}) - skipping!".format(len(new_skips),needed_skips),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Skip threshold met ({}/{}) - skipping!".format(len(new_skips),needed_skips),color=ctx.author,delete_after=delay).send(ctx)
 		# Update the skips
 		self.skips[str(ctx.guild.id)] = new_skips
-		await Message.EmbedText(title="♫ Skip threshold not met - {}/{} skip votes entered - need {} more!".format(len(new_skips),needed_skips,needed_skips-len(new_skips)),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ Skip threshold not met - {}/{} skip votes entered - need {} more!".format(len(new_skips),needed_skips,needed_skips-len(new_skips)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def volume(self, ctx, volume = None):
 		"""Changes the player's volume (0-100)."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not ctx.voice_client.is_playing():
-			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
 			cv = int(ctx.voice_client.source.volume*100)
-			return await Message.EmbedText(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
 		try:
 			volume = int(volume)
 		except:
-			return await Message.EmbedText(title="♫ Volume must be an integer between 0-100.",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Volume must be an integer between 0-100.",color=ctx.author,delete_after=delay).send(ctx)
 		# Ensure our volume is between 0 and 100
 		if not -1 < volume < 101:
 			volume = 100 if volume > 100 else 0
 		self.vol[str(ctx.guild.id)] = volume / 100
 		ctx.voice_client.source.volume = volume / 100
-		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def repeat(self, ctx, *, yes_no = None):
 		"""Checks or sets whether to repeat the current playlist."""
 
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
-			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		current = self.loop.get(str(ctx.guild.id),False)
 		setting_name = "Repeat"
 		if yes_no == None:
@@ -695,18 +710,42 @@ class Music(commands.Cog):
 			yes_no = current
 		if not yes_no == None and not yes_no == current:
 			self.loop[str(ctx.guild.id)] = yes_no
-		await Message.EmbedText(title="♫ "+msg,color=ctx.author,delete_after=self.delay).send(ctx)
+		await Message.EmbedText(title="♫ "+msg,color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def autodeleteafter(self, ctx, seconds = None):
+		"""Lists or sets the current delay before auto-deleting music related messages (max of 300 seconds).  Set to an integer less than 10 to disable auto-deletion."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if seconds == None:
+			# List the delay
+			if delay == None:
+				return await Message.EmbedText(title="♫ Music related messages are not auto-deleted!",color=ctx.author).send(ctx)
+			else:
+				return await Message.EmbedText(title="♫ Music related messages are auto-deleted after {} second{}!".format(delay, "" if delay == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+		# Attempting to set it
+		try:
+			real = int(seconds)
+		except:
+			return await Message.EmbedText(title="♫ Seconds must be an integer!",color=ctx.author,delete_after=delay).send(ctx)
+		if real < 10:
+			self.settings.setServerStat(ctx.guild, "MusicDeleteDelay", None)
+			return await Message.EmbedText(title="♫ Music related messages will not be auto-deleted!",color=ctx.author).send(ctx)
+		real = 300 if real > 300 else real
+		self.settings.setServerStat(ctx.guild, "MusicDeleteDelay", real)
+		return await Message.EmbedText(title="♫ Music related messages will be auto-deleted after {} second{}!".format(real, "" if real == 1 else "s"),color=ctx.author,delete_after=real).send(ctx)
 
 	@commands.command()
 	async def stop(self, ctx):
 		"""Stops and disconnects the bot from voice."""
 		
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		# Remove the per-server temp settings
 		self.dict_pop(ctx)
 		if ctx.voice_client:
 			await ctx.voice_client.disconnect()
-			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
-		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
 	@join.before_invoke
 	@play.before_invoke
@@ -728,24 +767,26 @@ class Music(commands.Cog):
 	@skip.before_invoke
 	@play.before_invoke
 	async def ensure_same_channel(self, ctx):
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if self.is_admin(ctx):
 			return
 		if not ctx.author.voice:
-			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Author not connected to a voice channel..")
 		if ctx.voice_client is None:
-			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Bot not connected to a voice channel.")
 		if ctx.author.voice.channel != ctx.voice_client.channel:
-			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Author not connected to the bot's voice channel.")
 
 	@play.before_invoke
 	async def ensure_voice(self, ctx):
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
 		if not ctx.author.voice and not self.is_admin(ctx):
-			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=self.delay).send(ctx)
+			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Author not connected to a voice channel.")
 		if ctx.voice_client is None:
 			if ctx.author.voice:
