@@ -101,7 +101,7 @@ class Welcome(commands.Cog):
             return
 
         if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Welcome", None)
+            self.settings.setServerStat(ctx.message.guild, "Welcome", "")
             await ctx.channel.send('Welcome message removed!')
             return
 
@@ -163,7 +163,7 @@ class Welcome(commands.Cog):
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.message.guild, "Welcome")
-        if message == None:
+        if message in (None,""):
             await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
             return
         await self._welcome(member, ctx.message.guild, ctx.message.channel)
@@ -223,7 +223,7 @@ class Welcome(commands.Cog):
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.message.guild, "Welcome")
-        if message == None:
+        if message in (None,""):
             await ctx.channel.send('Welcome message not setup.  You can do so with the `{}setwelcome [message]` command.'.format(ctx.prefix))
             return
         # Escape the markdown
@@ -272,7 +272,7 @@ class Welcome(commands.Cog):
             return
 
         if message == None:
-            self.settings.setServerStat(ctx.message.guild, "Goodbye", None)
+            self.settings.setServerStat(ctx.message.guild, "Goodbye", "")
             await ctx.channel.send('Goodbye message removed!')
             return
 
@@ -335,7 +335,7 @@ class Welcome(commands.Cog):
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
-        if message == None:
+        if message in (None,""):
             await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
             return
         await self._goodbye(member, ctx.message.guild, ctx.message.channel)
@@ -396,7 +396,7 @@ class Welcome(commands.Cog):
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.message.guild, "Goodbye")
-        if message == None:
+        if message in (None,""):
             await ctx.channel.send('Goodbye message not setup.  You can do so with the `{}setgoodbye [message]` command.'.format(ctx.prefix))
             return
         # Escape the markdown
@@ -426,7 +426,7 @@ class Welcome(commands.Cog):
         else:
             suppress = False
         message = self.settings.getServerStat(server, "Welcome")
-        if message == None:
+        if message in (None,""):
             return
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
@@ -471,7 +471,7 @@ class Welcome(commands.Cog):
         else:
             suppress = False
         message = self.settings.getServerStat(server, "Goodbye")
-        if message == None:
+        if message in (None,""):
             return
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
