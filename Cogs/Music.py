@@ -714,7 +714,20 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def autodeleteafter(self, ctx, seconds = None):
-		"""Lists or sets the current delay before auto-deleting music related messages (max of 300 seconds).  Set to an integer less than 10 to disable auto-deletion."""
+		"""Lists or sets the current delay before auto-deleting music related messages (max of 300 seconds).  Set to an integer less than 10 to disable auto-deletion.  Requires bot-admin or admin to set."""
+
+		isAdmin = ctx.author.permissions_in(ctx.message.channel).administrator
+		if not isAdmin:
+			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
+			for role in ctx.author.roles:
+				for aRole in checkAdmin:
+					if str(aRole['ID']) == str(role.id):
+						isAdmin = True
+						break
+				if isAdmin:
+					break
+		if not isAdmin:
+			seconds = None
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if seconds == None:
