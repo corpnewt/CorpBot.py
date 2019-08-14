@@ -443,13 +443,9 @@ class Settings(commands.Cog):
 				if role == defRole:
 					# We have our role
 					foundRole = True
+					break
 			if not foundRole:
-				try:
-					self.role.add_roles(member, [defRole])
-					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, self.suppressed(server, server.name))
-					await member.send(fmt)
-				except Exception:
-					pass
+				self.role.add_roles(member, [defRole])
 		if task in self.loop_list:
 			self.loop_list.remove(task)
 
