@@ -154,19 +154,16 @@ class Mute(commands.Cog):
     async def mute(self, member, server, cooldown = None):
         # Mutes the specified user on the specified server
         for channel in server.channels:
-            if not type(channel) is discord.TextChannel:
-                continue
-            # perms = member.permissions_in(channel)
-            # if perms.read_messages:
-            overs = channel.overwrites_for(member)
-            if not overs.send_messages == False:
-                # We haven't been muted here yet
-                overs.send_messages = False
-                overs.add_reactions = False
-                try:
-                    await channel.set_permissions(member, overwrite=overs)
-                except Exception:
-                    continue
+            if type(channel) in (discord.TextChannel,discord.VoiceChannel):
+                overs = channel.overwrites_for(member)
+                # if not overs.send_messages == False:
+                if not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
+                    # We haven't been muted compltely here yet
+                    overs.send_messages = overs.add_reactions = overs.speak = False
+                    try:
+                        await channel.set_permissions(member, overwrite=overs)
+                    except:
+                        pass
         
         self.settings.setUserStat(member, server, "Muted", True)
         self.settings.setUserStat(member, server, "Cooldown", cooldown)
@@ -194,31 +191,25 @@ class Mute(commands.Cog):
     async def unmute(self, member, server):
         # Unmutes the specified user on the specified server
         for channel in server.channels:
-            if not type(channel) is discord.TextChannel:
-                continue
-            # perms = member.permissions_in(channel)
-            # if perms.read_messages:
-            overs = channel.overwrites_for(member)
-            otherPerms = False
-            for perm in overs:
-                if not perm[1] == None and not str(perm[0]) == 'send_messages' and not str(perm[0]) == 'add_reactions':
-                    otherPerms = True
-            if overs.send_messages == False:
-                # We haven't been muted here yet
-                if otherPerms:
-                    # We have other overwrites - preserve those
-                    overs.send_messages = None
-                    overs.add_reactions = None
+            if type(channel) in (discord.TextChannel,discord.VoiceChannel):
+                overs = channel.overwrites_for(member)
+                otherPerms = False
+                for perm,state in overs:
+                    if not perm in ("send_messages","add_reactions","speak") and state != None:
+                        otherPerms = True
+                        break
+                if False in (overs.send_messages,overs.speak):
+                    if otherPerms:
+                        # We have other overwrites - preserve those
+                        overs.send_messages = overs.add_reactions = overs.speak = None
+                    else:
+                        # No other overwrites - delete custom perms
+                        overs = None
                     try:
                         await channel.set_permissions(member, overwrite=overs)
-                    except Exception:
+                    except:
                         continue
-                else:
-                    # No other overwrites - delete custom perms
-                    try:
-                        await channel.set_permissions(member, overwrite=None)
-                    except Exception:
-                        continue
+
         self.settings.setUserStat(member, server, "Muted", False)
         self.settings.setUserStat(member, server, "Cooldown", None)
 
