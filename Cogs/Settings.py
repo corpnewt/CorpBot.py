@@ -445,7 +445,10 @@ class Settings(commands.Cog):
 					foundRole = True
 					break
 			if not foundRole:
-				self.role.add_roles(member, [defRole])
+				try:
+					self.role.add_roles(member, [defRole])
+				except:
+					pass
 		if task in self.loop_list:
 			self.loop_list.remove(task)
 
