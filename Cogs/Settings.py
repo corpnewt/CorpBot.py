@@ -402,15 +402,12 @@ class Settings(commands.Cog):
 				if role == defRole:
 					# We have our role
 					foundRole = True
+					break
 			if not foundRole:
 				try:
 					self.role.add_roles(member, [defRole])
-					fmt = '*{}*, you\'ve been assigned the role **{}** in *{}!*'.format(DisplayName.name(member), defRole.name, self.suppressed(server, server.name))
-					await member.send(fmt)
-				except Exception:
+				except:
 					pass
-		'''if task in self.loop_list:
-			self.loop_list.remove(task)'''
 
 	async def backup(self):
 		# Works only for JSON files, not for database yet... :(
