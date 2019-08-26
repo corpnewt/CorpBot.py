@@ -361,34 +361,37 @@ class Debugging(commands.Cog):
 		if not logChan:
 			return
 		# At this point - we log the message
-		if filename:
-			await logChan.send(log_message, file=discord.File(filename))
-		else:
-			# Check for suppress
-			if suppress:
-				log_message = Nullify.clean(log_message)
-			# Remove triple backticks and replace any single backticks with single quotes
-			log_back  = log_message.replace("`", "'")
-			if log_back == log_message:
-				# Nothing changed
-				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
+		try:
+			if filename:
+				await logChan.send(log_message, file=discord.File(filename))
 			else:
-				# We nullified some backticks - make a note of it
-				log_message = log_back
-				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
-			if self.wrap:
-				# Wraps the message to lines no longer than 70 chars
-				log_message = textwrap.fill(log_message, replace_whitespace=False)
-			await Message.EmbedText(
-				title=title,
-				description=log_message,
-				color=color,
-				desc_head="```\n",
-				desc_foot="```",
-				footer=footer
-			).send(logChan)
-			# await logChan.send(log_message)
-
+				# Check for suppress
+				if suppress:
+					log_message = Nullify.clean(log_message)
+				# Remove triple backticks and replace any single backticks with single quotes
+				log_back  = log_message.replace("`", "'")
+				if log_back == log_message:
+					# Nothing changed
+					footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
+				else:
+					# We nullified some backticks - make a note of it
+					log_message = log_back
+					footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+				if self.wrap:
+					# Wraps the message to lines no longer than 70 chars
+					log_message = textwrap.fill(log_message, replace_whitespace=False)
+				await Message.EmbedText(
+					title=title,
+					description=log_message,
+					color=color,
+					desc_head="```\n",
+					desc_foot="```",
+					footer=footer
+				).send(logChan)
+				# await logChan.send(log_message)
+		except:
+			# We don't have perms in this channel or something - silently cry
+			pass
 
 	@commands.command(pass_context=True)
 	async def clean(self, ctx, messages = None, *, chan : discord.TextChannel = None):
