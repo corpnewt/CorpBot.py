@@ -1,4 +1,3 @@
-from pyquery import PyQuery as pq
 from xml.sax.saxutils import unescape
 from Cogs import DL
 from Cogs import Nullify
@@ -112,13 +111,10 @@ async def getMarkdown( url, style = None, escape = False):
 			response = await DL.async_text(url,{"user-agent":"Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"})
 		except Exception:
 			return None
-		dom = pq(response)
-		listLink = dom('span.header-actions')
-		newLink = None
-		for link in listLink.children():
-			for attrib_name in link.attrib:
-				if attrib_name == 'href':
-					newLink = link.attrib['href']
+		try:
+			newLink = response.split('">View full price breakdown<')[0].split('"')[-1]
+		except Exception as e:
+			newLink = None
 		if newLink == None:
 			return None
 		url = "https://pcpartpicker.com" + str(newLink)
@@ -168,14 +164,15 @@ async def getMarkdown( url, style = None, escape = False):
 			except Exception as e:
 				pass
 			continue
-		if type_primed == 1:
-			# If it's a custom part - we have to skip an extra line
-			type_primed = 2
-			continue
-		if type_primed == 2:
-			type_primed = False
-			# Try to get the type from the text
-			current_type = i.strip()
+		if type_primed:
+			# If it's a custom part - we need to look for <p>[whatever]</p>
+			# or for the absense of <a href=
+			if i.strip().startswith("<p>"):
+				type_primed = False
+				current_type = i.split("<p>")[1].split("</p>")[0]
+			elif not i.strip().startswith("<a href="):
+				type_primed = False
+				current_type = i.strip()
 			continue
 		if "td__component" in i:
 			# Got the type
@@ -184,7 +181,7 @@ async def getMarkdown( url, style = None, escape = False):
 				type_primed = False
 			except:
 				# bad type - prime it though
-				type_primed = 1
+				type_primed = True
 			continue
 		if "td__name" in i:
 			# Primed for name
