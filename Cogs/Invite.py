@@ -15,7 +15,8 @@ class Invite(commands.Cog):
 		self.settings = settings
 		self.current_requests = []
 		self.temp_allowed = []
-		self.wait_time = 3600 # 1 hour for a request/approval to roll off
+		self.approval_time = 3600 # 1 hour for an approval to roll off
+		self.request_time = 604800 # 7 x 24 x 3600 = 1 week for a request to roll off
 
 	async def onserverjoin(self, server):
 		# First verify if we're joining servers
@@ -34,7 +35,7 @@ class Invite(commands.Cog):
 
 	async def remove_request(self,user_server):
 		# Wait for the allotted time and remove the request if it still exists
-		await asyncio.sleep(self.wait_time)
+		await asyncio.sleep(self.request_time)
 		try:
 			self.current_requests.remove(user_server)
 		except ValueError:
@@ -42,7 +43,7 @@ class Invite(commands.Cog):
 
 	async def remove_allow(self,server_id):
 		# Wait for the allotted time and remove the temp_allowed value if it still exists
-		await asyncio.sleep(self.wait_time)
+		await asyncio.sleep(self.approval_time)
 		try:
 			self.temp_allowed.remove(server_id)
 		except ValueError:
@@ -117,12 +118,12 @@ class Invite(commands.Cog):
 			if not target:
 				continue
 			await target.send(msg)
-		request = (ctx.author,invite.guild,time.time()+self.wait_time,ctx)
+		request = (ctx.author,invite.guild,time.time()+self.request_time,ctx)
 		self.current_requests.append(request)
 		self.bot.loop.create_task(self.remove_request(request))
 		await ctx.send("I've forwarded the request to my owner{}.  The request is valid for {}.".format(
 			"" if len(owners) == 1 else "s",
-			ReadableTime.getReadableTimeBetween(0,self.wait_time)))
+			ReadableTime.getReadableTimeBetween(0,self.request_time)))
 
 	@commands.command()
 	async def approvejoin(self, ctx, server_id = None):
@@ -151,7 +152,7 @@ class Invite(commands.Cog):
 		if temp:
 			return await ctx.send("Approval to join guild id {} is still active for the next {}.".format(server_id,ReadableTime.getReadableTimeBetween(time.time(),temp[1])))
 		# Allow the guild
-		temp_allow = (server_id,time.time()+self.wait_time)
+		temp_allow = (server_id,time.time()+self.approval_time)
 		self.temp_allowed.append(temp_allow)
 		# Remove if it's been requested
 		request = next((x for x in self.current_requests if x[1].id == invite.guild.id),None)
@@ -159,7 +160,7 @@ class Invite(commands.Cog):
 			await request[3].send("{}, your request for me to join {} has been approved for the next {}.  You can invite me with this link:\n<{}>".format(
 				request[0].mention,
 				Nullify.clean(request[1].name),
-				ReadableTime.getReadableTimeBetween(0,self.wait_time),
+				ReadableTime.getReadableTimeBetween(0,self.approval_time),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=request[1])
 			))
 			try:
@@ -169,7 +170,7 @@ class Invite(commands.Cog):
 		self.bot.loop.create_task(self.remove_allow(temp_allow))
 		await ctx.send("I've been approved to join {} for the next {}.".format(
 			server_id,
-			ReadableTime.getReadableTimeBetween(0,self.wait_time)))
+			ReadableTime.getReadableTimeBetween(0,self.approval_time)))
 
 	@commands.command()
 	async def revokejoin(self, ctx, server_id = None):
