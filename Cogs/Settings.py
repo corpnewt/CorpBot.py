@@ -452,13 +452,13 @@ class Settings(commands.Cog):
 				print("Settings Backed Up: {}".format(timeStamp))
 			await asyncio.sleep(self.backupTime)
 
-	def isOwner(self, member):
+	def getOwners(self):
 		# This method converts prior, string-only ownership to a list,
 		# then searches the list for the passed member
 		ownerList = self.getGlobalStat("Owner",[])
 		ownerList = [] if ownerList == None else ownerList
 		if not len(ownerList):
-			return None
+			return []
 		if not type(ownerList) is list:
 			# We have a string, convert
 			ownerList = [ int(ownerList) ]
@@ -469,6 +469,12 @@ class Settings(commands.Cog):
 		# Update the setting if there were changes
 		if len(owners) != len(ownerList):
 			self.setGlobalStat("Owner", owners)
+		return owners
+
+	def isOwner(self, member):
+		owners = self.getOwners()
+		if not len(owners):
+			return None
 		# Let us know if we're an owner
 		return member.id in owners
 
