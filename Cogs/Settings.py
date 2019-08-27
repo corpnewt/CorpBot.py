@@ -488,33 +488,29 @@ class Settings(commands.Cog):
 			else:
 				print("Settings Backed Up: {}".format(timeStamp))
 			await asyncio.sleep(self.backupTime)
-
-	def isOwner(self, member):
-		# This method converts prior, string-only ownership to a list,
-		# then searches the list for the passed member
-		try:
-			ownerList = self.serverDict['Owner']
-		except KeyError:
-			self.serverDict['Owner'] = []
-			ownerList = self.serverDict['Owner']
-		if not len(ownerList):
-			return None
-		if not type(ownerList) is list:
+			
+	def getOwners(self):
+		ownerList = self.serverDict.get("Owner",[])
+		ownerList = [] if ownerList == None else ownerList
+		if isinstance(ownerList,list) and not len(ownerList):
+			return ownerList
+		if not isinstance(ownerList,list):
 			# We have a string, convert
 			ownerList = [ int(ownerList) ]
-			self.serverDict['Owner'] = ownerList
 		# At this point - we should have a list
-		for owner in ownerList:
-			if not self.bot.get_user(owner):
-				# Invalid user - remove
-				self.serverDict['Owner'].remove(owner)
-				continue
-			if int(owner) == member.id:
-				# We're in the list
-				return True
-		# Not in the list.. :(
-		return False
+		# Let's make sure all parties exist still
+		all_members = set([x.id for x in self.bot.get_all_members()])
+		owners = [x for x in ownerList if x in all_members]
+		# Update the setting if there were changes
+		if len(owners) != len(ownerList):
+			self.serverDict['Owner'] = owners
+		return owners
 
+	def isOwner(self, member):
+		owners = self.getOwners()
+		if not len(owners):
+			return None
+		return member.id in owners
 
 	def getServerDict(self):
 		# Returns the server dictionary
