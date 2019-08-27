@@ -104,10 +104,10 @@ class Invite(commands.Cog):
 		msg = "{} ({} - {}#{} - {})\nhas requested the bot for: {} ({})\nvia the following invite: {}".format(
 			DisplayName.name(ctx.author),
 			ctx.author.mention,
-			ctx.author.name,
+			Nullify.clean(ctx.author.name),
 			ctx.author.discriminator,
 			ctx.author.id,
-			invite.guild,
+			Nullify.clean(invite.guild.name),
 			invite.guild.id,
 			invite
 		)
