@@ -150,7 +150,11 @@ class Invite(commands.Cog):
 			return await ctx.send("I'm already in that server.")
 		temp = next((x for x in self.temp_allowed if x[0] == server_id),None)
 		if temp:
-			return await ctx.send("Approval to join guild id {} is still active for the next {}.".format(server_id,ReadableTime.getReadableTimeBetween(time.time(),temp[1])))
+			# Let's remove the approval to allow it to re-add with a new time
+			try:
+				self.temp_allowed.remove(temp)
+			except:
+				pass
 		# Allow the guild
 		temp_allow = (server_id,time.time()+self.approval_time)
 		self.temp_allowed.append(temp_allow)
