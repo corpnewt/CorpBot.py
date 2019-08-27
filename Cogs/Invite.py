@@ -69,7 +69,10 @@ class Invite(commands.Cog):
 				Nullify.clean(server.name),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=server)
 			))
-		return await ctx.send("I am not currently joining new servers.")
+		return await ctx.send("You need approval from my owner{} to add me.  You can request it with `{}requestjoin guild_invite_url`.".format(
+			"" if len(self.settings.getOwners()) == 1 else "s",
+			ctx.prefix
+		))
 
 	@commands.command()
 	async def requestjoin(self, ctx, invite_url = None):
