@@ -70,7 +70,7 @@ class Invite(commands.Cog):
 				Nullify.clean(server.name),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=server)
 			))
-		return await ctx.send("You need approval from my owner{} to add me.  You can request it with `{}requestjoin guild_invite_url`.".format(
+		return await ctx.send("You need approval from my owner{} to add me.  You can request it with `{}requestjoin (Server Invite URL)`.".format(
 			"" if len(self.settings.getOwners()) == 1 else "s",
 			ctx.prefix
 		))
