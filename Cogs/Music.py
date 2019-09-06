@@ -562,10 +562,11 @@ class Music(commands.Cog):
 			data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
 			play_text = "Paused"
 		queue = self.queue.get(str(ctx.guild.id))
-		fields = [{"name":"{}".format(data.get("title")),"value":"Currently {} - at {} - Requested by {}".format(
+		fields = [{"name":"{}".format(data.get("title")),"value":"Currently {} - at {} - Requested by {} - [Link]({})".format(
 			play_text,
-			self.format_duration(int(time.time())-data["started_at"],True),
-			data["added_by"].mention),"inline":False}
+			self.format_elapsed(data),
+			data["added_by"].mention,
+			data.get("webpage_url","")),"inline":False},
 		]
 		if len(queue):
 			total_time = 0
@@ -592,7 +593,7 @@ class Music(commands.Cog):
 			x += 1 # brings this up to the proper numbering
 			fields.append({
 				"name":"{}. {}".format(x,y.get("title")),
-				"value":"{} - Requested by {}".format(self.format_duration(y.get("duration",0)),y["added_by"].mention),
+				"value":"{} - Requested by {} - [Link]({})".format(self.format_duration(y.get("duration",0)),y["added_by"].mention,y.get("webpage_url","")),
 				"inline":False})
 		if len(queue) > 9:
 			pl_string = " (10/{:,} shown)".format(len(queue)+1)
