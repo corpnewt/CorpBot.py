@@ -395,7 +395,7 @@ class Debugging(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def clean(self, ctx, messages = None, *, chan : discord.TextChannel = None):
-		"""Cleans the passed number of messages from the given channel - 100 by default (admin only)."""
+		"""Cleans the passed number of messages from the given channel (admin only)."""
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
