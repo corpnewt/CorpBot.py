@@ -865,7 +865,7 @@ class Hw(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def newhw(self, ctx):
-		"""Initiate a new-hardware conversation with the bot."""
+		"""Initiate a new-hardware conversation with the bot.  The hardware added will also be set as the Main Build."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
 			buildList = []
@@ -992,14 +992,14 @@ class Hw(commands.Cog):
 			newBuild['Hardware'] = parts.content
 			break
 
-		# Check if we already have a main build
+		# Check if we already have a main build and clear it
 		for build in buildList:
 			if build['Main']:
-				newBuild['Main'] = False
+				build['Main'] = False
 
 		buildList.append(newBuild)
 		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = '*{}*, {} was created successfully!'.format(DisplayName.name(ctx.author), bname)
+		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
 
