@@ -131,7 +131,7 @@ class Telephone(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def phonebook(self, ctx, *, look_up = None):
-		"""Displays up to 20 entries in the phone book - or optionally lets you search for a server name or number."""
+		"""Lets you page through the phonebook - or optionally lets you search for a server name or number."""
 		# Build our phone list
 		entries = []
 		for guild in self.bot.guilds:
