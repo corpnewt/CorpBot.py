@@ -1,14 +1,6 @@
-import asyncio
-import discord
-import re
-import os
-import random
-import string
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import FuzzySearch
+import asyncio, discord, re, os, random
+from discord.ext import commands
+from Cogs import Settings, DisplayName, Nullify, FuzzySearch, PickList, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -145,69 +137,43 @@ class Telephone(commands.Cog):
 		for guild in self.bot.guilds:
 			teleNum = self.settings.getServerStat(guild, "TeleNumber")
 			if teleNum:
-				entries.append({ "Name": guild.name, "Number": teleNum })
+				entries.append({ "name": guild.name, "value": teleNum[:3] + "-" + teleNum[3:] })
 
 		if not len(entries):
 			await ctx.send(":telephone: The phonebook is *empty!*")
 			return
-		
-		max_entries = 20
+
+		# Sort alphabetically
+		entries = sorted(entries, key = lambda x: x["name"])
+
 		if look_up == None:
-			if len(entries) > max_entries:
-				title = ":telephone: __First {} of {} Phonebook Entries:__\n\n".format(max_entries, len(entries))
-			else:
-				max_entries = len(entries)
-				title = ":telephone: __Phonebook:__\n\n"
-			count = 0
-			for i in entries:
-				count += 1
-				if count > max_entries:
-					break
-				num = i['Number']
-				i_form = num[:3] + "-" + num[3:]
-				title += "{}. {} - *{}*\n".format(count, i["Name"], i_form)
-			await ctx.send(self.suppressed(ctx.guild, title))
+			await PickList.PagePicker(title=":telephone: Phonebook",list=entries,ctx=ctx).pick()
 			return
 
 		# Search time!
 		look_up_num = re.sub(r'\W+', '', look_up)
 		id_ratio = 0
 		if len(look_up_num):
-			idMatch = FuzzySearch.search(look_up_num, entries, 'Number', 3)
+			look_up_num = look_up_num if len(look_up_num) < 7 else look_up_num[:3]+"-"+look_up_num[3:]
+			idMatch = FuzzySearch.search(look_up_num, entries, 'value', 3)
 			id_ratio = idMatch[0]['Ratio']
 			if id_ratio == 1:
 				# Found it!
-				num = idMatch[0]['Item']['Number']
-				i_form = num[:3] + "-" + num[3:]
-				msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(idMatch[0]['Item']['Name'], i_form)
-				await ctx.send(self.suppressed(ctx.guild, msg))
-				return
+				return await Message.Embed(title=":telephone: Phonebook",fields=[idMatch[0]["Item"]],color=ctx.author).send(ctx)
 		# Look up by name now
-		nameMatch = FuzzySearch.search(look_up, entries, 'Name', 3)
+		nameMatch = FuzzySearch.search(look_up, entries, 'name', 3)
 		if nameMatch[0]['Ratio'] == 1:
 			# Exact name
 			# Found it!
-			num = nameMatch[0]['Item']['Number']
-			i_form = num[:3] + "-" + num[3:]
-			msg = ":telephone: __Phonebook:__\n\n{} - *{}*".format(nameMatch[0]['Item']['Name'], i_form)
-			await ctx.send(self.suppressed(ctx.guild, msg))
-			return
+			return await Message.Embed(title=":telephone: Phonebook",fields=[nameMatch[0]["Item"]],color=ctx.author).send(ctx)
 		# now we need to find which is better
 		matchCheck = []
 		if nameMatch[0]['Ratio'] > id_ratio:
 			matchCheck = nameMatch
 		else:
 			matchCheck = idMatch
-
-		msg = ":telephone: __Phonebook - Closest Matches:__\n\n"
-		count = 0
-		for m in matchCheck:
-			count += 1
-			num = m['Item']['Number']
-			i_form = num[:3] + "-" + num[3:]
-			msg += "{}. {} - *{}*\n".format(count, m['Item']['Name'], i_form)
-
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		fields = [m["Item"] for m in matchCheck]
+		return await Message.Embed(title=":telephone: Phonebook - Closest Matches",fields=fields,color=ctx.author).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def telenumber(self, ctx):
