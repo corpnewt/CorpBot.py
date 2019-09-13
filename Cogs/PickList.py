@@ -81,7 +81,7 @@ class Picker:
             reaction, user = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
         except:
             # Didn't get a reaction
-            await self.self_message.clear_reactions()
+            await self._remove_reactions(current_reactions)
             return (-2, self.self_message)
         
         await self._remove_reactions(current_reactions)
@@ -137,8 +137,8 @@ class PagePicker(Picker):
                 reaction, user = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
             except:
                 # Didn't get a reaction
-                await self.self_message.clear_reactions()
-                return (-2, self.self_message)
+                await self._remove_reactions(self.reactions)
+                return (page, self.self_message)
             # Got a reaction - let's process it
             ind = self.reactions.index(str(reaction.emoji))
             page = 0 if ind==0 else page-1 if ind==1 else page+1 if ind==2 else pages if ind==3 else page
@@ -159,6 +159,11 @@ class PagePicker(Picker):
                     pass
                 # Delete the instruction
                 await page_instruction.delete()
+                # Try to delete the user's page message too
+                try:
+                    await page_message.delete()
+                except:
+                    pass
             page = 0 if page < 0 else pages-1 if page > pages-1 else page
             embed["fields"] = self._get_page_contents(page)
             embed["footer"] = "Page {} of {}".format(page+1,pages)
