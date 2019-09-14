@@ -415,6 +415,40 @@ class Music(commands.Cog):
 		).edit(ctx,message)
 
 	@commands.command()
+	async def yt(self, ctx, *, search = None):
+		"""Searches youtube for the passed terms and posts a link to the first hit."""
+
+		if search == None:
+			return await Message.EmbedText(title="♫ You need to pass a search term!",color=ctx.author,delete_after=delay).send(ctx)
+		message = await Message.EmbedText(
+			title="♫ Searching For: {}...".format(search.strip("<>")),
+			color=ctx.author
+			).send(ctx)
+		queue = self.queue.get(str(ctx.guild.id),[])
+		search = search.strip('<>')
+		# Check if url - if not, remove /
+		matches = list(re.finditer(self.regex, search))
+		if not len(matches):
+			search = search.replace('/', '')
+		data = await self.get_song_info(search)
+		if not data:
+			# Nothing found
+			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms.",color=ctx.author,delete_after=delay).edit(ctx,message)
+		await Message.Embed(
+			title="♫ Enqueued: {}".format(data.get("title","Unknown")),
+			description="Requested by {}:\n\n{}".format(ctx.author.mention,data.get("description","No description provided.")),
+			fields=[
+				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False},
+				{"name":"Views","value":"{:,}".format(data.get("view_count","Unknown")),"inline":False},
+				{"name":"Likes","value":"{:,}".format(data.get("like_count","Unknown")),"inline":False},
+				{"name":"Dislikes","value":"{:,}".format(data.get("dislike_count","Unknown")),"inline":False}
+			],
+			color=ctx.author,
+			thumbnail=data.get("thumbnail",None),
+			url=data.get("webpage_url",None),
+		).edit(ctx,message)
+
+	@commands.command()
 	async def pause(self, ctx):
 		"""Pauses the currently playing song."""
 
