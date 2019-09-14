@@ -308,7 +308,15 @@ class Hw(commands.Cog):
 			bparts = Nullify.clean(bparts)
 		
 		msg = '"{}"\'s current parts:'.format(bname)
-		await hwChannel.send(msg)
+		try:
+			await hwChannel.send(msg)
+		except:
+			# Can't send to the destination
+			self._stop_hw(ctx.author)
+			if hwChannel == ctx.author:
+				# Must not accept pms
+				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
+			return
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
@@ -455,7 +463,15 @@ class Hw(commands.Cog):
 
 		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
 		while True:
-			buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			try:
+				buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			except:
+				# Can't send to the destination
+				self._stop_hw(ctx.author)
+				if hwChannel == ctx.author:
+					# Must not accept pms
+					await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
+				return
 			if not buildName:
 				self._stop_hw(ctx.author)
 				return
