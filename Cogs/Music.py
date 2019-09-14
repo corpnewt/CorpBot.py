@@ -439,9 +439,10 @@ class Music(commands.Cog):
 			description="Requested by {}:\n\n{}".format(ctx.author.mention,data.get("description","No description provided.")),
 			fields=[
 				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False},
-				{"name":"Views","value":"{:,}".format(data.get("view_count","Unknown")),"inline":False},
-				{"name":"Likes","value":"{:,}".format(data.get("like_count","Unknown")),"inline":False},
-				{"name":"Dislikes","value":"{:,}".format(data.get("dislike_count","Unknown")),"inline":False}
+				{"name":"Views","value":"{:,}".format(data.get("view_count",0)),"inline":False},
+				{"name":"Likes","value":"{:,}".format(data.get("like_count",0)),"inline":False},
+				{"name":"Dislikes","value":"{:,}".format(data.get("dislike_count",0)),"inline":False},
+				{"name":"Dislikes","value":round(data.get("average_rating",0),2),"inline":False}
 			],
 			color=ctx.author,
 			thumbnail=data.get("thumbnail",None),
