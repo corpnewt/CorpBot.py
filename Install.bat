@@ -16,7 +16,7 @@ REM use_py3:
 REM   TRUE  = Use if found, use py2 otherwise
 REM   FALSE = Use py2
 REM   FORCE = Use py3
-set "use_py3=TRUE"
+set "use_py3=FORCE"
 
 goto checkscript
 
