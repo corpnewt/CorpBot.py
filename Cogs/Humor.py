@@ -1,16 +1,7 @@
-import asyncio
-import discord
-import random
-import json
-import time
-import os
-from   discord.ext import commands
-from Cogs import Message
-from Cogs import FuzzySearch
-from Cogs import GetImage
-from Cogs import Nullify
-from Cogs import Message
-from Cogs import DL
+import asyncio, discord, random, json, time, os, PIL
+from discord.ext import commands
+from PIL import Image
+from Cogs import Message, FuzzySearch, GetImage, Nullify, DL, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -32,7 +23,8 @@ class Humor(commands.Cog):
 			with open(listName) as f:
 				for line in f:
 					self.adj.append(line)
-					
+		try: self.image = Image.open('images/dosomething.png')
+		except: self.image = Image.new("RGBA",(500,500),(0,0,0,0))
 					
 	@commands.command(pass_context=True)
 	async def zalgo(self, ctx, *, message = None):
@@ -116,9 +108,7 @@ class Humor(commands.Cog):
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		
 		await ctx.channel.send(msg)
-			
 		
 	@commands.command(pass_context=True)
 	async def fart(self, ctx):
@@ -159,8 +149,8 @@ class Humor(commands.Cog):
 
 	def canDisplay(self, server):
 		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
+		lastTime = int(self.settings.getServerStat(server, "LastPicture", 0))
+		threshold = int(self.settings.getServerStat(server, "PictureThreshold", 0))
 		if not GetImage.canDisplay( lastTime, threshold ):
 			# await self.bot.send_message(channel, 'Too many images at once - please wait a few seconds.')
 			return False
@@ -228,7 +218,6 @@ class Humor(commands.Cog):
 		await Message.Embed(image=result, color=ctx.author).send(ctx)
 		# await GetImage.get(ctx, result)
 
-
 	async def getTemps(self):
 		url = "https://api.imgflip.com/get_memes"
 		result_json = await DL.async_json(url)
@@ -236,3 +225,49 @@ class Humor(commands.Cog):
 		if templates:
 			return templates
 		return None
+
+	@commands.command()
+	async def poke(self, ctx, *, url = None):
+		"""Pokes the passed url/user/uploaded image."""
+
+		if not self.canDisplay(ctx.guild):
+			return
+		if url == None and len(ctx.message.attachments) == 0:
+			await ctx.send("Usage: `{}poke [url, user, or attachment]`".format(ctx.prefix))
+			return
+		if url == None:
+			url = ctx.message.attachments[0].url
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(url, ctx.guild)
+		if test_user:
+			# Got a user!
+			url = test_user.avatar_url
+			if not len(url):
+				url = test_user.default_avatar_url
+		image = self.image.copy()
+		image_width,image_height = image.size
+		message = await ctx.send("Preparing to poke...")
+		path = await GetImage.download(url)
+		if not path:
+			await message.edit(content="I guess I couldn't poke that...  Make sure you're passing a valid url, user, or attachment.")
+			return
+		# We should have the image - let's open it and convert to a single frame
+		try:
+			img = Image.open(path)
+			img = img.convert('RGBA')
+			# Let's ensure it's the right size, and place it in the right spot
+			t_max   = int(image_width*.38)
+			t_ratio = min(t_max/img.width,t_max/img.height)
+			t_w = int(img.width*t_ratio)
+			t_h = int(img.height*t_ratio)
+			img = img.resize((t_w,t_h),resample=PIL.Image.LANCZOS)
+			# Paste our other image on top
+			image.paste(img,(int(image_width*.6),int(image_height*.98)-t_h),mask=img)
+			image.save('images/dosomethingnow.png')
+			await ctx.send(file=discord.File(fp='images/dosomethingnow.png'))
+			await message.delete()
+		except Exception as e:
+			print(e)
+			pass
+		if os.path.exists(path):
+			GetImage.remove(path)
