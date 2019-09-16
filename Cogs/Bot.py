@@ -1,27 +1,7 @@
-import asyncio
-import discord
-import os
-import re
-import psutil
-import platform
-import time
-import sys
-import fnmatch
-import subprocess
-import speedtest
-import json
-import struct
+import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct
 from   PIL         import Image
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import ReadableTime
-from   Cogs import GetImage
-from   Cogs import Nullify
-from   Cogs import ProgressBar
-from   Cogs import UserTime
-from   Cogs import Message
-from   Cogs import DL
+from   Cogs import Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -109,8 +89,9 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def botinfo(self, ctx):
 		"""Lists some general stats about the bot."""
-		bot_member = ctx.guild.get_member(self.bot.user.id)
-		message = await Message.EmbedText(title="Gathering info...", color=bot_member).send(ctx)
+		bot_member = self.bot.user if not ctx.guild else ctx.guild.get_member(self.bot.user.id)
+		color = bot_member if isinstance(bot_member,discord.Member) else None
+		message = await Message.EmbedText(title="Gathering info...", color=color).send(ctx)
 		
 		# Get guild count
 		guild_count = "{:,}".format(len(self.bot.guilds))
@@ -157,9 +138,10 @@ class Bot(commands.Cog):
 		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.created_at)
 		created_at = "{} {}".format(local_time['time'], local_time['zone'])
 		
-		# Get localized joined time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.joined_at)
-		joined_at = "{} {}".format(local_time['time'], local_time['zone'])
+		# Get localized joined time if in a server
+		if isinstance(bot_member,discord.Member):
+			local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.joined_at)
+			joined_at = "{} {}".format(local_time['time'], local_time['zone'])
 		
 		# Get the current prefix
 		prefix = await self.bot.command_prefix(self.bot, ctx.message)
@@ -184,15 +166,6 @@ class Bot(commands.Cog):
 		avatar = bot_member.avatar_url
 		if not len(avatar):
 			avatar = bot_member.default_avatar_url
-			
-		# Get status
-		status_text = ":green_heart:"
-		if bot_member.status == discord.Status.offline:
-			status_text = ":black_heart:"
-		elif bot_member.status == discord.Status.dnd:
-			status_text = ":heart:"
-		elif bot_member.status == discord.Status.idle:
-			status_text = ":yellow_heart:"
 		
 		# Build the embed
 		fields = [
@@ -200,26 +173,36 @@ class Bot(commands.Cog):
 			{"name":"Servers","value":guild_count,"inline":True},
 			{"name":"Commands","value":command_count + " (in {})".format(cog_count),"inline":True},
 			{"name":"Created","value":created_at,"inline":True},
-			{"name":"Joined","value":joined_at,"inline":True},
 			{"name":"Owners","value":owners,"inline":True},
 			{"name":"Prefixes","value":prefix,"inline":True},
-			{"name":"Status","value":status_text,"inline":True},
 			{"name":"Shard Count","value":self.bot.shard_count,"inline":True}
 		]
-		if bot_member.activity and bot_member.activity.name:
-			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
-			try:
-				play_string = play_list[bot_member.activity.type]
-			except:
-				play_string = "Playing"
-			fields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
-			if bot_member.activity.type == 1:
-				# Add the URL too
-				fields.append({"name":"Stream URL","value":"[Watch Now]({})".format(bot_member.activity.url),"inline":True})
+		if isinstance(bot_member,discord.Member):
+			fields.append({"name":"Joined","value":joined_at,"inline":True})
+			# Get status
+			status_text = ":green_heart:"
+			if bot_member.status == discord.Status.offline:
+				status_text = ":black_heart:"
+			elif bot_member.status == discord.Status.dnd:
+				status_text = ":heart:"
+			elif bot_member.status == discord.Status.idle:
+				status_text = ":yellow_heart:"
+			fields.append({"name":"Status","value":status_text,"inline":True})
+
+			if bot_member.activity and bot_member.activity.name:
+				play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
+				try:
+					play_string = play_list[bot_member.activity.type]
+				except:
+					play_string = "Playing"
+				fields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
+				if bot_member.activity.type == 1:
+					# Add the URL too
+					fields.append({"name":"Stream URL","value":"[Watch Now]({})".format(bot_member.activity.url),"inline":True})
 		# Update the embed
 		await Message.Embed(
 			title=DisplayName.name(bot_member) + " Info",
-			color=bot_member,
+			color=color,
 			description="Current Bot Information",
 			fields=fields,
 			thumbnail=avatar
