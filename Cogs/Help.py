@@ -171,7 +171,7 @@ class Help(commands.Cog):
 			return
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command(pass_context=True)
 	async def dumphelp(self, ctx, tab_indent_count = None):
 		"""Dumps a timpestamped, formatted list of commands and descriptions into the same directory as the bot."""
 		try:
@@ -240,7 +240,7 @@ class Help(commands.Cog):
 		await message.edit(content='Uploaded *{}!*'.format(serverFile))
 		os.remove(serverFile)
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command(pass_context=True)
 	async def dumpmarkdown(self, ctx):
 		"""Dumps a timpestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
 		tab_indent_count = 1
