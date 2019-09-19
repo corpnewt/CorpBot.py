@@ -276,15 +276,21 @@ class Encode(commands.Cog):
 		# Let's sort our available by their size - then walk the list until we find the
 		# first valid slide
 		available = sorted(available, key=lambda x:x.get("size",0),reverse=True)
+		slides = []
 		for x in available:
 			slide = self.get_slide(x["start"])
 			if slide < 256:
 				# Got a good one - spit it out
 				hex_str = "{:x}".format(x["start"]).upper()
 				hex_str = "0"*(len(hex_str)%2)+hex_str
-				return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
-		# If we got here - we have no applicable slides
-		await ctx.send("No valid slide values were found for the passed info.")
+				slides.append(("0x"+hex_str,slide))
+				# return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
+		if not len(slides):
+			# If we got here - we have no applicable slides
+			return await ctx.send("No valid slide values were found for the passed info.")
+		# Format the slides
+		pad = max([len(x[0]) for x in slides])
+		await ctx.send("**Applicable Slide Values:**\n```\n{}\n```".format("\n".join(["{}: slide={}".format(x[0].rjust(pad),x[1]) for x in slides])))
 	
 	@commands.command(pass_context=True)
 	async def hexswap(self, ctx, *, input_hex = None):
