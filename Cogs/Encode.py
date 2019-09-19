@@ -1,10 +1,6 @@
-import asyncio
-import discord
+import asyncio, discord, base64, binascii, re, math, shutil, tempfile, os
 from   discord.ext import commands
-import base64
-import binascii
-import re
-from   Cogs import Nullify
+from   Cogs import Nullify, DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -17,6 +13,7 @@ class Encode(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions
@@ -24,6 +21,34 @@ class Encode(commands.Cog):
 			return Nullify.clean(msg)
 		else:
 			return msg
+
+	async def download(self, url):
+		url = url.strip("<>")
+		# Set up a temp directory
+		dirpath = tempfile.mkdtemp()
+		tempFileName = url.rsplit('/', 1)[-1]
+		# Strip question mark
+		tempFileName = tempFileName.split('?')[0]
+		filePath = dirpath + "/" + tempFileName
+		rImage = None
+		try:
+			rImage = await DL.async_dl(url)
+		except:
+			pass
+		if not rImage:
+			self.remove(dirpath)
+			return None
+		with open(filePath, 'wb') as f:
+			f.write(rImage)
+		# Check if the file exists
+		if not os.path.exists(filePath):
+			self.remove(dirpath)
+			return None
+		return filePath
+		
+	def remove(self, path):
+		if not path == None and os.path.exists(path):
+			shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
 	# Helper methods
 	def _to_bytes(self, in_string):
@@ -192,28 +217,74 @@ class Encode(commands.Cog):
 
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
-	async def slide(self, ctx, input_hex = None):
-		"""Calculates your slide value for Clover based on an input address (in hex)."""
-		try:
-			# We're accepting strings here - convert
-			start_addr = int(input_hex, 16)
-		except:
-			await ctx.send("Malformed input hex - try again.")
-			return
+	def get_slide(self, start_addr = 0):
 		# Setup our temp vars
-		first_str = "0x100000"
-		first = int(first_str, 16)
-		secon_str = "0x200000"
-		secon = int(secon_str, 16)
+		m1 = int("0x100000",16)
+		m2 = int("0x200000",16)
 		
-		slide_float = ( start_addr - first ) / secon
-		
-		if slide_float > int(slide_float):
-			# has a > 0 decimal - round up
-			slide_float = int(slide_float) + 1
-			
-		await ctx.send("```\nslide={}\n```".format(slide_float))
+		slide = int(math.ceil(( start_addr - m1 ) / m2))
+		return 0 if slide < 0 else slide
+
+	def get_available(self, line_list = []):
+		available = []
+		for line in line_list:
+			line_split = [x for x in line.split(" ") if len(x)]
+			if not len(line_split):
+				continue
+			if len(line_split) == 1:
+				# No spaces - let's make sure it's hex and add it
+				try: available.append({"start":int(line_split[0],16)})
+				except:	continue
+			elif line_split[0].lower() == "available":
+				# If our first item is "available", let's convert the others into ints
+				new_line = []
+				for x in line_split:
+					new_line.extend(x.split("-"))
+				if len(new_line) < 3:
+					# Not enough info
+					continue
+				try:
+					available.append({
+						"start":int(new_line[1],16),
+						"end":int(new_line[2],16),
+						"size": (int(new_line[2],16)-int(new_line[1],16))/4096 if len(new_line) < 4 else int(new_line[3],16)
+						})
+				except:	continue
+		return available
+
+	@commands.command(pass_context=True)
+	async def slide(self, ctx, *, input_hex = None):
+		"""Calculates your slide value for Clover based on an input address (in hex)."""
+		if input_hex == None and len(ctx.message.attachments) == 0: # No info passed - bail!
+			return await ctx.send("Usage: `{}slide [hex address]`".format(ctx.prefix))
+		# Check for urls
+		matches = [] if input_hex == None else list(re.finditer(self.regex, input_hex))
+		slide_url = ctx.message.attachments[0].url if input_hex == None else None if not len(matches) else matches[0].group(0)
+		if slide_url:
+			path = await self.download(slide_url)
+			if not path: # It was just an attachment - bail
+				return await ctx.send("Looks like I couldn't download that link...")
+			# Got something - let's load it as text
+			with open(path,"rb") as f:
+				input_hex = f.read().decode("utf-8")
+			self.remove(path)
+		# At this point - we might have a url, a table of data, or a single hex address
+		# Let's split by newlines first, then by spaces
+		available = self.get_available(input_hex.replace("`","").split("\n"))
+		if not len(available):
+			return await ctx.send("No available space was found in the passed values.")
+		# Let's sort our available by their size - then walk the list until we find the
+		# first valid slide
+		available = sorted(available, key=lambda x:x.get("size",0),reverse=True)
+		for x in available:
+			slide = self.get_slide(x["start"])
+			if slide < 256:
+				# Got a good one - spit it out
+				hex_str = "{:x}".format(x["start"]).upper()
+				hex_str = "0"*(len(hex_str)%2)+hex_str
+				return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
+		# If we got here - we have no applicable slides
+		await ctx.send("No valid slide values were found for the passed info.")
 	
 	@commands.command(pass_context=True)
 	async def hexswap(self, ctx, *, input_hex = None):
