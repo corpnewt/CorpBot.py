@@ -442,7 +442,7 @@ class Music(commands.Cog):
 				{"name":"Views","value":"{:,}".format(data.get("view_count",0)),"inline":False},
 				{"name":"Likes","value":"{:,}".format(data.get("like_count",0)),"inline":False},
 				{"name":"Dislikes","value":"{:,}".format(data.get("dislike_count",0)),"inline":False},
-				{"name":"Dislikes","value":round(data.get("average_rating",0),2),"inline":False}
+				{"name":"Rating","value":round(data.get("average_rating",0),2),"inline":False}
 			],
 			color=ctx.author,
 			thumbnail=data.get("thumbnail",None),
