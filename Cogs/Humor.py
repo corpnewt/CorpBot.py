@@ -1,6 +1,6 @@
-import asyncio, discord, random, json, time, os, PIL
+import asyncio, discord, random, json, time, os, PIL, textwrap
 from discord.ext import commands
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from Cogs import Message, FuzzySearch, GetImage, Nullify, DL, DisplayName
 
 def setup(bot):
@@ -25,6 +25,44 @@ class Humor(commands.Cog):
 					self.adj.append(line)
 		try: self.image = Image.open('images/dosomething.png')
 		except: self.image = Image.new("RGBA",(500,500),(0,0,0,0))
+		try: self.s_image = Image.open("images/Stardew.png")
+		except: self.s_image = Image.new("RGBA",(319,111),(0,0,0,0))
+		self.stardew_gifts = [
+			"prismatic shard",
+			"seaweed",
+			"green algae",
+			"diamond",
+			"red mushrooms",
+			"wool",
+			"coal",
+			"duck feather",
+			"cave carrot",
+			"solar essence",
+			"vinegar",
+			"sweet gem berry",
+			"truffle",
+			"fish",
+			"snail",
+			"frozen tear"
+			]
+		self.stardew_responses = [
+			"I'm just here for my annual check-up! Don't worry, I'm not preg... I mean, I'm not sick! Heh.",
+			"...I hate this.",
+			"Buh... Life.",
+			"You wish to date me? After how I treated you at first?",
+			"What do you want? Leave me alone.",
+			"You!!! Was that some kind of sick prank?! Those are very private!",
+			"Did you know that my nephew loves 'Beer'? I gave it to him one year and he wouldn't stop talking about it.",
+			"Ugh... that's such a stupid gift.",
+			"Don't you have work to do?",
+			"I'm just here for the free coffee.",
+			"I'll be honest. I don't want to dance with you",
+			"Me?... Oh, I'm thankful for... how about I just show you when we get home tonight?",
+			"Thanks!",
+			"Oh, is it my birthday today? I guess it is. Thanks. This is nice.",
+			"I wanted to talk to you in private...",
+			"Ew... No."
+		]
 					
 	@commands.command(pass_context=True)
 	async def zalgo(self, ctx, *, message = None):
@@ -245,26 +283,80 @@ class Humor(commands.Cog):
 			if not len(url):
 				url = test_user.default_avatar_url
 		image = self.image.copy()
-		image_width,image_height = image.size
 		message = await ctx.send("Preparing to poke...")
 		path = await GetImage.download(url)
 		if not path:
-			await message.edit(content="I guess I couldn't poke that...  Make sure you're passing a valid url, user, or attachment.")
-			return
+			return await message.edit(content="I guess I couldn't poke that...  Make sure you're passing a valid url, user, or attachment.")
 		# We should have the image - let's open it and convert to a single frame
 		try:
 			img = Image.open(path)
 			img = img.convert('RGBA')
 			# Let's ensure it's the right size, and place it in the right spot
-			t_max   = int(image_width*.38)
+			t_max   = int(image.width*.38)
 			t_ratio = min(t_max/img.width,t_max/img.height)
 			t_w = int(img.width*t_ratio)
 			t_h = int(img.height*t_ratio)
 			img = img.resize((t_w,t_h),resample=PIL.Image.LANCZOS)
 			# Paste our other image on top
-			image.paste(img,(int(image_width*.6),int(image_height*.98)-t_h),mask=img)
+			image.paste(img,(int(image.width*.6),int(image.height*.98)-t_h),mask=img)
 			image.save('images/dosomethingnow.png')
 			await ctx.send(file=discord.File(fp='images/dosomethingnow.png'))
+			await message.delete()
+		except Exception as e:
+			print(e)
+			pass
+		if os.path.exists(path):
+			GetImage.remove(path)
+
+	@commands.command()
+	async def stardew(self, ctx, *, user = None):
+		"""Test your luck with another user."""
+
+		if not self.canDisplay(ctx.guild):
+			return
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(user, ctx.guild)
+		if not test_user:
+			return await ctx.send("Usage: `{}stardew [user]`".format(ctx.prefix))
+		# Got a user!
+		user = test_user.avatar_url
+		if not len(user):
+			user = test_user.default_avatar_url
+		# User profile pic needs to be formatted to 64x65 pixels - and the top left corner is at
+		# (221,15)
+		image = self.s_image.copy()
+		if not image.width == 319 or not image.height == 111:
+			image = image.resize((319,111),resample=PIL.Image.LANCZOS)
+		message = await ctx.send("Gifting {} to {}...".format(random.choice(self.stardew_gifts),Nullify.clean(DisplayName.name(test_user))))
+		path = await GetImage.download(user)
+		if not path:
+			return await message.edit(content="I guess I couldn't gift that...  Make sure you're passing a valid user.")
+		# We should have the image - let's open it and convert to a single frame
+		try:
+			img = Image.open(path)
+			img = img.convert('RGBA')
+			# Let's ensure it's the right size, and place it in the right spot
+			img = img.resize((64,65))
+			# Paste our other image on top
+			image.paste(img,(221,15),mask=img)
+			# Write the user's name in the name box - starts at (209,99)
+			d = ImageDraw.Draw(image)
+			t_w,t_h = d.textsize(DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",15))
+			# max_w = 88
+			d.text((210+(88-t_w)/2,86),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",15),fill=(86,22,12))
+			# Get the response - origin is (10,10), each row height is 14
+			rows = textwrap.wrap(
+				random.choice(self.stardew_responses),
+				30,
+				break_long_words=True,
+            	replace_whitespace=False
+				)
+			for index,row in enumerate(rows[:6]):
+				d.text((11+2,10+14*index),row,font=ImageFont.truetype("fonts/stardew.ttf",15),fill=(86,22,12))
+			# Resize to triple and save
+			image = image.resize((319*3,111*3))
+			image.save('images/Stardewnow.png')
+			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
 			await message.delete()
 		except Exception as e:
 			print(e)
