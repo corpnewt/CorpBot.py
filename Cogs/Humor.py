@@ -61,7 +61,9 @@ class Humor(commands.Cog):
 			"Thanks!",
 			"Oh, is it my birthday today? I guess it is. Thanks. This is nice.",
 			"I wanted to talk to you in private...",
-			"Ew... No."
+			"Ew... No.",
+			"Sometimes I stop and realize that I'm nothing more than a bag of juicy, squishy flesh.",
+			"Ah... an Fish Taco! Thanks."
 		]
 					
 	@commands.command(pass_context=True)
@@ -341,9 +343,16 @@ class Humor(commands.Cog):
 			image.paste(img,(221,15),mask=img)
 			# Write the user's name in the name box - starts at (209,99)
 			d = ImageDraw.Draw(image)
-			t_w,t_h = d.textsize(DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",15))
-			# max_w = 88
-			d.text((210+(88-t_w)/2,86),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",15),fill=(86,22,12))
+			name_text = DisplayName.name(test_user)
+			name_size = 15
+			while True:
+				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+				if t_w > 92:
+					# Too big, scale down
+					name_size -= 1
+				else:
+					break
+			d.text((210+(88-t_w)/2,88+(12-t_h)/2),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
 				random.choice(self.stardew_responses),
