@@ -435,7 +435,7 @@ class Music(commands.Cog):
 			# Nothing found
 			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await Message.Embed(
-			title="♫ Enqueued: {}".format(data.get("title","Unknown")),
+			title="♫ {}".format(data.get("title","Unknown")),
 			description="Requested by {}:\n\n{}".format(ctx.author.mention,data.get("description","No description provided.")),
 			fields=[
 				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False},
