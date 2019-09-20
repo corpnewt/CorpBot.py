@@ -63,7 +63,9 @@ class Humor(commands.Cog):
 			"I wanted to talk to you in private...",
 			"Ew... No.",
 			"Sometimes I stop and realize that I'm nothing more than a bag of juicy, squishy flesh.",
-			"Ah... an Fish Taco! Thanks."
+			"Ah... an Fish Taco! Thanks.",
+			"No u.",
+			"Thanks... I hate it."
 		]
 					
 	@commands.command(pass_context=True)
