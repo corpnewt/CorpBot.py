@@ -368,7 +368,7 @@ class Humor(commands.Cog):
 			image = image.resize((319*3,111*3))
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
-			await message.delete()
+			await message.delete(delay=2)
 		except Exception as e:
 			print(e)
 			pass
