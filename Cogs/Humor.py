@@ -306,6 +306,7 @@ class Humor(commands.Cog):
 			image.save('images/dosomethingnow.png')
 			await ctx.send(file=discord.File(fp='images/dosomethingnow.png'))
 			await message.delete()
+			os.remove('images/dosomethingnow.png')
 		except Exception as e:
 			print(e)
 			pass
@@ -369,6 +370,7 @@ class Humor(commands.Cog):
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
 			await message.delete(delay=2)
+			os.remove('images/Stardewnow.png')
 		except Exception as e:
 			print(e)
 			pass
