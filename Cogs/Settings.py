@@ -464,8 +464,7 @@ class Settings(commands.Cog):
 			ownerList = [ int(ownerList) ]
 		# At this point - we should have a list
 		# Let's make sure all parties exist still
-		all_members = set([x.id for x in self.bot.get_all_members()])
-		owners = [x for x in ownerList if x in all_members]
+		owners = list(set([x.id for x in self.bot.get_all_members() if x.id in ownerList]))
 		# Update the setting if there were changes
 		if len(owners) != len(ownerList):
 			self.setGlobalStat("Owner", owners)
