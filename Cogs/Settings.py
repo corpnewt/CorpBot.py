@@ -499,9 +499,8 @@ class Settings(commands.Cog):
 			ownerList = [ int(ownerList) ]
 		# At this point - we should have a list
 		# Let's make sure all parties exist still
-		all_members = set([x.id for x in self.bot.get_all_members()])
-		owners = [x for x in ownerList if x in all_members]
-		# Update the setting if there were changes
+		owners = list(set([x.id for x in self.bot.get_all_members() if x.id in ownerList]))
+		# Update the setting if there were changes - or if we had no owners prior
 		if len(owners) != len(ownerList):
 			self.serverDict['Owner'] = owners
 		return owners
@@ -862,11 +861,7 @@ class Settings(commands.Cog):
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
-
-		# Check to force the owner list update
-		self.isOwner(ctx.author)
-
-		ownerList = self.serverDict['Owner']
+		ownerList = self.getOwners()
 
 		if not len(ownerList):
 			# No owners.
@@ -904,7 +899,7 @@ class Settings(commands.Cog):
 			msg = "I've already been claimed."
 		else:
 			# Claim it up
-			self.serverDict['Owner'].append(ctx.author.id)
+			self.serverDict['Owner'] = [ctx.author.id]
 			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await channel.send(msg)
 	
@@ -934,12 +929,13 @@ class Settings(commands.Cog):
 			msg = "I can't be owned by other bots.  I don't roll that way."
 			await ctx.channel.send(msg)
 			return
-
-		if member.id in self.serverDict['Owner']:
+		owners = self.getOwners()
+		if member.id in owners:
 			# Already an owner
 			msg = "Don't get greedy now - *{}* is already an owner.".format(DisplayName.name(member))
 		else:
-			self.serverDict['Owner'].append(member.id)
+			owners.append(member.id)
+			self.serverDict['Owner'] = owners
 			msg = '*{}* has been added to my owner list!'.format(DisplayName.name(member))
 		await ctx.channel.send(msg)
 
@@ -965,11 +961,12 @@ class Settings(commands.Cog):
 				msg = 'I couldn\'t find that user...'
 				await ctx.channel.send(msg)
 				return
-		
-		if member.id in self.serverDict['Owner']:
+		owners = self.getOwners()
+		if member.id in owners:
 			# Already an owner
 			msg = "*{}* is no longer an owner.".format(DisplayName.name(member))
-			self.serverDict['Owner'].remove(member.id)
+			owners.remove(member.id)
+			self.serverDict['Owner'] = owners
 		else:
 			msg = "*{}* can't be removed because they're not one of my owners.".format(DisplayName.name(member))
 		if not len(self.serverDict['Owner']):
