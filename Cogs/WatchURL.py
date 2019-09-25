@@ -31,7 +31,7 @@ class WatchURL(commands.Cog):
 			return
 		# Check if we have a link
 		matches = re.finditer(self.regex, message.content)
-		valid_matches = [match.group(0) for match in matches for x in url_list if x.lower() in match.group(0).lower()]
+		valid_matches = list(set([match.group(0) for match in matches for x in url_list if x.lower() in match.group(0).lower()]))
 		if not len(valid_matches):
 			return
 		matched = self.settings.getServerStat(message.guild,"URLWatchListMatches",[])
