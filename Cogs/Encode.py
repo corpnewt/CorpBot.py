@@ -266,7 +266,7 @@ class Encode(commands.Cog):
 				return await ctx.send("Looks like I couldn't download that link...")
 			# Got something - let's load it as text
 			with open(path,"rb") as f:
-				input_hex = f.read().decode("utf-8")
+				input_hex = f.read().decode("utf-8","ignore").replace("\x00","").replace("\r","")
 			self.remove(path)
 		# At this point - we might have a url, a table of data, or a single hex address
 		# Let's split by newlines first, then by spaces
