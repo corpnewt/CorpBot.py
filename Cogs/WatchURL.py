@@ -25,7 +25,6 @@ class WatchURL(commands.Cog):
 		if not message.guild:
 			return
 		if not self.settings.getServerStat(message.guild,"URLWatchListAllowBots",False) and message.author.bot:
-			print("Got a bot url - bailing")
 			return # We're not listening for bots
 		url_list = self.settings.getServerStat(message.guild,"URLWatchList",[])
 		if not url_list:
