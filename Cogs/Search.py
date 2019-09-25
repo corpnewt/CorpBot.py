@@ -1,15 +1,7 @@
-import asyncio
-import discord
-import json
-import os
+import asyncio, discord, json, os
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import TinyURL
-from   Cogs import Message
-from   Cogs import DL
-from   pyquery import PyQuery as pq
+from   Cogs import Settings, DisplayName, TinyURL, Message, DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -179,7 +171,11 @@ class Search(commands.Cog):
 			hasError = True
 
 		# Get the list of currencies
-		r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies?apiKey="+self.key)
+		# r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies?apiKey="+self.key)
+		try:
+			r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
+		except:
+			return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
 
 		if hasError:
 			# Gather our currency list
@@ -208,8 +204,12 @@ class Search(commands.Cog):
 			return
 
 		# At this point, we should be able to convert
-		o = await DL.async_json("http://free.currencyconverterapi.com/api/v6/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
-		
+		# o = await DL.async_json("http://free.currencyconverterapi.com/api/v6/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
+		try:
+			o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
+		except:
+			return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
+
 		if not o:
 			await ctx.send("Whoops!  I couldn't get that :(")
 			return
