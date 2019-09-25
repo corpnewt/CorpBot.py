@@ -1,7 +1,6 @@
-import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid
+import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid, ctypes
 from   discord.ext import commands
-from   Cogs import Message
-from   Cogs import DisplayName
+from   Cogs import Message, DisplayName, PickList 
 
 # This file is modified from Rapptz's basic_voice.py:
 # https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
@@ -131,6 +130,13 @@ class Music(commands.Cog):
 		self.data     = {}
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		# Ensure Opus
+		if not discord.opus.is_loaded():
+			opus = ctypes.util.find_library("opus")
+			if not opus:
+				print("Opus not found - Music will not work!")
+				return
+			discord.opus.load_opus(opus)
 
 	def skip_pop(self, ctx):
 		# Pops the current skip list and dispatches the "next_song" event
@@ -622,27 +628,27 @@ class Music(commands.Cog):
 			q_text = "-- {:,} Song{} in Queue -- {}".format(len(queue), "" if len(queue) == 1 else "s", time_string)
 			fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
 		for x,y in enumerate(queue):
-			if x >= 10:
-				# We have 10 values already - bail
-				break
 			x += 1 # brings this up to the proper numbering
 			fields.append({
 				"name":"{}. {}".format(x,y.get("title")),
 				"value":"{} - Requested by {} - [Link]({})".format(self.format_duration(y.get("duration",0)),y["added_by"].mention,y.get("webpage_url","")),
 				"inline":False})
-		if len(queue) > 9:
-			pl_string = " (10/{:,} shown)".format(len(queue)+1)
+		if self.loop.get(str(ctx.guild.id),False):
+			pl_string = " - Repeat Enabled"
 		else:
 			pl_string = ""
-		if self.loop.get(str(ctx.guild.id),False):
-			pl_string += " - Repeat Enabled"
-		await Message.Embed(
-			title="♫ Current Playlist{}".format(pl_string),
-			color=ctx.author,
-			fields=fields,
-			delete_after=delay,
-			pm_after=15
-		).send(ctx)
+		if len(fields) <= 11:
+			await Message.Embed(
+				title="♫ Current Playlist{}".format(pl_string),
+				color=ctx.author,
+				fields=fields,
+				delete_after=delay,
+				pm_after=15
+			).send(ctx)
+		else:
+			page,message = await PickList.PagePicker(title="♫ Current Playlist{}".format(pl_string),list=fields,timeout=60 if not delay else delay,ctx=ctx).pick()
+			if delay:
+				await message.delete()
 
 	@commands.command()
 	async def skip(self, ctx):
