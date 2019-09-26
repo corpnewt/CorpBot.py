@@ -181,18 +181,29 @@ class Search(commands.Cog):
 					color=ctx.author
 				).send(ctx)
 		
-		# Split up our args
+		# Set up our args
+		num = frm = to = None
 		vals = amount.split()
-		try:
-			# Walk the values and bail if formatted wrong
-			vals = [x for x in vals if not x.lower() in ["to","from"]]
-			amount = float(vals[0])
-			frm    = vals[1]
-			to     = vals[2]
-		except:
-			# Something went wrong! Print the usage.
-			return await ctx.send("Usage: `{}convert [amount] [from_currency] [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
-		if amount <= 0:
+		last = "from"
+		for val in vals:
+			if all(x in "0123456789." for x in val) and num is None:
+				# Got a number
+				try: num = float(val)
+				except: pass # Not a valid number
+				continue
+			if val.lower() in ["from","to"]:
+				last = val.lower()
+				continue
+			# Should have a type - let's figure out which to put it in
+			if last.lower() == "from" and frm is None:
+				frm = val
+				last = "to"
+			else:
+				to  = val
+				last = "from"
+		if not all((num,frm,to)):
+			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
+		if num == None or num <= 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
 
 		# Verify we have a proper from/to type
@@ -202,7 +213,6 @@ class Search(commands.Cog):
 			return await ctx.send("Invalid to currency!")
 
 		# At this point, we should be able to convert
-		# o = await DL.async_json("http://free.currencyconverterapi.com/api/v6/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
 		try: o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
 		except: return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
 
@@ -212,8 +222,8 @@ class Search(commands.Cog):
 		# Format the numbers
 		val = float(o[list(o)[0]])
 		# Calculate the results
-		inamnt  = "{:,f}".format(amount).rstrip("0").rstrip(".")
-		output = "{:,f}".format(amount*val).rstrip("0").rstrip(".")
+		inamnt  = "{:,f}".format(num).rstrip("0").rstrip(".")
+		output = "{:,f}".format(num*val).rstrip("0").rstrip(".")
 		await ctx.send("{} {} is {} {}".format(inamnt,frm.upper(), output, to.upper()))
 
 	async def find_category(self, categories, category_to_search):
