@@ -200,7 +200,7 @@ class Search(commands.Cog):
 				last = None
 		if num is None or len(conv) < 2:
 			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - Type `{}convert` for a list of valid currencies.".format(ctx.prefix,ctx.prefix))
-		if num == None or num <= 0:
+		if num <= 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
 		# Normalize our to/from prioritizing the end arg
 		conv[0][0] = False if conv[1][0] == True else True if conv[1][0] == False else conv[0][0] if conv[0][0] != None else False # wut
