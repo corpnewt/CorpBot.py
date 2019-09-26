@@ -157,27 +157,14 @@ class Search(commands.Cog):
 
 
 	@commands.command(pass_context=True)
-	async def convert(self, ctx, amount = None , frm = None, *, to = None):
-		"""convert currencies"""
-
-		hasError = False
-
-		try:
-			amount = float(amount)
-		except:
-			hasError = True
-
-		if frm == None or to == None or amount <= 0:
-			hasError = True
-
+	async def convert(self, ctx, *, amount = None, frm = None, to = None):
+		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
+		
 		# Get the list of currencies
-		# r = await DL.async_json("https://free.currencyconverterapi.com/api/v6/currencies?apiKey="+self.key)
-		try:
-			r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
-		except:
-			return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
-
-		if hasError:
+		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
+		except: return await ctx.send("Something went wrong!  The API I use may be down :(")
+		
+		if amount == None:
 			# Gather our currency list
 			curr_list = []
 			for l in r.get("results",{}):
@@ -185,7 +172,7 @@ class Search(commands.Cog):
 				curr_list.append("{} - {}".format(r["results"][l]["id"], r["results"][l]["currencyName"]))
 			if len(curr_list):
 				curr_list = sorted(curr_list)
-				await Message.EmbedText(
+				return await Message.EmbedText(
 					title="Currency List",
 					description="\n".join(curr_list),
 					desc_head="```\n",
@@ -193,34 +180,40 @@ class Search(commands.Cog):
 					pm_after=0,
 					color=ctx.author
 				).send(ctx)
-				return
+		
+		# Split up our args
+		vals = amount.split()
+		try:
+			# Walk the values and bail if formatted wrong
+			amount = float(vals[0])
+			frm    = vals[1]
+			to     = vals[2] if vals[2].lower() != "to" else vals[3]
+		except:
+			# Something went wrong! Print the usage.
+			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
+		if amount <= 0:
+			return await ctx.send("Anything times 0 is 0, silly.")
 
 		# Verify we have a proper from/to type
 		if not frm.upper() in r.get("results",{}):
-			await ctx.send("Invalid from currency!")
-			return
+			return await ctx.send("Invalid from currency!")
 		if not to.upper() in r.get("results",{}):
-			await ctx.send("Invalid to currency!")
-			return
+			return await ctx.send("Invalid to currency!")
 
 		# At this point, we should be able to convert
 		# o = await DL.async_json("http://free.currencyconverterapi.com/api/v6/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
-		try:
-			o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
-		except:
-			return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
+		try: o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
+		except: return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
 
 		if not o:
-			await ctx.send("Whoops!  I couldn't get that :(")
-			return
+			return await ctx.send("Whoops!  I couldn't get that :(")
 		
 		# Format the numbers
-		val = o[list(o)[0]]
+		val = float(o[list(o)[0]])
 		# Calculate the results
-		output = float(amount)*float(val)
-		amount = "{:,}".format(int(amount)) if int(amount) == float(amount) else "{:,f}".format(amount).rstrip("0")
-		output = "{:,}".format(int(output)) if int(output) == float(output) else "{:,f}".format(output).rstrip("0")
-		await ctx.channel.send("{} {} is {} {}".format(amount,str(frm).upper(), output, str(to).upper()))
+		inamnt  = "{:,f}".format(amount).rstrip("0").rstrip(".")
+		output = "{:,f}".format(amount*val).rstrip("0").rstrip(".")
+		await ctx.send("{} {} is {} {}".format(inamnt,frm.upper(), output, to.upper()))
 
 	async def find_category(self, categories, category_to_search):
 		"""recurse through the categories and sub categories to find the correct category"""
