@@ -185,12 +185,13 @@ class Search(commands.Cog):
 		vals = amount.split()
 		try:
 			# Walk the values and bail if formatted wrong
+			vals = [x for x in vals if not x.lower() in ["to","from"]]
 			amount = float(vals[0])
 			frm    = vals[1]
-			to     = vals[2] if vals[2].lower() != "to" else vals[3]
+			to     = vals[2]
 		except:
 			# Something went wrong! Print the usage.
-			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
+			return await ctx.send("Usage: `{}convert [amount] [from_currency] [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
 		if amount <= 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
 
