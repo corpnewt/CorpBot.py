@@ -184,35 +184,29 @@ class Search(commands.Cog):
 		# Set up our args
 		num = frm = to = None
 		vals = amount.split()
-		last = "from"
+		last = None
+		conv = []
 		for val in vals:
 			if all(x in "0123456789." for x in val) and num is None:
 				# Got a number
 				try: num = float(val)
 				except: pass # Not a valid number
-				continue
-			if val.lower() in ["from","to"]:
-				last = val.lower()
-				continue
-			# Should have a type - let's figure out which to put it in
-			if last.lower() == "from":
-				if frm is None:
-					frm = val
-					last = "to"
-				else:
-					to  = val
-					last = "from"
-			elif last.lower() == "to":
-				if to is None:
-					to  = val
-					last = "from"
-				else:
-					frm = val
-					last = "to"
-		if not all((num,frm,to)):
-			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
+			elif val.lower() in ["from","to"]:
+				last = True if val.lower() == "to" else False
+			elif val.upper() in r.get("results",{}):
+				# Should have a valid type - let's add it and the type to the list
+				conv.append([last,val])
+				if len(conv) >= 2: break # We have enough values
+				last = None
+		if num is None or len(conv) < 2:
+			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - Type `{}convert` for a list of valid currencies.".format(ctx.prefix,ctx.prefix))
 		if num == None or num <= 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
+		# Normalize our to/from prioritizing the end arg
+		conv[0][0] = False if conv[1][0] == True else True if conv[1][0] == False else conv[0][0] if conv[0][0] != None else False # wut
+		conv[1][0] = conv[0][0]^True # Make sure it's reversed
+		frm = conv[0][1] if conv[0][0] == False else conv[1][1]
+		to  = conv[0][1] if conv[0][0] == True else conv[1][1]
 
 		# Verify we have a proper from/to type
 		if not frm.upper() in r.get("results",{}):
