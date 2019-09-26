@@ -195,12 +195,20 @@ class Search(commands.Cog):
 				last = val.lower()
 				continue
 			# Should have a type - let's figure out which to put it in
-			if last.lower() == "from" and frm is None:
-				frm = val
-				last = "to"
-			else:
-				to  = val
-				last = "from"
+			if last.lower() == "from":
+				if frm is None:
+					frm = val
+					last = "to"
+				else:
+					to  = val
+					last = "from"
+			elif last.lower() == "to":
+				if to is None:
+					to  = val
+					last = "from"
+				else:
+					frm = val
+					last = "to"
 		if not all((num,frm,to)):
 			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - or just `{}convert` for a list of currencies.".format(ctx.prefix,ctx.prefix))
 		if num == None or num <= 0:
