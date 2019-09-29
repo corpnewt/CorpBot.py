@@ -40,13 +40,14 @@ def getUserTime(member, settings, time = None, strft = "%Y-%m-%d %I:%M %p", cloc
 			t = getClockForTime(time.strftime(strft))
 		else:
 			t = time.strftime(strft)
-		return { "zone" : 'UTC', "time" : t }
+		return { "zone" : 'UTC', "time" : t, "vanity" : "{} {}".format(t,"UTC") }
 		
 	# At this point - we need to determine if we have an offset - or possibly a timezone passed
 	t = getTimeFromTZ(offset, time, strft, clock)
 	if t == None:
 		# We did not get a zone
 		t = getTimeFromOffset(offset, time, strft, clock)
+	t["vanity"] = "{} {}".format(t["time"],t["zone"])
 	return t
 
 
