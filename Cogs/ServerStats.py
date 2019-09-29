@@ -1,12 +1,6 @@
-import asyncio
-import discord
-from   datetime    import datetime
-from   operator    import itemgetter
+import asyncio, discord
 from   discord.ext import commands
-from   Cogs        import Nullify
-from   Cogs        import DisplayName
-from   Cogs        import UserTime
-from   Cogs        import Message
+from   Cogs        import Nullify, DisplayName, UserTime, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -34,7 +28,7 @@ class ServerStats(commands.Cog):
             
         return { 'Ignore' : False, 'Delete' : False}
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def listbots(self, ctx, *, guild_name = None):
         """Lists up to the first 20 bots of the current or passed server."""
         # Check if we passed another guild
@@ -69,7 +63,7 @@ class ServerStats(commands.Cog):
             header = "__**Showing {} of {} bot{}:**__".format(last, len(bot_list), "" if len(bot_list) == 1 else "s")
             await Message.Embed(title=guild.name, description="{}".format(header), fields=bot_text_list, color=ctx.author).send(ctx)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def serverinfo(self, ctx, *, guild_name = None):
         """Lists some info about the current or passed server."""
         
@@ -134,7 +128,7 @@ class ServerStats(commands.Cog):
         server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
         server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id+1, self.bot.shard_count), inline=True)
-	# Find out where in our join position this server is
+	    # Find out where in our join position this server is
         joinedList = []
         popList    = []
         for g in self.bot.guilds:
@@ -193,7 +187,7 @@ class ServerStats(commands.Cog):
         await ctx.channel.send(embed=server_embed)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def sharedservers(self, ctx, *, member = None):
         """Lists how many servers you share with the bot."""
 
@@ -217,14 +211,8 @@ class ServerStats(commands.Cog):
             member = member_check
 
         if member.id == self.bot.user.id:
-            count = len(self.bot.guilds)
-            if count == 1:
-                await ctx.send("I'm on *1* server. :blush:")
-            else:
-                await ctx.send("I'm on *{}* servers. :blush:".format(count))
-            return
-
-
+            return await ctx.send("I'm on *{:,}* server{}. :blush:".format(len(self.bot.guilds),"" if len(self.bot.guilds)==1 else "s"))
+        
         count = 0
         for guild in self.bot.guilds:
             for mem in guild.members:
@@ -235,126 +223,27 @@ class ServerStats(commands.Cog):
         else:
             targ = "*{}* shares".format(DisplayName.name(member))
 
-        if count == 1:
-            await ctx.send("{} *1* server with me. :blush:".format(targ))
-        else:
-            await ctx.send("{} *{}* servers with me. :blush:".format(targ, count))
+        await ctx.send("{} *{:,}* server{} with me. :blush:".format(targ,count,"" if count==1 else "s"))
 
+    @commands.command()
+    async def listservers(self, ctx):
+        """Lists the servers I'm connected to."""
+        our_list = sorted([{"name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),"value":UserTime.getUserTime(ctx.author,self.settings,DisplayName.memberForID(self.bot.user.id, guild).joined_at)["vanity"],"date":DisplayName.memberForID(self.bot.user.id, guild).joined_at} for guild in self.bot.guilds], key=lambda x:x["date"])
+        return await PickList.PagePicker(title="Servers I'm On ({} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-    @commands.command(pass_context=True)
-    async def listservers(self, ctx, number : int = 10):
-        """Lists the servers I'm connected to - default is 10, max is 50."""
+    @commands.command()
+    async def topservers(self, ctx):
+        """Lists the top servers I'm connected to ordered by population."""
+        our_list = sorted([{"name":guild.name,"value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),"users":len(guild.members)} for guild in self.bot.guilds], key=lambda x:x["users"],reverse=True)
+        return await PickList.PagePicker(title="Top Servers By Population ({} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
+    @commands.command()
+    async def bottomservers(self, ctx):
+        """Lists the bottom servers I'm connected to ordered by population."""
+        our_list = sorted([{"name":guild.name,"value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),"users":len(guild.members)} for guild in self.bot.guilds], key=lambda x:x["users"])
+        return await PickList.PagePicker(title="Bottom Servers By Population ({} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-        if number > 50:
-            number = 50
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
-            return
-        i = 1
-        msg = '__**Servers I\'m On:**__\n\n'
-        for server in self.bot.guilds:
-            if i > number:
-                break
-            msg += '{}. *{}*\n'.format(i, server.name)
-            i += 1
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-    @commands.command(pass_context=True)
-    async def topservers(self, ctx, number : int = 10):
-        """Lists the top servers I'm connected to ordered by population - default is 10, max is 50."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
-        if number > 50:
-            number = 50
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
-            return
-        serverList = []
-        for server in self.bot.guilds:
-            memberCount = 0
-            for member in server.members:
-                memberCount += 1
-            serverList.append({ 'Name' : server.name, 'Users' : memberCount })
-
-        # sort the servers by population
-        serverList = sorted(serverList, key=lambda x:int(x['Users']), reverse=True)
-
-        if number > len(serverList):
-            number = len(serverList)
-
-        i = 1
-        msg = ''
-        for server in serverList:
-            if i > number:
-                break
-            msg += '{}. *{}* - *{:,}* members\n'.format(i, server['Name'], server['Users'])
-            i += 1
-
-        if number < len(serverList):
-            msg = '__**Top {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
-        else:
-            msg = '__**Top {} Servers:**__\n\n'.format(len(serverList))+msg
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-    @commands.command(pass_context=True)
-    async def bottomservers(self, ctx, number : int = 10):
-        """Lists the bottom servers I'm connected to ordered by population - default is 10, max is 50."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
-        if number > 50:
-            number = 50
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
-            return
-        serverList = []
-        for server in self.bot.guilds:
-            serverList.append({ 'Name' : server.name, 'Users' : len(server.members) })
-
-        # sort the servers by population
-        serverList = sorted(serverList, key=lambda x:int(x['Users']))
-
-        if number > len(serverList):
-            number = len(serverList)
-
-        i = 1
-        msg = ''
-        for server in serverList:
-            if i > number:
-                break
-            msg += '{}. *{}* - *{:,}* members\n'.format(i, server['Name'], server['Users'])
-            i += 1
-
-        if number < len(serverList):
-            msg = '__**Bottom {} of {} Servers:**__\n\n'.format(number, len(serverList))+msg
-        else:
-            msg = '__**Bottom {} Servers:**__\n\n'.format(len(serverList))+msg
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-
-    @commands.command(pass_context=True)
+    @commands.command()
     async def users(self, ctx):
         """Lists the total number of users on all servers I'm connected to."""
         message = await Message.EmbedText(title="Counting users...", color=ctx.message.author).send(ctx)
@@ -391,9 +280,8 @@ class ServerStats(commands.Cog):
                 ), "inline" : False}
             ],
             color=ctx.message.author).edit(ctx, message)
-
 	
-    @commands.command(pass_context=True)
+    @commands.command()
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""
         # Check if we're suppressing @here and @everyone mentions
@@ -453,7 +341,7 @@ class ServerStats(commands.Cog):
             msg += "\n\n{} joined after.".format(after)
         await ctx.send(msg)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def joinedatpos(self, ctx, *, position):
         """Lists the user that joined at the passed position."""
         try:
@@ -468,187 +356,31 @@ class ServerStats(commands.Cog):
         msg = "*{}* joined at position **{:,}**.".format(DisplayName.name(join["member"]),position+1)
         await ctx.send(msg)
 
-    @commands.command(pass_context=True)
-    async def firstjoins(self, ctx, number : int = 10):
-        """Lists the first users to join - default is 10, max is 25."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
+    @commands.command()
+    async def firstjoins(self, ctx):
+        """Lists the first users to join."""
+        our_list = sorted([{"name":DisplayName.name(member),"value":UserTime.getUserTime(ctx.author,self.settings,member.joined_at)["vanity"],"date":member.joined_at} for member in ctx.guild.members], key=lambda x:x["date"])
+        return await PickList.PagePicker(title="First Members to Join {} ({} total)".format(ctx.guild.name,len(ctx.guild.members)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-        if number > 25:
-            number = 25
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No users!  Just like you wanted!')
-            return
-
-        joinedList = []
-        for member in ctx.message.guild.members:
-            joinedList.append({ 'ID' : member.id, 'Joined' : member.joined_at })
+    @commands.command()
+    async def recentjoins(self, ctx):
+        """Lists the most recent users to join."""
+        our_list = sorted([{"name":DisplayName.name(member),"value":UserTime.getUserTime(ctx.author,self.settings,member.joined_at)["vanity"],"date":member.joined_at} for member in ctx.guild.members], key=lambda x:x["date"], reverse=True)
+        return await PickList.PagePicker(title="Last Members to Join {} ({} total)".format(ctx.guild.name,len(ctx.guild.members)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
         
-        # sort the users by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+    @commands.command()
+    async def firstservers(self, ctx):
+        """Lists the first servers I've joined."""
+        our_list = sorted([{"name":"{} ({} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),"value":UserTime.getUserTime(ctx.author,self.settings,DisplayName.memberForID(self.bot.user.id, guild).joined_at)["vanity"],"date":DisplayName.memberForID(self.bot.user.id, guild).joined_at} for guild in self.bot.guilds], key=lambda x:x["date"], reverse=True)
+        return await PickList.PagePicker(title="First Servers I Joined ({} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-        i = 1
-        msg = ''
-        for member in joinedList:
-            if i > number:
-                break
-            # Get localized user time
-            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
-            time_str = "{} {}".format(local_time['time'], local_time['zone'])
-            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), time_str)
-            i += 1
-        
-        if number < len(joinedList):
-            msg = '__**First {} of {} Members to Join:**__\n\n'.format(number, len(joinedList))+msg
-        else:
-            msg = '__**First {} Members to Join:**__\n\n'.format(len(joinedList))+msg
-
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-    @commands.command(pass_context=True)
-    async def recentjoins(self, ctx, number : int = 10):
+    @commands.command()
+    async def recentservers(self, ctx):
         """Lists the most recent users to join - default is 10, max is 25."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
+        our_list = sorted([{"name":"{} ({} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),"value":UserTime.getUserTime(ctx.author,self.settings,DisplayName.memberForID(self.bot.user.id, guild).joined_at)["vanity"],"date":DisplayName.memberForID(self.bot.user.id, guild).joined_at} for guild in self.bot.guilds], key=lambda x:x["date"])
+        return await PickList.PagePicker(title="First Servers I Joined ({} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
-        if number > 25:
-            number = 25
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No users!  Just like you wanted!')
-            return
-
-        joinedList = []
-        for member in ctx.message.guild.members:
-            joinedList.append({ 'ID' : member.id, 'Joined' : member.joined_at })
-        
-        # sort the users by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'], reverse=True)
-
-        i = 1
-        msg = ''
-        for member in joinedList:
-            if i > number:
-                break
-            # Get localized user time
-            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
-            time_str = "{} {}".format(local_time['time'], local_time['zone'])
-            msg += '{}. *{}* - *{}*\n'.format(i, DisplayName.name(DisplayName.memberForID(member['ID'], ctx.message.guild)), time_str)
-            i += 1
-        
-        if number < len(joinedList):
-            msg = '__**Last {} of {} Members to Join:**__\n\n'.format(number, len(joinedList))+msg
-        else:
-            msg = '__**Last {} Members to Join:**__\n\n'.format(len(joinedList))+msg
-
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-        
-    @commands.command(pass_context=True)
-    async def firstservers(self, ctx, number : int = 10):
-        """Lists the first servers I've joined - default is 10, max is 25."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
-        if number > 25:
-            number = 25
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
-            return
-
-        joinedList = []
-        for guild in self.bot.guilds:
-            botmember = DisplayName.memberForID(self.bot.user.id, guild)
-            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at, 'Members': len(guild.members) })
-        
-        # sort the servers by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
-
-        i = 1
-        msg = ''
-        for member in joinedList:
-            if i > number:
-                break
-            # Get localized user time
-            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
-            time_str = "{} {}".format(local_time['time'], local_time['zone'])
-            if member['Members'] == 1:
-                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], time_str)
-            else:
-                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], time_str, member['Members'])
-            i += 1
-        
-        if number < len(joinedList):
-            msg = '__**First {} of {} Servers I Joined:**__\n\n'.format(number, len(joinedList))+msg
-        else:
-            msg = '__**First {} Servers I Joined:**__\n\n'.format(len(joinedList))+msg
-
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-    @commands.command(pass_context=True)
-    async def recentservers(self, ctx, number : int = 10):
-        """Lists the most recent users to join - default is 10, max is 25."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
-        if number > 25:
-            number = 25
-        if number < 1:
-            await ctx.channel.send('Oookay - look!  No servers!  Just like you wanted!')
-            return
-
-        joinedList = []
-        for guild in self.bot.guilds:
-            botmember = DisplayName.memberForID(self.bot.user.id, guild)
-            joinedList.append({ 'Name' : guild.name, 'Joined' : botmember.joined_at, 'Members': len(guild.members) })
-        
-        # sort the servers by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'], reverse=True)
-
-        i = 1
-        msg = ''
-        for member in joinedList:
-            if i > number:
-                break
-            # Get localized user time
-            local_time = UserTime.getUserTime(ctx.author, self.settings, member['Joined'])
-            time_str = "{} {}".format(local_time['time'], local_time['zone'])
-            if member['Members'] == 1:
-                msg += '{}. *{}* - *{}* - *(1 member)*\n'.format(i, member['Name'], time_str)
-            else:
-                msg += '{}. *{}* - *{}* - *({} members)*\n'.format(i, member['Name'], time_str, member['Members'])
-            i += 1
-        
-        if number < len(joinedList):
-            msg = '__**Last {} of {} Servers I Joined:**__\n\n'.format(number, len(joinedList))+msg
-        else:
-            msg = '__**Last {} Servers I Joined:**__\n\n'.format(len(joinedList))+msg
-
-        # Check for suppress
-        if suppress:
-            msg = Nullify.clean(msg)
-        await ctx.channel.send(msg)
-
-    @commands.command(pass_context=True)
+    @commands.command()
     async def messages(self, ctx):
         """Lists the number of messages I've seen on this sever so far. (only applies after this module's inception, and if I'm online)"""
         messages = int(self.settings.getServerStat(ctx.message.guild, "TotalMessages"))
@@ -661,7 +393,7 @@ class ServerStats(commands.Cog):
         else:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} messages!*'.format(messages))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def allmessages(self, ctx):
         """Lists the number of messages I've seen on all severs so far. (only applies after this module's inception, and if I'm online)"""
         messages = 0
