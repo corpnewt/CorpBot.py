@@ -576,6 +576,8 @@ class VoteKick(commands.Cog):
 						return
 				# We haven't voted for them yet - add our vote
 				member["Kicks"].append({ "ID" : ctx.author.id, "Added" : time.time() })
+				# Update the array
+				self.settings.setServerStat(guild, "VoteKickArray", vote_list)
 				await ctx.send("Vote kick added for *{}!*".format(DisplayName.name(check_user)))
 				await self._check_votes(ctx, check_user)
 				return
