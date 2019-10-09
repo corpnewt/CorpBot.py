@@ -698,6 +698,8 @@ class Settings(commands.Cog):
 
 
 	def checkGlobalUsers(self):
+		# Just return from this method - may be erroneously dropping users' settings
+		return 0
 		# This whole method should be reworked to not require
 		# a couple loops to remove users - but since it's not
 		# something that's run all the time, it's probably not
