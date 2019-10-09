@@ -513,6 +513,8 @@ class Settings(commands.Cog):
 		return self.pd.del_guser(user,stat)
 
 	def checkGlobalUsers(self):
+		# Temp disable to see if that prevents some issues with users losing settings
+		return
 		total_members = self.pd.all_guser()
 		check_members = set([str(x.id) for x in self.bot.get_all_members()])
 		return self.pd.del_gusers([x for x in total_members if not x in check_members])
