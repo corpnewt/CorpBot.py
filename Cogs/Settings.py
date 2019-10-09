@@ -1,14 +1,7 @@
-import asyncio
-import discord
+import asyncio, discord, time, json, os, copy, subprocess, redis
 from   datetime    import datetime
 from   discord.ext import commands
 from   shutil      import copyfile
-import time
-import json
-import os
-import copy
-import subprocess
-import redis
 from   Cogs        import DisplayName
 from   Cogs        import Nullify
 from   Cogs        import PandorasDB
@@ -514,7 +507,7 @@ class Settings(commands.Cog):
 
 	def checkGlobalUsers(self):
 		# Temp disable to see if that prevents some issues with users losing settings
-		return
+		return 0
 		total_members = self.pd.all_guser()
 		check_members = set([str(x.id) for x in self.bot.get_all_members()])
 		return self.pd.del_gusers([x for x in total_members if not x in check_members])
