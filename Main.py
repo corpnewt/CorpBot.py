@@ -1,23 +1,31 @@
-import asyncio
-import discord
-import time
-import sys
-import os
-import random
-import subprocess
-import traceback
+import asyncio, discord, time, sys, os, random, traceback, json
 from   discord.ext import commands
 from   discord import errors
 from   Cogs import DisplayName
 
-# Let's load our prefix file
-prefix = '$'
-if os.path.exists('prefix.txt'):
-	with open('prefix.txt') as f:
-		prefix = f.read()
-	if not prefix:
-		prefix = '$'
-
+# Let's migrate any specific txt settings files into a single json file
+# called settings_dict.json
+if os.path.exists("settings_dict.json"):
+	try: settings_dict = json.load(open("settings_dict.json"))
+	except Exception as e:
+		print("Could not load settings_dict.json!")
+		print(" - {}".format(e))
+		# Kill the process to avoid constant reloads
+		os._exit(3)
+else:
+	settings_dict = {"token":""}
+	print("Migrating .txt files to settings_dict.json...")
+	for x in ["prefix.txt","corpSiteAuth.txt","token.txt","igdbKey.txt","weather.txt","discogs.txt","currency.txt"]:
+		if not os.path.exists(x): continue # Didn't find it
+		try:
+			with open(x,"rb") as f:
+				setting = f.read().strip().decode("utf-8")
+		except Exception as e:
+			print("Failed to migrate setting from {}! Ignoring.".format(x))
+			print(" - {}".format(e))
+			continue
+		settings_dict[x[:-4].lower()] = setting
+	json.dump(settings_dict,open("settings_dict.json","w"),indent=4)
 
 async def get_prefix(bot, message):
 	# Check commands against some things and do stuff or whatever...
@@ -30,7 +38,7 @@ async def get_prefix(bot, message):
 
 	if not serverPrefix:
 		# No custom prefix - use the default
-		serverPrefix = prefix
+		serverPrefix = settings_dict.get("prefix","$") # prefix
 	return (serverPrefix, "<@!{}> ".format(bot.user.id), "<@{}> ".format(bot.user.id))
 
 # This should be the main soul of the bot - everything should load from here
@@ -38,13 +46,7 @@ async def get_prefix(bot, message):
 # Let's SHARD!
 bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
 # bot = discord.AutoShardedClient(command_previs=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
-# Initialize some things
-jsonFile = "Settings.json"
-deckFile = "deck.json"
-corpSiteAuth = "corpSiteAuth.txt"
-# Open our token
-with open('token.txt', 'r') as f:
-	token = f.read().strip()
+bot.settings_dict = settings_dict
 
 async def return_message():
 	# Set the settings var up
@@ -178,7 +180,7 @@ async def on_guild_join(server):
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
 	msg = 'Hello there! Thanks for having me on your server! ({})\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.\n\n'.format(server.name, prefix)
-	msg += 'Whenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(prefix)
+	msg += 'Whenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(settings_dict.get("prefix","$"))
 	try:
 		await owner.send(msg)
 	except Exception:
@@ -253,24 +255,14 @@ async def on_message(message):
 		# Make sure we have things formatted right
 		if not type(check) is dict:
 			check = {}
-		try:
-			if check['Delete']:
-				delete = True
-		except KeyError:
-			pass
-		try:
-			if check['Ignore']:
-				ignore = True
-		except KeyError:
-			pass
-		try:
-			respond = check['Respond']
-		except KeyError:
-			pass
-		try:
-			react = check['Reaction']
-		except KeyError:
-			pass
+		if check.get("Delete",False):
+			delete = True
+		if check.get("Ignore",False):
+			ignore = True
+		try: respond = check['Respond']
+		except KeyError: pass
+		try: react = check['Reaction']
+		except KeyError: pass
 
 	if delete:
 		# We need to delete the message - top priority
@@ -363,20 +355,12 @@ async def on_message_edit(before, message):
 		except AttributeError:
 			# Onto the next
 			continue
-		try:
-			if check['Delete']:
-				delete = True
-		except KeyError:
-			pass
-		try:
-			if check['Ignore']:
-				ignore = True
-		except KeyError:
-			pass
-		try:
-			respond = check['Respond']
-		except KeyError:
-			pass
+		if check.get("Delete",False):
+			delete = True
+		if check.get("Ignore",False):
+			ignore = True
+		try: respond = check['Respond']
+		except KeyError: pass
 
 	if respond:
 		# We have something to say
@@ -386,4 +370,4 @@ async def on_message_edit(before, message):
 		await message.delete()
 
 # Run the bot
-bot.run(token)
+bot.run(settings_dict.get("token",""))
