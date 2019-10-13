@@ -3,6 +3,21 @@ A *slightly* less clumsy python bot for discord
 
 ***
 
+# Basic Settings
+
+The bot's basic settings should be in a file called `settings_dict.json` in the same folder as the `Main.py` file.  Some basic formatting of this file would look like so:
+
+```json
+{
+    "prefix": "your_custom_prefix_here",
+    "token": "your_token_here",
+    "weather": "your_weather_api_key_here",
+    "currency": "your_currency_api_key_here"
+}
+```
+
+You'll want to replace the values with your own.  The `prefix` key can be omitted, and the bot will fallback on its default `$` prefix.
+
 # WARNING
 
 This branch of CorpBot requires a Redis database server running to function correctly.  For Windows users, you can download the release [here](https://github.com/MicrosoftArchive/redis/releases) and just run the `redis-server.exe` with the default settings after unzipping the archive for the bot to connect to the db.
