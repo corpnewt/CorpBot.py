@@ -22,6 +22,9 @@ prefix.txt
 # Debug file
 debug.txt
 
+# Bot's settings
+settings_dict.json
+
 # FFMpeg.exe
 ffmpeg.exe
 
