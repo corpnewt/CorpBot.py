@@ -1,6 +1,27 @@
 # CorpBot.py
 A *slightly* less clumsy python bot for discord
 
+***
+
+# Basic Settings
+
+The bot's basic settings should be in a file called `settings_dict.json` in the same folder as the `Main.py` file.  Some basic formatting of this file would look like so:
+
+```json
+{
+    "prefix": "your_custom_prefix_here",
+    "token": "your_token_here",
+    "weather": "your_weather_api_key_here",
+    "currency": "your_currency_api_key_here"
+}
+```
+
+You'll want to replace the values with your own.  The `prefix` key can be omitted, and the bot will fallback on its default `$` prefix.
+
+***
+
+# Command List
+
 A list of cogs, commands, and descriptions:
 
 [Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [DisableCommand](#disablecommand), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Tags](#tags), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
