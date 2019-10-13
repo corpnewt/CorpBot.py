@@ -5,19 +5,15 @@ from   Cogs import Settings, DisplayName, TinyURL, Message, DL
 
 def setup(bot):
 	# Add the bot and deps
-	auth = "corpSiteAuth.txt"
-	bot.add_cog(Search(bot, auth))
+	bot.add_cog(Search(bot))
 
 class Search(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, auth_file: str = None):
-		self.bot = bot
-		self.site_auth = None
-		if os.path.isfile(auth_file):
-		        with open(auth_file, 'r') as f:
-		                self.site_auth = f.read()
-		self.key = "3a337666060f628a0a91"
+		self.bot       = bot
+		self.site_auth = bot.settings_dict.get("corpsiteauth",None)
+		self.key       = bot.settings_dict.get("currency","")
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
