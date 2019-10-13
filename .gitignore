@@ -1,6 +1,9 @@
 # Anythings starting with .
 .*
 
+# Ignore redis stuff
+Redis*
+
 # IGDB api key
 igdbKey*.txt
 
@@ -18,6 +21,9 @@ prefix.txt
 
 # Debug file
 debug.txt
+
+# Bot's settings
+settings_dict.json
 
 # FFMpeg.exe
 ffmpeg.exe
