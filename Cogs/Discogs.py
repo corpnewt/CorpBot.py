@@ -5,7 +5,7 @@ from   Cogs import Settings, DisplayName, TinyURL, Message, DL
 
 def setup(bot):
 	# Add the bot and deps
-	bot.add_cog(Search(bot))
+	bot.add_cog(Discogs(bot))
 
 class Discogs(commands.Cog):
 
