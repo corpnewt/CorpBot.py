@@ -7,7 +7,7 @@ def setup(bot):
 	# Add the bot and deps
 	bot.add_cog(Search(bot))
 
-class Search(commands.Cog):
+class Discogs(commands.Cog):
 
 	# Init with the bot reference
 	def __init__(self, bot, auth_file: str = None):
@@ -62,7 +62,7 @@ class Search(commands.Cog):
 		$discogs track=weak and powerless album=thirteenth step artist=a perfect circle type=release"""
 		
 		if search == None:
-			return await ctx.send("Usage: `{}discogs [search terms]`".format(self.bot.prefix))
+			return await ctx.send("Usage: `{}discogs [search terms]`".format(ctx.prefix))
 		# Split the search query by whitespace, then walk each and split by = only getting the prefix as needed
 		search_dict = {
 			"type":[],
