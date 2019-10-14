@@ -1,15 +1,7 @@
-import asyncio
-import discord
-import time
-import random
-import giphypop
-import re
+import asyncio, discord, time, random, warnings, re, giphypop
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import GetImage
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import DisplayName
+from   Cogs import GetImage, Message, Nullify, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -23,7 +15,10 @@ class Giphy(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.ua = 'CorpNewt DeepThoughtBot'
-		self.giphy = giphypop.Giphy()
+		# Instantiate giphypop, but suppress the warning message
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			self.giphy = giphypop.Giphy()
 			
 	def canDisplay(self, server):
 		# Check if we can display images
