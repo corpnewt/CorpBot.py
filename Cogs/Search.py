@@ -17,7 +17,7 @@ class Search(commands.Cog):
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
-		return quote(query.replace("+","%2B").replace("\t","+").replace("\r","+").replace("\n","+").replace(" ","+"))
+		return quote(query.replace("+","%2B").replace("\t","+").replace("\r","+").replace("\n","+").replace(" ","+"),safe="+")
 
 	async def get_search(self, ctx, query, service=""):
 		# Searches in the passed service
