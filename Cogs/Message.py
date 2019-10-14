@@ -1,9 +1,4 @@
-import asyncio
-import discord
-import textwrap
-import random
-import math
-import os
+import asyncio, discord, textwrap, random, math, os
 from   discord.ext import commands
 
 def setup(bot):
@@ -375,7 +370,7 @@ class Embed:
                     message = await self._send_embed(ctx, em, to_pm, self.file)
                 else:
                     # Clear any image if needed
-                    em.set_image(url="")
+                    # em.set_image(url="")
                     message = await self._send_embed(ctx, em, to_pm)
                 # Break if things didn't work
                 if not message:
@@ -395,7 +390,7 @@ class Embed:
                 message = await self._send_embed(ctx, em, to_pm, self.file)
             else:
                 # Clear any image if needed
-                em.set_image(url="")
+                # em.set_image(url="")
                 message = await self._send_embed(ctx, em, to_pm)
         return message
 
@@ -500,7 +495,7 @@ class EmbedText(Embed):
                 message = await self._send_embed(ctx, em, to_pm, self.file)
             else:
                 # Clear any image if needed
-                em.set_image(url="")
+                # em.set_image(url="")
                 message = await self._send_embed(ctx, em, to_pm)
             # Break if things didn't work
             if not message:
