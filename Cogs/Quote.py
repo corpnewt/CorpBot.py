@@ -117,7 +117,6 @@ class Quote(commands.Cog):
 				"[Link](https://discordapp.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
-			"image" : reaction.message.author.avatar_url,
 			"color" : reaction.message.author,
 			"footer" : "Quoted by {}#{}".format(member.name, member.discriminator)
 		}
