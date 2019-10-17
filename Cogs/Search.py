@@ -183,7 +183,7 @@ class Search(commands.Cog):
 		last = None
 		conv = []
 		for val in vals:
-			if all(x in "0123456789." for x in val) and num is None:
+			if all(x in "+-0123456789." for x in val) and num is None:
 				# Got a number
 				try: num = float(val)
 				except: pass # Not a valid number
@@ -196,7 +196,7 @@ class Search(commands.Cog):
 				last = None
 		if num is None or len(conv) < 2:
 			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - Type `{}convert` for a list of valid currencies.".format(ctx.prefix,ctx.prefix))
-		if num <= 0:
+		if num == 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
 		# Normalize our to/from prioritizing the end arg
 		conv[0][0] = False if conv[1][0] == True else True if conv[1][0] == False else conv[0][0] if conv[0][0] != None else False # wut
