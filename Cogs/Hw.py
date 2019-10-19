@@ -321,62 +321,15 @@ class Hw(commands.Cog):
 			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
 
-		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
-		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
-		msg += 'For example: '
-		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
-		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
-		while True:
-			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not parts:
-				self._stop_hw(ctx.author)
-				return
-			if 'pcpartpicker.com' in parts.content.lower():
-				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
-				if test == None:
-					self._stop_hw(ctx.author)
-					return
-				elif test == True:
-					partList = parts.content.split()
-					if len(partList) == 1:
-						partList.append(None)
-					output = None
-					try:
-						output = await PCPP.getMarkdown(partList[0], partList[1], False)
-					except:
-						pass
-					if not output:
-						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
-						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
-					if len(output) > 2000:
-						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-						msg += '\nMaybe see if you can prune up that list a bit and try again?'
-						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
-					# Make sure
-					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
-						# Timed out
-						self._stop_hw(ctx.author)
-						return
-					elif conf == False:
-						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
-						continue
+		# Prompt if user wants to use embeds
+		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
+		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
 
-					m = '{} set to:\n{}'.format(bname, output)
-					await hwChannel.send(m)
-					mainBuild['Hardware'] = output
-					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-					break
-			mainBuild['Hardware'] = parts.content
-			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-			break
+		mainBuild = await self.getHardware(hw_id, ctx, hwChannel, mainBuild, bname)
+
+		if not mainBuild:
+			return
+
 		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
@@ -915,7 +868,7 @@ class Hw(commands.Cog):
 
 		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
 		if len(buildList) == 1:
-			msg += 'You currently have *1 build* on file.\n\n'
+			msg += 'You currently have *1 build* on file.\n\nLet\'s get started!'
 		else:
 			msg += 'You currently have *{} builds* on file.\n\nLet\'s get started!'.format(len(buildList))
 
@@ -953,6 +906,29 @@ class Hw(commands.Cog):
 		bname = buildName.content
 		if self.checkSuppress(ctx):
 			bname = Nullify.clean(bname)
+
+		# Prompt if user wants to use embeds
+		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
+		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
+
+		newBuild = await self.getHardware(hw_id, ctx, hwChannel, newBuild, bname)
+
+		if not newBuild:
+			return
+
+		# Check if we already have a main build and clear it
+		for build in buildList:
+			if build['Main']:
+				build['Main'] = False
+
+		buildList.append(newBuild)
+		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
+		self._stop_hw(ctx.author)
+		await hwChannel.send(msg)
+
+	# Get Parts from User
+	async def getHardware(self, hw_id, ctx, hwChannel, build, bname):
 		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
 		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
 		msg += 'For example: '
@@ -1003,21 +979,10 @@ class Hw(commands.Cog):
 						continue
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
-					newBuild['Hardware'] = output
-					break
-			newBuild['Hardware'] = parts.content
-			break
-
-		# Check if we already have a main build and clear it
-		for build in buildList:
-			if build['Main']:
-				build['Main'] = False
-
-		buildList.append(newBuild)
-		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
-		self._stop_hw(ctx.author)
-		await hwChannel.send(msg)
+					build['Hardware'] = output
+					return build
+			build['Hardware'] = parts.content
+			return build
 
 	# New HW helper methods
 	def channelCheck(self, msg, dest = None):
