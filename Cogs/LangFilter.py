@@ -150,13 +150,11 @@ class LangFilter(commands.Cog):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+			return await ctx.send('You do not have sufficient privileges to access this command.')
 			
 		if words == None:
 			msg = 'Usage: `{}addfilter word1, word2, word3...`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		words = "".join(words.split())
@@ -168,11 +166,12 @@ class LangFilter(commands.Cog):
 				# Only add if not already added
 				addedOptions.append(option.lower())
 		if not len(addedOptions):
-			await ctx.send('No new words were passed.')
-			return
+			return await ctx.send('No new words were passed.')
 		
 		for option in addedOptions:
 			serverOptions.append(option)
+
+		self.settings.setServerStat(ctx.guild, "FilteredWords", serverOptions)
 			
 		if len(addedOptions) == 1:
 			await ctx.send('*1* word added to language filter.')
@@ -194,13 +193,11 @@ class LangFilter(commands.Cog):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+			return await ctx.send('You do not have sufficient privileges to access this command.')
 			
 		if words == None:
 			msg = 'Usage: `{}remfilter word1, word2, word3...`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		words = "".join(words.split())
@@ -217,11 +214,12 @@ class LangFilter(commands.Cog):
 				# Only add if not already added
 				addedOptions.append(option.lower())
 		if not len(addedOptions):
-			await ctx.send('No new words were passed.')
-			return
+			return await ctx.send('No existing words were passed.')
 		
 		for option in addedOptions:
 			serverOptions.remove(option)
+
+		self.settings.setServerStat(ctx.guild, "FilteredWords", serverOptions)
 			
 		if len(addedOptions) == 1:
 			await ctx.send('*1* word removed from language filter.')
@@ -243,14 +241,12 @@ class LangFilter(commands.Cog):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+			return await ctx.send('You do not have sufficient privileges to access this command.')
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
-			await ctx.send("The filtered words list is empty!")
-			return
+			return await ctx.send("The filtered words list is empty!")
 		
 		string_list = ", ".join(serverOptions)
 		
@@ -272,8 +268,7 @@ class LangFilter(commands.Cog):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+			return await ctx.send('You do not have sufficient privileges to access this command.')
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		self.settings.setServerStat(ctx.guild, "FilteredWords", [])
@@ -297,14 +292,12 @@ class LangFilter(commands.Cog):
 						isAdmin = True
 		# Only allow admins to change server stats
 		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+			return await ctx.send('You do not have sufficient privileges to access this command.')
 		
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
-			await ctx.author.send("The filtered words list is empty!")
-			return
+			return await ctx.author.send("The filtered words list is empty!")
 			
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
 		filename = "{}-WordList-{}.txt".format(ctx.guild.id, timeStamp)
