@@ -1,20 +1,10 @@
-import asyncio
-import discord
-import random
-import requests
-import time
-import mimetypes
+import asyncio, discord, random, requests, time, mimetypes
 from   datetime import datetime
 from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import GetImage
-from   Cogs import Message
-from   Cogs import ReadableTime
-from   Cogs import UserTime
-from   Cogs import DL
+from   Cogs import Settings, GetImage, Message, ReadableTime, UserTime, DL
 from   pyquery import PyQuery as pq
 try:
     # Python 2.6-2.7
@@ -225,7 +215,7 @@ class Reddit(commands.Cog):
 	@commands.command(pass_context=True)
 	async def nosleep(self, ctx):
 		"""I hope you're not tired..."""
-		msg = await self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=500')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -238,7 +228,7 @@ class Reddit(commands.Cog):
 	@commands.command(pass_context=True)
 	async def joke(self, ctx):
 		"""Let's see if reddit can be funny..."""
-		msg = await self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=500')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -281,7 +271,7 @@ class Reddit(commands.Cog):
 			await ctx.send('You do not have sufficient privileges to access nsfw subreddits.')
 			return
 		
-		msg = await self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
+		msg = await self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=500')
 		if not msg:
 			await ctx.send("Whoops! I couldn't find a working link.")
 			return
@@ -294,49 +284,49 @@ class Reddit(commands.Cog):
 	@commands.command(pass_context=True)
 	async def lpt(self, ctx):
 		"""Become a pro - AT LIFE."""
-		msg = await self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=500')
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def shittylpt(self, ctx):
 		"""Your advise is bad, and you should feel bad."""
-		msg = await self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=500')
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
-		msg = await self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=500')
 		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def brainfart(self, ctx):
 		"""Spout out some uh... intellectual brilliance..."""
-		msg = await self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=500')
 		await ctx.channel.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def nocontext(self, ctx):
 		"""Spout out some intersexual brilliance."""
-		msg = await self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=500')
 		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def withcontext(self, ctx):
 		"""Spout out some contextual brilliance."""
-		msg = await self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
+		msg = await self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=500')
 		await ctx.channel.send(msg)
 		
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):
 		"""Spout out some interstellar questioning... ?"""
-		infoDict = await self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
+		infoDict = await self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=500', True)
 		self.settings.setServerStat(ctx.message.guild, "LastAnswer", infoDict["url"])
 		msg = '{}'.format(infoDict["title"])
 		await ctx.channel.send(msg)
@@ -368,7 +358,7 @@ class Reddit(commands.Cog):
 			return
 		
 		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=100')
+		infoDict = await self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=500')
 		
 		if not infoDict:
 			await ctx.channel.send("Whoops! I couldn't find a working link.")
@@ -391,381 +381,107 @@ class Reddit(commands.Cog):
 				return
 		
 		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-		
-		
+
+	async def _image_do(self, ctx, url):
+		if not self.canDisplay(ctx.guild):
+			return
+		# Grab our image title and url
+		infoDict = await self.getInfo(url)
+		if not infoDict:
+			return await ctx.send("Whoops! I couldn't find a working link.")		
+		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+
+	@commands.command(pass_context=True)
+	async def beeple(self, ctx):
+		"""A new image every day... for years."""
+		await self._image_do(ctx, 'https://www.reddit.com/r/beeple/top.json?sort=top&t=week&limit=500')
 	
 	@commands.command(pass_context=True)
 	async def macsetup(self, ctx):
 		"""Feast your eyes upon these setups."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/macsetups/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-		
+		await self._image_do(ctx, 'https://www.reddit.com/r/macsetups/top.json?sort=top&t=week&limit=500')	
 		
 	@commands.command(pass_context=True)
 	async def pun(self, ctx):
 		"""I don't know, don't ask..."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/puns/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-	
+		await self._image_do(ctx, 'https://www.reddit.com/r/puns/top.json?sort=top&t=week&limit=500')
 	
 	@commands.command(pass_context=True)
 	async def carmod(self, ctx):
 		"""Marvels of modern engineering."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/Shitty_Car_Mods/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-	
+		await self._image_do(ctx, 'https://www.reddit.com/r/Shitty_Car_Mods/top.json?sort=top&t=week&limit=500')
 	
 	@commands.command(pass_context=True)
 	async def battlestation(self, ctx):
 		"""Let's look at some pretty stuff."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/battlestations/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-		
+		await self._image_do(ctx, 'https://www.reddit.com/r/battlestations/top.json?sort=top&t=week&limit=500')
 		
 	@commands.command(pass_context=True)
 	async def shittybattlestation(self, ctx):
 		"""Let's look at some shitty stuff."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/shittybattlestations/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/shittybattlestations/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def dankmeme(self, ctx):
 		"""Only the dankest."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/dankmemes/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def cablefail(self, ctx):
 		"""Might as well be a noose..."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/cablefail/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def techsupport(self, ctx):
 		"""Tech support irl."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/techsupportgore/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def software(self, ctx):
 		"""I uh... I wrote it myself."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-		
+		await self._image_do(ctx, 'https://www.reddit.com/r/softwaregore/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def meirl(self, ctx):
 		"""Me in real life."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/me_irl/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def starterpack(self, ctx):
 		"""Starterpacks."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/starterpacks/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def earthporn(self, ctx):
 		"""Earth is good."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/EarthPorn/top.json?sort=top&t=week&limit=500')
 		
 	@commands.command(pass_context=True)
 	async def wallpaper(self, ctx):
 		"""Get something pretty to look at."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-		
+		await self._image_do(ctx, 'https://www.reddit.com/r/wallpapers/top.json?sort=top&t=week&limit=500')
 		
 	@commands.command(pass_context=True)
 	async def abandoned(self, ctx):
 		"""Get something abandoned to look at."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/abandonedporn/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def dragon(self, ctx):
 		"""From the past - when great winged beasts soared the skies."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/BeardedDragons/top.json?sort=top&t=week&limit=500')
 
 	@commands.command(pass_context=True)
 	async def aww(self, ctx):
 		"""Whenever you're down - uppify."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
-
+		await self._image_do(ctx, 'https://www.reddit.com/r/aww/top.json?sort=top&t=week&limit=500')
 	
 	@commands.command(pass_context=True)
 	async def randomdog(self, ctx):
 		"""Bark if you know whassup."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+		await self._image_do(ctx, 'https://www.reddit.com/r/dogpictures/top.json?sort=top&t=week&limit=500')
 		
 	@commands.command(pass_context=True)
 	async def randomcat(self, ctx):
 		"""Meow."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Grab our image title and url
-		infoDict = await self.getInfo('https://www.reddit.com/r/cats/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+		await self._image_do(ctx, 'https://www.reddit.com/r/cats/top.json?sort=top&t=week&limit=500')
