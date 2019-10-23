@@ -313,16 +313,9 @@ class Hw(commands.Cog):
 
 		isEmbed = False
 
-		# Prompt if user wants to continue using embeds
+		# Check if it's an embed to change inital msg and launch embed editer
 		if mainBuild["Hardware"].startswith(self.embedPrefix):
-			# Prompt if user wants to use embeds
-			msg = '*{}*, we\'ve detected that this is an embed. Would you like to keep this as an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
-			embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
-
-			if not embedConf:
-				self._stop_hw(ctx.author)
-				return
-			isEmbed = embedConf
+			isEmbed = True
 		
 		msg = ""
 
@@ -691,7 +684,8 @@ class Hw(commands.Cog):
 			hardware = EmbeddedHardware.parse(buildParts['Hardware'].replace(self.embedPrefix, ""))
 
 			embed = discord.Embed()
-			embed.title = "{}'s {}".format(DisplayName.name(memFromName), buildParts['Name'])	
+			embed.title = "{}'s {}".format(DisplayName.name(memFromName), buildParts['Name'])
+			embed.color = ctx.author.color	
 
 			embed.description = hardware.description
 			embed.clear_fields()
@@ -1045,13 +1039,12 @@ class Hw(commands.Cog):
 		msg2 = "To save this build, use `Finalize`. You may use a listed command from below or paste a PCPartPicker link.\n"
 		msg2 += "(Add Field/Edit Field/Remove Field/Edit Description/Remove Description/Edit Thumbnail/Remove Thumbnail/Finalize/Stop)"
 
-		newTitleMsg = "What would you like the title of this field to be?"
-		newBodyMsg = "What would you like the body of this field to be?"
 		newDescMsg = "What would you like the new description to be?"
 		newThumbnailMsg = "Provide a link to an image you'd like to use"
 
 		embed = discord.Embed()
-		embed.title = "{}'s {}".format(displayName, bname)	
+		embed.title = "{}'s {}".format(displayName, bname)
+		embed.color = ctx.author.color	
 
 		while True:
 			embed.description = hardware.description
@@ -1066,21 +1059,64 @@ class Hw(commands.Cog):
 			await hwChannel.send(msg)
 			await hwChannel.send(embed=embed)
 			parts = await self.prompt(hw_id, ctx, msg2, hwChannel, DisplayName.name(ctx.author), False)
-
+			
 			if not parts:
 				self._stop_hw(ctx.author)
 				return
-			if "finalize" in parts.content.lower():
+
+			if "pcpartpicker.com" in parts.content.lower():
+				useLinkMsg = "Do you want to use this pcpartpicker link? This will overwrite all of your current hardware fields (y/n/stop)"
+				useLink = await self.confirm(hw_id, ctx, None, hwChannel, useLinkMsg)
+				
+				if not useLink:
+					continue
+				
+				try:
+					# No formatting please
+					output = await PCPP.getMarkdown(parts.content)
+				except:
+					pass
+
+				if not output:
+					msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
+					await hwChannel.send(msg)
+					continue
+				
+				newFields = []
+
+				# Time to parse the already parsed response
+				for line in output.splitlines():
+					if "```" in line or not line:
+						continue
+
+					parts = line.split(":")
+					if len(parts) != 2:
+						continue
+
+					newFields.append(EmbeddedHardwareField(parts[0].strip(), parts[1].strip()))
+				
+				# I really doubt this would ever happen, but just in case
+				if len(newFields) == 0:
+					await hwChannel.send("There is no information in this link! Ignoring link")
+					continue
+
+				if len(newFields) > 25:
+					await hwChannel.send("I appreciate your enthusiasm, but this has too many pieces of hardware. The max I can handle in an embed is *25*, and you are at {}".format(len(newFields))) 
+			
+				hardware.fields = newFields
+
+			elif "finalize" in parts.content.lower():
 				build["Hardware"] = self.embedPrefix + hardware.serialize()
 				return build
+
 			elif "add field" in parts.content.lower():
-				newTitle = await self.prompt(hw_id, ctx, newTitleMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newTitle:
+				if len(hardware.fields) == 25:
+					await hwChannel.send("There is a max of 25 Fields, you may think of combining some of your fields")
 					continue
-				newBody = await self.prompt(hw_id, ctx, newBodyMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newTitle:
-					continue
+
+				newTitle, newBody = getField(hw_id, ctx, hwChannel)
 				hardware.fields.append(EmbeddedHardwareField(newTitle.content, newBody.content))
+
 			elif "edit field" in parts.content.lower():
 				# Get all the titles and append a number in front
 				fieldList = "Fields:\n"
@@ -1119,12 +1155,8 @@ class Hw(commands.Cog):
 				if not fieldToEdit:
 					continue
 
-				newTitle = await self.prompt(hw_id, ctx, newTitleMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newTitle:
-					continue
-				newBody = await self.prompt(hw_id, ctx, newBodyMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newTitle:
-					continue
+				# We have the build now
+				newTitle, newBody = getField(hw_id, ctx, hwChannel)
 
 				fieldToEdit.title = newTitle.content
 				fieldToEdit.body = newBody.content
@@ -1165,10 +1197,16 @@ class Hw(commands.Cog):
 					break
 
 			elif "edit description" in parts.content.lower():
-				newDescription = await self.prompt(hw_id, ctx, newDescMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newDescription:
-					continue
-				hardware.description = newDescription.content
+				newDescription = None
+				while True:
+					newDescription = await self.prompt(hw_id, ctx, newDescMsg, hwChannel, DisplayName.name(ctx.author), False)
+					if not newDescription:
+						continue
+					
+					if len(newDescription.content) > 2048:
+						await hwChannel.send("Please limit the description to be 2048 characters or less")
+					hardware.description = newDescription.content
+					break
 			elif "remove description" in parts.content.lower():
 				hardware.description = None
 			elif "edit thumbnail" in parts.content.lower():
@@ -1179,9 +1217,37 @@ class Hw(commands.Cog):
 			elif "remove thumbnail" in parts.content.lower():
 				hardware.thumbnail = None
 			else:
-				hwChannel.send("Invalid command")
+				await hwChannel.send("Invalid command")
 
 		return None
+
+	async def getField(self, hw_id, ctx, hwChannel):
+		newTitleMsg = "What would you like the title of this field to be?"
+		newBodyMsg = "What would you like the body of this field to be?"
+		
+		newTitle, newBody = None
+
+		while True:
+			newTitle = await self.prompt(hw_id, ctx, newTitleMsg, hwChannel, DisplayName.name(ctx.author), False)
+			if not newTitle:
+				return
+
+			if len(newTitle.content) > 256:
+				await hwChannel.send("Can you shorten that a little? The max length for the title is 256 characters, and you are at {}".format(len(newTitle.content)))
+				continue
+			break
+
+		while True:
+			newBody = await self.prompt(hw_id, ctx, newBodyMsg, hwChannel, DisplayName.name(ctx.author), False)
+			if not newTitle:
+				return
+			
+			if len(newBody.content) > 1024:
+				await hwChannel.send("Woah that's *impressive*. However, the body of a field must stay below 1024 characters, and you are at {}".format(len(newBody.content)))
+				continue
+			break
+
+		return newTitle, newBody
 
 	# New HW helper methods
 	def channelCheck(self, msg, dest = None):
