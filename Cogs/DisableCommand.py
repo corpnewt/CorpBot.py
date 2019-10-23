@@ -1,9 +1,6 @@
-import asyncio
-import discord
-from   operator import itemgetter
+import asyncio, discord
 from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import Message
+from   Cogs import Utils, ReadableTime, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -39,16 +36,9 @@ class DisableCommand(commands.Cog):
 			# Check if we're going to override
 			admin_allow  = self.settings.getServerStat(ctx.guild, "AdminDisabledAccess")
 			badmin_allow = self.settings.getServerStat(ctx.guild, "BAdminDisabledAccess")
-			# Check if we're admin
-			is_admin  = ctx.message.author.permissions_in(ctx.channel).administrator
-			is_badmin = False
-			# Check if we're bot-admin
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isBadmin = True
+			# Check if we're admin and bot admin
+			is_admin  = Utils.is_admin(ctx)
+			is_badmin = Utils.is_bot_admin_only(ctx)
 			# Check if we override
 			if (is_admin and admin_allow) or (is_badmin and badmin_allow):
 				return
@@ -117,139 +107,36 @@ class DisableCommand(commands.Cog):
 	@commands.command(pass_context=True)
 	async def disabledreact(self, ctx, *, yes_no = None):
 		"""Sets whether the bot reacts to disabled commands when attempted (admin-only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Disabled command reactions"
-		setting_val  = "DisabledReactions"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Disabled command reactions","DisabledReactions",yes_no))
 
 	@commands.command(pass_context=True)
 	async def adminallow(self, ctx, *, yes_no = None):
 		"""Sets whether admins can access disabled commands (admin-only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Admin disabled command access"
-		setting_val  = "AdminDisabledAccess"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Admin disabled command access","AdminDisabledAccess",yes_no))
 
 	@commands.command(pass_context=True)
 	async def badminallow(self, ctx, *, yes_no = None):
 		"""Sets whether bot-admins can access disabled commands (admin-only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Bot-admin disabled command access"
-		setting_val  = "BAdminDisabledAccess"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Bot-admin disabled command access","BAdminDisabledAccess",yes_no))
 
 	@commands.command(pass_context=True)
 	async def disable(self, ctx, *, command_or_cog_name = None):
 		"""Disables the passed command or all commands in the passed cog (admin-only).  Command and cog names are case-sensitive."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		if command_or_cog_name == None:
-			await ctx.send("Usage: `{}disable [command_or_cog_name]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}disable [command_or_cog_name]`".format(ctx.prefix))
 		# Make sure we're not trying to block anything in this cog
 		if command_or_cog_name in self._get_our_comms():
 			msg = "You can't disable any commands from this cog."
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
-			return
+			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 		# At this point - we should check if we have a command
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
-			return
+			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 		# Build a list of the commands we disable
 		disabled = []
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
@@ -268,20 +155,14 @@ class DisableCommand(commands.Cog):
 	@commands.command(pass_context=True)
 	async def enable(self, ctx, *, command_or_cog_name = None):
 		"""Enables the passed command or all commands in the passed cog (admin-only).  Command and cog names are case-sensitive."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		if command_or_cog_name == None:
-			await ctx.send("Usage: `{}enable [command_or_cog_name]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}enable [command_or_cog_name]`".format(ctx.prefix))
 		# We should check if we have a command
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
-			return
+			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
 		# Build a list of the commands we disable
 		enabled = []
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
@@ -304,34 +185,22 @@ class DisableCommand(commands.Cog):
 	@commands.command(pass_context=True)
 	async def listdisabled(self, ctx):
 		"""Lists all disabled commands (admin-only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
-		if not len(dis_com):
-			msg = "No commands have been disabled."
-		else:
-			msg = ", ".join(sorted(dis_com))
+		msg = "No commands have been disabled." if len(dis_com) == 0 else ", ".join(sorted(dis_com))
 		title = "1 Disabled Command" if len(dis_com) == 1 else "{} Disabled Commands".format(len(dis_com))
 		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def isdisabled(self, ctx, *, command_or_cog_name = None):
 		"""Outputs whether the passed command - or all commands in a passed cog are disabled (admin-only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		# Get our commands or whatever
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disabled Commands").send(ctx)
-			return
+			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disabled Commands").send(ctx)
 		is_cog = True if self.bot.get_cog(command_or_cog_name) else False
 		# Now we check if they're all disabled
 		disabled = []
@@ -355,12 +224,7 @@ class DisableCommand(commands.Cog):
 	@commands.command(pass_context=True)
 	async def disableall(self, ctx):
 		"""Disables all enabled commands outside this module (admin-only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
+		if not await Utils.is_admin_reply(ctx): return
 		# Setup our lists
 		comm_list = self._get_all_commands()
 		our_comm_list = self._get_our_comms()
@@ -384,12 +248,7 @@ class DisableCommand(commands.Cog):
 	@commands.command(pass_context=True)
 	async def enableall(self, ctx):
 		"""Enables all disabled commands (admin-only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
+		if not await Utils.is_admin_reply(ctx): return
 		# Setup our lists
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
 

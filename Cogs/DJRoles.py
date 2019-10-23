@@ -1,9 +1,7 @@
-import asyncio
-import discord
+import asyncio, discord
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Nullify
-from   Cogs import DisplayName
+from   Cogs import Utils, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -20,68 +18,17 @@ class DJRoles(commands.Cog):
 	@commands.command(pass_context=True)
 	async def ytlist(self, ctx, yes_no = None):
 		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
-		
-		setting_name = "Youtube search list"
-		setting_val  = "YTMultiple"
-
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Youtube search list","YTMultiple",yes_no))
 
 	@commands.command(pass_context=True)
 	async def adddj(self, ctx, *, role : str = None):
 		"""Adds a new role to the dj list (bot-admin only)."""
-
 		usage = 'Usage: `{}adddj [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for trole in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(trole.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if role == None:
-			await ctx.message.channel.send(usage)
-			return
+			return await ctx.send(usage)
 
 		roleName = role
 		if type(role) is str:
@@ -91,67 +38,29 @@ class DJRoles(commands.Cog):
 				role = DisplayName.roleForName(roleName, ctx.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.message.channel.send(msg)
-				return
+				return await ctx.send(Utils.suppressed(ctx,msg))
 
 		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
-
-		for aRole in promoArray:
-			# Get the role that corresponds to the id
-			if str(aRole['ID']) == str(role.id):
-				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.message.channel.send(msg)
-				return
+		promoArray = self.settings.getServerStat(ctx.guild, "DJArray")
+		if next((x for x in promoArray if str(x["ID"])==str(role.id)),False):
+			msg = '**{}** is already in the list.'.format(role.name)
+			return await ctx.send(Utils.suppressed(ctx,msg))
 
 		# If we made it this far - then we can add it
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
-		self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
+		self.settings.setServerStat(ctx.guild, "DJArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.message.channel.send(msg)
-		return
+		await ctx.send(Utils.suppressed(ctx,msg))
 		
 		
 	@commands.command(pass_context=True)
 	async def removedj(self, ctx, *, role : str = None):
 		"""Removes a role from the dj list (bot-admin only)."""
-
 		usage = 'Usage: `{}removedj [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for trole in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(trole.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
-
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if role == None:
-			await ctx.message.channel.send(usage)
-			return
-
+			return await ctx.send(usage)
 		# Name placeholder
 		roleName = role
 		if type(role) is str:
@@ -159,78 +68,32 @@ class DJRoles(commands.Cog):
 				role = ctx.guild.default_role
 			else:
 				role = DisplayName.roleForName(role, ctx.guild)
-
 		# If we're here - then the role is a real one
-		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
-
-		for aRole in promoArray:
-			# Check for Name
-			if aRole['Name'].lower() == roleName.lower():
-				# We found it - let's remove it
-				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.message.channel.send(msg)
-				return
-
-			# Get the role that corresponds to the id
-			if role and (str(aRole['ID']) == str(role.id)):
-				# We found it - let's remove it
-				promoArray.remove(aRole)
-				self.settings.setServerStat(ctx.message.guild, "DJArray", promoArray)
-				msg = '**{}** removed successfully.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.message.channel.send(msg)
-				return
-
+		promoArray = self.settings.getServerStat(ctx.guild, "DJArray")
+		# Check by id first, then by name
+		found_role = next((x for x in promoArray if str(x["ID"])==str(role.id)),False)
+		if not found_role:
+			found_role = next((x for x in promoArray if x["Name"].lower()==role.name.lower()),False)
+		if found_role:
+			promoArray.remove(found_role)
+			self.settings.setServerStat(ctx.guild, "DJArray", promoArray)
+			msg = '**{}** removed successfully.'.format(found_role['Name'])
+			return await ctx.send(Utils.suppressed(ctx,msg))
 		# If we made it this far - then we didn't find it
-		msg = '**{}** not found in list.'.format(aRole['Name'])
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.message.channel.send(msg)
+		msg = '**{}** not found in list.'.format(role)
+		await ctx.send(Utils.suppressed(ctx,msg))
 
 
 	@commands.command(pass_context=True)
 	async def listdj(self, ctx):
 		"""Lists dj roles and id's."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		promoArray = self.settings.getServerStat(ctx.message.guild, "DJArray")
-		
-		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
-		
+		promoArray = self.settings.getServerStat(ctx.guild, "DJArray")
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
-
 		if not len(promoSorted):
 			roleText = "There are no dj roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix)
-			await ctx.channel.send(roleText)
-			return
-		
+			return await ctx.channel.send(roleText)
 		roleText = "__**Current DJ Roles:**__\n\n"
-
 		for arole in promoSorted:
-			found = False
-			for role in ctx.message.guild.roles:
-				if str(role.id) == str(arole["ID"]):
-					# Found the role ID
-					found = True
-					roleText = '{}**{}** (ID : `{}`)\n'.format(roleText, role.name, arole['ID'])
-			if not found:
-				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
-
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
-
-		await ctx.channel.send(roleText)
+			role = ctx.guild.get_role(int(arole["ID"]))
+			roleText += "**{}** (removed from server)\n".format(arole["Name"]) if role is None else "**{}** (ID : `{}`)\n".format(role.name, arole["ID"])
+		await ctx.send(Utils.suppressed(ctx,roleText))

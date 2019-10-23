@@ -1,14 +1,7 @@
-import asyncio
-import discord
-import time
-import os
-from aiml import Kernel
-from os import listdir
+import asyncio, discord, time, os
 from discord.ext import commands
-from Cogs import Nullify
-from pyquery import PyQuery as pq
-from Cogs import FuzzySearch
-from Cogs import DisplayName
+from aiml import Kernel
+from Cogs import Utils, FuzzySearch, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -38,7 +31,7 @@ class ChatterBot(commands.Cog):
 		# We're ready - let's load the bots
 		if not os.path.exists(self.botBrain):
 			# No brain, let's learn and create one
-			files = listdir(self.botDir)
+			files = os.listdir(self.botDir)
 			for file in files:
 				# Omit files starting with .
 				if file.startswith("."):
@@ -58,8 +51,9 @@ class ChatterBot(commands.Cog):
 		self.chatBot.respond('I am a {}'.format(self.ownerGender))
 
 	def canChat(self, server):
+		if not server: return True # No settings to check here
 		# Check if we can chat
-		lastTime = int(self.settings.getServerStat(server, "LastChat"))
+		lastTime = int(self.settings.getServerStat(server, "LastChat", 0))
 		threshold = int(self.waitTime)
 		currentTime = int(time.time())
 
@@ -111,63 +105,49 @@ class ChatterBot(commands.Cog):
 				#ignore = True
 				# Strip prefix
 				msg = message.content
-				await self._chat(message.channel, message.guild, msg)
+				ctx = await self.bot.get_context(message)
+				await self._chat(ctx, msg)
 		return { 'Ignore' : False, 'Delete' : False}
 
 
 	@commands.command(pass_context=True)
 	async def setchatchannel(self, ctx, *, channel : discord.TextChannel = None):
 		"""Sets the channel for bot chatter."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "ChatChannel", "")
+			self.settings.setServerStat(ctx.guild, "ChatChannel", "")
 			msg = 'Chat channel removed - must use the `{}chat [message]` command to chat.'.format(ctx.prefix)
-			await ctx.message.channel.send(msg)
+			await ctx.send(msg)
 			return
 
 		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "ChatChannel", channel.id)
+		self.settings.setServerStat(ctx.guild, "ChatChannel", channel.id)
 		msg = 'Chat channel set to **{}**.'.format(channel.name)
-		await ctx.message.channel.send(msg)
+		await ctx.send(msg)
 
 	@setchatchannel.error
 	async def setchatchannel_error(self, error, ctx):
 		# do stuff
 		msg = 'setchatchannel Error: {}'.format(error)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def chat(self, ctx, *, message = None):
 		"""Chats with the bot."""
-		await self._chat(ctx.message.channel, ctx.message.guild, message)
+		await self._chat(ctx, message)
 
 
-	async def _chat(self, channel, server, message):
+	async def _chat(self, ctx, message):
 		# Check if we're suppressing @here and @everyone mentions
-
-		message = DisplayName.clean_message(message, bot=self.bot, server=server)
-
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
+		message = DisplayName.clean_message(message, bot=self.bot, server=ctx.guild)
 		if message == None:
 			return
-		if not self.canChat(server):
+		if not self.canChat(ctx.guild):
 			return
-		await channel.trigger_typing()
+		await ctx.trigger_typing()
 
 		msg = self.chatBot.respond(message)
-
-		if not msg:
-			return
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
+		msg = msg if msg else "I don't know what to say..."
+		await ctx.send(msg)

@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct
 from   PIL         import Image
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
+from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -224,11 +224,7 @@ class Bot(commands.Cog):
 	async def nickname(self, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
 		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		
 		# Let's get the bot's member in the current server
 		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
@@ -438,173 +434,42 @@ class Bot(commands.Cog):
 		
 	@commands.command(pass_context=True)
 	async def adminunlim(self, ctx, *, yes_no : str = None):
-		"""Sets whether or not to allow unlimited xp to admins (owner only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Admin unlimited xp"
-		setting_val  = "AdminUnlimited"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		"""Sets whether or not to allow unlimited xp to admins (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Admin unlimited xp","AdminUnlimited",yes_no))
 		
 	
 	@commands.command(pass_context=True)
 	async def basadmin(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Bot-admin as admin"
-		setting_val  = "BotAdminAsAdmin"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Bot-admin as admin","BotAdminAsAdmin",yes_no))
 		
 		
 	@commands.command(pass_context=True)
 	async def joinpm(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "New user pm"
-		setting_val  = "JoinPM"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"New user pm","JoinPM",yes_no))
 
 
 	@commands.command(pass_context=True)
 	async def avatar(self, ctx, filename = None):
 		"""Sets the bot's avatar (owner only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
 		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send('I have not been claimed, *yet*.')
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send('You are not the *true* owner of me.  Only the rightful owner can use this command.')
 
 		if filename is None and not len(ctx.message.attachments):
 			m = await ctx.send("Removing avatar...")
 			try:
 				await self.bot.user.edit(avatar=None)
 			except discord.errors.HTTPException as e:
-				await m.edit(content="Looks like I can't do that right now.  Try again later!")
-				return
-			await m.edit(content='Avatar removed!')
-			# await self.bot.edit_profile(avatar=None)
-			return
+				return await m.edit(content="Looks like I can't do that right now.  Try again later!")
+			return await m.edit(content='Avatar removed!')
 		
 		# Check if attachment
 		if filename == None:
@@ -615,27 +480,26 @@ class Bot(commands.Cog):
 		if test_user:
 			# Got a user!
 			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+		# Ensure string
+		filename = str(filename)
 
 		# Check if we created a temp folder for this image
 		isTemp = False
-
-		status = await channel.send('Checking if url (and downloading if valid)...')
+		status = await ctx.send('Checking if url (and downloading if valid)...')
 
 		# File name is *something* - let's first check it as a url, then a file
-		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
+		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif", "webp"]
 		if GetImage.get_ext(filename).lower() in extList:
 			# URL has an image extension
-			file = await GetImage.download(filename)
-			if file:
+			f = await GetImage.download(filename)
+			if f:
 				# we got a download - let's reset and continue
-				filename = file
+				filename = f
 				isTemp = True
 
 		if not os.path.isfile(filename):
 			if not os.path.isfile('./{}'.format(filename)):
-				await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
-				# File doesn't exist
-				return
+				return await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
 			else:
 				# Local file name
 				filename = './{}'.format(filename)
@@ -646,8 +510,7 @@ class Bot(commands.Cog):
 
 		if not ext:
 			# File isn't a valid image
-			await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
-			return
+			return await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
 
 		wasConverted = False
 		# Is an image PIL understands
@@ -676,9 +539,7 @@ class Bot(commands.Cog):
 			try:
 				await self.bot.user.edit(avatar=newAvatar)
 			except discord.errors.HTTPException as e:
-				await status.edit(content="Looks like I can't do that right now.  Try again later!")
-				return
-			# await self.bot.edit_profile(avatar=newAvatar)
+				return await status.edit(content="Looks like I can't do that right now.  Try again later!")
 		# Cleanup - try removing with shutil.rmtree, then with os.remove()
 		await status.edit(content='Cleaning up...')
 		if isTemp:
