@@ -323,7 +323,7 @@ class Hw(commands.Cog):
 		if isEmbed:
 			msg = "Retrieving parts..."
 		else:
-			msg = '"{}"\'s current parts:'.format(bname)
+			msg = '__**{}\'s current parts:**__'.format(bname)
 		
 		try:
 			await hwChannel.send(msg)
@@ -948,7 +948,7 @@ class Hw(commands.Cog):
 		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
 		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
 
-		if not embedConf:
+		if embedConf == None:
 			self._stop_hw(ctx.author)
 			return
 		elif embedConf:
