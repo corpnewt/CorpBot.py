@@ -105,7 +105,7 @@ class BotAdmin(commands.Cog):
 					msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
 					return await ctx.send(msg)
 				
-				coolDown = None if endTime == 0 else endTime
+				cooldown = None if endTime == 0 else endTime
 				member   = memFromName
 
 		# Check if we're muting ourself
