@@ -4,7 +4,7 @@ from   Cogs import Nullify
 bot = None
 
 def setup(bot_start):
-	# This module isn't actually a cog - but it is a place
+    # This module isn't actually a cog - but it is a place
     # we can call "a trash fire"
     global bot
     bot = bot_start
