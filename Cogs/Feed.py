@@ -332,7 +332,7 @@ class Feed(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def setkillrole(self, ctx, *, role : discord.Role = None):
-		"""Sets the required role ID to add/remove hacks (admin only)."""
+		"""Sets the required role to kill/resurrect the bot (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
 		if role == None:
 			self.settings.setServerStat(ctx.guild, "RequiredKillRole", "")
