@@ -177,7 +177,7 @@ class Lists(commands.Cog):
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
 			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(safe_name,l_name.lower())))
@@ -193,7 +193,7 @@ class Lists(commands.Cog):
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		safe_name = name.replace("`", "").replace("\\","")
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
@@ -226,7 +226,7 @@ class Lists(commands.Cog):
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		# Sort by link name
 		itemList = sorted(itemList, key=lambda x:x['Name'].lower())
 		itemText = "**Current {}s:**\n".format(l_name)
@@ -237,7 +237,7 @@ class Lists(commands.Cog):
 		role = self.settings.getServerStat(ctx.message.guild, l_role)
 		if role == None or role == "":
 			msg = '**Only Admins** can add and remove {}s.'.format(l_name.lower())
-			return await ctx.channel.send(msg)
+			return await ctx.send(msg)
 		# Role is set - let's get its name
 		listrole = ctx.guild.get_role(int(role))
 		if not listrole:
@@ -461,7 +461,7 @@ class Lists(commands.Cog):
 		"""Lists the last time a user was online if known."""
 		if not member:
 			msg = 'Usage: `{}lastonline "[member]"`'.format(ctx.prefix)
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)

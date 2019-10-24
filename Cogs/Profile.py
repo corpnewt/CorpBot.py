@@ -56,7 +56,7 @@ class Profile(commands.Cog):
 		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles")
 		if not itemList or itemList == []:
 			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(ctx.author), ctx.prefix)
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
 			return await ctx.send(Utils.suppressed(ctx,"`{}` not found in {}'s profile list!".format(safe_name,DisplayName.name(ctx.author))))
@@ -111,7 +111,7 @@ class Profile(commands.Cog):
 		itemList = self.settings.getUserStat(member, ctx.guild, "Profiles")
 		if not itemList or itemList == []:
 			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(ctx.author), ctx.prefix)
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		itemList = sorted(itemList, key=itemgetter('Name'))
 		itemText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
 		itemText += discord.utils.escape_markdown("\n".join([x["Name"] for x in itemList])) if raw else "\n".join([x["Name"] for x in itemList])
@@ -132,7 +132,7 @@ class Profile(commands.Cog):
 		"""Displays info about a profile from the passed user's profile list."""
 		if not member:
 			msg = 'Usage: `{}profileinfo [member] [profile name]`'.format(ctx.prefix)
-			return await channel.send(msg)
+			return await ctx.send(msg)
 		item = self._get_profile(ctx,member)
 		if item == None:
 			return await ctx.send("Sorry, I couldn't find that user/profile.")
