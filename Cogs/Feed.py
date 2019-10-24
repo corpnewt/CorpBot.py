@@ -70,7 +70,7 @@ class Feed(commands.Cog):
 		if (isKill or hunger >= 100 and hungerLock):
 			ignore = not context.command or not context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]
 		# Check if admin and override
-		if Utils.is_bot_admin(ctx):
+		if Utils.is_bot_admin(context):
 			ignore = delete = False	
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
