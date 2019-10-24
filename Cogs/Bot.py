@@ -353,7 +353,7 @@ class Bot(commands.Cog):
 			return await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 		
 		# Only allow owner to modify the limits
-		if not Utils.is_owner_reply(ctx):
+		if not await Utils.is_owner_reply(ctx):
 			embed_dict["title_max"] = 256
 			embed_dict["desc_max"] = 2048
 			embed_dict["field_max"] = 25
