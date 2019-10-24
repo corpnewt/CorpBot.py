@@ -1,7 +1,8 @@
-import asyncio, discord
+import asyncio, discord, re
 from   Cogs import Nullify
 
 bot = None
+url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
 def setup(bot_start):
     # This module isn't actually a cog - but it is a place
@@ -17,6 +18,13 @@ def suppressed(ctx,msg):
 	settings = bot.get_cog("Settings")
 	if not settings: return msg
 	return Nullify.clean(msg) if settings.getServerStat(guild, "SuppressMentions", True) else msg
+
+def is_owner(ctc,member=None):
+	# Checks if the user in the passed context is an owner
+	settings = bot.get_cog("Settings")
+	if not settings: return False
+	member = ctx.author if not member else member
+	return settings.isOwner(member)
 
 def is_admin(ctx,member=None):
 	# Checks if the user in the passed context is admin
@@ -35,6 +43,13 @@ def is_bot_admin(ctx,member=None):
 	# Checks if the user in the passed context is admin or bot admin
 	member = ctx.author if not member else member
 	return member.permissions_in(ctx.channel).administrator or is_bot_admin_only(ctx,member)
+
+async def is_owner_reply(ctx,member=None,not_claimed="I have not been claimed, *yet*.",not_owner="You are not the *true* owner of me.  Only the rightful owner can use this command."):
+	# Auto-replies if the user isn't an owner
+	are_we = is_owner(ctx,member)
+	if owner == None: await ctx.send(not_claimed)
+	elif owner == False: await ctx.send(not_owner)
+	return are_we
 
 async def is_admin_reply(ctx,member=None,message="You do not have sufficient privileges to access this command.",message_when=False):
 	# Auto-replies if the user doesn't have admin privs
@@ -76,3 +91,8 @@ def yes_no_setting(ctx,display_name,setting_name,yes_no=None):
 	if not yes_no == current:
 		settings.setServerStat(ctx.guild, setting_name, yes_no)
 	return msg
+
+def get_urls(message):
+	# Returns a list of valid urls from a passed message/context/string
+	message = message.content if isinstance(message,discord.Message) else message.message.content if isinstance(message,discord.ext.commands.Context) else str(message)
+	return [x.group(0) for x in re.finditer(url_regex,message)]

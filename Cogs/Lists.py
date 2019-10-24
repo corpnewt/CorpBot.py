@@ -149,20 +149,22 @@ class Lists(commands.Cog):
 		if name == None or value == None:
 			msg = 'Usage: `{}add[[name]] "[[[name]] name]" [[[key]]]`'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
+		safe_name = name.replace("`", "").replace("\\","")
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList:
 			itemList = []
 		currentTime = int(time.time())
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if item:
-			msg = Utils.suppressed(ctx,'`{}` updated!'.format(name.replace("`", "").replace("\\","")))
+			safe_name = item["Name"].replace("`", "").replace("\\","")
+			msg = Utils.suppressed(ctx,'`{}` updated!'.format(safe_name))
 			item[l_key]       = value
 			item['UpdatedBy'] = DisplayName.name(ctx.author)
 			item['UpdatedID'] = ctx.author.id
 			item['Updated']   = currentTime
 		else:
 			itemList.append({"Name" : name, l_key : value, "CreatedBy" : DisplayName.name(ctx.author), "CreatedID": ctx.author.id, "Created" : currentTime})
-			msg = Utils.suppressed(ctx,'`{}` added to {} list!'.format(name.replace("`", "").replace("\\",""),l_name.lower()))
+			msg = Utils.suppressed(ctx,'`{}` added to {} list!'.format(safe_name,l_name.lower()))
 		self.settings.setServerStat(ctx.guild, l_list, itemList)
 		return await ctx.send(Utils.suppressed(ctx,msg))
 
@@ -171,16 +173,18 @@ class Lists(commands.Cog):
 		if name == None:
 			msg = 'Usage: `{}remove{} "[{} name]"`'.format(ctx.prefix,l_name.lower(),l_name.lower())
 			return await ctx.send(msg)
+		safe_name = name.replace("`", "").replace("\\","")
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await channel.send(msg)
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
-			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(name.replace("`", "").replace("\\",""),l_name.lower())))
+			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(safe_name,l_name.lower())))
+		safe_name = item["Name"].replace("`", "").replace("\\","")
 		itemList.remove(item)
 		self.settings.setServerStat(ctx.guild, l_list, itemList)
-		return await ctx.send(Utils.suppressed(ctx,'`{}` removed from {} list!'.format(name.replace("`", "").replace("\\",""),l_name.lower())))
+		return await ctx.send(Utils.suppressed(ctx,'`{}` removed from {} list!'.format(safe_name,l_name.lower())))
 
 	async def _item_info(self,ctx,name,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		if name == None:
@@ -190,9 +194,10 @@ class Lists(commands.Cog):
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await channel.send(msg)
+		safe_name = name.replace("`", "").replace("\\","")
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
-			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(name.replace("`", "").replace("\\",""),l_name.lower())))
+			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(safe_name,l_name.lower())))
 		current_time = int(time.time())
 		msg = "**{}:**\n".format(item["Name"])
 		# Get the info
@@ -205,7 +210,7 @@ class Lists(commands.Cog):
 		if item.get("Updated",None):
 			updated_by = DisplayName.memberForID(item["UpdatedID"],ctx.guild)
 			updated_by = DisplayName.name(updated_by) if updated_by else item.get("UpdatedBy","`UNKNOWN`")
-			msg += "Updated by: {}\n".format(created_by)
+			msg += "Updated by: {}\n".format(updated_by)
 			updated    = item.get("Updated",None)
 			if created:
 				msg += "Updated: {} ago\n".format(ReadableTime.getReadableTimeBetween(updated, current_time, True))

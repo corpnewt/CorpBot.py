@@ -1,6 +1,6 @@
 import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid, ctypes
 from   discord.ext import commands
-from   Cogs import Message, DisplayName, PickList 
+from   Cogs import Utils, Message, DisplayName, PickList
 
 # This file is modified from Rapptz's basic_voice.py:
 # https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
@@ -151,20 +151,8 @@ class Music(commands.Cog):
 		self.loop.pop(str(ctx.guild.id),None)
 		self.data.pop(str(ctx.guild.id),None)
 
-	def is_admin(self, ctx):
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			for role in self.settings.getServerStat(ctx.guild,"AdminArray",[]):
-				if ctx.guild.get_role(int(role["ID"])) in ctx.author.roles:
-					isAdmin = True
-					break
-		if isAdmin:
-			# Admin and bot-admin override
-			return True
-		return False
-
 	async def _check_role(self, ctx):
-		if self.is_admin(ctx):
+		if Utils.is_bot_admin(ctx):
 			return True
 		promoArray = self.settings.getServerStat(ctx.guild, "DJArray", [])
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -511,7 +499,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=delay).send(ctx)
 		# Get the song at the index
 		song = queue[song_number]
-		if song.get("added_by",None) == ctx.author or self.is_admin(ctx):
+		if song.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
 			queue.pop(song_number)
 			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=delay).send(ctx)
@@ -530,7 +518,7 @@ class Music(commands.Cog):
 		removed = 0
 		new_queue = []
 		for song in queue:
-			if song.get("added_by",None) == ctx.author or self.is_admin(ctx):
+			if song.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
 				removed += 1
 			else:
 				new_queue.append(song)
@@ -661,7 +649,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Check for added by first, then check admin
 		data = self.data.get(str(ctx.guild.id))
-		if self.is_admin(ctx):
+		if Utils.is_bot_admin(ctx):
 			self.skip_pop(ctx)
 			return await Message.EmbedText(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=delay).send(ctx)	
 		if data.get("added_by",None) == ctx.author:
@@ -757,20 +745,7 @@ class Music(commands.Cog):
 	@commands.command()
 	async def autodeleteafter(self, ctx, seconds = None):
 		"""Lists or sets the current delay before auto-deleting music related messages (max of 300 seconds).  Set to an integer less than 10 to disable auto-deletion.  Requires bot-admin or admin to set."""
-
-		isAdmin = ctx.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-						break
-				if isAdmin:
-					break
-		if not isAdmin:
-			seconds = None
-
+		if not Utils.is_bot_admin(ctx): seconds = None
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if seconds == None:
 			# List the delay
@@ -823,7 +798,7 @@ class Music(commands.Cog):
 	@play.before_invoke
 	async def ensure_same_channel(self, ctx):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		if self.is_admin(ctx):
+		if Utils.is_bot_admin(ctx):
 			return
 		if not ctx.author.voice:
 			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -840,7 +815,7 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
-		if not ctx.author.voice and not self.is_admin(ctx):
+		if not ctx.author.voice and not Utils.is_bot_admin(ctx):
 			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Author not connected to a voice channel.")
 		if ctx.voice_client is None:

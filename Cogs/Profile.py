@@ -1,13 +1,7 @@
-import asyncio
-import discord
-import time
+import asyncio, discord, time
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import Message
+from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -25,433 +19,138 @@ class Profile(commands.Cog):
 
 		
 	@commands.command(pass_context=True)
-	async def addprofile(self, ctx, name : str = None, *, link : str = None):
+	async def addprofile(self, ctx, name = None, *, link = None):
 		"""Add a profile to your profile list."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-				
+		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
+		name = None if name == None else name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		if name == None or link == None:
 			msg = 'Usage: `{}addprofile "[profile name]" [link]`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		linkList = self.settings.getUserStat(author, server, "Profiles")
-		if not linkList:
-			linkList = []
-		
-		found = False
-		currentTime = int(time.time())	
-		for alink in linkList:
-			if alink['Name'].lower() == name.lower():
-				# The link exists!
-				msg = '*{}\'s* *{}* profile was updated!'.format(DisplayName.name(author), name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				alink['URL'] = link
-				alink['Updated'] = currentTime
-				found = True
-		if not found:	
-			linkList.append({"Name" : name, "URL" : link, "Created" : currentTime})
-			msg = '*{}* added to *{}\'s* profile list!'.format(name, DisplayName.name(author))
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-		
-		self.settings.setUserStat(author, server, "Profiles", linkList)
-		await channel.send(msg)
+			return await ctx.send(msg)
+		safe_name = name.replace("`", "").replace("\\","")
+		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles")
+		if not itemList:
+			itemList = []
+		currentTime = int(time.time())
+		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+		if item:
+			safe_name = item["Name"].replace("`", "").replace("\\","")
+			msg = Utils.suppressed(ctx,"{}'s `{}` profile was updated!".format(DisplayName.name(ctx.author),safe_name))
+			item["URL"] = link
+			item["Updated"] = currentTime
+		else:
+			itemList.append({"Name":name,"URL":link,"Created":currentTime})
+			msg = Utils.suppressed(ctx,"`{}` added to {}'s profile list!".format(safe_name,DisplayName.name(ctx.author)))
+		self.settings.setUserStat(ctx.author, ctx.guild, "Profiles", itemList)
+		await ctx.send(msg)
 		
 		
 	@commands.command(pass_context=True)
-	async def removeprofile(self, ctx, *, name : str = None):
+	async def removeprofile(self, ctx, *, name = None):
 		"""Remove a profile from your profile list."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		# Why did I do this?  There shouldn't be role requirements for your own profiles...
-		'''# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredXPRole")
-		if requiredRole == "":
-			#admin only
-			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
-		else:
-			#role requirement
-			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
-					hasPerms = True
-			if not hasPerms:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return'''
-		
+		name = None if name == None else name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		if name == None:
-			msg = 'Usage: `{}removeprofile "[profile name]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
+			msg = 'Usage: `{}removeprofile [profile name]`'.format(ctx.prefix)
+			return await ctx.send(msg)
+		safe_name = name.replace("`", "").replace("\\","")
 
-		linkList = self.settings.getUserStat(author, server, "Profiles")
-		if not linkList or linkList == []:
-			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(author), ctx.prefix)
-			await channel.send(msg)
-			return
+		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles")
+		if not itemList or itemList == []:
+			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(ctx.author), ctx.prefix)
+			return await channel.send(msg)
+		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+		if not item:
+			return await ctx.send(Utils.suppressed(ctx,"`{}` not found in {}'s profile list!".format(safe_name,DisplayName.name(ctx.author))))
+		safe_name = item["Name"].replace("`", "").replace("\\","")
+		itemList.remove(item)
+		self.settings.setUserStat(ctx.author, ctx.guild, "Profiles", itemList)
+		await ctx.send(Utils.suppressed(ctx,"`{}` removed from {}'s profile list!".format(safe_name,DisplayName.name(ctx.author))))
 
-		for alink in linkList:
-			if alink['Name'].lower() == name.lower():
-				linkList.remove(alink)
-				self.settings.setUserStat(author, server, "Profiles", linkList)
-				msg = '*{}* removed from *{}\'s* profile list!'.format(alink['Name'], DisplayName.name(author))
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await channel.send(msg)
-				return
+	def _get_profile(self,ctx,name=None):
+		parts = name.split()
+		for j in range(len(parts)):
+			# Reverse search direction
+			i = len(parts)-1-j
+			# Name = 0 up to i joined by space
+			name_str    = ' '.join(parts[0:i+1])
+			# Profile = end of name -> end of parts joined by space
+			profile_str = ' '.join(parts[i+1:])
+			mem_from_name = DisplayName.memberForName(name_str, ctx.guild)
+			if mem_from_name:
+				# We got a member - let's check for a profile
+				itemList = self.settings.getUserStat(mem_from_name, ctx.guild, "Profiles", [])
+				item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+				if item: return (mem_from_name,item)
+		# Check if there is no member specified
+		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles", [])
+		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+		if item: return (ctx.author,item)
+		return None
 
-		msg = '*{}* not found in *{}\'s* profile list!'.format(name, DisplayName.name(author))
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
+	async def _get_profile_reply(self,ctx,name=None,raw=False):
+		if not name:
+			msg = "Usage: `{}{}profile [member] [profile name]`".format(ctx.prefix, "raw" if raw else "")
+			return await ctx.send(msg)
+		item = self._get_profile(ctx,name)
+		if item == None:
+			return await ctx.send("Sorry, I couldn't find that user/profile.")
+		member,item = item
+		msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(member), item['Name'], discord.utils.escape_markdown(item['URL']) if raw else item['URL'])
+		return await ctx.send(Utils.suppressed(ctx,msg))
 
+	async def _list_profiles(self,ctx,member=None,raw=None):
+		if not member:
+			member = ctx.author
+		else:
+			newMember = DisplayName.memberForName(member, ctx.guild)
+			if not newMember:
+				# no member found by that name
+				msg = 'I couldn\'t find *{}* on this server.'.format(member)
+				return await ctx.send(Utils.suppressed(ctx,msg))
+			member = newMember
+		# We have a member here
+		itemList = self.settings.getUserStat(member, ctx.guild, "Profiles")
+		if not itemList or itemList == []:
+			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(ctx.author), ctx.prefix)
+			return await channel.send(msg)
+		itemList = sorted(itemList, key=itemgetter('Name'))
+		itemText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
+		itemText += discord.utils.escape_markdown("\n".join([x["Name"] for x in itemList])) if raw else "\n".join([x["Name"] for x in itemList])
+		return await Message.Message(message=Utils.suppressed(ctx,itemText)).send(ctx)
 
 	@commands.command(pass_context=True)
-	async def profile(self, ctx, *, member : str = None, name : str = None):
+	async def profile(self, ctx, *, member = None, name = None):
 		"""Retrieve a profile from the passed user's profile list."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
+		await self._get_profile_reply(ctx,member)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		if not member:
-			msg = 'Usage: `{}profile [member] [profile name]`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# name is likely to be empty unless quotes are used
-		if name == None:
-			# Either a name wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				# Let's search for a name at the beginning - and a profile at the end
-				parts = member.split()
-				for j in range(len(parts)):
-					# Reverse search direction
-					i = len(parts)-1-j
-					memFromName = None
-					foundProf   = False
-					# Name = 0 up to i joined by space
-					nameStr    = ' '.join(parts[0:i+1])
-					# Profile = end of name -> end of parts joined by space
-					profileStr = ' '.join(parts[i+1:])
-					memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
-					if memFromName:
-						# We got a member - let's check for a profile
-						linkList = self.settings.getUserStat(memFromName, server, "Profiles")
-						if not linkList or linkList == []:
-							pass
-
-						for alink in linkList:
-							if alink['Name'].lower() == profileStr.lower():
-								# Found the link - return it.
-								msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(memFromName), alink['Name'], alink['URL'])
-								# Check for suppress
-								if suppress:
-									msg = Nullify.clean(msg)
-								await channel.send(msg)
-								return
-		# Check if there is no member specified
-		linkList = self.settings.getUserStat(author, server, "Profiles")
-		if not linkList or linkList == []:
-			pass
-
-		for alink in linkList:
-			if alink['Name'].lower() == member.lower():
-				# Found the link - return it.
-				msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(author), alink['Name'], alink['URL'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await channel.send(msg)
-				return
-
-		# If we got this far - we didn't find them or somehow they added a name
-		msg = 'Sorry, I couldn\'t find that user/profile.'
-		await channel.send(msg)
-		
-		
 	@commands.command(pass_context=True)
-	async def rawprofile(self, ctx, *, member : str = None, name : str = None):
+	async def rawprofile(self, ctx, *, member = None, name = None):
 		"""Retrieve a profile's raw markdown from the passed user's profile list."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		if not member:
-			msg = 'Usage: `{}rawprofile [member] [profile name]`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# name is likely to be empty unless quotes are used
-		if name == None:
-			# Either a name wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				# Let's search for a name at the beginning - and a profile at the end
-				parts = member.split()
-				for j in range(len(parts)):
-					# Reverse search direction
-					i = len(parts)-1-j
-					memFromName = None
-					foundProf   = False
-					# Name = 0 up to i joined by space
-					nameStr    = ' '.join(parts[0:i+1])
-					# Profile = end of name -> end of parts joined by space
-					profileStr = ' '.join(parts[i+1:])
-					memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
-					if memFromName:
-						# We got a member - let's check for a profile
-						linkList = self.settings.getUserStat(memFromName, server, "Profiles")
-						if not linkList or linkList == []:
-							pass
-
-						for alink in linkList:
-							if alink['Name'].lower() == profileStr.lower():
-								# Found the link - return it.
-								msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(memFromName), alink['Name'], discord.utils.escape_markdown(alink['URL']))
-								# Check for suppress
-								if suppress:
-									msg = Nullify.clean(msg)
-								await channel.send(msg)
-								return
-		# Check if there is no member specified
-		linkList = self.settings.getUserStat(author, server, "Profiles")
-		if not linkList or linkList == []:
-			pass
-
-		for alink in linkList:
-			if alink['Name'].lower() == member.lower():
-				# Found the link - return it.
-				msg = '*{}\'s {} Profile:*\n\n{}'.format(DisplayName.name(author), alink['Name'], discord.utils.escape_markdown(alink['URL']))
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await channel.send(msg)
-				return
-
-		# If we got this far - we didn't find them or somehow they added a name
-		msg = 'Sorry, I couldn\'t find that user/profile.'
-		await channel.send(msg)
-			
+		await self._get_profile_reply(ctx,member,raw=True)
 
 	@commands.command(pass_context=True)
-	async def profileinfo(self, ctx, *, member : str = None, name : str = None):
+	async def profileinfo(self, ctx, *, member = None, name = None):
 		"""Displays info about a profile from the passed user's profile list."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		if not member:
 			msg = 'Usage: `{}profileinfo [member] [profile name]`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		profile = None
-
-		# name is likely to be empty unless quotes are used
-		if name == None:
-			# Either a name wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				# Let's search for a name at the beginning - and a profile at the end
-				parts = member.split()
-				for j in range(len(parts)):
-					# Reverse search direction
-					i = len(parts)-1-j
-					memFromName = None
-					foundProf   = False
-					# Name = 0 up to i joined by space
-					nameStr    = ' '.join(parts[0:i+1])
-					# Profile = end of name -> end of parts joined by space
-					profileStr = ' '.join(parts[i+1:])
-					memFromName = DisplayName.memberForName(nameStr, ctx.message.guild)
-					if memFromName:
-						# We got a member - let's check for a profile
-						linkList = self.settings.getUserStat(memFromName, server, "Profiles")
-						if not linkList or linkList == []:
-							pass
-
-						for alink in linkList:
-							if alink['Name'].lower() == profileStr.lower():
-								# Found the link - return it.
-								profile = alink
-								break
-
-		if not profile:
-			# Check if there is no member specified
-			linkList = self.settings.getUserStat(author, server, "Profiles")
-			if not linkList or linkList == []:
-				pass
-
-			for alink in linkList:
-				if alink['Name'].lower() == member.lower():
-					# Found the link - return it.
-					profile = alink
-
-		if not profile:
-			# At this point - we've exhausted our search
-			msg = 'Sorry, I couldn\'t find that user/profile.'
-			await channel.send(msg)
-			return
-		
+			return await channel.send(msg)
+		item = self._get_profile(ctx,member)
+		if item == None:
+			return await ctx.send("Sorry, I couldn't find that user/profile.")
+		member,item = item
 		# We have a profile
-		currentTime = int(time.time())
-		msg = '**{}:**'.format(profile['Name'])
-		try:
-			createdTime = int(profile['Created'])
-			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
-			msg = '{}\nCreated : *{}* ago'.format(msg, timeString)
-		except KeyError as e:
-			msg = '{}\nCreated : `UNKNOWN`'.format(msg)
-		try:
-			createdTime = profile['Updated']
-			createdTime = int(createdTime)
-			timeString  = ReadableTime.getReadableTimeBetween(createdTime, currentTime, True)
-			msg = '{}\nUpdated : *{}* ago'.format(msg, timeString)
-		except:
-			pass
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
-		return
-
+		current_time = int(time.time())
+		msg = '**{}:**\n'.format(item['Name'])
+		msg += "Created: {} ago\n".format(ReadableTime.getReadableTimeBetween(item.get("Created",None), current_time, True)) if item.get("Created",None) else "Created: `UNKNOWN`\n"
+		if item.get("Updated",None):
+			msg += "Updated: {} ago\n".format(ReadableTime.getReadableTimeBetween(item["Updated"], current_time, True))
+		return await ctx.send(Utils.suppressed(ctx,msg))
 
 	@commands.command(pass_context=True)
-	async def profiles(self, ctx, *, member : str = None):
+	async def profiles(self, ctx, *, member = None):
 		"""List all profiles in the passed user's profile list."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		if not member:
-			member = author
-		else:
-			newMember = DisplayName.memberForName(member, server)
-			if not newMember:
-				# no member found by that name
-				msg = 'I couldn\'t find *{}* on this server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await channel.send(msg)
-				return
-			else:
-				member = newMember
-
-		# We have a member here
-		
-		linkList = self.settings.getUserStat(member, server, "Profiles")
-		if linkList == None or linkList == []:
-			msg = '*{}* hasn\'t added any profiles yet!  They can do so with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(member), ctx.prefix)
-			await channel.send(msg)
-			return
-			
-		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
-		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
-		linkText += "\n".join([x["Name"] for x in linkList])
-		# Check for suppress
-		if suppress:
-			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText).send(ctx)
+		await self._list_profiles(ctx,member)
 		
 	@commands.command(pass_context=True)
-	async def rawprofiles(self, ctx, *, member : str = None):
+	async def rawprofiles(self, ctx, *, member = None):
 		"""List all profiles' raw markdown in the passed user's profile list."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		if not member:
-			member = author
-		else:
-			newMember = DisplayName.memberForName(member, server)
-			if not newMember:
-				# no member found by that name
-				msg = 'I couldn\'t find *{}* on this server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await channel.send(msg)
-				return
-			else:
-				member = newMember
-
-		# We have a member here
-		
-		linkList = self.settings.getUserStat(member, server, "Profiles")
-		if linkList == None or linkList == []:
-			msg = '*{}* hasn\'t added any profiles yet!  They can do so with the `{}addprofile "[profile name]" [url]` command!'.format(DisplayName.name(member), ctx.prefix)
-			await channel.send(msg)
-			return
-			
-		# Sort by link name
-		linkList = sorted(linkList, key=itemgetter('Name'))
-		linkText = "*{}'s* Profiles:\n\n".format(DisplayName.name(member))
-		linkText += discord.utils.escape_markdown("\n".join([x["Name"] for x in linkList]))
-		# Check for suppress
-		if suppress:
-			linkText = Nullify.clean(linkText)
-		await Message.Message(message=linkText).send(ctx)
+		await self._list_profiles(ctx,member,raw=True)
