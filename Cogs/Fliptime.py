@@ -37,6 +37,7 @@ class Fliptime(commands.Cog):
 			return { 'Ignore' : False, 'Delete' : False}
 
 		# Check for admin status
+		ctx = await self.bot.get_context(message)
 		isAdmin = Utils.is_bot_admin(ctx)
 
 		# Check if the message contains the flip chars
