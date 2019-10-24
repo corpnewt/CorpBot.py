@@ -19,7 +19,7 @@ def suppressed(ctx,msg):
 	if not settings: return msg
 	return Nullify.clean(msg) if settings.getServerStat(guild, "SuppressMentions", True) else msg
 
-def is_owner(ctc,member=None):
+def is_owner(ctx,member=None):
 	# Checks if the user in the passed context is an owner
 	settings = bot.get_cog("Settings")
 	if not settings: return False
@@ -47,8 +47,8 @@ def is_bot_admin(ctx,member=None):
 async def is_owner_reply(ctx,member=None,not_claimed="I have not been claimed, *yet*.",not_owner="You are not the *true* owner of me.  Only the rightful owner can use this command."):
 	# Auto-replies if the user isn't an owner
 	are_we = is_owner(ctx,member)
-	if owner == None: await ctx.send(not_claimed)
-	elif owner == False: await ctx.send(not_owner)
+	if are_we == None: await ctx.send(not_claimed)
+	elif are_we == False: await ctx.send(not_owner)
 	return are_we
 
 async def is_admin_reply(ctx,member=None,message="You do not have sufficient privileges to access this command.",message_when=False):
