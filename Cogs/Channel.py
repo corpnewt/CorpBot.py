@@ -1,14 +1,8 @@
-import asyncio
-import discord
-import time
-import os
+import asyncio, discord, time, os
 from   discord.ext import commands
 from   datetime import datetime
 from   operator import itemgetter
-from   Cogs import Settings
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import Utils, Settings, ReadableTime, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -25,88 +19,31 @@ class Channel(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
-
 	async def member_update(self, before, after):
-		server = after.guild
-
 		# Check if the member went offline and log the time
 		if after.status == discord.Status.offline:
 			currentTime = int(time.time())
-			self.settings.setUserStat(after, server, "LastOnline", currentTime)
-
-
-		# Removed due to spam
-		'''self.settings.checkServer(server)
-		try:
-			channelMOTDList = self.settings.getServerStat(server, "ChannelMOTD")
-		except KeyError:
-			channelMOTDList = {}
-
-		if len(channelMOTDList) > 0:
-			members = 0
-			membersOnline = 0
-			for member in server.members:
-				members += 1
-				if not member.status == discord.Status.offline:
-					membersOnline += 1
-
-		for id in channelMOTDList:
-			channel = self.bot.get_channel(int(id))
-			if channel:
-				# Got our channel - let's update
-				motd = channelMOTDList[id]['MOTD'] # A markdown message of the day
-				listOnline = channelMOTDList[id]['ListOnline'] # Yes/No - do we list all online members or not?
-				if listOnline:
-					if members == 1:
-						msg = '{} - ({:,}/{:,} user online)'.format(motd, int(membersOnline), int(members))
-					else:
-						msg = '{} - ({:,}/{:,} users online)'.format(motd, int(membersOnline), int(members))
-				else:
-					msg = motd
-				try:		
-					await channel.edit(topic=msg)
-				except Exception:
-					# If someone has the wrong perms - we just move on
-					continue'''
+			self.settings.setUserStat(after, after.guild, "LastOnline", currentTime)
 		
 
 	@commands.command(pass_context=True)
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
-		
 		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
-		if isLocked:
-			msg = 'Admin lock is *On*.'
-		else:
-			msg = 'Admin lock is *Off*.'
-			
-		await ctx.channel.send(msg)
+		await ctx.send("Admin lock is *On*." if isLocked else "Admin lock is *Off*.")
 		
 		
 	@commands.command(pass_context=True)
 	async def rules(self, ctx):
 		"""Display the server's rules."""
-		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
-		msg = "*{}* Rules:\n{}".format(self.suppressed(ctx.guild, ctx.guild.name), rules)
-		await ctx.channel.send(msg)
+		rules = self.settings.getServerStat(ctx.guild, "Rules")
+		msg = "*{}* Rules:\n{}".format(Utils.suppressed(ctx, ctx.guild.name), rules)
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
 	async def listmuted(self, ctx):
 		"""Lists the names of those that are muted."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		muteList = self.settings.getServerStat(ctx.guild, "MuteList")
 		activeMutes = []
 		for entry in muteList:
@@ -116,32 +53,22 @@ class Channel(commands.Cog):
 				activeMutes.append(DisplayName.name(member))
 
 		if not len(activeMutes):
-			await ctx.channel.send("No one is currently muted.")
+			await ctx.send("No one is currently muted.")
 			return
 
 		# We have at least one member muted
 		msg = 'Currently muted:\n\n'
 		msg += ', '.join(activeMutes)
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.channel.send(msg)
+		await ctx.send(Utils.suppressed(ctx,msg))
 		
 		
 	@commands.command(pass_context=True)
 	async def ismuted(self, ctx, *, member = None):
 		"""Says whether a member is muted in chat."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-			
 		if member == None:
 			msg = 'Usage: `{}ismuted [member]`'.format(ctx.prefix)
-			await ctx.channel.send(msg)
+			await ctx.send(msg)
 			return
 
 		if type(member) is str:
@@ -149,10 +76,7 @@ class Channel(commands.Cog):
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
+				await ctx.send(Utils.suppressed(ctx,msg))
 				return
 				
 		mutedIn = 0
@@ -198,34 +122,24 @@ class Channel(commands.Cog):
 				DisplayName.name(member)
 			)
 			
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 		
 	@ismuted.error
 	async def ismuted_error(self, error, ctx):
 		# do stuff
 		msg = 'ismuted Error: {}'.format(error)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 		
 		
 	@commands.command(pass_context=True)
 	async def listadmin(self, ctx):
 		"""Lists admin roles and id's."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-		
-		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
-		
+		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")		
 		promoSorted = sorted(promoArray, key=itemgetter('Name'))
 
 		if not len(promoSorted):
 			roleText = "There are no admin roles set yet.  Use `{}addadmin [role]` to add some.".format(ctx.prefix)
-			await ctx.channel.send(roleText)
+			await ctx.send(roleText)
 			return
 		
 		roleText = "__**Current Admin Roles:**__\n\n"
@@ -240,120 +154,53 @@ class Channel(commands.Cog):
 			if not found:
 				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
 
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
-
-		await ctx.channel.send(roleText)
+		await ctx.send(Utils.suppressed(ctx,roleText))
 
 	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, role = None):
 		"""Lists the number of users in a current role."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
 		if role == None:
 			msg = 'Usage: `{}rolecall [role]`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
+			return await ctx.send(msg)
 			
 		if type(role) is str:
 			roleName = role
-			role = DisplayName.roleForName(roleName, ctx.message.guild)
+			role = DisplayName.roleForName(roleName, ctx.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(Utils.suppressed(ctx,msg))
 		
 		# Create blank embed
 		role_embed = discord.Embed(color=role.color)
-		# Get server's icon url if one exists - otherwise grab the default blank Discord avatar
-		avURL = server.icon_url
-		if not len(avURL):
-			avURL = discord.User.default_avatar_url
-		# Add the server icon
-		# role_embed.set_author(name='{}'.format(role.name), icon_url=avURL)
 		role_embed.set_author(name='{}'.format(role.name))
-
 		# We have a role
-		memberCount = 0
-		memberOnline = 0
-		for member in server.members:
-			roles = member.roles
-			if role in roles:
-				# We found it
-				memberCount += 1
-				if not member.status == discord.Status.offline:
-					memberOnline += 1
-
-		'''if memberCount == 1:
-			msg = 'There is currently *1 user* with the **{}** role.'.format(role.name)
-			role_embed.add_field(name="Members", value='1 user', inline=True)
-		else:
-			msg = 'There are currently *{} users* with the **{}** role.'.format(memberCount, role.name)
-			role_embed.add_field(name="Members", value='{}'.format(memberCount), inline=True)'''
-		
+		members = [x for x in ctx.guild.members if role in x.roles]
+		memberCount = len(members)
+		memberOnline = len([x for x in members if x.status != discord.Status.offline])
 		role_embed.add_field(name="Members", value='{:,} of {:,} online.'.format(memberOnline, memberCount), inline=True)
-			
-		# await channel.send(msg)
-		await channel.send(embed=role_embed)
-
-
-	@rolecall.error
-	async def rolecall_error(self, ctx, error):
-		# do stuff
-		msg = 'rolecall Error: {}'.format(ctx)
-		await error.channel.send(msg)
+		await ctx.send(embed=role_embed)
 
 
 	@commands.command(pass_context=True)
 	async def log(self, ctx, messages : int = 25, *, chan : discord.TextChannel = None):
 		"""Logs the passed number of messages from the given channel - 25 by default (admin only)."""
-
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
-		# Check for admin status
-		isAdmin = author.permissions_in(channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(server, "AdminArray")
-			for role in author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
 		logFile = 'Logs-{}.txt'.format(timeStamp)
 
 		if not chan:
-			chan = channel
+			chan = ctx
 
 		# Remove original message
 		await ctx.message.delete()
 
-		mess = await ctx.message.author.send('Saving logs to *{}*...'.format(logFile))
+		mess = await ctx.send('Saving logs to *{}*...'.format(logFile))
 
 		# Use logs_from instead of purge
 		counter = 0
 		msg = ''
-		async for message in channel.history(limit=messages):
+		async for message in chan.history(limit=messages):
 			counter += 1
 			msg += message.content + "\n"
 			msg += '----Sent-By: ' + message.author.name + '#' + message.author.discriminator + "\n"
@@ -366,9 +213,8 @@ class Channel(commands.Cog):
 
 		with open(logFile, "wb") as myfile:
 			myfile.write(msg)
-
 		
 		await mess.edit(content='Uploading *{}*...'.format(logFile))
-		await ctx.message.author.send(file=logFile)
+		await ctx.author.send(file=discord.File(fp=logFile))
 		await mess.edit(content='Uploaded *{}!*'.format(logFile))
 		os.remove(logFile)

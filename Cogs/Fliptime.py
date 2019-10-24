@@ -1,11 +1,7 @@
-import asyncio
-import discord
-import time
+import asyncio, discord, time
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Mute
+from   Cogs import Utils, ReadableTime, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -41,14 +37,8 @@ class Fliptime(commands.Cog):
 			return { 'Ignore' : False, 'Delete' : False}
 
 		# Check for admin status
-		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
+		ctx = await self.bot.get_context(message)
+		isAdmin = Utils.is_bot_admin(ctx)
 
 		# Check if the message contains the flip chars
 		conts = message.content
@@ -94,44 +84,5 @@ class Fliptime(commands.Cog):
 	@commands.command(pass_context=True)
 	async def tableflip(self, ctx, *, yes_no = None):
 		"""Turns on/off table flip muting (bot-admin only; always off by default)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Table flip muting"
-		setting_val  = "TableFlipMute"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Table flip muting","TableFlipMute",yes_no))

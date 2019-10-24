@@ -1,13 +1,6 @@
-import asyncio
-import discord
-import random
-import datetime
+import asyncio, discord, random
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Xp
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import CheckRoles
+from   Cogs import Utils, Xp, DisplayName, CheckRoles
 
 def setup(bot):
 	# Add the bot and deps
@@ -68,40 +61,19 @@ class Feed(commands.Cog):
 		current_ignore = self.settings.getServerStat(message.guild, "IgnoreDeath")
 		if current_ignore:
 			return { 'Ignore' : False, 'Delete' : False }
-		
-		ignore = False
-		delete = False
+		ignore = delete = False
 		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
 		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
 		isKill = self.settings.getServerStat(message.guild, "Killed")
 		# Get any commands in the message
 		context = await self.bot.get_context(message)
-		if isKill:
-			ignore = True
-			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
-				ignore = False
-				
-		if hunger >= 100 and hungerLock:
-			ignore = True
-			if context.command and context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]:
-				ignore = False
-				
+		if (isKill or hunger >= 100 and hungerLock):
+			ignore = not context.command or not context.command.name in [ "iskill", "resurrect", "hunger", "feed" ]
 		# Check if admin and override
-		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if isAdmin:
-			ignore = False
-			delete = False
-		
+		if Utils.is_bot_admin(context):
+			ignore = delete = False	
 		return { 'Ignore' : ignore, 'Delete' : delete}
 
-		
 	async def getHungry(self):
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
@@ -110,91 +82,39 @@ class Feed(commands.Cog):
 			for server in self.bot.guilds:
 				# Iterate through the servers and add them
 				isKill = self.settings.getServerStat(server, "Killed")
-				
 				if not isKill:
 					hunger = int(self.settings.getServerStat(server, "Hunger"))
 					# Check if hunger is 100% and increase by 1 if not
 					hunger += 1
-				
-					if hunger > 100:
-						hunger = 100
-					
+					hunger = 100 if hunger > 100 else hunger
 					self.settings.setServerStat(server, "Hunger", hunger)
 
 	@commands.command(pass_context=True)
 	async def ignoredeath(self, ctx, *, yes_no = None):
 		"""Sets whether the bot ignores its own death and continues to respond post-mortem (bot-admin only; always off by default)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Ignore death","IgnoreDeath",yes_no))
 
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Ignore death"
-		setting_val  = "IgnoreDeath"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
-
-		
 	@commands.command(pass_context=True)
 	async def hunger(self, ctx):
 		"""How hungry is the bot?"""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		hunger = int(self.settings.getServerStat(server, "Hunger"))
-		isKill = self.settings.getServerStat(server, "Killed")
+		hunger = int(self.settings.getServerStat(ctx.guild, "Hunger"))
+		isKill = self.settings.getServerStat(ctx.guild, "Killed")
 		overweight = hunger * -1
-		if hunger < 0:
-			
-			if hunger <= -1:
-				msg = 'I\'m stuffed ({:,}% overweight)... maybe I should take a break from eating...'.format(overweight)
-			if hunger <= -10:
-				msg = 'I\'m pudgy ({:,}% overweight)... I may get fat if I keeps going.'.format(overweight)
-			if hunger <= -25:
-				msg = 'I am, well fat ({:,}% overweight)... Diet time?'.format(overweight)
-			if hunger <= -50:
-				msg = 'I\'m obese ({:,}% overweight)... Eating is my enemy right now.'.format(overweight)
-			if hunger <= -75:
-				msg = 'I look fat to an extremely unhealthy degree ({:,}% overweight)... maybe you should think about *my* health?'.format(overweight)
-			if hunger <= -100:
-				msg = 'I am essentially dead from over-eating ({:,}% overweight).  I hope you\'re happy.'.format(overweight)
-			if hunger <= -150:
-				msg = 'I *AM* dead from over-eating ({:,}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
-				
+		if hunger <= -1:
+			msg = 'I\'m stuffed ({:,}% overweight)... maybe I should take a break from eating...'.format(overweight)
+		elif hunger <= -10:
+			msg = 'I\'m pudgy ({:,}% overweight)... I may get fat if I keeps going.'.format(overweight)
+		elif hunger <= -25:
+			msg = 'I am, well fat ({:,}% overweight)... Diet time?'.format(overweight)
+		elif hunger <= -50:
+			msg = 'I\'m obese ({:,}% overweight)... Eating is my enemy right now.'.format(overweight)
+		elif hunger <= -75:
+			msg = 'I look fat to an extremely unhealthy degree ({:,}% overweight)... maybe you should think about *my* health?'.format(overweight)
+		elif hunger <= -100:
+			msg = 'I am essentially dead from over-eating ({:,}% overweight).  I hope you\'re happy.'.format(overweight)
+		elif hunger <= -150:
+			msg = 'I *AM* dead from over-eating ({:,}% overweight).  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
 		elif hunger == 0:
 			msg = 'I\'m full ({:,}%).  You are safe.  *For now.*'.format(hunger)
 		elif hunger <= 15:
@@ -207,48 +127,31 @@ class Feed(commands.Cog):
 			msg = 'I\'m *starving* ({:,}%)!  Do you want me to starve to death?'.format(hunger)
 		else:
 			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
-			
 		if isKill and hunger > -150:
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
-			
-		await channel.send(msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def feed(self, ctx, food : int = None):
 		"""Feed the bot some xp!"""
 		# feed the bot, and maybe you'll get something in return!
 		msg = 'Usage: `{}feed [xp reserve feeding]`'.format(ctx.prefix)
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
 		if food == None:
-			await channel.send(msg)
-			return
+			return await channel.send(msg)
 			
 		if not type(food) == int:
-			await channel.send(msg)
-			return
+			return await channel.send(msg)
 
-		isAdmin    = author.permissions_in(channel).administrator
-		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-		# Check for bot admin
-		isBotAdmin      = False
-		for role in ctx.message.author.roles:
-			for aRole in checkAdmin:
-				# Get the role that corresponds to the id
-				if str(aRole['ID']) == str(role.id):
-					isBotAdmin = True
-					break
-		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
-		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
-		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
-		minRole    = self.settings.getServerStat(server, "MinimumXPRole")
-		requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-		isKill     = self.settings.getServerStat(server, "Killed")
-		hunger     = int(self.settings.getServerStat(server, "Hunger"))
-		xpblock    = self.settings.getServerStat(server, "XpBlockArray")
+		isAdmin    = Utils.is_admin(ctx)
+		isBotAdmin = Utils.is_bot_admin_only(ctx)
+		botAdminAsAdmin = self.settings.getServerStat(ctx.guild, "BotAdminAsAdmin")
+		adminUnlim = self.settings.getServerStat(ctx.guild, "AdminUnlimited")
+		reserveXP  = self.settings.getUserStat(ctx.author, ctx.guild, "XPReserve")
+		minRole    = self.settings.getServerStat(ctx.guild, "MinimumXPRole")
+		requiredXP = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
+		isKill     = self.settings.getServerStat(ctx.guild, "Killed")
+		hunger     = int(self.settings.getServerStat(ctx.guild, "Hunger"))
+		xpblock    = self.settings.getServerStat(ctx.guild, "XpBlockArray")
 
 		approve = True
 		decrement = True
@@ -268,13 +171,9 @@ class Feed(commands.Cog):
 		if food == 0:
 			msg = 'You can\'t feed me *nothing!*'
 			approve = False
-			
-		#if author.top_role.position < int(minRole):
-			#approve = False
-			#msg = 'You don\'t have the permissions to feed me.'
-		
+
 		# RequiredXPRole
-		if not self._can_xp(author, server):
+		if not self._can_xp(ctx.author, ctx.guild):
 			approve = False
 			msg = 'You don\'t have the permissions to feed me.'
 
@@ -315,26 +214,24 @@ class Feed(commands.Cog):
 			msg = "You can't feed the bot!"
 			approve = False
 		else:
-			for role in ctx.author.roles:
-				if role.id in xpblock:
-					msg = "Your role cannot feed the bot!"
-					approve = False
+			if any(x for x in ctx.author.roles if x.id in xpblock):
+				msg = "Your role cannot feed the bot!"
+				approve = False
 
 		if approve:
 			# Feed was approved - let's take the XPReserve right away
 			# Apply food - then check health
 			hunger -= food
 			
-			self.settings.setServerStat(server, "Hunger", hunger)
+			self.settings.setServerStat(ctx.guild, "Hunger", hunger)
 			takeReserve = -1*food
 			if decrement:
-				self.settings.incrementStat(author, server, "XPReserve", takeReserve)
+				self.settings.incrementStat(ctx.author, ctx.guild, "XPReserve", takeReserve)
 
 			if isKill:
 				# Bot's dead...
-				msg = '*{}* carelessly shoves *{:,} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(author), food, DisplayName.serverNick(self.bot.user, server))
-				await channel.send(msg)
-				return
+				msg = '*{}* carelessly shoves *{:,} xp* into the carcass of *{}*... maybe resurrect them first next time?'.format(DisplayName.name(ctx.author), food, DisplayName.serverNick(self.bot.user, ctx.guild))
+				return await ctx.send(msg)
 			
 			# Bet more, less chance of winning, but more winnings!
 			chanceToWin = 50
@@ -344,19 +241,19 @@ class Feed(commands.Cog):
 			randnum = random.randint(1, chanceToWin)
 			if randnum == 1:
 				# YOU WON!!
-				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(author), food, int(payout))
+				self.settings.incrementStat(ctx.author, ctx.guild, "XP", int(payout))
+				msg = '*{}\'s* offering of *{:,}* has made me feel *exceptionally* generous.  Please accept this *magical* package with *{:,} xp!*'.format(DisplayName.name(ctx.author), food, int(payout))
 				
 				# Got XP - let's see if we need to promote
-				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
+				await CheckRoles.checkroles(ctx.author, ctx.channel, self.settings, self.bot)
 			else:
-				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(author), food)
+				msg = '*{}* fed me *{:,} xp!* Thank you, kind soul! Perhaps I\'ll spare you...'.format(DisplayName.name(ctx.author), food)
 		
 			if hunger <= -150:
 				# Kill the bot here
-				self.settings.setServerStat(server, "Killed", True)
-				self.settings.setServerStat(server, "KilledBy", author.id)
-				msg = '{}\n\nI am kill...\n\n*{}* did it...'.format(msg, DisplayName.name(author))			
+				self.settings.setServerStat(ctx.guild, "Killed", True)
+				self.settings.setServerStat(ctx.guild, "KilledBy", ctx.author.id)
+				msg = '{}\n\nI am kill...\n\n*{}* did it...'.format(msg, DisplayName.name(ctx.author))			
 			elif hunger <= -100:
 				msg = '{}\n\nYou *are* going to kill me...  Stop *now* if you have a heart!'.format(msg)
 			elif hunger <= -75:
@@ -372,174 +269,102 @@ class Feed(commands.Cog):
 			elif hunger == 0:
 				msg = '{}\n\nIf you keep feeding me, I *may* get fat...'.format(msg)
 		
-		await channel.send(msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def kill(self, ctx):
 		"""Kill the bot... you heartless soul."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
 		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
+		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			if not await Utils.is_admin_reply(ctx): return
 		else:
 			#role requirement
-			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
-					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)) and not Utils.is_admin(ctx):
+				return await ctx.send("You do not have sufficient privileges to access this command.")
 
-		iskill = self.settings.getServerStat(server, "Killed")
+		iskill = self.settings.getServerStat(ctx.guild, "Killed")
 		if iskill:
-			killedby = self.settings.getServerStat(server, "KilledBy")
-			killedby = DisplayName.memberForID(killedby, server)
-			await channel.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
-			return
+			killedby = self.settings.getServerStat(ctx.guild, "KilledBy")
+			killedby = DisplayName.memberForID(killedby, ctx.guild)
+			return await ctx.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 		
-		self.settings.setServerStat(server, "Killed", True)
-		self.settings.setServerStat(server, "KilledBy", author.id)
-		await channel.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(author)))
+		self.settings.setServerStat(ctx.guild, "Killed", True)
+		self.settings.setServerStat(ctx.guild, "KilledBy", author.id)
+		await ctx.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(ctx.author)))
 		
 	@commands.command(pass_context=True)
 	async def resurrect(self, ctx):
 		"""Restore life to the bot.  What magic is this?"""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
 		# Check for role requirements
-		requiredRole = self.settings.getServerStat(server, "RequiredKillRole")
+		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
 		if requiredRole == "":
 			#admin only
-			isAdmin = author.permissions_in(channel).administrator
-			if not isAdmin:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			if not await Utils.is_admin_reply(ctx): return
 		else:
 			#role requirement
-			hasPerms = False
-			for role in author.roles:
-				if str(role.id) == str(requiredRole):
-					hasPerms = True
-			if not hasPerms and not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-				await channel.send('You do not have sufficient privileges to access this command.')
-				return
+			if not any(x for x in ctx.author.roles if str(x.id) == str(requiredRole)) and not Utils.is_admin(ctx):
+				return await ctx.send("You do not have sufficient privileges to access this command.")
 
-		iskill = self.settings.getServerStat(server, "Killed")
+		iskill = self.settings.getServerStat(ctx.guild, "Killed")
 		if not iskill:
-			await channel.send('Trying to bring back the *already-alive* - well aren\'t you special!')
-			return
+			return await ctx.send('Trying to bring back the *already-alive* - well aren\'t you special!')
 		
-		self.settings.setServerStat(server, "Killed", False)
-		self.settings.setServerStat(server, "Hunger", "0")
-		killedBy = self.settings.getServerStat(server, "KilledBy")
-		killedBy = DisplayName.memberForID(killedBy, server)
-		await channel.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
+		self.settings.setServerStat(ctx.guild, "Killed", False)
+		self.settings.setServerStat(ctx.guild, "Hunger", "0")
+		killedBy = self.settings.getServerStat(ctx.guild, "KilledBy")
+		killedBy = DisplayName.memberForID(killedBy, ctx.guild)
+		await ctx.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
 		
 	@commands.command(pass_context=True)
 	async def iskill(self, ctx):
 		"""Check the ded of the bot."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		isKill = self.settings.getServerStat(server, "Killed")
-		killedBy = self.settings.getServerStat(server, "KilledBy")
-		killedBy = DisplayName.memberForID(killedBy, server)
+		isKill = self.settings.getServerStat(ctx.guild, "Killed")
+		killedBy = self.settings.getServerStat(ctx.guild, "KilledBy")
+		killedBy = DisplayName.memberForID(killedBy, ctx.guild)
 		msg = 'I have no idea what you\'re talking about... Should I be worried?'
 		if isKill:
 			msg = '*Whispers from beyond the grave*\nI am kill...\n\n*{}* did it...'.format(DisplayName.name(killedBy))
 		else:
 			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
-			
-		await channel.send(msg)
-		
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
-	async def setkillrole(self, ctx, role : discord.Role = None):
+	async def setkillrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		isAdmin = author.permissions_in(channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
-			return
-
+		if not await Utils.is_admin_reply(ctx): return
 		if role == None:
-			self.settings.setServerStat(server, "RequiredKillRole", "")
+			self.settings.setServerStat(ctx.guild, "RequiredKillRole", "")
 			msg = 'Kill/resurrect now *admin-only*.'
-			await channel.send(msg)
-			return
-
+			return await ctx.send(msg)
 		if type(role) is str:
 			try:
-				role = discord.utils.get(server.roles, name=role)
+				role = discord.utils.get(ctx.server.roles, name=role)
 			except:
 				print("That role does not exist")
 				return
-
 		# If we made it this far - then we can add it
-		self.settings.setServerStat(server, "RequiredKillRole", role.id)
-
+		self.settings.setServerStat(ctx.guild, "RequiredKillRole", role.id)
 		msg = 'Role required for kill/resurrect set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
+		await ctx.send(Utils.suppressed(ctx,msg))
 
 	@setkillrole.error
 	async def killrole_error(self, ctx, error):
 		# do stuff
-		msg = 'setkillrole Error: {}'.format(ctx)
-		await error.channel.send(msg)
+		msg = 'setkillrole Error: {}'.format(error)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def killrole(self, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		role = self.settings.getServerStat(ctx.message.guild, "RequiredKillRole")
+		role = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
 		if role == None or role == "":
-			msg = '**Only Admins** can kill/ressurect the bot.'.format(ctx)
-			await ctx.channel.send(msg)
-		else:
-			# Role is set - let's get its name
-			found = False
-			for arole in ctx.message.guild.roles:
-				if str(arole.id) == str(role):
-					found = True
-					msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
-			if not found:
-				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
-			await ctx.channel.send(msg)
+			msg = '**Only Admins** can kill/ressurect the bot.'
+			return await ctx.send(msg)
+		# Role is set - let's get its name
+		arole = next((x for x in ctx.guild.roles if str(x.id) == str(role)),None)
+		if not arole:
+			msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
+		msg = 'You need to be a/an **{}** to kill/ressurect the bot.'.format(arole.name)
+		await ctx.send(Utils.suppressed(ctx,msg))

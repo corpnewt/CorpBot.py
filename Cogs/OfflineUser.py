@@ -1,7 +1,6 @@
-import asyncio
-import discord
+import asyncio, discord
 from   discord.ext import commands
-from   Cogs import DisplayName
+from   Cogs import Utils, DisplayName
 
 def setup(bot):
 	# Add the bot
@@ -22,10 +21,9 @@ class OfflineUser(commands.Cog):
 			# Try to dm
 			try:
 				await ctx.author.send(msg)
-				await ctx.message.add_reaction("📬")
+				return await ctx.message.add_reaction("📬")
 			except discord.Forbidden:
-				await ctx.send(msg)
-			return
+				pass
 		await ctx.send(msg)
 
 	@commands.Cog.listener()
@@ -41,10 +39,7 @@ class OfflineUser(commands.Cog):
 			return
 		if not len(message.mentions):
 			return
-		name_list = []
-		for mention in message.mentions:
-			if mention.status == discord.Status.offline:
-				name_list.append(DisplayName.name(mention))
+		name_list = [DisplayName.name(x) for x in message.mentions if x.status is discord.Status.offline]
 		if not len(name_list):
 			# No one was offline
 			return
@@ -57,44 +52,5 @@ class OfflineUser(commands.Cog):
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
 		"""Sets whether to inform users that pinged members are offline or not."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Offline user reminder"
-		setting_val  = "RemindOffline"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Offline user reminder","RemindOffline",yes_no))

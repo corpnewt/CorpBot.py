@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct
 from   PIL         import Image
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
+from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -56,7 +56,6 @@ class Bot(commands.Cog):
 			except Exception as e:
 				print(str(e))
 			await asyncio.sleep(3600) # runs only every 60 minutes (3600 seconds)
-
 
 	async def onserverjoin(self, server):
 		# Iterate the blocked list and see if we are blocked
@@ -207,7 +206,6 @@ class Bot(commands.Cog):
 			fields=fields,
 			thumbnail=avatar
 		).edit(ctx, message)
-		
 
 	@commands.command(pass_context=True)
 	async def ping(self, ctx):
@@ -218,17 +216,12 @@ class Bot(commands.Cog):
 		ms = int((after_typing - before_typing) * 1000)
 		msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
 		await ctx.channel.send(msg)
-
 		
 	@commands.command(pass_context=True)
 	async def nickname(self, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
 		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		
 		# Let's get the bot's member in the current server
 		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
@@ -280,11 +273,8 @@ class Bot(commands.Cog):
 		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
 		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
-		#msg += '{}% of {} {}\n\n'.format(cpuUsage, cpuThred, threadString)
-		#msg += '{}% of {} ({} {})\n\n'.format(cpuUsage, processor, cpuThred, threadString)
 		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
-		#msg += '{} ({}%) of {}GB used\n\n'.format(memUsedGB, memPerc, memTotalGB)
 		msg += '{} uptime```'.format(timeString)
 
 		await message.edit(content=msg)
@@ -293,19 +283,16 @@ class Bot(commands.Cog):
 	async def getimage(self, ctx, *, image):
 		"""Tests downloading - owner only"""
 		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
-		if not isOwner:
-			return
+		if not await Utils.is_owner_reply(ctx): return
 		
 		mess = await Message.Embed(title="Test", description="Downloading file...").send(ctx)
 		file_path = await GetImage.download(image)
 		mess = await Message.Embed(title="Test", description="Uploading file...").edit(ctx, mess)
 		await Message.EmbedText(title="Image", file=file_path).edit(ctx, mess)
 		GetImage.remove(file_path)
-		
 
 	@commands.command(pass_context=True)
-	async def embed(self, ctx, embed_type = "field", *, embed):
+	async def embed(self, ctx, *, embed = None):
 		"""Builds an embed using json formatting.
 
 		Types:
@@ -357,22 +344,16 @@ class Bot(commands.Cog):
 		max_pages    (int)
 		"""
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
-
+		if embed == None:
+			return await ctx.send("Usage: `{}embed [type] [embed json]`".format(ctx.prefix))
+		embed_type = embed.split()[0].lower() if embed.split()[0].lower() in ["field","text"] else "field"
 		try:
 			embed_dict = json.loads(embed)
 		except Exception as e:
-			await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
-			return
+			return await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 		
 		# Only allow owner to modify the limits
-		isOwner = self.settings.isOwner(ctx.author)
-		if not isOwner:
+		if not Utils.is_owner_reply(ctx):
 			embed_dict["title_max"] = 256
 			embed_dict["desc_max"] = 2048
 			embed_dict["field_max"] = 25
@@ -381,7 +362,6 @@ class Bot(commands.Cog):
 			embed_dict["foot_max"] = 2048
 			embed_dict["auth_max"] = 256
 			embed_dict["total_max"] = 6000
-
 		try:
 			if embed_type.lower() == "field":
 				await Message.Embed(**embed_dict).send(ctx)
@@ -396,27 +376,12 @@ class Bot(commands.Cog):
 				e = "An error occurred :("
 			await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
 
-
 	@commands.command(pass_context=True)
 	async def speedtest(self, ctx):
 		"""Run a network speed test (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		message = await channel.send('Running speed test...')
+		message = await ctx.send('Running speed test...')
 		try:
 			st = speedtest.Speedtest()
 			st.get_best_server()
@@ -435,176 +400,36 @@ class Bot(commands.Cog):
 		except Exception as e:
 			await message.edit(content="Speedtest Error: {}".format(str(e)))
 		
-		
 	@commands.command(pass_context=True)
 	async def adminunlim(self, ctx, *, yes_no : str = None):
-		"""Sets whether or not to allow unlimited xp to admins (owner only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Admin unlimited xp"
-		setting_val  = "AdminUnlimited"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
-		
+		"""Sets whether or not to allow unlimited xp to admins (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Admin unlimited xp","AdminUnlimited",yes_no))
 	
 	@commands.command(pass_context=True)
 	async def basadmin(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Bot-admin as admin"
-		setting_val  = "BotAdminAsAdmin"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
-		
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Bot-admin as admin","BotAdminAsAdmin",yes_no))
 		
 	@commands.command(pass_context=True)
 	async def joinpm(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "New user pm"
-		setting_val  = "JoinPM"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
-
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"New user pm","JoinPM",yes_no))
 
 	@commands.command(pass_context=True)
 	async def avatar(self, ctx, filename = None):
 		"""Sets the bot's avatar (owner only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if filename is None and not len(ctx.message.attachments):
 			m = await ctx.send("Removing avatar...")
 			try:
 				await self.bot.user.edit(avatar=None)
 			except discord.errors.HTTPException as e:
-				await m.edit(content="Looks like I can't do that right now.  Try again later!")
-				return
-			await m.edit(content='Avatar removed!')
-			# await self.bot.edit_profile(avatar=None)
-			return
+				return await m.edit(content="Looks like I can't do that right now.  Try again later!")
+			return await m.edit(content='Avatar removed!')
 		
 		# Check if attachment
 		if filename == None:
@@ -615,27 +440,26 @@ class Bot(commands.Cog):
 		if test_user:
 			# Got a user!
 			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+		# Ensure string
+		filename = str(filename)
 
 		# Check if we created a temp folder for this image
 		isTemp = False
-
-		status = await channel.send('Checking if url (and downloading if valid)...')
+		status = await ctx.send('Checking if url (and downloading if valid)...')
 
 		# File name is *something* - let's first check it as a url, then a file
-		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
+		extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif", "webp"]
 		if GetImage.get_ext(filename).lower() in extList:
 			# URL has an image extension
-			file = await GetImage.download(filename)
-			if file:
+			f = await GetImage.download(filename)
+			if f:
 				# we got a download - let's reset and continue
-				filename = file
+				filename = f
 				isTemp = True
 
 		if not os.path.isfile(filename):
 			if not os.path.isfile('./{}'.format(filename)):
-				await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
-				# File doesn't exist
-				return
+				return await status.edit(content='*{}* doesn\'t exist absolutely, or in my working directory.'.format(filename))
 			else:
 				# Local file name
 				filename = './{}'.format(filename)
@@ -646,8 +470,7 @@ class Bot(commands.Cog):
 
 		if not ext:
 			# File isn't a valid image
-			await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
-			return
+			return await status.edit(content='*{}* isn\'t a valid image format.'.format(filename))
 
 		wasConverted = False
 		# Is an image PIL understands
@@ -676,9 +499,7 @@ class Bot(commands.Cog):
 			try:
 				await self.bot.user.edit(avatar=newAvatar)
 			except discord.errors.HTTPException as e:
-				await status.edit(content="Looks like I can't do that right now.  Try again later!")
-				return
-			# await self.bot.edit_profile(avatar=newAvatar)
+				return await status.edit(content="Looks like I can't do that right now.  Try again later!")
 		# Cleanup - try removing with shutil.rmtree, then with os.remove()
 		await status.edit(content='Cleaning up...')
 		if isTemp:
@@ -688,26 +509,11 @@ class Bot(commands.Cog):
 				os.remove(filename)
 		await status.edit(content='Avatar set!')
 
-
 	# Needs rewrite!
 	@commands.command(pass_context=True)
 	async def reboot(self, ctx, force = None):
 		"""Reboots the bot (owner only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if not await Utils.is_owner_reply(ctx): return
 
 		quiet = False
 		if force and force.lower() == 'force':
@@ -737,25 +543,10 @@ class Bot(commands.Cog):
 		# Kill this process
 		os._exit(2)
 
-
 	@commands.command(pass_context=True)
 	async def shutdown(self, ctx, force = None):
 		"""Shuts down the bot (owner only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if not await Utils.is_owner_reply(ctx): return
 
 		quiet = False
 		if force and force.lower() == 'force':
@@ -782,26 +573,12 @@ class Bot(commands.Cog):
 		except Exception:
 			pass
 		# Kill this process
-		os._exit(3)
-			
+		os._exit(3)		
 
 	@commands.command(pass_context=True)
 	async def servers(self, ctx):
 		"""Lists the number of servers I'm connected to!"""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		total = 0
-		for server in self.bot.guilds:
-			total += 1
-		if total == 1:
-			msg = 'I am a part of *1* server!'
-		else:
-			msg = 'I am a part of *{}* servers!'.format(total)
-		await channel.send(msg)
-
+		await ctx.send("I am a part of *{}* server{}!".format(len(self.bot.guilds),"" if len(self.bot.guilds) == 1 else "s"))
 
 	async def _update_status(self):
 		# Helper method to update the status based on the server dict
@@ -823,7 +600,6 @@ class Bot(commands.Cog):
 		dgame = discord.Activity(name=game, url=url, type=t) if game else None
 		await self.bot.change_presence(status=s, activity=dgame)
 		
-		
 	@commands.command(pass_context=True)
 	async def pres(self, ctx, playing_type="0", status_type="online", game=None, url=None):
 		"""Changes the bot's presence (owner-only).
@@ -843,17 +619,7 @@ class Bot(commands.Cog):
 		4. Invisible
 		
 		If any of the passed entries have spaces, they must be in quotes."""
-		
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if not await Utils.is_owner_reply(ctx): return
 		
 		# Check playing type
 		play = None
@@ -864,10 +630,9 @@ class Bot(commands.Cog):
 		elif playing_type.lower() in [ "1", "stream", "streaming" ]:
 			play = 1
 			play_string = "Streaming"
-			if url == None or not "twitch.tv" in url.lower():
+			if url == None or not any("twitch.tv" in x.lower() for x in Utils.get_urls(url)):
 				# Guess what - you failed!! :D
-				await ctx.send("You need a valid twitch.tv url to set a streaming status!")
-				return
+				return await ctx.send("You need a valid twitch.tv url to set a streaming status!")
 		elif playing_type.lower() in [ "2", "listen", "listening" ]:
 			play = 2
 			play_string = "Listening"
@@ -877,8 +642,7 @@ class Bot(commands.Cog):
 		# Verify we got something
 		if play == None:
 			# NOooooooooaooOOooOOooope.
-			await ctx.send("Playing type is invalid!")
-			return
+			return await ctx.send("Playing type is invalid!")
 		
 		# Clear the URL if we're not streaming
 		if not play == 1:
@@ -902,8 +666,7 @@ class Bot(commands.Cog):
 		# Verify we got something
 		if stat == None:
 			# OHMYGODHOWHARDISITTOFOLLOWDIRECTIONS?!?!?
-			await ctx.send("Status type is invalid!")
-			return
+			return await ctx.send("Status type is invalid!")
 		
 		# Here, we assume that everything is A OK.  Peachy keen.
 		# Set the shiz and move along
@@ -928,7 +691,6 @@ class Bot(commands.Cog):
 			]
 		).send(ctx)
 
-
 	@commands.command(pass_context=True)
 	async def status(self, ctx, status = None):
 		"""Gets or sets the bot's online status (owner-only).
@@ -937,22 +699,11 @@ class Bot(commands.Cog):
 		2. Idle
 		3. DnD
 		4. Invisible"""
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if status == None:
 			botmem = ctx.guild.get_member(self.bot.user.id)
-			await ctx.send("I'm currently set to *{}!*".format(botmem.status))
-			return
+			return await ctx.send("I'm currently set to *{}!*".format(botmem.status))
 
 		stat_string = "1"
 		if status == "1" or status.lower() == "online":
@@ -971,283 +722,78 @@ class Bot(commands.Cog):
 			s = discord.Status.invisible
 			stat_name = "invisible"
 		else:
-			await ctx.send("That is not a valid status.")
-			return
+			return await ctx.send("That is not a valid status.")
 
 		self.settings.setGlobalStat("Status",stat_string)
 		await self._update_status()
 		await ctx.send("Status changed to *{}!*".format(stat_name))
 			
+	async def set_status(self, ctx, status, status_name="Playing", status_type=0, status_url=None):
+		# Only allow owner
+		if not await Utils.is_owner_reply(ctx): return
+
+		if status == status_url == None:
+			self.settings.setGlobalStat('Game',None)
+			self.settings.setGlobalStat('Stream',None)
+			self.settings.setGlobalStat('Type',0)
+			msg = 'Removing my {} status...'.format(status_name.lower())
+			message = await ctx.send(msg)
+			await self._update_status()
+			return await message.edit(content='{} status removed!'.format(status_name))
+
+		if status_type == 1:
+			if not status:
+				return await ctx.send("You need to provide a url if streaming!")
+			if not any("twitch.tv" in x.lower() for x in Utils.get_urls(ctx)):
+				return await ctx.send("You need to provide a valid twitch.tv url for streaming!")
+
+		self.settings.setGlobalStat('Game',status)
+		self.settings.setGlobalStat('Stream',status_url)
+		self.settings.setGlobalStat('Type',status_type)
+		msg = 'Setting my {} status to *{}*...'.format(status_name.lower(), status)
+		message = await ctx.send(Utils.suppressed(ctx,msg))
+
+		await self._update_status()
+		await message.edit(content='{} status set to **{}**{}!'.format(status_name,Utils.suppressed(ctx,status)," at `{}`".format(status_url) if status_url else ""))
 		
 	@commands.command(pass_context=True)
 	async def playgame(self, ctx, *, game : str = None):
 		"""Sets the playing status of the bot (owner-only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		if game == None:
-			self.settings.setGlobalStat('Game',None)
-			self.settings.setGlobalStat('Stream',None)
-			self.settings.setGlobalStat('Type',0)
-			msg = 'Removing my playing status...'
-			status = await channel.send(msg)
-
-			await self._update_status()
-			
-			await status.edit(content='Playing status removed!')
-			return
-
-		self.settings.setGlobalStat('Game',game)
-		self.settings.setGlobalStat('Stream',None)
-		self.settings.setGlobalStat('Type',0)
-		msg = 'Setting my playing status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		status = await channel.send(msg)
-
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Playing status set to *{}!*'.format(game))
+		await self.set_status(ctx,game,"Playing",0)
 		
 	@commands.command(pass_context=True)
 	async def watchgame(self, ctx, *, game : str = None):
 		"""Sets the watching status of the bot (owner-only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		if game == None:
-			self.settings.setGlobalStat('Game',None)
-			self.settings.setGlobalStat('Stream',None)
-			self.settings.setGlobalStat('Type',0)
-			msg = 'Removing my watching status...'
-			status = await channel.send(msg)
-
-			await self._update_status()
-			
-			await status.edit(content='Watching status removed!')
-			return
-
-		self.settings.setGlobalStat('Game',game)
-		self.settings.setGlobalStat('Stream',None)
-		self.settings.setGlobalStat('Type',3)
-		msg = 'Setting my watching status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		status = await channel.send(msg)
-
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Watching status set to *{}!*'.format(game))
+		await self.set_status(ctx,game,"Watching",3)
 		
 	@commands.command(pass_context=True)
 	async def listengame(self, ctx, *, game : str = None):
 		"""Sets the listening status of the bot (owner-only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		if game == None:
-			self.settings.setGlobalStat('Game',None)
-			self.settings.setGlobalStat('Stream',None)
-			self.settings.setGlobalStat('Type',0)
-			msg = 'Removing my listening status...'
-			status = await channel.send(msg)
-
-			await self._update_status()
-			
-			await status.edit(content='Listening status removed!')
-			return
-
-		self.settings.setGlobalStat('Game',game)
-		self.settings.setGlobalStat('Stream',None)
-		self.settings.setGlobalStat('Type',2)
-		msg = 'Setting my listening status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		status = await channel.send(msg)
-
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Listening status set to *{}!*'.format(game))
-
+		await self.set_status(ctx,game,"Listening",2)
 
 	@commands.command(pass_context=True)
 	async def streamgame(self, ctx, url = None, *, game : str = None):
 		"""Sets the streaming status of the bot, requires the url and the game (owner-only)."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		if url == None:
-			self.settings.setGlobalStat('Game',None)
-			self.settings.setGlobalStat('Stream',None)
-			self.settings.setGlobalStat('Type',0)
-			msg = 'Removing my streaming status...'
-			status = await channel.send(msg)
-
-			await self._update_status()
-			
-			await status.edit(content='Streaming status removed!')
-			return
-
-		if game == None:
-			# We're missing parts
-			msg = "Usage: `{}streamgame [url] [game]`".format(ctx.prefix)
-			await ctx.send(msg)
-			return
-
-		# Verify url
-		matches = re.finditer(self.regex, url)
-		match_url = None
-		for match in matches:
-			match_url = match.group(0)
-		
-		if not match_url:
-			# No valid url found
-			await ctx.send("Url is invalid!")
-			return
-
-		self.settings.setGlobalStat('Game',game)
-		self.settings.setGlobalStat('Stream',url)
-		self.settings.setGlobalStat('Type',1)
-		msg = 'Setting my streaming status to *{}*...'.format(game)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		status = await channel.send(msg)
-
-		await self._update_status()
-		# Check for suppress
-		if suppress:
-			game = Nullify.clean(game)
-		await status.edit(content='Streaming status set to *{}* at `{}`!'.format(game, url))
-	
+		await self.set_status(ctx,game,"Streaming",1,url)
 
 	@commands.command(pass_context=True)
 	async def setbotparts(self, ctx, *, parts : str = None):
 		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
+		if not await Utils.is_owner_reply(ctx): return
 
 		if not parts:
 			parts = ""
 			
 		self.settings.setGlobalUserStat(self.bot.user, "Parts", parts)
-		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, server), parts)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await channel.send(msg)
+		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, ctx.guild), parts)
+		await ctx.send(Utils.suppressed(ctx,msg))
 
 	@commands.command(pass_context=True)
 	async def source(self, ctx):
 		"""Link the github source."""
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
-		await ctx.channel.send(msg)
-
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def cloc(self, ctx):
@@ -1294,13 +840,7 @@ class Bot(commands.Cog):
 			# print(extensions[idx] + ": " + str(code_count[idx]))
 			pass
 		msg += '```'
-		await ctx.channel.send(msg)
-		
-	@cloc.error
-	async def cloc_error(self, ctx, error):
-		# do stuff
-		msg = 'cloc Error: {}'.format(ctx)
-		await error.channel.send(msg)
+		await ctx.send(msg)
 
 	# Helper function to get extensions
 	def get_extensions(self, path, excl):

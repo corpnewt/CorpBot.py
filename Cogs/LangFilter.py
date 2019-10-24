@@ -1,14 +1,7 @@
-import random
-import re
-
-import asyncio
-import discord
-import os
+import asyncio, discord, re, random, os
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import Message
+from   Cogs import Utils, DisplayName, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -112,15 +105,8 @@ class LangFilter(commands.Cog):
 			return { "Ignore" : False, "Delete" : False }
 	
 		# Check for admin/bot-admin
-		isAdmin = message.author.permissions_in(message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(message.guild, "AdminArray")
-			for role in message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if isAdmin:
+		ctx = await self.bot.get_context(message)
+		if Utils.is_bot_admin(ctx):
 			return { "Ignore" : False, "Delete" : False }
 		
 		f = ProfanitiesFilter(word_list, replacements=self.replacements)
@@ -139,18 +125,7 @@ class LangFilter(commands.Cog):
 	@commands.command(pass_context=True)
 	async def addfilter(self, ctx, *, words = None):
 		"""Adds comma delimited words to the word list (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			return await ctx.send('You do not have sufficient privileges to access this command.')
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if words == None:
 			msg = 'Usage: `{}addfilter word1, word2, word3...`'.format(ctx.prefix)
@@ -182,18 +157,7 @@ class LangFilter(commands.Cog):
 	@commands.command(pass_context=True)
 	async def remfilter(self, ctx, *, words = None):
 		"""Removes comma delimited words from the word list (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			return await ctx.send('You do not have sufficient privileges to access this command.')
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if words == None:
 			msg = 'Usage: `{}remfilter word1, word2, word3...`'.format(ctx.prefix)
@@ -230,18 +194,7 @@ class LangFilter(commands.Cog):
 	@commands.command(pass_context=True)
 	async def listfilter(self, ctx):
 		"""Prints out the list of words that will be filtered (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			return await ctx.send('You do not have sufficient privileges to access this command.')
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
@@ -257,18 +210,7 @@ class LangFilter(commands.Cog):
 	@commands.command(pass_context=True)
 	async def clearfilter(self, ctx):
 		"""Empties the list of words that will be filtered (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			return await ctx.send('You do not have sufficient privileges to access this command.')
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		self.settings.setServerStat(ctx.guild, "FilteredWords", [])
@@ -281,23 +223,12 @@ class LangFilter(commands.Cog):
 	@commands.command(pass_context=True)
 	async def dumpfilter(self, ctx):
 		"""Saves the filtered word list to a text file and uploads it to the requestor (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			return await ctx.send('You do not have sufficient privileges to access this command.')
+		if not await Utils.is_bot_admin_reply(ctx): return
 		
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
-			return await ctx.author.send("The filtered words list is empty!")
+			return await ctx.send("The filtered words list is empty!")
 			
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
 		filename = "{}-WordList-{}.txt".format(ctx.guild.id, timeStamp)
@@ -307,26 +238,14 @@ class LangFilter(commands.Cog):
 		with open(filename, "wb") as myfile:
 			myfile.write(msg)
 			
-		await ctx.author.send(file=discord.File(filename))
+		await ctx.send(file=discord.File(filename))
 		os.remove(filename)
 		
 	
 	'''@commands.command(pass_context=True)
 	async def setfilter(self, ctx, url = None):
 		"""Sets the word list to a passed text file url, or attachment contents (bot-admin only)."""
-		
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if url == None and len(ctx.message.attachments) == 0:
 			await ctx.send("Usage: `{}setfilter [url or attachment]`".format(ctx.prefix))
