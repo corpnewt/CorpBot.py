@@ -292,7 +292,7 @@ class Bot(commands.Cog):
 		GetImage.remove(file_path)
 
 	@commands.command(pass_context=True)
-	async def embed(self, ctx, embed_type = "field", *, embed):
+	async def embed(self, ctx, *, embed = None):
 		"""Builds an embed using json formatting.
 
 		Types:
@@ -344,6 +344,9 @@ class Bot(commands.Cog):
 		max_pages    (int)
 		"""
 
+		if embed == None:
+			return await ctx.send("Usage: `{}embed [type] [embed json]`".format(ctx.prefix))
+		embed_type = embed.split()[0].lower() if embed.split()[0].lower() in ["field","text"] else "field"
 		try:
 			embed_dict = json.loads(embed)
 		except Exception as e:
@@ -738,11 +741,11 @@ class Bot(commands.Cog):
 			await self._update_status()
 			return await message.edit(content='{} status removed!'.format(status_name))
 
-		if status_type == 1 and not status:
-			return await ctx.send("You need to provide a url if streaming!")
-
-		if not any("twitch.tv" in x.lower() for x in Utils.get_urls(ctx)):
-			return await ctx.send("You need to provide a valid twitch.tv url for streaming!")
+		if status_type == 1:
+			if not status:
+				return await ctx.send("You need to provide a url if streaming!")
+			if not any("twitch.tv" in x.lower() for x in Utils.get_urls(ctx)):
+				return await ctx.send("You need to provide a valid twitch.tv url for streaming!")
 
 		self.settings.setGlobalStat('Game',status)
 		self.settings.setGlobalStat('Stream',status_url)
