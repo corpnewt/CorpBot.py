@@ -283,7 +283,7 @@ class Bot(commands.Cog):
 	async def getimage(self, ctx, *, image):
 		"""Tests downloading - owner only"""
 		# Only allow owner to modify the limits
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 		
 		mess = await Message.Embed(title="Test", description="Downloading file...").send(ctx)
 		file_path = await GetImage.download(image)
@@ -376,7 +376,7 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def speedtest(self, ctx):
 		"""Run a network speed test (owner only)."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		message = await ctx.send('Running speed test...')
 		try:
@@ -418,7 +418,7 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def avatar(self, ctx, filename = None):
 		"""Sets the bot's avatar (owner only)."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if filename is None and not len(ctx.message.attachments):
 			m = await ctx.send("Removing avatar...")
@@ -510,7 +510,7 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def reboot(self, ctx, force = None):
 		"""Reboots the bot (owner only)."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		quiet = False
 		if force and force.lower() == 'force':
@@ -543,7 +543,7 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def shutdown(self, ctx, force = None):
 		"""Shuts down the bot (owner only)."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		quiet = False
 		if force and force.lower() == 'force':
@@ -616,7 +616,7 @@ class Bot(commands.Cog):
 		4. Invisible
 		
 		If any of the passed entries have spaces, they must be in quotes."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 		
 		# Check playing type
 		play = None
@@ -696,7 +696,7 @@ class Bot(commands.Cog):
 		2. Idle
 		3. DnD
 		4. Invisible"""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if status == None:
 			botmem = ctx.guild.get_member(self.bot.user.id)
@@ -727,7 +727,7 @@ class Bot(commands.Cog):
 			
 	async def set_status(self, ctx, status, status_name="Playing", status_type=0, status_url=None):
 		# Only allow owner
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if status == status_url == None:
 			self.settings.setGlobalStat('Game',None)
@@ -776,7 +776,7 @@ class Bot(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setbotparts(self, ctx, *, parts : str = None):
 		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
-		if not Utils.is_owner_reply(ctx): return
+		if not await Utils.is_owner_reply(ctx): return
 
 		if not parts:
 			parts = ""
