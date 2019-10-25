@@ -72,7 +72,6 @@ class Admin(commands.Cog):
 				self.settings.setUserStat(message.author, message.guild, "Cooldown", None)
 				self.settings.setUserStat(message.author, message.guild, "Muted", False)
 			
-		
 		ignoreList = self.settings.getServerStat(message.guild, "IgnoredUsers")
 		if ignoreList:
 			for user in ignoreList:
