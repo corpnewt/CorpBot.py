@@ -1101,7 +1101,7 @@ class Hw(commands.Cog):
 					continue
 
 				if len(newFields) > 25:
-					await hwChannel.send("I appreciate your enthusiasm, but this has too many pieces of hardware. The max I can handle in an embed is *25*, and you are at {}".format(len(newFields)))
+					await hwChannel.send("I appreciate your enthusiasm, but this has too many pieces of hardware. The max I can handle in an embed is *25*, and there are {}".format(len(newFields)))
 					continue
 			
 				hardware.fields = newFields
