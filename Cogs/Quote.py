@@ -1,8 +1,6 @@
-import asyncio
-import discord
+import asyncio, discord
 from   discord.ext import commands
-from   Cogs import DisplayName
-from   Cogs import Message
+from   Cogs import Utils, DisplayName, Message
 
 def setup(bot):
 	# Add the bot
@@ -15,18 +13,6 @@ class Quote(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-
-	def _is_admin(self, member, channel):
-		# Check for admin/bot-admin
-			isAdmin = member.permissions_in(channel).administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(member.guild, "AdminArray")
-				for role in member.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if str(aRole['ID']) == str(role.id):
-							isAdmin = True
-			return isAdmin
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction, member):
@@ -60,7 +46,7 @@ class Quote(commands.Cog):
 		if not em:
 			# Broken for no reason?
 			return
-
+		ctx = await self.bot.get_context(reaction.message)
 		if em.count > 1:
 			# Our reaction is already here
 			if not r_admin:
@@ -68,7 +54,7 @@ class Quote(commands.Cog):
 				# and someone already quoted
 				return
 			# Check for admin/bot-admin
-			if not self._is_admin(member, reaction.message.channel):
+			if not Utils.is_admin(ctx,member=member):
 				# We ARE worried about admin - and we're not admin... skip
 				return
 			# Iterate through those that reacted and see if any are admin
@@ -76,13 +62,13 @@ class Quote(commands.Cog):
 			for r_user in r_users:
 				if r_user == member:
 					continue
-				if self._is_admin(r_user, reaction.message.channel):
+				if Utils.is_admin(ctx,member=r_user):
 					# An admin already quoted - skip
 					return
 		else:
 			# This is the first reaction
 			# Check for admin/bot-admin
-			if r_admin and not self._is_admin(member, reaction.message.channel):
+			if r_admin and not Utils.is_admin(ctx,member=member):
 				return
 
 		r_channel = member.guild.get_channel(int(r_channel))
@@ -126,31 +112,18 @@ class Quote(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setquotechannel(self, ctx, channel = None):
 		"""Sets the channel for quoted messages or disables it if no channel sent (admin only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "QuoteChannel", None)
+			self.settings.setServerStat(ctx.guild, "QuoteChannel", None)
 			msg = 'Quote channel *disabled*.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 		channel = DisplayName.channelForName(channel, ctx.guild, "text")
 		if channel == None:
-			await ctx.send("I couldn't find that channel :(")
-			return
-		self.settings.setServerStat(ctx.message.guild, "QuoteChannel", channel.id)
+			return await ctx.send("I couldn't find that channel :(")
+		self.settings.setServerStat(ctx.guild, "QuoteChannel", channel.id)
 		
 		msg = 'Quote channel set to {}'.format(channel.mention)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 	
 
 	@commands.command(pass_context=True)
@@ -158,55 +131,29 @@ class Quote(commands.Cog):
 		"""Prints the current quote channel."""
 		qChan = self.settings.getServerStat(ctx.guild, "QuoteChannel")
 		if not qChan:
-			await ctx.send("Quoting is currently *disabled*.")
-			return
+			return await ctx.send("Quoting is currently *disabled*.")
 		channel = DisplayName.channelForName(str(qChan), ctx.guild, "text")
 		if channel:
-			await ctx.send("The current quote channel is {}".format(channel.mention))
-			return
+			return await ctx.send("The current quote channel is {}".format(channel.mention))
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(qChan))
 
 
 	@commands.command(pass_context=True)
 	async def clearquotereaction(self, ctx):
 		"""Clears the trigger reaction for quoting messages (admin only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		self.settings.setServerStat(ctx.message.guild, "QuoteReaction", None)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		self.settings.setServerStat(ctx.guild, "QuoteReaction", None)
 		await ctx.send("Quote reaction *cleared*.")
 
 
 	@commands.command(pass_context=True)
 	async def setquotereaction(self, ctx):
 		"""Sets the trigger reaction for quoting messages (bot-admin only)."""
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
+		if not await Utils.is_bot_admin_reply(ctx): return
 		message = await ctx.send("Please react to this message with the desired quote reaction.")
 		# Backup then clear - so we don't trigger quoting during this
-		backup_reaction = self.settings.getServerStat(ctx.message.guild, "QuoteReaction")
-		self.settings.setServerStat(ctx.message.guild, "QuoteReaction", None)
+		backup_reaction = self.settings.getServerStat(ctx.guild, "QuoteReaction")
+		self.settings.setServerStat(ctx.guild, "QuoteReaction", None)
 		# Now we would wait...
 		def check(reaction, user):
 			return reaction.message.id == message.id and user == ctx.author
@@ -214,12 +161,11 @@ class Quote(commands.Cog):
 			reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=check)
 		except:
 			# Didn't get a reaction
-			self.settings.setServerStat(ctx.message.guild, "QuoteReaction", backup_reaction)
-			await message.edit(content="Looks like we ran out of time - run `{}setquotereaction` to try again.".format(ctx.prefix))
-			return
+			self.settings.setServerStat(ctx.guild, "QuoteReaction", backup_reaction)
+			return await message.edit(content="Looks like we ran out of time - run `{}setquotereaction` to try again.".format(ctx.prefix))
 
 		# Got it!
-		self.settings.setServerStat(ctx.message.guild, "QuoteReaction", str(reaction.emoji))
+		self.settings.setServerStat(ctx.guild, "QuoteReaction", str(reaction.emoji))
 
 		await message.edit(content="Quote reaction set to {}".format(str(reaction.emoji)))
 
@@ -227,56 +173,12 @@ class Quote(commands.Cog):
 	@commands.command(pass_context=True)
 	async def getquotereaction(self, ctx):
 		"""Displays the quote reaction if there is one."""
-		r = self.settings.getServerStat(ctx.message.guild, "QuoteReaction")
-
-		if r:
-			await ctx.send("Current quote reaction is {}".format(r))
-			return
-		else:
-			await ctx.send("No quote reaction set.")
+		r = self.settings.getServerStat(ctx.guild, "QuoteReaction")
+		await ctx.send("No quote reaction set." if not r else "Current quote reaction is {}".format(r))
 
 
 	@commands.command(pass_context=True)
 	async def quoteadminonly(self, ctx, *, yes_no = None):
 		"""Sets whether only admins/bot-admins can quote or not (bot-admin only)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "Admin-only quotes"
-		setting_val  = "QuoteAdminOnly"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Admin-only quotes","QuoteAdminOnly",yes_no))
