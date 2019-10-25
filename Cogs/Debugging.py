@@ -353,7 +353,7 @@ class Debugging(commands.Cog):
 			else:
 				# Check for suppress
 				if suppress:
-					log_message = Nullify.clean(log_message)
+					log_message = Utils.suppressed(server,log_message)
 				# Remove triple backticks and replace any single backticks with single quotes
 				log_back  = log_message.replace("`", "'")
 				if log_back == log_message:
