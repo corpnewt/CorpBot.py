@@ -4,7 +4,7 @@ from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
-from   Cogs import Settings, GetImage, Message, ReadableTime, UserTime, DL
+from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL
 from   pyquery import PyQuery as pq
 try:
     # Python 2.6-2.7
@@ -33,7 +33,6 @@ class MLStripper(HTMLParser):
 		self.fed.append(d)
 	def get_data(self):
 		return ''.join(self.fed)
-
 
 class Reddit(commands.Cog):
 
@@ -69,25 +68,21 @@ class Reddit(commands.Cog):
 				gotImage = False
 				while not gotImage:
 					randnum = random.randint(0,self.posts)
-				
 					try:
 						theJSON = r["data"]["children"][randnum]["data"]
 					except IndexError:
 						# Failed - set to none
 						theJSON = { "url" : "" }
-
 					if GetImage.get_ext(theJSON["url"]).lower() in self.extList:
 						gotImage = True
 						gotLink  = True
 			else:
 				randnum = random.randint(0,self.posts)
-				
 				try:
 					theJSON = r["data"]["children"][randnum]["data"]
 					gotLink = True
 				except IndexError:
 					theJSON = { "url" : "" }
-		
 		if not (answer or image):
 			# Just return the title
 			return '{}'.format(theJSON["title"])
@@ -166,7 +161,6 @@ class Reddit(commands.Cog):
 		if not GetImage.canDisplay( lastTime, threshold ):
 			# await channel.send('Too many images at once - please wait a few seconds.')
 			return False
-		
 		# If we made it here - set the LastPicture method
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
@@ -184,13 +178,11 @@ class Reddit(commands.Cog):
 		except:
 			# Assume that we couldn't find that user
 			error = "Make sure you're passing a valid reddit username."
-			await Message.EmbedText(title="An error occurred!", description=error, color=ctx.author).send(ctx)
-			return
+			return await Message.EmbedText(title="An error occurred!", description=error, color=ctx.author).send(ctx)
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
 			error = theJSON.get("error", "An error has occurred.")
-			await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
-			return
+			return await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
 		# Build our embed
 		e = { 
 			"title" : "/u/" + theJSON["data"]["name"],
@@ -210,185 +202,110 @@ class Reddit(commands.Cog):
 		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : True })
 		# Send the embed
 		await Message.Embed(**e).send(ctx)
-		
 
 	@commands.command(pass_context=True)
 	async def nosleep(self, ctx):
 		"""I hope you're not tired..."""
 		msg = await self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
-		if not msg:
-			await ctx.send("Whoops! I couldn't find a working link.")
-			return
+		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
 		mess = '__**{}**__\n\n'.format(msg['title'])
 		mess += msg['content']
 		await Message.Message(message=mess).send(ctx)
-		#await self.bot.send_message(ctx.message.channel, msg)
-
 
 	@commands.command(pass_context=True)
 	async def joke(self, ctx):
 		"""Let's see if reddit can be funny..."""
 		msg = await self.getText('https://www.reddit.com/r/jokes/top.json?sort=top&t=week&limit=100')
-		if not msg:
-			await ctx.send("Whoops! I couldn't find a working link.")
-			return
+		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
 		# Check for nsfw - and for now, only allow admins/botadmins to post those
 		if msg['over_18']:
 			# NSFW - check admin
-			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-				for role in ctx.message.author.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if aRole['ID'] == role.id:
-							isAdmin = True
-			# Only allow admins to change server stats
-			if not isAdmin:
-				await ctx.channel.send('You do not have sufficient privileges to access nsfw subreddits.')
-				return
-
+			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
 		await Message.Message(message=mess).send(ctx)
-		#await self.bot.send_message(ctx.message.channel, msg)
-
 
 	@commands.command(pass_context=True)
 	async def dirtyjoke(self, ctx):
 		"""Let's see if reddit can be dir-... oh... uh.. funny... (bot-admin only)"""
 		# NSFW - check admin
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if aRole['ID'] == role.id:
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access nsfw subreddits.')
-			return
-		
+		if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
 		msg = await self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
-		if not msg:
-			await ctx.send("Whoops! I couldn't find a working link.")
-			return
+		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
 		await Message.Message(message=mess).send(ctx)
-		#await self.bot.send_message(ctx.message.channel, msg)
-
 	
 	@commands.command(pass_context=True)
 	async def lpt(self, ctx):
 		"""Become a pro - AT LIFE."""
 		msg = await self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
-		await ctx.channel.send(msg)
-		
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def shittylpt(self, ctx):
 		"""Your advise is bad, and you should feel bad."""
 		msg = await self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
-		await ctx.channel.send(msg)
-
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
-		await ctx.channel.send(msg)
-		
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def brainfart(self, ctx):
 		"""Spout out some uh... intellectual brilliance..."""
 		msg = await self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
-		await ctx.channel.send(msg)
-
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def nocontext(self, ctx):
 		"""Spout out some intersexual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
-		await ctx.channel.send(msg)
-		
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def withcontext(self, ctx):
 		"""Spout out some contextual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
-		await ctx.channel.send(msg)
-		
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):
 		"""Spout out some interstellar questioning... ?"""
 		infoDict = await self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
-		self.settings.setServerStat(ctx.message.guild, "LastAnswer", infoDict["url"])
+		self.settings.setServerStat(ctx.guild, "LastAnswer", infoDict["url"])
 		msg = '{}'.format(infoDict["title"])
-		await ctx.channel.send(msg)
-		
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def answer(self, ctx):
 		"""Spout out some interstellar answering... ?"""
-		answer = self.settings.getServerStat(ctx.message.guild, "LastAnswer")
-		if answer == "":
-			msg = 'You need to ask a `{}question` first!'.format(ctx.prefix)
-		else:
-			msg = '{}'.format(answer)
-		await ctx.channel.send(msg)
-
+		answer = self.settings.getServerStat(ctx.guild, "LastAnswer")
+		msg = "You need to ask a `{}question` first!".format(ctx.prefix) if not answer else "{}".format(answer)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def redditimage(self, ctx, subreddit = None):
 		"""Try to grab an image from an image-based subreddit."""
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		if not subreddit:
-			await ctx.channel.send("You need to pass a subreddit name.")
-			return
-		
+		if not self.canDisplay(ctx.guild): return
+		if not subreddit: return await ctx.send("You need to pass a subreddit name.")
 		# Grab our image title and url
 		infoDict = await self.getInfo('https://www.reddit.com/r/' + subreddit + '/top.json?sort=top&t=week&limit=100')
-		
-		if not infoDict:
-			await ctx.channel.send("Whoops! I couldn't find a working link.")
-			return
-			
+		if not infoDict: return await ctx.send("Whoops! I couldn't find a working link.")
 		# Check for nsfw - and for now, only allow admins/botadmins to post those
 		if infoDict['over_18']:
 			# NSFW - check admin
-			isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-				for role in ctx.message.author.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if aRole['ID'] == role.id:
-							isAdmin = True
-			# Only allow admins to change server stats
-			if not isAdmin:
-				await ctx.channel.send('You do not have sufficient privileges to access nsfw subreddits.')
-				return
-		
+			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
 		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 	async def _image_do(self, ctx, url):
-		if not self.canDisplay(ctx.guild):
-			return
+		if not self.canDisplay(ctx.guild): return
 		# Grab our image title and url
 		infoDict = await self.getInfo(url)
-		if not infoDict:
-			return await ctx.send("Whoops! I couldn't find a working link.")		
+		if not infoDict: return await ctx.send("Whoops! I couldn't find a working link.")		
 		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
 
 	@commands.command(pass_context=True)
