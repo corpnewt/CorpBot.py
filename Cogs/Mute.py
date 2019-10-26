@@ -459,7 +459,7 @@ class Mute(commands.Cog):
             if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
             if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
                 if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-            overs = channel.overwrites_for(mute_role) # Get any overrides for the user
+            overs = channel.overwrites_for(member) # Get any overrides for the user
             # Check if we match any of the mute overrides - and if we have any others
             if any(x[0] in ("send_messages","add_reactions","speak") and x[1] != None for x in overs):
                 muted_channels += 1
