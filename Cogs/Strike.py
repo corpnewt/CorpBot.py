@@ -56,7 +56,7 @@ class Strike(commands.Cog):
 			self.settings.setUserStat(member, server, "StrikeLevel", 3)
 			self.settings.setUserStat(member, server, "Muted", True)
 			self.settings.setUserStat(member, server, "Cooldown", None)
-			await self.mute.mute(member, server)
+			await self.mute._mute(member, server)
 
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
@@ -227,7 +227,7 @@ class Strike(commands.Cog):
 				else:
 					self.settings.setUserStat(member, ctx.message.guild, "Muted", True)
 					self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
-					await self.mute.mute(member, ctx.message.guild, cooldownFinal)
+					await self.mute._mute(member, ctx.message.guild, cooldownFinal)
 
 				await member.send(mutemessage)
 			elif strikeLevel == 1:
