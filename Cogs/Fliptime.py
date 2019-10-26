@@ -74,7 +74,7 @@ class Fliptime(commands.Cog):
 					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
 				# Do the actual muting
-				await self.mute.mute(message.author, message.guild, cooldownFinal)
+				await self.mute._mute(message.author, message.guild, cooldownFinal)
 
 				await message.channel.send(res)
 				return { 'Ignore' : True, 'Delete' : True }		
