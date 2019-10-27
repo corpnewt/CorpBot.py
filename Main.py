@@ -74,11 +74,12 @@ async def return_message():
 async def on_ready():
 	# Special workaround for the bot saying it's ready before all shards are ready.
 	# The bot seems to dispatch the ready event every 2 shards or so.
-	print(" - {} of {} ready...".format(len(bot.shards), bot.shard_count))
-	if len(bot.shards) >= bot.shard_count and not bot.ready_dispatched:
-		print("\nAll shards ready!\n")
-		bot.ready_dispatched = True
-		bot.dispatch("all_shards_ready")
+	if not bot.ready_dispatched:
+		print(" - {} of {} ready...".format(len(bot.shards), bot.shard_count))
+		if len(bot.shards) >= bot.shard_count:
+			print("\nAll shards ready!\n")
+			bot.ready_dispatched = True
+			bot.dispatch("all_shards_ready")
 
 @bot.event
 # async def on_ready():
