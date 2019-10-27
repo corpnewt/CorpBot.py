@@ -387,7 +387,7 @@ class Mute(commands.Cog):
         try: role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
         except: role = None
         mess = await ctx.send("Muting...{}".format(
-            " You can set up a mute role with `{}setmuterole [role]` or `{}createmuterole [role_name]` for a **much faster** muting experience.".format(ctx.prefix,ctx.prefix)
+            "" if role else " You can set up a mute role with `{}setmuterole [role]` or `{}createmuterole [role_name]` for a **much faster** muting experience.".format(ctx.prefix,ctx.prefix)
             ))
         # Do the actual muting
         await self._mute(member, ctx.guild, cooldownFinal)
