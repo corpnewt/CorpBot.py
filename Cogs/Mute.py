@@ -1,6 +1,6 @@
 import asyncio, discord, time, parsedatetime
 from discord.ext import commands
-from   datetime import datetime
+from datetime import datetime
 from Cogs import Utils, DisplayName, ReadableTime
 
 def setup(bot):
@@ -15,6 +15,7 @@ class Mute(commands.Cog):
         self.bot = bot
         self.settings = settings
         self.loop_list = []
+        self.mute_perms = ("send_messages","add_reactions","speak")
 
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
@@ -148,17 +149,7 @@ class Mute(commands.Cog):
             if not mute_role in member.roles: # Doesn't already have it
                 self.settings.role.add_roles(member,[mute_role])
         else: # Need to mute the old-fashioned way
-            for channel in server.channels:
-                if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-                if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                    if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-                overs = channel.overwrites_for(member)
-                # if not overs.send_messages == False:
-                if not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
-                    # We haven't been muted completely here yet
-                    overs.send_messages = overs.add_reactions = overs.speak = False
-                    try: await channel.set_permissions(member, overwrite=overs)
-                    except: pass
+            await self._sync_perms(server, member)
         # Setup our info
         self.settings.setUserStat(member, server, "Muted", True)
         self.settings.setUserStat(member, server, "Cooldown", cooldown)
@@ -184,18 +175,7 @@ class Mute(commands.Cog):
             if mute_role in member.roles: # Already have it
                 self.settings.role.rem_roles(member,[mute_role])
         # Let's walk all the channels and make sure we remove the overrides as needed
-        for channel in server.channels:
-            if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-            if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-            overs = channel.overwrites_for(member) # Get any overrides for the user
-            # Check if we match any of the mute overrides - and if we have any others
-            mute_perms  = any(x[0] in ("send_messages","add_reactions","speak") and x[1] != None for x in overs)
-            other_perms = any(x[0] not in ("send_messages","add_reactions","speak") and x[1] != None for x in overs)
-            if mute_perms: # We've been traditionally muted, unmute
-                overs.send_messages = overs.add_reactions = overs.speak = None
-                try: await channel.set_permissions(member, overwrite=overs if other_perms else None)
-                except: pass
+        await self._sync_perms(server, member, desync=True)
         # Setup and gather our info
         self.settings.setUserStat(member, server, "Muted", False)
         self.settings.setUserStat(member, server, "Cooldown", None)
@@ -205,41 +185,83 @@ class Mute(commands.Cog):
         # Save the results
         self.settings.setServerStat(server, "MuteList", muteList)
 
-    async def _desync_role(self, ctx, mute_role):
-        # Helper to desync the role based on the current context.
-        for channel in ctx.guild.channels:
+    async def _ask_perms(self, ctx, mute_role, desync=False, show_count=True):
+        # Helper that asks the user if they want to sync/desync the role perms
+        # Let's build our question:
+        question = ""
+        if show_count:
+            count = len([x for x in ctx.guild.members if mute_role in x.roles])
+            question += "**There {} currently {} member{} with {}.**\n".format(
+                "is" if count == "1" else "are",
+                count,
+                "" if count == 1 else "s",
+                Utils.suppressed(ctx,mute_role.name)
+            )
+        question += "Would you like to {}sync **{}**'s permissions? (y/n)\nThis *{}* the following permissions in all channels:\n`{}`".format(
+            "de" if desync else "",
+            Utils.suppressed(ctx,mute_role.name),
+            "enables" if desync else "disables",
+            ", ".join(self.mute_perms)
+        )
+        check_sync = await ctx.send(question)
+        def check_answer(message):
+            return message.channel == ctx.channel and message.author == ctx.author and message.content.lower() in ["y","yes","true","n","no","false"]
+        try: sync_response = await self.bot.wait_for('message', timeout=60, check=check_answer)
+        except:
+            await ctx.send("We're out of time - I'll leave the permissions untouched.")
+            return None
+        if sync_response.content.lower() in ["n","no","false"]:
+            await ctx.send("Permissions for **{}** have been left untouched.".format(Utils.suppressed(ctx,mute_role.name)))
+            return False
+        # We want to adjust perms
+        syncing_message = await ctx.send("{}yncing permissions for **{}**...".format("Des" if desync else "S", Utils.suppressed(ctx,mute_role.name)))
+        await self._sync_perms(ctx,mute_role,desync)
+        await syncing_message.edit(content="**{}** has been **{}ynced**.".format(Utils.suppressed(ctx,mute_role.name),"de" if desync else "s"))
+        return True
+
+    async def _sync_perms(self, ctx, mute_role, desync=False):
+        # Helper to sync or desync the role based on the current context.
+        guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if isinstance(ctx,discord.ext.commands.Context) else None
+        if guild is None: return # Got sent some wonky values, I guess...
+        for channel in guild.channels:
             if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
             if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
                 if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-            overs = channel.overwrites_for(mute_role) # Get any overrides for the user
-            # Check if we match any of the mute overrides - and if we have any others
-            mute_perms  = any(x[0] in ("send_messages","add_reactions","speak") and x[1] != None for x in overs)
-            other_perms = any(x[0] not in ("send_messages","add_reactions","speak") and x[1] != None for x in overs)
-            if mute_perms: # We've been traditionally muted, unmute
-                overs.send_messages = overs.add_reactions = overs.speak = None
-                try: await channel.set_permissions(mute_role, overwrite=overs if other_perms else None)
+            overs = channel.overwrites_for(mute_role) # Get any overrides for the role
+            # Check if we qualify in this channel to sync/desync
+            if desync: perm_check  = any(x[0] in self.mute_perms and x[1] != None for x in overs)
+            else: perm_check = not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)])
+            if perm_check: # We qualify - set our perms as needed
+                other_perms = any(x[0] not in self.mute_perms and x[1] != None for x in overs)
+                overs.send_messages = overs.add_reactions = overs.speak = None if desync else False
+                try: await channel.set_permissions(mute_role, overwrite=overs if other_perms or not desync else None)
                 except: pass
 
     @commands.command(pass_context=True)
     async def setmuterole(self, ctx, *, role = None):
         """Sets the target role to apply when muting.  Passing nothing will disable the mute role and remove send_messages, add_reactions, and speak overrides (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
+        if role:
+            target_role = DisplayName.roleForName(role, ctx.guild)
+            if not target_role: return await ctx.send("That role doesn't exist - you can create a new mute role with `{}createmuterole [role_name]` though.".format(ctx.prefix))
+        try: mute_role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
+        except: mute_role = None
+        await ctx.send("Current mute role: **{}**".format(Utils.suppressed(ctx,mute_role.name)) if mute_role else "Currently, there is **no mute role** setup.")
         if role == None:
-            try: mute_role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
-            except: mute_role = None
-            message = await ctx.send("Removing mute role...")
             if mute_role:
-                await message.edit(content="Syncing permissions for **{}**...".format(Utils.suppressed(ctx,mute_role.name)))
-                await self._desync_role(ctx,mute_role)
-                await message.edit(content="**{}** has been **desynced**.".format(Utils.suppressed(ctx,mute_role.name)))
+                await self._ask_perms(ctx,mute_role,desync=True,show_count=True)
             self.settings.setServerStat(ctx.guild,"MuteRole",None)
-            return await message.edit(content="Mute role **removed** - muting will now create overrides per channel!")
-        # Check that it's a real role that we passed
-        mute_role = DisplayName.roleForName(role, ctx.guild)
-        if not mute_role: return await ctx.send("That role doesn't exist - you can create a new mute role with `{}createmuterole [role_name]` though.".format(ctx.prefix))
+            return await ctx.send("Mute role **removed** - muting will now create overrides per channel!") if mute_role else None
+        if mute_role:
+            if mute_role == target_role:
+                await ctx.send("Target mute role is **the same** as the current!")
+                return await self._ask_perms(ctx,target_role,desync=False,show_count=True)
+            await self._ask_perms(ctx,mute_role,desync=True,show_count=True)
         # Got a mute role - let's set the id
-        self.settings.setServerStat(ctx.guild,"MuteRole",mute_role.id)
-        await ctx.send("The muted role has been set to **{}**!".format(Utils.suppressed(ctx,mute_role.name)))
+        await ctx.send("Target mute role: **{}**".format(Utils.suppressed(ctx,target_role.name)))
+        self.settings.setServerStat(ctx.guild,"MuteRole",target_role.id)
+        await self._ask_perms(ctx,target_role,desync=False,show_count=True)
+        await ctx.send("The mute role has been set to **{}**!".format(Utils.suppressed(ctx,target_role.name)))
 
     @commands.command(pass_context=True)
     async def muterole(self, ctx):
@@ -260,7 +282,7 @@ class Mute(commands.Cog):
         mute_role = DisplayName.roleForName(role_name, ctx.guild)
         if mute_role: # Already exists - let's update the settings
             self.settings.setServerStat(ctx.guild,"MuteRole",mute_role.id)
-            return await ctx.send("The muted role has been set to the __existing__ **{}** role!".format(Utils.suppressed(ctx,mute_role.name)))
+            return await ctx.send("The mute role has been set to the __existing__ **{}** role!".format(Utils.suppressed(ctx,mute_role.name)))
         # Create a role with the proper overrides
         message = await ctx.send("Creating **{}** role...".format(Utils.suppressed(ctx,role_name)))
         try: mute_role = await ctx.guild.create_role(name=role_name,reason="Mute role created by {}#{}".format(ctx.author.name,ctx.author.discriminator))
@@ -272,7 +294,6 @@ class Mute(commands.Cog):
             if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
                 if channel.permissions_synced: channel = channel.category # Get the category if we're synced
             overs = channel.overwrites_for(mute_role)
-            # if not overs.send_messages == False:
             if not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
                 # We haven't been muted completely here yet
                 overs.send_messages = overs.add_reactions = overs.speak = False
@@ -299,7 +320,6 @@ class Mute(commands.Cog):
             if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
                 if channel.permissions_synced: channel = channel.category # Get the category if we're synced
             overs = channel.overwrites_for(mute_role)
-            # if not overs.send_messages == False:
             if not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
                 # We haven't been muted completely here yet
                 overs.send_messages = overs.add_reactions = overs.speak = False
@@ -319,7 +339,7 @@ class Mute(commands.Cog):
         if not mute_role: return await ctx.send("The prior mute role (ID: `{}`) no longer exists.  You can set one with `{}setmuterole [role]` - or have me create one with `{}createmuterole [role_name]`".format(role,ctx.prefix,ctx.prefix))
         # Have a valid mute role here - let's desync our perms
         message = await ctx.send("Syncing permissions for **{}**...".format(Utils.suppressed(ctx,mute_role.name)))
-        await self._desync_role(ctx,mute_role)
+        await self._sync_perms(ctx,mute_role)
         await message.edit(content="**{}** has been **desynced**.  It will **__no longer work__** for muting!".format(Utils.suppressed(ctx,mute_role.name)))
 
     @commands.command(pass_context=True)
@@ -461,7 +481,7 @@ class Mute(commands.Cog):
                 if channel.permissions_synced: channel = channel.category # Get the category if we're synced
             overs = channel.overwrites_for(member) # Get any overrides for the user
             # Check if we match any of the mute overrides - and if we have any others
-            if any(x[0] in ("send_messages","add_reactions","speak") and x[1] != None for x in overs):
+            if any(x[0] in self.mute_perms and x[1] != None for x in overs):
                 muted_channels += 1
         # Tell the user if the target is muted
         if muted_channels:
