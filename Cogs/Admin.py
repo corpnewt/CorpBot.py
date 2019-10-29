@@ -925,7 +925,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "Rules", rules)
 		msg = 'Rules now set to:\n{}'.format(rules)
 		
-		await ctx.message.channel.send(msg)
+		await ctx.message.channel.send(Utils.suppressed(ctx,msg))
 		
 		
 	@commands.command(pass_context=True)
