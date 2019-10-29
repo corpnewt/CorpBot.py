@@ -37,8 +37,8 @@ class Channel(commands.Cog):
 	async def rules(self, ctx):
 		"""Display the server's rules."""
 		rules = self.settings.getServerStat(ctx.guild, "Rules")
-		msg = "*{}* Rules:\n{}".format(Utils.suppressed(ctx, ctx.guild.name), rules)
-		await ctx.send(msg)
+		msg = "*{}* Rules:\n{}".format(ctx.guild.name, rules)
+		await ctx.send(Utils.suppressed(ctx,msg))
 
 
 	@commands.command(pass_context=True)
