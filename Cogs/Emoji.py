@@ -19,7 +19,8 @@ class Emoji(commands.Cog):
         if len(emoji) < 3:
             # Try to get just the unicode
             h = "-".join([hex(ord(x)).lower()[2:] for x in emoji])
-            url = "https://raw.githubusercontent.com/twitter/twemoji/gh-pages/2/72x72/{}.png".format(h)
+            # url = "https://raw.githubusercontent.com/twitter/twemoji/gh-pages/2/72x72/{}.png".format(h)
+            url = "https://github.com/twitter/twemoji/raw/master/assets/72x72/{}.png".format(h)
             f = await GetImage.download(url)
             if not f:
                 await ctx.send("I couldn't get that emoji :(")
