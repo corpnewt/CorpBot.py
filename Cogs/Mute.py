@@ -315,16 +315,7 @@ class Mute(commands.Cog):
         if not mute_role: return await ctx.send("The prior mute role (ID: `{}`) no longer exists.  You can set one with `{}setmuterole [role]` - or have me create one with `{}createmuterole [role_name]`".format(role,ctx.prefix,ctx.prefix))
         # Have a valid mute role here - let's sync the perms
         message = await ctx.send("Syncing permissions for **{}**...".format(Utils.suppressed(ctx,mute_role.name)))
-        for channel in ctx.guild.channels:
-            if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-            if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-            overs = channel.overwrites_for(mute_role)
-            if not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
-                # We haven't been muted completely here yet
-                overs.send_messages = overs.add_reactions = overs.speak = False
-                try: await channel.set_permissions(mute_role, overwrite=overs)
-                except: pass
+        await self._sync_perms(ctx,mute_role)
         await message.edit(content="**{}** has been synced for muting.".format(Utils.suppressed(ctx,mute_role.name)))
 
     @commands.command(pass_context=True)
@@ -339,7 +330,7 @@ class Mute(commands.Cog):
         if not mute_role: return await ctx.send("The prior mute role (ID: `{}`) no longer exists.  You can set one with `{}setmuterole [role]` - or have me create one with `{}createmuterole [role_name]`".format(role,ctx.prefix,ctx.prefix))
         # Have a valid mute role here - let's desync our perms
         message = await ctx.send("Syncing permissions for **{}**...".format(Utils.suppressed(ctx,mute_role.name)))
-        await self._sync_perms(ctx,mute_role)
+        await self._sync_perms(ctx,mute_role,True)
         await message.edit(content="**{}** has been **desynced**.  It will **__no longer work__** for muting!".format(Utils.suppressed(ctx,mute_role.name)))
 
     @commands.command(pass_context=True)
