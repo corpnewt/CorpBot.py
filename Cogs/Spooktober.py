@@ -19,7 +19,7 @@ class Spooktober(commands.Cog):
 				# We have this turned off - bail
 				return
 			# it is the day of ultimate sp00p, sp00p all the messages
-			if "spook" in message.content.lower():
+			if any(x.lower() in message.content.lower() for x in ("spook","sp00p")):
 				await message.add_reaction("🎃")
 	
 	@commands.command(pass_context=True)
