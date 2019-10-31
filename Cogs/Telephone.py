@@ -493,8 +493,7 @@ class Telephone(commands.Cog):
 		# Ring!
 		try:
 			await self._ring(caller, target, hidden, dial_hide)
-		except Exception as e:
-			print(e)
+		except:
 			# Something went wrong - hang up and inform both parties that the call was disconnected
 			self._hangup(caller)
 			caller = self._gettelechannel(caller)
