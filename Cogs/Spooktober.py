@@ -25,6 +25,6 @@ class Spooktober(commands.Cog):
 	
 	@commands.command(pass_context=True)
 	async def spooking(self, ctx, *, yes_no = None):
-		"""Enables/Disables reacting 🎃 to every sp00py message on Halloween (bot-admin only)."""
+		"""Enables/Disables reacting 🎃 to every sp00py message on Halloween (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Spooking","Spooking",yes_no,is_global=True))
