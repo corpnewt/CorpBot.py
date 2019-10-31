@@ -69,13 +69,13 @@ async def is_bot_admin_reply(ctx,member=None,message="You do not have sufficient
 	if are_we == message_when: await ctx.send(message)
 	return are_we
 
-def yes_no_setting(ctx,display_name,setting_name,yes_no=None,is_global=False):
+def yes_no_setting(ctx,display_name,setting_name,yes_no=None,default=None,is_global=False):
 	# Get or set a true/false value and return the resulting message
 	guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if isinstance(ctx,discord.ext.commands.Context) else None
 	if not guild: return "I can't get a guild from here :("
 	settings = bot.get_cog("Settings")
 	if not settings: return "Something is wrong with my settings module :("
-	current = settings.getGlobalStat(setting_name) if is_global else settings.getServerStat(guild, setting_name)
+	current = settings.getGlobalStat(setting_name, default) if is_global else settings.getServerStat(guild, setting_name, default)
 	if yes_no == None:
 		# Output what we have
 		return "{} currently *{}*.".format(display_name,"enabled" if current else "disabled")
