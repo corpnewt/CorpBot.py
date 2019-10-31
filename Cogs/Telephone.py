@@ -1,6 +1,6 @@
 import asyncio, discord, re, os, random
 from discord.ext import commands
-from Cogs import Settings, DisplayName, Nullify, FuzzySearch, PickList, Message
+from Cogs import Utils, DisplayName, Nullify, FuzzySearch, PickList, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -128,6 +128,12 @@ class Telephone(commands.Cog):
 		for call in self.switchboard:
 			if caller in call["Members"]:
 				self.switchboard.remove(call)
+
+	@commands.command(pass_context=True)
+	async def teleblocklinks(self, ctx, *, yes_no = None):
+		"""Enables/Disables removing links sent over telephone calls (owner only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Block telephone links","TeleBlockLinks",yes_no,default=True))
 
 	@commands.command(pass_context=True)
 	async def phonebook(self, ctx, *, look_up = None):
@@ -487,7 +493,8 @@ class Telephone(commands.Cog):
 		# Ring!
 		try:
 			await self._ring(caller, target, hidden, dial_hide)
-		except:
+		except Exception as e:
+			print(e)
 			# Something went wrong - hang up and inform both parties that the call was disconnected
 			self._hangup(caller)
 			caller = self._gettelechannel(caller)
@@ -626,13 +633,15 @@ class Telephone(commands.Cog):
 				talk_msg = talk.content # Nullify.clean(talk.content)
 				# Let's make sure we strip links out - and nullify discord.gg links to patch a spam loophole
 				# Create a set of all matches (to avoid duplicates in case of spam)
-				matches = [x.group(0) for x in re.finditer(self.regex, talk_msg)]
-				dmatches = [x.group(0) for x in re.finditer(self.dregex, talk_msg)]
-				matches.extend(dmatches)
-				matches = set(matches)
-				# Now we iterate that list and replace all links with `link removed`
-				for x in matches:
-					talk_msg = talk_msg.replace(x,"`link removed`")
+				if self.settings.getServerStat(receiver if talk.channel==caller_chan else caller,"TeleBlockLinks",True):
+					# Remove links only if the target channel chooses to
+					matches = [x.group(0) for x in re.finditer(self.regex, talk_msg)]
+					dmatches = [x.group(0) for x in re.finditer(self.dregex, talk_msg)]
+					matches.extend(dmatches)
+					matches = set(matches)
+					# Now we iterate that list and replace all links with `link removed`
+					for x in matches:
+						talk_msg = talk_msg.replace(x,"`link removed`")
 				# Clean out mentions from the message
 				talk_msg = DisplayName.clean_message(talk_msg, bot=self.bot, server=talk.guild)
 				# Must be conversation
