@@ -54,7 +54,7 @@ class Quote(commands.Cog):
 				# and someone already quoted
 				return
 			# Check for admin/bot-admin
-			if not Utils.is_admin(ctx,member=member):
+			if not Utils.is_bot_admin(ctx,member=member):
 				# We ARE worried about admin - and we're not admin... skip
 				return
 			# Iterate through those that reacted and see if any are admin
@@ -62,13 +62,13 @@ class Quote(commands.Cog):
 			for r_user in r_users:
 				if r_user == member:
 					continue
-				if Utils.is_admin(ctx,member=r_user):
+				if Utils.is_bot_admin(ctx,member=r_user):
 					# An admin already quoted - skip
 					return
 		else:
 			# This is the first reaction
 			# Check for admin/bot-admin
-			if r_admin and not Utils.is_admin(ctx,member=member):
+			if r_admin and not Utils.is_bot_admin(ctx,member=member):
 				return
 
 		r_channel = member.guild.get_channel(int(r_channel))
