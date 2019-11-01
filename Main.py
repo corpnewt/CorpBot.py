@@ -45,8 +45,8 @@ async def get_prefix(bot, message):
 # bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
 # Let's SHARD!
 bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
-# bot = discord.AutoShardedClient(command_previs=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
-bot.settings_dict = settings_dict
+bot.settings_dict    = settings_dict
+bot.ready_dispatched = False
 
 async def return_message():
 	# Set the settings var up
@@ -72,6 +72,18 @@ async def return_message():
 # Main bot events
 @bot.event
 async def on_ready():
+	# Special workaround for the bot saying it's ready before all shards are ready.
+	# The bot seems to dispatch the ready event every 2 shards or so.
+	if not bot.ready_dispatched:
+		print(" - {} of {} ready...".format(len(bot.shards), bot.shard_count))
+		if len(bot.shards) >= bot.shard_count:
+			print("\nAll shards ready!\n")
+			bot.ready_dispatched = True
+			bot.dispatch("all_shards_ready")
+
+@bot.event
+# async def on_ready():
+async def on_all_shards_ready():
 	if not bot.get_cog("CogManager"):
 		# We need to load shiz!
 		print('Logged in as:\n{0} (ID: {0.id})\n'.format(bot.user))
@@ -370,4 +382,5 @@ async def on_message_edit(before, message):
 		await message.delete()
 
 # Run the bot
+print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count == 1 else "s"))
 bot.run(settings_dict.get("token",""))

@@ -1,11 +1,6 @@
-import asyncio
-import discord
-import random, re, json, os, tempfile
-from   collections import deque
+import asyncio, discord, random, re, json, os, tempfile
 from   discord.ext import commands
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import DL
+from   Cogs import Utils, DisplayName, DL
 
 def setup(bot):
 	# Add the bot
@@ -57,27 +52,17 @@ class SecretSanta(commands.Cog):
 		if not path == None and os.path.exists(path):
 			shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
-	def is_bot_admin(self, ctx):
-		# Verify perms - bot-admin
-		if not ctx.author.permissions_in(ctx.channel).administrator:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray", [])
-			if not any(x for x in checkAdmin for y in ctx.author.roles if str(y.id) == str(x["ID"])):
-				return False
-		return True
-
 	async def _channel_message(self, ctx, member):
 		# Sends the welcome message when a new Secret Santa channel is created for a user
 		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		message = self.settings.getServerStat(ctx.guild, "SSMessage")
 		if message == None:
-			return
+			return None
 		# Let's regex and replace [[user]] [[atuser]] and [[server]]
 		message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
 		message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
 		message = re.sub(self.regexServer,   "{}".format(ctx.guild.name), message)
-		if suppress:
-			message = Nullify.clean(message)
-		await ctx.send(message)
+		return await ctx.send(Utils.suppressed(ctx,message))
 
 	@commands.command()
 	async def setssrole(self, ctx, *, role = None):
@@ -87,14 +72,11 @@ class SecretSanta(commands.Cog):
 		# Check if we're suppressing @here and @everyone mentions
 		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# Verify perms - bot-admin
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if role == None:
 			self.settings.setServerStat(ctx.guild, "SSRole", "")
 			msg = 'Secret Santa role has been *removed*.'
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 		if type(role) is str:
 			if role == "everyone":
 				role = "@everyone"
@@ -102,18 +84,11 @@ class SecretSanta(commands.Cog):
 			role = DisplayName.roleForName(roleName, ctx.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
-				await ctx.send(msg)
-				return
+				return await ctx.send(Utils.suppressed(ctx,msg))
 		# If we made it this far - then we can add it
 		self.settings.setServerStat(ctx.guild, "SSRole", role.id)
 		msg = 'Secret Santa role has been set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.send(msg)
+		return await ctx.send(Utils.suppressed(ctx,msg))
 
 	@commands.command()
 	async def getssrole(self, ctx):
@@ -125,37 +100,28 @@ class SecretSanta(commands.Cog):
 		# See if we have the setting set at all
 		role = self.settings.getServerStat(ctx.guild,"SSRole","")
 		if role in [None,""]:
-			await ctx.send("There is no Secret Santa role set. You can set it with the `{}setssrole [role]` command.".format(ctx.prefix))
-			return
+			return await ctx.send("There is no Secret Santa role set. You can set it with the `{}setssrole [role]` command.".format(ctx.prefix))
 		# Role is set - let's get its name
 		found = False
 		vowels = "aeiou"
 		arole = next((x for x in ctx.guild.roles if str(x.id) == str(role)),None)
-		if arole:
-			if arole.name[:1].lower() in vowels:
-				msg = 'You need to be an **{}** to participate in Secret Santa.'.format(arole.name)
-			else:
-				msg = 'You need to be a **{}** to participate in Secret Santa.'.format(arole.name)
+		if not arole:
+			return await ctx.send("There is no role that matches id: `{}`. You can change this with the `{}setssrole [role]` command.".format(role,ctx.prefix))
+		if arole.name[:1].lower() in vowels:
+			msg = 'You need to be an **{}** to participate in Secret Santa.'.format(arole.name)
 		else:
-			msg = await ctx.send("There is no role that matches id: `{}`. You can change this with the `{}setssrole [role]` command.".format(role,ctx.prefix))
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.send(msg)
+			msg = 'You need to be a **{}** to participate in Secret Santa.'.format(arole.name)
+		return await ctx.send(Utils.suppressed(ctx,msg))
 
 	@commands.command()
 	async def sscreatechannels(self, ctx, *, category = None):
 		"""Creates the private channels for all users with the Secret Santa role under the supplied category (bot-admin only)."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		# Verify perms - bot-admin
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		# Check if our category exists - if not, create it
 		if not category:
-			await ctx.send('You must supply a category for the Secret Santa channels.')
-			return
+			return await ctx.send('You must supply a category for the Secret Santa channels.')
 		category_name = category # Save for later
 		category = DisplayName.channelForName(category_name,ctx.guild,"category")
 		if not category:
@@ -165,23 +131,18 @@ class SecretSanta(commands.Cog):
 		# Make sure we even have a role setup and that it's valid
 		role = self.settings.getServerStat(ctx.guild,"SSRole","")
 		if role in [None,""]:
-			await ctx.send("There is no Secret Santa role set. You can set it with the `{}setssrole [role]` command.".format(ctx.prefix))
-			return
+			return await ctx.send("There is no Secret Santa role set. You can set it with the `{}setssrole [role]` command.".format(ctx.prefix))
 		# Verify it corresponds to a real role
 		arole = next((x for x in ctx.guild.roles if str(x.id) == str(role)),None)
 		if not arole:
-			await ctx.send("There is no role that matches id: `{}`. You can change this with the `{}setssrole [role]` command.".format(role,ctx.prefix))
-			return
+			return await ctx.send("There is no role that matches id: `{}`. You can change this with the `{}setssrole [role]` command.".format(role,ctx.prefix))
 		# We have a clean slate - let's get a list of non-bot users with the SSRole
 		participants = [x for x in ctx.guild.members if not x.bot and arole in x.roles]
 		# Verify we have a minimum of 3 participants - otherwise we can't randomize
 		if len(participants) < 3:
 			# No one has the role, it seems.
 			msg = "Not enough users are participating in the Secret Santa drawing - 3 or more need the **{}** role to participate.".format(arole.name)
-			if suppress:
-				msg = Nullify.clean(msg)
-			await ctx.send(msg)
-			return
+			return await ctx.send(Utils.suppressed(ctx,msg))
 		m = await ctx.send("Iterating and adding Secret Santa channels...")
 		# We now have a clean slate, valid role, and enough particpiants - let's create the channels
 		channels = 0
@@ -201,17 +162,12 @@ class SecretSanta(commands.Cog):
 		"""Removes all Secret Santa channels under a given category whose names correspond to active user's id (bot-admin only)."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		# Verify perms - bot-admin
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if not category:
-			await ctx.send('You must supply the category for the Secret Santa channels.')
-			return
+			return await ctx.send('You must supply the category for the Secret Santa channels.')
 		category = DisplayName.channelForName(category,ctx.guild,"category")
 		if not category:
-			await ctx.send("I couldn't locate that category...")
-			return
+			return await ctx.send("I couldn't locate that category...")
 		m = await ctx.send("Iterating and removing Secret Santa channels...")
 		channels_total   = len(category.channels)
 		channels_removed = 0
@@ -257,16 +213,12 @@ class SecretSanta(commands.Cog):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
 		# We need to make sure that we have channels setup, they're all valid, and the correspond to existing users with
 		# the SSRole
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if not category:
-			await ctx.send('You must supply the category for the Secret Santa channels.')
-			return
+			return await ctx.send('You must supply the category for the Secret Santa channels.')
 		category = DisplayName.channelForName(category,ctx.guild,"category")
 		if not category:
-			await ctx.send("I couldn't locate that category...")
-			return
+			return await ctx.send("I couldn't locate that category...")
 		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# Get our users by resolving the text channel names to user ids, then shuffle
 		m = await ctx.send("Gathering and shuffling participants...")
@@ -313,34 +265,27 @@ class SecretSanta(commands.Cog):
 		"""Applies the passed ss.json file's settings and gives the Secret Santa channels to the target with read-only perms (bot-admin only).  Accepts a url - or picks the first attachment."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}ssapplyreport [url or attachment]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}ssapplyreport [url or attachment]`".format(ctx.prefix))
 		if url == None:
 			url = ctx.message.attachments[0].url
 		message = await ctx.send("Downloading...")
 		path = await self.download(url)
 		if not path:
-			await message.edit(content="I guess I couldn't get that json document...  Make sure you're passing a valid url or attachment.")
-			return
+			return await message.edit(content="I guess I couldn't get that json document...  Make sure you're passing a valid url or attachment.")
 		# Load the actual data
 		await message.edit(content="Loading json data...")
 		try:
 			data = json.load(open(path))
 		except Exception as e:
-			await message.edit(content="Incorrectly formatted json.\n{}".format(str(e)))
-			return
+			return await message.edit(content="Incorrectly formatted json.\n{}".format(str(e)))
 		# Verify it's a dict
 		if not isinstance(data, dict) or not "category" in data or not "swaps" in data:
-			await message.edit(content="Incorrectly organized json data.")
-			return
+			return await message.edit(content="Incorrectly organized json data.")
 		# Get our category from it
 		if not data.get("category",{}).get("id",None):
-			await message.edit(content="Incorrectly organized json data.")
-			return
+			return await message.edit(content="Incorrectly organized json data.")
 		category = None
 		try:
 			cat_id = int(data["category"]["id"])
@@ -349,8 +294,7 @@ class SecretSanta(commands.Cog):
 			pass
 		category = ctx.guild.get_channel(cat_id)
 		if not category or not isinstance(category, discord.CategoryChannel):
-			await message.edit(content="Incorrectly organized json data.")
-			return
+			return await message.edit(content="Incorrectly organized json data.")
 		swap_list = data["swaps"]
 		# Build a list of all the needed data
 		resolved = []
@@ -361,11 +305,9 @@ class SecretSanta(commands.Cog):
 				from_user = ctx.guild.get_member(x["from_id"])
 				channel = next((x for x in category.text_channels if x.name == str(to_user.id)),None)
 			except:
-				await message.edit(content="There were errors merging the data.  Please review the report for errors.")
-				return
+				return await message.edit(content="There were errors merging the data.  Please review the report for errors.")
 			if not all([to_user, from_user, channel]):
-				await message.edit(content="There were errors merging the data.  Please review the report for errors.")
-				return
+				return await message.edit(content="There were errors merging the data.  Please review the report for errors.")
 			# Add them to the array
 			resolved.append({"to":to_user,"from":from_user,"chan":channel})
 		# Iterate through the resolved list and apply the changes
@@ -382,18 +324,13 @@ class SecretSanta(commands.Cog):
 		"""Returns ownership of the Secret Santa channels to their original owners if found (bot-admin only)."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		# Verify perms - bot-admin
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		# Check if our category exists - if not, create it
 		if not category:
-			await ctx.send('You must supply a category for the Secret Santa channels.')
-			return
+			return await ctx.send('You must supply a category for the Secret Santa channels.')
 		category = DisplayName.channelForName(category,ctx.guild,"category")
 		if not category:
-			await ctx.send("I couldn't locate that category...")
-			return
+			return await ctx.send("I couldn't locate that category...")
 		m = await ctx.send("Iterating and removing Secret Santa channels...")
 		channels_total    = len(category.channels)
 		channels_reverted = 0
@@ -439,15 +376,12 @@ class SecretSanta(commands.Cog):
 		[[server]] = server name"""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		if message == None:
 			self.settings.setServerStat(ctx.guild, "SSMessage", None)
-			await ctx.send('Secret Santa channel create message removed!')
-			return
+			return await ctx.send('Secret Santa channel create message removed!')
 		self.settings.setServerStat(ctx.guild, "SSMessage", message)
-		await ctx.channel.send('Secret Santa channel create message updated!\n\nHere\'s a preview:')
+		await ctx.send('Secret Santa channel create message updated!\n\nHere\'s a preview:')
 		await self._channel_message(ctx,ctx.author)
 
 	@commands.command()
@@ -455,13 +389,10 @@ class SecretSanta(commands.Cog):
 		"""Prints the raw markdown for the Secret Santa channel create message (bot-admin only)."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		message = self.settings.getServerStat(ctx.guild, "SSMessage", None)
 		if message in [None,""]:
-			await ctx.channel.send('Secret Santa channel create message not setup.  You can do so with the `{}setssmessage [message]` command.'.format(ctx.prefix))
-			return
+			return await ctx.send('Secret Santa channel create message not setup.  You can do so with the `{}setssmessage [message]` command.'.format(ctx.prefix))
 		# Escape the markdown
 		message = discord.utils.escape_markdown(message)
 		await ctx.send(message)
@@ -471,40 +402,14 @@ class SecretSanta(commands.Cog):
 		"""Prints the current Secret Santa channel create message (bot-admin only)."""
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
-		if not self.is_bot_admin(ctx):
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		message = self.settings.getServerStat(ctx.guild, "SSMessage", None)
 		if message in [None,""]:
-			await ctx.channel.send('Secret Santa channel create message not setup.  You can do so with the `{}setssmessage [message]` command.'.format(ctx.prefix))
-			return
+			return await ctx.send('Secret Santa channel create message not setup.  You can do so with the `{}setssmessage [message]` command.'.format(ctx.prefix))
 		await self._channel_message(ctx,ctx.author)
 
 	@commands.command()
 	async def allowss(self, ctx, *, yes_no = None):
 		"""Sets whether the Secret Santa module is enabled (owner only; always off by default)."""
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return await ctx.send('I have not been claimed, *yet*.')
-		elif isOwner == False:
-			return await ctx.send('You are not the *true* owner of me.  Only the rightful owner can use this command.')
-
-		setting_name = "Secret Santa"
-		setting_val  = "SSAllowed"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			msg = "{} currently *enabled.*".format(setting_name) if current else "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			msg = '{} remains *enabled*.'.format(setting_name) if current == True else '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			msg = '{} remains *disabled*.'.format(setting_name) if current == False else '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_owner_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Secret Santa","SSAllowed",yes_no))

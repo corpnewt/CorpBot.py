@@ -1,15 +1,7 @@
-import asyncio
-import discord
-import time
-import argparse
-import json
-from   operator import itemgetter
+import asyncio, discord, time, json
+from   discord.errors import HTTPException
 from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import PCPP
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import Message
+from   Cogs import Utils, ReadableTime, PCPP, DisplayName, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -26,22 +18,15 @@ class Hw(commands.Cog):
 		self.settings = settings
 		self.hwactive = {}
 		self.charset = "0123456789"
-		
+
 		# Something stupid that no one would ever actually use...
 		self.embedPrefix = "^^&&^^&&"
+
 
 	def gen_id(self):
 		# Just use the current time as that shouldn't ever be the same (unless a user
 		# manages to do this twice in < 1 second)
 		return str(time.time())
-
-	def checkSuppress(self, ctx):
-		if not ctx.guild:
-			return False
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
-			return True
-		else:
-			return False
 
 	@commands.command(pass_context=True)
 	async def cancelhw(self, ctx):
@@ -60,81 +45,53 @@ class Hw(commands.Cog):
 	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets the channel for hardware (admin only)."""
 		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if channel == None:
-			self.settings.setServerStat(ctx.message.guild, "HardwareChannel", "")
+			self.settings.setServerStat(ctx.guild, "HardwareChannel", "")
 			msg = 'Hardware works *only* in pm now.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		# If we made it this far - then we can add it
-		self.settings.setServerStat(ctx.message.guild, "HardwareChannel", channel.id)
+		self.settings.setServerStat(ctx.guild, "HardwareChannel", channel.id)
 
 		msg = 'Hardware channel set to **{}**.'.format(channel.name)
-		await ctx.channel.send(msg)
+		await ctx.send(Utils.suppressed(ctx,msg))
 	
 	@sethwchannel.error
 	async def sethwchannel_error(self, error, ctx):
 		# do stuff
 		msg = 'sethwchannel Error: {}'.format(error)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def pcpp(self, ctx, url = None, style = None, escape = None):
 		"""Convert a pcpartpicker.com link into markdown parts. Available styles: normal, md, mdblock, bold, and bolditalic."""
 		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not style:
 			style = 'normal'
-		
 		if not url:
-			await ctx.channel.send(usage)
-			return
-
+			return await ctx.send(usage)
 		if escape == None:
 			escape = 'no'
-		escape = escape.lower()
-
-		if escape == 'yes' or escape == 'true' or escape == 'on':
-			escape = True
-		else:
-			escape = False
+		escape = escape.lower() in ["yes","true","on","enable","enabled"]
 		
 		output = await PCPP.getMarkdown(url, style, escape)
 		if not output:
 			msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 		if len(output) > 2000:
 			msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
 			msg += '\nMaybe see if you can prune up that list a bit and try again?'
-			await ctx.channel.send(msg)
-			return
-
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(output)
-		await ctx.channel.send(output)
-
+			return await ctx.send(msg)
+		await ctx.send(Utils.suppressed(ctx,output))
 
 	@commands.command(pass_context=True)
 	async def mainhw(self, ctx, *, build = None):
 		"""Sets a new main build from your build list."""
 
 		if not build:
-			await ctx.channel.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
@@ -159,10 +116,7 @@ class Hw(commands.Cog):
 					b['Main'] = False
 			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(Utils.suppressed(ctx,msg))
 				
 		try:
 			build = int(build)-1
@@ -180,13 +134,10 @@ class Hw(commands.Cog):
 					b['Main'] = False
 			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(Utils.suppressed(ctx,msg))
 
 		msg = "I couldn't find that build or number."
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 	
 	@commands.command(pass_context=True)
@@ -194,8 +145,7 @@ class Hw(commands.Cog):
 		"""Removes a build from your build list."""
 
 		if not build:
-			await ctx.channel.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
@@ -211,10 +161,7 @@ class Hw(commands.Cog):
 					buildList[0]['Main'] = True
 				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
-				if self.checkSuppress(ctx):
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(Utils.suppressed(ctx,msg))
 		try:
 			build = int(build)-1
 			if build >= 0 and build < len(buildList):
@@ -223,15 +170,12 @@ class Hw(commands.Cog):
 					buildList[0]['Main'] = True
 				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
-				if self.checkSuppress(ctx):
-					msg = Nullify.clean(msg)
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(Utils.suppressed(ctx,msg))
 		except:
 			pass
 
 		msg = "I couldn't find that build or number."
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -248,8 +192,8 @@ class Hw(commands.Cog):
 					for chan in ctx.guild.channels:
 						if str(chan.id) == str(hwChannel):
 							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-					await ctx.channel.send(msg)
-					return
+							break
+					return await ctx.send(Utils.suppressed(ctx,msg))
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
 		if not hwChannel:
@@ -258,8 +202,7 @@ class Hw(commands.Cog):
 
 		# Make sure we're not already in a parts transaction
 		if str(ctx.author.id) in self.hwactive:
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
-			return
+			return await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
@@ -267,8 +210,7 @@ class Hw(commands.Cog):
 		if not len(buildList):
 			# No parts!
 			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
@@ -297,26 +239,22 @@ class Hw(commands.Cog):
 
 		if not mainBuild:
 			msg = "I couldn't find that build or number."
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		# Set our HWActive flag
 		hw_id = self.gen_id()
 		self.hwactive[str(ctx.author.id)] = hw_id
 
 		# Here, we have a build
-		bname = mainBuild['Name']
-		bparts = mainBuild['Hardware']
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
-			bparts = Nullify.clean(bparts)
+		bname = Utils.suppressed(ctx,mainBuild['Name'])
+		bparts = Utils.suppressed(ctx,mainBuild['Hardware'])		
 
 		isEmbed = False
 
 		# Check if it's an embed to change inital msg and launch embed editer
-		if mainBuild["Hardware"].startswith(self.embedPrefix):
+		if bparts.startswith(self.embedPrefix):
 			isEmbed = True
-		
+
 		msg = ""
 
 		# Embed already contains title, just say we're retrieving parts
@@ -324,7 +262,7 @@ class Hw(commands.Cog):
 			msg = "Retrieving parts..."
 		else:
 			msg = '__**{}\'s current parts:**__'.format(bname)
-		
+
 		try:
 			await hwChannel.send(msg)
 		except:
@@ -336,7 +274,7 @@ class Hw(commands.Cog):
 			return
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
-
+		
 		if isEmbed:
 			mainBuild = await self.getEmbeddedHardware(hw_id, ctx, hwChannel, mainBuild, bname)
 		else:
@@ -367,7 +305,7 @@ class Hw(commands.Cog):
 					for chan in ctx.guild.channels:
 						if str(chan.id) == str(hwChannel):
 							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-					await ctx.channel.send(msg)
+					await ctx.send(msg)
 					return
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
@@ -386,7 +324,7 @@ class Hw(commands.Cog):
 		if not len(buildList):
 			# No parts!
 			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
-			await ctx.channel.send(msg)
+			await ctx.send(msg)
 			return
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
@@ -416,7 +354,7 @@ class Hw(commands.Cog):
 
 		if not mainBuild:
 			msg = "I couldn't find that build or number."
-			await ctx.channel.send(msg)
+			await ctx.send(msg)
 			return
 
 		# Set our HWActive flag
@@ -428,9 +366,7 @@ class Hw(commands.Cog):
 			await ctx.message.add_reaction("📬")
 
 		# Here, we have a build
-		bname = mainBuild['Name']
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
+		bname = Utils.suppressed(ctx,mainBuild['Name'])
 
 		msg = 'Alright, *{}*, what do you want to rename "{}" to?'.format(DisplayName.name(ctx.author), bname)
 		while True:
@@ -458,9 +394,7 @@ class Hw(commands.Cog):
 				# Flush settings to all servers
 				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
 				break
-		bname2 = buildName.content
-		if self.checkSuppress(ctx):
-			bname2 = Nullify.clean(bname2)
+		bname2 = Utils.suppressed(ctx,buildName.content)
 		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
@@ -471,7 +405,7 @@ class Hw(commands.Cog):
 		"""Searches the user's hardware for a specific search term."""
 		if not user:
 			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
-			await ctx.channel.send(usage)
+			await ctx.send(usage)
 			return
 	
 		# Let's check for username and search term
@@ -495,8 +429,7 @@ class Hw(commands.Cog):
 				# Got a member - let's check the remainder length, and search!
 				if len(buildStr) < 3:
 					usage = "Search term must be at least 3 characters."
-					await ctx.channel.send(usage)
-					return
+					return await ctx.send(usage)
 				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
 				if buildList == None:
 					buildList = []
@@ -521,18 +454,14 @@ class Hw(commands.Cog):
 					buildStr    = None
 		if memFromName and len(foundStr):
 			# We're in business
-			if self.checkSuppress(ctx):
-				foundStr = Nullify.clean(foundStr)
-			await Message.Message(message=foundStr).send(ctx)
-			return
+			return await Message.Message(message=Utils.suppressed(ctx,foundStr)).send(ctx)
 
 		# If we're here - then we didn't find a member - set it to the author, and run another quick search
 		buildStr  = user
 
 		if len(buildStr) < 3:
 			usage = "Search term must be at least 3 characters."
-			await ctx.channel.send(usage)
-			return
+			return await ctx.send(usage)
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
 		if buildList == None:
@@ -554,9 +483,7 @@ class Hw(commands.Cog):
 		else:
 			foundStr = 'Nothing found for "{}".'.format(buildStr)
 			# Nothing found...
-		if self.checkSuppress(ctx):
-			foundStr = Nullify.clean(foundStr)
-		await Message.Message(message=foundStr).send(ctx)
+		await Message.Message(message=Utils.suppressed(ctx,foundStr)).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -564,7 +491,6 @@ class Hw(commands.Cog):
 		"""Lists the hardware for either the user's default build - or the passed build."""
 		if not user:
 			user = "{}".format(ctx.author.mention)
-
 
 		# Let's check for username and build name
 		parts = user.split()
@@ -653,8 +579,7 @@ class Hw(commands.Cog):
 		if not memFromName:
 			# We couldn't find them :(
 			msg = "I couldn't find that user/build combo..."
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		if buildParts == None:
 			# Check if that user has no builds
@@ -664,8 +589,7 @@ class Hw(commands.Cog):
 			if not len(buildList):
 				# No parts!
 				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(msg)
 			
 			# Must be the default build
 			for build in buildList:
@@ -676,8 +600,7 @@ class Hw(commands.Cog):
 			if not buildParts:
 				# Well... uh... no defaults
 				msg = "I couldn't find that user/build combo..."
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(msg)
 		
 		# At this point - we *should* have a user and a build
 		if buildParts['Hardware'].startswith(self.embedPrefix):
@@ -692,20 +615,19 @@ class Hw(commands.Cog):
 
 			if not hardware.thumbnail == None:
 				embed.set_thumbnail(url=hardware.thumbnail)
-			
+
 			for x in hardware.fields:
 				embed.add_field(name=x.title, value=x.body)
 
 			await ctx.channel.send(embed=embed)
-
+		
 		else:
+
 			msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
 			msg = msg_head + buildParts['Hardware']
 			if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
 				msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-			await ctx.channel.send(msg)
+			await ctx.send(Utils.suppressed(ctx,msg))
 
 
 	@commands.command(pass_context=True)
@@ -801,8 +723,7 @@ class Hw(commands.Cog):
 		if not memFromName:
 			# We couldn't find them :(
 			msg = "I couldn't find that user/build combo..."
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		if buildParts == None:
 			# Check if that user has no builds
@@ -812,8 +733,7 @@ class Hw(commands.Cog):
 			if not len(buildList):
 				# No parts!
 				msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(memFromName), ctx.prefix)
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(msg)
 			
 			# Must be the default build
 			for build in buildList:
@@ -824,15 +744,12 @@ class Hw(commands.Cog):
 			if not buildParts:
 				# Well... uh... no defaults
 				msg = "I couldn't find that user/build combo..."
-				await ctx.channel.send(msg)
-				return
+				return await ctx.send(msg)
 		
 		# At this point - we *should* have a user and a build
 		p = discord.utils.escape_markdown(buildParts['Hardware'])
 		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(msg)
-		await ctx.channel.send(msg)
+		await ctx.send(Utils.suppressed(ctx,msg))
 			
 
 	@commands.command(pass_context=True)
@@ -843,16 +760,14 @@ class Hw(commands.Cog):
 			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
 		member = DisplayName.memberForName(user, ctx.guild)
 		if not member:
-			await ctx.channel.send(usage)
-			return
+			return await ctx.send(usage)
 		buildList = self.settings.getGlobalUserStat(member, "Hardware")
 		if buildList == None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 		if not len(buildList):
 			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 		msg = "__**{}'s Builds:**__\n\n".format(DisplayName.name(member))
 		i = 1
 		for build in buildList:
@@ -863,10 +778,8 @@ class Hw(commands.Cog):
 			i += 1
 		# Cut the last return
 		msg = msg[:-1]
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(msg)
 		# Limit output to 1 page - if more than that, send to pm
-		await Message.Message(message=msg).send(ctx)
+		await Message.Message(message=Utils.suppressed(ctx,msg)).send(ctx)
 
 
 	@commands.command(pass_context=True)
@@ -886,8 +799,7 @@ class Hw(commands.Cog):
 					for chan in ctx.guild.channels:
 						if str(chan.id) == str(hwChannel):
 							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-					await ctx.channel.send(msg)
-					return
+					return await ctx.send(msg)
 				else:
 					hwChannel = self.bot.get_channel(hwChannel)
 		if not hwChannel:
@@ -896,8 +808,7 @@ class Hw(commands.Cog):
 
 		# Make sure we're not already in a parts transaction
 		if str(ctx.author.id) in self.hwactive:
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
-			return
+			return await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 
 		# Set our HWActive flag
 		hw_id = self.gen_id()
@@ -940,10 +851,9 @@ class Hw(commands.Cog):
 			if not buildExists:
 				newBuild['Name'] = buildName.content
 				break
-		bname = buildName.content
-		if self.checkSuppress(ctx):
-			bname = Nullify.clean(bname)
+		bname = Utils.suppressed(ctx,buildName.content)
 
+		
 		# Prompt if user wants to use embeds
 		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
 		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
@@ -1039,14 +949,18 @@ class Hw(commands.Cog):
 		msg2 = "To save this build, use `Finalize`. You may use a listed command from below or paste a PCPartPicker link.\n"
 		msg2 += "(Add Field/Edit Field/Remove Field/Edit Description/Remove Description/Edit Thumbnail/Remove Thumbnail/Finalize/Stop)"
 
-		newDescMsg = "What would you like the new description to be?"
-		newThumbnailMsg = "Provide a link to an image you'd like to use"
+		errMsg = "The embed cannot be displayed! Make sure your thumbnail total is under 6000 characters (you may need to remove fields or edit them) and that your thumbnail URL is valid.\n"
+		errMsg += "__This build *cannot* be finalized with the `Finalize` command until this is fixed.__"
 
-		embed = discord.Embed()
-		embed.title = "{}'s {}".format(displayName, bname)
-		embed.color = ctx.author.color	
+		newDescMsg = "What would you like the new description to be?"
+		newThumbnailMsg = "Provide a link to an image you'd like to use. It must start with `http` or `https`"
 
 		while True:
+			embed = discord.Embed()
+			embed.title = "{}'s {}".format(displayName, bname)
+			embed.color = ctx.author.color
+			
+			failure = False
 			embed.description = hardware.description
 			embed.clear_fields()
 
@@ -1056,10 +970,18 @@ class Hw(commands.Cog):
 			for x in hardware.fields:
 				embed.add_field(name=x.title, value=x.body)
 
-			await hwChannel.send(msg)
-			await hwChannel.send(embed=embed)
-			parts = await self.prompt(hw_id, ctx, msg2, hwChannel, DisplayName.name(ctx.author), False)
+			try: 
+				await hwChannel.send(msg, embed=embed)
+			except HTTPException as exception:
+				if "Not a well formed URL." in exception.args[0]:
+					await hwChannel.send("__Thumbnail has an invalid link.__ Please set a new thumbnail link or remove it")
+				else:
+					await hwChannel.send(errMsg)
+				failure = True
 			
+			parts = await self.prompt(hw_id, ctx, msg2, hwChannel, DisplayName.name(ctx.author), False)
+
+
 			if not parts:
 				self._stop_hw(ctx.author)
 				return
@@ -1107,6 +1029,10 @@ class Hw(commands.Cog):
 				hardware.fields = newFields
 
 			elif "finalize" in parts.content.lower():
+				if failure:
+					await hwChannel.send("Cannot finalize until issues are fixed")
+					continue
+
 				build["Hardware"] = self.embedPrefix + hardware.serialize()
 				return build
 
@@ -1115,7 +1041,7 @@ class Hw(commands.Cog):
 					await hwChannel.send("There is a max of 25 Fields, you may think of combining some of your fields")
 					continue
 
-				newTitle, newBody = getField(hw_id, ctx, hwChannel)
+				newTitle, newBody = await self.getField(hw_id, ctx, hwChannel)
 				hardware.fields.append(EmbeddedHardwareField(newTitle.content, newBody.content))
 
 			elif "edit field" in parts.content.lower():
@@ -1157,7 +1083,7 @@ class Hw(commands.Cog):
 					continue
 
 				# We have the build now
-				newTitle, newBody = getField(hw_id, ctx, hwChannel)
+				newTitle, newBody = await self.getField(hw_id, ctx, hwChannel)
 
 				fieldToEdit.title = newTitle.content
 				fieldToEdit.body = newBody.content
@@ -1183,7 +1109,7 @@ class Hw(commands.Cog):
 					
 					# Try to get a number out of the message
 					try:
-						index = int(fieldToEdit.content) - 1
+						index = int(fieldToEdit.content)
 					except ValueError:
 						await hwChannel.send("Invalid number. Make sure it is an actual field between 1 and {}".format(len(hardware.fields)))
 						continue
@@ -1194,7 +1120,7 @@ class Hw(commands.Cog):
 						continue
 
 					# Woah, We actually got a number?
-					del hardware.fields[index]
+					del hardware.fields[index - 1]
 					break
 
 			elif "edit description" in parts.content.lower():
@@ -1211,10 +1137,14 @@ class Hw(commands.Cog):
 			elif "remove description" in parts.content.lower():
 				hardware.description = None
 			elif "edit thumbnail" in parts.content.lower():
-				newThumbnail = await self.prompt(hw_id, ctx, newThumbnailMsg, hwChannel, DisplayName.name(ctx.author), False)
-				if not newThumbnail:
-					continue
-				hardware.thumbnail = newThumbnail.content
+				while True:		
+					newThumbnail = await self.prompt(hw_id, ctx, newThumbnailMsg, hwChannel, DisplayName.name(ctx.author), False)
+					if not newThumbnail:
+						break
+
+					hardware.thumbnail = newThumbnail.content
+					break
+
 			elif "remove thumbnail" in parts.content.lower():
 				hardware.thumbnail = None
 			else:
@@ -1226,7 +1156,7 @@ class Hw(commands.Cog):
 		newTitleMsg = "What would you like the title of this field to be?"
 		newBodyMsg = "What would you like the body of this field to be?"
 		
-		newTitle, newBody = None
+		newTitle, newBody = None, None
 
 		while True:
 			newTitle = await self.prompt(hw_id, ctx, newTitleMsg, hwChannel, DisplayName.name(ctx.author), False)
@@ -1323,26 +1253,20 @@ class Hw(commands.Cog):
 			dest = message.channel
 		if not m:
 			if authorName:
-				msg = '*{}*, I got:'.format(authorName)
+				msg = '*{}*, I got:'.format(Utils.suppressed(ctx,authorName))
 			else:
 				msg = "I got:"
 			if type(message) is str:
-				msg2 = message
+				msg2 = Utils.suppressed(ctx,message)
 			else:
-				msg2 = '{}'.format(message.content)
+				msg2 = '{}'.format(Utils.suppressed(ctx,message.content))
 			msg3 = 'Is that correct? (y/n/stop)'
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-				msg2 = Nullify.clean(msg2)
-				msg3 = Nullify.clean(msg3)
 			await dest.send(msg)
 			await dest.send(msg2)
 			await dest.send(msg3)
 		else:
 			msg = m
-			if self.checkSuppress(ctx):
-				msg = Nullify.clean(msg)
-			await dest.send(msg)
+			await dest.send(Utils.suppressed(ctx,msg))
 
 		while True:
 			def littleCheck(m):
@@ -1405,9 +1329,7 @@ class Hw(commands.Cog):
 
 		if not dest:
 			dest = ctx.channel
-		if self.checkSuppress(ctx):
-			msg = Nullify.clean(message)
-		await dest.send(message)
+		await dest.send(Utils.suppressed(ctx,message))
 		while True:
 			def littleCheck(m):
 				return ctx.author.id == m.author.id and self.channelCheck(m, dest) and len(m.content)
@@ -1434,7 +1356,7 @@ class Hw(commands.Cog):
 					msg = "No problem, *{}!*  See you later!".format(authorName, ctx.prefix)
 					await dest.send(msg)
 					return None
-
+				
 				if not confirm:
 					return talk
 
@@ -1451,7 +1373,6 @@ class Hw(commands.Cog):
 					return None
 
 class EmbeddedHardware:
-
 	def __init__(self, description, thumbnail, fields):
 		self.description = description
 		self.thumbnail = thumbnail
@@ -1467,7 +1388,7 @@ class EmbeddedHardware:
 			"thumbnail": self.thumbnail,
 			"fields": serializedFields
 		}, indent=4)
-		print(string)
+		
 		return string
 
 	@staticmethod
