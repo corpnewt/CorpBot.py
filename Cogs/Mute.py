@@ -20,15 +20,6 @@ class Mute(commands.Cog):
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
-    async def onjoin(self, member, server):
-        # Check id against the mute list and react accordingly
-        mute_list = self.settings.getServerStat(server, "MuteList")
-        for mem in mute_list:
-            if str(member.id) == str(mem["ID"]):
-                # The user was muted when they left - remute
-                cd = mem["Cooldown"]
-                await self._mute(member, server, cd)
-
     @commands.Cog.listener()
     async def on_unloaded_extension(self, ext):
         # Called to shut things down
