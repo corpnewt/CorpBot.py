@@ -832,12 +832,25 @@ class Hw(commands.Cog):
 
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
-		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
 		
+		# Prompt if user wants to use embeds
+		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
+		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
+
+		if embedConf == None:
+			self._stop_hw(ctx.author)
+			return
+
+		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
+
 		# Get the build name
 		newBuild = { 'Main': True }
 		while True:
 			buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			if embedConf and len(buildName.content) > 230:
+				await hwChannel.send("This title is too long. It needs to be under 230 characters, and you are at {} characters.".format(len(buildName.content)))
+				continue
+
 			if not buildName:
 				self._stop_hw(ctx.author)
 				return
@@ -853,15 +866,7 @@ class Hw(commands.Cog):
 				break
 		bname = Utils.suppressed(ctx,buildName.content)
 
-		
-		# Prompt if user wants to use embeds
-		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
-		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
-
-		if embedConf == None:
-			self._stop_hw(ctx.author)
-			return
-		elif embedConf:
+		if embedConf:
 			newBuild = await self.getEmbeddedHardware(hw_id, ctx, hwChannel, newBuild, bname)
 		else:
 			newBuild = await self.getHardware(hw_id, ctx, hwChannel, newBuild, bname)
@@ -949,13 +954,16 @@ class Hw(commands.Cog):
 		msg2 = "To save this build, use `Finalize`. You may use a listed command from below or paste a PCPartPicker link.\n"
 		msg2 += "(Add Field/Edit Field/Remove Field/Edit Description/Remove Description/Edit Thumbnail/Remove Thumbnail/Finalize/Stop)"
 
-		errMsg = "The embed cannot be displayed! Make sure your thumbnail total is under 6000 characters (you may need to remove fields or edit them) and that your thumbnail URL is valid.\n"
+		errMsg = "The embed cannot be displayed! Make sure your thumbnail total is under 6000 characters (you may need to remove fields or edit them).\n"
 		errMsg += "__This build *cannot* be finalized with the `Finalize` command until this is fixed.__"
 
 		newDescMsg = "What would you like the new description to be?"
 		newThumbnailMsg = "Provide a link to an image you'd like to use. It must start with `http` or `https`"
 
 		while True:
+			# Reset Failure
+			failure = False
+
 			embed = discord.Embed()
 			embed.title = "{}'s {}".format(displayName, bname)
 			embed.color = ctx.author.color
@@ -973,11 +981,20 @@ class Hw(commands.Cog):
 			try: 
 				await hwChannel.send(msg, embed=embed)
 			except HTTPException as exception:
+				# Thumbnail is invalid - remove it and print it out
 				if "Not a well formed URL." in exception.args[0]:
-					await hwChannel.send("__Thumbnail has an invalid link.__ Please set a new thumbnail link or remove it")
+					await hwChannel.send("__Thumbnail link removed.__ Thumbnail link was invalid and prevented the embed from forming correctly")
+					
+					# Bad
+					embed._thumbnail = None
+					
+					hardware.thumbnail = None
+					await hwChannel.send(embed=embed)
 				else:
 					await hwChannel.send(errMsg)
-				failure = True
+					# Prevent finalization since it's likely longer than 6000 characters
+					failure = True
+				
 			
 			parts = await self.prompt(hw_id, ctx, msg2, hwChannel, DisplayName.name(ctx.author), False)
 
@@ -1128,10 +1145,11 @@ class Hw(commands.Cog):
 				while True:
 					newDescription = await self.prompt(hw_id, ctx, newDescMsg, hwChannel, DisplayName.name(ctx.author), False)
 					if not newDescription:
-						continue
+						break
 					
 					if len(newDescription.content) > 2048:
 						await hwChannel.send("Please limit the description to be 2048 characters or less")
+						continue
 					hardware.description = newDescription.content
 					break
 			elif "remove description" in parts.content.lower():
@@ -1164,7 +1182,7 @@ class Hw(commands.Cog):
 				return
 
 			if len(newTitle.content) > 256:
-				await hwChannel.send("Can you shorten that a little? The max length for the title is 256 characters, and you are at {}".format(len(newTitle.content)))
+				await hwChannel.send("The max length for the title is 256 characters, and you are at {}".format(len(newTitle.content)))
 				continue
 			break
 
@@ -1174,7 +1192,7 @@ class Hw(commands.Cog):
 				return
 			
 			if len(newBody.content) > 1024:
-				await hwChannel.send("Woah that's *impressive*. However, the body of a field must stay below 1024 characters, and you are at {}".format(len(newBody.content)))
+				await hwChannel.send("The body of a field must stay below 1024 characters, and you are at {}".format(len(newBody.content)))
 				continue
 			break
 
@@ -1388,7 +1406,7 @@ class EmbeddedHardware:
 			"thumbnail": self.thumbnail,
 			"fields": serializedFields
 		}, indent=4)
-		
+
 		return string
 
 	@staticmethod
