@@ -208,7 +208,7 @@ class Settings(commands.Cog):
 				"AdminUnlimited" 		: True,		# Do admins have unlimited xp to give?
 				"BotAdminAsAdmin" 		: False,	# Do bot-admins count as admins with xp?
 				"RemindOffline"			: False,	# Let users know when they ping offline members
-				"JoinPM"				: True,		# Do we pm new users with rules?
+				"JoinPM"				: False,	# Do we pm new users with rules?
 				"XPPromote" 			: True,		# Can xp raise your rank?
 				"XPDemote" 				: False,	# Can xp lower your rank?
 				"SuppressPromotions"	: False,	# Do we suppress the promotion message?
