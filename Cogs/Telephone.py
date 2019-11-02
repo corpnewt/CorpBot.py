@@ -131,7 +131,7 @@ class Telephone(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def teleblocklinks(self, ctx, *, yes_no = None):
-		"""Enables/Disables removing links sent over telephone calls (owner only)."""
+		"""Enables/Disables removing links sent over telephone calls (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Block telephone links","TeleBlockLinks",yes_no,default=True))
 

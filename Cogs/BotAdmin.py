@@ -1,4 +1,4 @@
-import asyncio, discord
+import asyncio, discord, re
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName
@@ -14,6 +14,24 @@ class BotAdmin(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
+
+	async def message(self, message):
+		# Check for discord invite links and remove them if found - per server settings
+		if not self.dregex.search(message.content): return None # No invite in the passed message - nothing to do
+		# Got an invite - let's see if we care
+		if not self.settings.getServerStat(message.guild,"RemoveInviteLinks",False): return None # We don't care
+		# We *do* care, let's see if the author is admin/bot-admin as they'd have power to post invites
+		ctx = await self.bot.get_context(message)
+		if Utils.is_bot_admin(ctx): return None # We are immune!
+		# At this point - we need to delete the message
+		return { 'Ignore' : True, 'Delete' : True}
+
+	@commands.command(pass_context=True)
+	async def removeinvitelinks(self, ctx, *, yes_no = None):
+		"""Enables/Disables auto-deleting discord invite links in chat (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Remove discord invite links","RemoveInviteLinks",yes_no))
 
 	@commands.command(pass_context=True)
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
