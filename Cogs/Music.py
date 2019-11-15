@@ -1,4 +1,4 @@
-import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid, ctypes
+import asyncio, discord, youtube_dl, subprocess, os, re, time, math, uuid, ctypes, random
 from   discord.ext import commands
 from   Cogs import Utils, Message, DisplayName, PickList
 
@@ -8,6 +8,7 @@ from   Cogs import Utils, Message, DisplayName, PickList
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
 
+# Setup the format options for non-playlist calls
 ytdl_format_options = {
 	'format': 'bestaudio/best',
 	'extractaudio': True,
@@ -24,12 +25,20 @@ ytdl_format_options = {
 	'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
+# Setup for playlists as well
+ytdlp_format_options = {}
+for x in ytdl_format_options:
+	ytdlp_format_options[x] = ytdl_format_options[x]
+ytdlp_format_options['noplaylist'] = False
+
 ffmpeg_options = {
 	'before_options': '-re -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
 	#'options': '-ac 2 -f s16le -ar 48000'
 }
 
+# Create our two downloaders
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+ytdlp = youtube_dl.YoutubeDL(ytdlp_format_options)
 
 class YTDLSource(discord.PCMVolumeTransformer):
 	def __init__(self, source, *, data, volume=0.5):
@@ -128,6 +137,9 @@ class Music(commands.Cog):
 		self.vol      = {}
 		self.loop     = {}
 		self.data     = {}
+		self.p_delay  = 5 # Message edit delay in seconds when adding playlist
+		self.p_adder  = {}
+		self.p_max    = 100 # Max number of songs to add in the playlist
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		# Ensure Opus
@@ -150,6 +162,7 @@ class Music(commands.Cog):
 		self.skips.pop(str(ctx.guild.id),None)
 		self.loop.pop(str(ctx.guild.id),None)
 		self.data.pop(str(ctx.guild.id),None)
+		self.p_adder.pop(str(ctx.guild.id),None)
 
 	async def _check_role(self, ctx):
 		if Utils.is_bot_admin(ctx):
@@ -165,17 +178,14 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=delay).send(ctx)
 		return False
 
-	async def get_song_info(self, url, search=False):
+	async def get_song_info(self, url, playlist=True):
 		# Grabs some info on the passed song/url
-		data = await self.bot.loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
-		if not data:
-			return None
-		if 'entries' in data:
-			# take first item from a playlist
-			data = data['entries'][0]
-		return data
+		y = ytdlp if playlist else ytdl
+		data = await self.bot.loop.run_in_executor(None, lambda: y.extract_info(url, download=False, process=False))
+		if not data: return None
+		return data if 'entries' in data else await self.bot.loop.run_in_executor(None, lambda: y.extract_info(url, download=False))
 
-	async def add_to_queue(self, ctx, url):
+	async def add_to_queue(self, ctx, url, message = None):
 		queue = self.queue.get(str(ctx.guild.id),[])
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -185,11 +195,57 @@ class Music(commands.Cog):
 		data = await self.get_song_info(url)
 		if not data:
 			return None
-		data["added_by"] = ctx.author
-		queue.append(data)
-		self.queue[str(ctx.guild.id)] = queue
-		if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
-			self.bot.dispatch("next_song",ctx)
+		if not 'entries' in data:
+			data["added_by"] = ctx.author
+			queue.append(data)
+			self.queue[str(ctx.guild.id)] = queue
+			if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
+				self.bot.dispatch("next_song",ctx)
+		else:
+			# We've got a playlist - let's make sure this author isn't already adding
+			adder = self.p_adder.get(str(ctx.guild.id),[])
+			if ctx.author.id in adder: return False
+			# Add our author to avoid conflicts
+			adder.append(ctx.author.id)
+			self.p_adder[str(ctx.guild.id)] = adder
+			# Gather our entries and convert from generator to list
+			entries = list(data['entries'])
+			if not len(entries): return None
+			# Check if our url has "index=#" and start at that index-1
+			try: starting_index = next((int(x[6:])-1 for x in data['webpage_url'].split("?")[1].split("&") if x.lower().startswith("index=")),0)
+			except: starting_index = 0
+			starting_index = 0 if starting_index >= len(entries) or starting_index < 0 else starting_index # Ensure we're not out of bounds
+			data['entries'] = entries = entries[starting_index:]
+			data['added_entries'] = 0
+			last_time = 0
+			for index,song in enumerate(entries):
+				# First verify that we're still adding
+				if not ctx.author.id in self.p_adder.get(str(ctx.guild.id),[]):
+					break
+				if time.time() - last_time >= self.p_delay:
+					await Message.EmbedText(
+						title="♫ Adding playlist: {} ({} of {} song{})...".format(data.get("title","Unknown Playlist"),index+1,len(entries),"" if len(entries)==1 else "s"),
+						color=ctx.author,
+						description="Requested by {}{}".format(ctx.author.mention,"" if starting_index == 0 else " - Starting at song {}".format(starting_index+1)),
+						url=data.get("webpage_url",None),
+					).edit(ctx,message)
+					last_time = time.time()
+				if not 'url' in song: continue # Not a valid song - skip
+				song_data = await self.get_song_info(song['url'])
+				if not song_data: continue # Failed to enqueue
+				if 'entries' in song_data: song_data = song_data['entries'][0] # Only get the first at this point - no nested playlists
+				# Add the author to the song, then enqueue it
+				data['added_entries'] += 1
+				song_data["added_by"] = ctx.author
+				queue.append(song_data)
+				self.queue[str(ctx.guild.id)] = queue
+				# Check if it's the first song - and start playing as soon as it's loaded if need be
+				if index==0 and not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
+					self.bot.dispatch("next_song",ctx)
+				if self.p_max > 0 and index+1 >= self.p_max: break # We hit our limit
+			# Remove our author from the add queue
+			adder = [x for x in self.p_adder.get(str(ctx.guild.id),[]) if not x == ctx.author.id]
+			self.p_adder[str(ctx.guild.id)] = adder
 		return data
 
 	def format_duration(self, dur, allow_zero = False):
@@ -392,21 +448,34 @@ class Music(commands.Cog):
 			title="♫ Searching For: {}...".format(url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
-		data = await self.add_to_queue(ctx, url)
-		if not data:
+		data = await self.add_to_queue(ctx, url, message=message)
+		if data == None:
 			# Nothing found
 			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
-		await Message.Embed(
-			title="♫ Enqueued: {}".format(data.get("title","Unknown")),
-			description="Requested by {}".format(ctx.author.mention),
-			fields=[
-				{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False}
-			],
-			color=ctx.author,
-			thumbnail=data.get("thumbnail",None),
-			url=data.get("webpage_url",None),
-			delete_after=delay
-		).edit(ctx,message)
+		if data == False:
+			# We are already adding a playlist - just ignore
+			return await Message.EmbedText(title="♫ You are already enqueueing a playlist!",description="You will have to wait for the current playlist to finish before enqueueing another.",color=ctx.author,delete_after=delay).edit(ctx,message)
+		if 'added_entries' in data: # Is a playlist
+			entries = list(data['entries'])
+			await Message.EmbedText(
+				title="♫ Added playlist: {} ({} of {} song{})".format(data.get("title","Unknown Playlist"),data['added_entries'],len(entries),"" if len(entries)==1 else "s"),
+				description="Requested by {}".format(ctx.author.mention),
+				url=data.get("webpage_url",None),
+				delete_after=delay,
+				color=ctx.author
+			).edit(ctx,message)
+		else:
+			await Message.Embed(
+				title="♫ Enqueued: {}".format(data.get("title","Unknown")),
+				description="Requested by {}".format(ctx.author.mention),
+				fields=[
+					{"name":"Duration","value":self.format_duration(data.get("duration",0)),"inline":False}
+				],
+				color=ctx.author,
+				thumbnail=data.get("thumbnail",None),
+				url=data.get("webpage_url",None),
+				delete_after=delay
+			).edit(ctx,message)
 
 	@commands.command()
 	async def yt(self, ctx, *, search = None):
@@ -424,7 +493,7 @@ class Music(commands.Cog):
 		matches = list(re.finditer(self.regex, search))
 		if not len(matches):
 			search = search.replace('/', '')
-		data = await self.get_song_info(search)
+		data = await self.get_song_info(search,playlist=False)
 		if not data:
 			# Nothing found
 			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -487,7 +556,7 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		queue = self.queue.get(str(ctx.guild.id))
+		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
 			# No songs in queue
 			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
@@ -511,7 +580,7 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if ctx.voice_client is None:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		queue = self.queue.get(str(ctx.guild.id))
+		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
 			# No songs in queue
 			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
@@ -526,6 +595,40 @@ class Music(commands.Cog):
 		if removed > 0:
 			return await Message.EmbedText(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def shuffle(self, ctx):
+		"""Shuffles the current queue."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if ctx.voice_client is None:
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		queue = self.queue.get(str(ctx.guild.id),[])
+		if not len(queue):
+			# No songs in queue
+			return await Message.EmbedText(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
+		random.shuffle(queue)
+		self.queue[str(ctx.guild.id)] = queue
+		return await Message.EmbedText(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def stopadd(self, ctx, member = None):
+		"""Stops adding songs from a playlist requested by the passed member.  You must be the requestor, or an admin to stop it"""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if ctx.voice_client is None:
+			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		member = ctx.author if member == None else DisplayName.memberForName(member, ctx.guild)
+		if member == None:
+			return await Message.EmbedText(title="♫ I couldn't find that member!",color=ctx.author,delete_after=delay).send(ctx)
+		if not Utils.is_bot_admin(ctx) and member != ctx.author:
+			return await Message.EmbedText(title="♫ You do not have permissions to stop another user's playlist adding!",color=ctx.author,delete_after=delay).send(ctx)
+		# If we got here, we can stop the passed user from adding songs
+		adder = self.p_adder.get(str(ctx.guild.id),[])
+		if not member.id in adder:
+			return await Message.EmbedText(title="♫ {} not adding a playlist!".format("You are" if member == ctx.author else "{} is".format(DisplayName.name(member))),color=ctx.author,delete_after=delay).send(ctx)
+		self.p_adder[str(ctx.guild.id)] = [x for x in adder if not x == member.id]
+		return await Message.EmbedText(title="♫ {} stopped adding a playlist!".format("You have" if member == ctx.author else "{} has".format(DisplayName.name(member))),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def playing(self, ctx, *, moons = None):
@@ -590,7 +693,7 @@ class Music(commands.Cog):
 		else:
 			data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
 			play_text = "Paused"
-		queue = self.queue.get(str(ctx.guild.id))
+		queue = self.queue.get(str(ctx.guild.id),[])
 		fields = [{"name":"{}".format(data.get("title")),"value":"Currently {} - at {} - Requested by {} - [Link]({})".format(
 			play_text,
 			self.format_elapsed(data),
@@ -785,6 +888,8 @@ class Music(commands.Cog):
 	@stop.before_invoke
 	@volume.before_invoke
 	@repeat.before_invoke
+	@stopadd.before_invoke
+	@shuffle.before_invoke
 	async def ensure_roles(self, ctx):
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Missing DJ roles.")
@@ -796,6 +901,8 @@ class Music(commands.Cog):
 	@repeat.before_invoke
 	@skip.before_invoke
 	@play.before_invoke
+	@stopadd.before_invoke
+	@shuffle.before_invoke
 	async def ensure_same_channel(self, ctx):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if Utils.is_bot_admin(ctx):
