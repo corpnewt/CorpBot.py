@@ -237,6 +237,7 @@ class Music(commands.Cog):
 				# Add the author to the song, then enqueue it
 				data['added_entries'] += 1
 				song_data["added_by"] = ctx.author
+				queue = self.queue.get(str(ctx.guild.id),[])
 				queue.append(song_data)
 				self.queue[str(ctx.guild.id)] = queue
 				# Check if it's the first song - and start playing as soon as it's loaded if need be
