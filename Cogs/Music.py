@@ -268,7 +268,7 @@ class Music(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, user, before, after):
-		if not user.guild or user.id == self.bot.user.id:
+		if not user.guild or user.id == self.bot.user.id or not before.channel:
 			return
 		# Get our member on the same server as the user
 		player = self.bot.wavelink.get_player(before.channel.guild.id)
