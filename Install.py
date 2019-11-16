@@ -154,7 +154,8 @@ if __name__ == '__main__':
     modules = [
         {"name":"discord [rewrite]", "item":"discord.py[voice]"},
         {"name":"pillow"},
-        {"name":"youtube-dl"},
+        # {"name":"youtube-dl"},
+        {"name":"Wavelink"},
         {"name":"Requests"},
         {"name":"parsedatetime"},
         {"name":"psutil"},
