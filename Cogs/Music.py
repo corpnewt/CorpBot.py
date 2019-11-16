@@ -16,11 +16,6 @@ class Music(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot      = bot
 		self.settings = settings
-		self.folder   = os.path.join(".","Music")
-		# self.delay    = 20 # Set to None to keep all messages
-		if not os.path.exists(self.folder):
-			# Create our music folder
-			os.mkdir(self.folder)
 		self.queue    = {}
 		self.skips    = {}
 		self.vol      = {}
@@ -29,12 +24,12 @@ class Music(commands.Cog):
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		# Ensure Opus
-		if not discord.opus.is_loaded():
+		'''if not discord.opus.is_loaded():
 			opus = ctypes.util.find_library("opus")
 			if not opus:
 				print("Opus not found - Music will not work!")
 				return
-			discord.opus.load_opus(opus)
+			discord.opus.load_opus(opus)'''
 		# Setup Wavelink
 		if not hasattr(self.bot,'wavelink'): self.bot.wavelink = wavelink.Client(self.bot)
 		self.bot.loop.create_task(self.start_nodes())
@@ -78,7 +73,40 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=delay).send(ctx)
 		return False
 
-	async def add_to_queue(self, ctx, url, message = None):
+	async def resolve_search(self, ctx, url, shuffle = False):
+		# Helper method to search for songs/resolve urls and add the contents to the queue
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		message = await Message.EmbedText(
+			title="♫ Searching For: {}...".format(url.strip("<>")),
+			color=ctx.author
+			).send(ctx)
+		data = await self.add_to_queue(ctx, url, shuffle)
+		if data == None:
+			# Nothing found
+			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
+		if isinstance(data,wavelink.Track):
+			# Just got one - let's display it
+			await Message.Embed(
+				title="♫ Enqueued: {}".format(data.title),
+				description="Requested by {}".format(ctx.author.mention),
+				fields=[
+					{"name":"Duration","value":self.format_duration(data.duration,data),"inline":False}
+				],
+				color=ctx.author,
+				thumbnail=data.thumb,
+				url=data.uri,
+				delete_after=delay
+			).edit(ctx,message)
+		else:
+			await Message.EmbedText(
+				title="♫ Added {}playlist: {} ({} song{})".format("shuffled " if shuffle else "",data.data["playlistInfo"]["name"],len(data.tracks),"" if len(data.tracks)==1 else "s"),
+				description="Requested by {}".format(ctx.author.mention),
+				url=data.search,
+				delete_after=delay,
+				color=ctx.author
+			).edit(ctx,message)
+
+	async def add_to_queue(self, ctx, url, shuffle = False):
 		queue = self.queue.get(str(ctx.guild.id),[])
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -103,6 +131,7 @@ class Music(commands.Cog):
 		except: starting_index = 0
 		starting_index = 0 if starting_index >= len(tracks.tracks) or starting_index < 0 else starting_index # Ensure we're not out of bounds
 		tracks.tracks = tracks.tracks[starting_index:]
+		if shuffle: random.shuffle(tracks.tracks) # Shuffle before adding
 		for index,track in enumerate(tracks.tracks):
 			track.info["added_by"] = ctx.author
 			track.info["ctx"] = ctx
@@ -181,14 +210,6 @@ class Music(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		self.bot.loop.create_task(self.setup_music_folder())
-		
-	async def setup_music_folder(self):
-		await self.bot.wait_until_ready()
-		# Clean out the music folder
-		for x in os.listdir(self.folder):
-			if x.lower().endswith(".mp3"):
-				os.remove(os.path.join(self.folder,x))
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
@@ -248,6 +269,9 @@ class Music(commands.Cog):
 		data = queue.pop(0)
 		# Save the current data in case of repeats
 		self.data[str(ctx.guild.id)] = data
+		# Set the volume - default to 50
+		volume = self.vol.get(str(ctx.guild.id),100)
+		await player.set_volume(volume/2)
 		async with ctx.typing():
 			self.bot.dispatch("play_next",player,data)
 		await Message.Embed(
@@ -318,35 +342,7 @@ class Music(commands.Cog):
 		if url == None:
 			return await Message.EmbedText(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
 		# Add our url to the queue
-		message = await Message.EmbedText(
-			title="♫ Searching For: {}...".format(url.strip("<>")),
-			color=ctx.author
-			).send(ctx)
-		data = await self.add_to_queue(ctx, url, message=message)
-		if data == None:
-			# Nothing found
-			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
-		if isinstance(data,wavelink.Track):
-			# Just got one - let's display it
-			await Message.Embed(
-				title="♫ Enqueued: {}".format(data.title),
-				description="Requested by {}".format(ctx.author.mention),
-				fields=[
-					{"name":"Duration","value":self.format_duration(data.duration,data),"inline":False}
-				],
-				color=ctx.author,
-				thumbnail=data.thumb,
-				url=data.uri,
-				delete_after=delay
-			).edit(ctx,message)
-		else:
-			await Message.EmbedText(
-				title="♫ Added playlist: {} ({} song{})".format(data.data["playlistInfo"]["name"],len(data.tracks),"" if len(data.tracks)==1 else "s"),
-				description="Requested by {}".format(ctx.author.mention),
-				url=data.search,
-				delete_after=delay,
-				color=ctx.author
-			).edit(ctx,message)
+		await self.resolve_search(ctx, url)
 
 	@commands.command()
 	async def pause(self, ctx):
@@ -435,20 +431,27 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
-	async def shuffle(self, ctx):
-		"""Shuffles the current queue."""
+	async def shuffle(self, ctx, *, url = None):
+		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if not player.is_connected:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		queue = self.queue.get(str(ctx.guild.id),[])
-		if not len(queue):
-			# No songs in queue
-			return await Message.EmbedText(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
-		random.shuffle(queue)
-		self.queue[str(ctx.guild.id)] = queue
-		return await Message.EmbedText(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+			if url == None: # No need to connect to shuffle nothing
+				return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+			if not ctx.author.voice:
+				return await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+			await player.connect(ctx.author.voice.channel.id)
+		if url == None:
+			queue = self.queue.get(str(ctx.guild.id),[])
+			if not len(queue):
+				# No songs in queue
+				return await Message.EmbedText(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
+			random.shuffle(queue)
+			self.queue[str(ctx.guild.id)] = queue
+			return await Message.EmbedText(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+		# We're adding a new song/playlist/search shuffled to the queue
+		await self.resolve_search(ctx, url, shuffle=True)
 
 	@commands.command()
 	async def playing(self, ctx, *, moons = None):
@@ -466,7 +469,7 @@ class Music(commands.Cog):
 			).send(ctx)
 		data = self.data.get(str(ctx.guild.id))
 		play_text = "Playing" if player.is_playing else "Paused"
-		cv = player.volume
+		cv = int(player.volume*2)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,data.title),
 			description="Requested by {} -- Volume at {}%".format(data.info["added_by"].mention,cv),
@@ -606,7 +609,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def volume(self, ctx, volume = None):
-		"""Changes the player's volume (0-100)."""
+		"""Changes the player's volume (0-150%)."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.bot.wavelink.get_player(ctx.guild.id)
@@ -616,16 +619,16 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
-			cv = player.volume
+			cv = int(player.volume*2)
 			return await Message.EmbedText(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
 		try:
 			volume = int(volume)
 		except:
-			return await Message.EmbedText(title="♫ Volume must be an integer between 0-100.",color=ctx.author,delete_after=delay).send(ctx)
-		# Ensure our volume is between 0 and 100
-		volume = 1000 if volume > 1000 else 0 if volume < 0 else volume
+			return await Message.EmbedText(title="♫ Volume must be an integer between 0-150.",color=ctx.author,delete_after=delay).send(ctx)
+		# Ensure our volume is between 0 and 150
+		volume = 150 if volume > 150 else 0 if volume < 0 else volume
 		self.vol[str(ctx.guild.id)] = volume
-		await player.set_volume(volume)
+		await player.set_volume(volume/2)
 		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
