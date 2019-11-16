@@ -26,9 +26,6 @@ class Music(commands.Cog):
 		self.vol      = {}
 		self.loop     = {}
 		self.data     = {}
-		self.p_delay  = 5 # Message edit delay in seconds when adding playlist
-		self.p_adder  = {}
-		self.p_max    = 100 # Max number of songs to add in the playlist
 		# Regex for extracting urls from strings
 		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		# Ensure Opus
@@ -66,7 +63,6 @@ class Music(commands.Cog):
 		self.skips.pop(str(guild.id),None)
 		self.loop.pop(str(guild.id),None)
 		self.data.pop(str(guild.id),None)
-		self.p_adder.pop(str(guild.id),None)
 
 	async def _check_role(self, ctx):
 		if Utils.is_bot_admin(ctx):
@@ -318,7 +314,6 @@ class Music(commands.Cog):
 			# We're trying to resume
 			await player.set_pause(False)
 			data = self.data.get(str(ctx.guild.id))
-			# data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
 			return await Message.EmbedText(title="♫ Resumed: {}".format(data.title),color=ctx.author,delete_after=delay).send(ctx)
 		if url == None:
 			return await Message.EmbedText(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
@@ -388,8 +383,7 @@ class Music(commands.Cog):
 		# We're trying to resume
 		await player.set_pause(False)
 		data = self.data.get(str(ctx.guild.id))
-		# data["started_at"] = int(time.time()) - data.get("elapsed_time",0)
-		await Message.EmbedText(title="♫ Resumed: {}".format(data.get("title","Unknown")),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ Resumed: {}".format(data.title),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def unplay(self, ctx, *, song_number = None):
@@ -411,9 +405,9 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=delay).send(ctx)
 		# Get the song at the index
 		song = queue[song_number]
-		if song.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
+		if song.info.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
 			queue.pop(song_number)
-			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song["title"],song_number+1),color=ctx.author,delete_after=delay).send(ctx)
+			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song.title,song_number+1),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
@@ -431,7 +425,7 @@ class Music(commands.Cog):
 		removed = 0
 		new_queue = []
 		for song in queue:
-			if song.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
+			if song.info.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
 				removed += 1
 			else:
 				new_queue.append(song)
@@ -455,26 +449,6 @@ class Music(commands.Cog):
 		random.shuffle(queue)
 		self.queue[str(ctx.guild.id)] = queue
 		return await Message.EmbedText(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
-
-	@commands.command()
-	async def stopadd(self, ctx, member = None):
-		"""Stops adding songs from a playlist requested by the passed member.  You must be the requestor, or an admin to stop it"""
-
-		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
-			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		member = ctx.author if member == None else DisplayName.memberForName(member, ctx.guild)
-		if member == None:
-			return await Message.EmbedText(title="♫ I couldn't find that member!",color=ctx.author,delete_after=delay).send(ctx)
-		if not Utils.is_bot_admin(ctx) and member != ctx.author:
-			return await Message.EmbedText(title="♫ You do not have permissions to stop another user's playlist adding!",color=ctx.author,delete_after=delay).send(ctx)
-		# If we got here, we can stop the passed user from adding songs
-		adder = self.p_adder.get(str(ctx.guild.id),[])
-		if not member.id in adder:
-			return await Message.EmbedText(title="♫ {} not adding a playlist!".format("You are" if member == ctx.author else "{} is".format(DisplayName.name(member))),color=ctx.author,delete_after=delay).send(ctx)
-		self.p_adder[str(ctx.guild.id)] = [x for x in adder if not x == member.id]
-		return await Message.EmbedText(title="♫ {} stopped adding a playlist!".format("You have" if member == ctx.author else "{} has".format(DisplayName.name(member))),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def playing(self, ctx, *, moons = None):
@@ -732,7 +706,6 @@ class Music(commands.Cog):
 	@stop.before_invoke
 	@volume.before_invoke
 	@repeat.before_invoke
-	@stopadd.before_invoke
 	@shuffle.before_invoke
 	async def ensure_roles(self, ctx):
 		if not await self._check_role(ctx):
@@ -745,7 +718,6 @@ class Music(commands.Cog):
 	@repeat.before_invoke
 	@skip.before_invoke
 	@play.before_invoke
-	@stopadd.before_invoke
 	@shuffle.before_invoke
 	async def ensure_same_channel(self, ctx):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
