@@ -120,6 +120,7 @@ class Music(commands.Cog):
 			# Only got one item - add it to the queue
 			tracks.info["added_by"] = ctx.author
 			tracks.info["ctx"] = ctx
+			tracks.info["search"] = url
 			queue.append(tracks)
 			self.queue[str(ctx.guild.id)] = queue
 			if not player.is_playing and not player.paused:
@@ -557,6 +558,29 @@ class Music(commands.Cog):
 				await message.delete()
 
 	@commands.command()
+	async def unskip(self, ctx):
+		"""Removes your vote to skip the current song."""
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = self.bot.wavelink.get_player(ctx.guild.id)
+		if not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		
+		skips = self.skips.get(str(ctx.guild.id),[])
+		if not ctx.author.id in skips: return await Message.EmbedText(title="♫ You haven't voted to skip this song!".format(len(new_skips),needed_skips),color=ctx.author,delete_after=delay).send(ctx)
+		# We did vote - remove that
+		skips.remove(ctx.author.id)
+		self.skips[str(ctx.guild.id)] = skips
+		channel = ctx.guild.get_channel(int(player.channel_id))
+		if not channel:
+			return await Message.EmbedText(title="♫ Something went wrong!",description="That voice channel doesn't seem to exist anymore...",color=ctx.author,delete_after=delay).send(ctx)
+		# Let's get the number of valid skippers
+		skippers = [x for x in channel.members if not x.bot]
+		needed_skips = math.ceil(len(skippers)/2)
+		await Message.EmbedText(title="♫ You have removed your vote to skip - {}/{} votes entered - {} more needed to skip!".format(len(skips),needed_skips,needed_skips-len(skips)),color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
 	async def skip(self, ctx):
 		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requestors and admins can skip without voting."""
 
@@ -606,6 +630,30 @@ class Music(commands.Cog):
 		# Update the skips
 		self.skips[str(ctx.guild.id)] = new_skips
 		await Message.EmbedText(title="♫ Skip threshold not met - {}/{} skip votes entered - need {} more!".format(len(new_skips),needed_skips,needed_skips-len(new_skips)),color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def seek(self, ctx, position = None):
+		"""Seeks to the passed position in the song if possible.  Position should be in seconds or in HH:MM:SS format."""
+
+		if position == None or position.lower() in ["moon","moons","moonme","moon me"]: # Show the playing status
+			return await ctx.invoke(self.playing,moons=position)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = self.bot.wavelink.get_player(ctx.guild.id)
+		if not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		# Try to resolve the position - first in seconds, then with the HH:MM:SS format
+		vals = position.split(":")
+		seconds = 0
+		multiplier = [3600,60,1]
+		vals = ["0"] * (len(multiplier)-len(vals)) + vals if len(vals) < len(multiplier) else vals # Ensure we have 3 values
+		for index,mult in enumerate(multiplier):
+			try: seconds += mult * float("".join([x for x in vals[index] if x in "0123456789."])) # Try to avoid h, m, s suffixes
+			except: return await Message.EmbedText(title="♫ Malformed seek value!",description="Please make sure the seek time is in seconds, or using HH:MM:SS format.",color=ctx.author,delete_after=delay).send(ctx)
+		ms = int(seconds*1000)
+		await player.seek(ms)
+		return await Message.EmbedText(title="♫ Seeking to {}!".format(self.format_duration(ms)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def volume(self, ctx, volume = None):
