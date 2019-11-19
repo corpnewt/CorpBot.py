@@ -191,6 +191,8 @@ async def on_guild_join(server):
 	settings = bot.get_cog("Settings")
 	owner = server.owner
 	# Let's message hello in the main chat - then pm the owner
+	prefixes = await get_prefix(bot,None)
+	prefix = prefixes[0] if len(prefixes) else "$"
 	msg = 'Hello there! Thanks for having me on your server! ({})\n\nFeel free to put me to work.\n\nYou can get a list of my commands by typing `{}help` either in chat or in PM.\n\n'.format(server.name, prefix)
 	msg += 'Whenever you have a chance, maybe take the time to set me up by typing `{}setup` in the main chat.  Thanks!'.format(settings_dict.get("prefix","$"))
 	try:
