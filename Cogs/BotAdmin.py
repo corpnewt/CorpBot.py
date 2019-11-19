@@ -205,7 +205,7 @@ class BotAdmin(commands.Cog):
 		command = ctx.guild.ban if command_name == "ban" else ctx.guild.kick
 		for target in targets:
 			try:
-				await command(target,reason=reason)
+				await command(target,reason="{}#{}: {}".format(ctx.author.name,ctx.author.discriminator,reason))
 				canned.append(target)
 			except: cant.append(target)
 		msg = ""
