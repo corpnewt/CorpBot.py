@@ -228,10 +228,14 @@ class Music(commands.Cog):
 
 	async def on_event_hook(self, event):
 		# Node callback
-		if isinstance(event,(wavelink.TrackEnd, wavelink.TrackException)):
+		if isinstance(event,(wavelink.TrackEnd, wavelink.TrackException, wavelink.TrackStuck)):
 			# get ctx from data object
 			try: ctx = self.data[str(event.player.guild_id)].info["ctx"]
 			except: return # No ctx, no next_song :(
+			# Check if we had an issue
+			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+			if isinstance(event,(wavelink.TrackException,wavelink.TrackStuck)):
+				await Message.EmbedText(title="♫ Something went wrong playing that song!",description=event.reason,color=ctx.author,delete_after=delay).send(ctx)
 			self.bot.dispatch("next_song",ctx)
 
 	@commands.Cog.listener()
