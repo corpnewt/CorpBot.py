@@ -473,7 +473,7 @@ class Music(commands.Cog):
 				delete_after=delay
 			).send(ctx)
 		data = self.data.get(str(ctx.guild.id))
-		play_text = "Playing" if player.is_playing else "Paused"
+		play_text = "Playing" if (player.is_playing and not player.paused) else "Paused"
 		cv = int(player.volume*2)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,data.title),
