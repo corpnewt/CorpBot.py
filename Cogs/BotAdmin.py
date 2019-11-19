@@ -1,7 +1,7 @@
-import asyncio, discord, re
+import asyncio, discord, re, random
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName
+from   Cogs import Utils, DisplayName, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -15,6 +15,7 @@ class BotAdmin(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
+		self.mention_re = re.compile(r"\<\@!{0,1}[0-9]+\>")
 
 	async def message(self, message):
 		# Check for discord invite links and remove them if found - per server settings
@@ -146,65 +147,91 @@ class BotAdmin(commands.Cog):
 		ignored = ["*{}*".format(DisplayName.name(ctx.guild.get_member(int(x["ID"])))) for x in promoSorted if ctx.guild.get_member(int(x["ID"]))]
 		await ctx.send("Currently Ignored Users:\n{}".format("\n".join(ignored)))
 
+	
+	async def kick_ban(self, ctx, members_and_reason = None, command_name = "kick"):
+		# Helper method to handle the lifting for kick and ban
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not members_and_reason:
+			return await ctx.send('Usage: `{}{} [space delimited member mention] [reason]`'.format(ctx.prefix, command_name))
+		# Force a mention - we don't want any ambiguity
+		args = members_and_reason.split()
+		# Get our list of targets
+		targets = []
+		reason = ""
+		for index,item in enumerate(args):
+			if self.mention_re.search(item): # Check if it's a mention
+				# Resolve the member
+				member = ctx.guild.get_member(int(re.sub(r'\W+', '', item)))
+				# If we have an invalid mention - bail - no ambiguity
+				if member is None: return await ctx.send("Invalid mention passed!")
+				# We should have a valid member - let's make sure it's not:
+				# 1. The bot, 2. The command caller, 3. Another bot-admin/admin
+				if member.id == self.bot.user.id: return await ctx.send("I don't think I want to {} myself...".format(command_name))
+				if member.id == ctx.author.id: return await ctx.send("I don't think you really want to {} yourself...".format(command_name))
+				if Utils.is_bot_admin(ctx,member): return await ctx.send("You cannot {} other admins!".format(command_name))
+				targets.append(member)
+			else:
+				# Not a mention - must be the reason, dump the rest of the items into a string
+				# separated by a space
+				reason = " ".join(args[index:])
+				break
+		if not len(targets): return await ctx.send("No valid members passed!")
+		if len(targets) > 5: return await ctx.send("You can only {} up to 5 members at once!".format(command_name))
+		if not len(reason): return await ctx.send("Reason is required!")
+		# We should have a list of targets, and the reason - let's list them for confirmation
+		# then generate a 4-digit confirmation code that the original requestor needs to confirm
+		# in order to follow through
+		confirmation_code = "".join([str(random.randint(0,9)) for x in range(4)])
+		msg = "**To {} the following member{}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`".format(
+			command_name,
+			"" if len(targets) == 1 else "s",
+			"\n".join([x.name+"#"+x.discriminator for x in targets]),
+			reason,
+			confirmation_code
+			)
+		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author).send(ctx)
+		def check_confirmation(message):
+			return message.channel == ctx.channel and ctx.author == message.author # Just making sure it's the same user/channel
+		try: confirmation_user = await self.bot.wait_for('message', timeout=60, check=check_confirmation)
+		except: confirmation_user = ""
+		# Delete the confirmation message
+		await confirmation_message.delete()
+		# Verify the confirmation
+		if not confirmation_user.content == confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
+		# We got the authorization!
+		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Kick"),color=ctx.author).send(ctx)
+		canned = []
+		cant = []
+		command = ctx.guild.ban if command_name == "ban" else ctx.guild.kick
+		for target in targets:
+			try:
+				await command(target,reason=reason)
+				canned.append(target)
+			except: cant.append(target)
+		msg = ""
+		if len(canned):
+			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
+		if len(cant):
+			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in cant]))
+		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg).edit(ctx,message)
 
 	@commands.command(pass_context=True)
-	async def kick(self, ctx, *, member : str = None):
-		"""Kicks the selected member (bot-admin only)."""
-		if not await Utils.is_bot_admin_reply(ctx): return
+	async def kick(self, ctx, *, members = None, reason = None):
+		"""Kicks the passed members for the specified reason.
+		All kick targets must be mentions to avoid ambiguity.
+		You can kick up to 5 members at once.
+		The reason is required (bot-admin only).
 		
-		if not member:
-			return await ctx.send('Usage: `{}kick [member]`'.format(ctx.prefix))
-		
-		# Resolve member name -> member
-		newMem = DisplayName.memberForName(member, ctx.guild)
-		if not newMem:
-			msg = 'I couldn\'t find *{}*.'.format(member)
-			return await ctx.send(Utils.suppressed(ctx,msg))
-		
-		# newMem = valid member
-		member = newMem
-		
-		if member.id == ctx.author.id:
-			return await ctx.send('Stop kicking yourself.  Stop kicking yourself.')
-
-		# Check if we're kicking the bot
-		if member.id == self.bot.user.id:
-			return await ctx.send('Oh - you probably meant to kick *yourself* instead, right?')
-		
-		# Check if the targeted user is admin
-		if await Utils.is_bot_admin_reply(ctx,member=member,message="You can't kick other admins or bot-admins.",message_when=True): return
-		
-		# We can kick
-		await ctx.send('If this were live - you would have **kicked** *{}*'.format(DisplayName.name(member)))
+		eg:  $kick @user1#1234 @user2#5678 @user3#9012 for spamming"""
+		await self.kick_ban(ctx,members, "kick")
 		
 		
 	@commands.command(pass_context=True)
-	async def ban(self, ctx, *, member : str = None):
-		"""Bans the selected member (bot-admin only)."""
-		if not await Utils.is_bot_admin_reply(ctx): return
+	async def ban(self, ctx, *, members = None, reason = None):
+		"""Bans the passed members for the specified reason.
+		All ban targets must be mentions to avoid ambiguity.
+		You can ban up to 5 members at once.
+		The reason is required (bot-admin only).
 		
-		if not member:
-			return await ctx.send('Usage: `{}ban [member]`'.format(ctx.prefix))
-		
-		# Resolve member name -> member
-		newMem = DisplayName.memberForName(member, ctx.guild)
-		if not newMem:
-			msg = 'I couldn\'t find *{}*.'.format(member)
-			return await ctx.send(Utils.suppressed(ctx,msg))
-		
-		# newMem = valid member
-		member = newMem
-		
-		if member.id == ctx.author.id:
-			return await ctx.send('Ahh - the ol\' self-ban.  Good try.')
-
-		# Check if we're banning the bot
-		if member.id == self.bot.user.id:
-			return await ctx.send('Oh - you probably meant to ban *yourself* instead, right?')
-		
-		# Check if the targeted user is admin
-		if await Utils.is_bot_admin_reply(ctx,member=member,message="You can't ban other admins or bot-admins.",message_when=True): return
-		
-		# We can ban
-		await ctx.send('If this were live - you would have **banned** *{}*'.format(DisplayName.name(member)))
-		
+		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming"""
+		await self.kick_ban(ctx,members, "ban")
