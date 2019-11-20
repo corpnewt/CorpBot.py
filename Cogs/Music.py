@@ -753,6 +753,12 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
+	@commands.command()
+	async def disableplay(self, ctx, *, yes_no = None):
+		"""Enables/Disables the play/join/shuffle commands.  Helpful in case Youtube is rate limiting to avoid extra api calls and allow things to calm down.  Owners can still access play/join commands (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Play/Join command lock out","DisableMusic",yes_no,is_global=True))
+
 	@join.before_invoke
 	@play.before_invoke
 	@resume.before_invoke
@@ -801,3 +807,14 @@ class Music(commands.Cog):
 		if not player.is_connected:
 			if ctx.author.voice:
 				await player.connect(ctx.author.voice.channel.id)
+
+	@join.before_invoke
+	@play.before_invoke
+	@shuffle.before_invoke
+	async def ensure_music(self, ctx):
+		# If Youtube ratelimits - you can disable music globally so only owners can use it
+		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
+			# Music is off - and we're not an owner - send the bad news :(
+			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+			await Message.EmbedText(title="♫ Playing music is currently disabled!",color=ctx.author,delete_after=delay).send(ctx)
+			raise commands.CommandError("Music disabled.")
