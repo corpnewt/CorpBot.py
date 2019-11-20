@@ -235,7 +235,7 @@ class Music(commands.Cog):
 			# Check if we had an issue
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			if isinstance(event,(wavelink.TrackException,wavelink.TrackStuck)):
-				await Message.EmbedText(title="♫ Something went wrong playing that song!",description=event.reason,color=ctx.author,delete_after=delay).send(ctx)
+				await Message.EmbedText(title="♫ Something went wrong playing that song!",color=ctx.author,delete_after=delay).send(ctx)
 			self.bot.dispatch("next_song",ctx)
 
 	@commands.Cog.listener()
