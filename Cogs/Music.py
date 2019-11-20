@@ -770,7 +770,7 @@ class Music(commands.Cog):
 	@shuffle.before_invoke
 	async def ensure_roles(self, ctx):
 		if not await self._check_role(ctx):
-			raise commands.CommandError("Missing DJ roles.")
+			raise commands.CommandError("Music Cog: Missing DJ roles.")
 
 	@volume.before_invoke
 	@pause.before_invoke
@@ -786,23 +786,23 @@ class Music(commands.Cog):
 			return
 		if not ctx.author.voice:
 			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Author not connected to a voice channel..")
+			raise commands.CommandError("Music Cog: Author not connected to a voice channel..")
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if not player.is_connected:
 			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Bot not connected to a voice channel.")
+			raise commands.CommandError("Music Cog: Bot not connected to a voice channel.")
 		if ctx.author.voice.channel.id != int(player.channel_id):
 			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Author not connected to the bot's voice channel.")
+			raise commands.CommandError("Music Cog: Author not connected to the bot's voice channel.")
 
 	@play.before_invoke
 	async def ensure_voice(self, ctx):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not await self._check_role(ctx):
-			raise commands.CommandError("Missing DJ roles.")
+			raise commands.CommandError("Music Cog: Missing DJ roles.")
 		if not ctx.author.voice and not Utils.is_bot_admin(ctx):
 			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Author not connected to a voice channel.")
+			raise commands.CommandError("Music Cog: Author not connected to a voice channel.")
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if not player.is_connected:
 			if ctx.author.voice:
@@ -817,4 +817,4 @@ class Music(commands.Cog):
 			# Music is off - and we're not an owner - send the bad news :(
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			await Message.EmbedText(title="♫ Playing music is currently disabled!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Music disabled.")
+			raise commands.CommandError("Music Cog: Music disabled.")
