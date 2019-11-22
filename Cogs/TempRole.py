@@ -122,7 +122,7 @@ class TempRole(commands.Cog):
 		found_role = next((x for x in temp_roles if x["ID"] == temp_role["ID"]),None)
 		if not found_role: return # Didn't find it - bail
 		if found_role["Cooldown"] == None: # We have it forever - remove from the list
-			return self.settings.setUserStat(member, member.guild, "TempRoles", [x for x in temp_roles if not x == found_role])
+			return self.settings.setUserStat(member, member.guild, "TempRoles", [x for x in temp_roles if not x["ID"] == found_role["ID"]])
 
 		# Get the cooldown and server id
 		c    = int(found_role["Cooldown"])
@@ -131,21 +131,21 @@ class TempRole(commands.Cog):
 		# Wait until we're ready to remove
 		timeleft = c-int(time.time())
 
-		if timeleft >= 0: # We need to wait - and then we'll re-run this function
+		if timeleft > 0: # We need to wait - and then we'll re-run this function
 			await asyncio.sleep(timeleft)
-			return await self.check_temp_roles(member,temp_role)
+			return await self.check_temp_roles(member,found_role)
 			
 		# Resolve the role
 		role = member.guild.get_role(r_id)		
 		if role and role in member.roles:
 			self.settings.role.rem_roles(member, [role])
 			# Check if we pm
-			if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in temp_role:
+			if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in found_role:
 				try: await member.send("**{}** was removed from your roles in *{}*.".format(role.name, member.guild.name))
 				except: pass
 
 		# Remove it from our TempRoles setting
-		self.settings.setUserStat(member, member.guild, "TempRoles", [x for x in temp_roles if not x == found_role])
+		self.settings.setUserStat(member, member.guild, "TempRoles", [x for x in temp_roles if not x["ID"] == found_role["ID"]])
 			
 	@commands.command(pass_context=True)
 	async def temppm(self, ctx, *, yes_no = None):
