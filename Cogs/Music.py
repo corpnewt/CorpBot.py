@@ -755,66 +755,38 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def disableplay(self, ctx, *, yes_no = None):
-		"""Enables/Disables the play/join/shuffle commands.  Helpful in case Youtube is rate limiting to avoid extra api calls and allow things to calm down.  Owners can still access play/join commands (owner only)."""
+		"""Enables/Disables the music commands.  Helpful in case Youtube is rate limiting to avoid extra api calls and allow things to calm down.  Owners can still access music commands (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
-		await ctx.send(Utils.yes_no_setting(ctx,"Play/Join command lock out","DisableMusic",yes_no,is_global=True))
+		await ctx.send(Utils.yes_no_setting(ctx,"Music player lock out","DisableMusic",yes_no,is_global=True))
 
-	@join.before_invoke
-	@play.before_invoke
-	@resume.before_invoke
-	@pause.before_invoke
-	@skip.before_invoke
-	@stop.before_invoke
-	@volume.before_invoke
-	@repeat.before_invoke
-	@shuffle.before_invoke
-	async def ensure_roles(self, ctx):
+	async def cog_before_invoke(self, ctx):
+		# We don't need to ensure extra for the following commands:
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay"): return
+		# General checks for all music player commands - with specifics filtered per command
+		# If Youtube ratelimits - you can disable music globally so only owners can use it
+		player = self.bot.wavelink.get_player(ctx.guild.id)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
+			# Music is off - and we're not an owner - disconnect if connected, then send the bad news :(
+			self.dict_pop(ctx)
+			if player.is_connected:
+				await player.destroy()
+			await Message.EmbedText(title="♫ Music player is currently disabled!",color=ctx.author,delete_after=delay).send(ctx)
+			raise commands.CommandError("Music Cog: Music disabled.")
+		# Music is enabled - let's make sure we have the right role
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Music Cog: Missing DJ roles.")
-
-	@volume.before_invoke
-	@pause.before_invoke
-	@resume.before_invoke
-	@stop.before_invoke
-	@repeat.before_invoke
-	@skip.before_invoke
-	@play.before_invoke
-	@shuffle.before_invoke
-	async def ensure_same_channel(self, ctx):
-		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		if Utils.is_bot_admin(ctx):
-			return
-		if not ctx.author.voice:
-			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Music Cog: Author not connected to a voice channel..")
-		player = self.bot.wavelink.get_player(ctx.guild.id)
+		# If we're just using the join command - we don't need extra checks - they're done in the command itself
+		if ctx.command.name == "join": return
+		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
+		if ctx.command.name in ("play","shuffle") and not player.is_connected and ctx.author.voice:
+			await player.connect(ctx.author.voice.channel.id)
+		# Let's ensure the bot is connected to voice
 		if not player.is_connected:
 			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Music Cog: Bot not connected to a voice channel.")
-		if ctx.author.voice.channel.id != int(player.channel_id):
+			raise commands.CommandError("Music Cog: Not connected to a voice channel.")
+		# Let's make sure the caller is connected to voice and the same channel as the bot - or a bot-admin
+		if Utils.is_bot_admin(ctx): return # We good - have enough perms to override whatever
+		if not ctx.author.voice or not ctx.author.voice.channel.id == int(player.channel_id):
 			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Author not connected to the bot's voice channel.")
-
-	@play.before_invoke
-	async def ensure_voice(self, ctx):
-		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		if not await self._check_role(ctx):
-			raise commands.CommandError("Music Cog: Missing DJ roles.")
-		if not ctx.author.voice and not Utils.is_bot_admin(ctx):
-			await Message.EmbedText(title="♫ You are not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Music Cog: Author not connected to a voice channel.")
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
-			if ctx.author.voice:
-				await player.connect(ctx.author.voice.channel.id)
-
-	@join.before_invoke
-	@play.before_invoke
-	@shuffle.before_invoke
-	async def ensure_music(self, ctx):
-		# If Youtube ratelimits - you can disable music globally so only owners can use it
-		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
-			# Music is off - and we're not an owner - send the bad news :(
-			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-			await Message.EmbedText(title="♫ Playing music is currently disabled!",color=ctx.author,delete_after=delay).send(ctx)
-			raise commands.CommandError("Music Cog: Music disabled.")
