@@ -41,7 +41,7 @@ class Lists(commands.Cog):
 			"Tag": {
 				"l_list": "Tags",
 				"l_name": "Tag",
-				"l_key" : "Tag",
+				"l_key" : "URL",
 				"l_role": "RequiredTagRole",
 			}
 		}
