@@ -183,9 +183,9 @@ class Search(commands.Cog):
 		last = None
 		conv = []
 		for val in vals:
-			if all(x in "+-0123456789." for x in val) and num is None:
+			if all(x in "+-0123456789." for x in val if not x == ",") and num is None:
 				# Got a number
-				try: num = float(val)
+				try: num = float(val.replace(",",""))
 				except: pass # Not a valid number
 			elif val.lower() in ["from","to"]:
 				last = True if val.lower() == "to" else False
