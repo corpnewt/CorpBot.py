@@ -1,4 +1,4 @@
-import asyncio, discord, time, parsedatetime
+import asyncio, discord, time, parsedatetime, sys
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
@@ -133,7 +133,15 @@ class TempRole(commands.Cog):
 
 		if timeleft > 0: # We need to wait - and then we'll re-run this function
 			await asyncio.sleep(timeleft)
-			return await self.check_temp_roles(member,found_role)
+			try: return await self.check_temp_roles(member,found_role)
+			except RecursionError:
+				print("MAX RECURSION ({}) hit for temp role. Removing!\n   - Guild: {} - Member: {} - Role: {} - TimeLeft: {}".format(
+					sys.getrecursionlimit(),
+					member.guild,
+					member,
+					found_role,
+					timeleft)
+				)
 			
 		# Resolve the role
 		role = member.guild.get_role(r_id)		
