@@ -18,6 +18,9 @@ class Invite(commands.Cog):
 		self.approval_time = 3600 # 1 hour for an approval to roll off
 		self.request_time = 604800 # 7 x 24 x 3600 = 1 week for a request to roll off
 
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
 	async def onserverjoin(self, server):
 		# First verify if we're joining servers
 		if not self.settings.getGlobalStat("AllowServerJoin",True):
@@ -25,6 +28,8 @@ class Invite(commands.Cog):
 			temp = next((x for x in self.temp_allowed if x[0] == server.id),None)
 			if temp:
 				self.temp_allowed.remove(temp)
+				# Add to our whitelist
+				self._whitelist_server(temp[0])
 				return False
 			try:
 				await server.leave()
@@ -32,6 +37,11 @@ class Invite(commands.Cog):
 				pass
 			return True
 		return False
+
+	@commands.Cog.listener()
+	async def on_guild_remove(self, server):
+		# Remove from the whitelist if it exists
+		self._unwhitelist_server(server.id)
 
 	async def remove_request(self,user_server):
 		# Wait for the allotted time and remove the request if it still exists
@@ -48,6 +58,51 @@ class Invite(commands.Cog):
 			self.temp_allowed.remove(server_id)
 		except ValueError:
 			pass
+
+	def _check_whitelist(self):
+		# Helper method to whitelist all servers based on the "AllowServerJoin" setting - or else just revokes the whitelist entirely
+		self.settings.setGlobalStat("ServerWhitelist",None if self.settings.getGlobalStat("AllowServerJoin",True) else [x.id for x in self.bot.guilds])
+
+	def _whitelist_server(self, guild_id = None):
+		# Takes a guild id and ensures it's whitelisted
+		if not guild_id: return
+		current_whitelist = self.settings.getGlobalStat("ServerWhitelist",[])
+		current_whitelist = [] if not isinstance(current_whitelist,(list,tuple)) else current_whitelist
+		current_whitelist.append(guild_id)
+		self.settings.setGlobalStat("ServerWhitelist",current_whitelist)
+
+	def _unwhitelist_server(self, guild_id = None):
+		# Takes a guild id and removes it from the whitelist - if it finds it
+		if not guild_id: return
+		current_whitelist = self.settings.getGlobalStat("ServerWhitelist",[])
+		current_whitelist = [] if not isinstance(current_whitelist,(list,tuple)) else [x for x in current_whitelist if not x == guild_id]
+		self.settings.setGlobalStat("ServerWhitelist",current_whitelist if len(current_whitelist) else None)
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		await self.bot.wait_until_ready()
+		# Check if we have the whitelist setup - and if not, auto-whitlelist all joined servers
+		if self.settings.getGlobalStat("AllowServerJoin", True): return # No need to check - not restricting
+		print("Verifying server whitelist...")
+		current_whitelist = self.settings.getGlobalStat("ServerWhitelist",None)
+		if not current_whitelist:
+			print("No whitelist found - creating one with current servers.")
+			return self._check_whitelist() # If we don't have one saved - save one and bail
+		# Let's gather a list of any server we're on that's not in the whitelist
+		server_list = [x.id for x in self.bot.guilds]
+		bail_list = [x for x in server_list if not x in current_whitelist]
+		# Leave the unwhitelisted servers
+		t = time.time()
+		for x in bail_list:
+			server = self.bot.get_guild(x)
+			print(" - {} not in whitelist - leaving...".format(x))
+			try: 
+				if server: await server.leave()
+			except: print(" --> I couldn't leave {} :(".format(x))
+		print("Whitelist verified - took {} seconds.".format(time.time() - t))
 
 	@commands.command()
 	async def invite(self, ctx, invite_url = None):
@@ -230,6 +285,8 @@ class Invite(commands.Cog):
 			yes_no = current
 		if not yes_no == None and not yes_no == current:
 			self.settings.setGlobalStat(setting_val, yes_no)
+		# Force the whitelist update
+		self._check_whitelist()
 		await ctx.send(msg)
 
 	@commands.command()
