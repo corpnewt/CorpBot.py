@@ -194,7 +194,8 @@ class Search(commands.Cog):
 				conv.append([last,val])
 				if len(conv) >= 2: break # We have enough values
 				last = None
-		if num is None or len(conv) < 2:
+		if num is None: num = 1
+		if len(conv) < 2:
 			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - Type `{}convert` for a list of valid currencies.".format(ctx.prefix,ctx.prefix))
 		if num == 0:
 			return await ctx.send("Anything times 0 is 0, silly.")
@@ -238,4 +239,3 @@ class Search(commands.Cog):
 							return result_category
 		
 		return result_category
-
