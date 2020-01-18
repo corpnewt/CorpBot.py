@@ -148,7 +148,7 @@ class Reddit(commands.Cog):
 							theURL = imageURL				
 				if not theURL:
 					continue
-				returnDict = { 'title': theJSON['title'], 'url': HTMLParser().unescape(theURL), 'over_18': theJSON['over_18'] }
+				returnDict = { 'title': theJSON['title'], 'url': HTMLParser().unescape(theURL), 'over_18': theJSON['over_18'], 'permalink': theJSON['permalink'] }
 				break
 			except Exception:
 				continue
@@ -299,14 +299,14 @@ class Reddit(commands.Cog):
 		if infoDict['over_18']:
 			# NSFW - check admin
 			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+		await Message.Embed(title=infoDict["title"], url="https://www.reddit.com"+infoDict["permalink"], image=infoDict["url"], color=ctx.author).send(ctx)
 
 	async def _image_do(self, ctx, url):
 		if not self.canDisplay(ctx.guild): return
 		# Grab our image title and url
 		infoDict = await self.getInfo(url)
-		if not infoDict: return await ctx.send("Whoops! I couldn't find a working link.")		
-		await GetImage.get(ctx, infoDict['url'], infoDict['title'], self.ua)
+		if not infoDict: return await ctx.send("Whoops! I couldn't find a working link.")
+		return await Message.Embed(title=infoDict["title"], url="https://www.reddit.com"+infoDict["permalink"], image=infoDict["url"], color=ctx.author).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def beeple(self, ctx):
