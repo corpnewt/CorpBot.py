@@ -1,5 +1,6 @@
 import asyncio, discord, re, os, random
 from discord.ext import commands
+from collections import OrderedDict
 from Cogs import Utils, DisplayName, Nullify, FuzzySearch, PickList, Message
 
 def setup(bot):
@@ -637,7 +638,7 @@ class Telephone(commands.Cog):
 					matches = [x.group(0) for x in re.finditer(self.regex, talk_msg)]
 					dmatches = [x.group(0) for x in re.finditer(self.dregex, talk_msg)]
 					matches.extend(dmatches)
-					matches = set(matches)
+					matches = OrderedDict.fromkeys(matches) # Use an OrderedDict to avoid duplicates
 					# Now we iterate that list and replace all links with `link removed`
 					for x in matches:
 						talk_msg = talk_msg.replace(x,"`link removed`")
