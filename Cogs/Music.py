@@ -273,7 +273,8 @@ class Music(commands.Cog):
 		# Just a helper to play the next song without hanging things up
 		await player.play(track)
 		# Seek if we need to
-		if track.info["seek"]: await player.seek(track.info["seek"]*1000)
+		seek = track.info.get("seek",0)*1000
+		if seek and not seek > track.duration: await player.seek(track.info["seek"]*1000)
 	
 	@commands.Cog.listener()
 	async def on_next_song(self,ctx,error=None):
