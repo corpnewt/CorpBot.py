@@ -121,6 +121,30 @@ class Music(commands.Cog):
 			tracks.info["added_by"] = ctx.author
 			tracks.info["ctx"] = ctx
 			tracks.info["search"] = url
+			# Let's also get the seek position if needed
+			try:
+				seek_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("t=")),"0").lower()
+				values = [x for x in re.split("(\\d+)",seek_str) if x]
+				# We should have a list of numbers and non-numbers.  Let's total the values
+				total_time = 0
+				last_type = "s" # Assume seconds in case no value is given
+				for x in values[::-1]:
+					if not x.isdigit():
+						# Save the type
+						last_type = x
+						continue
+					# We have a digit, let's calculate and add our time
+					# Only factor hours, minutes, seconds - anything else is ignored
+					if last_type == "h":
+						total_time += int(x) * 3600
+					elif last_type == "m":
+						total_time += int(x) * 60
+					elif last_type == "s":
+						total_time += int(x)
+				seek_pos = total_time
+			except Exception as e:
+				seek_pos = 0
+			tracks.info["seek"] = seek_pos
 			queue.append(tracks)
 			self.queue[str(ctx.guild.id)] = queue
 			if not player.is_playing and not player.paused:
@@ -248,6 +272,8 @@ class Music(commands.Cog):
 	async def on_play_next(self,player,track):
 		# Just a helper to play the next song without hanging things up
 		await player.play(track)
+		# Seek if we need to
+		if track.info["seek"]: await player.seek(track.info["seek"]*1000)
 	
 	@commands.Cog.listener()
 	async def on_next_song(self,ctx,error=None):
