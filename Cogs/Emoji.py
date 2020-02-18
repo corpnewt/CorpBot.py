@@ -36,44 +36,59 @@ class Emoji(commands.Cog):
         # Check attachments first - as they'll have priority
         if len(ctx.message.attachments):
             name = emoji
-            emoji = ctx.message.attachments[0].url
-        else:
-            # We can assume we have something text based, let's split, set emoji to the first item, and name
-            # to anything else with spaces replaced by _
-            emoji_parts = emoji.split()
-            emoji = emoji_parts[0]
-            if len(emoji_parts) > 1:
-                name = "_".join(emoji_parts[1:])
-        # Now we should have the emoji - let's see if we have a direct url, or if it's an emoji item
-        urls = Utils.get_urls(emoji)
-        if urls:
-            # It's a url - sweet, save only the first
-            emoji = (urls[0], os.path.basename(urls[0]).split(".")[0])
-        else:
-            # It's not a url - check if it's an emoji
-            emoji = self._get_emoji_url(emoji)
-        if not emoji:
-            # Something is bonked
-            return await ctx.send("The passed emoji, url, or attachment was not valid.")
-        # Let's try to download it
-        emoji, e_name = emoji # Expand into the parts
-        f = await GetImage.download(emoji)
-        if not f: return await ctx.send("I couldn't get that image :(")
-        # Open the image file
-        with open(f,"rb") as e:
-            image = e.read()
-        # Clean up
-        GetImage.remove(f)
-        # Let's get the name
-        if not name:
-            name = os.path.basename(e_name).split(".")[0]
-        # Ensure it's only A-Z,0-9 or _ in the name
-        name = "".join([x for x in name if x.isalnum() or x is "_"])
-        if not name.replace("_",""): return await ctx.send("Invalid name - cannot create this emoji.")
-        # Create the emoji and display it
-        try: new_emoji = await ctx.guild.create_custom_emoji(name=name,image=image,roles=None,reason="Added by {}#{}".format(ctx.author.name,ctx.author.discriminator))
-        except: return await ctx.send("Something went wrong creating that emoji :(")
-        await ctx.send("Created `:{}:` - {}".format(new_emoji.name,self._get_emoji_mention(new_emoji)))
+            emoji = " ".join([x.url for x in ctx.message.attachments])
+            if name: # Add the name separated by a space
+                emoji += " "+name
+        # Now we split the emoji string, and walk it, looking for urls, emojis, and names
+        emojis_to_add = []
+        last_name = []
+        for x in emoji.split():
+            # Check for a url
+            urls = Utils.get_urls(x)
+            if len(urls):
+                url = (urls[0], os.path.basename(urls[0]).split(".")[0])
+            else:
+                # Check for an emoji
+                url = self._get_emoji_url(x)
+                if not url:
+                    # Gotta be a part of the name - add it
+                    last_name.append(x)
+                    continue
+            if len(emojis_to_add) and last_name:
+                # Update the previous name if need be
+                emojis_to_add[-1][1] = "".join([z for z in "_".join(last_name) if z.isalnum() or z == "_"])
+            # We have a valid url or emoji here
+            emojis_to_add.append([url[0],url[1]])
+            # Reset last_name
+            last_name = []
+        if len(emojis_to_add) and last_name:
+            # Update the final name if need be
+            emojis_to_add[-1][1] = "".join([z for z in "_".join(last_name) if z.isalnum() or z == "_"])
+        if not emojis_to_add: return await ctx.send("Usage: `{}addemoji [emoji, url, attachment] [name]`".format(ctx.prefix))
+        # Now we have a list of emojis and names
+        added_emojis = []
+        message = await ctx.send("Adding {} emoji{}...".format(len(emojis_to_add),"" if len(emojis_to_add)==1 else "s"))
+        for emoji_to_add in emojis_to_add:
+            # Let's try to download it
+            emoji,e_name = emoji_to_add # Expand into the parts
+            f = await GetImage.download(emoji)
+            if not f: continue
+            # Open the image file
+            with open(f,"rb") as e:
+                image = e.read()
+            # Clean up
+            GetImage.remove(f)
+            if not e_name.replace("_",""): continue
+            # Create the emoji and save it
+            try: new_emoji = await ctx.guild.create_custom_emoji(name=e_name,image=image,roles=None,reason="Added by {}#{}".format(ctx.author.name,ctx.author.discriminator))
+            except: continue
+            added_emojis.append(new_emoji)
+        msg = "Created {} of {} emoji{}.".format(len(added_emojis),len(emojis_to_add),"" if len(emojis_to_add)==1 else "s")
+        if len(added_emojis):
+            msg += "\n\n"
+            emoji_text = ["{} - `:{}:`".format(self._get_emoji_mention(x),x.name) for x in added_emojis]
+            msg += "\n".join(emoji_text)
+        await message.edit(content=msg)
 
     @commands.command()
     async def emoji(self, ctx, emoji = None):
