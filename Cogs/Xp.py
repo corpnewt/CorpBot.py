@@ -1055,6 +1055,10 @@ class Xp(commands.Cog):
 
 		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
 		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
+		if member.premium_since:
+			local_time = UserTime.getUserTime(ctx.author, self.settings, member.premium_since, clock=True)
+			c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
+			stat_embed.add_field(name="Boosting Since",value=c_time_str)
 		
 		if member.activity and member.activity.name:
 			# Playing a game!
