@@ -148,7 +148,13 @@ class Reddit(commands.Cog):
 							theURL = imageURL				
 				if not theURL:
 					continue
-				returnDict = { 'title': theJSON['title'], 'url': HTMLParser().unescape(theURL), 'over_18': theJSON['over_18'], 'permalink': theJSON['permalink'] }
+				returnDict = { 
+					'title': theJSON['title'], 
+					'url': HTMLParser().unescape(theURL), 
+					'over_18': theJSON['over_18'], 
+					'permalink': theJSON['permalink'], 
+					'score' : theJSON['score'], 
+					'num_comments' : theJSON['num_comments'] }
 				break
 			except Exception:
 				continue
@@ -306,7 +312,15 @@ class Reddit(commands.Cog):
 		# Grab our image title and url
 		infoDict = await self.getInfo(url)
 		if not infoDict: return await ctx.send("Whoops! I couldn't find a working link.")
-		return await Message.Embed(title=infoDict["title"], url="https://www.reddit.com"+infoDict["permalink"], image=infoDict["url"], color=ctx.author).send(ctx)
+		return await Message.Embed(
+			title=infoDict["title"], 
+			url="https://www.reddit.com"+infoDict["permalink"], 
+			image=infoDict["url"], 
+			color=ctx.author,
+			footer="Score: {:,} | Comments: {:,}".format(
+				infoDict["score"],
+				infoDict["num_comments"]
+			)).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def beeple(self, ctx):
