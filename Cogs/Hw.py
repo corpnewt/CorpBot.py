@@ -1,4 +1,5 @@
-import asyncio, discord, time
+import asyncio, discord, time, json
+from   discord.errors import HTTPException
 from   discord.ext import commands
 from   Cogs import Utils, ReadableTime, PCPP, DisplayName, Message
 
@@ -17,6 +18,10 @@ class Hw(commands.Cog):
 		self.settings = settings
 		self.hwactive = {}
 		self.charset = "0123456789"
+
+		# Something stupid that no one would ever actually use...
+		self.embedPrefix = "^^&&^^&&"
+
 
 	def gen_id(self):
 		# Just use the current time as that shouldn't ever be the same (unless a user
@@ -242,9 +247,22 @@ class Hw(commands.Cog):
 
 		# Here, we have a build
 		bname = Utils.suppressed(ctx,mainBuild['Name'])
-		bparts = Utils.suppressed(ctx,mainBuild['Hardware'])
-		
-		msg = '"{}"\'s current parts:'.format(bname)
+		bparts = Utils.suppressed(ctx,mainBuild['Hardware'])		
+
+		isEmbed = False
+
+		# Check if it's an embed to change inital msg and launch embed editer
+		if bparts.startswith(self.embedPrefix):
+			isEmbed = True
+
+		msg = ""
+
+		# Embed already contains title, just say we're retrieving parts
+		if isEmbed:
+			msg = "Retrieving parts..."
+		else:
+			msg = '__**{}\'s current parts:**__'.format(bname)
+
 		try:
 			await hwChannel.send(msg)
 		except:
@@ -256,64 +274,18 @@ class Hw(commands.Cog):
 			return
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
-		await hwChannel.send(bparts)
+		
+		if isEmbed:
+			mainBuild = await self.getEmbeddedHardware(hw_id, ctx, hwChannel, mainBuild, bname)
+		else:
+			await hwChannel.send(bparts)
+			mainBuild = await self.getHardware(hw_id, ctx, hwChannel, mainBuild, bname)
 
-		msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
-		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
-		msg += 'For example: '
-		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
-		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
-		while True:
-			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
-			if not parts:
-				self._stop_hw(ctx.author)
-				return
-			if 'pcpartpicker.com' in parts.content.lower():
-				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
-				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
-				if test == None:
-					self._stop_hw(ctx.author)
-					return
-				elif test == True:
-					partList = parts.content.split()
-					if len(partList) == 1:
-						partList.append(None)
-					output = None
-					try:
-						output = await PCPP.getMarkdown(partList[0], partList[1], False)
-					except:
-						pass
-					if not output:
-						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
-						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
-					if len(output) > 2000:
-						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
-						msg += '\nMaybe see if you can prune up that list a bit and try again?'
-						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
-					# Make sure
-					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
-						# Timed out
-						self._stop_hw(ctx.author)
-						return
-					elif conf == False:
-						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
-						continue
+		if not mainBuild:
+			return
 
-					m = '{} set to:\n{}'.format(bname, output)
-					await hwChannel.send(m)
-					mainBuild['Hardware'] = output
-					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-					break
-			mainBuild['Hardware'] = parts.content
-			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-			break
+		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+
 		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
@@ -631,11 +603,31 @@ class Hw(commands.Cog):
 				return await ctx.send(msg)
 		
 		# At this point - we *should* have a user and a build
-		msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
-		msg = msg_head + buildParts['Hardware']
-		if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
-			msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
-		await ctx.send(Utils.suppressed(ctx,msg))
+		if buildParts['Hardware'].startswith(self.embedPrefix):
+			hardware = EmbeddedHardware.parse(buildParts['Hardware'].replace(self.embedPrefix, ""))
+
+			embed = discord.Embed()
+			embed.title = "{}'s {}".format(DisplayName.name(memFromName), buildParts['Name'])
+			embed.color = ctx.author.color	
+
+			embed.description = hardware.description
+			embed.clear_fields()
+
+			if not hardware.thumbnail == None:
+				embed.set_thumbnail(url=hardware.thumbnail)
+
+			for x in hardware.fields:
+				embed.add_field(name=x.title, value=x.body)
+
+			await ctx.channel.send(embed=embed)
+		
+		else:
+
+			msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
+			msg = msg_head + buildParts['Hardware']
+			if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
+				msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
+			await ctx.send(Utils.suppressed(ctx,msg))
 
 
 	@commands.command(pass_context=True)
@@ -824,7 +816,7 @@ class Hw(commands.Cog):
 
 		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
 		if len(buildList) == 1:
-			msg += 'You currently have *1 build* on file.\n\n'
+			msg += 'You currently have *1 build* on file.\n\nLet\'s get started!'
 		else:
 			msg += 'You currently have *{} builds* on file.\n\nLet\'s get started!'.format(len(buildList))
 
@@ -840,12 +832,25 @@ class Hw(commands.Cog):
 
 		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
 			await ctx.message.add_reaction("📬")
-		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
 		
+		# Prompt if user wants to use embeds
+		msg = '*{}*, would you like to make this build an embed? (y/n/stop)'.format(DisplayName.name(ctx.author))
+		embedConf = await self.confirm(hw_id, ctx, None, hwChannel, msg)
+
+		if embedConf == None:
+			self._stop_hw(ctx.author)
+			return
+
+		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
+
 		# Get the build name
 		newBuild = { 'Main': True }
 		while True:
 			buildName = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
+			if embedConf and len(buildName.content) > 230:
+				await hwChannel.send("This title is too long. It needs to be under 230 characters, and you are at {} characters.".format(len(buildName.content)))
+				continue
+
 			if not buildName:
 				self._stop_hw(ctx.author)
 				return
@@ -860,6 +865,28 @@ class Hw(commands.Cog):
 				newBuild['Name'] = buildName.content
 				break
 		bname = Utils.suppressed(ctx,buildName.content)
+
+		if embedConf:
+			newBuild = await self.getEmbeddedHardware(hw_id, ctx, hwChannel, newBuild, bname)
+		else:
+			newBuild = await self.getHardware(hw_id, ctx, hwChannel, newBuild, bname)
+
+		if not newBuild:
+			return
+
+		# Check if we already have a main build and clear it
+		for build in buildList:
+			if build['Main']:
+				build['Main'] = False
+
+		buildList.append(newBuild)
+		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
+		self._stop_hw(ctx.author)
+		await hwChannel.send(msg)
+
+	# Get Parts from User
+	async def getHardware(self, hw_id, ctx, hwChannel, build, bname):
 		msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)\n'.format(DisplayName.name(ctx.author), bname)
 		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
 		msg += 'For example: '
@@ -910,21 +937,266 @@ class Hw(commands.Cog):
 						continue
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
-					newBuild['Hardware'] = output
+					build['Hardware'] = output
+					return build
+			build['Hardware'] = parts.content
+			return build
+
+	async def getEmbeddedHardware(self, hw_id, ctx, hwChannel, build, bname):
+		# Example embed
+		if "Hardware" not in build:
+			build['Hardware'] = "{ \"desc\":\"Description\", \"fields\": [{\"title\":\"Field\", \"body\":\"Field Body\"}] }"
+
+		hardware = EmbeddedHardware.parse(build['Hardware'].replace(self.embedPrefix, ""))
+		displayName = DisplayName.name(ctx.author)
+
+		msg = "Your embed currently looks like this:"
+		msg2 = "To save this build, use `Finalize`. You may use a listed command from below or paste a PCPartPicker link.\n"
+		msg2 += "(Add Field/Edit Field/Remove Field/Edit Description/Remove Description/Edit Thumbnail/Remove Thumbnail/Finalize/Stop)"
+
+		errMsg = "The embed cannot be displayed! Make sure your thumbnail total is under 6000 characters (you may need to remove fields or edit them).\n"
+		errMsg += "__This build *cannot* be finalized with the `Finalize` command until this is fixed.__"
+
+		newDescMsg = "What would you like the new description to be?"
+		newThumbnailMsg = "Provide a link to an image you'd like to use. It must start with `http` or `https`"
+
+		while True:
+			# Reset Failure
+			failure = False
+
+			embed = discord.Embed()
+			embed.title = "{}'s {}".format(displayName, bname)
+			embed.color = ctx.author.color
+			
+			failure = False
+			embed.description = hardware.description
+			embed.clear_fields()
+
+			if not hardware.thumbnail == None:
+				embed.set_thumbnail(url=hardware.thumbnail)
+			
+			for x in hardware.fields:
+				embed.add_field(name=x.title, value=x.body)
+
+			try: 
+				await hwChannel.send(msg, embed=embed)
+			except HTTPException as exception:
+				# Thumbnail is invalid - remove it and print it out
+				if "Not a well formed URL." in exception.args[0]:
+					await hwChannel.send("__Thumbnail link removed.__ Thumbnail link was invalid and prevented the embed from forming correctly")
+					
+					# Bad
+					embed._thumbnail = None
+					
+					hardware.thumbnail = None
+					await hwChannel.send(embed=embed)
+				else:
+					await hwChannel.send(errMsg)
+					# Prevent finalization since it's likely longer than 6000 characters
+					failure = True
+				
+			
+			parts = await self.prompt(hw_id, ctx, msg2, hwChannel, DisplayName.name(ctx.author), False)
+
+
+			if not parts:
+				self._stop_hw(ctx.author)
+				return
+
+			if "pcpartpicker.com" in parts.content.lower():
+				useLinkMsg = "Do you want to use this pcpartpicker link? This will overwrite all of your current hardware fields (y/n/stop)"
+				useLink = await self.confirm(hw_id, ctx, None, hwChannel, useLinkMsg)
+				
+				if not useLink:
+					continue
+				
+				try:
+					# No formatting please
+					output = await PCPP.getMarkdown(parts.content)
+				except:
+					pass
+
+				if not output:
+					msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
+					await hwChannel.send(msg)
+					continue
+				
+				newFields = []
+
+				# Time to parse the already parsed response
+				for line in output.splitlines():
+					if "```" in line or not line:
+						continue
+
+					parts = line.split(":")
+					if len(parts) != 2:
+						continue
+
+					newFields.append(EmbeddedHardwareField(parts[0].strip(), parts[1].strip()))
+				
+				# I really doubt this would ever happen, but just in case
+				if len(newFields) == 0:
+					await hwChannel.send("There is no information in this link! Ignoring link")
+					continue
+
+				if len(newFields) > 25:
+					await hwChannel.send("I appreciate your enthusiasm, but this has too many pieces of hardware. The max I can handle in an embed is *25*, and there are {}".format(len(newFields)))
+					continue
+			
+				hardware.fields = newFields
+
+			elif "finalize" in parts.content.lower():
+				if failure:
+					await hwChannel.send("Cannot finalize until issues are fixed")
+					continue
+
+				build["Hardware"] = self.embedPrefix + hardware.serialize()
+				return build
+
+			elif "add field" in parts.content.lower():
+				if len(hardware.fields) == 25:
+					await hwChannel.send("There is a max of 25 Fields, you may think of combining some of your fields")
+					continue
+
+				newTitle, newBody = await self.getField(hw_id, ctx, hwChannel)
+				hardware.fields.append(EmbeddedHardwareField(newTitle.content, newBody.content))
+
+			elif "edit field" in parts.content.lower():
+				# Get all the titles and append a number in front
+				fieldList = "Fields:\n"
+				index = 1
+
+				for x in hardware.fields:
+					fieldList += "{}: {}\n".format(index, x.title)
+					index += 1
+
+				fieldList += "Which field would you like to edit? Enter in the number of the field"
+				fieldToEdit = None
+				
+				# Loop until we get a valid number
+				while True:
+					fieldToEdit = await self.prompt(hw_id, ctx, fieldList, hwChannel, DisplayName.name(ctx.author), False)
+				
+					if not fieldToEdit:
+						break
+					
+					# Try to get a number out of the message
+					try:
+						index = int(fieldToEdit.content)
+					except ValueError:
+						await hwChannel.send("Invalid number. Make sure it is an actual field between 1 and {}".format(len(hardware.fields)))
+						continue
+
+					# Check field actually exists
+					if index < 1 or index > len(hardware.fields):
+						await hwChannel.send("Invalid number. Make sure it is an actual field between 1 and {}".format(len(hardware.fields)))
+						continue
+
+					# Woah, We actually got a number?
+					fieldToEdit = hardware.fields[index - 1]
 					break
-			newBuild['Hardware'] = parts.content
+
+				if not fieldToEdit:
+					continue
+
+				# We have the build now
+				newTitle, newBody = await self.getField(hw_id, ctx, hwChannel)
+
+				fieldToEdit.title = newTitle.content
+				fieldToEdit.body = newBody.content
+
+			elif "remove field" in parts.content.lower():
+				# Get all the titles and append a number in front
+				fieldList = "Fields:\n"
+				index = 1
+
+				for x in hardware.fields:
+					fieldList += "{}: {}\n".format(index, x.title)
+					index += 1
+
+				fieldList += "Which field would you like to edit? Enter in the number of the field"
+				fieldToEdit = None
+				
+				# Loop until we get a valid number
+				while True:
+					fieldToEdit = await self.prompt(hw_id, ctx, fieldList, hwChannel, DisplayName.name(ctx.author), False)
+				
+					if not fieldToEdit:
+						break
+					
+					# Try to get a number out of the message
+					try:
+						index = int(fieldToEdit.content)
+					except ValueError:
+						await hwChannel.send("Invalid number. Make sure it is an actual field between 1 and {}".format(len(hardware.fields)))
+						continue
+
+					# Check field actually exists
+					if index < 1 or index > len(hardware.fields):
+						await hwChannel.send("Invalid number. Make sure it is an actual field between 1 and {}".format(len(hardware.fields)))
+						continue
+
+					# Woah, We actually got a number?
+					del hardware.fields[index - 1]
+					break
+
+			elif "edit description" in parts.content.lower():
+				newDescription = None
+				while True:
+					newDescription = await self.prompt(hw_id, ctx, newDescMsg, hwChannel, DisplayName.name(ctx.author), False)
+					if not newDescription:
+						break
+					
+					if len(newDescription.content) > 2048:
+						await hwChannel.send("Please limit the description to be 2048 characters or less")
+						continue
+					hardware.description = newDescription.content
+					break
+			elif "remove description" in parts.content.lower():
+				hardware.description = None
+			elif "edit thumbnail" in parts.content.lower():
+				while True:		
+					newThumbnail = await self.prompt(hw_id, ctx, newThumbnailMsg, hwChannel, DisplayName.name(ctx.author), False)
+					if not newThumbnail:
+						break
+
+					hardware.thumbnail = newThumbnail.content
+					break
+
+			elif "remove thumbnail" in parts.content.lower():
+				hardware.thumbnail = None
+			else:
+				await hwChannel.send("Invalid command")
+
+		return None
+
+	async def getField(self, hw_id, ctx, hwChannel):
+		newTitleMsg = "What would you like the title of this field to be?"
+		newBodyMsg = "What would you like the body of this field to be?"
+		
+		newTitle, newBody = None, None
+
+		while True:
+			newTitle = await self.prompt(hw_id, ctx, newTitleMsg, hwChannel, DisplayName.name(ctx.author), False)
+			if not newTitle:
+				return
+
+			if len(newTitle.content) > 256:
+				await hwChannel.send("The max length for the title is 256 characters, and you are at {}".format(len(newTitle.content)))
+				continue
 			break
 
-		# Check if we already have a main build and clear it
-		for build in buildList:
-			if build['Main']:
-				build['Main'] = False
+		while True:
+			newBody = await self.prompt(hw_id, ctx, newBodyMsg, hwChannel, DisplayName.name(ctx.author), False)
+			if not newTitle:
+				return
+			
+			if len(newBody.content) > 1024:
+				await hwChannel.send("The body of a field must stay below 1024 characters, and you are at {}".format(len(newBody.content)))
+				continue
+			break
 
-		buildList.append(newBuild)
-		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
-		self._stop_hw(ctx.author)
-		await hwChannel.send(msg)
+		return newTitle, newBody
 
 	# New HW helper methods
 	def channelCheck(self, msg, dest = None):
@@ -1051,7 +1323,7 @@ class Hw(commands.Cog):
 				else:
 					return False
 
-	async def prompt(self, hw_id, ctx, message, dest = None, author = None):
+	async def prompt(self, hw_id, ctx, message, dest = None, author = None, confirm = True):
 		# Get author name
 		authorName = None
 		if author:
@@ -1102,6 +1374,10 @@ class Hw(commands.Cog):
 					msg = "No problem, *{}!*  See you later!".format(authorName, ctx.prefix)
 					await dest.send(msg)
 					return None
+				
+				if not confirm:
+					return talk
+
 				# Make sure
 				conf = await self.confirm(hw_id, ctx, talk, dest, "", author)
 				if conf == True:
@@ -1113,3 +1389,44 @@ class Hw(commands.Cog):
 				else:
 					# Timed out
 					return None
+
+class EmbeddedHardware:
+	def __init__(self, description, thumbnail, fields):
+		self.description = description
+		self.thumbnail = thumbnail
+		self.fields = fields
+
+	def serialize(self):
+		serializedFields = []
+		for x in self.fields:
+			serializedFields.append(x.serialize())
+
+		string = json.dumps({
+			"desc": self.description,
+			"thumbnail": self.thumbnail,
+			"fields": serializedFields
+		}, indent=4)
+
+		return string
+
+	@staticmethod
+	def parse(hardware):
+		obj = json.loads(hardware)
+
+		fields = []
+		if "fields" in obj:
+			for field in obj.get("fields"):
+				fields.append(EmbeddedHardwareField(field.get("title"), field.get("body")))
+
+		return EmbeddedHardware(obj.get("desc"), obj.get("thumbnail"), fields)
+
+class EmbeddedHardwareField:
+	def __init__(self, title, body):
+		self.title = title
+		self.body = body
+
+	def serialize(self):
+		return {
+			"title": self.title,
+			"body": self.body,
+		}
