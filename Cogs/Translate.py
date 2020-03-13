@@ -9,9 +9,9 @@ import os
 import mtranslate
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Translate(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Translate(bot, settings))
 
 # Requires the mtranslate module be installed
 
@@ -20,6 +20,9 @@ class Translate(commands.Cog):
     def __init__(self, bot, settings, language_file = "Languages.json"):
         self.bot = bot
         self.settings = settings
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
         if os.path.exists(language_file):
             f = open(language_file,'r')

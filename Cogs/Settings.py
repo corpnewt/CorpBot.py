@@ -138,6 +138,9 @@ class Settings(commands.Cog):
 		self.is_current = False # Used for stopping loops
 		self.role = RoleManager(bot)
 		self.pd = PandorasDB.PandorasDB()
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 		# Database time!!!!!
 		# self.r = redis.Redis(host="localhost",port=6379,db=0,decode_responses=True)

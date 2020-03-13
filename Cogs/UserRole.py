@@ -17,6 +17,9 @@ class UserRole(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.loop_list = []
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")

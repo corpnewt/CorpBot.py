@@ -13,6 +13,9 @@ class Quote(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction, member):

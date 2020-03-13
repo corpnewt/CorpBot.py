@@ -18,6 +18,9 @@ class Channel(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def member_update(self, before, after):
 		# Check if the member went offline and log the time

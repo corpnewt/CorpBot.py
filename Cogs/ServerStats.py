@@ -3,15 +3,18 @@ from   discord.ext import commands
 from   Cogs        import Nullify, DisplayName, UserTime, Message, PickList
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(ServerStats(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(ServerStats(bot, settings))
 
 class ServerStats(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     async def message(self, message):
         # Check the message and see if we should allow it - always yes.
@@ -129,7 +132,7 @@ class ServerStats(commands.Cog):
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
         server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id+1, self.bot.shard_count), inline=True)
         server_embed.add_field(name="Nitro Boosts",value="{} (level {})".format(guild.premium_subscription_count,guild.premium_tier))
-	    # Find out where in our join position this server is
+        # Find out where in our join position this server is
         joinedList = []
         popList    = []
         for g in self.bot.guilds:
@@ -307,7 +310,7 @@ class ServerStats(commands.Cog):
                 ), "inline" : False}
             ],
             color=ctx.message.author).edit(ctx, message)
-	
+    
     @commands.command()
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""

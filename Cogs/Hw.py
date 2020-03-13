@@ -17,6 +17,9 @@ class Hw(commands.Cog):
 		self.settings = settings
 		self.hwactive = {}
 		self.charset = "0123456789"
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def gen_id(self):
 		# Just use the current time as that shouldn't ever be the same (unless a user

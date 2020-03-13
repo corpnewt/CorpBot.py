@@ -6,7 +6,6 @@ import random
 import math
 import subprocess
 from   discord.ext import commands
-from   Cogs import DisplayName
 from   Cogs import Settings
 from   Cogs import Message
 
@@ -22,6 +21,7 @@ class CogManager(commands.Cog):
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
+		self.preloads = ("Cogs.Utils","Cogs.DisplayName","Cogs.Settings","Cogs.Mute")
 		self.bot = bot
 		self.settings = settings
 		self.colors = [ 
@@ -86,20 +86,17 @@ class CogManager(commands.Cog):
 		# starts with Settings, then Mute
 		if extension == None:
 			# Load them all!
-			if "Cogs.Settings" in self.bot.extensions:
-				# Unload first
-				self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs.Settings"))
-				self.bot.unload_extension("Cogs.Settings")
-			if "Cogs.Mute" in self.bot.extensions:
-				# Unload first
-				self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs.Mute"))
-				self.bot.unload_extension("Cogs.Mute")
-			self.bot.load_extension("Cogs.Settings")
-			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Settings"))
-			self.bot.load_extension("Cogs.Mute")
-			self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs.Mute"))
-			cog_count = 2 # Assumes the prior 2 loaded correctly
-			cog_loaded = 2 # Again, assumes success above
+			for x in self.preloads:
+				if x in self.bot.extensions:
+					self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
+					try: self.bot.unload_extension(x)
+					except: print("{} failed to unload!".format(x))
+				try:
+					self.bot.load_extension(x)
+					self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
+				except: print("{} failed to load!".format(x))
+			cog_count = len(self.preloads) # Assumes the prior 2 loaded correctly
+			cog_loaded = len(self.preloads) # Again, assumes success above
 			# Load the rest of the cogs
 			for ext in os.listdir("Cogs"):
 				# Avoid reloading Settings and Mute

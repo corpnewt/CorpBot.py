@@ -215,6 +215,9 @@ class Actions(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command(pass_context=True)
 	async def eat(self, ctx, *, member : str = None):

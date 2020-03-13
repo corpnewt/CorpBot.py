@@ -14,6 +14,9 @@ class OfflineUser(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.settings = bot.get_cog("Settings")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	async def _send_message(self, ctx, msg, pm = False):
 		# Helper method to send messages to their proper location

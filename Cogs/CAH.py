@@ -197,6 +197,9 @@ class CAH(commands.Cog):
         self.minMembers = 3
         self.loopsleep = 0.05
         self.loop_list = []
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
         if file == None:
             file = "deck.json"
         # Let's load our deck file

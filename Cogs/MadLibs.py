@@ -26,6 +26,9 @@ class MadLibs(commands.Cog):
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
 		self.playing_madlibs = {}
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):

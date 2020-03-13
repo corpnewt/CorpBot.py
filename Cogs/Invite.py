@@ -17,6 +17,9 @@ class Invite(commands.Cog):
 		self.temp_allowed = []
 		self.approval_time = 3600 # 1 hour for an approval to roll off
 		self.request_time = 604800 # 7 x 24 x 3600 = 1 week for a request to roll off
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")

@@ -13,6 +13,9 @@ class Discogs(commands.Cog):
 	def __init__(self, bot, auth_file: str = None):
 		self.bot = bot
 		self.key = bot.settings_dict.get("discogs","")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes

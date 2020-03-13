@@ -3,9 +3,9 @@ from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Xp
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Promote(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Promote(bot, settings))
 
 # This module is for auto promoting/demoting of roles - admin only
 
@@ -15,6 +15,9 @@ class Promote(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     async def _can_run(self, ctx, reply=True):
         # Check if we're admin - and if not, check if bot admins can run this

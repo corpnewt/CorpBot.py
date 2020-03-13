@@ -10,6 +10,9 @@ class Emoji(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.max_emojis = 10
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     def _get_emoji_url(self, emoji):
         if len(emoji) < 3:

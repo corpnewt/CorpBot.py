@@ -14,6 +14,9 @@ class Search(commands.Cog):
 		self.bot       = bot
 		self.site_auth = bot.settings_dict.get("corpsiteauth",None)
 		self.key       = bot.settings_dict.get("currency","")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes

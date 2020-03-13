@@ -14,6 +14,9 @@ class Humor(commands.Cog):
 
 	def __init__(self, bot, settings, listName = "Adjectives.txt"):
 		self.bot = bot
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		self.settings = settings
 		# Setup our adjective list
 		self.adj = []
@@ -361,7 +364,7 @@ class Humor(commands.Cog):
 				random.choice(self.stardew_responses),
 				30,
 				break_long_words=True,
-            	replace_whitespace=False
+				replace_whitespace=False
 				)
 			for index,row in enumerate(rows[:6]):
 				d.text((11+2,10+14*index),row,font=ImageFont.truetype("fonts/stardew.ttf",15),fill=(86,22,12))

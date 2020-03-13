@@ -5,9 +5,9 @@ from   shutil      import copyfile
 from Cogs import Utils, DisplayName
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Welcome(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Welcome(bot, settings))
 
 class Welcome(commands.Cog):
 
@@ -20,6 +20,9 @@ class Welcome(commands.Cog):
         self.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
         self.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
         self.regexOnline   = re.compile(r"\[\[[online]+\]\]", re.IGNORECASE)
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     async def onjoin(self, member, server):
         # Welcome

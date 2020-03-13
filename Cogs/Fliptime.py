@@ -18,6 +18,9 @@ class Fliptime(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.mute = mute
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed

@@ -24,6 +24,9 @@ class Help(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def _get_prefix(self, ctx):
 		# Helper method to get the simplified prefix
