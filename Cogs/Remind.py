@@ -25,6 +25,9 @@ class Remind(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.loop_list = []
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions

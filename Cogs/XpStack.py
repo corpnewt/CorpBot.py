@@ -24,6 +24,9 @@ class XpStack(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.xp_save_count = 10
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions

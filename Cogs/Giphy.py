@@ -19,6 +19,9 @@ class Giphy(commands.Cog):
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
 			self.giphy = giphypop.Giphy()
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 			
 	def canDisplay(self, server):
 		# Check if we can display images

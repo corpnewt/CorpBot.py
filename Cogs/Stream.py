@@ -16,6 +16,9 @@ class Stream(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
         # Regex values
         self.regexUserName = re.compile(r"\[\[[user]+\]\]",     re.IGNORECASE)
         self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]",   re.IGNORECASE)

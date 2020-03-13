@@ -153,6 +153,9 @@ class Settings(commands.Cog):
 		self.prefix = prefix
 		self.loop_list = []
 		self.role = RoleManager(bot)
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 		self.defaultServer = { 						# Negates Name and ID - those are added dynamically to each new server
 				"DefaultRole" 			: "", 		# Auto-assigned role position

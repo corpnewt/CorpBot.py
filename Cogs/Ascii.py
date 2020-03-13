@@ -13,9 +13,12 @@ def setup(bot):
 	bot.add_cog(Ascii(bot))
 	
 class Ascii(commands.Cog):
-    
+	
 	def __init__(self, bot):
 		self.bot = bot
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def ascii(self, ctx, *, text : str = None):

@@ -12,6 +12,7 @@ def setup(bot):
 async def checkroles(user, channel, settings, bot, suppress : bool = False):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
+    DisplayName = bot.get_cog("DisplayName")
     
     if type(channel) is discord.Guild:
         server = channel

@@ -14,6 +14,9 @@ class Lists(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
 		self.bot = bot
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		self.settings = settings
 		self.alt_lists = [ { 
 			"command" : "hack",

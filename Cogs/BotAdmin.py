@@ -16,6 +16,9 @@ class BotAdmin(commands.Cog):
 		self.settings = settings
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
 		self.mention_re = re.compile(r"\<\@!{0,1}[0-9]+\>")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def message(self, message):
 		# Check for discord invite links and remove them if found - per server settings

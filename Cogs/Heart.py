@@ -15,6 +15,9 @@ class Heart(commands.Cog):
 		self.bot = bot
 		# compile regex to look for i + hug or hug + me
 		self.regex = re.compile(r"((.*?)\bi\b(.*?)\bhug\b(.*?))|((.*?)\bhug\b(.*?)\bme\b(.*?))")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def message(self, message):
 		# Check the message - and append a heart if a ping exists, but no command

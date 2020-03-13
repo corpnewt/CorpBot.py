@@ -10,7 +10,7 @@ def setup(bot):
 
 class ProfanitiesFilter(object):
 	def __init__(self, filterlist, ignore_case=True, replacements="$@%-?!", 
-				 complete=True, inside_words=False):
+				complete=True, inside_words=False):
 		"""
 		Inits the profanity filter.
 
@@ -40,7 +40,7 @@ class ProfanitiesFilter(object):
 
 		"""
 		return ''.join([random.choice(self.replacements) for i in
-				  range(length)])
+				range(length)])
 
 	def __replacer(self, match):
 		value = match.group()
@@ -58,7 +58,7 @@ class ProfanitiesFilter(object):
 			}
 
 		regexp = (regexp_insidewords[self.inside_words] % 
-				  '|'.join(self.badwords))
+				'|'.join(self.badwords))
 
 		r = re.compile(regexp, re.IGNORECASE if self.ignore_case else 0)
 
@@ -88,6 +88,9 @@ class LangFilter(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.replacements = replacements
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 		
 	async def test_message(self, message):

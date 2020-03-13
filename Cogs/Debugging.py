@@ -25,13 +25,16 @@ class Debugging(commands.Cog):
 				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.join', 'user.leave' ]
 		self.normal = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
-			       'message.edit', 'message.delete', "xp" ]
+				'message.edit', 'message.delete', "xp" ]
 		self.verbose = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
 		self.cleanChannels = []
 		self.invite_list = {}
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")

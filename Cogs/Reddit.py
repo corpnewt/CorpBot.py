@@ -7,15 +7,15 @@ from   discord.ext import commands
 from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL
 from   pyquery import PyQuery as pq
 try:
-    # Python 2.6-2.7
-    from HTMLParser import HTMLParser
+	# Python 2.6-2.7
+	from HTMLParser import HTMLParser
 except ImportError:
-    # Python 3
-    from html.parser import HTMLParser
+	# Python 3
+	from html.parser import HTMLParser
 try:
-    from urllib.parse import urlparse
+	from urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse
+	from urlparse import urlparse
 
 def setup(bot):
 	# Add the bot and deps
@@ -46,6 +46,9 @@ class Reddit(commands.Cog):
 		self.ua = 'CorpNewt DeepThoughtBot'
 		self.extList = ["jpg", "jpeg", "png", "gif", "tiff", "tif"]
 		self.headList = ["image/jpeg", "image/png", "image/gif", "image/jpg"]
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def strip_tags(self, html):
 		parser = HTMLParser()

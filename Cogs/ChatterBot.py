@@ -26,6 +26,9 @@ class ChatterBot(commands.Cog):
 		self.ownerGender = "man"
 		self.timeout = 3
 		self.chatBot = Kernel()
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def _load(self):
 		# We're ready - let's load the bots

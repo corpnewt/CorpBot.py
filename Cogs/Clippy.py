@@ -1,7 +1,6 @@
 import discord, os, random
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-from Cogs import DisplayName
 
 def setup(bot):
     bot.add_cog(Clippy(bot))
@@ -10,6 +9,9 @@ class Clippy(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     def text_wrap(self, text, font, max_width):
         # Replace \n, \r, and \t with a space

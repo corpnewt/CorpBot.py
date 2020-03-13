@@ -3,9 +3,9 @@ from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
 try:
-    from urllib.parse import urlparse
+	from urllib.parse import urlparse
 except ImportError:
-    from urlparse import urlparse
+	from urlparse import urlparse
 
 def setup(bot):
 	# Add the bot and deps
@@ -25,6 +25,9 @@ class Bot(commands.Cog):
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.is_current = False
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")

@@ -20,6 +20,9 @@ class Torment(commands.Cog):
 		self.waitBetween = 1 # number of seconds to wait before sending another message
 		self.settings = settings
 		self.toTorment = False
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 		
 	@commands.command(pass_context=True, hidden=True)
 	async def tormentdelay(self, ctx, delay : int = None):

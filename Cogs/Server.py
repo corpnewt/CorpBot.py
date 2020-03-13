@@ -18,6 +18,9 @@ class Server(commands.Cog):
 		self.settings = settings
 		# Regex for extracting urls from strings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def message(self, message):
 		if not type(message.channel) is discord.TextChannel:

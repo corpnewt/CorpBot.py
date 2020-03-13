@@ -16,6 +16,9 @@ class Mute(commands.Cog):
         self.settings = settings
         self.loop_list = []
         self.mute_perms = ("send_messages","add_reactions","speak")
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")

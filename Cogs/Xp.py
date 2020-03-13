@@ -25,6 +25,9 @@ class Xp(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.is_current = False # Used for stopping loops
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
 		# Checks whether or not said user has access to the xp system

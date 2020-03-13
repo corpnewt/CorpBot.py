@@ -18,6 +18,9 @@ class Setup(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	def suppressed(self, guild, msg):
 		# Check if we're suppressing @here and @everyone mentions

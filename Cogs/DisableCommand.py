@@ -20,6 +20,9 @@ class DisableCommand(commands.Cog):
 			"CogManager",
 			"Help"
 		]
+		global Utils, DisplayName
+		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	async def message(self, message):
 		# Check the message and see if we should allow it
