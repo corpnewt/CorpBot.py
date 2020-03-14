@@ -51,7 +51,7 @@ class DisplayName(commands.Cog):
                     mem = self.memberForName(match, server)
                 if not mem:
                     continue
-                mem_name = name(mem)
+                mem_name = self.name(mem)
             else:
                 # Must have bot then
                 memID = re.sub(r'\W+', '', match)
