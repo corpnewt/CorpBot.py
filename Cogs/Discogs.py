@@ -1,7 +1,7 @@
 import asyncio, discord, json, os
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, TinyURL, Message, DL
+from   Cogs import Settings, DisplayName, Message, DL
 
 def setup(bot):
 	# Add the bot and deps

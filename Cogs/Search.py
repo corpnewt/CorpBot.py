@@ -27,8 +27,9 @@ class Search(commands.Cog):
 		service = "s={}&".format(service) if service else ""
 		lmgtfy = "http://lmgtfy.com/?{}q={}".format(service, self.quote(query))
 		try:
-			lmgtfyT = await TinyURL.tiny_url(lmgtfy)
-		except:
+			lmgtfyT = await TinyURL.tiny_url(lmgtfy, self.bot)
+		except Exception as e:
+			print(e)
 			msg = "It looks like I couldn't search for that... :("
 		else:
 			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
