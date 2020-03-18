@@ -4,7 +4,7 @@ import string
 import random
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings
+from   Cogs import Settings, PickList
 from   Cogs import Message
 from   Cogs import Nullify
 from   Cogs import DL
@@ -46,23 +46,17 @@ class UrbanDict(commands.Cog):
 		theJSON = theJSON["list"]
 		if len(theJSON):
 			# Got it - let's build our response
-			if self.random:
-				ourWord = random.choice(theJSON)
-			else:
-				ourWord = theJSON[0]
-			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
-			if ourWord["example"]:
-				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
-			permalink = ourWord["permalink"]
-			title = "Urban Dictionary Link"
-		
-		# await ctx.channel.send(msg)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		# await Message.Message(message=msg).send(ctx)
-		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)
-		# await Message.say(self.bot, msg, ctx.message.channel, ctx.message.author)
+			words = []
+			for x in theJSON:
+				value = x["definition"]
+				if x["example"]:
+					value += "\n\n__Example(s):__\n\n*{}*".format(x["example"])
+				words.append({
+					"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
+					"value":value
+				})
+			return await PickList.PagePicker(title="Results For: {}".format(string.capwords(word)),list=words,ctx=ctx,max=1,url=theJSON[0]["permalink"]).pick()
+		await ctx.send(Nullify.clean(msg))
 
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
@@ -80,19 +74,13 @@ class UrbanDict(commands.Cog):
 		theJSON = theJSON["list"]
 		if len(theJSON):
 			# Got it - let's build our response
-			if self.random:
-				ourWord = random.choice(theJSON)
-			else:
-				ourWord = theJSON[0]
-			msg = '__**{}:**__\n\n{}'.format(string.capwords(ourWord["word"]), ourWord["definition"])
-			if ourWord["example"]:
-				msg = '{}\n\n__**Example(s):**__\n\n*{}*'.format(msg, ourWord["example"])
-			permalink = ourWord["permalink"]
-			title = "Urban Dictionary Link"
-		
-		# await ctx.channel.send(msg)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		# await Message.Message(message=msg).send(ctx)
-		await Message.EmbedText(title=title, description=msg, color=ctx.author, url=permalink).send(ctx)
+			x = random.choice(theJSON)
+			value = x["definition"]
+			if x["example"]:
+				value += "\n\n__Example(s):__\n\n*{}*".format(x["example"])
+			words = [{
+				"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
+				"value":value
+			}]
+			return await PickList.PagePicker(title="Results For: {}".format(string.capwords(x["word"])),list=words,ctx=ctx,max=1,url=x["permalink"]).pick()
+		await ctx.send(Nullify.clean(msg))
