@@ -354,8 +354,10 @@ class Humor(commands.Cog):
 			while True:
 				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 				if t_w > 92:
-					# Too big, scale down
-					name_size -= 1
+					# Too big, scale down - try to avoid scaling incrementally
+					adjust = (t_w - 92) // 12
+					adjust = 1 if adjust < 1 else adjust
+					name_size -= 1 if adjust < 1 else adjust
 				else:
 					break
 			d.text((210+(88-t_w)/2,88+(12-t_h)/2),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
@@ -369,7 +371,7 @@ class Humor(commands.Cog):
 			for index,row in enumerate(rows[:6]):
 				d.text((11+2,10+14*index),row,font=ImageFont.truetype("fonts/stardew.ttf",15),fill=(86,22,12))
 			# Resize to triple and save
-			image = image.resize((319*3,111*3))
+			image = image.resize((319*3,111*3),PIL.Image.NEAREST)
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
 			await message.delete(delay=2)
