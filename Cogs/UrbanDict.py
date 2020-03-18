@@ -50,7 +50,9 @@ class UrbanDict(commands.Cog):
 			for x in theJSON:
 				value = x["definition"]
 				if x["example"]:
-					value += "\n\n__Example(s):__\n\n*{}*".format(x["example"])
+					ex = x["example"].replace("*","")
+					lines = ["*{}*".format(y.strip()) if len(y.strip()) else "" for y in ex.split("\n")]
+					value += "\n\n__Example(s):__\n\n{}".format("\n".join(lines))
 				words.append({
 					"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 					"value":value
@@ -77,7 +79,9 @@ class UrbanDict(commands.Cog):
 			x = random.choice(theJSON)
 			value = x["definition"]
 			if x["example"]:
-				value += "\n\n__Example(s):__\n\n*{}*".format(x["example"])
+				ex = x["example"].replace("*","")
+				lines = ["*{}*".format(y.strip()) if len(y.strip()) else "" for y in ex.split("\n")]
+				value += "\n\n__Example(s):__\n\n{}".format("\n".join(lines))
 			words = [{
 				"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 				"value":value
