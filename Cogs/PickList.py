@@ -98,6 +98,7 @@ class PagePicker(Picker):
         self.max = kwargs.get("max",10) # Must be between 1 and 25
         self.max = 1 if self.max < 1 else 10 if self.max > 10 else self.max
         self.reactions = ["⏪","◀","▶","⏩","🔢"] # These will always be in the same order
+        self.url = kwargs.get("url",None) # The URL the title of the embed will link to
 
     def _get_page_contents(self, page_number):
         # Returns the contents of the page passed
@@ -116,6 +117,7 @@ class PagePicker(Picker):
         # Setup the embed
         embed = {
             "title":self.title,
+            "url":self.url,
             "description":self.message,
             "color":self.ctx.author,
             "pm_after":25,
@@ -127,6 +129,9 @@ class PagePicker(Picker):
             await Message.Embed(**embed).edit(self.ctx,self.message)
         else:
             self.self_message = await Message.Embed(**embed).send(self.ctx)
+        # First verify we have more than one page to display
+        if pages <= 1:
+            return (0,self.self_message)
         # Add our reactions
         await self._add_reactions(self.self_message, self.reactions)
         # Now we would wait...
