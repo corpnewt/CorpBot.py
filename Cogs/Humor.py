@@ -350,6 +350,9 @@ class Humor(commands.Cog):
 	async def stardew(self, ctx, *, user = None):
 		"""Test your luck with another user."""
 
+		# Set some defaults
+		name_max_w = 92
+		name_max_h = 15
 		if not self.canDisplay(ctx.guild):
 			return
 		# Let's check if the "url" is actually a user
@@ -380,16 +383,12 @@ class Humor(commands.Cog):
 			# Write the user's name in the name box - starts at (209,99)
 			d = ImageDraw.Draw(image)
 			name_text = DisplayName.name(test_user)
-			name_size = 15
+			name_size = name_max_h # max size for the name to fit
 			while True:
 				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
-				if t_w > 92:
-					# Too big, scale down - try to avoid scaling incrementally
-					adjust = (t_w - 92) // 12
-					adjust = 1 if adjust < 1 else adjust
-					name_size -= 1 if adjust < 1 else adjust
-				else:
-					break
+				if t_w <= name_max_w: break
+				# Let's scale the text accordingly
+				name_size = int(t_h*(name_max_w/t_w))
 			d.text((210+(88-t_w)/2,88+(12-t_h)/2),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
