@@ -46,7 +46,22 @@ class Humor(commands.Cog):
 			"truffle",
 			"fish",
 			"snail",
-			"frozen tear"
+			"frozen tear",
+			"chicken statue",
+			"bone flute",
+			"pufferfish",
+			"Joja Cola",
+			"trash",
+			"egg",
+			"crispy bass",
+			"fish taco",
+			"cookie",
+			"garlic",
+			"weeds",
+			"honey",
+			"gizmo",
+			"cloth",
+			"geode"
 			]
 		self.stardew_responses = [
 			"I'm just here for my annual check-up! Don't worry, I'm not preg... I mean, I'm not sick! Heh.",
@@ -68,7 +83,22 @@ class Humor(commands.Cog):
 			"Sometimes I stop and realize that I'm nothing more than a bag of juicy, squishy flesh.",
 			"Ah... an Fish Taco! Thanks.",
 			"No u.",
-			"Thanks... I hate it."
+			"Thanks... I hate it.",
+			"I really should scrub my floorboards today. I think an algae is starting to form.",
+			"That was some way to ring in the new year last night...",
+			"You scared me, sneaking into my room like that!",
+			"So there you have it. You probably figured I hated this chair.",
+			"This... Are you trying to hurt me even more?",
+			"I thought we had something special... I guess I was wrong.",
+			"This... They gave this to me in Gotoro prison camp. I've been trying to forget about that. *shudder*",
+			"If I stay perfectly still, perhaps a resplendent butterfly will bless my nose with a landing.",
+			"My basket! Thank you. This means a lot to me.",
+			"But... You don't need to try and 'help' me... I know best how to live my own life... okay?",
+			"This is a great gift. Thank you!",
+			"Oh, a birthday gift! Thank you.",
+			"All my customers... Here?!?",
+			"Grr... sounds like these raccoons are back again. Filthy varmints...",
+			"Sometimes I look for crawdads in the river. Don't tell Aunt Marnie... but I fed one to a cow once."
 		]
 					
 	@commands.command(pass_context=True)
@@ -335,7 +365,7 @@ class Humor(commands.Cog):
 		image = self.s_image.copy()
 		if not image.width == 319 or not image.height == 111:
 			image = image.resize((319,111),resample=PIL.Image.LANCZOS)
-		message = await ctx.send("Gifting {} to {}...".format(random.choice(self.stardew_gifts),Nullify.clean(DisplayName.name(test_user))))
+		message = await ctx.send("Gifting *{}* to {}...".format(random.choice(self.stardew_gifts),Nullify.clean(DisplayName.name(test_user))))
 		path = await GetImage.download(user)
 		if not path:
 			return await message.edit(content="I guess I couldn't gift that...  Make sure you're passing a valid user.")
