@@ -309,14 +309,14 @@ class Settings(commands.Cog):
 
 
 	def load_json(self, file):
-		if os.path.exists(file):
+		if os.path.exists(file) and os.path.getsize(file):
 			print("Since no mongoDB instance was running, I'm reverting back to the Settings.json")
 			self.serverDict = json.load(open(file))
 		else:
 			self.serverDict = {}
 
 	def migrate(self, _file):
-		if os.path.exists(_file):
+		if os.path.exists(_file) and os.path.getsize(_file):
 			try:
 				settings_json = json.load(open(_file))
 				if "mongodb_migrated" not in settings_json:
