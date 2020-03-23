@@ -1,0 +1,37 @@
+version: "2.4" # Use v2.x for resource limit support on Docker Compose
+
+services:
+
+  corpbot:
+    image: corpnewt/corpbot:latest
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    env_file: ../.env ## Use a .env file at the root
+    ## Alternatively you can comment out the
+    ## `environment:` object below and use that instead
+    # environment:
+    #   SETTINGS_DICT_PREFIX: "bot_prefix"
+    #   SETTINGS_DICT_TOKEN: "discord_token"
+    #   SETTINGS_DICT_WEATHER: "weather_api_key"
+    #   SETTINGS_DICT_CURRENCY: "currency_api_key"
+    depends_on:
+      - lavalink
+    networks:
+      - bot_network
+    cpus: 0.5
+    mem_limit: 2048m
+    mem_reservation: 1024m
+
+  lavalink:
+    image: 1conan/lavalink:latest
+    volumes:
+      - ${PWD}/lavalink.yaml:/config/application.yml
+    networks:
+      - bot_network
+    cpus: 0.5
+    mem_limit: 1024m
+    mem_reservation: 512m
+
+networks:
+  bot_network:
