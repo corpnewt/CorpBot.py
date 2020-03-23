@@ -1,11 +1,12 @@
-## TODO: Use build stages to create separate containers for building and running
-
 # Base the image on Python 3 running on Alpine
 FROM python:3.7.7-alpine
 
 # Install base dependencies
 RUN apk add --update --no-cache \
     bash \
+    git \
+    openssh \
+    ca-certificates \
     libffi \
     libxml2 \
     zlib \
@@ -23,6 +24,10 @@ RUN apk add --update --no-cache --virtual build-dependencies \
     libxslt-dev \
     jpeg-dev
 
+# Disable host key checking for git
+RUN mkdir -p ~/.ssh && \
+    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
 # Switch to the image provided work directory
 WORKDIR /usr/src/app
 
@@ -36,15 +41,20 @@ RUN apk del build-dependencies
 # Copy the rest of the application over
 COPY . .
 
+# Make sure Settings.json exists
+RUN touch /usr/src/app/Settings.json && chown 755 /usr/src/app/Settings.json
+
 # Define default environment variables
-ENV SETTINGS_DICT_PREFIX   ""
-ENV SETTINGS_DICT_TOKEN    ""
-ENV SETTINGS_DICT_WEATHER  ""
-ENV SETTINGS_DICT_CURRENCY ""
-ENV LAVALINK_HOST          "lavalink"
-ENV LAVALINK_REGION        "us_central"
+ENV SETTINGS_DICT_PREFIX            ""
+ENV SETTINGS_DICT_TOKEN             ""
+ENV SETTINGS_DICT_WEATHER           ""
+ENV SETTINGS_DICT_CURRENCY          ""
+ENV SETTINGS_DICT_LAVALINK_HOST     "lavalink"
+ENV SETTINGS_DICT_LAVALINK_REGION   "us_central"
+ENV SETTINGS_DICT_LAVALINK_PASSWORD "youshallnotpass"
+
+# Expose volumes
+VOLUME [ "/usr/src/app/Settings-Backup" ]
 
 # Set the startup Python script
-#CMD [ "python", "./WatchDog.py" ]
-#CMD [ "python", "./Main.py" ]
 CMD [ "docker/start.sh" ]

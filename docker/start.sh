@@ -24,12 +24,8 @@ JSON="${JSON::-1}\n}" # Removes the last character (comma) and finishes the JSON
 JSON="$(echo -e $JSON)" # Applies the new lines
 echo ${JSON} > settings_dict.json # Writes the JSON string to the file
 
-# Modify the lavalink host in Music.py to use the configured lavalink host instead
-sed -i "s/127.0.0.1/$LAVALINK_HOST/g" ./Cogs/Music.py
-
-# Modify the lavalink region in Music.py to use the configured lavalink region instead
-sed -i "s/us_central/$LAVALINK_REGION/g" ./Cogs/Music.py
+# Replace git SSH urls with HTTPS to get around WatchDog issues
+sed -i "s/git@github.com:/https:\/\/github.com\//g" ./.git/config
 
 # Start the application
-#python ./WatchDog.py
-python ./Main.py
+python ./WatchDog.py
