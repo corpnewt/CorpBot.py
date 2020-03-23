@@ -41,8 +41,11 @@ RUN apk del build-dependencies
 # Copy the rest of the application over
 COPY . .
 
+# Create the data directory
+RUN mkdir -p /data
+
 # Make sure Settings.json exists
-RUN touch /usr/src/app/Settings.json && chown 755 /usr/src/app/Settings.json
+#RUN touch /usr/src/app/Settings.json && chown 755 /usr/src/app/Settings.json
 
 # Define default environment variables
 ENV SETTINGS_DICT_PREFIX            ""
@@ -54,7 +57,7 @@ ENV SETTINGS_DICT_LAVALINK_REGION   "us_central"
 ENV SETTINGS_DICT_LAVALINK_PASSWORD "youshallnotpass"
 
 # Expose volumes
-VOLUME [ "/usr/src/app/Settings-Backup" ]
+VOLUME [ "/data", "/usr/src/app/Settings-Backup" ]
 
 # Set the startup Python script
 CMD [ "docker/start.sh" ]
