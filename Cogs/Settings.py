@@ -138,10 +138,10 @@ class Settings(commands.Cog):
 	def __init__(self, bot, prefix = "$", file : str = None):
 		if file == None:
 			# We weren't given a file, default to ./Settings.json
-			file = "Settings.json"
+			file = bot.settings_dict.get("settings_path","Settings.json")
 		
 		self.file = file
-		self.backupDir = "Settings-Backup"
+		self.backupDir = bot.settings_dict.get("settings_backup_path","Settings-Backup")
 		self.backupMax = 100
 		self.backupTime = 7200 # runs every 2 hours
 		self.backupWait = 10 # initial wait time before first backup
