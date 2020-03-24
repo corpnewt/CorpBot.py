@@ -314,20 +314,22 @@ class Music(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, user, before, after):
-		if not user.guild or user.id == self.bot.user.id or not before.channel:
-			return
-		# Get our member on the same server as the user
+		if not user.guild or not before.channel or (user.bot and user.id != self.bot.user.id):
+			return # No guild, someone joined, or the user is a bot that's not us
 		player = self.bot.wavelink.players.get(before.channel.guild.id,None)
-		if player == None or not player.is_connected or not before.channel.id == int(player.channel_id):
-			# We're not in a voice channel or this isn't our voice channel - don't care
+		if player == None:
 			return
+		if not player.is_connected or (user.id == self.bot.user.id and not after.channel):
+			# Not connected, or we made the change and left - destroy and bail
+			return await player.destroy()
+		if int(player.channel_id) != before.channel.id:
+			return # No player to worry about, or someone left a different channel - ignore
 		if len([x for x in before.channel.members if not x.bot]) > 0:
 			# At least one non-bot user
 			return
-		# if we made it here - then we're alone - disconnect
+		# if we made it here - then we're alone - disconnect and destroy
 		self.dict_pop(user.guild)
-		if player.is_connected:
-			await player.destroy()
+		if player: await player.destroy()
 
 	@commands.command()
 	async def join(self, ctx, *, channel = None):
