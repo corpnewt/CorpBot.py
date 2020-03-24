@@ -30,8 +30,6 @@ SETTINGS_DICT_LAVALINK_REGION="<lavalink_discord_region>"       (optional)
 SETTINGS_DICT_LAVALINK_PASSWORD="<lavalink_password>"           (optional)
 ```
 
-Create an empty `Settings.json` file at the root of this project, which will be mounted by Docker Compose.
-
 Build and run with Docker Compose while inside the `./docker/` directory:
 > docker-compose up --build
 

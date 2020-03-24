@@ -1,4 +1,4 @@
-version: "2.4" # Use v2.x for resource limit support on Docker Compose
+version: "2.4" # We use v2.x for resource limit support with Docker Compose
 
 services:
 
@@ -9,7 +9,7 @@ services:
       dockerfile: docker/Dockerfile
     env_file: ../.env ## Use a .env file at the root
     ## Alternatively you can comment out the
-    ## `environment:` object below and use that instead
+    ## `environment:` object below and use that instead of the .env file#
     # environment:
     #   SETTINGS_DICT_PREFIX: "bot_prefix"
     #   SETTINGS_DICT_TOKEN: "discord_token"
@@ -18,12 +18,9 @@ services:
     depends_on:
       - lavalink
     networks:
-      - bot_network
+      - corpbot_network
     volumes:
-      ## FIXME: This doesn't work properly, bot can't seem to write to it (we can though)
-      #- ${PWD}/../Settings.json:/usr/src/app/Settings.json:rw
-      - ./data:/data
-      #- bot_settings_backup:/usr/src/app/Settings-Backup
+      - corpbot_data:/data
     cpus: 0.5
     mem_limit: 1024m
     mem_reservation: 512m
@@ -33,13 +30,13 @@ services:
     volumes:
       - ${PWD}/lavalink.yaml:/config/application.yml
     networks:
-      - bot_network
+      - corpbot_network
     cpus: 0.5
     mem_limit: 1024m
     mem_reservation: 512m
 
 networks:
-  bot_network:
+  corpbot:
 
 volumes:
-  bot_settings_backup:
+  corpbot_data:
