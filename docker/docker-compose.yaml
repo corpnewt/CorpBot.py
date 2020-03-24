@@ -23,7 +23,7 @@ services:
       ## FIXME: This doesn't work properly, bot can't seem to write to it (we can though)
       #- ${PWD}/../Settings.json:/usr/src/app/Settings.json:rw
       - ./data:/data
-      - bot_settings_backup:/usr/src/app/Settings-Backup
+      #- bot_settings_backup:/usr/src/app/Settings-Backup
     cpus: 0.5
     mem_limit: 1024m
     mem_reservation: 512m

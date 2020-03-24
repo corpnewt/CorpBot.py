@@ -10,12 +10,6 @@ set -o pipefail
 # Switch to the application directory
 cd /usr/src/app
 
-# Replace git SSH urls with HTTPS to get around WatchDog issues
-sed -i "s/git@github.com:/https:\/\/github.com\//g" ./.git/config
-
-# Switch to the data directory
-cd /data
-
 # Parse all environment variables that start with "SETTINGS_DICT_",
 # then create a matching JSON object string and store it in "settings_dict.json"
 JSON="{" # Starts a new JSON object
@@ -30,7 +24,8 @@ JSON="${JSON::-1}\n}" # Removes the last character (comma) and finishes the JSON
 JSON="$(echo -e $JSON)" # Applies the new lines
 echo ${JSON} > settings_dict.json # Writes the JSON string to the file
 
+# Replace git SSH urls with HTTPS to get around WatchDog issues
+sed -i "s/git@github.com:/https:\/\/github.com\//g" ./.git/config
+
 # Start the application
-#python ./WatchDog.py
-#python /usr/src/app/WatchDog.py
-python /usr/src/app/Main.py
+python ./WatchDog.py

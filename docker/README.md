@@ -9,7 +9,7 @@
 - [x] Linux support (Alpine)
 - [x] Patch `Music.py` to read Lavalink settings from the config file instead
 - [x] Expose persistable data (`Settings.json` and `Settings-Backup/`)
-- [ ] Fix `Settings.json` mounting (it should ideally be in a folder that we can mount)
+- [x] Fix `Settings.json` mounting (it should ideally be in a folder that we can mount)
 - [ ] Redis support (redis branch)
 - [ ] MongoDB support (?)
 - [ ] Minimal image size (Alpine, multi-staged builds)
@@ -23,9 +23,11 @@ SETTINGS_DICT_PREFIX="<bot_prefix>"
 SETTINGS_DICT_TOKEN="<discord_bot_token>"
 SETTINGS_DICT_WEATHER="<weather_api_token>"
 SETTINGS_DICT_CURRENCY="<currency_api_token>"
-SETTINGS_DICT_LAVALINK_HOST="<lavalink_hostname_or_ip>"   (optional)
-SETTINGS_DICT_LAVALINK_REGION="<lavalink_discord_region>" (optional)
-SETTINGS_DICT_LAVALINK_PASSWORD="<lavalink_password>"     (optional)
+SETTINGS_DICT_SETTINGS_PATH="<path_to_settings.json>            (optional)
+SETTINGS_DICT_SETTINGS_BACKUP_PATH="<path_to_settings_backups>" (optional)
+SETTINGS_DICT_LAVALINK_HOST="<lavalink_hostname_or_ip>"         (optional)
+SETTINGS_DICT_LAVALINK_REGION="<lavalink_discord_region>"       (optional)
+SETTINGS_DICT_LAVALINK_PASSWORD="<lavalink_password>"           (optional)
 ```
 
 Create an empty `Settings.json` file at the root of this project, which will be mounted by Docker Compose.

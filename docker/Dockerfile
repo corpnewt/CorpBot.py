@@ -44,20 +44,19 @@ COPY . .
 # Create the data directory
 RUN mkdir -p /data
 
-# Make sure Settings.json exists
-#RUN touch /usr/src/app/Settings.json && chown 755 /usr/src/app/Settings.json
-
 # Define default environment variables
-ENV SETTINGS_DICT_PREFIX            ""
-ENV SETTINGS_DICT_TOKEN             ""
-ENV SETTINGS_DICT_WEATHER           ""
-ENV SETTINGS_DICT_CURRENCY          ""
-ENV SETTINGS_DICT_LAVALINK_HOST     "lavalink"
-ENV SETTINGS_DICT_LAVALINK_REGION   "us_central"
-ENV SETTINGS_DICT_LAVALINK_PASSWORD "youshallnotpass"
+ENV SETTINGS_DICT_PREFIX               ""
+ENV SETTINGS_DICT_TOKEN                ""
+ENV SETTINGS_DICT_WEATHER              ""
+ENV SETTINGS_DICT_CURRENCY             ""
+ENV SETTINGS_DICT_SETTINGS_PATH        "/data/Settings.json"
+ENV SETTINGS_DICT_SETTINGS_BACKUP_PATH "/data/Settings-Backup"
+ENV SETTINGS_DICT_LAVALINK_HOST        "lavalink"
+ENV SETTINGS_DICT_LAVALINK_REGION      "us_central"
+ENV SETTINGS_DICT_LAVALINK_PASSWORD    "youshallnotpass"
 
 # Expose volumes
-VOLUME [ "/data", "/usr/src/app/Settings-Backup" ]
+VOLUME [ "/data" ]
 
 # Set the startup Python script
 CMD [ "docker/start.sh" ]
