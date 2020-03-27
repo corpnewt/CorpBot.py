@@ -1,0 +1,22 @@
+# Base the image on Python 3 running on Windows Server Core
+FROM python:3.7.7-windowsservercore
+
+# Create the app directory
+RUN mkdir C:/app
+
+# Set the working directory
+WORKDIR C:/app
+
+# Copy the application
+ADD ./ C:/app
+
+# Install dependencies
+RUN Install.bat
+# RUN python Install.py
+
+## TODO: Install Lavalink and use "StartBot.bat"
+## https://github.com/Frederikam/Lavalink/releases/tag/3.3.1
+
+# Set the startup command
+CMD [ "Start.bat" ]
+#CMD [ "python", "Start.py" ]
