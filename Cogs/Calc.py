@@ -144,7 +144,7 @@ class Calc(commands.Cog):
             msg += "factor  :: atom [ expop factor ]*\n"
             msg += "term    :: factor [ multop factor ]*\n"
             msg += "expr    :: term [ addop term ]*```"
-            return await ctx.send(Nullyify.clean(msg))
+            return await ctx.send(Nullify.clean(msg))
         
         if int(answer) == answer:
             # Check if it's a whole number and cast to int if so
