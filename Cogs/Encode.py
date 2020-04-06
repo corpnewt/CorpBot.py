@@ -375,7 +375,7 @@ class Encode(commands.Cog):
 		# Clean the string
 		new_bin = ""
 		for char in input_binary:
-			if char is "0" or char is "1":
+			if char == "0" or char == "1":
 				new_bin += char
 		if not len(new_bin):
 			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))

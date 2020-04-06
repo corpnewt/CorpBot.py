@@ -838,7 +838,7 @@ class Settings(commands.Cog):
 		message = await ctx.send("Pruning local settings...")
 		settingsWord = "settings"
 		removedSettings = self._prune_settings(ctx.guild)
-		if removedSettings is 1:
+		if removedSettings == 1:
 			settingsWord = "setting"
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
 		await message.edit(content=msg, embed=None)
@@ -898,7 +898,7 @@ class Settings(commands.Cog):
 
 		removedSettings = await self.bot.loop.run_in_executor(None, self._prune_settings)
 
-		if removedSettings is 1:
+		if removedSettings == 1:
 			settingsWord = "setting"
 
 		await message.edit(content="Flushing settings to disk...")

@@ -89,7 +89,7 @@ class Discogs(commands.Cog):
 		search_text = ""
 		for x in search_dict:
 			s = " ".join(search_dict[x])
-			x = "title" if x is "album" else x
+			x = "title" if x == "album" else x
 			if s:
 				search_text += "&{}={}".format(x,self.quote(s))
 		# Get the search results - per_page maxes at 100

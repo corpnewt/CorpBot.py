@@ -62,7 +62,7 @@ class CogManager(commands.Cog):
 		imports = [__ for __ in instructions if 'IMPORT' in __.opname]
 		i = []
 		for instr in imports:
-			if not instr.opname is "IMPORT_FROM":
+			if not instr.opname == "IMPORT_FROM":
 				continue
 			i.append(instr.argval)
 		cog_imports = []
