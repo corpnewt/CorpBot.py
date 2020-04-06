@@ -1247,7 +1247,7 @@ class Settings(commands.Cog):
 			for key in removeKeys:
 				self.serverDict["Servers"][str(server.id)].pop(key, None)
 
-		if removedSettings is 1:
+		if removedSettings == 1:
 			settingsWord = "setting"
 		
 		await message.edit(content="Flushing settings to disk...", embed=None)
@@ -1367,7 +1367,7 @@ class Settings(commands.Cog):
 			for key in removeKeys:
 				self.serverDict["Servers"][serv].pop(key, None)
 
-		if removedSettings is 1:
+		if removedSettings == 1:
 			settingsWord = "setting"
 
 		await message.edit(content="Flushing settings to disk...")
