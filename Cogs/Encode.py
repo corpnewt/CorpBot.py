@@ -279,12 +279,12 @@ class Encode(commands.Cog):
 		slides = []
 		for x in available:
 			slide = self.get_slide(x["start"])
-			if slide < 256:
-				# Got a good one - spit it out
-				hex_str = "{:x}".format(x["start"]).upper()
-				hex_str = "0"*(len(hex_str)%2)+hex_str
-				slides.append(("0x"+hex_str,slide))
-				# return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
+			if slide >= 256 or x["start"] == 0: continue # Out of range
+			# Got a good one - spit it out
+			hex_str = "{:x}".format(x["start"]).upper()
+			hex_str = "0"*(len(hex_str)%2)+hex_str
+			slides.append(("0x"+hex_str,slide))
+			# return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
 		if not len(slides):
 			# If we got here - we have no applicable slides
 			return await ctx.send("No valid slide values were found for the passed info.")
