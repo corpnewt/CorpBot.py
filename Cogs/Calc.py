@@ -39,7 +39,7 @@ class NumericStringParser(object):
     def __init__(self):
         """
         expop   :: '^'
-        multop  :: 'x' | '/'
+        multop  :: 'x' | '*' | '/'
         addop   :: '+' | '-'
         integer :: ['+' | '-'] '0'..'9'+
         atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'
@@ -128,10 +128,8 @@ class Calc(commands.Cog):
     async def calc(self, ctx, *, formula = None):
         """Do some math."""
 
-        if formula == None:
-            msg = 'Usage: `{}calc [formula]`'.format(ctx.prefix)
-            await ctx.channel.send(msg)
-            return
+        if formula == None: return await ctx.send('Usage: `{}calc [formula]`'.format(ctx.prefix))
+        formula = formula.replace("*","x")
 
         try:
             answer=self.nsp.eval(formula)
@@ -139,21 +137,18 @@ class Calc(commands.Cog):
             msg = 'I couldn\'t parse "{}" :(\n\n'.format(formula.replace('*', '\\*').replace('`', '\\`').replace('_', '\\_'))
             msg += 'I understand the following syntax:\n```\n'
             msg += "expop   :: '^'\n"
-            msg += "multop  :: 'x' | '/'\n"
+            msg += "multop  :: 'x' | '*' | '/'\n"
             msg += "addop   :: '+' | '-'\n"
             msg += "integer :: ['+' | '-'] '0'..'9'+\n"
             msg += "atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'\n"
             msg += "factor  :: atom [ expop factor ]*\n"
             msg += "term    :: factor [ multop factor ]*\n"
             msg += "expr    :: term [ addop term ]*```"
-            msg = Nullify.clean(msg)
-            await ctx.channel.send(msg)
-            return
-          
+            return await ctx.send(Nullify.clean(msg))
+        
         if int(answer) == answer:
             # Check if it's a whole number and cast to int if so
             answer = int(answer)
             
-        msg = '{} = {}'.format(formula, answer)
         # Say message
-        await ctx.channel.send(msg)
+        await ctx.send('{} = {}'.format(formula, answer))

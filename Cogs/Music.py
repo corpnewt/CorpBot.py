@@ -11,7 +11,7 @@ def setup(bot):
 
 class Music(commands.Cog):
 
-	__slots__ = ("bot","settings","folder","delay","queue","skips","vol","loop","data","regex")
+	__slots__ = ("bot","settings","queue","skips","vol","loop","data")
 
 	def __init__(self, bot, settings):
 		self.bot      = bot
@@ -24,15 +24,6 @@ class Music(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-		# Regex for extracting urls from strings
-		self.regex    = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-		# Ensure Opus
-		'''if not discord.opus.is_loaded():
-			opus = ctypes.util.find_library("opus")
-			if not opus:
-				print("Opus not found - Music will not work!")
-				return
-			discord.opus.load_opus(opus)'''
 		# Setup Wavelink
 		if not hasattr(self.bot,'wavelink'): self.bot.wavelink = wavelink.Client(self.bot)
 		self.bot.loop.create_task(self.start_nodes())
@@ -249,9 +240,8 @@ class Music(commands.Cog):
 			return
 		# Stop all players
 		for x in self.bot.guilds:
-			player = self.bot.wavelink.get_player(x.id)
-			if player.is_connected:
-				await player.destroy()
+			player = self.bot.wavelink.players.get(x.id,None)
+			if player: await player.destroy()
 
 	async def on_event_hook(self, event):
 		# Node callback
@@ -267,8 +257,8 @@ class Music(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_skip_song(self,ctx):
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player != None and player.is_connected:
 			await player.stop()
 
 	@commands.Cog.listener()
@@ -286,7 +276,8 @@ class Music(commands.Cog):
 		if error:
 			print(error)
 		# Gather our player
-		player = self.bot.wavelink.get_player(ctx.guild.id)
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None: return # Nothing to do here
 		# Try to cleanup before starting
 		if not player.is_connected:
 			# Stopped - or late-fired signal - destroy the player
@@ -323,20 +314,22 @@ class Music(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, user, before, after):
-		if not user.guild or user.id == self.bot.user.id or not before.channel:
+		if not user.guild or not before.channel or (user.bot and user.id != self.bot.user.id):
+			return # No guild, someone joined, or the user is a bot that's not us
+		player = self.bot.wavelink.players.get(before.channel.guild.id,None)
+		if player == None:
 			return
-		# Get our member on the same server as the user
-		player = self.bot.wavelink.get_player(before.channel.guild.id)
-		if not player.is_connected or not before.channel.id == int(player.channel_id):
-			# We're not in a voice channel or this isn't our voice channel - don't care
-			return
+		if not player.is_connected or (user.id == self.bot.user.id and not after.channel):
+			# Not connected, or we made the change and left - destroy and bail
+			return await player.destroy()
+		if int(player.channel_id) != before.channel.id:
+			return # No player to worry about, or someone left a different channel - ignore
 		if len([x for x in before.channel.members if not x.bot]) > 0:
 			# At least one non-bot user
 			return
-		# if we made it here - then we're alone - disconnect
+		# if we made it here - then we're alone - disconnect and destroy
 		self.dict_pop(user.guild)
-		if player.is_connected:
-			await player.destroy()
+		if player: await player.destroy()
 
 	@commands.command()
 	async def join(self, ctx, *, channel = None):
@@ -384,8 +377,8 @@ class Music(commands.Cog):
 		"""Pauses the currently playing song."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.paused:
 			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=delay).send(ctx)
@@ -399,6 +392,7 @@ class Music(commands.Cog):
 	@commands.command()
 	async def paused(self, ctx, *, moons = None):
 		"""Lists whether or not the player is paused.  Synonym of the playing command."""
+		
 		await ctx.invoke(self.playing,moons=moons)
 
 	@commands.command()
@@ -406,8 +400,8 @@ class Music(commands.Cog):
 		"""Resumes the song if paused."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.paused:
 			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=delay).send(ctx)
@@ -421,8 +415,8 @@ class Music(commands.Cog):
 		"""Removes the passed song number from the queue.  You must be the requestor, or an admin to remove it.  Does not include the currently playing song."""
 		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
@@ -446,8 +440,8 @@ class Music(commands.Cog):
 		"""Removes all songs you've added from the queue (does not include the currently playing song).  Admins remove all songs from the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		queue = self.queue.get(str(ctx.guild.id),[])
 		if not len(queue):
@@ -470,8 +464,8 @@ class Music(commands.Cog):
 		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			if url == None: # No need to connect to shuffle nothing
 				return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			if not ctx.author.voice:
@@ -493,8 +487,8 @@ class Music(commands.Cog):
 		"""Lists the currently playing song if any."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected or not (player.is_playing or player.paused):
+		player = self.bot.wavelink.players.get(ctx.guild.id,None) if ctx.guild.id in self.bot.wavelink.players else None
+		if player == None or not player.is_connected or not (player.is_playing or player.paused):
 			# No client - and we're not playing or paused
 			return await Message.EmbedText(
 				title="♫ Currently Playing",
@@ -523,8 +517,10 @@ class Music(commands.Cog):
 		"""Shows the number of servers the bot is currently playing music in."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		playing_list = [x for x in self.bot.guilds if self.queue.get(str(x.id),None) or self.data.get(str(x.id))]
-		playing_in = len(playing_list)
+		playing_in = 0
+		for x in self.bot.wavelink.players:
+			p = self.bot.wavelink.get_player(x)
+			if p.is_playing and not p.paused: playing_in += 1
 		msg = "♫ Playing music in {:,} of {:,} server{}.".format(playing_in, len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s")
 		await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
 
@@ -533,8 +529,8 @@ class Music(commands.Cog):
 		"""Lists the queued songs in the playlist."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected or not (player.is_playing or player.paused):
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected or not (player.is_playing or player.paused):
 			return await Message.EmbedText(
 				title="♫ Current Playlist",
 				color=ctx.author,
@@ -594,9 +590,10 @@ class Music(commands.Cog):
 	@commands.command()
 	async def unskip(self, ctx):
 		"""Removes your vote to skip the current song."""
+		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
@@ -619,8 +616,8 @@ class Music(commands.Cog):
 		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requestors and admins can skip without voting."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
@@ -672,8 +669,8 @@ class Music(commands.Cog):
 		if position == None or position.lower() in ["moon","moons","moonme","moon me"]: # Show the playing status
 			return await ctx.invoke(self.playing,moons=position)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
@@ -694,8 +691,8 @@ class Music(commands.Cog):
 		"""Changes the player's volume (0-150%)."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
@@ -718,8 +715,8 @@ class Music(commands.Cog):
 		"""Checks or sets whether to repeat the current playlist."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if not player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		current = self.loop.get(str(ctx.guild.id),False)
 		setting_name = "Repeat"
@@ -750,6 +747,7 @@ class Music(commands.Cog):
 	@commands.command()
 	async def autodeleteafter(self, ctx, seconds = None):
 		"""Lists or sets the current delay before auto-deleting music related messages (max of 300 seconds).  Set to an integer less than 10 to disable auto-deletion.  Requires bot-admin or admin to set."""
+		
 		if not Utils.is_bot_admin(ctx): seconds = None
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if seconds == None:
@@ -777,30 +775,46 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		# Remove the per-server temp settings
 		self.dict_pop(ctx)
-		player = self.bot.wavelink.get_player(ctx.guild.id)
-		if player.is_connected:
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player != None:
 			await player.destroy()
-			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+			if player.is_connected: return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def stopall(self, ctx):
+		"""Stops and disconnects the bot from all voice channels in all servers (owner-only)."""
+
+		if not await Utils.is_owner_reply(ctx): return
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		players = 0
+		for guild in self.bot.guilds:
+			# Remove the per-server temp settings
+			self.dict_pop(guild)
+			player = self.bot.wavelink.players.get(guild.id,None)
+			if player != None:
+				players += 1
+				await player.destroy()
+		await Message.EmbedText(title="♫ I've left all voice channels ({:,}/{:,})!".format(players,len(self.bot.guilds)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def disableplay(self, ctx, *, yes_no = None):
 		"""Enables/Disables the music commands.  Helpful in case Youtube is rate limiting to avoid extra api calls and allow things to calm down.  Owners can still access music commands (owner only)."""
+		
 		if not await Utils.is_owner_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Music player lock out","DisableMusic",yes_no,is_global=True))
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
-		player = self.bot.wavelink.get_player(ctx.guild.id)
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
 			# Music is off - and we're not an owner - disconnect if connected, then send the bad news :(
 			self.dict_pop(ctx)
-			if player.is_connected:
-				await player.destroy()
+			if player: await player.destroy()
 			await Message.EmbedText(title="♫ Music player is currently disabled!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Music disabled.")
 		# Music is enabled - let's make sure we have the right role
@@ -809,14 +823,15 @@ class Music(commands.Cog):
 		# If we're just using the join command - we don't need extra checks - they're done in the command itself
 		if ctx.command.name == "join": return
 		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
-		if ctx.command.name in ("play","shuffle") and not player.is_connected and ctx.author.voice:
-			await player.connect(ctx.author.voice.channel.id)
+		if ctx.command.name in ("play","shuffle") and ctx.author.voice:
+			if player == None: player = self.bot.wavelink.get_player(ctx.guild.id)
+			if not player.is_connected: return await player.connect(ctx.author.voice.channel.id)
 		# Let's ensure the bot is connected to voice
-		if not player.is_connected:
+		if player == None or not player.is_connected:
 			await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Not connected to a voice channel.")
 		# Let's make sure the caller is connected to voice and the same channel as the bot - or a bot-admin
 		if Utils.is_bot_admin(ctx): return # We good - have enough perms to override whatever
-		if not ctx.author.voice or not ctx.author.voice.channel.id == int(player.channel_id):
+		if not ctx.author.voice or player == None or not ctx.author.voice.channel.id == int(player.channel_id):
 			await Message.EmbedText(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Author not connected to the bot's voice channel.")
