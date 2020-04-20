@@ -1,7 +1,3 @@
-## Builds a Docker image for both Linux and Windows,
-## then deploys these to GitHub Package Registry,
-## where they are publicly available for everyone
-
 name: Deploy Docker
 
 on:
@@ -9,7 +5,6 @@ on:
     # Only build when pushing to the "rewrite" branch
     branches:
       - rewrite
-      - feature/docker ## TODO: Remove when done
 
 jobs:
 
@@ -30,25 +25,26 @@ jobs:
       - name: Publish to GitHub Package Registry
         run: docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-linux-amd64
 
-  deploy-windows:
-    name: Deploy (windows)
-    runs-on: windows-latest
-    steps:
+  ## TODO: GitHub Package Registry doesn't support Windows images (yet)
+  # deploy-windows:
+  #   name: Deploy (windows)
+  #   runs-on: windows-latest
+  #   steps:
 
-      - name: Checkout Repository
-        uses: actions/checkout@v1
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v1
 
-      - name: Login to GitHub Package Registry
-        shell: bash
-        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Login to GitHub Package Registry
+  #       shell: bash
+  #       run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        shell: bash
-        run: docker build --rm -f docker/Dockerfile.win -t docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64 .
+  #     - name: Build Docker image
+  #       shell: bash
+  #       run: docker build --rm -f docker/Dockerfile.win -t docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64 .
 
-      - name: Publish to GitHub Package Registry
-        shell: bash
-        run: docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64
+  #     - name: Publish to GitHub Package Registry
+  #       shell: bash
+  #       run: docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64
 
 ## TODO: Use the manifest tool to combine the platforms into one image,
 ##       and use "depends_on" to ensure both are built before the manifest job
