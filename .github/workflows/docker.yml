@@ -1,3 +1,7 @@
+## Builds a Docker image for both Linux and Windows,
+## then deploys these to GitHub Package Registry,
+## where they are publicly available for everyone
+
 name: Deploy Docker
 
 on:
