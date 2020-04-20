@@ -1,6 +1,9 @@
 # Anythings starting with .
 .*
 
+# Don't ignore .github
+!.github
+
 # Ignore redis stuff
 Redis*
 

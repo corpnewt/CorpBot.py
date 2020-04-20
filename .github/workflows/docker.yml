@@ -1,0 +1,41 @@
+name: Deploy Docker
+
+jobs:
+
+  deploy-linux:
+    name: Deploy (linux)
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: docker build --rm -f docker/Dockerfile -t docker.pkg.github.com/$GITHUB_ACTOR/corpbot.py/corpbot.py:linux-amd64 .
+
+      - name: Publish (GitHub Package Registry)
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: $GITHUB_ACTOR/corpbot.py/corpbot.py:linux-amd64
+          username: $GITHUB_ACTOR
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+
+  deploy-windows:
+    name: Deploy (windows)
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: docker build --rm -f docker/Dockerfile -t docker.pkg.github.com/$GITHUB_ACTOR/corpbot.py/corpbot.py:linux-amd64 .
+
+      - name: Publish (GitHub Package Registry)
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: $GITHUB_ACTOR/corpbot.py/corpbot.py:windows-amd64
+          username: $GITHUB_ACTOR
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
