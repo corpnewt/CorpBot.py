@@ -155,40 +155,47 @@ class ServerStats(commands.Cog):
         server_embed.add_field(name="Population Rank", value="{:,} of {:,}".format(position, total), inline=True)
         
         emojitext = ""
-        emojicount = 0
-        for emoji in guild.emojis:
-            if emoji.animated:
-                emojiMention = "<a:"+emoji.name+":"+str(emoji.id)+">"
-            else:
-                emojiMention = "<:"+emoji.name+":"+str(emoji.id)+">"
+        emojifields = []
+        disabledemojis = 0
+        twitchemojis = 0
+        for i,emoji in enumerate(guild.emojis):
+            if not emoji.available:
+                disabledemojis += 1
+                continue
+            if emoji.managed:
+                twitchemojis += 1
+                continue
+            if emoji.name == "HomieKiss": print(emoji,emoji.available,emoji.animated)
+            emojiMention = "<{}:{}:{}>".format("a" if emoji.animated else "",emoji.name,emoji.id)
             test = emojitext + emojiMention
             if len(test) > 1024:
                 # TOOO BIIIIIIIIG
-                emojicount += 1
-                if emojicount == 1:
-                    ename = "Emojis ({:,} total)".format(len(guild.emojis))
-                else:
-                    ename = "Emojis (Continued)"
-                server_embed.add_field(name=ename, value=emojitext, inline=True)
+                emojifields.append(emojitext)
                 emojitext=emojiMention
             else:
                 emojitext = emojitext + emojiMention
+        
+        if len(emojitext): emojifields.append(emojitext) # Add any leftovers
+        if twitchemojis:   emojifields.append("{:,} managed".format(twitchemojis))
+        if disabledemojis: emojifields.append("{:,} unavailable".format(disabledemojis)) # Add the disabled if any
 
-        if len(emojitext):
-            if emojicount == 0:
-                emojiname = "Emojis ({} total)".format(len(guild.emojis))
-            else:
-                emojiname = "Emojis (Continued)"
-            server_embed.add_field(name=emojiname, value=emojitext, inline=True)
-
-
-        if len(guild.icon_url):
-            server_embed.set_thumbnail(url=guild.icon_url)
-        else:
-            # No Icon
-            server_embed.set_thumbnail(url=ctx.author.default_avatar_url)
+        server_embed.set_thumbnail(url=guild.icon_url if len(guild.icon_url) else ctx.author.default_avatar_url)
         server_embed.set_footer(text="Server ID: {}".format(guild.id))
-        await ctx.channel.send(embed=server_embed)
+        # Let's send all the embeds we need finishing off with extra emojis as needed
+        for i,e in enumerate(emojifields):
+            name = "Disabled Emojis" if e.lower().endswith("unavailable") else "Twitch Emojis" if e.lower().endswith("managed") else "Emojis ({} of {})".format(i+1,len(emojifields))
+            server_embed.add_field(name=name,value=e,inline=True)
+            if len(server_embed) > 6000: # too big
+                server_embed.remove_field(len(server_embed.fields)-1)
+                await ctx.send(embed=server_embed)
+                server_embed = discord.Embed(color=ctx.author.color)
+                server_embed.title = guild.name
+                server_embed.set_thumbnail(url=guild.icon_url if len(guild.icon_url) else ctx.author.default_avatar_url)
+                server_embed.set_footer(text="Server ID: {}".format(guild.id))
+                server_embed.description = "Continued Emojis:"
+                server_embed.add_field(name=name,value=e,inline=True)
+        if len(server_embed.fields):
+            await ctx.send(embed=server_embed)
 
 
     @commands.command()
