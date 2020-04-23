@@ -1,19 +1,23 @@
 # Docker support for CorpBot.py
 
-**NOTE:** This is still a work in progress and may not be fully stable or bug free!
+This is a short document detailing the current status of the Docker images, including how to set them up.
 
 ## Features
 
-- [x] Bot and its basic features running inside a container
-- [x] Working music playback through Lavalink
-- [x] Linux support (Alpine)
-- [x] Patch `Music.py` to read Lavalink settings from the config file instead
-- [x] Expose persistable data (`Settings.json` and `Settings-Backup/`)
-- [x] Fix `Settings.json` mounting (it should ideally be in a folder that we can mount)
+#### Implemented
+
+- [x] Bot running smoothly inside Docker (tested and works well)
+- [x] Full data persistence (data is stored under `/data`, see `docker-compose.yml`)
+- [x] Lavalink support both as a Docker container and an external service (playback tested and works well)
+- [x] Docker image for Linux (tested and working)
+- [x] Docker image for Windows (largely untested)
+
+#### Planned
+
 - [ ] Redis support (redis branch)
-- [ ] MongoDB support (?)
-- [ ] Minimal image size (Alpine, multi-staged builds)
-- [ ] Windows support (coming soon, maybe)
+- [ ] MongoDB support (same deal)
+- [ ] Optimized, minimal image sizes (Alpine, multi-staged builds)
+- [ ] A single image for multiple platforms (needs Docker Hub support)
 
 ## Running
 
