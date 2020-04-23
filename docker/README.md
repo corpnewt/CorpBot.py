@@ -16,8 +16,7 @@ This is a short document detailing the current status of the Docker images, incl
 
 - [ ] Redis support (redis branch)
 - [ ] MongoDB support (same deal)
-- [ ] Optimized, minimal image sizes (Alpine, multi-staged builds)
-- [ ] A single image for multiple platforms (needs Docker Hub support)
+- [ ] Optimized, minimal image sizes (Alpine, multi-staged builds, Windows image needs special attention)
 
 ## Running
 
