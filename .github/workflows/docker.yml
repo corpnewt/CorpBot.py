@@ -1,15 +1,16 @@
 name: Deploy Docker
 
-on:
-  push:
-    # Only build when pushing to the "rewrite" branch
-    branches:
-      - rewrite
-      - feature/docker ## TODO: Remove this when this branch is no longer used
+# Trigger the workflow on both pushes and pull requests
+on: [ push, pull_request ]
+
+# Use bash as the default shell for run commands
+defaults:
+  run:
+    shell: bash
 
 env:
-  # Enable Docker experimental features (eg. `docker manifest ...`)
-  DOCKER_CLI_EXPERIMENTAL: enabled
+  DOCKER_CLI_EXPERIMENTAL: enabled # Enable Docker experimental features (eg. `docker manifest ...`)
+  GITHUB_BRANCH: ${GITHUB_REF##*/}
 
 jobs:
 
@@ -22,6 +23,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Login to Docker Registry
+        if: github.event_name != 'pull_request'
         run: |-
           # Login to GitHub Package Registry
           docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
@@ -33,18 +35,19 @@ jobs:
 
       - name: Build Docker image
         run: |-
-          docker build --rm -f docker/Dockerfile -t corpbot.py:rewrite-linux-amd64 .
+          docker build --rm -f docker/Dockerfile -t corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 .
 
       - name: Publish to Docker Registry
+        if: github.event_name != 'pull_request'
         run: |-
           # Publish to GitHub Package Registry
-          docker tag corpbot.py:rewrite-linux-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-linux-amd64
-          docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-linux-amd64
+          docker tag corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64
+          docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64
 
           # Publish to Docker Hub
           if [ ! -z "${{ secrets.DOCKER_HUB_USERNAME }}" ]; then
-            docker tag corpbot.py:rewrite-linux-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-linux-amd64
-            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-linux-amd64
+            docker tag corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64
+            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64
           fi
 
   deploy-windows:
@@ -56,7 +59,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Login to Docker Registry
-        shell: bash
+        if: github.event_name != 'pull_request'
         run: |-
           # Login to GitHub Package Registry
           docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
@@ -67,22 +70,21 @@ jobs:
           fi
 
       - name: Build Docker image
-        shell: bash
         run: |-
-          docker build --rm -f docker/Dockerfile.win -t corpbot.py:rewrite-windows-amd64 .
+          docker build --rm -f docker/Dockerfile.win -t corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64 .
 
       - name: Publish to Docker Registry
-        shell: bash
+        if: github.event_name != 'pull_request'
         run: |-
           ## FIXME: GitHub Package Registry doesn't support Windows images (yet)
           # Publish to GitHub Package Registry
-          # docker tag corpbot.py:rewrite-windows-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64
-          # docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:rewrite-windows-amd64
+          # docker tag corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
+          # docker push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
 
           # Publish to Docker Hub
           if [ ! -z "${{ secrets.DOCKER_HUB_USERNAME }}" ]; then
-            docker tag corpbot.py:rewrite-windows-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-windows-amd64
-            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-windows-amd64
+            docker tag corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
+            docker push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
           fi
 
   deploy-manifest:
@@ -95,6 +97,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Login to Docker Registry
+        if: github.event_name != 'pull_request'
         run: |-
           # Login to GitHub Package Registry
           docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
@@ -105,19 +108,19 @@ jobs:
           fi
 
       - name: Publish to Docker Registry
-        shell: bash
+        if: github.event_name != 'pull_request'
         run: |-
           ## FIXME: GitHub Package Registry doesn't support Windows images (yet)
           # Create and push a combined image manifest to GitHub Package Registry
-          # docker manifest create docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite-linux-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite-windows-amd64
-          # docker manifest annotate docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite-linux-amd64 --os linux --arch amd64
-          # docker manifest annotate docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite-windows-amd64 --os windows --arch amd64
-          # docker manifest push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:rewrite --purge
+          # docker manifest create docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
+          # docker manifest annotate docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 --os linux --arch amd64
+          # docker manifest annotate docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64 --os windows --arch amd64
+          # docker manifest push docker.pkg.github.com/${GITHUB_ACTOR,,}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} --purge
 
           # Create and push a combined image manifest to Docker Hub
           if [ ! -z "${{ secrets.DOCKER_HUB_USERNAME }}" ]; then
-            docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-linux-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-windows-amd64
-            docker manifest annotate ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-linux-amd64 --os linux --arch amd64
-            docker manifest annotate ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite-windows-amd64 --os windows --arch amd64
-            docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:rewrite --purge
+            docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64
+            docker manifest annotate ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-linux-amd64 --os linux --arch amd64
+            docker manifest annotate ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA}-windows-amd64 --os windows --arch amd64
+            docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/corpbot.py:${GITHUB_BRANCH:-$GITHUB_SHA} --purge
           fi
