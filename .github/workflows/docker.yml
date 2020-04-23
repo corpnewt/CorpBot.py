@@ -69,7 +69,7 @@ jobs:
       - name: Build Docker image
         shell: bash
         run: |-
-          docker build --rm -f docker/Dockerfile -t corpbot.py:rewrite-windows-amd64 .
+          docker build --rm -f docker/Dockerfile.win -t corpbot.py:rewrite-windows-amd64 .
 
       - name: Publish to Docker Registry
         shell: bash
