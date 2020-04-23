@@ -5,6 +5,7 @@ on:
     # Only build when pushing to the "rewrite" branch
     branches:
       - rewrite
+      - feature/docker ## TODO: Remove this when this branch is no longer used
 
 env:
   # Enable Docker experimental features (eg. `docker manifest ...`)
