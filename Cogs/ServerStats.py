@@ -165,7 +165,6 @@ class ServerStats(commands.Cog):
             if emoji.managed:
                 twitchemojis += 1
                 continue
-            if emoji.name == "HomieKiss": print(emoji,emoji.available,emoji.animated)
             emojiMention = "<{}:{}:{}>".format("a" if emoji.animated else "",emoji.name,emoji.id)
             test = emojitext + emojiMention
             if len(test) > 1024:
