@@ -18,5 +18,5 @@ class ThatsTrue(commands.Cog):
 		ctx = await self.bot.get_context(message)
 		if ctx.command:
 			return {}
-		if re.match(self.regex,ctx.message.content):
+		if re.search(self.regex,ctx.message.content):
 			return {"Respond":"That's true."}
