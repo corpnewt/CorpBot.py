@@ -140,7 +140,7 @@ class ServerStats(commands.Cog):
             popList.append({ 'ID' : g.id, 'Population' : len(g.members) })
         
         # sort the guilds by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+        joinedList = sorted(joinedList, key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
         popList = sorted(popList, key=lambda x:x['Population'], reverse=True)
         
         check_item = { "ID" : guild.id, "Joined" : guild.me.joined_at }
@@ -344,7 +344,7 @@ class ServerStats(commands.Cog):
             joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
         
         # sort the users by join date
-        joinedList = sorted(joinedList, key=lambda x:x['Joined'])
+        joinedList = sorted(joinedList, key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 
         check_item = { "ID" : member.id, "Joined" : member.joined_at }
 
@@ -387,7 +387,7 @@ class ServerStats(commands.Cog):
             return await ctx.send("Position must be an int between 1 and {:,}".format(len(ctx.guild.members)))
         joinedList = [{"member":mem,"joined":mem.joined_at} for mem in ctx.guild.members]
         # sort the users by join date
-        joinedList = sorted(joinedList, key=lambda x:x['joined'])
+        joinedList = sorted(joinedList, key=lambda x:x["joined"].timestamp() if x["joined"] != None else -1)
         join = joinedList[position]
         msg = "*{}* joined at position **{:,}**.".format(DisplayName.name(join["member"]),position+1)
         await ctx.send(msg)
@@ -401,11 +401,11 @@ class ServerStats(commands.Cog):
             our_list.append(
                 {
                     "name":DisplayName.name(member),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p")),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
+                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
                     "date":member.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"])
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
         return await PickList.PagePicker(title="First Members to Join {} ({:,} total)".format(ctx.guild.name,len(ctx.guild.members)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
     @commands.command()
@@ -417,11 +417,11 @@ class ServerStats(commands.Cog):
             our_list.append(
                 {
                     "name":DisplayName.name(member),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p")),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
+                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
                     "date":member.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"],reverse=True)
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
         return await PickList.PagePicker(title="Most Recent Members to Join {} ({:,} total)".format(ctx.guild.name,len(ctx.guild.members)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
         
     @commands.command()
@@ -434,11 +434,11 @@ class ServerStats(commands.Cog):
             our_list.append(
                 {
                     "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
-                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p")),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
+                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
                     "date":bot.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"])
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
         return await PickList.PagePicker(title="First Servers I Joined ({:,} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
     @commands.command()
@@ -451,11 +451,11 @@ class ServerStats(commands.Cog):
             our_list.append(
                 {
                     "name":"{} ({} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
-                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p")),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
+                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
                     "date":bot.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"],reverse=True)
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
         return await PickList.PagePicker(title="Most Recent Servers I Joined ({:,} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
     @commands.command()
