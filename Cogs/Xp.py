@@ -1077,6 +1077,7 @@ class Xp(commands.Cog):
 		# Add joinpos
 		joinedList = []
 		for mem in ctx.message.guild.members:
+			if mem.joined_at == None: mem.joined_at = ctx.guild.create_at # Just use the guild creation date if we can't get joined_at...
 			joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
 		
 		# sort the users by join date
