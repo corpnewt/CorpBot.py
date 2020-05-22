@@ -778,7 +778,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player != None:
 			await player.destroy()
-			if player.is_connected: return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
