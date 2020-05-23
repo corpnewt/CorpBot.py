@@ -293,7 +293,8 @@ class Settings(commands.Cog):
 		except:
 			vt = 0
 		self.setUserStat(member,server,"VerificationTime",vt)
-		self.bot.loop.create_task(self.giveRole(member, server))
+		if not member.bot:
+			self.bot.loop.create_task(self.giveRole(member, server))
 
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
