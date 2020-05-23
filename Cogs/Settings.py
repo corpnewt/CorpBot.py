@@ -364,7 +364,13 @@ class Settings(commands.Cog):
 
 	async def onjoin(self, member, server):
 		# Welcome - and initialize timers
-		self.bot.loop.create_task(self.giveRole(member, server))
+		try:
+			vt = time.time() + int(self.getServerStat(server,"VerificationTime",0)) * 60
+		except:
+			vt = 0
+		self.setUserStat(member,server,"VerificationTime",vt)
+		if not member.bot:
+			self.bot.loop.create_task(self.giveRole(member, server))
 
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
@@ -408,6 +414,9 @@ class Settings(commands.Cog):
 			if defRole:
 				# We have a default - check for it
 				for member in server.members:
+					if member.bot:
+						# skip bots
+						continue
 					foundRole = False
 					for role in member.roles:
 						if role == defRole:
