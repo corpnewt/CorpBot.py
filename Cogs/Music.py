@@ -782,6 +782,11 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
+	@commands.command(hidden=True)
+	async def okbye(self, ctx):
+		"""Do you wanna build a snowman?"""
+		await ctx.invoke(self.stop)
+
 	@commands.command()
 	async def stopall(self, ctx):
 		"""Stops and disconnects the bot from all voice channels in all servers (owner-only)."""
