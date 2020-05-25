@@ -701,7 +701,8 @@ class Music(commands.Cog):
 			cv = int(player.volume*2)
 			return await Message.EmbedText(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
 		try:
-			volume = int(volume)
+			volume = float(volume)
+			volume = int(volume) if volume - int(volume) < 0.5 else int(volume)+1
 		except:
 			return await Message.EmbedText(title="♫ Volume must be an integer between 0-150.",color=ctx.author,delete_after=delay).send(ctx)
 		# Ensure our volume is between 0 and 150
