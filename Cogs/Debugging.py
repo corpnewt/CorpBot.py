@@ -173,7 +173,6 @@ class Debugging(commands.Cog):
 		if not guild: return # Didn't find it
 		# Store the invite in our working list
 		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
-		print(self.invite_list[str(guild.id)])
 		if not self.shouldLog('invite.create', invite.guild): return
 		# An invite was created
 		msg = "📥 Invite created."
