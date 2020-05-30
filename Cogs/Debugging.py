@@ -19,12 +19,12 @@ class Debugging(commands.Cog):
 		self.wrap = False
 		self.settings = settings
 		self.debug = debug
-		self.logvars = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
+		self.logvars = [ 'invite.create', 'invite.delete', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave' ]
-		self.normal = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
+		self.normal = [ 'invite.create', 'invite.delete', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 				'message.edit', 'message.delete', "xp" ]
 		self.verbose = [ x for x in self.logvars ] # Enable all of them
 		self.cleanChannels = []
@@ -96,6 +96,29 @@ class Debugging(commands.Cog):
 				return True
 		return False
 
+	def format_invite(self, invite):
+		# Gather prelim info
+		guild = self.bot.get_guild(int(invite.guild.id))
+		channel = None if guild == None else guild.get_channel(invite.channel.id)
+		url = invite.url if invite.url else "https://discord.gg/{}".format(invite.code)
+		expires_after = None if invite.max_age == None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
+		max_uses = None if invite.max_uses == None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
+		uses = None if invite.uses == None else "{:,}".format(invite.uses)
+		created_by = None if invite.inviter == None else "{}#{} ({})".format(invite.inviter.name, invite.inviter.discriminator, invite.inviter.id)
+		created_at = None if invite.created_at == None else invite.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC"
+		temp = None if invite.temporary == None else invite.temporary
+		# Build the description
+		desc = "Invite URL:      {}".format(url)
+		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
+		if created_at != None:    desc += "\nCreated At:      {}".format(created_at)
+		if channel != None:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
+		if expires_after != None: desc += "\nExpires:         {}".format(expires_after)
+		if temp != None:          desc += "\nTemporary:       {}".format(temp)
+		if uses != None:          desc += "\nUses:            {}".format(uses)
+		if max_uses != None:      desc += "\nMax Uses:        {}".format(max_uses)
+		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
+		return desc
+
 	# Catch custom xp event
 	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
@@ -142,16 +165,41 @@ class Debugging(commands.Cog):
 		msg = "🔊 {}#{} ({}) was unmuted.".format(member.name, member.discriminator, member.id)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green())
 
+	@commands.Cog.listener()
+	async def on_invite_create(self, invite):
+		# Add the invite to our list
+		if invite.guild == None: return # Nothing to do here
+		guild = self.bot.get_guild(int(invite.guild.id))
+		if not guild: return # Didn't find it
+		# Store the invite in our working list
+		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
+		print(self.invite_list[str(guild.id)])
+		if not self.shouldLog('invite.create', invite.guild): return
+		# An invite was created
+		msg = "📥 Invite created."
+		log_msg = self.format_invite(invite)
+		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),log_msg,title=msg,color=discord.Color.teal())
+
+	@commands.Cog.listener()
+	async def on_invite_delete(self, invite):
+		if invite.guild == None: return # Nothing to do here
+		guild = self.bot.get_guild(int(invite.guild.id))
+		if not guild: return # Didn't find it
+		# Refresh the list omitting the deleted invite
+		self.invite_list[str(guild.id)] = [x for x in self.invite_list.get(str(guild.id),[]) if x.code != invite.code]
+		if not self.shouldLog('invite.delete', guild): return
+		msg = "📤 Invite deleted."
+		log_msg = self.format_invite(invite)
+		await self._logEvent(guild,log_msg,title=msg,color=discord.Color.teal())
+
 	@commands.Cog.listener()	
 	async def on_member_join(self, member):
 		guild = member.guild
 		# Try and determine which invite was used
 		invite = None
 		invite_list = self.invite_list.get(str(guild.id),[])
-		try:
-			new_invites = await guild.invites()
-		except:
-			new_invites = []
+		try: new_invites = await guild.invites()
+		except: new_invites = []
 		changed = [x for x in invite_list for y in new_invites if x.code == y.code and x.uses != y.uses]
 		if len(changed) == 1:
 			# We have only one changed invite - this is the one!
@@ -161,11 +209,8 @@ class Debugging(commands.Cog):
 			return
 		# A new member joined
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
-		log_msg = "Account Created: {}".format(member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
-		if invite:
-			log_msg += "\nInvite Used: {}".format(invite.url)
-			log_msg += "\nTotal Uses: {}".format(invite.uses)
-			log_msg += "\nInvite Created By: {}#{}".format(invite.inviter.name, invite.inviter.discriminator)
+		log_msg = "Account Created: {}".format("Unknown" if member.created_at == None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
+		if invite: log_msg += "\n"+self.format_invite(invite)
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal())
 		
 	@commands.Cog.listener()
