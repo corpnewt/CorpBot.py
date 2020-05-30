@@ -2,7 +2,7 @@ import asyncio, discord, os, textwrap, time
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName, Message
+from   Cogs import Utils, DisplayName, Message, ReadableTime
 
 def setup(bot):
 	# Add the bot and deps
@@ -19,17 +19,14 @@ class Debugging(commands.Cog):
 		self.wrap = False
 		self.settings = settings
 		self.debug = debug
-		self.logvars = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
+		self.logvars = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
-		self.quiet = [ 'user.ban', 'user.unban', 'user.join', 'user.leave' ]
-		self.normal = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
+		self.quiet = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave' ]
+		self.normal = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 				'message.edit', 'message.delete', "xp" ]
-		self.verbose = [ 'user.ban', 'user.unban', 'user.join', 'user.leave', 'user.status',
-				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
-				'user.nick', 'user.name', 'message.send', 'message.delete',
-				'message.edit', "xp" ]
+		self.verbose = [ x for x in self.logvars ] # Enable all of them
 		self.cleanChannels = []
 		self.invite_list = {}
 		global Utils, DisplayName
@@ -123,8 +120,26 @@ class Debugging(commands.Cog):
 	async def on_member_unban(self, guild, member):
 		if not self.shouldLog('user.unban', guild):
 			return
-		# A member was banned
+		# A member was unbanned
 		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
+		await self._logEvent(guild, "", title=msg, color=discord.Color.green())
+
+	@commands.Cog.listener()
+	async def on_mute(self, member, guild, cooldown, muted_by):
+		if not self.shouldLog('user.mute', guild): return
+		# A memeber was muted
+		msg = "🔇 {}#{} ({}) was muted.".format(member.name, member.discriminator, member.id)
+		message = "Muted by {}.\nMuted {}.".format(
+			"Auto-Muted" if not muted_by else "{}#{} ({})".format(muted_by.name, muted_by.discriminator, muted_by.id),
+			"for "+ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "until further notice"
+		)
+		await self._logEvent(guild, message, title=msg, color=discord.Color.red())
+
+	@commands.Cog.listener()
+	async def on_unmute(self, member, guild):
+		if not self.shouldLog('user.unmute', guild): return
+		# A memeber was muted
+		msg = "🔊 {}#{} ({}) was unmuted.".format(member.name, member.discriminator, member.id)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green())
 
 	@commands.Cog.listener()	
@@ -201,7 +216,7 @@ class Debugging(commands.Cog):
 		server = before.guild
 		if not before.status == after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.activities == after.activities:
 			# Something changed
 			msg = ''
@@ -243,19 +258,19 @@ class Debugging(commands.Cog):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not str(before.avatar_url) == str(after.avatar_url) and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
 			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		if not before.name == after.name and self.shouldLog('user.name', server):
 			# Name changed
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
