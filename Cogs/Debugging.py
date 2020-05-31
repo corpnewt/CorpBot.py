@@ -175,7 +175,8 @@ class Debugging(commands.Cog):
 		if invite.guild == None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
-		pfpurl = guild.icon_url if len(guild.icon_url) else self.bot.user.default_avatar_url
+		pfpurl = self.bot.user.default_avatar_url
+		if invite.inviter != None and len(invite.inviter.avatar_url): pfpurl = invite.inviter.avatar_url
 		# Store the invite in our working list
 		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
 		if not self.shouldLog('invite.create', invite.guild): return
