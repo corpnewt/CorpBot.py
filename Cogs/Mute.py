@@ -429,13 +429,13 @@ class Mute(commands.Cog):
                 return await ctx.send(Utils.suppressed(ctx,msg))
         mess = await ctx.send("Unmuting...")
         await self._unmute(member, ctx.guild)
-        pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
+        # pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
-        try:
+        '''try:
             await member.send(pm)
         except Exception:
-            pass
+            pass'''
 
     @commands.command(pass_context=True)
     async def ismuted(self, ctx, *, member = None):
