@@ -392,12 +392,10 @@ class Bot(commands.Cog):
 			msg = '**Speed Test Results:**\n'
 			msg += '```\n'
 			await message.edit(content="Running speed test...\n- Downloading...")
-			a = self.bot.loop.run_in_executor(None, st.download)
-			d = await a
-			msg += 'Download: {}Mb/s\n'.format(round(d/1024/1024, 2))
+			d = await self.bot.loop.run_in_executor(None, st.download)
+			msg += '    Ping: {} ms\nDownload: {} Mb/s\n'.format(round(st.results.ping, 2), round(d/1024/1024, 2))
 			await message.edit(content="Running speed test...\n- Downloading...\n- Uploading...")
-			a = self.bot.loop.run_in_executor(None, st.upload)
-			u = await a
+			u = await self.bot.loop.run_in_executor(None, st.upload)
 			msg += '  Upload: {}Mb/s```'.format(round(u/1024/1024, 2))
 			await message.edit(content=msg)
 		except Exception as e:
