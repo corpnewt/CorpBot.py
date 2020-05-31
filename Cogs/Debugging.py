@@ -122,47 +122,52 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
 		guild = from_user.guild
+		pfpurl = from_user.avatar_url if len(from_user.avatar_url) else from_user.default_avatar_url
 		if not self.shouldLog('xp', guild):
 			return
 		if type(to_user) is discord.Role:
 			msg = "🌟 {}#{} ({}) gave {} xp to the {} role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
 		else:
 			msg = "🌟 {}#{} ({}) gave {} xp to {}#{} ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.blue())
+		await self._logEvent(guild, "", title=msg, color=discord.Color.blue(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_member_ban(self, guild, member):
 		if not self.shouldLog('user.ban', guild):
 			return
 		# A member was banned
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
-		await self._logEvent(guild, "", title=msg, color=discord.Color.red())
+		await self._logEvent(guild, "", title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_member_unban(self, guild, member):
 		if not self.shouldLog('user.unban', guild):
 			return
 		# A member was unbanned
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
-		await self._logEvent(guild, "", title=msg, color=discord.Color.green())
+		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_mute(self, member, guild, cooldown, muted_by):
 		if not self.shouldLog('user.mute', guild): return
 		# A memeber was muted
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		msg = "🔇 {}#{} ({}) was muted.".format(member.name, member.discriminator, member.id)
 		message = "Muted by {}.\nMuted {}.".format(
 			"Auto-Muted" if not muted_by else "{}#{} ({})".format(muted_by.name, muted_by.discriminator, muted_by.id),
 			"for "+ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "until further notice"
 		)
-		await self._logEvent(guild, message, title=msg, color=discord.Color.red())
+		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_unmute(self, member, guild):
 		if not self.shouldLog('user.unmute', guild): return
 		# A memeber was muted
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		msg = "🔊 {}#{} ({}) was unmuted.".format(member.name, member.discriminator, member.id)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.green())
+		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_invite_create(self, invite):
@@ -170,29 +175,32 @@ class Debugging(commands.Cog):
 		if invite.guild == None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
+		pfpurl = guild.icon_url if len(guild.icon_url) else self.bot.user.default_avatar_url
 		# Store the invite in our working list
 		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
 		if not self.shouldLog('invite.create', invite.guild): return
 		# An invite was created
 		msg = "📥 Invite created."
 		log_msg = self.format_invite(invite)
-		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),log_msg,title=msg,color=discord.Color.teal())
+		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),log_msg,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_invite_delete(self, invite):
 		if invite.guild == None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
+		pfpurl = guild.icon_url if len(guild.icon_url) else self.bot.user.default_avatar_url
 		# Refresh the list omitting the deleted invite
 		self.invite_list[str(guild.id)] = [x for x in self.invite_list.get(str(guild.id),[]) if x.code != invite.code]
 		if not self.shouldLog('invite.delete', guild): return
 		msg = "📤 Invite deleted."
 		log_msg = self.format_invite(invite)
-		await self._logEvent(guild,log_msg,title=msg,color=discord.Color.teal())
+		await self._logEvent(guild,log_msg,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()	
 	async def on_member_join(self, member):
 		guild = member.guild
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		# Try and determine which invite was used
 		invite = None
 		invite_list = self.invite_list.get(str(guild.id),[])
@@ -209,16 +217,17 @@ class Debugging(commands.Cog):
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
 		log_msg = "Account Created: {}".format("Unknown" if member.created_at == None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
 		if invite: log_msg += "\n"+self.format_invite(invite)
-		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal())
+		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
 		
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		guild = member.guild
+		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
 		if not self.shouldLog('user.leave', guild):
 			return
 		# A member left
 		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
-		await self._logEvent(guild, "", title=msg, color=discord.Color.light_grey())
+		await self._logEvent(guild, "", title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
 
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
@@ -257,9 +266,10 @@ class Debugging(commands.Cog):
 			return
 		# A member changed something about their user-profile
 		server = before.guild
+		pfpurl = before.avatar_url if len(before.avatar_url) else before.default_avatar_url
 		if not before.status == after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if not before.activities == after.activities:
 			# Something changed
 			msg = ''
@@ -301,26 +311,22 @@ class Debugging(commands.Cog):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if not str(before.avatar_url) == str(after.avatar_url) and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
 			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if not before.name == after.name and self.shouldLog('user.name', server):
 			# Name changed
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold())
+			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		# context = await self.bot.get_context(message)
-		# print(context)
-		# print(context.command)
-
 		if not message.guild:
 			return
 		
@@ -335,8 +341,8 @@ class Debugging(commands.Cog):
 			msg += "\n\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
-		
-		await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey())
+		pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+		await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
 		return
 		
 	@commands.Cog.listener()
@@ -364,8 +370,8 @@ class Debugging(commands.Cog):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
 				msg += a.url + "\n"
-		
-		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple())
+		pfpurl = before.author.avatar_url if len(before.author.avatar_url) else before.author.default_avatar_url
+		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
 		return
 		
 	@commands.Cog.listener()
@@ -389,9 +395,10 @@ class Debugging(commands.Cog):
 			msg += "\n\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
-		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange())
+		pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange(), thumbnail = pfpurl)
 	
-	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None):
+	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color == None:
@@ -409,33 +416,31 @@ class Debugging(commands.Cog):
 			return
 		# At this point - we log the message
 		try:
-			if filename:
-				await logChan.send(log_message, file=discord.File(filename))
+			# Check for suppress
+			if suppress:
+				log_message = Utils.suppressed(server,log_message)
+			# Remove triple backticks and replace any single backticks with single quotes
+			log_back  = log_message.replace("`", "'")
+			if log_back == log_message:
+				# Nothing changed
+				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
 			else:
-				# Check for suppress
-				if suppress:
-					log_message = Utils.suppressed(server,log_message)
-				# Remove triple backticks and replace any single backticks with single quotes
-				log_back  = log_message.replace("`", "'")
-				if log_back == log_message:
-					# Nothing changed
-					footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
-				else:
-					# We nullified some backticks - make a note of it
-					log_message = log_back
-					footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
-				if self.wrap:
-					# Wraps the message to lines no longer than 70 chars
-					log_message = textwrap.fill(log_message, replace_whitespace=False)
-				await Message.EmbedText(
-					title=title,
-					description=log_message,
-					color=color,
-					desc_head="```\n",
-					desc_foot="```",
-					footer=footer
-				).send(logChan)
-				# await logChan.send(log_message)
+				# We nullified some backticks - make a note of it
+				log_message = log_back
+				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+			if self.wrap:
+				# Wraps the message to lines no longer than 70 chars
+				log_message = textwrap.fill(log_message, replace_whitespace=False)
+			await Message.EmbedText(
+				title=title,
+				description=log_message,
+				color=color,
+				thumbnail=thumbnail,
+				desc_head="```\n",
+				desc_foot="```",
+				footer=footer
+			).send(logChan)
+			if filename: await logChan.send(file=discord.File(filename))
 		except:
 			# We don't have perms in this channel or something - silently cry
 			pass
@@ -520,13 +525,18 @@ class Debugging(commands.Cog):
 			myfile.write(msg)
 
 		# Send the cleaner a pm letting them know we're done
-		await ctx.author.send('*{}* message{} removed from *#{}* in *{}!*'.format(counter, "" if counter == 1 else "s", chan.name, Utils.suppressed(ctx, ctx.guild.name)))
-		# PM the file
-		await ctx.author.send(file=discord.File(filename))
+		try:
+			await ctx.author.send('*{}* message{} removed from *#{}* in *{}!*'.format(counter, "" if counter == 1 else "s", chan.name, Utils.suppressed(ctx, ctx.guild.name)))
+			# PM the file
+			await ctx.author.send(file=discord.File(filename))
+		except:
+			# Assume the author doesn't accept pms - just silently fail
+			pass
 		if self.shouldLog('message.delete', ctx.guild):
 			# We're logging
 			logmess = '{}#{} cleaned in #{}'.format(ctx.author.name, ctx.author.discriminator, chan.name)
-			await self._logEvent(ctx.guild, logmess, filename=filename)
+			pfpurl = ctx.author.avatar_url if len(ctx.author.avatar_url) else ctx.author.default_avatar_url
+			await self._logEvent(ctx.guild, "{:,} message{} removed.".format(counter, "" if counter == 1 else "s"), title=logmess, filename=filename, thumbnail=pfpurl)
 		# Delete the remaining file
 		os.remove(filename)
 	
