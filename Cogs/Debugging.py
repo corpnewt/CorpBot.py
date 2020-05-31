@@ -116,7 +116,6 @@ class Debugging(commands.Cog):
 		if temp != None:          desc += "\nTemporary:       {}".format(temp)
 		if uses != None:          desc += "\nUses:            {}".format(uses)
 		if max_uses != None:      desc += "\nMax Uses:        {}".format(max_uses)
-		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
 		return desc
 
 	# Catch custom xp event
