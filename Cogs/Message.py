@@ -491,7 +491,7 @@ class EmbedText(Embed):
                     icon_url=footer_icon
                 )
             em.description = self.desc_head + m + self.desc_foot
-            if i == 1 and self.file:
+            if i == 0 and self.file != None:
                 message = await self._send_embed(ctx, em, to_pm, self.file)
             else:
                 # Clear any image if needed
