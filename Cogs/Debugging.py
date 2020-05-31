@@ -207,7 +207,7 @@ class Debugging(commands.Cog):
 		invite_list = self.invite_list.get(str(guild.id),[])
 		try: new_invites = await guild.invites()
 		except: new_invites = []
-		changed = [x for x in invite_list for y in new_invites if x.code == y.code and x.uses != y.uses]
+		changed = [x for x in new_invites for y in invite_list if x.code == y.code and x.uses != y.uses]
 		if len(changed) == 1:
 			# We have only one changed invite - this is the one!
 			invite = changed[0]
