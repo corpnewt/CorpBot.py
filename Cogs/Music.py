@@ -1,6 +1,6 @@
-import asyncio, discord, subprocess, os, re, time, math, uuid, ctypes, random, wavelink
+import asyncio, discord, subprocess, os, re, time, math, uuid, ctypes, random, wavelink, json, tempfile, shutil
 from   discord.ext import commands
-from   Cogs import Utils, Message, DisplayName, PickList
+from   Cogs import Utils, Message, DisplayName, PickList, DL
 
 # This file is modified from Rapptz's basic_voice.py:
 # https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
@@ -27,6 +27,30 @@ class Music(commands.Cog):
 		# Setup Wavelink
 		if not hasattr(self.bot,'wavelink'): self.bot.wavelink = wavelink.Client(bot=self.bot)
 		self.bot.loop.create_task(self.start_nodes())
+
+	async def download(self, url):
+		url = url.strip("<>")
+		# Set up a temp directory
+		dirpath = tempfile.mkdtemp()
+		tempFileName = url.rsplit('/', 1)[-1]
+		# Strip question mark
+		tempFileName = tempFileName.split('?')[0]
+		filePath = dirpath + "/" + tempFileName
+		rImage = None
+		try:
+			rImage = await DL.async_dl(url)
+		except:
+			pass
+		if not rImage:
+			self.remove(dirpath)
+			return None
+		with open(filePath, 'wb') as f:
+			f.write(rImage)
+		# Check if the file exists
+		if not os.path.exists(filePath):
+			self.remove(dirpath)
+			return None
+		return filePath
 
 	async def start_nodes(self):
 		node = self.bot.wavelink.get_best_node()
@@ -330,6 +354,111 @@ class Music(commands.Cog):
 		# if we made it here - then we're alone - disconnect and destroy
 		self.dict_pop(user.guild)
 		if player: await player.destroy()
+
+	@commands.command()
+	async def savepl(self, ctx, *, options = ""):
+		"""Saves the current playlist to a json file that can be loaded later.
+		
+		Note that the structure of this file is very specific and alterations may not work.
+		
+		Available options:
+
+		ts : Include the timestamp of the currently playing song."""
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		# Get the options
+		timestamp = False
+		time = 0
+		for x in options.split():
+			if x.lower() == "ts": timestamp = True
+		# Let's save the playlist
+		current = self.data.get(str(ctx.guild.id),None)
+		queue = [x for x in self.queue.get(str(ctx.guild.id),[])]
+		if current:
+			if timestamp and current.info.get("uri"):
+				current.info["seek"] = int(player.last_position/1000)
+			queue.insert(0,current)
+		if not len(queue):
+			return await Message.EmbedText(title="♫ No playlist to save!",color=ctx.author,delete_after=delay).send(ctx)
+		songs = []
+		for x in queue:
+			if x.uri == None: continue # No link
+			# Strip the added by and ctx keys
+			x.info.pop("added_by",None)
+			x.info.pop("ctx",None)
+			x.info["id"] = x.id
+			songs.append(x.info)
+		temp = tempfile.mkdtemp()
+		temp_json = os.path.join(temp,"playlist.json")
+		try:
+			json.dump(songs,open(temp_json,"w"),indent=2)
+			await ctx.send(file=discord.File(temp_json))
+		except Exception as e:
+			return await Message.EmbedText(title="♫ An error occurred creating the playlist!",description=str(e),color=ctx.author).send(ctx)
+		finally:
+			shutil.rmtree(temp,ignore_errors=True)
+		return await Message.EmbedText(title="♫ Uploaded playlist!",color=ctx.author).send(ctx)
+
+	async def _load_playlist_from_url(self, url, ctx, shuffle = False):
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if url == None and len(ctx.message.attachments) == 0:
+			return await ctx.send("Usage: `{}loadpl [url or attachment]`".format(ctx.prefix))
+		if url == None:
+			url = ctx.message.attachments[0].url
+		message = await Message.EmbedText(title="♫ Downloading...",color=ctx.author).send(ctx)
+		path = await self.download(url)
+		if not path:
+			return await Message.EmbedText(title="♫ Couldn't download playlist!",color=ctx.author).edit(ctx,message)
+		try:
+			playlist = json.load(open(path))
+		except Exception as e:
+			return await Message.EmbedText(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,message)
+		finally:
+			shutil.rmtree(os.path.dirname(path),ignore_errors=True)
+		if not len(playlist): return await Message.EmbedText(title="♫ Playlist is empty!",color=ctx.author).edit(ctx,message)
+		if not isinstance(playlist,list): return await Message.EmbedText(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,message)
+		if shuffle:
+			random.shuffle(playlist)
+		# Let's walk the items and add them
+		queue = self.queue.get(str(ctx.guild.id),[])
+		for x in playlist:
+			if not "id" in x and isinstance(x["id"],str): continue # Bad id
+			x["added_by"] = ctx.author
+			x["ctx"] = ctx
+			queue.append(wavelink.Track(x["id"],x))
+		# Reset the queue as needed
+		self.queue[str(ctx.guild.id)] = queue
+		await Message.EmbedText(title="♫ Added {} song{} from playlist!".format(len(playlist),"" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
+		if not player.is_playing and not player.paused:
+			self.bot.dispatch("next_song",ctx)
+
+	@commands.command()
+	async def loadpl(self, ctx, *, url = None):
+		"""Loads the passed playlist json data.  Accepts a url - or picks the first attachment.
+		
+		Note that the structure of this file is very specific and alterations may not work.
+		
+		Only files dumped via the savepl command are supported."""
+		await self._load_playlist_from_url(url, ctx)
+
+	@commands.command()
+	async def shufflepl(self, ctx, *, url = None):
+		"""Loads and shuffles the passed playlist json data.  Accepts a url - or picks the first attachment.
+		
+		Note that the structure of this file is very specific and alterations may not work.
+		
+		Only files dumped via the savepl command are supported."""
+		await self._load_playlist_from_url(url, ctx, shuffle=True)
+
+	@commands.command()
+	async def summon(self, ctx, *, channel = None):
+		"""Joins the summoner's voice channel."""
+		await ctx.invoke(self.join,channel=channel)
 
 	@commands.command()
 	async def join(self, ctx, *, channel = None):
@@ -827,9 +956,9 @@ class Music(commands.Cog):
 		if not await self._check_role(ctx):
 			raise commands.CommandError("Music Cog: Missing DJ roles.")
 		# If we're just using the join command - we don't need extra checks - they're done in the command itself
-		if ctx.command.name == "join": return
+		if ctx.command.name in ("join","summon"): return
 		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
-		if ctx.command.name in ("play","shuffle") and ctx.author.voice:
+		if ctx.command.name in ("play","shuffle","loadpl","shufflepl") and ctx.author.voice:
 			if player == None: player = self.bot.wavelink.get_player(ctx.guild.id)
 			if not player.is_connected: return await player.connect(ctx.author.voice.channel.id)
 		# Let's ensure the bot is connected to voice
