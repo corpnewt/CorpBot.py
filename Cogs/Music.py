@@ -491,7 +491,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if player.paused:
+		if player.paused and url == None:
 			# We're trying to resume
 			await player.set_pause(False)
 			data = self.data.get(str(ctx.guild.id))
