@@ -433,7 +433,7 @@ class Music(commands.Cog):
 			queue.append(wavelink.Track(x["id"],x))
 		# Reset the queue as needed
 		self.queue[str(ctx.guild.id)] = queue
-		await Message.EmbedText(title="♫ Added {} song{} from playlist!".format(len(playlist),"" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
+		await Message.EmbedText(title="♫ Added {} {}song{} from playlist!".format(len(playlist),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
 		if not player.is_playing and not player.paused:
 			self.bot.dispatch("next_song",ctx)
 
