@@ -17,12 +17,6 @@ class DJRoles(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-			
-	@commands.command(pass_context=True)
-	async def ytlist(self, ctx, yes_no = None):
-		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
-		if not await Utils.is_admin_reply(ctx): return
-		await ctx.send(Utils.yes_no_setting(ctx,"Youtube search list","YTMultiple",yes_no))
 
 	@commands.command(pass_context=True)
 	async def adddj(self, ctx, *, role : str = None):
