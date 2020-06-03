@@ -126,6 +126,7 @@ class Music(commands.Cog):
 			).edit(ctx,message)
 
 	async def add_to_queue(self, ctx, url, message, shuffle = False):
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		queue = self.queue.get(str(ctx.guild.id),[])
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -145,11 +146,11 @@ class Music(commands.Cog):
 				).pick()
 				if index < 0:
 					if index == -3:
-						await message.edit(content="Something went wrong :(")
+						await message.edit(content="Something went wrong :(",delete_after=delay)
 					elif index == -2:
-						await message.edit(content="Times up!  We can search for music another time.")
+						await message.edit(content="Times up!  We can search for music another time.",delete_after=delay)
 					else:
-						await message.edit(content="Aborting!  We can search for music another time.")
+						await message.edit(content="Aborting!  We can search for music another time.",delete_after=delay)
 					return False
 				# Got the index of the track to add
 				tracks = tracks[index]
