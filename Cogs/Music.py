@@ -380,7 +380,11 @@ class Music(commands.Cog):
 		self.dict_pop(user.guild)
 		if player: await player.destroy()
 
-	
+	@commands.command(pass_context=True)
+	async def searchlist(self, ctx, yes_no = None):
+		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Music player search list","YTMultiple",yes_no))
 
 	@commands.command()
 	async def savepl(self, ctx, *, options = ""):
@@ -972,7 +976,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
