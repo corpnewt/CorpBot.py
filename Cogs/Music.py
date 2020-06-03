@@ -98,7 +98,8 @@ class Music(commands.Cog):
 			title="♫ Searching For: {}...".format(url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
-		data = await self.add_to_queue(ctx, url, shuffle)
+		data = await self.add_to_queue(ctx, url, message, shuffle)
+		if data == False: return # Something else happened, ignore it.
 		if data == None:
 			# Nothing found
 			return await Message.EmbedText(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -124,7 +125,7 @@ class Music(commands.Cog):
 				color=ctx.author
 			).edit(ctx,message)
 
-	async def add_to_queue(self, ctx, url, shuffle = False):
+	async def add_to_queue(self, ctx, url, message, shuffle = False):
 		queue = self.queue.get(str(ctx.guild.id),[])
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -132,7 +133,30 @@ class Music(commands.Cog):
 		url = urls[0] if len(urls) else "ytsearch:"+url.replace('/', '')
 		tracks = await self.bot.wavelink.get_tracks(url)
 		if tracks == None: return None
-		tracks = tracks[0] if (url.startswith("ytsearch:") or isinstance(tracks,list)) and len(tracks) else tracks
+		if (url.startswith("ytsearch:") or isinstance(tracks,list)) and len(tracks):
+			if self.settings.getServerStat(ctx.guild, "YTMultiple", False):
+				# We want to let the user pick
+				list_show = "Please select the number of the track you'd like to add:"
+				index, message = await PickList.Picker(
+					title=list_show,
+					list=[x.info['title'] for x in tracks[:5]],
+					ctx=ctx,
+					message=message
+				).pick()
+				if index < 0:
+					if index == -3:
+						await message.edit(content="Something went wrong :(")
+					elif index == -2:
+						await message.edit(content="Times up!  We can search for music another time.")
+					else:
+						await message.edit(content="Aborting!  We can search for music another time.")
+					return False
+				# Got the index of the track to add
+				tracks = tracks[index]
+			else:
+				# We only want the first entry
+				tracks = tracks[0]
+		# tracks = tracks[0] if (url.startswith("ytsearch:") or isinstance(tracks,list)) and len(tracks) else tracks
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if isinstance(tracks,wavelink.Track):
 			# Only got one item - add it to the queue
@@ -320,7 +344,7 @@ class Music(commands.Cog):
 		# Save the current data in case of repeats
 		self.data[str(ctx.guild.id)] = data
 		# Set the volume - default to 50
-		volume = self.vol.get(str(ctx.guild.id),100)
+		volume = self.vol[str(ctx.guild.id)] if str(ctx.guild.id) in self.vol else self.settings.getServerStat(ctx.guild, "MusicVolume", 100)
 		await player.set_volume(volume/2)
 		async with ctx.typing():
 			self.bot.dispatch("play_next",player,data)
@@ -354,6 +378,8 @@ class Music(commands.Cog):
 		# if we made it here - then we're alone - disconnect and destroy
 		self.dict_pop(user.guild)
 		if player: await player.destroy()
+
+	
 
 	@commands.command()
 	async def savepl(self, ctx, *, options = ""):
@@ -838,6 +864,8 @@ class Music(commands.Cog):
 		volume = 150 if volume > 150 else 0 if volume < 0 else volume
 		self.vol[str(ctx.guild.id)] = volume
 		await player.set_volume(volume/2)
+		# Save it to the server stats with range 10-100
+		self.settings.setServerStat(ctx.guild, "MusicVolume", 10 if volume < 10 else 100 if volume > 100 else volume)
 		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
