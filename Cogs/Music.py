@@ -409,6 +409,7 @@ class Music(commands.Cog):
 			queue.insert(0,current)
 		if not len(queue):
 			return await Message.EmbedText(title="♫ No playlist to save!",color=ctx.author,delete_after=delay).send(ctx)
+		message = await Message.EmbedText(title="♫ Gathering info...",color=ctx.author).send(ctx)
 		songs = []
 		for x in queue:
 			if x.uri == None: continue # No link
@@ -417,16 +418,17 @@ class Music(commands.Cog):
 			x.info.pop("ctx",None)
 			x.info["id"] = x.id
 			songs.append(x.info)
+		await Message.EmbedText(title="♫ Saving and uploading...",color=ctx.author).edit(ctx,message)
 		temp = tempfile.mkdtemp()
 		temp_json = os.path.join(temp,"playlist.json")
 		try:
 			json.dump(songs,open(temp_json,"w"),indent=2)
 			await ctx.send(file=discord.File(temp_json))
 		except Exception as e:
-			return await Message.EmbedText(title="♫ An error occurred creating the playlist!",description=str(e),color=ctx.author).send(ctx)
+			return await Message.EmbedText(title="♫ An error occurred creating the playlist!",description=str(e),color=ctx.author).edit(ctx,message)
 		finally:
 			shutil.rmtree(temp,ignore_errors=True)
-		return await Message.EmbedText(title="♫ Uploaded playlist!",color=ctx.author).send(ctx)
+		return await Message.EmbedText(title="♫ Uploaded playlist!",color=ctx.author).edit(ctx,message)
 
 	async def _load_playlist_from_url(self, url, ctx, shuffle = False):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
