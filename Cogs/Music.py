@@ -339,7 +339,6 @@ class Music(commands.Cog):
 			queue.append(self.data.get(str(ctx.guild.id),None))
 		if not len(queue):
 			# Nothing to play - strip the last played song and bail
-			self.data.pop(str(ctx.guild.id),None)
 			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
@@ -408,7 +407,7 @@ class Music(commands.Cog):
 		# Let's save the playlist
 		current = self.data.get(str(ctx.guild.id),None)
 		queue = [x for x in self.queue.get(str(ctx.guild.id),[])]
-		if current:
+		if current and (player.is_playing or player.paused):
 			if timestamp and current.info.get("uri"):
 				current.info["seek"] = int(player.last_position/1000)
 			queue.insert(0,current)
