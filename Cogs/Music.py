@@ -338,7 +338,8 @@ class Music(commands.Cog):
 			# Re-add the track to the end of the playlist
 			queue.append(self.data.get(str(ctx.guild.id),None))
 		if not len(queue):
-			# Nothing to play, bail
+			# Nothing to play - strip the last played song and bail
+			self.data.pop(str(ctx.guild.id),None)
 			return await Message.EmbedText(title="♫ End of playlist!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the first song in the list and start playing it
 		data = queue.pop(0)
