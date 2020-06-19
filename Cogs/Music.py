@@ -64,7 +64,7 @@ class Music(commands.Cog):
 		node.set_hook(self.on_event_hook)
 
 	def skip_pop(self, ctx):
-		# Pops the current skip list and dispatches the "next_song" event
+		# Pops the current skip list and dispatches the "skip_song" event
 		self.skips.pop(str(ctx.guild.id),None)
 		self.bot.dispatch("skip_song",ctx)
 
@@ -157,7 +157,6 @@ class Music(commands.Cog):
 			else:
 				# We only want the first entry
 				tracks = tracks[0]
-		# tracks = tracks[0] if (url.startswith("ytsearch:") or isinstance(tracks,list)) and len(tracks) else tracks
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if isinstance(tracks,wavelink.Track):
 			# Only got one item - add it to the queue
@@ -294,6 +293,7 @@ class Music(commands.Cog):
 
 	async def on_event_hook(self, event):
 		# Node callback
+		# print(event)
 		if isinstance(event,(wavelink.TrackEnd, wavelink.TrackException, wavelink.TrackStuck)):
 			# get ctx from data object
 			try: ctx = self.data[str(event.player.guild_id)].info["ctx"]
@@ -302,6 +302,7 @@ class Music(commands.Cog):
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			if isinstance(event,(wavelink.TrackException,wavelink.TrackStuck)):
 				await Message.EmbedText(title="♫ Something went wrong playing that song!",color=ctx.author,delete_after=delay).send(ctx)
+				return await event.player.stop() # Sends the TrackStop event to move to the next song as needed
 			self.bot.dispatch("next_song",ctx)
 
 	@commands.Cog.listener()
@@ -331,8 +332,9 @@ class Music(commands.Cog):
 		if not player.is_connected:
 			# Stopped - or late-fired signal - destroy the player
 			return await player.destroy()
-		# Stop it in case it's still playing
-		await player.stop()
+		# Check if we need to stop the player (shouldn't be required, but *just in case*)
+		if player.is_playing or player.paused: return await player.stop() # This will fire another "next_song" event so we bail here
+		# Gather up the queue
 		queue = self.queue.get(str(ctx.guild.id),[])
 		if self.loop.get(str(ctx.guild.id),False) and self.data.get(str(ctx.guild.id),None):
 			# Re-add the track to the end of the playlist
@@ -542,8 +544,8 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if player.paused:
-			return await Message.EmbedText(title="♫ Already paused!",color=ctx.author,delete_after=delay).send(ctx)
+		if player.paused: # Just toggle play
+			return await ctx.invoke(self.play)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Pause the track
@@ -935,8 +937,30 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def stop(self, ctx):
-		"""Stops and disconnects the bot from voice."""
+		"""Stops and empties the current playlist."""
 		
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		# Remove the per-server temp settings
+		self.dict_pop(ctx)
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		if player != None:
+			if player.is_playing or player.is_paused:
+				await player.stop()
+				return await Message.EmbedText(title="♫ Music stopped and playlist cleared!",color=ctx.author,delete_after=delay).send(ctx)
+			else:
+				return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command(hidden=True)
+	async def okbye(self, ctx):
+		"""Do you wanna build a snowman?"""
+
+		await ctx.invoke(self.leave)
+
+	@commands.command()
+	async def leave(self, ctx):
+		"""Stops and disconnects the bot from voice."""
+
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		# Remove the per-server temp settings
 		self.dict_pop(ctx)
@@ -945,11 +969,6 @@ class Music(commands.Cog):
 			await player.destroy()
 			return await Message.EmbedText(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-
-	@commands.command(hidden=True)
-	async def okbye(self, ctx):
-		"""Do you wanna build a snowman?"""
-		await ctx.invoke(self.stop)
 
 	@commands.command()
 	async def stopall(self, ctx):
