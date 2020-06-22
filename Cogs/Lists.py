@@ -245,7 +245,7 @@ class Lists(commands.Cog):
 		listrole = ctx.guild.get_role(int(role))
 		if not listrole:
 			return await ctx.send('There is no role that matches id: `{}` - consider updating this setting.'.format(role))
-		return await ctx.send(Utils.suppressed(ctx,"You need to be a{} **{}** to add and remove links.").format("n" if listrole.name.lower()[0] in "aeiou" else "",Utils.suppressed(ctx,listrole.name)))
+		return await ctx.send(Utils.suppressed(ctx,"You need to be a{} **{}** to add and remove {}s.").format("n" if listrole.name.lower()[0] in "aeiou" else "",Utils.suppressed(ctx,listrole.name),l_name.lower()))
 		
 	###                    ###
 	## Link-related Methods ##
