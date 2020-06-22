@@ -343,7 +343,7 @@ class Invite(commands.Cog):
 		if len(serverList) != len(serverTest):
 			# Something changed
 			self.settings.setGlobalStat("BlockedServers",serverTest)
-			msg = "*{}* unblocked!".format(serv)
+			msg = "*{}* unblocked!".format(server)
 			if suppress:
 				msg = Nullify.clean(msg)
 			return await ctx.send(msg)
