@@ -944,6 +944,36 @@ class Music(commands.Cog):
 		return await Message.EmbedText(title="♫ Set equalizer to Custom preset!",description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
+	async def setband(self, ctx, band_number = None, value = None):
+		"""Sets the value of the passed eq band (1-15) to the passed value from -5 (silent) to 5 (double volume)."""
+
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing and not player.is_paused:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		if band_number == None or value == None:
+			return await Message.EmbedText(title="♫ Please specify a band and value!",description="Bands can be between 1 and 15, and eq values from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		try:
+			band_number = int(band_number)
+			assert 0 < band_number < 16
+		except:
+			return await Message.EmbedText(title="♫ Invalid band passed!",description="Bands can be between 1 and 15, and eq values from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		try:
+			value = int(value)
+			value = -5 if value < -5 else 5 if value > 5 else value
+		except:
+			return await Message.EmbedText(title="♫ Invalid eq value passed!",description="Bands can be between 1 and 15, and eq values from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		new_bands = [(band_number-1,float(value/20)) if x == band_number-1 else (x,y) for x,y in player.eq.raw]
+		eq = wavelink.eqs.Equalizer.build(levels=new_bands)
+		await player.set_eq(eq)
+		player._equalizer = eq # Dirty hack to fix a bug in wavelink
+		eq_text = self.print_eq(player.eq.raw)
+		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
+		return await Message.EmbedText(title="♫ Set band {} to {}!".format(band_number,value),description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
 	async def reseteq(self, ctx):
 		"""Resets the current eq to the flat preset."""
 		
