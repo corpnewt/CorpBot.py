@@ -914,6 +914,54 @@ class Admin(commands.Cog):
 		# do stuff
 		msg = 'sethackrole Error: {}'.format(error)
 		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def settagrole(self, ctx, *, role : str = None):
+		"""Sets the required role ID to add/remove tags (admin only)."""
+		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		if not await Utils.is_admin_reply(ctx): return
+
+		if role == None:
+			self.settings.setServerStat(ctx.message.guild, "RequiredTagRole", "")
+			msg = 'Add/remove tags now *admin-only*.'
+			await ctx.message.channel.send(msg)
+			return
+
+		if type(role) is str:
+			if role == "everyone":
+				role = "@everyone"
+			roleName = role
+			role = DisplayName.roleForName(roleName, ctx.message.guild)
+			if not role:
+				msg = 'I couldn\'t find *{}*...'.format(roleName)
+				# Check for suppress
+				if suppress:
+					msg = Nullify.clean(msg)
+				await ctx.message.channel.send(msg)
+				return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.guild, "RequiredTagRole", role.id)
+
+		msg = 'Role required for add/remove tags set to **{}**.'.format(role.name)
+		# Check for suppress
+		if suppress:
+			msg = Nullify.clean(msg)
+		await ctx.message.channel.send(msg)
+
+
+	@settagrole.error
+	async def tagrole_error(self, error, ctx):
+		# do stuff
+		msg = 'settagrole Error: {}'.format(error)
+		await ctx.channel.send(msg)
 		
 		
 	@commands.command(pass_context=True)
