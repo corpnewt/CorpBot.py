@@ -274,26 +274,52 @@ class Music(commands.Cog):
 
 	def print_eq(self, eq, max_len = 5):
 		# EQ values are from -0.25 (muted) to 0.25 (doubled)
-		bar = "║"
-		emp = " "
-		sep = "═"
-		sup = "╩"
-		sdn = "╦"
-		eq_list = []
-		vals = ""
+		bar      = "│" # "║"
+		topleft  = "┌" # "╔"
+		topright = "┐" # "╗"
+		botleft  = "└" # "╚"
+		botright = "┘" # "╝"
+		cap      = "─" # "═"
+		emp      = " "
+		sep      = "─" # "═"
+		sup      = "┴" # "╩"
+		sdn      = "┬" # "╦"
+		eq_list  = []
+		nums     = ""
+		vals     = ""
 		for band,value in eq:
 			value *= 4 # Quadruple it for -1 to 1 range
 			ourbar = math.ceil(abs(value)*max_len)
-			vals += str(ourbar if value > 0 else -1*ourbar).rjust(2)
+			vals += " "+str(ourbar if value > 0 else -1*ourbar).rjust(2)
+			nums += " "+str(band+1).rjust(2)
 			# Check if positive or negative
-			ours = ""
-			if value == 0:  ours += emp*max_len + sep + emp*max_len
-			elif value > 0: ours += emp*max_len + sup + bar*ourbar + emp*(max_len-ourbar)
-			else:           ours += emp*(max_len-ourbar) + bar*ourbar + sdn + emp*max_len
-			eq_list.append([x for x in ours][::-1])
+			if value == 0:
+				# They're all 0, nothing to display
+				our_cent = our_left = our_right = emp*max_len + sep + emp*max_len
+			elif value > 0:
+				# Let's draw a bar going up
+				our_left  = emp*max_len + sup + bar*(ourbar-1) + topleft  + emp*(max_len-ourbar)
+				our_cent  = emp*max_len + sep + emp*(ourbar-1) + cap      + emp*(max_len-ourbar)
+				our_right = emp*max_len + sup + bar*(ourbar-1) + topright + emp*(max_len-ourbar)
+			else:
+				# Let's draw a bar going down
+				our_left  = emp*(max_len-ourbar) + botleft  + bar*(ourbar-1) + sdn + emp*max_len
+				our_cent  = emp*(max_len-ourbar) + cap + emp*(ourbar-1) + sep + emp*max_len
+				our_right = emp*(max_len-ourbar) + botright + bar*(ourbar-1) + sdn + emp*max_len
+			our_left  = [x for x in our_left][::-1]
+			our_cent  = [x for x in our_cent][::-1]
+			our_right = [x for x in our_right][::-1]
+			eq_list.extend([our_left,our_cent,our_right])
 		# Rotate the eq 90 degrees
-		graph = "```\n" + "\n".join([sep+x+sep if any(y in x for y in (sep,sup,sdn)) else " "+x+" " for x in map(" ".join, zip(*eq_list))]) + "\n" + vals + "\n```"
-		graph = graph.replace(sep+" ",sep+sep).replace(sup+" ",sup+sep).replace(sdn+" ",sdn+sep)
+		graph = "```\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n```".format(
+			"Bands".center(len(nums)+1,sep),
+			nums,
+			sep*(len(nums)+1),
+			"\n".join([" "+x+" " for x in map("".join, zip(*eq_list))]),
+			"Values".center(len(vals)+1,sep),
+			vals,
+			sep*(len(vals)+1)
+		)
 		return graph
 
 	@commands.Cog.listener()
