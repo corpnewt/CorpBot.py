@@ -272,6 +272,30 @@ class Music(commands.Cog):
 			bar = time_prefix + bar
 		return bar
 
+	def print_eq(self, eq, max_len = 5):
+		# EQ values are from -0.25 (muted) to 0.25 (doubled)
+		bar = "║"
+		emp = " "
+		sep = "═"
+		sup = "╩"
+		sdn = "╦"
+		eq_list = []
+		vals = ""
+		for band,value in eq:
+			value *= 4 # Quadruple it for -1 to 1 range
+			ourbar = math.ceil(abs(value)*max_len)
+			vals += str(ourbar if value > 0 else -1*ourbar).rjust(2)
+			# Check if positive or negative
+			ours = ""
+			if value == 0:  ours += emp*max_len + sep + emp*max_len
+			elif value > 0: ours += emp*max_len + sup + bar*ourbar + emp*(max_len-ourbar)
+			else:           ours += emp*(max_len-ourbar) + bar*ourbar + sdn + emp*max_len
+			eq_list.append([x for x in ours][::-1])
+		# Rotate the eq 90 degrees
+		graph = "```\n" + "\n".join([sep+x+sep if any(y in x for y in (sep,sup,sdn)) else " "+x+" " for x in map(" ".join, zip(*eq_list))]) + "\n" + vals + "\n```"
+		graph = graph.replace(sep+" ",sep+sep).replace(sup+" ",sup+sep).replace(sdn+" ",sdn+sep)
+		return graph
+
 	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
 		# See if we were loaded
@@ -348,7 +372,10 @@ class Music(commands.Cog):
 		self.data[str(ctx.guild.id)] = data
 		# Set the volume - default to 50
 		volume = self.vol[str(ctx.guild.id)] if str(ctx.guild.id) in self.vol else self.settings.getServerStat(ctx.guild, "MusicVolume", 100)
+		eq = wavelink.eqs.Equalizer.build(levels=self.settings.getServerStat(ctx.guild, "MusicEqualizer", wavelink.eqs.Equalizer.flat().raw))
 		await player.set_volume(volume/2)
+		await player.set_eq(eq)
+		player._equalizer = eq # Dirty hack to work around a bug in wavelink
 		async with ctx.typing():
 			self.bot.dispatch("play_next",player,data)
 		await Message.Embed(
@@ -858,7 +885,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if not player.is_playing:
+		if not player.is_playing and not player.is_paused:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		if volume == None:
 			# We're listing the current volume
@@ -876,6 +903,70 @@ class Music(commands.Cog):
 		# Save it to the server stats with range 10-100
 		self.settings.setServerStat(ctx.guild, "MusicVolume", 10 if volume < 10 else 100 if volume > 100 else volume)
 		await Message.EmbedText(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def geteq(self, ctx):
+		"""Prints the current equalizer settings."""
+
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing and not player.is_paused:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		# Get the current eq
+		eq_text = self.print_eq(player.eq.raw)
+		return await Message.EmbedText(title="♫ Current Equalizer Settings",description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def seteq(self, ctx, *, bands = None):
+		"""Sets the equalizer to the passed 15 space-delimited values from -5 (silent) to 5 (double volume)."""
+		
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing and not player.is_paused:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		if bands == None: 
+			return await Message.EmbedText(title="♫ Please specify the eq values!",description="15 numbers separated by a space from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		try:
+			band_ints = [int(x) for x in bands.split()]
+		except:
+			return await Message.EmbedText(title="♫ Invalid eq values passed!",description="15 numbers separated by a space from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		if not len(band_ints) == 15: return await Message.EmbedText(title="♫ Incorrect number of eq values! ({} - need 15)".format(len(band_ints)),description="15 numbers separated by a space from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		eq_list = [(x,float(0.25 if y/20 > 0.25 else -0.25 if y/20 < -0.25 else y/20)) for x,y in enumerate(band_ints)]
+		eq = wavelink.eqs.Equalizer.build(levels=eq_list)
+		await player.set_eq(eq)
+		player._equalizer = eq # Dirty hack to fix a bug in wavelink
+		eq_text = self.print_eq(player.eq.raw)
+		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
+		return await Message.EmbedText(title="♫ Set equalizer to Custom preset!",description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
+
+	@commands.command()
+	async def reseteq(self, ctx):
+		"""Resets the current eq to the flat preset."""
+		
+		await ctx.invoke(self.eqpreset, preset="flat")
+
+	@commands.command()
+	async def eqpreset(self, ctx, preset = None):
+		"""Sets the current eq to one of the following presets:  Boost, Flat, Metal"""
+
+		player = self.bot.wavelink.players.get(ctx.guild.id,None)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if player == None or not player.is_connected:
+			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not player.is_playing and not player.is_paused:
+			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		if preset == None or not preset.lower() in ("boost","flat","metal"):
+			return await Message.EmbedText(title="♫ Please specify a valid eq preset!",description="Options are:  Boost, Flat, Metal",color=ctx.author,delete_after=delay).send(ctx)
+		eq = wavelink.eqs.Equalizer.boost() if preset.lower() == "boost" else wavelink.eqs.Equalizer.flat() if preset.lower() == "flat" else wavelink.eqs.Equalizer.metal()
+		await player.set_eq(eq)
+		player._equalizer = eq # Dirty hack to fix a bug in wavelink
+		eq_text = self.print_eq(player.eq.raw)
+		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
+		return await Message.EmbedText(title="♫ Set equalizer to {} preset!".format(preset.lower().capitalize()),description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def repeat(self, ctx, *, yes_no = None):
