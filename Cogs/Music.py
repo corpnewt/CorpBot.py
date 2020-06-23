@@ -189,7 +189,7 @@ class Music(commands.Cog):
 			tracks.info["seek"] = seek_pos
 			queue.append(tracks)
 			self.queue[str(ctx.guild.id)] = queue
-			if not player.is_playing and not player.paused:
+			if not player.is_playing and not player.is_paused:
 				self.bot.dispatch("next_song",ctx)
 			return tracks
 		# Have more than one item - iterate them
@@ -204,7 +204,7 @@ class Music(commands.Cog):
 			track.info["ctx"] = ctx
 			queue.append(track)
 			self.queue[str(ctx.guild.id)] = queue
-			if index == 0 and not player.is_playing and not player.paused:
+			if index == 0 and not player.is_playing and not player.is_paused:
 				self.bot.dispatch("next_song",ctx)
 		return tracks
 
@@ -384,7 +384,7 @@ class Music(commands.Cog):
 			# Stopped - or late-fired signal - destroy the player
 			return await player.destroy()
 		# Check if we need to stop the player (shouldn't be required, but *just in case*)
-		if player.is_playing or player.paused: return await player.stop() # This will fire another "next_song" event so we bail here
+		if player.is_playing or player.is_paused: return await player.stop() # This will fire another "next_song" event so we bail here
 		# Gather up the queue
 		queue = self.queue.get(str(ctx.guild.id),[])
 		if self.loop.get(str(ctx.guild.id),False) and self.data.get(str(ctx.guild.id),None):
@@ -463,7 +463,7 @@ class Music(commands.Cog):
 		# Let's save the playlist
 		current = self.data.get(str(ctx.guild.id),None)
 		queue = [x for x in self.queue.get(str(ctx.guild.id),[])]
-		if current and (player.is_playing or player.paused):
+		if current and (player.is_playing or player.is_paused):
 			if timestamp and current.info.get("uri"):
 				current.info["seek"] = int(player.last_position/1000)
 			queue.insert(0,current)
@@ -523,7 +523,7 @@ class Music(commands.Cog):
 		# Reset the queue as needed
 		self.queue[str(ctx.guild.id)] = queue
 		await Message.EmbedText(title="♫ Added {} {}song{} from playlist!".format(len(playlist),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
-		if not player.is_playing and not player.paused:
+		if not player.is_playing and not player.is_paused:
 			self.bot.dispatch("next_song",ctx)
 
 	@commands.command()
@@ -564,7 +564,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if player.is_connected:
-			if not (player.paused or player.is_playing):
+			if not (player.is_paused or player.is_playing):
 				await player.connect(channel.id)
 				return await Message.EmbedText(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=delay).send(ctx)
 			else:
@@ -580,7 +580,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.get_player(ctx.guild.id)
 		if not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if player.paused and url == None:
+		if player.is_paused and url == None:
 			# We're trying to resume
 			await player.set_pause(False)
 			data = self.data.get(str(ctx.guild.id))
@@ -598,7 +598,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if player.paused: # Just toggle play
+		if player.is_paused: # Just toggle play
 			return await ctx.invoke(self.play)
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
@@ -621,7 +621,7 @@ class Music(commands.Cog):
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if not player.paused:
+		if not player.is_paused:
 			return await Message.EmbedText(title="♫ Not currently paused!",color=ctx.author,delete_after=delay).send(ctx)
 		# We're trying to resume
 		await player.set_pause(False)
@@ -706,7 +706,7 @@ class Music(commands.Cog):
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.bot.wavelink.players.get(ctx.guild.id,None) if ctx.guild.id in self.bot.wavelink.players else None
-		if player == None or not player.is_connected or not (player.is_playing or player.paused):
+		if player == None or not player.is_connected or not (player.is_playing or player.is_paused):
 			# No client - and we're not playing or paused
 			return await Message.EmbedText(
 				title="♫ Currently Playing",
@@ -715,7 +715,7 @@ class Music(commands.Cog):
 				delete_after=delay
 			).send(ctx)
 		data = self.data.get(str(ctx.guild.id))
-		play_text = "Playing" if (player.is_playing and not player.paused) else "Paused"
+		play_text = "Playing" if (player.is_playing and not player.is_paused) else "Paused"
 		cv = int(player.volume*2)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,data.title),
@@ -735,12 +735,16 @@ class Music(commands.Cog):
 		"""Shows the number of servers the bot is currently playing music in."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		playing_in = 0
+		server_list = []
 		for x in self.bot.wavelink.players:
+			server = self.bot.get_guild(int(x))
+			if not server: continue
 			p = self.bot.wavelink.get_player(x)
-			if p.is_playing and not p.paused: playing_in += 1
-		msg = "♫ Playing music in {:,} of {:,} server{}.".format(playing_in, len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s")
-		await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
+			if p.is_playing and not p.is_paused:
+				server_list.append({"name":server.name,"value":p.current.info.get("title","Unknown title")})
+		msg = "♫ Playing music in {:,} of {:,} server{}.".format(len(server_list), len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s")
+		if len(server_list): await PickList.PagePicker(title=msg,list=server_list,ctx=ctx).pick()
+		else: await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def playlist(self, ctx):
@@ -748,7 +752,7 @@ class Music(commands.Cog):
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
-		if player == None or not player.is_connected or not (player.is_playing or player.paused):
+		if player == None or not player.is_connected or not (player.is_playing or player.is_paused):
 			return await Message.EmbedText(
 				title="♫ Current Playlist",
 				color=ctx.author,
