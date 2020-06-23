@@ -281,6 +281,7 @@ class Music(commands.Cog):
 		botright = "┘" # "╝"
 		cap      = "─" # "═"
 		emp      = " "
+		inner    = " "
 		sep      = "─" # "═"
 		sup      = "┴" # "╩"
 		sdn      = "┬" # "╦"
@@ -298,13 +299,13 @@ class Music(commands.Cog):
 				our_cent = our_left = our_right = emp*max_len + sep + emp*max_len
 			elif value > 0:
 				# Let's draw a bar going up
-				our_left  = emp*max_len + sup + bar*(ourbar-1) + topleft  + emp*(max_len-ourbar)
-				our_cent  = emp*max_len + sep + emp*(ourbar-1) + cap      + emp*(max_len-ourbar)
-				our_right = emp*max_len + sup + bar*(ourbar-1) + topright + emp*(max_len-ourbar)
+				our_left  = emp*max_len + sup + bar*(ourbar-1)   + topleft  + emp*(max_len-ourbar)
+				our_cent  = emp*max_len + sep + inner*(ourbar-1) + cap      + emp*(max_len-ourbar)
+				our_right = emp*max_len + sup + bar*(ourbar-1)   + topright + emp*(max_len-ourbar)
 			else:
 				# Let's draw a bar going down
 				our_left  = emp*(max_len-ourbar) + botleft  + bar*(ourbar-1) + sdn + emp*max_len
-				our_cent  = emp*(max_len-ourbar) + cap + emp*(ourbar-1) + sep + emp*max_len
+				our_cent  = emp*(max_len-ourbar) + cap    + inner*(ourbar-1) + sep + emp*max_len
 				our_right = emp*(max_len-ourbar) + botright + bar*(ourbar-1) + sdn + emp*max_len
 			our_left  = [x for x in our_left][::-1]
 			our_cent  = [x for x in our_cent][::-1]
