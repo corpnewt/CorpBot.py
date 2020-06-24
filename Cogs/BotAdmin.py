@@ -14,7 +14,7 @@ class BotAdmin(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
+		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
 		self.mention_re = re.compile(r"\<\@!{0,1}[0-9]+\>")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
