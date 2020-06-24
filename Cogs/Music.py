@@ -285,14 +285,15 @@ class Music(commands.Cog):
 		sep      = "─" # "═"
 		sup      = "┴" # "╩"
 		sdn      = "┬" # "╦"
+		lpad     = ""
 		eq_list  = []
 		nums     = ""
 		vals     = ""
 		for band,value in eq:
 			value *= 4 # Quadruple it for -1 to 1 range
 			ourbar = math.ceil(abs(value)*max_len)
-			vals += " "+str(ourbar if value > 0 else -1*ourbar).rjust(2)
-			nums += " "+str(band+1).rjust(2)
+			vals += str(ourbar if value > 0 else -1*ourbar).rjust(2)+" "
+			nums += str(band+1).rjust(2)+" "
 			# Check if positive or negative
 			if value == 0:
 				# They're all 0, nothing to display
@@ -313,13 +314,13 @@ class Music(commands.Cog):
 			eq_list.extend([our_left,our_cent,our_right])
 		# Rotate the eq 90 degrees
 		graph = "```\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n```".format(
-			"Bands".center(len(nums)+1,sep),
+			"Bands".center(len(nums),sep),
 			nums,
-			sep*(len(nums)+1),
-			"\n".join([" "+x+" " for x in map("".join, zip(*eq_list))]),
-			"Values".center(len(vals)+1,sep),
+			sep*(len(nums)),
+			"\n".join(["{}{}{}".format(lpad,x,lpad) for x in map("".join, zip(*eq_list))]),
+			"Values".center(len(vals),sep),
 			vals,
-			sep*(len(vals)+1)
+			sep*(len(vals))
 		)
 		return graph
 
