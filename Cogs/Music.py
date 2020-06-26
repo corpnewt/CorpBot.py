@@ -401,8 +401,8 @@ class Music(commands.Cog):
 		# Set the volume - default to 50
 		volume = self.vol[str(ctx.guild.id)] if str(ctx.guild.id) in self.vol else self.settings.getServerStat(ctx.guild, "MusicVolume", 100)
 		eq = wavelink.eqs.Equalizer.build(levels=self.settings.getServerStat(ctx.guild, "MusicEqualizer", wavelink.eqs.Equalizer.flat().raw))
-		await player.set_volume(volume/2)
-		await player.set_eq(eq)
+		if not player.volume == volume/2: await player.set_volume(volume/2)
+		if not player.eq.raw == eq.raw:   await player.set_eq(eq)
 		player._equalizer = eq # Dirty hack to work around a bug in wavelink
 		async with ctx.typing():
 			self.bot.dispatch("play_next",player,data)
