@@ -312,7 +312,8 @@ class Embed:
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
+                await message.delete()
+                # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
@@ -322,7 +323,8 @@ class Embed:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            await message.edit(content=" ", embed=None, delete_after=self.delete_after)
+            await message.delete()
+            # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
         return new_message
 
     async def send(self, ctx):
@@ -432,7 +434,8 @@ class EmbedText(Embed):
             send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.edit(content=" ", embed=None, delete_after=self.delete_after)
+                await message.delete()
+                # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
                 return m
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
             return message
@@ -442,7 +445,8 @@ class EmbedText(Embed):
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            await message.edit(content=" ", embed=None, delete_after=self.delete_after)
+            await message.delete()
+            # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
         return new_message
 
     async def send(self, ctx):
