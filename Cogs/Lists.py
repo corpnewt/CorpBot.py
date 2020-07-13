@@ -204,14 +204,14 @@ class Lists(commands.Cog):
 		current_time = int(time.time())
 		msg = "**{}:**\n".format(item["Name"])
 		# Get the info
-		created_by = DisplayName.memberForID(item["CreatedID"],ctx.guild)
+		created_by = DisplayName.memberForID(item.get("CreatedID",0),ctx.guild)
 		created_by = DisplayName.name(created_by) if created_by else item.get("CreatedBy","`UNKNOWN`")
 		msg += "Created by: {}\n".format(created_by)
 		created    = item.get("Created",None)
 		if created:
 			msg += "Created: {} ago\n".format(ReadableTime.getReadableTimeBetween(created, current_time, True))
 		if item.get("Updated",None):
-			updated_by = DisplayName.memberForID(item["UpdatedID"],ctx.guild)
+			updated_by = DisplayName.memberForID(item.get("UpdatedID",0),ctx.guild)
 			updated_by = DisplayName.name(updated_by) if updated_by else item.get("UpdatedBy","`UNKNOWN`")
 			msg += "Updated by: {}\n".format(updated_by)
 			updated    = item.get("Updated",None)
