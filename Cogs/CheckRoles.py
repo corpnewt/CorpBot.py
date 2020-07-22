@@ -9,7 +9,7 @@ def setup(bot):
     # This module isn't actually a cog
     return
 
-async def checkroles(user, channel, settings, bot, suppress : bool = False):
+async def checkroles(user, channel, settings, bot, suppress : bool = False, **kwargs):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
     if user.bot: return # Don't apply roles to bots
@@ -23,12 +23,12 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     
     # Get our preliminary vars
     msg         = None
-    xpPromote   = settings.getServerStat(server,     "XPPromote")
-    xpDemote    = settings.getServerStat(server,     "XPDemote")
+    xpPromote   = kwargs.get("xp_promote",settings.getServerStat(server,"XPPromote"))
+    xpDemote    = kwargs.get("xp_demote",settings.getServerStat(server,"XPDemote"))
     userXP      = int(settings.getUserStat(user, server, "XP"))
-    suppProm    = settings.getServerStat(server, "SuppressPromotions")
-    suppDem     = settings.getServerStat(server, "SuppressDemotions")
-    onlyOne     = settings.getServerStat(server, "OnlyOneRole")
+    suppProm    = kwargs.get("suppress_promotions",settings.getServerStat(server,"SuppressPromotions"))
+    suppDem     = kwargs.get("suppress_demotions",settings.getServerStat(server,"SuppressDemotions"))
+    onlyOne     = kwargs.get("only_one_role",settings.getServerStat(server,"OnlyOneRole"))
 
     # Check if we're suppressing @here and @everyone mentions
     if settings.getServerStat(server, "SuppressMentions"):
