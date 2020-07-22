@@ -90,7 +90,7 @@ class Xp(commands.Cog):
 				updates = await self.bot.loop.run_in_executor(None, self.update_xp)
 				t = time.time()
 				for update in updates:
-					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot)
+					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot, **update["kwargs"])
 				# Sleep after for testing
 			except Exception as e:
 				print(str(e))
@@ -124,6 +124,13 @@ class Xp(commands.Cog):
 
 			xpblock = self.settings.getServerStat(server, "XpBlockArray")
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+			kwargs = {
+					"xp_promote":self.settings.getServerStat(server,"XPPromote"),
+					"xp_demote":self.settings.getServerStat(server,"XPDemote"),
+					"suppress_promotions":self.settings.getServerStat(server,"SuppressPromotions"),
+					"suppress_demotions":self.settings.getServerStat(server,"SuppressDemotions"),
+					"only_one_role":self.settings.getServerStat(server,"OnlyOneRole")
+			}
 			
 			for user in server_dict[server_id]:
 
@@ -216,7 +223,7 @@ class Xp(commands.Cog):
 							if tChan:
 								# We *do* have one
 								targetChan = tChan
-						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server_id))})
+						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server_id)), "kwargs":kwargs})
 		print("XP Done - took {} seconds.".format(time.time() - t))
 		return responses
 
@@ -423,6 +430,12 @@ class Xp(commands.Cog):
 				if len(memSorted):
 					# There actually ARE members in said role
 					totalXP = xpAmount
+					# Gather presets
+					xp_p = self.settings.getServerStat(server,"XPPromote")
+					xp_d = self.settings.getServerStat(server,"XPDemote")
+					xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
+					xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
+					xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
 					if xpAmount > len(memSorted):
 						# More xp than members
 						leftover = xpAmount % len(memSorted)
@@ -438,12 +451,30 @@ class Xp(commands.Cog):
 								leftover -= 1
 							else:
 								self.settings.incrementStat(cMember, server, "XP", eachXP)
-							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
+							await CheckRoles.checkroles(
+								cMember,
+								channel,
+								self.settings,
+								self.bot,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo)
 					else:
 						for i in range(0, xpAmount):
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							self.settings.incrementStat(cMember, server, "XP", 1)
-							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
+							await CheckRoles.checkroles(
+								cMember,
+								channel,
+								self.settings,
+								self.bot,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo)
 
 					# Decrement if needed
 					if decrement:
@@ -658,12 +689,28 @@ class Xp(commands.Cog):
 			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 		
+		# Gather presets
+		xp_p = self.settings.getServerStat(server,"XPPromote")
+		xp_d = self.settings.getServerStat(server,"XPDemote")
+		xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
+		xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
+		xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
 		message = await ctx.channel.send('Checking roles...')
 
 		changeCount = 0
 		for member in server.members:
 			# Now we check for promotions
-			if await CheckRoles.checkroles(member, channel, self.settings, self.bot, True):
+			if await CheckRoles.checkroles(
+								member,
+								channel,
+								self.settings,
+								self.bot,
+								True,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo):
 				changeCount += 1
 		
 		if changeCount == 1:
