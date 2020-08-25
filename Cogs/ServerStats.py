@@ -421,7 +421,7 @@ class ServerStats(commands.Cog):
                     "date":member.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1, reverse=True)
         return await PickList.PagePicker(title="Most Recent Members to Join {} ({:,} total)".format(ctx.guild.name,len(ctx.guild.members)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
         
     @commands.command()
@@ -455,7 +455,7 @@ class ServerStats(commands.Cog):
                     "date":bot.joined_at
                 }
             )
-        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1)
+        our_list = sorted(our_list, key=lambda x:x["date"].timestamp() if x["date"] != None else -1, reverse=True)
         return await PickList.PagePicker(title="Most Recent Servers I Joined ({:,} total)".format(len(self.bot.guilds)),ctx=ctx,list=[{"name":"{}. {}".format(y+1,x["name"]),"value":x["value"]} for y,x in enumerate(our_list)]).pick()
 
     @commands.command()
