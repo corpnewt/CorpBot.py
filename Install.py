@@ -170,7 +170,10 @@ if __name__ == '__main__':
         {"name":"numpy"},
         {"name":"pymongo"},
         {"name":"igdb_api_python"},
-        {"name":"geopy"}
+        {"name":"geopy"},
+        {"name":"lxml"},
+        {"name":"beautifulsoup4"},
+        {"name":"google"}
     ]
     item = 0
     for module in modules:
