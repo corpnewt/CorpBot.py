@@ -12,7 +12,7 @@ from   Cogs import Nullify
 EMBED_MAX_LEN = 2048
 MAX_USERS = 30 # max people to list for !whohas
 STATUSMAP1 = {discord.Status.online:'1',discord.Status.dnd:'2',discord.Status.idle:'3'} ##for sorting
-STATUSMAP2 = {discord.Status.online:':green_circle:',discord.Status.dnd:':red_circle:',discord.Status.idle:':yellow_circle:',discord.Status.offline:':black_circle:'}
+STATUSMAP2 = {discord.Status.online:':green_circle:',discord.Status.dnd:':no_entry_sign:',discord.Status.idle:':crescent_moon:',discord.Status.offline:':black_circle:'}
 
 
 def setup(bot):
