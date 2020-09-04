@@ -153,4 +153,5 @@ class ChatterBot(commands.Cog):
 
 		msg = self.chatBot.respond(message)
 		msg = msg if msg else "I don't know what to say..."
+		if len(msg) > 2000: msg = msg[:1997]+"..." # Fix for > 2000 chars
 		await ctx.send(msg)
