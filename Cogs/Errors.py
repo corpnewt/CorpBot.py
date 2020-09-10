@@ -16,12 +16,19 @@ class Errors(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_command_error(self, context, exception):
-		if type(exception) is commands.CommandInvokeError and type(exception.original) is discord.Forbidden:
-			return await Message.EmbedText(
-					title="⚠ Forbidden Error",
-					color=context.author,
-					description="Looks like I tried to do something I don't have permissions for!\nIf `{}{}` is role-based - make sure that my role is above the affected role(s).".format(context.prefix, context.command.name)
-				).send(context)
+		if type(exception) is commands.CommandInvokeError:
+			if type(exception.original) is discord.Forbidden:
+				return await Message.EmbedText(
+						title="⚠ Forbidden Error",
+						color=context.author,
+						description="Looks like I tried to do something I don't have permissions for!\nIf `{}{}` is role-based - make sure that my role is above the affected role(s).".format(context.prefix, context.command.name)
+					).send(context)
+			elif type(exception.original) is discord.errors.HTTPException and "Must be 2000 or fewer in length" in str(exception.original):
+				return await Message.EmbedText(
+						title="⚠ I Got Too Wordy",
+						color=context.author,
+						description="Looks like I tried to send a response that was greater than 2,000 characters!"
+					).send(context)
 		if str(exception).startswith("Music Cog: "):
 			# Generic music exception - ignore
 			return
