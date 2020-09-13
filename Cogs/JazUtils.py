@@ -123,7 +123,8 @@ class JazUtils(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def roles(self, ctx, sort_order:str='name'):
-		"""Shows roles and their member counts."""
+		"""Shows roles and their member counts. Takes one argument,
+		sort_order, which can be default, name, count, or rainbow."""
 
 		if not sort_order in ['default', 'name', 'count', 'rainbow']: # make sure it has valid args
 			await ctx.channel.send("Invalid arguments. Check the help for this command.")
@@ -173,7 +174,7 @@ class JazUtils(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def whohas(self, ctx, *, rolename):
-		"""Lists the people who have the specified role.
+		"""Lists the people who have the specified role alongside their online status.
 		Can take a -nick or -username argument to enhance output."""
 		mode = 0 # tells how to display: 0 = just mention, 1 = add nickname, 2 = add username
 		if '-nick' in rolename:
