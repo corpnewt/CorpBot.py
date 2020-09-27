@@ -1148,7 +1148,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","playing","playlist"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
