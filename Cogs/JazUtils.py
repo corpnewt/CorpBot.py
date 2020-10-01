@@ -141,7 +141,7 @@ class JazUtils(commands.Cog):
 
 		await self.rolelist_paginate(ctx,sorted_list) # send the list to get actually printed to discord
 
-	'''@commands.command(pass_context=True)
+	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, rolename):
 		"""Counts the number of members with a specific role."""
 		check_role = self.get_named_role(ctx.guild, rolename)
@@ -158,7 +158,7 @@ class JazUtils(commands.Cog):
 
 		embed = discord.Embed(title=check_role.name, description='{}/{} online'.format(online, count), color=check_role.color)
 		embed.set_footer(text='ID: {}'.format(check_role.id))
-		await ctx.send(embed=embed)'''
+		await ctx.send(embed=embed)
 
 	@commands.command(pass_context=True)
 	async def whohas(self, ctx, *, rolename):

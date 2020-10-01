@@ -91,7 +91,7 @@ class Channel(commands.Cog):
 
 		await ctx.send(Utils.suppressed(ctx,roleText))
 
-	@commands.command(pass_context=True)
+	'''@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, role = None):
 		"""Lists the number of users in a current role."""
 		if role == None:
@@ -113,7 +113,7 @@ class Channel(commands.Cog):
 		memberCount = len(members)
 		memberOnline = len([x for x in members if x.status != discord.Status.offline])
 		role_embed.add_field(name="Members", value='{:,} of {:,} online.'.format(memberOnline, memberCount), inline=True)
-		await ctx.send(embed=role_embed)
+		await ctx.send(embed=role_embed)'''
 
 
 	@commands.command(pass_context=True)
