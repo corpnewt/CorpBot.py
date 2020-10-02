@@ -96,10 +96,10 @@ class Debugging(commands.Cog):
 				return True
 		return False
 
-	def format_invite(self, invite):
+	def format_invite(self, invite, sent = False):
 		# Gather prelim info
-		guild = self.bot.get_guild(int(invite.guild.id))
-		channel = None if guild == None else guild.get_channel(invite.channel.id)
+		guild = invite.guild
+		channel = None if guild == None else invite.channel
 		url = invite.url if invite.url else "https://discord.gg/{}".format(invite.code)
 		expires_after = None if invite.max_age == None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
 		max_uses = None if invite.max_uses == None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
@@ -109,6 +109,9 @@ class Debugging(commands.Cog):
 		temp = None if invite.temporary == None else invite.temporary
 		# Build the description
 		desc = "Invite URL:      {}".format(url)
+		if sent == True:
+			if guild != None:		  desc += "\nName:            {}".format(guild.name)
+			if invite.approximate_member_count != None:		  desc += "\nUsers:           {}\{}".format(invite.approximate_presence_count,invite.approximate_member_count)
 		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
 		if created_at != None:    desc += "\nCreated At:      {}".format(created_at)
 		if channel != None:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
@@ -358,7 +361,7 @@ class Debugging(commands.Cog):
 			else:
 				return
 			title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
-			msg = self.format_invite(await self.bot.fetch_invite(invite, with_counts=True))
+			msg = self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True)
 			pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
 			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
 			return
