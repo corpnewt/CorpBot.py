@@ -19,12 +19,12 @@ class Debugging(commands.Cog):
 		self.wrap = False
 		self.settings = settings
 		self.debug = debug
-		self.logvars = [ 'invite.create', 'invite.delete', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
+		self.logvars = [ 'invite.create', 'invite.delete', 'invite.send', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
 				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave' ]
-		self.normal = [ 'invite.create', 'invite.delete', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
+		self.normal = [ 'invite.create', 'invite.delete', 'invite.send', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.avatar', 'user.nick', 'user.name',
 				'message.edit', 'message.delete', "xp" ]
 		self.verbose = [ x for x in self.logvars ] # Enable all of them
 		self.cleanChannels = []
@@ -96,10 +96,10 @@ class Debugging(commands.Cog):
 				return True
 		return False
 
-	def format_invite(self, invite):
+	def format_invite(self, invite, sent = False):
 		# Gather prelim info
-		guild = self.bot.get_guild(int(invite.guild.id))
-		channel = None if guild == None else guild.get_channel(invite.channel.id)
+		guild = invite.guild
+		channel = None if guild == None else invite.channel
 		url = invite.url if invite.url else "https://discord.gg/{}".format(invite.code)
 		expires_after = None if invite.max_age == None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
 		max_uses = None if invite.max_uses == None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
@@ -109,6 +109,9 @@ class Debugging(commands.Cog):
 		temp = None if invite.temporary == None else invite.temporary
 		# Build the description
 		desc = "Invite URL:      {}".format(url)
+		if sent == True:
+			if guild != None:		  desc += "\nName:            {}".format(guild.name)
+			if invite.approximate_member_count != None:		  desc += "\nUsers:           {}\{}".format(invite.approximate_presence_count,invite.approximate_member_count)
 		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
 		if created_at != None:    desc += "\nCreated At:      {}".format(created_at)
 		if channel != None:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
@@ -333,18 +336,35 @@ class Debugging(commands.Cog):
 		
 		if message.author.bot:
 			return
-		if not self.shouldLog('message.send', message.guild):
+		if self.shouldLog('message.send', message.guild):
+			# A message was sent
+			title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+			msg = message.content
+			if len(message.attachments):
+				msg += "\n\n--- Attachments ---\n\n"
+				for a in message.attachments:
+					msg += a.url + "\n"
+			pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
 			return
-		# A message was sent
-		title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
-		msg = message.content
-		if len(message.attachments):
-			msg += "\n\n--- Attachments ---\n\n"
-			for a in message.attachments:
-				msg += a.url + "\n"
-		pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
-		await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
-		return
+		elif self.shouldLog('invite.send', message.guild):
+			# A message was sent
+			mes = message.content
+			if "discord.gg/" in mes or "discordapp.com/invite/" in mes:
+				for b in mes.split(" "):
+					if "discord.gg/" in b or "discordapp.com/invite/" in b:
+						c = b.split("/")
+						if c[-1] != "":
+							invite = c[-1]
+						else:
+							invite = c[-2]
+			else:
+				return
+			title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+			msg = self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True)
+			pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
+			return
 		
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
