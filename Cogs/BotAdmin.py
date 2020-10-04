@@ -238,3 +238,11 @@ class BotAdmin(commands.Cog):
 		
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming"""
 		await self.kick_ban(ctx,members, "ban")
+
+	@commands.command(pass_context=True)
+	async def blacklist(self, ctx, userid, reason = None):
+		"""Bans a target who is NOT currently on the server via userid
+		This can only blacklist one member at a time.
+		All blacklists are stored in a | seperated list in a file where the bot is stored
+		"""
+		await self.blacklist_user(userid)
