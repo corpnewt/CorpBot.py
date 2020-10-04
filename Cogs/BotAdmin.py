@@ -245,4 +245,4 @@ class BotAdmin(commands.Cog):
 		This can only blacklist one member at a time.
 		All blacklists are stored in a | seperated list in a file where the bot is stored
 		"""
-		await self.blacklist_user(userid)
+		await self.settings.BlacklistUser(userid)
