@@ -233,7 +233,8 @@ class Settings(commands.Cog):
 				"Hunger" 				: 0,		# The bot's hunger % 0-100 (can also go negative)
 				"HungerLock" 			: False,	# Will the bot stop answering at 100% hunger?
 				"SuppressMentions"		: True,		# Will the bot suppress @here and @everyone in its own output?
-				"Volume"				: "",		# Float volume for music player
+				"Volume"			: "",		# Float volume for music player
+				"BlacklistedUsers"		: [],		# List of blacklisted users in a server
 				"DefaultVolume"			: 0.6,		# Default volume for music player
 				"Playlisting"			: None,		# Not adding a playlist
 				"PlaylistRequestor"		: None,		# No one requested a playlist
@@ -739,6 +740,13 @@ class Settings(commands.Cog):
 		self.serverDict["Servers"][str(server.id)]["Members"].pop(str(id), None)
 		self.checkGlobalUsers()
 
+	def BlacklistUser(self, server, userid):
+		self.checkServer(server)
+		self.serverDict["Servers"][str(server.id)]["BlacklistedUsers"].append(userid)
+		self.checkServer(server)
+	
+	def GetBlacklistedUsers(self, server):
+		return self.serverDict["Servers"][str(server.id)]["BlacklistedUsers"]
 	
 	# Return the requested stat
 	def getUserStat(self, user, server, stat, default = None):
@@ -787,8 +795,7 @@ class Settings(commands.Cog):
 		value = self.serverDict["Servers"].get(str(server.id),{}).get("Members",{}).get(str(user.id),{}).get(stat,0)
 		self.serverDict["Servers"][str(server.id)]["Members"][str(user.id)][stat] = value+incrementAmount
 		return value+incrementAmount
-	
-	
+		
 	# Get the requested stat
 	def getServerStat(self, server, stat, default = None):
 		# Make sure our server exists in the list
