@@ -176,7 +176,7 @@ class Help(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def dumphelp(self, ctx, tab_indent_count = None):
-		"""Dumps a timpestamped, formatted list of commands and descriptions into the same directory as the bot."""
+		"""Dumps a timestamped, formatted list of commands and descriptions into the same directory as the bot."""
 		try:
 			tab_indent_count = int(tab_indent_count)
 		except:
@@ -245,7 +245,7 @@ class Help(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def dumpmarkdown(self, ctx):
-		"""Dumps a timpestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
+		"""Dumps a timestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
 		tab_indent_count = 1
 
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
