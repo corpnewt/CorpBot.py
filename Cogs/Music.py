@@ -517,7 +517,7 @@ class Music(commands.Cog):
 		# Let's walk the items and add them
 		queue = self.queue.get(str(ctx.guild.id),[])
 		for x in playlist:
-			if not "id" in x and isinstance(x["id"],str): continue # Bad id
+			if not "id" in x or not isinstance(x["id"],str): continue # id missing or not string - skip
 			x["added_by"] = ctx.author
 			x["ctx"] = ctx
 			queue.append(wavelink.Track(x["id"],x))
