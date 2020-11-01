@@ -451,16 +451,16 @@ class Music(commands.Cog):
 		
 		Available options:
 
-		ts : Include the timestamp of the currently playing song."""
+		ts : Exclude the timestamp of the currently playing song."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None or not player.is_connected:
 			return await Message.EmbedText(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the options
-		timestamp = False
+		timestamp = True
 		time = 0
 		for x in options.split():
-			if x.lower() == "ts": timestamp = True
+			if x.lower() == "ts": timestamp = False
 		# Let's save the playlist
 		current = self.data.get(str(ctx.guild.id),None)
 		queue = [x for x in self.queue.get(str(ctx.guild.id),[])]
