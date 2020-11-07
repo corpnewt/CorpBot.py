@@ -74,9 +74,9 @@ class DisplayName(commands.Cog):
         except AttributeError:
             pass
         if nick:
-            return Nullify.clean(nick)
+            return Nullify.clean(discord.utils.escape_markdown(discord.utils.escape_mentions(nick)))
         if name:
-            return Nullify.clean(name)
+            return Nullify.clean(discord.utils.escape_markdown(discord.utils.escape_mentions(name)))
         return None
 
     def memberForID(self, checkid, server):
