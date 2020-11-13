@@ -165,7 +165,7 @@ if __name__ == '__main__':
         {"name":"speedtest-cli"},
         {"name":"pytz"},
         {"name":"wikipedia"},
-        {"name":"mtranslate"},
+        {"name":"googletrans"},
         {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
