@@ -1,12 +1,6 @@
-import asyncio
-import discord
-from   Cogs import Nullify
-from   Cogs import DisplayName
-from   Cogs import Message
-from   discord.ext import commands
-import json
-import os
-import mtranslate
+import functools, asyncio, discord, json, os, string, googletrans
+from Cogs import Nullify, DisplayName, Message
+from discord.ext import commands
 
 def setup(bot):
     # Add the bot and deps
@@ -17,36 +11,24 @@ def setup(bot):
 
 class Translate(commands.Cog):
             
-    def __init__(self, bot, settings, language_file = "Languages.json"):
+    def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        self.translator = googletrans.Translator()
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
 
-        if os.path.exists(language_file):
-            f = open(language_file,'r')
-            filedata = f.read()
-            f.close()
-            self.languages = json.loads(filedata)
-        else:
-            self.languages = []
-            print("No {}!".format(language_file))
-
     @commands.command(pass_context=True)
     async def langlist(self, ctx):
         """Lists available languages."""
-        if not len(self.languages):
-            await ctx.send("I can't seem to find any languages :(")
-            return
         description = ""
-        for lang in self.languages:
-                description += "**{}** - {}\n".format(lang["name"], lang["code"])
+        for lang in googletrans.LANGCODES:
+            description += "**{}** - {}\n".format(string.capwords(lang), googletrans.LANGCODES[lang])
         await Message.EmbedText(title="Language List",
                 force_pm=True,
                 description=description,
-                color=ctx.author,
-                footer="Note - some languages may not be supported."
+                color=ctx.author
         ).send(ctx)
 
     @commands.command(pass_context=True)
@@ -69,69 +51,60 @@ class Translate(commands.Cog):
             suppress = False
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code]`".format(ctx.prefix)
-        if translate == None:
-            await ctx.send(usage)
-            return
+        if translate == None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
 
-        if len(word_list) < 2:
-            await ctx.send(usage)
-            return
+        if len(word_list) < 2: return await ctx.send(usage)
 
-        lang = word_list[len(word_list)-1]
-        from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else "auto"
+        to_lang   = word_list[len(word_list)-1]
+        from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else ""
 
-        # Get the from language
-        from_lang_back = [ x for x in self.languages if x["code"].lower() == from_lang.lower() ]
-        from_lang_code = from_lang_back[0]["code"] if len(from_lang_back) else "auto"
-        from_lang_name = from_lang_back[0]["name"] if len(from_lang_back) else "Auto"
-        # Get the to language
-        lang_back = [ x for x in self.languages if x["code"].lower() == lang.lower() ]
-        lang_code = lang_back[0]["code"] if len(lang_back) else None
-        lang_name = lang_back[0]["name"] if len(lang_back) else None
-
-        # Translate all but our language codes
-        if len(word_list) > 2 and word_list[len(word_list)-2].lower() == from_lang_code.lower():
-            trans = " ".join(word_list[:-2])
-        else:
-            trans = " ".join(word_list[:-1])
-        
-        if not lang_code:
-            await Message.EmbedText(
-                        title="Something went wrong...",
-                        description="I couldn't find that language!",
-                        color=ctx.author
+        # Get the from language name from the passed code
+        from_lang_name = googletrans.LANGUAGES.get(from_lang.lower(),None)
+        # Get the to language name from the passed code
+        to_lang_name   = googletrans.LANGUAGES.get(to_lang.lower(),None)
+        if not to_lang_name: # No dice on the language :(
+            return await Message.EmbedText(
+                    title="Something went wrong...",
+                    description="I couldn't find that language!",
+                    color=ctx.author
                 ).send(ctx)
-            return
-
-        result = mtranslate.translate(trans, lang_code, from_lang_code)
+        # Get all but our language codes joined with spaces
+        trans = " ".join(word_list[:-2] if from_lang_name else word_list[:-1])
+        # If our from_lang_name is None, we need to auto-detect it
+        if not from_lang_name:
+            from_output = await self.bot.loop.run_in_executor(None, self.translator.detect, trans)
+            from_lang = from_output.lang
+            from_lang_name = googletrans.LANGUAGES.get(from_lang,"Unknown")
+        # Let's actually translate now
+        result_output = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, trans, dest=to_lang, src=from_lang))
+        result = result_output.text
         
+        # Explore the results!
         if not result:
             await Message.EmbedText(
-                        title="Something went wrong...",
-                        description="I wasn't able to translate that!",
-                        color=ctx.author
+                    title="Something went wrong...",
+                    description="I wasn't able to translate that!",
+                    color=ctx.author
                 ).send(ctx)
             return
         
         if result == trans:
-                # We got back what we put in...
-                await Message.EmbedText(
-                        title="Something went wrong...",
-                        description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language (en -> en)",
-                        color=ctx.author
-                ).send(ctx)
-                return
+            # We got back what we put in...
+            await Message.EmbedText(
+                title="Something went wrong...",
+                description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language (en -> en)",
+                color=ctx.author
+            ).send(ctx)
+            return
 
         # Check for suppress
-        if suppress:
-            result = Nullify.clean(result)
-
+        if suppress: result = Nullify.clean(result)
         await Message.EmbedText(
                 title="{}, your translation is:".format(DisplayName.name(ctx.author)),
                 force_pm=True,
                 color=ctx.author,
                 description=result,
-                footer="{} --> {} - Powered by Google Translate".format(from_lang_name, lang_name)
+                footer="{} --> {} - Powered by Google Translate".format(string.capwords(from_lang_name), string.capwords(to_lang_name))
         ).send(ctx)
