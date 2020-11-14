@@ -25,10 +25,26 @@ class Translate(commands.Cog):
         description = ""
         for lang in googletrans.LANGCODES:
             description += "**{}** - {}\n".format(string.capwords(lang), googletrans.LANGCODES[lang])
-        await Message.EmbedText(title="Language List",
-                force_pm=True,
-                description=description,
-                color=ctx.author
+        await Message.EmbedText(
+            title="Language List",
+            force_pm=True,
+            description=description,
+            color=ctx.author
+        ).send(ctx)
+
+    @commands.command(pass_context=True)
+    async def detectlang(self, ctx, *, text):
+        """Reports the detected language and certainty of the passed text."""
+        if text == None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
+        lang_detect = await self.bot.loop.run_in_executor(None, self.translator.detect, text)
+        await Message.EmbedText(
+            title="Detected Language",
+            description="Detected **{}** ({}) with {:.0%} confidence.".format(
+                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang,"Martian?")),
+                lang_detect.lang,
+                lang_detect.confidence
+            ),
+            color=ctx.author
         ).send(ctx)
 
     @commands.command(pass_context=True)
@@ -43,12 +59,6 @@ class Translate(commands.Cog):
         ¿Hola como estás?
         
         If you do not specify the from language, Google translate will attempt to automatically determine it."""
-
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code]`".format(ctx.prefix)
         if translate == None: return await ctx.send(usage)
@@ -84,10 +94,10 @@ class Translate(commands.Cog):
         # Explore the results!
         if not result:
             await Message.EmbedText(
-                    title="Something went wrong...",
-                    description="I wasn't able to translate that!",
-                    color=ctx.author
-                ).send(ctx)
+                title="Something went wrong...",
+                description="I wasn't able to translate that!",
+                color=ctx.author
+            ).send(ctx)
             return
         
         if result == trans:
@@ -99,12 +109,10 @@ class Translate(commands.Cog):
             ).send(ctx)
             return
 
-        # Check for suppress
-        if suppress: result = Nullify.clean(result)
         await Message.EmbedText(
-                title="{}, your translation is:".format(DisplayName.name(ctx.author)),
-                force_pm=True,
-                color=ctx.author,
-                description=result,
-                footer="{} --> {} - Powered by Google Translate".format(string.capwords(from_lang_name), string.capwords(to_lang_name))
+            title="{}, your translation is:".format(DisplayName.name(ctx.author)),
+            force_pm=True,
+            color=ctx.author,
+            description=result,
+            footer="{} --> {} - Powered by Google Translate".format(string.capwords(from_lang_name), string.capwords(to_lang_name))
         ).send(ctx)
