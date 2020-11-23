@@ -152,7 +152,7 @@ class Humor(commands.Cog):
 		"""Time to backup the Batman!"""
 		
 		if subject == None:
-			await ctx.channel.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
 			return
 		
 		# Check if we're suppressing @here and @everyone mentions
@@ -183,7 +183,7 @@ class Humor(commands.Cog):
 		# Check for suppress
 		if suppress:
 			msg = Nullify.clean(msg)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def fart(self, ctx):
@@ -191,7 +191,7 @@ class Humor(commands.Cog):
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
 		randnum = random.randint(0, len(fartList)-1)
 		msg = '{}'.format(fartList[randnum])
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def french(self, ctx):
@@ -259,39 +259,36 @@ class Humor(commands.Cog):
 			# Set as space if not included
 			text_one = " "
 
-		if template_id == None or text_zero == None or text_one == None:
+		if any((x==None for x in (template_id,text_zero,text_one))):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		templates = await self.getTemps()
 
-		chosenTemp = None
-		msg = ''
+		chosenTemp = gotName = None
 
 		idMatch   = FuzzySearch.search(template_id, templates, 'id', 1)
 		if idMatch[0]['Ratio'] == 1:
 			# Perfect match
 			chosenTemp = idMatch[0]['Item']['id']
+			gotName    = idMatch[0]['Item']['name']
 		else:
 			# Imperfect match - assume the name
 			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
 			chosenTemp = nameMatch[0]['Item']['id']
-			if nameMatch[0]['Ratio'] < 1:
-				# Less than perfect, still
-				msg = 'I\'ll assume you meant *{}*.'.format(nameMatch[0]['Item']['name'])
+			gotName    = nameMatch[0]['Item']['name']
 
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
 		result_json = await DL.async_post_json(url, payload)
-		# json.loads(r.text)
 		result = result_json["data"]["url"]
-		if msg:
-			# result = '{}\n{}'.format(msg, result)
-			await ctx.channel.send(msg)
-		# Download Image - set title as a space so it disappears on upload
-		await Message.Embed(image=result, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, result)
+		await Message.Embed(
+			url=result,
+			title=text_zero + " - " + text_one if text_one != " " else text_zero,
+			image=result,
+			color=ctx.author,
+			footer='Powered by imgflip.com - using template id {}: {}'.format(chosenTemp,gotName)
+		).send(ctx)
 
 	async def getTemps(self):
 		url = "https://api.imgflip.com/get_memes"
