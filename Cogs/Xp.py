@@ -1121,10 +1121,13 @@ class Xp(commands.Cog):
 		joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in ctx.guild.members], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 
 		if member.joined_at != None:
-			check_item = { "ID" : member.id, "Joined" : member.joined_at }
-			total = len(joinedList)
-			position = joinedList.index(check_item) + 1
-			stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+			try:
+				check_item = { "ID" : member.id, "Joined" : member.joined_at }
+				total = len(joinedList)
+				position = joinedList.index(check_item) + 1
+				stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+			except:
+				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 		else:
 			stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 		
