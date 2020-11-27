@@ -40,8 +40,8 @@ class Translate(commands.Cog):
         await Message.EmbedText(
             title="Detected Language",
             description="Detected **{}** ({}) with {:.0%} confidence.".format(
-                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang,"Martian?")),
-                lang_detect.lang,
+                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang.lower(),"Martian?")),
+                lang_detect.lang.lower(),
                 lang_detect.confidence
             ),
             color=ctx.author
