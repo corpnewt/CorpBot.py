@@ -66,6 +66,33 @@ class Lists(commands.Cog):
 				return False
 		return True
 
+	def _ensure_keys(self,ctx,l_list,item_list,l_key):
+		# Helper to walk all items in a list and ensure our keys are valid
+		valid_keys = (l_key,"Name","Created","CreatedID","CreatedBy","Updated","UpdatedID","UpdatedBy")
+		to_remove = []
+		changed = False
+		for item in item_list:
+			if l_key in item: continue
+			# We got a mismatched key - possibly due to a prior error, or failed migration?
+			changed = True
+			best_guess = next((x for x in item if not x in valid_keys),None)
+			if best_guess:
+				# Got a best_guess, let's adjust it
+				item[l_key] = item[best_guess]
+				item.pop(best_guess,None)
+			else:
+				# Nothing found
+				to_remove.append(item)
+		# Remove entries as needed
+		if to_remove:
+			for item in to_remove:
+				try: item_list.remove(item)
+				except: pass
+		if changed:
+			# Save changes
+			self.settings.setServerStat(ctx.guild, l_list, item_list)
+		return item_list
+
 	async def _get_item(self,ctx,name,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL",raw=False):
 		# Helper function to pull items from lists
 		if not name:
@@ -103,6 +130,9 @@ class Lists(commands.Cog):
 			await message.edit(content="`{}`".format(other_names[index]))
 			# Invoke
 			return await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
+
+		# Ensure our keys are proper - and save if need be
+		itemList = self._ensure_keys(ctx,l_list,itemList,l_key)
 
 		for item in itemList:
 			if item['Name'].lower() == name.lower():
