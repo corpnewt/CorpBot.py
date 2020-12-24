@@ -365,7 +365,8 @@ class Humor(commands.Cog):
 		image = self.s_image.copy()
 		if not image.width == 319 or not image.height == 111:
 			image = image.resize((319,111),resample=PIL.Image.LANCZOS)
-		message = await ctx.send("Gifting *{}* to {}...".format(random.choice(self.stardew_gifts),Nullify.clean(DisplayName.name(test_user))))
+		item = random.choice(self.stardew_gifts)
+		message = await ctx.send("Gifting *{}* to {}...".format(item,Nullify.clean(DisplayName.name(test_user))))
 		path = await GetImage.download(user)
 		if not path:
 			return await message.edit(content="I guess I couldn't gift that...  Make sure you're passing a valid user.")
@@ -400,6 +401,7 @@ class Humor(commands.Cog):
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
 			# await message.delete(delay=2)
+			await message.edit(content="Gifted *{}* to {}.".format(item,Nullify.clean(DisplayName.name(test_user))))
 			os.remove('images/Stardewnow.png')
 		except Exception as e:
 			print(e)
