@@ -73,7 +73,7 @@ class UserRole(commands.Cog):
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find {}.".format(member.replace("`", "\\`")))
+			await ctx.send("I couldn't find {}.".format(Nullify.escape_all(member)))
 			return
 		# Check if we're trying to block a bot-admin
 		isAdmin = mem.permissions_in(ctx.channel).administrator
@@ -93,11 +93,11 @@ class UserRole(commands.Cog):
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		m = ""
 		if mem.id in block_list:
-			m += "{} is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+			m += "{} is already blocked from the UserRole module.".format(DisplayName.name(mem))
 		else:
 			block_list.append(mem.id)
 			self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-			m += "{} now blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+			m += "{} now blocked from the UserRole module.".format(DisplayName.name(mem))
 		# Remove any roles
 		# Get the array
 		try:
@@ -141,16 +141,16 @@ class UserRole(commands.Cog):
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find {}.".format(member.replace("`", "\\`")))
+			await ctx.send("I couldn't find {}.".format(Nullify.escape_all(member)))
 			return
 		# At this point - we have someone to unblock - see if they're blocked
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		if not mem.id in block_list:
-			await ctx.send("{} is not blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+			await ctx.send("{} is not blocked from the UserRole module.".format(DisplayName.name(mem)))
 			return
 		block_list.remove(mem.id)
 		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-		await ctx.send("{} has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+		await ctx.send("{} has been unblocked from the UserRole module.".format(DisplayName.name(mem)))
 	
 	@commands.command(pass_context=True)
 	async def isurblocked(self, ctx, *, member = None):
