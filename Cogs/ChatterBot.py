@@ -144,10 +144,8 @@ class ChatterBot(commands.Cog):
 
 	async def _chat(self, ctx, message):
 		# Check if we're suppressing @here and @everyone mentions
-		message = DisplayName.clean_message(message, bot=self.bot, server=ctx.guild)
-		if message == None:
-			return
-		if not self.canChat(ctx.guild):
+		message = Utils.suppressed(ctx,message,force=True)
+		if message == None or not self.canChat(ctx.guild):
 			return
 		await ctx.trigger_typing()
 

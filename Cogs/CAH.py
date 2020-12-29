@@ -13,7 +13,6 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
-from   Cogs import Nullify
 try:
     # Python 2.6-2.7
     from HTMLParser import HTMLParser

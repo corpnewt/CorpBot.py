@@ -4,112 +4,36 @@ import re
 from   discord.ext import commands
 from   Cogs import Nullify
 
-# Stupid global vars because I didn't plan this
-# out correctly... sigh...
-bot = None
-
 def setup(bot):
-	# This module isn't actually a cog - but it is a place
+    # This module isn't actually a cog - but it is a place
     # we can start small fires and watch them burn the entire
     # house to the ground.
     bot.add_cog(DisplayName(bot))
-    
-    # global bot
-    # bot = bot_start
-    # return
 
 class DisplayName(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
-    def clean_message(self, message, *, bot = None, server = None, nullify = True):
-        # Searches for <@ > and <!@ > and gets the ids between
-        # then resolves them to their user name if it can be determined
-        
-        if nullify:
-            # Strip out @here and @everyone first
-            zerospace = "​"
-            message = message.replace("@everyone", "@{}everyone".format(zerospace)).replace("@here", "@{}here".format(zerospace))
-        # Check for matches
-        matches_re = re.finditer(r"\<[!&#\@]*[^<\@!&#]+[0-9]\>", message)
-        matches = []
-        matches = [x.group(0) for x in matches_re]
-        if not len(matches):
-            return message
-        for match in matches:
-            if server:
-                # Have the server, bot doesn't matter
-                # Let's do this right
-                if "#" in match:
-                    # It should be a channel
-                    mem = self.channelForName(match, server)
-                elif "&" in match:
-                    # It should be a role
-                    mem = self.roleForName(match, server)
-                else:
-                    # Guess it's a user
-                    mem = self.memberForName(match, server)
-                if not mem:
-                    continue
-                mem_name = self.name(mem)
-            else:
-                # Must have bot then
-                memID = re.sub(r'\W+', '', match)
-                mem = self.bot.get_user(int(memID))
-                if mem == None:
-                    continue
-                mem_name = mem.name
-            message = message.replace(match, mem_name)
-        return message
-
     def name(self, member : discord.Member):
         # A helper function to return the member's display name
-        nick = name = None
-        try:
-            nick = member.nick
-        except AttributeError:
-            pass
-        try:
-            name = member.name
-        except AttributeError:
-            pass
-        if nick:
-            return Nullify.clean(discord.utils.escape_markdown(discord.utils.escape_mentions(nick)))
-        if name:
-            return Nullify.clean(discord.utils.escape_markdown(discord.utils.escape_mentions(name)))
-        return None
+        return Nullify.escape_all(member.display_name)
 
     def memberForID(self, checkid, server):
-        if server == None:
-            mems = self.bot.users
-        else:
-            mems = server.members
         try:
-            checkid = int(checkid)
+            return server.get_member(int(checkid)) if server else self.bot.get_user(int(checkid))
         except:
             return None
-        for member in mems:
-            if member.id == checkid:
-                return member
-        return None
 
     def memberForName(self, name, server):
-        if server == None:
-            # No server passed - this is likely happening
-            # in dm - let's get a user as-is.
-            mems = self.bot.users
-        else:
-            # We got a server - let's get that server's members
-            mems = server.members
+        mems = server.members if server else self.bot.users
         # Check nick first - then name
         name = str(name)
         for member in mems:
             if not hasattr(member,"nick"):
                 # No nick property - must be a user, bail
                 break
-            if member.nick:
-                if member.nick.lower() == name.lower():
-                    return member
+            if member.nick and member.nick.lower() == name.lower():
+                return member
         for member in mems:
             if member.name.lower() == name.lower():
                 return member

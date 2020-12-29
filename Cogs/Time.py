@@ -96,10 +96,7 @@ class Time(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 
@@ -160,10 +157,7 @@ class Time(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 

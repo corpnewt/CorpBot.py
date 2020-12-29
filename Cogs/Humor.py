@@ -1,7 +1,7 @@
 import asyncio, discord, random, json, time, os, PIL, textwrap
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-from Cogs import Message, FuzzySearch, GetImage, Nullify, DL, DisplayName
+from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -134,8 +134,7 @@ class Humor(commands.Cog):
 		zalgo = zalgo[:2000]
 
 		# Check for suppress
-		if suppress:
-			zalgo = Nullify.clean(zalgo)
+		zalgo = Utils.suppressed(ctx,zalgo)
 		await Message.Message(message=zalgo).send(ctx)
 		#await ctx.send(zalgo)
 		
@@ -180,9 +179,7 @@ class Humor(commands.Cog):
 			subject = subject.strip().capitalize()
 			msg = "*Holy {} {}, Batman!*".format(word, subject)
 		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
@@ -366,7 +363,7 @@ class Humor(commands.Cog):
 		if not image.width == 319 or not image.height == 111:
 			image = image.resize((319,111),resample=PIL.Image.LANCZOS)
 		item = random.choice(self.stardew_gifts)
-		message = await ctx.send("Gifting *{}* to {}...".format(item,Nullify.clean(DisplayName.name(test_user))))
+		message = await ctx.send("Gifting *{}* to {}...".format(item,DisplayName.name(test_user)))
 		path = await GetImage.download(user)
 		if not path:
 			return await message.edit(content="I guess I couldn't gift that...  Make sure you're passing a valid user.")
@@ -401,7 +398,7 @@ class Humor(commands.Cog):
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
 			# await message.delete(delay=2)
-			await message.edit(content="Gifted *{}* to {}.".format(item,Nullify.clean(DisplayName.name(test_user))))
+			await message.edit(content="Gifted *{}* to {}.".format(item,DisplayName.name(test_user)))
 			os.remove('images/Stardewnow.png')
 		except Exception as e:
 			print(e)

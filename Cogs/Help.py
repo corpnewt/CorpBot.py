@@ -6,11 +6,7 @@ import os
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import Nullify
-from   Cogs import DisplayName
-from   Cogs import Message
-from   Cogs import FuzzySearch
+from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch
 
 def setup(bot):
 	# Add the cog
@@ -24,8 +20,7 @@ class Help(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-		global Utils, DisplayName
-		Utils = self.bot.get_cog("Utils")
+		global DisplayName
 		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def _get_prefix(self, ctx):
@@ -349,7 +344,7 @@ class Help(commands.Cog):
 			m = Message.Embed(force_pm=True,pm_after=25)
 			if type(ctx.author) is discord.Member:
 				m.color = ctx.author.color
-			m.title = "No command called \"{}\" found".format(Nullify.clean(command))
+			m.title = "No command called \"{}\" found".format(command)
 			if len(cog_match):
 				cog_mess = ""
 				for pot in cog_match:

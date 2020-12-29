@@ -2,10 +2,7 @@ import asyncio
 import discord
 import random
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import DL
+from   Cogs import Settings, DL, Utils, DisplayName
 import urllib
 
 def setup(bot):

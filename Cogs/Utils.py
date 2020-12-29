@@ -17,13 +17,13 @@ class Utils(commands.Cog):
 		self.bot = bot
 		self.url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
-	def suppressed(self,ctx,msg):
-		# Checks if the passed server is suppressing @here and @everyone and adjust the msg accordingly
-		guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if isinstance(ctx,discord.ext.commands.Context) else None
+	def suppressed(self,ctx,msg,force=False):
+		# Checks if the passed server is suppressing user/role mentions and adjust the msg accordingly
+		guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if hasattr(ctx,"guild") else None
 		if not guild: return msg
 		settings = self.bot.get_cog("Settings")
 		if not settings: return msg
-		return Nullify.clean(msg) if settings.getServerStat(guild, "SuppressMentions", True) else msg
+		return Nullify.clean(msg, ctx=guild) if (force or settings.getServerStat(guild, "SuppressMentions", True)) else msg
 
 	def is_owner(self,ctx,member=None):
 		# Checks if the user in the passed context is an owner

@@ -3,8 +3,7 @@ import asyncio
 import discord
 import random
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Nullify
+from   Cogs import Settings, Utils
 
 from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
                     ZeroOrMore,Forward,nums,alphas,oneOf)
@@ -12,8 +11,8 @@ import math
 import operator
 
 def setup(bot):
-	# Add the bot
-	bot.add_cog(Calc(bot))
+    # Add the bot
+    bot.add_cog(Calc(bot))
 
 __author__='Paul McGuire'
 __version__ = '$Revision: 0.0 $'
@@ -123,6 +122,8 @@ class Calc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.nsp=NumericStringParser()
+        global Utils
+        Utils = self.bot.get_cog("Utils")
 
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, formula = None):
@@ -144,7 +145,7 @@ class Calc(commands.Cog):
             msg += "factor  :: atom [ expop factor ]*\n"
             msg += "term    :: factor [ multop factor ]*\n"
             msg += "expr    :: term [ addop term ]*```"
-            return await ctx.send(Nullify.clean(msg))
+            return await ctx.send(Utils.suppressed(ctx,msg))
         
         if int(answer) == answer:
             # Check if it's a whole number and cast to int if so

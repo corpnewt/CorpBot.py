@@ -3,8 +3,7 @@ import discord
 import random
 import datetime
 from   discord.ext import commands
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import DisplayName, Utils
 
 def setup(bot):
 	# Add the bot
@@ -41,8 +40,8 @@ class Actions(commands.Cog):
 					if '{}' in mesg:
 						mesg = mesg.format(target)
 
-			mesgFull = '*{}*, {}'.format(DisplayName.name(ctx.message.author), mesg)
-			mesgFull = Nullify.clean(mesgFull)
+			mesgFull = '*{}*, {}'.format(DisplayName.name(ctx.author), mesg)
+			mesgFull = Utils.suppressed(ctx,mesgFull)
 			return mesgFull
 
 	## static definitions of all the action messages

@@ -73,7 +73,7 @@ class UserRole(commands.Cog):
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			await ctx.send("I couldn't find {}.".format(member.replace("`", "\\`")))
 			return
 		# Check if we're trying to block a bot-admin
 		isAdmin = mem.permissions_in(ctx.channel).administrator
@@ -93,11 +93,11 @@ class UserRole(commands.Cog):
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		m = ""
 		if mem.id in block_list:
-			m += "`{}` is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+			m += "{} is already blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
 		else:
 			block_list.append(mem.id)
 			self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-			m += "`{}` now blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
+			m += "{} now blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`"))
 		# Remove any roles
 		# Get the array
 		try:
@@ -141,16 +141,16 @@ class UserRole(commands.Cog):
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			await ctx.send("I couldn't find {}.".format(member.replace("`", "\\`")))
 			return
 		# At this point - we have someone to unblock - see if they're blocked
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		if not mem.id in block_list:
-			await ctx.send("`{}` is not blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+			await ctx.send("{} is not blocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
 			return
 		block_list.remove(mem.id)
 		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
-		await ctx.send("`{}` has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
+		await ctx.send("{} has been unblocked from the UserRole module.".format(DisplayName.name(mem).replace("`", "\\`")))
 	
 	@commands.command(pass_context=True)
 	async def isurblocked(self, ctx, *, member = None):
@@ -160,10 +160,10 @@ class UserRole(commands.Cog):
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find `{}`.".format(member.replace("`", "\\`")))
+			await ctx.send("I couldn't find {}.".format(Nullify.escape_all(member)))
 			return
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
-		name = "You are" if mem.id == ctx.author.id else "`"+DisplayName.name(mem).replace("`", "\\`") + "` is"
+		name = "You are" if mem.id == ctx.author.id else DisplayName.name(mem) + " is"
 		if mem.id in block_list:
 			await ctx.send(name + " blocked from the UserRole module.")
 		else:
@@ -178,12 +178,6 @@ class UserRole(commands.Cog):
 		channel = ctx.message.channel
 
 		usage = 'Usage: `{}adduserrole [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 		
 		isAdmin = author.permissions_in(channel).administrator
 		# Only allow admins to change server stats
@@ -201,9 +195,7 @@ class UserRole(commands.Cog):
 			# It' a string - the hope continues
 			roleCheck = DisplayName.roleForName(role, server)
 			if not roleCheck:
-				msg = "I couldn't find **{}**...".format(role)
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = "I couldn't find **{}**...".format(Nullify.escape_all(role))
 				await ctx.send(msg)
 				return
 			role = roleCheck
@@ -220,10 +212,7 @@ class UserRole(commands.Cog):
 			# Get the role that corresponds to the id
 			if str(aRole['ID']) == str(role.id):
 				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = '**{}** is already in the list.'.format(Nullify.escape_all(role.name))
 				await channel.send(msg)
 				return
 
@@ -231,10 +220,7 @@ class UserRole(commands.Cog):
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
 		self.settings.setServerStat(server, "UserRoles", promoArray)
 
-		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.'.format(Nullify.escape_all(role.name))
 		await channel.send(msg)
 		return
 
@@ -288,10 +274,7 @@ class UserRole(commands.Cog):
 					# We found it - let's remove it
 					promoArray.remove(aRole)
 					self.settings.setServerStat(server, "UserRoles", promoArray)
-					msg = '**{}** removed successfully.'.format(aRole['Name'])
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 					await channel.send(msg)
 					return
 			# At this point - no name
@@ -315,18 +298,12 @@ class UserRole(commands.Cog):
 						# We found it - let's remove it
 						promoArray.remove(aRole)
 						self.settings.setServerStat(server, "UserRoles", promoArray)
-						msg = '**{}** removed successfully.'.format(aRole['Name'])
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 						await channel.send(msg)
 						return
 				
 			# If we made it this far - then we didn't find it
-			msg = '*{}* not found in list.'.format(roleCheck.name)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.'.format(Nullify.escape_all(roleCheck.name))
 			await channel.send(msg)
 			return
 
@@ -344,18 +321,12 @@ class UserRole(commands.Cog):
 				# We found it - let's remove it
 				promoArray.remove(aRole)
 				self.settings.setServerStat(server, "UserRoles", promoArray)
-				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 				await channel.send(msg)
 				return
 
 		# If we made it this far - then we didn't find it
-		msg = '*{}* not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* not found in list.'.format(Nullify.escape_all(role.name))
 		await channel.send(msg)
 
 	@removeuserrole.error
@@ -403,13 +374,9 @@ class UserRole(commands.Cog):
 				if str(role.id) == str(arole['ID']):
 					# We found it
 					foundRole = True
-					roleText = '{}**{}**\n'.format(roleText, role.name)
+					roleText = '{}**{}**\n'.format(roleText, Nullify.escape_all(role.name))
 			if not foundRole:
-				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
-
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']))
 
 		await channel.send(roleText)
 
@@ -530,10 +497,7 @@ class UserRole(commands.Cog):
 		roleCheck = DisplayName.roleForName(role, server)
 		if not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role), ctx.prefix)
 			await channel.send(msg)
 			return
 		
@@ -559,19 +523,14 @@ class UserRole(commands.Cog):
 
 		if not len(remRole):
 			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role.name), ctx.prefix)
 			await channel.send(msg)
 			return
 
 		if len(remRole):
 			self.settings.role.rem_roles(ctx.author, remRole)
 
-		msg = '*{}* has been removed from **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has been removed from **{}!**'.format(DisplayName.name(ctx.message.author), Nullify.escape_all(role.name))
 		await channel.send(msg)
 		
 
@@ -612,10 +571,7 @@ class UserRole(commands.Cog):
 		roleCheck = DisplayName.roleForName(role, server)
 		if not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role), ctx.prefix)
 			await channel.send(msg)
 			return
 		
@@ -639,19 +595,14 @@ class UserRole(commands.Cog):
 
 		if not len(addRole):
 			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role.name), ctx.prefix)
 			await channel.send(msg)
 			return
 
 		if len(addRole):
 			self.settings.role.add_roles(ctx.author, addRole)
 
-		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), Nullify.escape_all(role.name))
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
@@ -698,8 +649,6 @@ class UserRole(commands.Cog):
 				self.settings.role.rem_roles(ctx.author, remRole)
 			# Give a quick status
 			msg = '*{}* has been moved out of all roles in the list!'.format(DisplayName.name(ctx.message.author))
-			if suppress:
-				msg = Nullify.clean(msg)
 			await channel.send(msg)
 			return
 
@@ -707,10 +656,7 @@ class UserRole(commands.Cog):
 		roleCheck = DisplayName.roleForName(role, server)
 		if not roleCheck:
 			# No luck...
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role), ctx.prefix)
 			await channel.send(msg)
 			return
 		
@@ -733,17 +679,12 @@ class UserRole(commands.Cog):
 
 		if not len(addRole):
 			# We didn't find that role
-			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(role.name, ctx.prefix)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '*{}* not found in list.\n\nTo see a list of user roles - run `{}listuserroles`'.format(Nullify.escape_all(role.name), ctx.prefix)
 			await channel.send(msg)
 			return
 
 		if len(remRole) or len(addRole):
 			self.settings.role.change_roles(ctx.author, add_roles=addRole, rem_roles=remRole)
 
-		msg = '*{}* has been moved to **{}!**'.format(DisplayName.name(ctx.message.author), role.name)
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '*{}* has been moved to **{}!**'.format(DisplayName.name(ctx.message.author), Nullify.escape_all(role.name))
 		await channel.send(msg)

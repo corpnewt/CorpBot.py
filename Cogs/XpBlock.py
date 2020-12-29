@@ -67,10 +67,7 @@ class XpBlock(commands.Cog):
 					user_or_role = DisplayName.roleForName(roleName, ctx.guild)
 					
 			if not user_or_role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(roleName))
 				await ctx.message.channel.send(msg)
 				return
 		
@@ -103,7 +100,7 @@ class XpBlock(commands.Cog):
 				await ctx.send(msg)
 				return
 
-			ur_name = user_or_role.name
+			ur_name = Nullify.escape_all(user_or_role.name)
 
 		# Now we see if we already have that role in our list
 		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
@@ -113,9 +110,6 @@ class XpBlock(commands.Cog):
 			if str(aRole) == str(user_or_role.id):
 				# We found it - throw an error message and return
 				msg = '**{}** is already in the list.'.format(ur_name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -124,9 +118,6 @@ class XpBlock(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "XpBlockArray", promoArray)
 
 		msg = '**{}** added to list.'.format(ur_name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
 		await ctx.message.channel.send(msg)
 		return
 		
@@ -205,17 +196,14 @@ class XpBlock(commands.Cog):
 					user_or_role = DisplayName.roleForName(roleName, ctx.guild)
 					
 			if not user_or_role:
-				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(roleName))
 				await ctx.message.channel.send(msg)
 				return
 		
 		if is_user:
 			ur_name = DisplayName.name(user_or_role)
 		else:
-			ur_name = user_or_role.name
+			ur_name = Nullify.escape_all(user_or_role.name)
 
 		# If we're here - then the role is a real one
 		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
@@ -227,17 +215,11 @@ class XpBlock(commands.Cog):
 				promoArray.remove(aRole)
 				self.settings.setServerStat(ctx.message.guild, "XpBlockArray", promoArray)
 				msg = '**{}** removed successfully.'.format(ur_name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
 				await ctx.message.channel.send(msg)
 				return
 
 		# If we made it this far - then we didn't find it
 		msg = '**{}** not found in list.'.format(ur_name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
 		await ctx.message.channel.send(msg)
 
 
@@ -273,14 +255,11 @@ class XpBlock(commands.Cog):
 			test = DisplayName.roleForID(arole, ctx.guild)
 			if test:
 				# It's a role
-				roleText = roleText + "**{}** (Role), ".format(test.name)
+				roleText = roleText + "**{}** (Role), ".format(Nullify.escape_all(test.name))
 				continue
 			# Didn't find a role or person
 			roleText = roleText + "**{}** (removed from server), ".format(arole)
 
 		roleText = roleText[:-2]
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
 
 		await ctx.channel.send(roleText)

@@ -1,9 +1,7 @@
 import asyncio
 import discord
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import Settings, DisplayName, Utils
 
 def setup(bot):
 	# Add the bot and deps
@@ -26,12 +24,6 @@ class Face(commands.Cog):
 	async def lenny(self, ctx, *, message : str = None):
 		"""Give me some Lenny."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		# Log the user
 		self.settings.setServerStat(ctx.message.guild, "LastLenny", ctx.message.author.id)
 
@@ -39,8 +31,7 @@ class Face(commands.Cog):
 		if message:
 			msg += "\n{}".format(message)
 		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		# Send new message first, then delete original
 		await ctx.channel.send(msg)
 		# Remove original message
@@ -65,12 +56,6 @@ class Face(commands.Cog):
 	async def shrug(self, ctx, *, message : str = None):
 		"""Shrug it off."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		# Log the user
 		self.settings.setServerStat(ctx.message.guild, "LastShrug", ctx.message.author.id)
 
@@ -78,8 +63,7 @@ class Face(commands.Cog):
 		if message:
 			msg += "\n{}".format(message)
 		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		# Send new message first, then delete original
 		await ctx.channel.send(msg)
 		# Remove original message

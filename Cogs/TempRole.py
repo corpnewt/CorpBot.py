@@ -227,19 +227,14 @@ class TempRole(commands.Cog):
 		roleName = role
 		role = DisplayName.roleForName(roleName, ctx.guild)
 		if not role:
-			msg = 'I couldn\'t find *{}*...'.format(roleName)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(roleName))
 			await ctx.send(msg)
 			return
 
 		self.settings.setServerStat(ctx.guild, "TempRole", role.id)
 		role_time = self.settings.getServerStat(ctx.guild, "TempRoleTime")
 
-		msg = "**{}** is now the default temp role - will be active for *{}*.".format(role.name, ReadableTime.getReadableTimeBetween(0, role_time * 60))
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = "**{}** is now the default temp role - will be active for *{}*.".format(Nullify.escape_all(role.name), ReadableTime.getReadableTimeBetween(0, role_time * 60))
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
@@ -269,9 +264,7 @@ class TempRole(commands.Cog):
 			await ctx.send("The default temp role ({}) no longer exists.".format(temp_id))
 			return
 		role_time = self.settings.getServerStat(ctx.guild, "TempRoleTime")
-		msg = "**{}** is the default temp role - will be active for *{}*.".format(temp_role.name, ReadableTime.getReadableTimeBetween(0, role_time * 60))
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = "**{}** is the default temp role - will be active for *{}*.".format(Nullify.escape_all(temp_role.name), ReadableTime.getReadableTimeBetween(0, role_time * 60))
 		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
@@ -335,10 +328,7 @@ class TempRole(commands.Cog):
 			member_name = member
 			member = DisplayName.memberForName(member, ctx.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(member_name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(member_name))
 				await ctx.send(msg)
 				return
 		# Got the member - let's check for roles
@@ -363,12 +353,9 @@ class TempRole(commands.Cog):
 						if not add_user:
 							add_user = str(arole["AddedBy"])
 						added = "by {}".format(add_user)
-					roleText = '{}**{}** - added {} - *{}* remain\n'.format(roleText, role.name, added, ReadableTime.getReadableTimeBetween(0, timeleft))
+					roleText = '{}**{}** - added {} - *{}* remain\n'.format(roleText, Nullify.escape_all(role.name), added, ReadableTime.getReadableTimeBetween(0, timeleft))
 			if not foundRole:
 				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
 		await ctx.send(roleText)
 
 	@commands.command(pass_context=True)
@@ -394,10 +381,7 @@ class TempRole(commands.Cog):
 		roleName = role
 		role = DisplayName.roleForName(roleName, ctx.guild)
 		if not role:
-			msg = 'I couldn\'t find *{}*...'.format(roleName)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(roleName))
 			await ctx.send(msg)
 			return
 
@@ -406,10 +390,7 @@ class TempRole(commands.Cog):
 
 		if role.id in [int(x["ID"]) for x in promoArray]:
 			# We found it - throw an error message and return
-			msg = '**{}** is already in the list.'.format(role.name)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = '**{}** is already in the list.'.format(Nullify.escape_all(role.name))
 			await ctx.send(msg)
 			return
 
@@ -417,10 +398,7 @@ class TempRole(commands.Cog):
 		promoArray.append({ 'ID' : role.id, 'Name' : role.name })
 		self.settings.setServerStat(ctx.guild, "TempRoleList", promoArray)
 
-		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** added to list.'.format(Nullify.escape_all(role.name))
 		await ctx.message.channel.send(msg)
 		return
 
@@ -447,10 +425,7 @@ class TempRole(commands.Cog):
 		roleName = role
 		role = DisplayName.roleForName(roleName, ctx.guild)
 		if not role:
-			msg = 'I couldn\'t find *{}*...'.format(roleName)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(roleName))
 			await ctx.send(msg)
 			return
 
@@ -459,18 +434,12 @@ class TempRole(commands.Cog):
 
 		if role.id in [int(x["ID"]) for x in promoArray]:
 			# We found it - throw an error message and return
-			msg = '**{}** removed successfully.'.format(role.name)
+			msg = '**{}** removed successfully.'.format(Nullify.escape_all(role.name))
 			self.settings.setServerStat(ctx.guild, "TempRoleList", [x for x in promoArray if role.id != int(x["ID"])])
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
 			await ctx.send(msg)
 			return
 
-		msg = '**{}** not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = '**{}** not found in list.'.format(Nullify.escape_all(role.name))
 		await ctx.send(msg)
 		return
 
@@ -513,13 +482,9 @@ class TempRole(commands.Cog):
 				if str(role.id) == str(arole['ID']):
 					# We found it
 					foundRole = True
-					roleText = '{}**{}**\n'.format(roleText, role.name)
+					roleText = '{}**{}**\n'.format(roleText, Nullify.escape_all(role.name))
 			if not foundRole:
-				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
-
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
+				roleText = '{}**{}** (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']))
 
 		await channel.send(roleText)
 
@@ -560,18 +525,12 @@ class TempRole(commands.Cog):
 			return
 
 		if not member_from_name:
-			msg = 'I couldn\'t find *{}*...'.format(member)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(member))
 			await ctx.send(msg)
 			return
 
 		if not role_from_name:
-			msg = 'I couldn\'t find *{}*...'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(role))
 			await ctx.send(msg)
 			return
 
@@ -601,16 +560,13 @@ class TempRole(commands.Cog):
 		
 		msg = "*{}* was removed from **{}**.".format(
 			DisplayName.name(member_from_name),
-			role_from_name.name
+			Nullify.escape_all(role_from_name.name)
 		)
-		# Announce it
-		if suppress:
-			msg = Nullify.clean(msg)
 		await message.edit(content=msg)
 		# Check if we pm
 		if self.settings.getServerStat(ctx.guild, "TempRolePM"):
 			try:
-				await member_from_name.send("**{}** was removed from your roles in *{}*.".format(role_from_name.name, ctx.guild.name))
+				await member_from_name.send("**{}** was removed from your roles in *{}*.".format(Nullify.escape_all(role_from_name.name), Nullify.escape_all(ctx.guild.name)))
 			except:
 				pass
 
@@ -703,26 +659,26 @@ class TempRole(commands.Cog):
 			# We have a cooldown
 			msg = "*{}* has been given **{}** for *{}*.".format(
 				DisplayName.name(member_from_name),
-				role_from_name.name,
+				Nullify.escape_all(role_from_name.name),
 				ReadableTime.getReadableTimeBetween(0, cooldown)
 			)
 			pm = "You have been given **{}** in *{}* for *{}*".format(
-				role_from_name.name,
-				ctx.guild.name,
+				Nullify.escape_all(role_from_name.name),
+				Nullify.escape_all(ctx.guild.name),
 				ReadableTime.getReadableTimeBetween(0, cooldown)
 			)
 			self.bot.loop.create_task(self.check_temp_roles(member_from_name, temp_role))
 		else:
 			msg = "*{}* has been given **{}** *until further notice*.".format(
 				DisplayName.name(member_from_name),
-				role_from_name.name
+				Nullify.escape_all(role_from_name.name)
 			)
 			pm = "You have been given **{}** in *{} until further notice*.".format(
-				role_from_name.name,
+				Nullify.escape_all(role_from_name.name),
 				ctx.guild.name
 			)
 		# Announce it
-		await message.edit(content=Utils.suppressed(ctx,msg))
+		await message.edit(content=msg)
 		# Check if we pm
 		if self.settings.getServerStat(ctx.guild, "TempRolePM"):
 			try: await member_from_name.send(pm)

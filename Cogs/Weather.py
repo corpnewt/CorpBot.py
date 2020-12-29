@@ -1,7 +1,7 @@
 import asyncio, discord, datetime, re
 from geopy.geocoders import Nominatim
 from   discord.ext import commands
-from   Cogs import Message, PickList, Nullify, DL
+from   Cogs import Message, PickList, DL
 
 def setup(bot):
 	# Add the bot

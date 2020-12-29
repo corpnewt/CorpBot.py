@@ -70,13 +70,6 @@ class Xp(commands.Cog):
 			return
 		self.is_current = True
 		self.bot.loop.create_task(self.addXP())
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 		
 	async def addXP(self):
 		print("Starting XP loop: {}".format(datetime.datetime.now().time().isoformat()))
@@ -257,10 +250,7 @@ class Xp(commands.Cog):
 				roleCheck = DisplayName.checkRoleForInt(member, server)
 				if not roleCheck:
 					# Returned nothing - means there isn't even an int
-					msg = 'I couldn\'t find *{}* on the server.'.format(member)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
 					await ctx.message.channel.send(msg)
 					return
 				if roleCheck["Role"]:
@@ -274,10 +264,7 @@ class Xp(commands.Cog):
 						await ctx.message.channel.send(usage)
 						return
 					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find *{}* on the server.'.format(member)
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
 						await ctx.message.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
@@ -479,15 +466,10 @@ class Xp(commands.Cog):
 					# Decrement if needed
 					if decrement:
 						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
-					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, member.name)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, Nullify.escape_all(member.name))
 					await channel.send(msg)
 				else:
-					msg = 'There are no eligible members in *{}!*'.format(member.name)
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'There are no eligible members in *{}!*'.format(Nullify.escape_all(member.name))
 					await channel.send(msg)
 
 			else:
@@ -496,9 +478,6 @@ class Xp(commands.Cog):
 					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 				msg = '*{}* was given *{:,} xp!*'.format(DisplayName.name(member), xpAmount)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				self.settings.incrementStat(member, server, "XP", xpAmount)
 				# Now we check for promotions
@@ -531,10 +510,7 @@ class Xp(commands.Cog):
 			for arole in ctx.message.guild.roles:
 				if str(arole.id) == str(role):
 					found = True
-					msg = 'New users will be assigned to **{}**.'.format(arole.name)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'New users will be assigned to **{}**.'.format(Nullify.escape_all(arole.name))
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await ctx.message.channel.send(msg)
@@ -777,9 +753,9 @@ class Xp(commands.Cog):
 					if str(role.id) == str(arole['ID']):
 						# We found it
 						foundRole = True
-						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, role.name, arole['XP'])
+						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, Nullify.escape_all(role.name), arole['XP'])
 				if not foundRole:
-					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
+					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']), arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
@@ -793,16 +769,12 @@ class Xp(commands.Cog):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
-						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
 					else:
-						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
 					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
 				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that setting.'.format(roleText, role)
-
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
 
 		await channel.send(roleText)
 		
@@ -824,10 +796,7 @@ class Xp(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.message.channel.send(msg)
 				return
 			
@@ -907,7 +876,7 @@ class Xp(commands.Cog):
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
 			startIndex = len(promoSorted)-1
-			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
+			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
@@ -953,7 +922,7 @@ class Xp(commands.Cog):
 		
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
-			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
+			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
@@ -992,10 +961,7 @@ class Xp(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.message.channel.send(msg)
 				return
 
@@ -1161,7 +1127,7 @@ class Xp(commands.Cog):
 		else:
 			suppress = False
 
-		serverName = self.suppressed(server, server.name)
+		serverName = Nullify.escape_all(server.name)
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
 		xpPerMessage = int(self.settings.getServerStat(server, "XPPerMessage"))
@@ -1251,16 +1217,12 @@ class Xp(commands.Cog):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
-						msg = '{}Currently, you need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+						msg = '{}Currently, you need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, Nullify.escape_all(arole.name))
 					else:
-						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, Nullify.escape_all(arole.name))
 			if not found:
 				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that setting.\n\n'.format(msg, role)
 
 		msg = "{}Hopefully that clears things up!".format(msg)
-
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
 
 		await ctx.message.channel.send(msg)
