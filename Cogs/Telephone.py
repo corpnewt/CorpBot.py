@@ -639,8 +639,8 @@ class Telephone(commands.Cog):
 					if hidden:
 						await receiver_chan.send(":telephone_receiver: " + talk_msg)
 					else:
-						user = DisplayName.name(talk.author.display_name.replace("`","")) # Remove @here and @everyone mentions in username
+						user = DisplayName.name(talk.author).replace("`","").replace("\\","") # Remove @here and @everyone mentions in username
 						await receiver_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))
 				else:
-					user = DisplayName.name(talk.author.display_name.replace("`","")) # Remove @here and @everyone mentions in username
+					user = DisplayName.name(talk.author).replace("`","").replace("\\","") # Remove @here and @everyone mentions in username
 					await caller_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))
