@@ -1,9 +1,10 @@
 @echo off
-setlocal enableDelayedExpansion
+REM Get our local path before delayed expansion - allows ! in path
+set "thisDir=%~dp0"
 
+setlocal enableDelayedExpansion
 REM Setup initial vars
 set "script_name=WatchDog.py"
-set "thisDir=%~dp0"
 set /a tried=0
 set "toask=yes"
 set "py2v="
