@@ -2,7 +2,7 @@ import asyncio, discord, time, json, os, re
 from   datetime    import datetime
 from   discord.ext import commands
 from   shutil      import copyfile
-from Cogs import Utils, DisplayName
+from Cogs import Utils, DisplayName, Nullify
 
 def setup(bot):
     # Add the bot and deps
@@ -103,8 +103,8 @@ class Welcome(commands.Cog):
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.guild)
             if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                return await ctx.send(Utils.suppressed(ctx,msg))
+                msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+                return await ctx.send(msg)
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.guild, "Welcome")
@@ -135,8 +135,8 @@ class Welcome(commands.Cog):
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.guild)
             if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                return await ctx.send(Utils.suppressed(ctx,msg))
+                msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+                return await ctx.send(msg)
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.guild, "Welcome")
@@ -203,8 +203,8 @@ class Welcome(commands.Cog):
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.guild)
             if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                return await ctx.send(Utils.suppressed(ctx,msg))
+                msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+                return await ctx.send(msg)
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.guild, "Goodbye")
@@ -236,8 +236,8 @@ class Welcome(commands.Cog):
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.guild)
             if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                return await ctx.send(Utils.suppressed(ctx,msg))
+                msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+                return await ctx.send(msg)
         # Here we have found a member, and stuff.
         # Let's make sure we have a message
         message = self.settings.getServerStat(ctx.guild, "Goodbye")
@@ -279,7 +279,7 @@ class Welcome(commands.Cog):
         message = re.sub(self.regexPlace, "{:,}{}".format(len(server.members), end_str), message)
         # Get online users
         online_count = len([x for x in server.members if not x.status == discord.Status.offline])
-        message = Utils.suppressed(server,re.sub(self.regexOnline, "{:,}".format(online_count), message))
+        message = re.sub(self.regexOnline, "{:,}".format(online_count), message)
         if channel: return await channel.send(message)
         try:
             await self._getDefault(server).send(message)
