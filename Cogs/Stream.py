@@ -2,9 +2,7 @@ import asyncio
 import discord
 import re
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Message
+from   Cogs import Settings, DisplayName, Message, Nullify
 
 def setup(bot):
     # Add the bot and deps
@@ -135,7 +133,7 @@ class Stream(commands.Cog):
             await ctx.send("There is no stream announcement setup.")
             return
         # Nullify markdown
-        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        message = Nullify.escape_all(message,mentions=False)
         await ctx.send(message)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         channel = ctx.guild.get_channel(chan)
@@ -147,7 +145,7 @@ class Stream(commands.Cog):
     async def _stream_message(self, member, message, dest, test = False):
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(dest.guild.name.replace("@here", "@​here").replace("@everyone", "@​everyone")), message)
+        message = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(dest.guild.name)), message)
         # Get the activity info
         act = next((x for x in list(member.activities) if x.type is discord.ActivityType.streaming), None)
         try:
@@ -181,16 +179,16 @@ class Stream(commands.Cog):
             return
         mem = DisplayName.memberForName(member, ctx.guild)
         if not mem:
-            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "\\`")))
+            await ctx.send("I couldn't find {}...".format(Nullify.escape_all(member)))
             return
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if mem.id in stream_list:
-            await ctx.send("I'm already watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+            await ctx.send("I'm already watching for streams from {}.".format(DisplayName.name(mem)))
             return
         stream_list.append(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` added to the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+        await ctx.send("{} added to the stream list!".format(DisplayName.name(mem)))
 
     @commands.command(pass_context=True)
     async def remstreamer(self, ctx, *, member = None):
@@ -203,16 +201,16 @@ class Stream(commands.Cog):
             return
         mem = DisplayName.memberForName(member, ctx.guild)
         if not mem:
-            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "").replace("\\","")))
+            await ctx.send("I couldn't find {}...".format(Nullify.escape_all(member)))
             return
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if not mem.id in stream_list:
-            await ctx.send("I'm not currently watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+            await ctx.send("I'm not currently watching for streams from {}.".format(DisplayName.name(mem)))
             return
         stream_list.remove(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` removed from the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+        await ctx.send("{} removed from the stream list!".format(DisplayName.name(mem)))
 
     @commands.command(pass_context=True)
     async def streamers(self, ctx):

@@ -29,18 +29,12 @@ class UrbanDict(commands.Cog):
 	async def define(self, ctx, *, word : str = None):
 		"""Gives the definition of the word passed."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not word:
 			msg = 'Usage: `{}define [word]`'.format(ctx.prefix)
 			await ctx.channel.send(msg)
 			return
 		url = "http://api.urbandictionary.com/v0/define?term={}".format(quote(word))
-		msg = 'I couldn\'t find a definition for "{}"...'.format(word)
+		msg = 'I couldn\'t find a definition for "{}"...'.format(Nullify.escape_all(word))
 		title = permalink = None
 		theJSON = await DL.async_json(url, headers = {'User-agent': self.ua})
 		theJSON = theJSON["list"]
@@ -58,17 +52,11 @@ class UrbanDict(commands.Cog):
 					"value":value
 				})
 			return await PickList.PagePicker(title="Results For: {}".format(string.capwords(word)),list=words,ctx=ctx,max=1,url=theJSON[0]["permalink"]).pick()
-		await ctx.send(Nullify.clean(msg))
+		await ctx.send(msg)
 
 	@commands.command(pass_context=True)
 	async def randefine(self, ctx):
 		"""Gives a random word and its definition."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 
 		url = "http://api.urbandictionary.com/v0/random"
 		title = permalink = None
@@ -87,4 +75,4 @@ class UrbanDict(commands.Cog):
 				"value":value
 			}]
 			return await PickList.PagePicker(title="Results For: {}".format(string.capwords(x["word"])),list=words,ctx=ctx,max=1,url=x["permalink"]).pick()
-		await ctx.send(Nullify.clean(msg))
+		await ctx.send("I couldn't find any definitions...")

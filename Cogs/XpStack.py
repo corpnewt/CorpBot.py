@@ -27,13 +27,6 @@ class XpStack(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 		
 	async def _send_embed(self, ctx, embed, pm = False):
 		# Helper method to send embeds to their proper location
@@ -164,7 +157,7 @@ class XpStack(commands.Cog):
 			xp_array = []
 
 		if not len(xp_array):
-			await ctx.send("No recent XP transactions in *{}*.".format(self.suppressed(ctx.guild, ctx.guild.name)))
+			await ctx.send("No recent XP transactions in *{}*.".format(Nullify.escape_all(ctx.guild.name)))
 			return
 
 		count = 0

@@ -1,6 +1,7 @@
 import discord, os, random
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
+from Cogs import Nullify
 
 def setup(bot):
     bot.add_cog(Clippy(bot))
@@ -52,7 +53,7 @@ class Clippy(commands.Cog):
         image_width = image.size[0]
         draw = ImageDraw.Draw(image)
 
-        text = DisplayName.clean_message(text, bot=self.bot, server=ctx.guild)
+        text = Nullify.resolve_mentions(text,ctx=ctx,escape=False)
         # Remove any non-ascii chars
         text = ''.join([i for i in text if ord(i) < 128])
 

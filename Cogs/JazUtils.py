@@ -5,7 +5,6 @@ import datetime
 import colorsys
 from   discord.ext import commands
 from   Cogs import DisplayName
-from   Cogs import Nullify
 
 
 # constant for paginating embeds

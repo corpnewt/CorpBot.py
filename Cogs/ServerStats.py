@@ -213,9 +213,7 @@ class ServerStats(commands.Cog):
         if type(member) is str:
             member_check = DisplayName.memberForName(member, ctx.guild)
             if not member_check:
-                msg = "I couldn't find *{}* on this server...".format(member)
-                if suppress:
-                    msg = Nullify.clean(msg)
+                msg = "I couldn't find *{}* on this server...".format(Nullify.escape_all(member))
                 await ctx.send(msg)
                 return
             member = member_check
@@ -332,9 +330,7 @@ class ServerStats(commands.Cog):
         if type(member) is str:
             member_check = DisplayName.memberForName(member, ctx.guild)
             if not member_check:
-                msg = "I couldn't find *{}* on this server...".format(member)
-                if suppress:
-                    msg = Nullify.clean(msg)
+                msg = "I couldn't find *{}* on this server...".format(Nullify.escape_all(member))
                 await ctx.send(msg)
                 return
             member = member_check

@@ -3,7 +3,6 @@ import discord
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
-from   Cogs import Nullify
 
 def setup(bot):
     # This module isn't actually a cog
@@ -14,6 +13,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
     # then performs the said action, and outputs.
     if user.bot: return # Don't apply roles to bots
     DisplayName = bot.get_cog("DisplayName")
+    Utils = bot.get_cog("Utils")
+    if not DisplayName or not Utils: return # We are missing dependencies
     
     if type(channel) is discord.Guild:
         server = channel
@@ -149,8 +150,6 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
 
     # Check if we have a message to display - and display it
     if msg and channel and (not suppress):
-        # Check for suppress
-        if suppressed:
-            msg = Nullify.clean(msg)
+        msg = Utils.suppressed(server,msg)
         await channel.send(msg)
     return changed

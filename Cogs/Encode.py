@@ -1,6 +1,6 @@
 import asyncio, discord, base64, binascii, re, math, shutil, tempfile, os
 from   discord.ext import commands
-from   Cogs import Nullify, DL, Message
+from   Cogs import Utils, DL, Message, Nullify
 from   PIL import Image
 
 def setup(bot):
@@ -15,13 +15,8 @@ class Encode(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
+		global Utils
+		Utils = self.bot.get_cog("Utils")
 
 	async def download(self, url):
 		url = url.strip("<>")
@@ -358,7 +353,7 @@ class Encode(commands.Cog):
 			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
 			return
 		msg = ''.join(chr(int(new_bin[i:i+8], 2)) for i in range(0, len(new_bin), 8))
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(Nullify.escape_all(msg))
 
 	@commands.command(pass_context=True)
 	async def binint(self, ctx, *, input_binary = None):
@@ -420,24 +415,24 @@ class Encode(commands.Cog):
 		try:
 			if from_type.lower() == "base64":
 				if to_type.lower() == "hex":
-					await ctx.send(self.suppressed(ctx.guild, self._base64_to_hex(value)))
+					await ctx.send(Nullify.escape_all(self._base64_to_hex(value)))
 					return
 				elif to_type.lower() == "ascii":
-					await ctx.send(self.suppressed(ctx.guild, self._base64_to_ascii(value)))
+					await ctx.send(Nullify.escape_all(self._base64_to_ascii(value)))
 					return
 			elif from_type.lower() == "hex":
 				if to_type.lower() == "ascii":
-					await ctx.send(self.suppressed(ctx.guild, self._hex_to_ascii(value)))
+					await ctx.send(Nullify.escape_all(self._hex_to_ascii(value)))
 					return
 				elif to_type.lower() == "base64":
-					await ctx.send(self.suppressed(ctx.guild, self._hex_to_base64(value)))
+					await ctx.send(Nullify.escape_all(self._hex_to_base64(value)))
 					return
 			elif from_type.lower() == "ascii":
 				if to_type.lower() == "hex":
-					await ctx.send(self.suppressed(ctx.guild, self._ascii_to_hex(value)))
+					await ctx.send(Nullify.escape_all(self._ascii_to_hex(value)))
 					return
 				elif to_type.lower() == "base64":
-					await ctx.send(self.suppressed(ctx.guild, self._ascii_to_base64(value)))
+					await ctx.send(Nullify.escape_all(self._ascii_to_base64(value)))
 					return
 		except Exception:
 			await ctx.send("I couldn't make that conversion!")

@@ -5,9 +5,7 @@ import os
 import random
 import string
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import Settings, DisplayName, Utils
 
 def setup(bot):
 	# Add the bot and deps
@@ -170,9 +168,7 @@ class MadLibs(commands.Cog):
 
 		self.playing_madlibs.pop(str(server.id),None)
 		
-		# Check for suppress
-		if suppress:
-			data = Nullify.clean(data)
+		data = Utils.suppressed(ctx,data)
 		# Message the output
 		await channel.send(data)
 
