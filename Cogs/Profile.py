@@ -1,7 +1,7 @@
 import asyncio, discord, time
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message
+from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -29,20 +29,18 @@ class Profile(commands.Cog):
 		if name == None or link == None:
 			msg = 'Usage: `{}addprofile "[profile name]" [link]`'.format(ctx.prefix)
 			return await ctx.send(msg)
-		safe_name = name.replace("`", "").replace("\\","")
 		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles")
 		if not itemList:
 			itemList = []
 		currentTime = int(time.time())
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if item:
-			safe_name = item["Name"].replace("`", "").replace("\\","")
-			msg = Utils.suppressed(ctx,"{}'s `{}` profile was updated!".format(DisplayName.name(ctx.author),safe_name))
+			msg = Utils.suppressed(ctx,"{}'s {} profile was updated!".format(DisplayName.name(ctx.author),Nullify.escape_all(item["Name"])))
 			item["URL"] = link
 			item["Updated"] = currentTime
 		else:
 			itemList.append({"Name":name,"URL":link,"Created":currentTime})
-			msg = Utils.suppressed(ctx,"`{}` added to {}'s profile list!".format(safe_name,DisplayName.name(ctx.author)))
+			msg = Utils.suppressed(ctx,"{} added to {}'s profile list!".format(Nullify.escape_all(name),DisplayName.name(ctx.author)))
 		self.settings.setUserStat(ctx.author, ctx.guild, "Profiles", itemList)
 		await ctx.send(msg)
 		
@@ -54,7 +52,6 @@ class Profile(commands.Cog):
 		if name == None:
 			msg = 'Usage: `{}removeprofile [profile name]`'.format(ctx.prefix)
 			return await ctx.send(msg)
-		safe_name = name.replace("`", "").replace("\\","")
 
 		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles")
 		if not itemList or itemList == []:
@@ -62,11 +59,10 @@ class Profile(commands.Cog):
 			return await ctx.send(msg)
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
-			return await ctx.send(Utils.suppressed(ctx,"`{}` not found in {}'s profile list!".format(safe_name,DisplayName.name(ctx.author))))
-		safe_name = item["Name"].replace("`", "").replace("\\","")
+			return await ctx.send(Utils.suppressed(ctx,"{} not found in {}'s profile list!".format(Nullify.escape_all(name),DisplayName.name(ctx.author))))
 		itemList.remove(item)
 		self.settings.setUserStat(ctx.author, ctx.guild, "Profiles", itemList)
-		await ctx.send(Utils.suppressed(ctx,"`{}` removed from {}'s profile list!".format(safe_name,DisplayName.name(ctx.author))))
+		await ctx.send(Utils.suppressed(ctx,"{} removed from {}'s profile list!".format(Nullify.escape_all(item["Name"]),DisplayName.name(ctx.author))))
 
 	def _get_profile(self,ctx,name=None):
 		parts = name.split()
