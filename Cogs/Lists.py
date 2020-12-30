@@ -158,7 +158,7 @@ class Lists(commands.Cog):
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content="`{}`".format(other_names[index - len(potentialList)]))
+				await message.edit(content="`{}`".format(Nullify.escape_all(other_names[index - len(potentialList)])))
 				# Invoke
 				return await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 			# Display the item
@@ -166,10 +166,10 @@ class Lists(commands.Cog):
 				if item["Name"] == potentialList[index]["Item"]["Name"]:
 					msg = '**{}:**\n{}'.format(Nullify.escape_all(item['Name']), discord.utils.escape_markdown(item[l_key]) if raw else item[l_key])
 					return await message.edit(content=Utils.suppressed(ctx,msg))
-			return await message.edit(content="{} `{}` no longer exists!".format(
+			return await message.edit(content="{} {} no longer exists!".format(
 				l_name,
-				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
-			)
+				Nullify.escape_all(potentialList[index]["Item"]["Name"])
+			))
 		# Here we have no potentials
 		return await ctx.send(not_found)
 
