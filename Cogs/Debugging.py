@@ -140,7 +140,7 @@ class Debugging(commands.Cog):
 			return
 		# A member was banned
 		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
-		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
+		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -149,7 +149,7 @@ class Debugging(commands.Cog):
 			return
 		# A member was unbanned
 		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
-		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
+		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -218,7 +218,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.join', guild):
 			return
 		# A new member joined
-		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
+		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		log_msg = "Account Created: {}".format("Unknown" if member.created_at == None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
 		if invite: log_msg += "\n"+self.format_invite(invite)
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
@@ -230,7 +230,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.leave', guild):
 			return
 		# A member left
-		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, Utils.suppressed(guild, guild.name))
+		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
 
 	def type_to_string(self, activity_type):
@@ -437,9 +437,6 @@ class Debugging(commands.Cog):
 			return
 		# At this point - we log the message
 		try:
-			# Check for suppress
-			if suppress:
-				log_message = Utils.suppressed(server,log_message)
 			# Remove triple backticks and replace any single backticks with single quotes
 			log_back  = log_message.replace("`", "'")
 			if log_back == log_message:
@@ -458,7 +455,7 @@ class Debugging(commands.Cog):
 				color=color,
 				thumbnail=thumbnail,
 				desc_head="```\n",
-				desc_foot="```",
+				desc_foot="\n```",
 				footer=footer
 			).send(logChan)
 			if filename: await logChan.send(file=discord.File(filename))
@@ -536,7 +533,7 @@ class Debugging(commands.Cog):
 		# Remove channel from list
 		self.cleanChannels.remove(chan)
 
-		msg = 'Messages cleaned by {}#{} in {} - #{}\n\n'.format(ctx.message.author.name, ctx.message.author.discriminator, Utils.suppressed(ctx, ctx.guild.name), ctx.channel.name) + msg
+		msg = 'Messages cleaned by {}#{} in {} - #{}\n\n'.format(ctx.message.author.name, ctx.message.author.discriminator, ctx.guild.name, ctx.channel.name) + msg
 
 		# Timestamp and save to file
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
@@ -547,7 +544,7 @@ class Debugging(commands.Cog):
 
 		# Send the cleaner a pm letting them know we're done
 		try:
-			await ctx.author.send('*{}* message{} removed from *#{}* in *{}!*'.format(counter, "" if counter == 1 else "s", chan.name, Utils.suppressed(ctx, ctx.guild.name)))
+			await ctx.author.send('*{}* message{} removed from *#{}* in *{}!*'.format(counter, "" if counter == 1 else "s", chan.name, ctx.guild.name))
 			# PM the file
 			await ctx.author.send(file=discord.File(filename))
 		except:
