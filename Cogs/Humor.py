@@ -377,13 +377,13 @@ class Humor(commands.Cog):
 			image.paste(img,(221,15),mask=img)
 			# Write the user's name in the name box - starts at (209,99)
 			d = ImageDraw.Draw(image)
-			name_text = DisplayName.name(test_user)
+			name_text = test_user.display_name
 			name_size = name_max_h # max size for the name to fit
 			t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 			if t_w > name_max_w:
 				name_size = int(t_h*(name_max_w/t_w))
 				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
-			d.text((210+(88-t_w)/2,88+(12-t_h)/2),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
+			d.text((210+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
 				random.choice(self.stardew_responses),
