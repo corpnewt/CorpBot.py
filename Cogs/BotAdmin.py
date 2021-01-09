@@ -15,7 +15,7 @@ class BotAdmin(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
-		self.mention_re = re.compile(r"\<\@!{0,1}[0-9]+\>")
+		self.mention_re = re.compile(r"[0-9]{17,21}")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -155,7 +155,7 @@ class BotAdmin(commands.Cog):
 		# Helper method to handle the lifting for kick and ban
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not members_and_reason:
-			return await ctx.send('Usage: `{}{} [space delimited member mention] [reason]`'.format(ctx.prefix, command_name))
+			return await ctx.send('Usage: `{}{} [space delimited member mention/id] [reason]`'.format(ctx.prefix, command_name))
 		# Force a mention - we don't want any ambiguity
 		args = members_and_reason.split()
 		# Get our list of targets
@@ -164,15 +164,16 @@ class BotAdmin(commands.Cog):
 		for index,item in enumerate(args):
 			if self.mention_re.search(item): # Check if it's a mention
 				# Resolve the member
-				member = ctx.guild.get_member(int(re.sub(r'\W+', '', item)))
+				mem_id = int(re.sub(r'\W+', '', item))
+				member = ctx.guild.get_member(mem_id)
 				# If we have an invalid mention - bail - no ambiguity
-				if member is None: return await ctx.send("Invalid mention passed!")
+				if member is None: return await ctx.send("No member found for id `{}`!".format(mem_id))
 				# We should have a valid member - let's make sure it's not:
 				# 1. The bot, 2. The command caller, 3. Another bot-admin/admin
 				if member.id == self.bot.user.id: return await ctx.send("I don't think I want to {} myself...".format(command_name))
 				if member.id == ctx.author.id: return await ctx.send("I don't think you really want to {} yourself...".format(command_name))
 				if Utils.is_bot_admin(ctx,member): return await ctx.send("You cannot {} other admins!".format(command_name))
-				targets.append(member)
+				if not member in targets: targets.append(member) # Only add them if we don't already have them
 			else:
 				# Not a mention - must be the reason, dump the rest of the items into a string
 				# separated by a space
@@ -180,7 +181,7 @@ class BotAdmin(commands.Cog):
 				break
 		if not len(targets): return await ctx.send("No valid members passed!")
 		if len(targets) > 5: return await ctx.send("You can only {} up to 5 members at once!".format(command_name))
-		if not len(reason): return await ctx.send("Reason is required!")
+		if not len(reason):  return await ctx.send("Reason is required!")
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
