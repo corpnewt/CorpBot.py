@@ -50,8 +50,11 @@ class Encode(commands.Cog):
 	def _to_bytes(self, in_string):
 		return in_string.encode('utf-8')
 	
-	def _to_string(self, in_bytes):
-		return in_bytes.decode('utf-8')
+	def _to_string(self, in_bytes, split_hex = 0):
+		out_str = in_bytes.decode("utf-8")
+		if split_hex>0: # Break into chunks of split_hex size
+			out_str = " ".join((out_str[0+i:split_hex+i] for i in range(0, len(out_str), split_hex))).upper()
+		return out_str
 
 	# Check hex value
 	def _check_hex(self, hex_string):
@@ -81,6 +84,7 @@ class Encode(commands.Cog):
 		return self._to_string(ascii_bytes)
 
 	def _base64_to_ascii(self, base64_string):
+		if len(base64_string) % 4: base64_string+="="*(4-(len(base64_string)%4))
 		base64_bytes  = self._to_bytes(base64_string)
 		ascii_bytes   = base64.b64decode(base64_bytes)
 		return self._to_string(ascii_bytes)
@@ -89,13 +93,14 @@ class Encode(commands.Cog):
 	def _ascii_to_hex(self, ascii_string):
 		ascii_bytes = self._to_bytes(ascii_string)
 		hex_bytes   = binascii.hexlify(ascii_bytes)
-		return self._to_string(hex_bytes)
+		return self._to_string(hex_bytes,split_hex=8)
 
 	def _base64_to_hex(self, base64_string):
-		b64_string = self._to_bytes(base64_string)
+		if len(base64_string) % 4: base64_string+="="*(4-(len(base64_string)%4))
+		b64_string   = self._to_bytes(base64_string)
 		base64_bytes = base64.b64decode(b64_string)
 		hex_bytes    = binascii.hexlify(base64_bytes)
-		return self._to_string(hex_bytes)
+		return self._to_string(hex_bytes,split_hex=8)
 
 	def _rgb_to_hex(self, r, g, b):
 		return "#{:02x}{:02x}{:02x}".format(r,g,b).upper()
