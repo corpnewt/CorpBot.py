@@ -21,6 +21,13 @@ class Music(commands.Cog):
 		self.vol      = {}
 		self.loop     = {}
 		self.data     = {}
+		# Get the Lavalink info as needed
+		self.ll_host = bot.settings_dict.get("lavalink_host","127.0.0.1")
+		self.ll_port = bot.settings_dict.get("lavalink_port",2333)
+		self.ll_uri  = bot.settings_dict.get("lavalink_rest_uri","http://127.0.0.1:2333")
+		self.ll_pass = bot.settings_dict.get("lavalink_password","youshallnotpass")
+		self.ll_id   = bot.settings_dict.get("lavalink_identifier","TEST")
+		self.ll_reg  = bot.settings_dict.get("lavalink_region","us_central")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -55,12 +62,12 @@ class Music(commands.Cog):
 	async def start_nodes(self):
 		node = self.bot.wavelink.get_best_node()
 		if not node:
-			node = await self.bot.wavelink.initiate_node(host='127.0.0.1',
-				port=2333,
-				rest_uri='http://127.0.0.1:2333',
-				password='youshallnotpass',
-				identifier='TEST',
-				region='us_central')
+			node = await self.bot.wavelink.initiate_node(host=self.ll_host,
+				port=self.ll_port,
+				rest_uri=self.ll_uri,
+				password=self.ll_pass,
+				identifier=self.ll_id,
+				region=self.ll_reg)
 		node.set_hook(self.on_event_hook)
 
 	def skip_pop(self, ctx):
