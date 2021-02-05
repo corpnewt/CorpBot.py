@@ -223,7 +223,8 @@ class Mute(commands.Cog):
         if guild is None: return # Got sent some wonky values, I guess...
         for channel in guild.channels:
             if isinstance(channel,(discord.TextChannel,discord.VoiceChannel)) and hasattr(channel,"permissions_synced") and channel.permissions_synced:
-                channel = channel.category # Leverage the category instead
+                # This channel inherits its permissions from the category - let's skip it and just set that.
+                continue
             overs = channel.overwrites_for(mute_role) # Get any overrides for the role
             # Check if we qualify in this channel to sync/desync
             if desync: perm_check  = any(x[0] in self.mute_perms and x[1] != None for x in overs)
@@ -408,10 +409,6 @@ class Mute(commands.Cog):
             msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
             # pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         await mess.edit(content=Utils.suppressed(ctx,msg))
-        '''try:
-            await member.send(pm)
-        except Exception:
-            pass'''
 
     @commands.command(pass_context=True)
     async def unmute(self, ctx, *, member = None):
@@ -431,10 +428,6 @@ class Mute(commands.Cog):
         # pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
-        '''try:
-            await member.send(pm)
-        except Exception:
-            pass'''
 
     @commands.command(pass_context=True)
     async def ismuted(self, ctx, *, member = None):
