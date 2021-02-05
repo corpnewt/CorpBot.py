@@ -37,26 +37,27 @@ class Lockdown(commands.Cog):
                 # Let's check if it's a category, and if it has synced channels
                 # then remove those as there's no reason to add them too
                 if isinstance(channel,discord.CategoryChannel):
-                    if hasattr(channel,"permissions_synced"):
-                        # Add the synced channel ids to the orphaned list
-                        orphaned.extend([x.id for x in channel.channels if x.permissions_synced])
-                    else:
-                        # Add all child channels as we're considering them all synced
-                        orphaned.extend(channel.channels)
+                    orphaned.extend([x.id for x in channel.channels if not hasattr(channel,"permissions_synced") or x.permissions_synced])
                 # Don't add it if we're trying to remove it via sync-checking
                 if not channel.id in orphaned: channels.append(channel)
-        return (orphaned,channels)
+        # Let's get the guild by_category() output and sort our channels using that
+        ordered = []
+        for cat,chan_list in ctx.guild.by_category():
+            if cat and not cat.id in ordered: ordered.append(cat.id)
+            ordered.extend([chan.id for chan in chan_list])
+        # Return the list sorted by discord's GUI position
+        return (orphaned,sorted(channels,key=lambda x:ordered.index(x.id)))
 
     def _get_mention(self,channel):
         # Returns a formatted mention for the passed channel - including
         # the number of synced channels if it's a category
         if isinstance(channel,discord.CategoryChannel):
             synced = [x for x in channel.channels if x.permissions_synced] if hasattr(channel,"permissions_synced") else channel.channels
-            return "{} ({:,}/{:,} synced)\n{}".format(
+            return "{} ({:,}/{:,} synced){}".format(
                 channel.mention,
                 len(synced),
                 len(channel.channels),
-                "\n".join(["  --> "+x.mention for x in synced])
+                "\n"+"\n".join(["  --> "+x.mention for x in synced]) if len(synced) else ""
             )
         return channel.mention
 
