@@ -222,9 +222,8 @@ class Mute(commands.Cog):
         guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if isinstance(ctx,discord.ext.commands.Context) else None
         if guild is None: return # Got sent some wonky values, I guess...
         for channel in guild.channels:
-            if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-            if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                if channel.permissions_synced: channel = channel.category # Get the category if we're synced
+            if isinstance(channel,(discord.TextChannel,discord.VoiceChannel)) and hasattr(channel,"permissions_synced") and channel.permissions_synced:
+                channel = channel.category # Leverage the category instead
             overs = channel.overwrites_for(mute_role) # Get any overrides for the role
             # Check if we qualify in this channel to sync/desync
             if desync: perm_check  = any(x[0] in self.mute_perms and x[1] != None for x in overs)
