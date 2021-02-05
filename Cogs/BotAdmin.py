@@ -183,8 +183,12 @@ class BotAdmin(commands.Cog):
 				# separated by a space
 				reason = " ".join(args[index:])
 				break
-		if not len(targets): return await ctx.send("No valid members passed!")
-		if not len(reason):  reason = "No reason provided."
+		reason = reason if len(reason) else "No reason provided."
+		if not len(targets):
+			msg = "**With reason:**\n\n{}".format(reason)
+			if len(unable): msg = "**Unable to {}:**\n\n{}\n\n".format(command_name,"\n".join(unable)) + msg
+			if len(missed): msg = "**Unmatched ID{}:**\n\n{}\n\n".format("" if len(missed) == 1 else "s","\n".join(missed)) + msg
+			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author).send(ctx)
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
