@@ -28,6 +28,11 @@ class MadLibs(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
+	@commands.command()
+	async def ml(self, ctx, word = None):
+		"""Used to choose your words when in the middle of a madlibs."""
+		pass
+
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
 		"""Let's play MadLibs!"""
@@ -85,8 +90,8 @@ class MadLibs(commands.Cog):
 		randLib = choices[randnum]
 
 		# Let's load our text and get to work
-		with open("./Cogs/MadLibs/{}".format(randLib), 'r') as myfile:
-			data = myfile.read()
+		with open("./Cogs/MadLibs/{}".format(randLib), 'rb') as myfile:
+			data = myfile.read().decode("utf-8")
 
 		# Set up an empty arry
 		words = []
