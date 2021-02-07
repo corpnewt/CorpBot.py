@@ -16,6 +16,28 @@ class Comic(commands.Cog):
 		self.settings = settings
 		self.max_tries = 10
 		self.comic_data = {
+			"cyanide": {
+				"name": "Cyanide & Happiness",
+				"url": "https://explosm.net/comics/{}/",
+				"comic_number": True,
+				"first_date": 15,
+				"archive_url": "http://explosm.net/comics/archive/{}/{}",
+				"archive_keys": ["year","month"],
+				"latest_url": [
+					{"find":'id="comic-author">',"index":0},
+					{"find":'a href="/comics/',"index":-1},
+					{"find":'/"',"index":0}
+				],
+				"date_url": [
+					{"find":"{}.{}.{}","keys":["year","month","day"],"index":0},
+					{"find":'a href="/comics/',"index":-1},
+					{"find":'/"',"index":0}
+				],
+				"comic_url": [
+					{"find":'"main-comic" src="',"index":-1},
+					{"find":'"',"index":0}
+				],
+			},
 			"dilbert": {
 				"name": "Dilbert",
 				"url": "https://dilbert.com/strip/{}-{}-{}",
@@ -110,14 +132,17 @@ class Comic(commands.Cog):
 		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(x) for x in date.split("-")]
 		return {"month":m,"day":d,"year":y}
 
-	async def _get_last_comic_number(self,comic_data):
+	async def _get_last_comic_number(self,comic_data,date=None):
 		# Helper to return the highest comic number for a given comic and source html
-		try: archive_html = await DL.async_text(comic_data["archive_url"])
-		except: return (None,None)
-		latest_comic = archive_html
-		for step in comic_data["latest_url"]:
-			try: latest_comic = latest_comic.split(step["find"])[step["index"]]
-			except: return (None,None)
+		date_dict = self._date_dict(dt.datetime.today().strftime("%m-%d-%Y") if date == None else date,padded=comic_data.get("padded",True))
+		try: 
+			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
+			archive_html = await DL.async_text(archive_url)
+			with open("test.html","wb") as f: f.write(archive_html.encode("utf-8"))
+		except:
+			return (None,None)
+		latest_comic = self._walk_replace(archive_html,comic_data["latest_url"])
+		if not latest_comic: return (None,None)
 		return (int(latest_comic),archive_html)
 
 	async def _get_random_comic(self,comic_data):
@@ -158,11 +183,11 @@ class Comic(commands.Cog):
 		if comic_data.get("comic_number",False):
 			# Gather the latest comic number and archive info
 			if latest_tuple: latest,archive_html = latest_tuple
-			else: latest,archive_html = await self._get_last_comic_number(comic_data)
+			else: latest,archive_html = await self._get_last_comic_number(comic_data, date)
 			if latest == None: return None # Failed to get the info
 			date = latest if date == None else date # Set it to the latest if None
 			if not isinstance(date,int):
-				date_dict = self._date_dict(date,padded=False)
+				date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
 				# We have a date to check for
 				date = self._walk_replace(archive_html, comic_data["date_url"], date_dict)
 				if not date: return None
@@ -186,6 +211,7 @@ class Comic(commands.Cog):
 		# Let's locate our comic by walking the search steps
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
 		if not comic_url: return None
+		if comic_url.startswith("//"): comic_url = "https:"+comic_url
 		h = HTMLParser()
 		# Check if we need to get title text
 		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
@@ -220,6 +246,16 @@ class Comic(commands.Cog):
 			).edit(ctx,message)
 		comic_out["color"] = ctx.author
 		return await Message.EmbedText(**comic_out).edit(ctx,message)
+
+	@commands.command()
+	async def cyanide(self, ctx, date=None):
+		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today if found."""
+		await self._display_comic(ctx, "cyanide", date=date)
+
+	@commands.command()
+	async def randcyanide(self, ctx):
+		"""Displays a random Cyanide & Happiness comic from 01-26-2005 to today."""
+		await self._display_comic(ctx, "cyanide", random=True)
 
 	@commands.command()
 	async def dilbert(self, ctx, date=None):
