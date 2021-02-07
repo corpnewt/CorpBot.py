@@ -183,7 +183,7 @@ class Comic(commands.Cog):
 		if comic_data.get("comic_number",False):
 			# Gather the latest comic number and archive info
 			if latest_tuple: latest,archive_html = latest_tuple
-			else: latest,archive_html = await self._get_last_comic_number(comic_data, date)
+			else: latest,archive_html = await self._get_last_comic_number(comic_data, date if not isinstance(date,int) else None)
 			if latest == None: return None # Failed to get the info
 			date = latest if date == None else date # Set it to the latest if None
 			if not isinstance(date,int):
@@ -249,7 +249,9 @@ class Comic(commands.Cog):
 
 	@commands.command()
 	async def cyanide(self, ctx, date=None):
-		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today if found."""
+		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
+		try: date = int(date)
+		except: pass
 		await self._display_comic(ctx, "cyanide", date=date)
 
 	@commands.command()
