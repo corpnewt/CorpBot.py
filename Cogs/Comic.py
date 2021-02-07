@@ -138,7 +138,6 @@ class Comic(commands.Cog):
 		try: 
 			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
 			archive_html = await DL.async_text(archive_url)
-			with open("test.html","wb") as f: f.write(archive_html.encode("utf-8"))
 		except:
 			return (None,None)
 		latest_comic = self._walk_replace(archive_html,comic_data["latest_url"])
