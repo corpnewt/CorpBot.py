@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -644,10 +644,31 @@ A list of cogs, commands, and descriptions:
 	  $tags 
 	   └─ List all tag in the tag list.
 
+## Lockdown
+####	Lockdown Cog (8 commands) - Lockdown.py Extension:
+	  $addlock [channel_list]
+	   └─ Adds the passed space-delimited list of channels and categories to the lockdo...
+	  $addlockall 
+	   └─ Adds all channels and categories to the lockdown list (bot-admin only).
+	  $checklock 
+	   └─ Reports the number of configured channels that are locked down (bot-admin only).
+	  $listlock 
+	   └─ Lists the channels and categories configured for lockdown (bot-admin only).
+	  $lockdown 
+	   └─ Iterate through the channels in the lockdown list and revoke the send_message...
+	  $remlock [channel_list]
+	   └─ Removes the passed space-delimited list of channels and categories from the l...
+	  $remlockall 
+	   └─ Removes all channels and categories from the lockdown list (bot-admin only).
+	  $unlockdown 
+	   └─ Iterate through the channels in the lockdown list and clear the send_message,...
+
 ## MadLibs
-####	MadLibs Cog (1 command) - MadLibs.py Extension:
+####	MadLibs Cog (2 commands) - MadLibs.py Extension:
 	  $madlibs 
 	   └─ Let's play MadLibs!
+	  $ml [word]
+	   └─ Used to choose your words when in the middle of a madlibs.
 
 ## Morse
 ####	Morse Cog (3 commands) - Morse.py Extension:
