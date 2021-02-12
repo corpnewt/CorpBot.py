@@ -13,6 +13,8 @@ class Lockdown(commands.Cog):
         self.settings = settings
         self.lockdown_perms = ("send_messages","add_reactions","speak")
         global Utils, DisplayName
+        self.key = "Key: 🔴=Locked 🟡=Partial Lock 🟢=Unlocked 🔄=Synced 🟦=Not Synced"
+        self.key_long = self.key+" ✅=Configured 🟩=Not Configured"
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
 
@@ -43,17 +45,28 @@ class Lockdown(commands.Cog):
         # Return the list sorted by discord's GUI position
         return (orphaned,sorted(channels,key=lambda x:ordered.index(x.id)))
 
-    def _get_mention(self,channel):
+    def _get_mention(self,channel,show_lock=False,lockdown_list=[]):
         # Returns a formatted mention for the passed channel - including
         # the number of synced channels if it's a category
+        #
+        # First we get the overrides for the default role to check if this channel is
+        # locked, unlocked, or partially locked
+        default_role = channel.guild.default_role
+        overs = channel.overwrites_for(default_role)
+        overs_check = (overs.send_messages,overs.add_reactions,overs.speak)
+        lock = "🔴" if all([x==False for x in overs_check]) else "🟡" if any([x==False for x in overs_check]) else "🟢"
+        lock_text = ""
+        if show_lock: lock_text = "✅ " if channel.id in lockdown_list else "🟩 "
         if isinstance(channel,discord.CategoryChannel):
             synced = [x for x in channel.channels if x.permissions_synced] if hasattr(channel,"permissions_synced") else channel.channels
-            return "{} ({:,}/{:,} synced)".format(
-                channel.mention,
+            return "{}{} {} ({:,}/{:,} synced)".format(
+                lock_text,
+                lock,
+                channel.name,
                 len(synced),
                 len(channel.channels)
             )
-        return "{}{}".format("☑️ " if not hasattr(channel,"permissions_synced") or channel.permissions_synced else "", channel.mention)
+        return "{}{} {}{}".format(lock_text,lock, "🔄 " if not hasattr(channel,"permissions_synced") or channel.permissions_synced else "🟦 " if channel.category else "", channel.mention)
 
     async def _check_lockdown(self, lockdown, ctx):
         # Helper to auto-reply if Lockdown is not configured
@@ -102,29 +115,15 @@ class Lockdown(commands.Cog):
         lockdown,channels = self._get_lockdown(ctx)
         if not await self._check_lockdown(lockdown,ctx): return
         desc = "\n".join([self._get_mention(x) for x in channels])
-        await Message.EmbedText(title="Current Lockdown List - {:,} Total".format(len(lockdown)),description=desc,color=ctx.author).send(ctx)
+        await Message.EmbedText(title="Current Lockdown List - {:,} Total".format(len(lockdown)),description=desc,color=ctx.author,footer=self.key).send(ctx)
 
     @commands.command()
-    async def checklock(self, ctx):
-        """Reports the number of configured channels that are locked down (bot-admin only)."""
+    async def listlockall(self, ctx):
+        """Lists all channels and categories and their lockdown/sync status (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
-        lockdown,channels = self._get_lockdown(ctx)
-        if not await self._check_lockdown(lockdown,ctx): return
-        message = await Message.EmbedText(
-            title="Checking Lockdown",
-            description="Checking {:,} entr{}...".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
-            color=ctx.author
-        ).send(ctx)
-        default_role = ctx.guild.default_role
-        locked = []
-        for channel in channels:
-            overs = channel.overwrites_for(default_role)
-            if all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)]):
-                locked.append(channel)
-        await Message.EmbedText(
-            title="Lockdown Status: {}".format("UNLOCKED" if len(locked) == 0 else "LOCKED" if len(locked)==len(lockdown) else "PARTIALLY LOCKED"),
-            description="{:,}/{:,} entr{} fully locked down.".format(len(locked),len(lockdown),"y" if len(lockdown)==1 else "ies")
-        ).edit(ctx,message)
+        lockdown = self.settings.getServerStat(ctx.guild,"LockdownList",[])
+        desc = "\n".join([self._get_mention(x,lockdown_list=lockdown,show_lock=True) for x in ctx.guild.channels])
+        await Message.EmbedText(title="All Channel Lockdown Status - {:,} Total".format(len(ctx.guild.channels)),description=desc,color=ctx.author,footer=self.key_long).send(ctx)
 
     @commands.command()
     async def addlock(self, ctx, *, channel_list = None):
@@ -149,7 +148,7 @@ class Lockdown(commands.Cog):
         lockdown.extend(resolved_id)
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
         desc = "\n".join([self._get_mention(x) for x in resolved])
-        await Message.EmbedText(title="{:,} Added to Lockdown List".format(len(resolved)),description=desc,color=ctx.author).send(ctx)
+        await Message.EmbedText(title="{:,} New Entr{} Added to Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
 
     @commands.command()
     async def addlockall(self, ctx):
@@ -158,9 +157,10 @@ class Lockdown(commands.Cog):
         orphaned,channels = self._verify_lockdown(ctx,[x.id for x in ctx.guild.channels])
         if not len(channels): return await ctx.send("No valid channels found!")
         lockdown = [x.id for x in channels]
+        new_lockdown = [x for x in channels if not x.id in self.settings.getServerStat(ctx.guild,"LockdownList",[])]
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
-        desc = "\n".join([self._get_mention(x) for x in channels])
-        await Message.EmbedText(title="{:,} Added to Lockdown List".format(len(lockdown)),description=desc,color=ctx.author).send(ctx)
+        desc = "\n".join([self._get_mention(x) for x in new_lockdown])
+        await Message.EmbedText(title="{:,} New Entr{} Added to Lockdown List".format(len(new_lockdown),"y" if len(new_lockdown)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
 
     @commands.command()
     async def remlock(self, ctx, *, channel_list = None):
@@ -186,7 +186,7 @@ class Lockdown(commands.Cog):
         lockdown = [x for x in lockdown if not x in resolved_id]
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
         desc = "\n".join([self._get_mention(x) for x in resolved])
-        await Message.EmbedText(title="{:,} Removed from Lockdown List".format(len(resolved)),description=desc,color=ctx.author).send(ctx)
+        await Message.EmbedText(title="{:,} Entr{} Removed from Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
 
     @commands.command()
     async def remlockall(self, ctx):
@@ -196,7 +196,7 @@ class Lockdown(commands.Cog):
         if not await self._check_lockdown(lockdown,ctx): return
         self.settings.setServerStat(ctx.guild,"LockdownList",[])
         desc = "\n".join([self._get_mention(x) for x in channels])
-        await Message.EmbedText(title="{:,} Removed from Lockdown List".format(len(lockdown)),description=desc,color=ctx.author).send(ctx)
+        await Message.EmbedText(title="{:,} Entr{} Removed from Lockdown List".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
 
     @commands.command()
     async def lockdown(self, ctx, target_channel = None):
@@ -212,14 +212,14 @@ class Lockdown(commands.Cog):
             if not await self._check_lockdown(lockdown,ctx): return
         message = await Message.EmbedText(
             title="Lockdown",
-            description="Locking down {:,} entr{}...".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
+            description="🔴 Locking down {:,} entr{}...".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
             color=ctx.author
         ).send(ctx)
         cats,chans = await self._perform_lockdown(ctx,channels)
         if cats==chans==0: return await Message.EmbedText(title="Lockdown",description="**LOCKDOWN FAILED!**").edit(ctx,message)
         await Message.EmbedText(
             title="Lockdown",
-            description="Locked down {}{}.".format(
+            description="🔴 Locked down {}{}.".format(
                 "{:,} categor{}".format(cats,"y" if cats==1 else "ies") if cats else "",
                 "" if not chans else "{}{:,} channel{}.".format(", " if cats else "",chans,"" if chans==1 else "s")
             )
@@ -239,14 +239,14 @@ class Lockdown(commands.Cog):
             if not await self._check_lockdown(lockdown,ctx): return
         message = await Message.EmbedText(
             title="Unlockdown",
-            description="Unlocking {:,} entr{}...".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
+            description="🟢 Unlocking {:,} entr{}...".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
             color=ctx.author
         ).send(ctx)
         cats,chans = await self._perform_lockdown(ctx,channels,unlock=True)
         if cats==chans==0: return await Message.EmbedText(title="Unlockdown",description="**UNLOCKDOWN FAILED!**").edit(ctx,message)
         await Message.EmbedText(
             title="Unlockdown",
-            description="Unlocked {}{}.".format(
+            description="🟢 Unlocked {}{}.".format(
                 "{:,} categor{}".format(cats,"y" if cats==1 else "ies") if cats else "",
                 "" if not chans else "{}{:,} channel{}.".format(", " if cats else "",chans,"" if chans==1 else "s")
             )
