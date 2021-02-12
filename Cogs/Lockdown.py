@@ -124,7 +124,6 @@ class Lockdown(commands.Cog):
         """Lists all channels and categories and their lockdown/sync status (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
         lockdown = self.settings.getServerStat(ctx.guild,"LockdownList",[])
-        print(self._order(ctx,ctx.guild.channels,only_id=False))
         desc = "\n".join([self._get_mention(x,lockdown_list=lockdown,show_lock=True) for x in self._order(ctx,ctx.guild.channels,only_id=False)])
         await Message.EmbedText(title="All Channel Lockdown Status - {:,} Total".format(len(ctx.guild.channels)),description=desc,color=ctx.author,footer=self.key_long).send(ctx)
 
