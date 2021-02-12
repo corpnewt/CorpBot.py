@@ -139,6 +139,12 @@ class Lockdown(commands.Cog):
             if c and not c.id in lockdown:
                 resolved.append(c)
                 resolved_id.append(c.id)
+            # Also consider child channels as needed
+            if isinstance(c,discord.CategoryChannel):
+                for c_child in c.channels:
+                    if not c_child.id in lockdown:
+                        resolved.append(c_child)
+                        resolved_id.append(c_child.id)
         if not len(resolved): return await ctx.send("No valid channels passed!\nUsage: `{}addlock [channel list]`".format(ctx.prefix))
         lockdown.extend(resolved_id)
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
@@ -170,6 +176,12 @@ class Lockdown(commands.Cog):
             if c and c.id in lockdown:
                 resolved.append(c)
                 resolved_id.append(c.id)
+            # Also consider child channels as needed
+            if isinstance(c,discord.CategoryChannel):
+                for c_child in c.channels:
+                    if c_child and c_child.id in lockdown:
+                        resolved.append(c_child)
+                        resolved_id.append(c_child.id)
         if not len(resolved): return await ctx.send("No valid channels passed!\nUsage: `{}remlock [channel list]`".format(ctx.prefix))
         lockdown = [x for x in lockdown if not x in resolved_id]
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
