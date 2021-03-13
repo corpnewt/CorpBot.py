@@ -25,6 +25,7 @@ class Responses(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
+		if message.author.bot: return
 		if not message.guild: return
 		message_responses = self.settings.getServerStat(message.guild, "MessageResponses", {})
 		if not message_responses: return
