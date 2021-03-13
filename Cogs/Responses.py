@@ -54,8 +54,6 @@ class Responses(commands.Cog):
 		[[user]]     = user name
 		[[atuser]]   = user mention
 		[[server]]   = server name
-		[[game]]     = the game name
-		[[url]]      = stream url
 		[[here]]     = @​here ping
 		[[everyone]] = @​everyone ping
 		
