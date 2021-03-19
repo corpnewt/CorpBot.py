@@ -259,8 +259,12 @@ class Lockdown(commands.Cog):
         if response.lower() == "mute":
             mute = self.bot.get_cog("Mute")
             if mute: await mute._mute(member, member.guild)
-        elif response.lower() == "ban": await member.guild.ban(member, reason="Anti-raid active")
-        else: await member.guild.kick(member, reason="Anti-raid active") # Assume kick if nothing specified
+        elif response.lower() == "ban":
+            try: await member.guild.ban(member, reason="Anti-raid active")
+            except: pass
+        else:
+            try: await member.guild.kick(member, reason="Anti-raid active") # Assume kick if nothing specified
+            except: pass
 
     @commands.Cog.listener()	
     async def on_member_join(self, member):
