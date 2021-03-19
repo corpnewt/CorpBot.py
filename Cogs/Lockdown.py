@@ -1,4 +1,4 @@
-import asyncio, discord
+import asyncio, discord, time
 from discord.ext import commands
 from Cogs import Utils, DisplayName, Message
 
@@ -253,3 +253,116 @@ class Lockdown(commands.Cog):
                 "" if not chans else "{}{:,} channel{}.".format(", " if cats else "",chans,"" if chans==1 else "s")
             )
         ).edit(ctx,message)
+
+    async def _anti_raid_respond(self, member):
+        response = self.settings.getServerStat(member.guild, "AntiRaidResponse", "kick") # kick, mute, ban
+        if response.lower() == "mute":
+            mute = self.bot.get_cog("Mute")
+            if mute: await mute._mute(member, member.guild)
+        elif response.lower() == "ban": await member.guild.ban(member, reason="Anti-raid active")
+        else: await member.guild.kick(member, reason="Anti-raid active") # Assume kick if nothing specified
+
+    @commands.Cog.listener()	
+    async def on_member_join(self, member):
+        if not self.settings.getServerStat(member.guild, "AntiRaidEnabled", False): return # Not enabled, ignore
+        if self.settings.getServerStat(member.guild, "AntiRaidActive", False):
+            # Currently in anti-raid mode, find out what to do with the new join
+            ar_cooldown = self.settings.getServerStat(member.guild, "AntiRaidCooldown", 600) # 10 minute default
+            ar_lastjoin = self.settings.getServerStat(member.guild, "AntiRaidLastJoin", 0)
+            if time.time() - ar_lastjoin >= ar_cooldown: # No longer watching - disable anti-raid
+                self.settings.setServerStat(member.guild, "AntiRaidActive", False)
+            else: # Gather our response to the new user and put it into effect
+                await self._anti_raid_respond(member)
+            # Save the last join timestamp in the anti-raid list
+            self.settings.setServerStat(member.guild, "AntiRaidLastJoin", time.time())
+        # Gather the settings and go from there
+        ar_joins = self.settings.getServerStat(member.guild, "AntiRaidJoins", [])
+        ar_maxj  = self.settings.getServerStat(member.guild, "AntiRaidMax", 10)
+        ar_time  = self.settings.getServerStat(member.guild, "AntiRaidTime", 10)
+        ar_joins.insert(0,(member.id,time.time())) # Add (mem_id,timestamp) to the front of the list
+        ar_joins = ar_joins[:ar_maxj] # Ensure the list is only as long as the max joins allowed
+        self.settings.setServerStat(member.guild, "AntiRaidJoins", ar_joins) # Save the updated list
+        if len(ar_joins) < ar_maxj: return # List isn't long enough to consider - bail
+        # Compare the first and last join times to the threshold
+        if ar_joins[0][1] - ar_joins[-1][1] <= ar_time: # Enable anti-raid!
+            self.settings.setServerStat(member.guild, "AntiRaidActive", True)
+            self.settings.setServerStat(member.guild, "AntiRaidLastJoin", time.time())
+            for m_id,t in ar_joins:
+                # Resolve the ids and react accordingly
+                m = member.guild.get_member(m_id)
+                if m: await self._anti_raid_respond(m)
+
+    @commands.command()
+    async def antiraid(self, ctx, *, on_off = None, join_number = None, join_seconds = None, kick_ban_mute = None, cooldown_minutes = None):
+        """Sets up the anti-raid module (bot-admin only).
+        Options:
+
+            on_off:           Enables or disables anti-raid detection
+            join_number:      The number of members that need to join within the threshold to enable anti-raid (2-100)
+            join_seconds:     The seconds threshold for the number of members specified in join_number to enable anti-raid (2-100)
+            kick_ban_mute:    The response the bot should take for all members that join during anti-raid (including those in the threshold)
+            cooldown_minutes: The number of minutes with no joins before anti-raid is disabled (2-100)
+        
+        Example:
+
+            $antiraid on 10 8 kick 5
+
+            This would result in anti-raid being active, and if 10 users join in 8 seconds, anti-raid will enable and auto-kick any users
+            that join (including those that joined during the original 8 second threshold) until the 5 minute cooldown has elapsed with
+            no new joins."""
+        
+        if not await Utils.is_bot_admin_reply(ctx): return
+        usage = "Usage: `{}antiraid on_off join_number join_seconds kick_ban_mute cooldown_minutes`".format(ctx.prefix)
+        if on_off == None: # Gather settings and report the current
+            on_off = self.settings.getServerStat(ctx.guild, "AntiRaidEnabled", False)
+            if not on_off: return await ctx.send("Anti-raid is currently disabled.")
+            # Check if we're past the cooldown - and adjust accordingly
+            ar_cooldown = self.settings.getServerStat(ctx.guild, "AntiRaidCooldown", 600) # 10 minute default
+            ar_lastjoin = self.settings.getServerStat(ctx.guild, "AntiRaidLastJoin", 0)
+            if time.time() - ar_lastjoin >= ar_cooldown: self.settings.setServerStat(ctx.guild, "AntiRaidActive", False) # No longer watching - disable anti-raid
+            active = self.settings.getServerStat(ctx.guild, "AntiRaidActive", False)
+            join_number = self.settings.getServerStat(ctx.guild, "AntiRaidMax", 10)
+            join_seconds = self.settings.getServerStat(ctx.guild, "AntiRaidTime", 10)
+            kick_ban_mute = self.settings.getServerStat(ctx.guild, "AntiRaidResponse", "kick")
+            cooldown_minutes = self.settings.getServerStat(ctx.guild, "AntiRaidCooldown", 600)
+            return await ctx.send("Anti-raid protection enabled and currently **{}** with settings:\n\nIf {:,} users join within {:,} seconds, the I will {} all new users until {} minutes have elapsed without joins.".format(
+                "active" if active else "inactive",
+                join_number,
+                join_seconds,
+                kick_ban_mute.lower(),
+                cooldown_minutes
+            )) 
+        if on_off.lower() in ("off", "no", "disable", "disabled", "false"):
+            self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", False)
+            self.settings.setServerStat(ctx.guild, "AntiRaidJoins", [])
+            self.settings.setServerStat(ctx.guild, "AntiRaidLastJoin", 0)
+            return await ctx.send("Anti-raid is disabled!")
+        try: # Split and convert as needed
+            on_off, join_number, join_seconds, kick_ban_mute, cooldown_minutes = on_off.split()
+            join_number, join_seconds, cooldown_minutes = int(join_number), int(join_seconds), int(cooldown_minutes)
+        except:
+            return await ctx.send(usage)
+        # We should have adequate values here - let's ensure limits though
+        if on_off.lower() in ("off", "no", "disable", "disabled", "false"):
+            self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", False)
+            return await ctx.send("Anti-raid is disabled!")
+        elif not on_off.lower() in ("on", "yes", "enable", "enabled", "true"):
+            return await ctx.send(usage)
+        # We're enabling - qualify the rest of the values
+        if any((100 < x or 2 > x for x in (join_number, join_seconds, cooldown_minutes))):
+            return await ctx.send("All numerical values must be between 2-100.")
+        if not kick_ban_mute.lower() in ("kick","ban","mute"):
+            return await ctx.send("Unknown kick_ban_mute value - can only be kick, ban, or mute.")
+        # Values should be qualified - let's save them
+        self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", True)
+        self.settings.setServerStat(ctx.guild, "AntiRaidMax", join_number)
+        self.settings.setServerStat(ctx.guild, "AntiRaidTime", join_seconds)
+        self.settings.setServerStat(ctx.guild, "AntiRaidResponse", kick_ban_mute.lower())
+        self.settings.setServerStat(ctx.guild, "AntiRaidCooldown", cooldown_minutes*60)
+        self.settings.setServerStat(ctx.guild, "AntiRaidActive", False)
+        await ctx.send("Anti-raid protection enabled with the following settings:\n\nIf {:,} members join within {:,} seconds, I will {} all new members until {} minutes have elapsed without joins.".format(
+            join_number,
+            join_seconds,
+            kick_ban_mute.lower(),
+            cooldown_minutes
+        )) 
