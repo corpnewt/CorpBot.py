@@ -1,6 +1,6 @@
 import asyncio, discord, time
 from discord.ext import commands
-from Cogs import Utils, DisplayName, Message
+from Cogs import Utils, DisplayName, Message, Nullify
 
 def setup(bot):
     bot.add_cog(Lockdown(bot, bot.get_cog("Settings")))
@@ -392,7 +392,7 @@ class Lockdown(commands.Cog):
             chan = self.settings.getServerStat(ctx.guild, "AntiRaidChannel", None)
             if chan: chan = DisplayName.channelForName(chan, ctx.guild)
             if not user_role or not chan: return await ctx.send("Anti-raid ping is not setup.")
-            return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(DisplayName.name(user_role),chan.mention))
+            return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(Nullify.escape_all(user_role.display_name) if isinstance(user_role, discord.Member) else Nullify.escape_all(user_role.name),chan.mention))
         if channel == None: return await ctx.send("Usage: `{}antiraidping user_or_role channel`".format(ctx.prefix))
         # We're setting it up - let's check the user first, then role, then channel
         ur = DisplayName.memberForName(user_or_role, ctx.guild)
@@ -403,4 +403,4 @@ class Lockdown(commands.Cog):
         # Got them! - Save and report
         self.settings.setServerStat(ctx.guild, "AntiRaidPing", ur.id)
         self.settings.setServerStat(ctx.guild, "AntiRaidChannel", ch.id)
-        return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(DisplayName.name(ur),ch.mention))
+        return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(Nullify.escape_all(ur.display_name) if isinstance(ur, discord.Member) else Nullify.escape_all(ur.name),ch.mention))
