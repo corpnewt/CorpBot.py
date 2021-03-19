@@ -285,7 +285,19 @@ class Lockdown(commands.Cog):
         if len(ar_joins) < ar_maxj: return # List isn't long enough to consider - bail
         # Compare the first and last join times to the threshold
         if ar_joins[0][1] - ar_joins[-1][1] <= ar_time: # Enable anti-raid!
-            self.settings.setServerStat(member.guild, "AntiRaidActive", True)
+            if not self.settings.getServerStat(member.guild, "AntiRaidActive", False):
+                self.settings.setServerStat(member.guild, "AntiRaidActive", True)
+                mention = self.settings.getServerStat(member.guild, "AntiRaidPing", None)
+                if mention:
+                    m = DisplayName.memberForName(mention, member.guild)
+                    if not m: m = DisplayName.roleForName(mention, member.guild)
+                    if m: # Got a member or role - let's get the channel
+                        channel = self.settings.getServerStat(member.guild, "AntiRaidChannel", None)
+                        if channel:
+                            c = DisplayName.channelForName(channel, member.guild)
+                            if c: # Got a member/role and a channel - try to post the ping
+                                try: await c.send("{} - Anti-raid has been enabled!".format(m.mention))
+                                except: pass
             self.settings.setServerStat(member.guild, "AntiRaidLastJoin", time.time())
             for m_id,t in ar_joins:
                 # Resolve the ids and react accordingly
@@ -317,20 +329,19 @@ class Lockdown(commands.Cog):
             on_off = self.settings.getServerStat(ctx.guild, "AntiRaidEnabled", False)
             if not on_off: return await ctx.send("Anti-raid is currently disabled.")
             # Check if we're past the cooldown - and adjust accordingly
-            ar_cooldown = self.settings.getServerStat(ctx.guild, "AntiRaidCooldown", 600) # 10 minute default
+            cooldown_minutes = self.settings.getServerStat(ctx.guild, "AntiRaidCooldown", 600) # 10 minute default
             ar_lastjoin = self.settings.getServerStat(ctx.guild, "AntiRaidLastJoin", 0)
-            if time.time() - ar_lastjoin >= ar_cooldown: self.settings.setServerStat(ctx.guild, "AntiRaidActive", False) # No longer watching - disable anti-raid
+            if time.time() - ar_lastjoin >= cooldown_minutes: self.settings.setServerStat(ctx.guild, "AntiRaidActive", False) # No longer watching - disable anti-raid
             active = self.settings.getServerStat(ctx.guild, "AntiRaidActive", False)
             join_number = self.settings.getServerStat(ctx.guild, "AntiRaidMax", 10)
             join_seconds = self.settings.getServerStat(ctx.guild, "AntiRaidTime", 10)
             kick_ban_mute = self.settings.getServerStat(ctx.guild, "AntiRaidResponse", "kick")
-            cooldown_minutes = self.settings.getServerStat(ctx.guild, "AntiRaidCooldown", 600)
-            return await ctx.send("Anti-raid protection enabled and currently **{}** with settings:\n\nIf {:,} users join within {:,} seconds, the I will {} all new users until {} minutes have elapsed without joins.".format(
+            return await ctx.send("Anti-raid protection enabled and currently **{}** with settings:\n\nIf {:,} users join within {:,} seconds, then I will {} all new users until {} minutes have elapsed without joins.".format(
                 "active" if active else "inactive",
                 join_number,
                 join_seconds,
                 kick_ban_mute.lower(),
-                cooldown_minutes
+                int(cooldown_minutes/60)
             )) 
         if on_off.lower() in ("off", "no", "disable", "disabled", "false"):
             self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", False)
@@ -366,3 +377,30 @@ class Lockdown(commands.Cog):
             kick_ban_mute.lower(),
             cooldown_minutes
         )) 
+
+    @commands.command()
+    async def antiraidping(self, ctx, user_or_role = None, channel = None):
+        """Sets up what user or role to ping and in what channel when anti-raid is activated (bot-admin only)."""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        if user_or_role == None: # print the settings
+            user_role = self.settings.getServerStat(ctx.guild, "AntiRaidPing", None)
+            if user_role:
+                u = DisplayName.memberForName(user_role, ctx.guild)
+                if not u: u = DisplayName.roleForName(user_role, ctx.guild)
+                user_role = u
+            chan = self.settings.getServerStat(ctx.guild, "AntiRaidChannel", None)
+            if chan: chan = DisplayName.channelForName(chan, ctx.guild)
+            if not user_role or not chan: return await ctx.send("Anti-raid ping is not setup.")
+            return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(DisplayName.name(user_role),chan.mention))
+        if channel == None: return await ctx.send("Usage: `{}antiraidping user_or_role channel`".format(ctx.prefix))
+        # We're setting it up - let's check the user first, then role, then channel
+        ur = DisplayName.memberForName(user_or_role, ctx.guild)
+        if not ur: ur = DisplayName.roleForName(user_or_role, ctx.guild)
+        if not ur: return await ctx.send("I couldn't find that user or role.")
+        ch = DisplayName.channelForName(channel, ctx.guild)
+        if not ch: return await ctx.send("I couldn't find that channel.")
+        # Got them! - Save and report
+        self.settings.setServerStat(ctx.guild, "AntiRaidPing", ur.id)
+        self.settings.setServerStat(ctx.guild, "AntiRaidChannel", ch.id)
+        return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(DisplayName.name(ur),ch.mention))
