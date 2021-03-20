@@ -83,27 +83,37 @@ class Quote(commands.Cog):
 			# Only quote actual text or attachments - no embeds
 			return
 		
-		# Initialize our message
+		# Initialize our message and image field
 		msg = reaction.message.content if len(reaction.message.content) else ""
-		
+		image = None
 		if len(reaction.message.attachments):
 			# We have some attachments to work through
 			attach_text = ""
 			for a in reaction.message.attachments:
 				# Add each attachment by name as a link to its own url
 				attach_text += "[{}]({}), ".format(a.filename, a.url)
+				if image == None and a.filename.lower().endswith((".jpg",".jpeg",".png",".gif")):
+					# We got the first image in the attachment list - set it
+					image = a.url
 			# Remove the last ", "
 			attach_text = attach_text[:-2]
 			msg += "\n\n" + attach_text
+		if len(reaction.message.embeds) and image == None:
+			# We have embeds to look at too, and we haven't set an image yet
+			for e in reaction.message.embeds:
+				if e.thumbnail.url == discord.Embed.Empty: continue
+				image = e.thumbnail.url
+				break
 
 		# Build an embed!
 		e = {
 			"author" : reaction.message.author,
+			"image" : image,
 			"pm_after" : -1, # Don't pm quotes
 			"description" : msg + "\n\nSent by {} in {} | {} | {} UTC".format(
 				reaction.message.author.mention,
 				reaction.message.channel.mention,
-				"[Link](https://discordapp.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
+				"[Link](https://discord.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"color" : reaction.message.author,
