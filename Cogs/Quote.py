@@ -102,7 +102,7 @@ class Quote(commands.Cog):
 			# We have embeds to look at too, and we haven't set an image yet
 			for e in reaction.message.embeds:
 				d = e.to_dict()
-				i = d.get("thumbnail",d.get("image",d.get("video",{}))).get("url",None)
+				i = d.get("thumbnail",d.get("video",d.get("image",{}))).get("url",None)
 				if not i: continue
 				image = i
 				break
