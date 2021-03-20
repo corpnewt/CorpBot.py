@@ -101,8 +101,10 @@ class Quote(commands.Cog):
 		if len(reaction.message.embeds) and image == None:
 			# We have embeds to look at too, and we haven't set an image yet
 			for e in reaction.message.embeds:
-				if e.thumbnail.url == discord.Embed.Empty: continue
-				image = e.thumbnail.url
+				d = e.to_dict()
+				i = d.get("thumbnail",d.get("image",d.get("video",{}))).get("url",None)
+				if not i: continue
+				image = i
 				break
 
 		# Build an embed!
