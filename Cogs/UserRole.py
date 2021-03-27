@@ -1,10 +1,6 @@
-import asyncio
-import discord
-import random
+import asyncio, discord
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import Settings, DisplayName, Nullify, Utils, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -53,7 +49,212 @@ class UserRole(commands.Cog):
 					self.settings.setServerStat(guild, "UserRoleBlock", block_list)
 			# Check once per hour
 			await asyncio.sleep(3600)
+
+	def _get_emoji_mention(self, emoji):
+		if not emoji["emoji_id"]: return emoji["emoji_name"] # Unicode
+		return "<{}:{}:{}>".format("a" if emoji["emoji_a"] else "",emoji["emoji_name"],emoji["emoji_id"])
+
+	def _get_channel_message(self, ctx):
+		if not ctx.guild: return None
+		channel = message = None
+		chan_message = self.settings.getServerStat(ctx.guild, "ReactionMessageId", None)
+		if chan_message: channel,message = [int(x) for x in chan_message.split()]
+		if not (message and channel): return None
+		return (channel,message)
+
+	async def _get_message_url(self, ctx):
+		m = await self._get_message(ctx)
+		if not m: return None
+		# Let's build the url
+		return "https://discord.com/channels/{}/{}/{}".format(m.guild.id, m.channel.id, m.id)
+
+	async def _get_message(self, ctx):
+		if not ctx.guild: return None
+		chan_message = self._get_channel_message(ctx)
+		if not chan_message: return None
+		# Let's actually get the channel+message and ensure it exists
+		c = ctx.guild.get_channel(chan_message[0])
+		try: return await c.fetch_message(chan_message[1])
+		except Exception as e: print(e)#pass
+		return None
+
+	@commands.Cog.listener()
+	async def on_raw_reaction_add(self, payload):
+		if not payload.guild_id: return
+		await self._check_react(payload)
+
+	@commands.Cog.listener()
+	async def on_raw_reaction_remove(self, payload):
+		if not payload.guild_id: return
+		await self._check_react(payload)
+
+	async def _check_react(self, payload):
+		guild = self.bot.get_guild(payload.guild_id)
+		member = guild.get_member(payload.user_id)
+		if member.bot: return
+		block_list = self.settings.getServerStat(member.guild,"UserRoleBlock",[])
+		if member.id in block_list: return # User is blocked
+		m = await self._get_message(member)
+		if not m: return
+		# Gather the reaction role info - and apply roles if necessary
+		chan_message = self._get_channel_message(m)
+		# Check if it's the right channel and message id
+		if not chan_message or not (payload.channel_id == chan_message[0] and payload.message_id == chan_message[1]): return
+		# Got the right setup - let's see if it's a valid reaction
+		ur_list = self.settings.getServerStat(m.guild, "UserRoles", [])
+		ur_id_list = [x["ID"] for x in ur_list]
+		rr_list = self.settings.getServerStat(m.guild, "ReactionMessageList", [])
+		entry = next((x for x in rr_list if x["emoji_name"] == payload.emoji.name and x["emoji_id"] == payload.emoji.id),None)
+		if not entry: # Doesn't match, try to remove
+			try: await m.clear_reaction(payload.emoji)
+			except: pass # Might not have perms
+			return
+		role = guild.get_role(entry["role_id"])
+		if not role or not role.id in ur_id_list: return # Doesn't exist
+		toggle = self.settings.getServerStat(m.guild,"ReactionMessageToggle",True)
+		only_one = self.settings.getServerStat(m.guild,"OnlyOneUserRole",True)
+		rem_roles = []
+		add_roles = []
+		# Find out if we need to add/remove roles
+		if role in member.roles:
+			if toggle: rem_roles.append(role)
+		else: add_roles.append(role)
+		if only_one:
+			for r_dict in ur_list:
+				if r_dict["ID"] == role.id: continue # Don't remove the one we just found
+				r_test = m.guild.get_role(r_dict["ID"])
+				if not r_test: continue
+				# Add it to the remove list
+				rem_roles.append(r_test)
+		if len(rem_roles) or len(add_roles): self.settings.role.change_roles(member, add_roles=add_roles, rem_roles=rem_roles)
+
+	@commands.command()
+	async def rrmessage(self, ctx, *, message_url = None):
+		"""Gets or sets the message to watch for user reaction roles (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		# We want to know what message the bot is watching, if any
+		if not message_url: return await ctx.invoke(self.rrlist)
+		# We are setting a message - let's split the url and get the last 2 integers - then save them.
+		parts = [x for x in message_url.replace("/"," ").split() if len(x)]
+		try: channel,message = [int(x) for x in parts[-2:]]
+		except: return await ctx.send("Improperly formatted message url!")
+		# Let's actually get the channel+message and ensure it exists
+		c = ctx.guild.get_channel(channel)
+		if not c: return await ctx.send("I couldn't find the channel connected to that id.")
+		try: await c.fetch_message(message)
+		except: return await ctx.send("I couldn't find the message connected to that id.")
+		# Here we have what we need - save it and print the final url
+		self.settings.setServerStat(ctx.guild, "ReactionMessageId", "{} {}".format(channel,message))
+		return await ctx.send("I will watch the following message for reactions:\nhttps://discord.com/channels/{}/{}/{}".format(
+			ctx.guild.id, channel, message
+		))
+
+	@commands.command()
+	async def rrclear(self, ctx):
+		"""Removes the message to watch for user reaction roles, as well as all roles and reactions (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		self.settings.setServerStat(ctx.guild, "ReactionMessageId", None)
+		self.settings.setServerStat(ctx.guild, "ReactionMessageList", [])
+		return await ctx.send("Reaction message info cleared!")
+
+	@commands.command()
+	async def rrtoggle(self, ctx, yes_no = None):
+		"""Sets whether or not reaction messages will toggle roles - or only add them (bot-admin only)."""
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Reaction role add/remove toggle","ReactionMessageToggle",yes_no,True))
+
+	@commands.command()
+	async def rradd(self, ctx, *, role_name_or_id = None):
+		"""Adds a new role to the reaction roles list.
+		The added role must be in the user role list, and rrmessage must be setup (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		m = await self._get_message(ctx)
+		if not m: return await ctx.send("Reaction role message is not currently set.  Please set that up first with `{}rrmessage [message_url]`.".format(ctx.prefix))
+		# We should meet prerequisites - let's resolve the role.
+		if not role_name_or_id: return await ctx.send("No role passed.")
+		role = DisplayName.roleForName(role_name_or_id,ctx.guild)
+		if not role: return await ctx.send("I couldn't find that role.")
+		# We have the role - make sure it's in the user roles list
+		ur_list = self.settings.getServerStat(ctx.guild, "UserRoles", [])
+		# Make sure it's in the user role list
+		if not next((x for x in ur_list if int(x["ID"]) == role.id),None): return await ctx.send("That role is not in the user role list.  Please add it first with `{}adduserrole [role]`.".format(ctx.prefix))
+		message = await ctx.send("Please react to this message with the desired emoji.")
+		# Now we would wait...
+		def check(reaction, user): return reaction.message.id == message.id and user == ctx.author
+		try: reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=check)
+		except:
+			# Didn't get a reaction
+			return await message.edit(content="Looks like we ran out of time - run `{}rradd [role_name_or_id]` to try again.".format(ctx.prefix))
+		# Let's walk through the reaction list and verify what we have
+		rr_list = self.settings.getServerStat(ctx.guild, "ReactionMessageList", [])
+		emoji_a,emoji_id,emoji_name = (False,None,str(reaction.emoji)) if isinstance(reaction.emoji,str) else (reaction.emoji.animated,reaction.emoji.id,reaction.emoji.name)
+		# Check if we are already using that reaction for a different role
+		using_that_emoji = [x for x in rr_list if x["emoji_a"] == emoji_a and x["emoji_id"] == emoji_id and x["emoji_name"] == emoji_name and x["role_id"] != role.id]
+		using_that_role = [x for x in rr_list if x["role_id"] == role.id]
+		if using_that_emoji:
+			# Evaluate the role id - and ensure it exists
+			using_role = DisplayName.roleForName(using_that_emoji[0]["role_id"],ctx.guild)
+			if using_role: return await message.edit(content="That reaction is already being used for \"{}\".".format(Nullify.escape_all(using_role.name)))
+			# If we got here - it doesn't exist - pop it from that list
+			rr_list.remove(using_that_emoji[0])
+		if using_that_role:
+			# Pop the role from the list so we can re-add it with the new emoji
+			rr_list.remove(using_that_role[0])
+		# Add the emoji name/id and role id to the list
+		rr_list.append({"emoji_a":emoji_a,"emoji_id":emoji_id,"emoji_name":emoji_name,"role_id":role.id})
+		self.settings.setServerStat(ctx.guild, "ReactionMessageList", rr_list)
+		await message.edit(content="Reaction for \"{}\" set to {}".format(
+			Nullify.escape_all(role.name),
+			str(reaction.emoji)
+		))
+
+	@commands.command()
+	async def rrdel(self, ctx, *, role_name_or_id = None):
+		"""Removes the passed role from the reaction roles list (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		m = await self._get_message(ctx)
+		if not m: return await ctx.send("Reaction role message is not currently set.  Please set that up first with `{}rrmessage [message_url]`.".format(ctx.prefix))
+		# We should meet prerequisites - let's resolve the role.
+		if not role_name_or_id: return await ctx.send("No role passed.")
+		role = DisplayName.roleForName(role_name_or_id,ctx.guild)
+		if not role: return await ctx.send("I couldn't find that role.")
+		rr_list = self.settings.getServerStat(ctx.guild, "ReactionMessageList", [])
+		to_remove = next((x for x in rr_list if x["role_id"] == role.id),None)
+		if not to_remove: return await ctx.send("That role is not in the reaction roles list.")
+		rr_list.remove(to_remove)
+		self.settings.setServerStat(ctx.guild, "ReactionMessageList", rr_list)
+		return await ctx.send("\"{}\" has been removed from the reaction roles list.".format(Nullify.escape_all(role.name)))
 	
+	@commands.command()
+	async def rrlist(self, ctx):
+		"""Lists the current reaction roles and their corresponding reactions (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		url = await self._get_message_url(ctx)
+		if not url: return await ctx.send("Reaction role message is not currently set.")
+		toggle = self.settings.getServerStat(ctx.guild,"ReactionMessageToggle",True)
+		only_one = self.settings.getServerStat(ctx.guild,"OnlyOneUserRole",True)
+		desc = "Currently watching [this message]({}) for reactions.\nReacting will **{}** the target role.\nUsers can select {}".format(
+			url,
+			"add or remove" if toggle else "only add",
+			"**only one** role at a time." if only_one else "**multiple** roles at a time."
+		)
+		# Gather the roles/reactions
+		rr_list = self.settings.getServerStat(ctx.guild, "ReactionMessageList", [])
+		if not rr_list: return await ctx.send("There are no reaction roles setup currently.")
+		role_list = []
+		for x in rr_list:
+			role = ctx.guild.get_role(x["role_id"])
+			if not role: continue # Doesn't exist, ignore it
+			name = "{} ({})".format(role.name,role.id)
+			# Check if it's a custom emoji - and give the name, id, and a ping
+			if x["emoji_id"]:
+				emoji = self.bot.get_emoji(x["emoji_id"])
+				if emoji: value = "{} - `{}`".format(self._get_emoji_mention(x),self._get_emoji_mention(x))
+				else: value = "`{}` - Not from a shared server".format(self._get_emoji_mention(x))
+			else: value = x["emoji_name"]
+			role_list.append({"name":name,"value":value})
+		return await PickList.PagePicker(title="Current Reaction Roles",list=role_list,description=desc,ctx=ctx).pick()
+
 	@commands.command(pass_context=True)
 	async def urblock(self, ctx, *, member = None):
 		"""Blocks a user from using the UserRole system and removes applicable roles (bot-admin only)."""
@@ -256,6 +457,8 @@ class UserRole(commands.Cog):
 			await channel.send(usage)
 			return
 
+		rr_list = self.settings.getServerStat(ctx.guild, "ReactionMessageList", [])
+
 		if type(role) is str:
 			if role == "everyone":
 				role = "@everyone"
@@ -273,6 +476,9 @@ class UserRole(commands.Cog):
 				if aRole['Name'].lower() == role.lower():
 					# We found it - let's remove it
 					promoArray.remove(aRole)
+					# Also remove it from the rr_list
+					rr_list = [x for x in rr_list if x["role_id"] != int(aRole["ID"])]
+					self.settings.setServerStat(server, "ReactionMessageList", rr_list)
 					self.settings.setServerStat(server, "UserRoles", promoArray)
 					msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 					await channel.send(msg)
@@ -297,6 +503,9 @@ class UserRole(commands.Cog):
 					if str(aRole['ID']) == str(roleCheck.id):
 						# We found it - let's remove it
 						promoArray.remove(aRole)
+						# Also remove it from the rr_list
+						rr_list = [x for x in rr_list if x["role_id"] != roleCheck.id]
+						self.settings.setServerStat(server, "ReactionMessageList", rr_list)
 						self.settings.setServerStat(server, "UserRoles", promoArray)
 						msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 						await channel.send(msg)
@@ -320,6 +529,9 @@ class UserRole(commands.Cog):
 			if str(arole['ID']) == str(role.id):
 				# We found it - let's remove it
 				promoArray.remove(aRole)
+				# Also remove it from the rr_list
+				rr_list = [x for x in rr_list if x["role_id"] != role.id]
+				self.settings.setServerStat(server, "ReactionMessageList", rr_list)
 				self.settings.setServerStat(server, "UserRoles", promoArray)
 				msg = '**{}** removed successfully.'.format(Nullify.escape_all(aRole['Name']))
 				await channel.send(msg)
@@ -329,11 +541,11 @@ class UserRole(commands.Cog):
 		msg = '*{}* not found in list.'.format(Nullify.escape_all(role.name))
 		await channel.send(msg)
 
-	@removeuserrole.error
+	'''@removeuserrole.error
 	async def removeuserrole_error(self, ctx, error):
 		# do stuff
 		msg = 'removeuserrole Error: {}'.format(ctx)
-		await error.channel.send(msg)
+		await error.channel.send(msg)'''
 
 	@commands.command(pass_context=True)
 	async def listuserroles(self, ctx):
@@ -383,47 +595,8 @@ class UserRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def oneuserrole(self, ctx, *, yes_no = None):
 		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
-
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-
-		setting_name = "One user role at a time"
-		setting_val  = "OnlyOneUserRole"
-
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		if not await Utils.is_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"One user role at a time","OnlyOneUserRole",yes_no,True))
 
 	@commands.command(pass_context=True)
 	async def clearroles(self, ctx):
