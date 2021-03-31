@@ -218,6 +218,7 @@ class Help(commands.Cog):
 					cog_count
 				)
 			for command in cog_commands:
+				if command.hidden: continue
 				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.name + " " + command.signature)
 				cog_string += "{}  {}└─ {}\n".format(
 					"	"*tab_indent_count,
@@ -288,6 +289,7 @@ class Help(commands.Cog):
 					cog_count
 				)
 			for command in cog_commands:
+				if command.hidden: continue
 				cog_string += "{}  {}\n".format("	"*tab_indent_count, prefix + command.name + " " + command.signature)
 				cog_string += "{}  {}└─ {}\n".format(
 					"	"*tab_indent_count,
