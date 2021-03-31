@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -265,35 +265,31 @@ A list of cogs, commands, and descriptions:
 	   └─ Updates from git.
 
 ## Comic
-####	Comic Cog (14 commands) - Comic.py Extension:
-	  $calvin [date]
-	   └─ Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found.
+####	Comic Cog (12 commands) - Comic.py Extension:
 	  $cyanide [date]
-	   └─ Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if fo...
+	   └─ Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from ...
 	  $dilbert [date]
-	   └─ Displays the Dilbert comic for the passed date (MM-DD-YYYY).
+	   └─ Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 t...
 	  $garfield [date]
-	   └─ Displays the Garfield comic for the passed date (MM-DD-YYYY) if found.
+	   └─ Displays the Garfield comic for the passed date (MM-DD-YYYY) from 06-19-1978 ...
 	  $gmg [date]
-	   └─ Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) i...
+	   └─ Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) f...
 	  $peanuts [date]
-	   └─ Displays the Peanuts comic for the passed date (MM-DD-YYYY) if found.
-	  $randcalvin 
-	   └─ Randomly picks and displays a Calvin & Hobbes comic.
+	   └─ Displays the Peanuts comic for the passed date (MM-DD-YYYY) from 10-02-1950 t...
 	  $randcyanide 
-	   └─ Randomly picks and displays a Cyanide & Happiness comic.
+	   └─ Displays a random Cyanide & Happiness comic from 01-26-2005 to today.
 	  $randgarfield 
-	   └─ Randomly picks and displays a Garfield comic.
+	   └─ Displays a random Garfield comic from 06-19-1978 to today.
 	  $randgmg 
-	   └─ Randomly picks and displays a Garfield Minus Garfield comic.
-	  $randilbert 
-	   └─ Randomly picks and displays a Dilbert comic.
+	   └─ Displays a random Garfield Minus Garfield comic from 02-13-2008 to today.
+	  $randilbert [date]
+	   └─ Displays a random Dilbert comic from 04-16-1989 to today.
 	  $randpeanuts 
-	   └─ Randomly picks and displays a Peanuts comic.
+	   └─ Displays a random Peanuts comic from 10-02-1950 to today.
 	  $randxkcd 
-	   └─ Displays a random XKCD comic.
+	   └─ Displays a random XKCD comic from 01-01-2006 to today.
 	  $xkcd [date]
-	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if f...
+	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to t...
 
 ## DJRoles
 ####	DJRoles Cog (3 commands) - DJRoles.py Extension:
@@ -365,8 +361,6 @@ A list of cogs, commands, and descriptions:
 ####	EightBall Cog (1 command) - EightBall.py Extension:
 	  $eightball [question]
 	   └─ Get some answers.
-	  $lmap [question]
-	   └─ Let me ask Pooter...
 
 ## Emoji
 ####	Emoji Cog (2 commands) - Emoji.py Extension:
@@ -645,22 +639,26 @@ A list of cogs, commands, and descriptions:
 	   └─ List all tag in the tag list.
 
 ## Lockdown
-####	Lockdown Cog (8 commands) - Lockdown.py Extension:
+####	Lockdown Cog (10 commands) - Lockdown.py Extension:
 	  $addlock [channel_list]
 	   └─ Adds the passed space-delimited list of channels and categories to the lockdo...
 	  $addlockall 
 	   └─ Adds all channels and categories to the lockdown list (bot-admin only).
-	  $checklock 
-	   └─ Reports the number of configured channels that are locked down (bot-admin only).
+	  $antiraid [on_off] [join_number] [join_seconds] [kick_ban_mute] [cooldown_minutes]
+	   └─ Sets up the anti-raid module (bot-admin only).
+	  $antiraidping [user_or_role] [channel]
+	   └─ Sets up what user or role to ping and in what channel when anti-raid is activ...
 	  $listlock 
 	   └─ Lists the channels and categories configured for lockdown (bot-admin only).
-	  $lockdown 
+	  $listlockall 
+	   └─ Lists all channels and categories and their lockdown/sync status (bot-admin o...
+	  $lockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and revoke the send_message...
 	  $remlock [channel_list]
 	   └─ Removes the passed space-delimited list of channels and categories from the l...
 	  $remlockall 
 	   └─ Removes all channels and categories from the lockdown list (bot-admin only).
-	  $unlockdown 
+	  $unlockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and clear the send_message,...
 
 ## MadLibs
@@ -695,8 +693,6 @@ A list of cogs, commands, and descriptions:
 	   └─ Stops and disconnects the bot from voice.
 	  $loadpl [url]
 	   └─ Loads the passed playlist json data.  Accepts a url - or picks the first atta...
-	  $okbye 
-	   └─ Do you wanna build a snowman?
 	  $pause 
 	   └─ Pauses the currently playing song.
 	  $paused [moons]
@@ -914,6 +910,17 @@ A list of cogs, commands, and descriptions:
 	   └─ List up to 10 pending reminders - pass a user to see their reminders.
 	  $remindme [message] [endtime]
 	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
+
+## Responses
+####	Responses Cog (4 commands) - Responses.py Extension:
+	  $addresponse [regex_trigger] [response]
+	   └─ Adds a new response for the regex trigger.  If the trigger has spaces, it mus...
+	  $clearresponses 
+	   └─ Removes all response triggers (bot-admin only).
+	  $remresponse [regex_trigger_number]
+	   └─ Removes the passed response trigger (bot-admin only).
+	  $responses 
+	   └─ Lists the response triggers and their responses (bot-admin only).
 
 ## Search
 ####	Search Cog (8 commands) - Search.py Extension:
@@ -1182,7 +1189,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Gives a random word and its definition.
 
 ## UserRole
-####	UserRole Cog (11 commands) - UserRole.py Extension:
+####	UserRole Cog (17 commands) - UserRole.py Extension:
 	  $addrole [role]
 	   └─ Adds a role from the user role list to your roles.  You can have multiples at...
 	  $adduserrole [role]
@@ -1199,6 +1206,18 @@ A list of cogs, commands, and descriptions:
 	   └─ Removes a role from the user role system (admin only).
 	  $remrole [role]
 	   └─ Removes a role from the user role list from your roles.
+	  $rradd [role_name_or_id]
+	   └─ Adds a new role to the reaction roles list.
+	  $rrclear 
+	   └─ Removes the message to watch for user reaction roles, as well as all roles an...
+	  $rrdel [role_name_or_id]
+	   └─ Removes the passed role from the reaction roles list (bot-admin only).
+	  $rrlist 
+	   └─ Lists the current reaction roles and their corresponding reactions (bot-admin...
+	  $rrmessage [message_url]
+	   └─ Gets or sets the message to watch for user reaction roles (bot-admin only).
+	  $rrtoggle [yes_no]
+	   └─ Sets whether or not reaction messages will toggle roles - or only add them (b...
 	  $setrole [role]
 	   └─ Sets your role from the user role list.  You can only have one at a time.
 	  $urblock [member]
