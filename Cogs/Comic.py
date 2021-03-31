@@ -16,6 +16,16 @@ class Comic(commands.Cog):
 		self.settings = settings
 		self.max_tries = 10
 		self.comic_data = {
+			"calvin": {
+				"name": "Calvin & Hobbes",
+				"url": "https://www.gocomics.com/calvinandhobbes/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "11-18-1985",
+				"comic_url": [
+					{"find":'data-image="',"index":-1},
+					{"find":'"',"index":0}
+				]
+			},
 			"cyanide": {
 				"name": "Cyanide & Happiness",
 				"url": "https://explosm.net/comics/{}/",
@@ -245,6 +255,16 @@ class Comic(commands.Cog):
 			).edit(ctx,message)
 		comic_out["color"] = ctx.author
 		return await Message.EmbedText(**comic_out).edit(ctx,message)
+
+	@commands.command()
+	async def calvin(self, ctx, date=None):
+		"""Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) from 11-18-1985 to today if found."""
+		await self._display_comic(ctx, "calvin", date=date)
+
+	@commands.command()
+	async def randcalvin(self, ctx):
+		"""Displays a random Calvin & Hobbes comic from 11-18-1985 to today."""
+		await self._display_comic(ctx, "calvin", random=True)
 
 	@commands.command()
 	async def cyanide(self, ctx, date=None):
