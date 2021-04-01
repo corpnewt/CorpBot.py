@@ -22,11 +22,12 @@ class Quote(commands.Cog):
 		# Make sure we're in a guild, then gather member info
 		if not payload.guild_id: return
 		guild = self.bot.get_guild(payload.guild_id)
+		if not guild: return
 		member = guild.get_member(payload.user_id)
-		if member.bot: return
+		if not member or member.bot: return
 		# Make sure we're in the right channel
 		r_channel = self.settings.getServerStat(member.guild, "QuoteChannel")
-		if not r_channel or int(r_channel) != payload.channel_id: return # Not setup, or wrong channel
+		if not r_channel: return # Not setup, or wrong channel
 		# Gather the reaction - and make sure it's the same
 		r = self.settings.getServerStat(member.guild, "QuoteReaction")
 		if not r or str(payload.emoji) != r: return # Not setup, or wrong reaction
