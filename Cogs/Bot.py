@@ -512,23 +512,15 @@ class Bot(commands.Cog):
 
 	# Needs rewrite!
 	@commands.command(pass_context=True)
-	async def reboot(self, ctx, force = None):
+	async def reboot(self, ctx):
 		"""Reboots the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
 
-		quiet = False
-		if force and force.lower() == 'force':
-			quiet = True		
 		# Save the return channel and flush settings
 		self.settings.setGlobalStat("ReturnChannel",ctx.channel.id)
-		if not quiet:
-			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
-		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
-		if not quiet:
-			msg = 'Flushed settings to disk.\nRebooting...'
-			await message.edit(content=msg)
+		await ctx.invoke(self.settings.flush)
+		await ctx.send("Rebooting...")
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
@@ -545,33 +537,23 @@ class Bot(commands.Cog):
 		os._exit(2)
 
 	@commands.command(pass_context=True)
-	async def shutdown(self, ctx, force = None):
+	async def shutdown(self, ctx):
 		"""Shuts down the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
-
-		quiet = False
-		if force and force.lower() == 'force':
-			quiet = True
-		if not quiet:
-			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
-		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
-
-		if not quiet:
-			msg = 'Flushed settings to disk.\nShutting down...'
-			await message.edit(content=msg)
+		await ctx.invoke(self.settings.flush)
+		await ctx.send("Shutting down...")
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
 				task.cancel()
-			except Exception:
+			except:
 				continue
 		try:
 			await self.bot.logout()
 			self.bot.loop.stop()
 			self.bot.loop.close()
-		except Exception:
+		except:
 			pass
 		# Kill this process
 		os._exit(3)		
