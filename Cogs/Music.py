@@ -1116,7 +1116,7 @@ class Music(commands.Cog):
 
 		await ctx.invoke(self.leave)
 
-	@commands.command()
+	@commands.command(aliases=["disconnect"])
 	async def leave(self, ctx):
 		"""Stops and disconnects the bot from voice."""
 
