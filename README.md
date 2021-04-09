@@ -133,13 +133,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the playing status of the bot (owner-only).
 	  $pres [playing_type=0] [status_type=online] [game] [url]
 	   └─ Changes the bot's presence (owner-only).
-	  $reboot [force]
+	  $reboot 
 	   └─ Reboots the bot (owner only).
 	  $servers 
 	   └─ Lists the number of servers I'm connected to!
 	  $setbotparts [parts]
 	   └─ Set the bot's parts - can be a url, formatted text, or nothing to clear.
-	  $shutdown [force]
+	  $shutdown 
 	   └─ Shuts down the bot (owner only).
 	  $source 
 	   └─ Link the github source.
@@ -255,7 +255,9 @@ A list of cogs, commands, and descriptions:
 	   └─ Updates from git.
 
 ## Comic
-####	Comic Cog (12 commands) - Comic.py Extension:
+####	Comic Cog (14 commands) - Comic.py Extension:
+	  $calvin [date]
+	   └─ Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) from 11-1...
 	  $cyanide [date]
 	   └─ Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from ...
 	  $dilbert [date]
@@ -266,6 +268,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) f...
 	  $peanuts [date]
 	   └─ Displays the Peanuts comic for the passed date (MM-DD-YYYY) from 10-02-1950 t...
+	  $randcalvin 
+	   └─ Displays a random Calvin & Hobbes comic from 11-18-1985 to today.
 	  $randcyanide 
 	   └─ Displays a random Cyanide & Happiness comic from 01-26-2005 to today.
 	  $randgarfield 
@@ -679,7 +683,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Prints the current equalizer settings.
 	  $join [channel]
 	   └─ Joins a voice channel.
-	  $leave 
+	  $leave  (AKA: disconnect)
 	   └─ Stops and disconnects the bot from voice.
 	  $loadpl [url]
 	   └─ Loads the passed playlist json data.  Accepts a url - or picks the first atta...
