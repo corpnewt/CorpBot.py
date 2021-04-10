@@ -257,7 +257,7 @@ class Lists(commands.Cog):
 			return await ctx.send(msg)
 		# Sort by link name
 		items = [{"name":x["Name"],"value":x[l_key].split("\n")[0]+("..." if len(x[l_key].split("\n"))>1 else "")} for x in sorted(itemList, key=lambda x:x["Name"].lower())]
-		await PickList.PagePicker(title="Current {}s".format(l_name),list=items,ctx=ctx).pick()
+		return await PickList.PagePicker(title="Current {}s".format(l_name),list=items,ctx=ctx).pick()
 
 	async def _get_role(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		role = self.settings.getServerStat(ctx.message.guild, l_role)
