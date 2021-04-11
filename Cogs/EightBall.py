@@ -20,7 +20,7 @@ class EightBall(commands.Cog):
 
 		await ctx.invoke(self.eightball,question=question)
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["8ball"])
 	async def eightball(self, ctx, *, question = None):
 		"""Get some answers."""
 
