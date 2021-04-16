@@ -266,14 +266,14 @@ class Help(commands.Cog):
 					if comm.hidden: continue
 					hid = False
 					if comm.name in com_name_list: continue
-					com_name_list.append(comm.name)
+					com_name_list.extend([comm.name]+comm.aliases)
 				if not hid:
 					cog_name_list.append(cog)
 			
 			# Get cog list:
 			cog_match = FuzzySearch.search(command, cog_name_list)
 			com_match = FuzzySearch.search(command, com_name_list)
-			ali_match = FuzzySearch.search(command, ali_name_list)
+			# ali_match = FuzzySearch.search(command, ali_name_list)
 
 			# Build the embed
 			m = Message.Embed(force_pm=True,pm_after=25)
