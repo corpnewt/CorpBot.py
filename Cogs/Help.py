@@ -109,7 +109,6 @@ class Help(commands.Cog):
 			# Make sure there are non-hidden commands here
 			visible = [x for x in comms if not x.hidden]
 			disabled = len([x for x in visible if x.name in disabled_list])
-			print(cog,disabled)
 			if not len(visible): continue
 			# Add the name of each cog in the list
 			embed_list["fields"].append({
