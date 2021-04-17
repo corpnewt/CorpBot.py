@@ -779,8 +779,8 @@ class Hw(commands.Cog):
 		if not len(buildList):
 			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
 			return await ctx.send(msg)
-		items = [{"name":x["Name"]+(" (Main Build)" if x["Main"] else ""),"value":Utils.truncate_string(x["Hardware"])} for x in buildList]
-		return await PickList.PagePicker(title="{}'s Builds".format(DisplayName.name(member)),list=items,ctx=ctx).pick()
+		items = [{"name":"{}. {}".format(i,x["Name"]+(" (Main Build)" if x["Main"] else "")),"value":Utils.truncate_string(x["Hardware"])} for i,x in enumerate(buildList,start=1)]
+		return await PickList.PagePicker(title="{}'s Builds ({:,} total)".format(DisplayName.name(member),len(buildList)),list=items,ctx=ctx).pick()
 
 
 	@commands.command(pass_context=True)
