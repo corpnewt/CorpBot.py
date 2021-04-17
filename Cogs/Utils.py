@@ -103,3 +103,9 @@ class Utils(commands.Cog):
 		# Returns a list of valid urls from a passed message/context/string
 		message = message.content if isinstance(message,discord.Message) else message.message.content if isinstance(message,discord.ext.commands.Context) else str(message)
 		return [x.group(0) for x in re.finditer(self.url_regex,message)]
+
+	def truncate_string(self,value=None,limit=128,suffix="...",replace_newlines=True):
+		if not isinstance(value,str) : return value
+		# Truncates the string to the max chars passed
+		if replace_newlines: value = value.replace("\n"," ")
+		return (value[:limit-len(suffix)]+suffix) if len(value)>limit else value
