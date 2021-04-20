@@ -1,4 +1,4 @@
-version: "2.4" # We use v2.x for resource limit support with Docker Compose
+version: "2.1" # We use v2.x for resource limit support with Docker Compose
 
 services:
 
@@ -7,8 +7,8 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-      ## This can be used for building a Windows image instead
-      #dockerfile: docker/Dockerfile.win
+    #  ## This can be used for building a Windows image instead
+    #  #dockerfile: docker/Dockerfile.win
     env_file: ../.env ## Use a .env file at the root
     ## Alternatively you can comment out the
     ## `environment:` object below and use that instead of the .env file#
@@ -23,21 +23,24 @@ services:
       - corpbot_network
     volumes:
       - corpbot_data:/data
-    cpus: 0.5
-    mem_limit: 1024m
-    mem_reservation: 512m
+    # The following can be used to limit resource usage
+    # cpus: 0.5
+    # mem_limit: 1024m
+    # mem_reservation: 512m
 
-  ## NOTE: There is no publicly available Lavalink images for Windows,
-  ##       so it might be necessary to run it separately instead
+  # NOTE: There is no publicly available Lavalink images for Windows,
+  #       so it might be necessary to run it separately instead
   lavalink:
     image: 1conan/lavalink:latest
-    volumes:
-      - ${PWD}/lavalink.yaml:/config/application.yml
+    build:
+      context: .
+      dockerfile: Dockerfile.lavalink
     networks:
       - corpbot_network
-    cpus: 0.5
-    mem_limit: 1024m
-    mem_reservation: 512m
+    # The following can be used to limit resource usage
+    # cpus: 0.5
+    # mem_limit: 1024m
+    # mem_reservation: 512m
 
 networks:
   corpbot_network:

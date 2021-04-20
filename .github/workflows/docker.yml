@@ -19,7 +19,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Login to Docker Registry
         if: github.event_name != 'pull_request'
@@ -64,7 +64,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Login to Docker Registry
         if: github.event_name != 'pull_request'

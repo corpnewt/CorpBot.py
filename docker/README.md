@@ -14,6 +14,9 @@ This is a short document detailing the current status of the Docker images, incl
 
 #### Planned
 
+- [ ] Fix/update CI workflow to use new GH registry URL
+- [ ] Fix/update CI workflow to support Windows (if/when available)
+- [ ] ARM image support (CorpBot itself runs fine on ARM)
 - [ ] Redis support (redis branch)
 - [ ] MongoDB support (same deal)
 - [ ] Optimized, minimal image sizes (Alpine, multi-staged builds, Windows image needs special attention)
@@ -24,8 +27,8 @@ Create a `.env` file at the root of this project with the following environment 
 ```
 SETTINGS_DICT_PREFIX="<bot_prefix>"
 SETTINGS_DICT_TOKEN="<discord_bot_token>"
-SETTINGS_DICT_WEATHER="<weather_api_token>"
-SETTINGS_DICT_CURRENCY="<currency_api_token>"
+SETTINGS_DICT_WEATHER="<openweathermap_api_token>"
+SETTINGS_DICT_CURRENCY="<currencyconverter_api_token>"
 SETTINGS_DICT_SETTINGS_PATH="<path_to_settings.json>            (optional)
 SETTINGS_DICT_SETTINGS_BACKUP_PATH="<path_to_settings_backups>" (optional)
 SETTINGS_DICT_LAVALINK_HOST="<lavalink_hostname_or_ip>"         (optional)

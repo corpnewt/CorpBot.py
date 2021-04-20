@@ -1,5 +1,6 @@
 # Base the image on Python 3 running on Alpine
-FROM python:3.7.7-alpine
+# FROM python:3.9.4-alpine3.13
+FROM python:3.8.9-alpine3.13
 
 # Install base dependencies
 RUN apk add --update --no-cache \
@@ -17,7 +18,7 @@ RUN apk add --update --no-cache \
 RUN apk add --update --no-cache --virtual build-dependencies \
     alpine-sdk \
     linux-headers \
-    python-dev \
+    python3-dev \
     libffi-dev \
     libxml2-dev \
     zlib-dev \
@@ -50,7 +51,7 @@ ENV SETTINGS_DICT_TOKEN                ""
 ENV SETTINGS_DICT_WEATHER              ""
 ENV SETTINGS_DICT_CURRENCY             ""
 ENV SETTINGS_DICT_SETTINGS_PATH        "/data/Settings.json"
-ENV SETTINGS_DICT_SETTINGS_BACKUP_PATH "/data/Settings-Backup"
+ENV SETTINGS_DICT_SETTINGS_BACKUP_PATH "/data"
 ENV SETTINGS_DICT_LAVALINK_HOST        "lavalink"
 ENV SETTINGS_DICT_LAVALINK_REGION      "us_central"
 ENV SETTINGS_DICT_LAVALINK_PASSWORD    "youshallnotpass"
