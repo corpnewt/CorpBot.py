@@ -528,7 +528,7 @@ class Bot(commands.Cog):
 			except:
 				continue
 		try:
-			await self.bot.logout()
+			await self.bot.close()
 			self.bot.loop.stop()
 			self.bot.loop.close()
 		except:
@@ -550,7 +550,7 @@ class Bot(commands.Cog):
 			except:
 				continue
 		try:
-			await self.bot.logout()
+			await self.bot.close()
 			self.bot.loop.stop()
 			self.bot.loop.close()
 		except:
