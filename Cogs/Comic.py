@@ -1,905 +1,331 @@
-import asyncio
-import discord
-import random
-import time
+import discord, random, time
 import datetime as dt
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import GetImage
-from   Cogs import ComicHelper
-from   Cogs import DL
-from   Cogs import Message
+from discord.ext import commands
+from urllib.parse import unquote
+from html.parser import HTMLParser
+from Cogs import DL, Message
 
 def setup(bot):
-	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Comic(bot, settings))
 
-# This module will probably get comics... *finges crossed*
-
 class Comic(commands.Cog):
 
-	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-	
-	def getRandDateBetween(self, first, last):
-		# Takes two date strings "MM-DD-YYYY" and
-		# returns a dict of day, month, and year values
-		# from a random date between them
-		fDate = first.split("-")
-		fJDate = ComicHelper.date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
-		lDate = last.split("-")
-		lJDate = ComicHelper.date_to_jd(int(lDate[2]), int(lDate[0]), int(lDate[1]))
-		
-		# Get random Julian Date
-		randJDate = random.uniform(fJDate, lJDate)
-		
-		# Convert to gregorian
-		gDate = ComicHelper.jd_to_date(randJDate)
-		yea   = int(gDate[0])
-		mon   = int(gDate[1])
-		day   = int(gDate[2])
-		
-		# Make sure all months/days are double digits
-		if (int(mon) < 10):
-			mon = "0"+str(mon)
-		if (int(day) < 10):
-			day = "0"+str(day)
-		
-		# Build our dict and return it
-		newDate = { "Year" : str(yea), "Month" : str(mon), "Day" : str(day)}
-		return newDate
-		
-	
-	def dateDict(self, date):
-		# Takes a MM-DD-YYYY string or array
-		# and converts it to a dict
-		if type(date) == str:
-			# Split by "-"
-			date = date.split("-")
-		
-		yea   = int(date[2])
-		mon   = int(date[0])
-		day   = int(date[1])
-		# Make sure all months/days are double digits
-		if (int(mon) < 10):
-			mon = "0"+str(mon)
-		if (int(day) < 10):
-			day = "0"+str(day)
-		# Build our dict and return it
-		newDate = { "Year" : str(yea), "Month" : str(mon), "Day" : str(day)}
-		return newDate
-		
-		
-		
-	def isDateBetween(self, check, first, last):
-		# Takes three date strings "MM-DD-YYY" and
-		# returns whether the first is between the next two
-		fDate = first.split("-")
-		fJDate = ComicHelper.date_to_jd(int(fDate[2]), int(fDate[0]), int(fDate[1]))
-		lDate = last.split("-")
-		lJDate = ComicHelper.date_to_jd(int(lDate[2]), int(lDate[0]), int(lDate[1]))
-		cDate = check.split("-")
-		cJDate = ComicHelper.date_to_jd(int(cDate[2]), int(cDate[0]), int(cDate[1]))
-		
-		if cJDate <= lJDate and cJDate >= fJDate:
-			return True
+		self.max_tries = 10
+		self.comic_data = {
+			"calvin": {
+				"name": "Calvin & Hobbes",
+				"url": "https://www.gocomics.com/calvinandhobbes/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "11-18-1985",
+				"comic_url": [
+					{"find":'data-image="',"index":-1},
+					{"find":'"',"index":0}
+				]
+			},
+			"cyanide": {
+				"name": "Cyanide & Happiness",
+				"url": "https://explosm.net/comics/{}/",
+				"comic_number": True,
+				"first_date": 15,
+				"archive_url": "http://explosm.net/comics/archive/{}/{}",
+				"archive_keys": ["year","month"],
+				"latest_url": [
+					{"find":'id="comic-author">',"index":0},
+					{"find":'a href="/comics/',"index":-1},
+					{"find":'/"',"index":0}
+				],
+				"date_url": [
+					{"find":"{}.{}.{}","keys":["year","month","day"],"index":0},
+					{"find":'a href="/comics/',"index":-1},
+					{"find":'/"',"index":0}
+				],
+				"comic_url": [
+					{"find":'"main-comic" src="',"index":-1},
+					{"find":'"',"index":0}
+				],
+			},
+			"dilbert": {
+				"name": "Dilbert",
+				"url": "https://dilbert.com/strip/{}-{}-{}",
+				"keys": ["year","month","day"],
+				"first_date": "04-16-1989",
+				"comic_url": [
+					{"find":'data-image="',"index":-1},
+					{"find":'"',"index":0}
+				],
+				"comic_title": [
+					{"find":'data-title="',"index":-1},
+					{"find":'"',"index":0},
+					{"find":"Dilbert Comic for ","index":0}
+				]
+			},
+			"garfield": {
+				"name": "Garfield",
+				"url": "https://www.gocomics.com/garfield/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "06-19-1978",
+				"comic_url": [
+					{"find":'data-image="',"index":-1},
+					{"find":'"',"index":0}
+				]
+			},
+			"gmg": {
+				"name": "Garfield Minus Garfield",
+				"url": "https://garfieldminusgarfield.net/day/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "02-13-2008",
+				"comic_url": [
+					{"find":'<img src="',"index":-1},
+					{"find":'"',"index":0}
+				]
+			},
+			"peanuts": {
+				"name": "Peanuts",
+				"url": "https://www.gocomics.com/peanuts/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "10-02-1950",
+				"comic_url": [
+					{"find":'data-image="',"index":-1},
+					{"find":'"',"index":0}
+				]
+			},
+			"xkcd": {
+				"name": "XKCD",
+				"comic_number": True,
+				"first_date": 1,
+				"archive_url": "https://xkcd.com/archive/",
+				"latest_url": [
+					{"find":"<h1>Comics:</h1>","index":-1},
+					{"find":'a href="/',"index":1},
+					{"find":'/" title="',"index":0}
+				],
+				"date_url": [
+					{"find":'title="{}-{}-{}"',"keys":["year","month","day"],"index":0},
+					{"find":'a href="/',"index":-1},
+					{"find":'/"',"index":0}
+				],
+				"url": "https://xkcd.com/{}/",
+				"comic_url": [
+					{"find":"(for hotlinking/embedding): ","index":1},
+					{"find":"\n","index":0}
+				],
+				"comic_desc": [
+					{"find":'<div id="comic">',"index":-1},
+					{"find":'title="',"index":1},
+					{"find":'"',"index":0}
+				],
+				"comic_title": [
+					{"find":'<div id="comic">',"index":-1},
+					{"find":'alt="',"index":1},
+					{"find":'"',"index":0}
+				],
+				"padded": False
+			}
+		}
+
+	def _julian_day(self,gregorian_day):
+		# Takes a date string MM-DD-YYYY and returns the Julian day
+		M,D,Y = [int(x) for x in gregorian_day.split("-")]
+		return int(dt.date(Y,M,D).toordinal() + 1721424.5)
+
+	def _gregorian_day(self,julian_day):
+		# Takes a Julian day and returns MM-DD-YYYY in Gregorian
+		return dt.date.fromordinal(int(julian_day-1721424.5)).strftime("%m-%d-%Y")
+
+	def _date_dict(self,date,padded=True):
+		if isinstance(date,(int,float)):
+			date = self._gregorian_day(date)
+		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(x) for x in date.split("-")]
+		return {"month":m,"day":d,"year":y}
+
+	async def _get_last_comic_number(self,comic_data,date=None):
+		# Helper to return the highest comic number for a given comic and source html
+		date_dict = self._date_dict(dt.datetime.today().strftime("%m-%d-%Y") if date == None else date,padded=comic_data.get("padded",True))
+		try: 
+			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
+			archive_html = await DL.async_text(archive_url)
+		except:
+			return (None,None)
+		latest_comic = self._walk_replace(archive_html,comic_data["latest_url"])
+		if not latest_comic: return (None,None)
+		return (int(latest_comic),archive_html)
+
+	async def _get_random_comic(self,comic_data):
+		# Try to get a random comic between the first_date/last_date, or between custom indexes (XKCD)
+		latest_tuple = None
+		use_number = comic_data.get("comic_number",False)
+		if use_number:
+			# We're using numbers - not dates
+			latest_tuple = await self._get_last_comic_number(comic_data)
+			if latest_tuple[0] == None: return None # borken
+			first = comic_data["first_date"]
+			last  = latest_tuple[0]
 		else:
-			return False
-			
-	def dateIsValid(self, date : str = None):
-		# Checks if a passed date is a valid MM-DD-YYYY string
-		if not date:
-			# Auto to today's date
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-		try:
-			startDate = date.split("-")
-		except ValueError:
-			# Doesn't split by -?  Not valid
-			return False
-			
-		if len(startDate) < 3:
-			# Not enough values
-			return False
-			
-		for d in startDate:
+			# Using dates, organize them into julian days
+			first = self._julian_day(comic_data["first_date"])
+			last  = self._julian_day(comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")))
+		for x in range(self.max_tries):
+			# Generate a random date
+			date = random.randint(first,last)
+			if not use_number: date = self._gregorian_day(date)
+			comic = await self._get_comic(comic_data,date,latest_tuple)
+			if comic: return comic
+		return None
+
+	def _walk_replace(self,search_text,steps,key_dict=None):
+		text = search_text
+		for step in steps:
 			try:
-				int(d)
-			except ValueError:
-				return False
-		
-		return True
-		
-	def canDisplay(self, server):
-		# Check if we can display images
-		lastTime = int(self.settings.getServerStat(server, "LastPicture"))
-		threshold = int(self.settings.getServerStat(server, "PictureThreshold"))
-		if not GetImage.canDisplay( lastTime, threshold ):
-			# await channel.send('Too many images at once - please wait a few seconds.')
-			return False
-		
-		# If we made it here - set the LastPicture method
-		self.settings.setServerStat(server, "LastPicture", int(time.time()))
-		return True
+				if key_dict: text = text.split(step["find"].format(*[key_dict[x] for x in step.get("keys",[])]))[step["index"]]
+				else: text = text.split(step["find"])[step["index"]]
+			except: return None
+		return text
 
-	
-	def buildDilbertURL(self, date):
-		return "http://dilbert.com/strip/" + str(date['Year']) + "-" + str(date['Month']) + "-" + str(date['Day'])
-		
-	  # ####### #
-	 # Dilbert #
-	# ####### #
-	@commands.command(pass_context=True)
-	async def randilbert(self, ctx):
-		"""Randomly picks and displays a Dilbert comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Get some preliminary values
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "04-16-1989"
-
-		# Start a loop to find a comic
-		gotComic = False
-		tries = 0
-		while not gotComic:
-	
-			if tries >= 10:
-				break
-		
-			# Try to get a valid comic
-			date      = self.getRandDateBetween(firstDate, todayDate)
-			url       = self.buildDilbertURL(date)
-			imageHTML = await ComicHelper.getImageHTML(url)
-			
-			if imageHTML:
-				# Got it!
-				gotComic = True
-				
-			# Increment try counter
-			tries += 1	
-		
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-		
-		# Got a comic link
-		imageURL  = ComicHelper.getImageURL(imageHTML)
-		imageDisplayName = ComicHelper.getImageTitle(imageHTML)
-		if imageDisplayName.lower().startswith("dilbert comic for "):
-			d = imageDisplayName.split(" ")[-1].split("-")
-			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
-		
-		# Download Image
-		if not imageURL.lower().startswith("http"):
-			imageURL = "https:"+imageURL
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-		
-	@commands.command(pass_context=True)
-	async def dilbert(self, ctx, *, date : str = None):
-		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY)."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today's date
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}dilbert "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-		
-		# Can't be after this date
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "04-16-1989"
-		
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-		
-		# Build our url and check if it's valid
-		url       = self.buildDilbertURL(self.dateDict(date))
-		imageHTML = await ComicHelper.getImageHTML(url)
-		
-		if not imageHTML:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-			
-		# Got a comic link
-		imageURL  = ComicHelper.getImageURL(imageHTML)
-		imageDisplayName = ComicHelper.getImageTitle(imageHTML)
-		if imageDisplayName.lower().startswith("dilbert comic for "):
-			d = imageDisplayName.split(" ")[-1].split("-")
-			imageDisplayName = "Dilbert Comic for {}-{}-{}".format(d[1], d[2], d[0])
-		
-		# Download Image
-		if not imageURL.lower().startswith("http"):
-			imageURL = "https:"+imageURL
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-	  # #### #
-	 # XKCD #
-	# #### #
-	@commands.command(pass_context=True)
-	async def randxkcd(self, ctx):
-		"""Displays a random XKCD comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Must be a comic number
-		archiveURL = "http://xkcd.com/archive/"
-		archiveHTML = await ComicHelper.getImageHTML(archiveURL)
-		newest = int(ComicHelper.getNewestXKCD(archiveHTML))
-		
-		# Start a loop to find a comic
-		gotComic = False
-		tries = 0
-		while not gotComic:
-	
-			if tries >= 10:
-				break
-		
-			# Build our url
-			date = random.randint(1, newest)
-			comicURL = "http://xkcd.com/" + str(date) + "/"
-
-			# now we get the actual comic info
-			imageHTML = await ComicHelper.getImageHTML(comicURL)
-		
-			if imageHTML:
-				gotComic = True
-			
-			tries += 1
-			
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-		
-		# Got a comic link
-		imageURL = ComicHelper.getXKCDImageURL(imageHTML)
-		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
-		imageText = ComicHelper.getXKCDImageText(imageHTML)
-		title = '{} *({})*'.format(imageDisplayName, date)
-
-		# Download Image
-		await Message.Embed(title=title, image=imageURL, url=imageURL, description=imageText, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, title)
-
-
-	@commands.command(pass_context=True)
-	async def xkcd(self, ctx, *, date : str = None):
-		"""Displays the XKCD comic for the passed date (MM-DD-YYYY) or comic number if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today's date
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			# If it's an int - let's see if it fits
-			try:
-				date = int(date)
-			except:
-				msg = 'Usage: `{}xkcd "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-				await channel.send(msg)
-				return
-			# Must be a comic number
-			archiveURL = "http://xkcd.com/archive/"
-			archiveHTML = await ComicHelper.getImageHTML(archiveURL)
-			newest = int(ComicHelper.getNewestXKCD(archiveHTML))
-			if int(date) > int(newest) or int(date) < 1:
-				msg = "Comic out of range. Must be between 1 and {}".format(newest)
-				await channel.send(msg)
-				return
-			comicURL = "/" + str(date) + "/"
+	async def _get_comic(self,comic_data,date=None,latest_tuple=None):
+		# Attempts to retrieve the comic at the passed date
+		first_date = comic_data.get("first_date",None)
+		if first_date == None: return None # Malformed comic data - first date must be defined
+		if comic_data.get("comic_number",False):
+			# Gather the latest comic number and archive info
+			if latest_tuple: latest,archive_html = latest_tuple
+			else: latest,archive_html = await self._get_last_comic_number(comic_data, date if not isinstance(date,int) else None)
+			if latest == None: return None # Failed to get the info
+			date = latest if date == None else date # Set it to the latest if None
+			if not isinstance(date,int):
+				date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
+				# We have a date to check for
+				date = self._walk_replace(archive_html, comic_data["date_url"], date_dict)
+				if not date: return None
+				try: date = int(date)
+				except: pass
+			# We got a comic number - let's use that in our url
+			url = comic_data["url"].format(date)
 		else:
-			# Can't be after this date.
-			todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-			# Can't be before this date.
-			firstDate = "01-01-2006"
+			# Use today's date if none passed
+			date = dt.datetime.today().strftime("%m-%d-%Y") if date == None else date
+			# We're using date-oriented urls
+			last_date = comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")) # Last supplied date, or today
+			# Gather our julian days for comparison
+			first_julian,last_julian,date_julian = [self._julian_day(x) for x in (first_date,last_date,date)]
+			if not first_julian <= date_julian <= last_julian: return None # Out of our date range
+			# We have a valid date - let's format the url and gather the html
+			date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
+			url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
+		try: html = await DL.async_text(url, {'User-Agent': ''})
+		except: return None # Failed to get the HTML, bail
+		# Let's locate our comic by walking the search steps
+		comic_url = self._walk_replace(html, comic_data["comic_url"])
+		if not comic_url: return None
+		if comic_url.startswith("//"): comic_url = "https:"+comic_url
+		h = HTMLParser()
+		# Check if we need to get title text
+		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
+		if not comic_title: comic_title = comic_data["name"]
+		comic_title += " ({}{})".format("#" if isinstance(date,int) else "", date)
+		comic_title = h.unescape(unquote(comic_title))
+		# Check if we need to get a description
+		comic_desc = self._walk_replace(html, comic_data["comic_desc"]) if len(comic_data.get("comic_desc",[])) else None
+		comic_desc = h.unescape(unquote(comic_desc)) if comic_desc else None
+		return {"image":comic_url,"url":url,"title":comic_title,"description":comic_desc}
 
-			if not self.isDateBetween(date, firstDate, todayDate):
-				msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-				await channel.send(msg)
-				return
-			# Get date in a dict (Month, Day, Year)
-			dateDict = self.dateDict(date)
-			# Get URL
-			archiveURL = "http://xkcd.com/archive/"
-			archiveHTML = await ComicHelper.getImageHTML(archiveURL)
+	async def _display_comic(self, ctx, comic, date = None, random = False):
+		# Helper to display the comic, or post an error if there was an issue
+		message = await Message.EmbedText(
+			title="Locating comic...",
+			description="Feeling around in the dark trying to find a {} comic...".format(self.comic_data[comic]["name"]),
+			color=ctx.author
+		).send(ctx)
+		if random:
+			desc = "a random {} comic".format(self.comic_data[comic]["name"])
+			try: comic_out = await self._get_random_comic(self.comic_data[comic])
+			except: comic_out = None
+		else:
+			desc = "{} comic {}".format(self.comic_data[comic]["name"],date if isinstance(date,int) else "for today" if date==None else "for "+date)
+			try: comic_out = await self._get_comic(self.comic_data[comic],date)
+			except: comic_out = None
+		if not comic_out:
+			return await Message.EmbedText(
+				title=self.comic_data[comic]["name"]+" Error",
+				description="Could not get {} :(".format(desc),
+				color=ctx.author
+			).edit(ctx,message)
+		comic_out["color"] = ctx.author
+		return await Message.EmbedText(**comic_out).edit(ctx,message)
 
-			xkcdDate = "{}-{}-{}".format(int(dateDict['Year']), int(dateDict['Month']), int(dateDict['Day']))
-			comicURL = ComicHelper.getXKCDURL( archiveHTML, xkcdDate )
-		
-		if not comicURL:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-		
-		comicNumber = comicURL.replace('/', '').strip()
-		comicURL = "http://xkcd.com" + comicURL
+	@commands.command()
+	async def calvin(self, ctx, date=None):
+		"""Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) from 11-18-1985 to today if found."""
+		await self._display_comic(ctx, "calvin", date=date)
 
-		# now we get the actual comic info
-		imageHTML = await ComicHelper.getImageHTML(comicURL)
-		imageURL = ComicHelper.getXKCDImageURL(imageHTML)
-		imageText = ComicHelper.getXKCDImageText(imageHTML)
-		imageDisplayName = ComicHelper.getXKCDImageTitle(imageHTML)
-		title = '{} *({})*'.format(imageDisplayName, comicNumber)
-		# Download Image
-		await Message.Embed(title=title, image=imageURL, url=imageURL, color=ctx.author, description=imageText).send(ctx)
-		# await GetImage.get(ctx, imageURL, title)
-		
-		
-	  # ################### #
-	 # Cyanide & Happiness #	
-	# ################### #	
-		
-	@commands.command(pass_context=True)
-	async def randcyanide(self, ctx):
-		"""Randomly picks and displays a Cyanide & Happiness comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-		
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "01-26-2005"
-
-		# Get a random Julian date between the first comic and today
-		gotComic = False
-		tries = 0
-		while not gotComic:
-		
-			if tries >= 10:
-				break
-						
-			date = self.getRandDateBetween(firstDate, todayDate)
-
-			# Get Arvhive URL
-			getURL = "http://explosm.net/comics/archive/" + date['Year'] + "/" + date['Month']
-		
-			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL)
-			if imageHTML:
-				imagePage = ComicHelper.getCHURL(imageHTML, date['Year'] + "." + date['Month'] + "." + date['Day'])
-				if imagePage:
-					comicHTML = await ComicHelper.getImageHTML(imagePage)
-					if comicHTML:
-						imageURL  = ComicHelper.getCHImageURL( comicHTML )
-						if imageURL:
-							gotComic = True
-				
-			tries += 1
-			
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-			
-		imageDisplayName = "Cyanide & Happiness Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), url=imageURL.strip(), color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
-
-
-
-	@commands.command(pass_context=True)
-	async def cyanide(self, ctx, *, date : str = None):
-		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today's date
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}cyanide "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "01-26-2005"
-
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-
-		dateDict = self.dateDict(date)	
-		# Get Arvhive URL
-		getURL = "http://explosm.net/comics/archive/" + dateDict['Year'] + "/" + dateDict['Month']
-
-		gotComic = False
-		imageHTML = await ComicHelper.getImageHTML(getURL)
-		if imageHTML:
-			imagePage = ComicHelper.getCHURL(imageHTML, dateDict['Year'] + "." + dateDict['Month'] + "." + dateDict['Day'])
-			if imagePage:
-				comicHTML = await ComicHelper.getImageHTML(imagePage)
-				if comicHTML:
-					imageURL  = ComicHelper.getCHImageURL( comicHTML )
-					if imageURL:
-						gotComic = True
-		
-		if not gotComic:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-		
-		imageDisplayName = "Cyanide & Happiness Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL.strip(), url=imageURL.strip(), color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL.strip(), imageDisplayName)
-		
-		
-	  # ############### #
-	 # Calvin & Hobbes #
-	# ############### #
-	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def randcalvin(self, ctx):
-		"""Randomly picks and displays a Calvin & Hobbes comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
+		"""Displays a random Calvin & Hobbes comic from 11-18-1985 to today."""
+		await self._display_comic(ctx, "calvin", random=True)
 
-		# Can't be after this date.
-		todayDate = "12-31-1995"
-		# Can't be before this date.
-		firstDate = "11-18-1985"
+	@commands.command()
+	async def cyanide(self, ctx, date=None):
+		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
+		try: date = int(date)
+		except: pass
+		await self._display_comic(ctx, "cyanide", date=date)
 
-		gotComic = False
-		tries = 0
-		while not gotComic:
-		
-			if tries >= 10:
-				break
-						
-			date = self.getRandDateBetween(firstDate, todayDate)
-			# Get URL
-			# getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + date['Year'] + "/" + date['Month'] + "/" + date['Year'] + date['Month'] + date['Day'] + ".gif"
-			getURL = "http://downloads.esbasura.com/comics/Calvin%20and%20Hobbes/" + date["Year"] + "/" + "ch" + date["Year"][2:] + date["Month"] + date["Day"] + ".gif"
+	@commands.command()
+	async def randcyanide(self, ctx):
+		"""Displays a random Cyanide & Happiness comic from 01-26-2005 to today."""
+		await self._display_comic(ctx, "cyanide", random=True)
 
-			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL.strip(), "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-		
-			if imageHTML:
-				imageURL  = getURL
-				gotComic = True
-				
-			tries += 1
-			
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-			
-		imageDisplayName = "Calvin & Hobbes Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
+	@commands.command()
+	async def dilbert(self, ctx, date=None):
+		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 to today if found."""
+		await self._display_comic(ctx, "dilbert", date=date)
 
+	@commands.command()
+	async def randilbert(self, ctx, date=None):
+		"""Displays a random Dilbert comic from 04-16-1989 to today."""
+		await self._display_comic(ctx, "dilbert", random=True)
 
+	@commands.command()
+	async def garfield(self, ctx, date=None):
+		"""Displays the Garfield comic for the passed date (MM-DD-YYYY) from 06-19-1978 to today if found."""
+		await self._display_comic(ctx, "garfield", date=date)
 
-	@commands.command(pass_context=True)
-	async def calvin(self, ctx, *, date : str = None):
-		"""Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to the last Calvin & Hobbes comic
-			date = "12-31-1995"
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}calvin "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# Can't be after this date.
-		todayDate = "12-31-1995"
-		# Can't be before this date.
-		firstDate = "11-18-1985"
-
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-
-		dateDict = self.dateDict(date)
-		# Get URL
-		# getURL = "http://marcel-oehler.marcellosendos.ch/comics/ch/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Year'] + dateDict['Month'] + dateDict['Day'] + ".gif"
-		getURL = "http://downloads.esbasura.com/comics/Calvin%20and%20Hobbes/" + dateDict["Year"] + "/" + "ch" + dateDict["Year"][2:] + dateDict["Month"] + dateDict["Day"] + ".gif"
-
-		# Retrieve html and info
-		imageHTML = await ComicHelper.getImageHTML(getURL, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-		
-		if not imageHTML:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-
-		imageDisplayName = "Calvin & Hobbes Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=getURL, url=getURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, getURL, imageDisplayName)
-		
-		
-	  # ####################### #
-	 # Garfield Minus Garfield #
-	# ####################### #
-	
-	@commands.command(pass_context=True)
-	async def randgmg(self, ctx):
-		"""Randomly picks and displays a Garfield Minus Garfield comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "02-13-2008"
-
-		# Get a random Julian date between the first comic and today
-		gotComic = False
-		tries = 0
-		while not gotComic:
-		
-			if tries >= 10:
-				break
-				
-			date = self.getRandDateBetween(firstDate, todayDate)
-			# Get URL
-			getURL = "http://garfieldminusgarfield.net/day/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
-			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-			if imageHTML:
-				imageURL  = ComicHelper.getGMGImageURL(imageHTML)
-				if imageURL:
-					gotComic = True
-				
-			tries += 1
-
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-		
-		imageDisplayName = "Garfield Minus Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-
-
-
-	@commands.command(pass_context=True)
-	async def gmg(self, ctx, *, date : str = None):
-		"""Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}gmg "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "02-13-2008"
-
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-
-		dateDict = self.dateDict(date)
-
-		# Get URL
-		getURL = "http://garfieldminusgarfield.net/day/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
-		
-		# Retrieve html and info
-		imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-		# Comment out to test
-		'''if imageHTML == None:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return'''
-		
-		imageURL  = ComicHelper.getGMGImageURL(imageHTML)
-
-		if not imageURL:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-
-		imageDisplayName = "Garfield Minus Garfield Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-		
-	  # ######## #
-	 # Garfield #
-	# ######## #
-		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def randgarfield(self, ctx):
-		"""Randomly picks and displays a Garfield comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
+		"""Displays a random Garfield comic from 06-19-1978 to today."""
+		await self._display_comic(ctx, "garfield", random=True)
 
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "06-19-1978"
+	@commands.command()
+	async def gmg(self, ctx, date=None):
+		"""Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) from 02-13-2008 to today if found."""
+		await self._display_comic(ctx, "gmg", date=date)
 
-		# Get a random Julian date between the first comic and today
-		gotComic = False
-		tries = 0
-		while not gotComic:
-		
-			if tries >= 10:
-				break
-				
-			date = self.getRandDateBetween(firstDate, todayDate)
-			# Get URL
-			getURL = "https://garfield.com/comic/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
-			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-			if imageHTML:
-				imageURL  = ComicHelper.getGImageURL(imageHTML)
-				if imageURL:
-					gotComic = True
-				
-			tries += 1
+	@commands.command()
+	async def randgmg(self, ctx):
+		"""Displays a random Garfield Minus Garfield comic from 02-13-2008 to today."""
+		await self._display_comic(ctx, "gmg", random=True)
 
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-		
-		imageDisplayName = "Garfield Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-	@commands.command(pass_context=True)
-	async def garfield(self, ctx, *, date : str = None):
-		"""Displays the Garfield comic for the passed date (MM-DD-YYYY) if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}garfield "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
+	@commands.command()
+	async def peanuts(self, ctx, date=None):
+		"""Displays the Peanuts comic for the passed date (MM-DD-YYYY) from 10-02-1950 to today if found."""
+		await self._display_comic(ctx, "peanuts", date=date)
 
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "06-19-1978"
-
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-
-		dateDict = self.dateDict(date)
-
-		# Get URL
-		getURL = "https://garfield.com/comic/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
-		
-		# Retrieve html and info
-		imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-		# Comment out to test
-		'''if imageHTML == None:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return'''
-		
-		imageURL  = ComicHelper.getGImageURL(imageHTML)
-
-		if not imageURL:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-
-		imageDisplayName = "Garfield Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-		
-	  # ####### #	
-	 # Peanuts #
-	# ####### #
-	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def randpeanuts(self, ctx):
-		"""Randomly picks and displays a Peanuts comic."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
+		"""Displays a random Peanuts comic from 10-02-1950 to today."""
+		await self._display_comic(ctx, "peanuts", random=True)
 
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "10-02-1950"
+	@commands.command()
+	async def xkcd(self, ctx, date=None):
+		"""Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to today or comic number if found."""
+		try: date = int(date)
+		except: pass
+		await self._display_comic(ctx, "xkcd", date=date)
 
-		# Get a random Julian date between the first comic and today
-		gotComic = False
-		tries = 0
-		while not gotComic:
-		
-			if tries >= 10:
-				break
-				
-			date = self.getRandDateBetween(firstDate, todayDate)
-			# Get URL
-			getURL = "http://www.gocomics.com/peanuts/" + date['Year'] + "/" + date['Month'] + "/" + date['Day']
-			# Retrieve html and info
-			imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-			if imageHTML:
-				imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
-				if imageURL:
-					gotComic = True
-				
-			tries += 1
-
-		if tries >= 10:
-			msg = 'Failed to find working link.'
-			await channel.send(msg)
-			return
-		
-		imageDisplayName = "Peanuts Comic for " + date['Month'] + "-" + date['Day'] + "-" + date['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
-		
-	@commands.command(pass_context=True)
-	async def peanuts(self, ctx, *, date : str = None):
-		"""Displays the Peanuts comic for the passed date (MM-DD-YYYY) if found."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		
-		if not self.canDisplay(server):
-			return
-			
-		if not date:
-			# Auto to today
-			date = dt.datetime.today().strftime("%m-%d-%Y")
-			
-		if not self.dateIsValid(date):
-			msg = 'Usage: `{}peanuts "[date MM-DD-YYYY]"`'.format(ctx.prefix)
-			await channel.send(msg)
-			return
-
-		# Can't be after this date.
-		todayDate = dt.datetime.today().strftime("%m-%d-%Y")
-		# Can't be before this date.
-		firstDate = "10-02-1950"
-
-		if not self.isDateBetween(date, firstDate, todayDate):
-			msg = "Date out of range. Must be between {} and {}".format(firstDate, todayDate)
-			await channel.send(msg)
-			return
-
-		dateDict = self.dateDict(date)
-
-		# Get URL
-		getURL = "http://www.gocomics.com/peanuts/" + dateDict['Year'] + "/" + dateDict['Month'] + "/" + dateDict['Day']
-		
-		# Retrieve html and info
-		imageHTML = await ComicHelper.getImageHTML(getURL)
-		
-		# Comment out to test
-		'''if imageHTML == None:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return'''
-		
-		imageURL  = ComicHelper.getPeanutsImageURL(imageHTML)
-
-		if not imageURL:
-			msg = 'No comic found for *{}*'.format(date)
-			await channel.send(msg)
-			return
-
-		imageDisplayName = "Peanuts Comic for " + dateDict['Month'] + "-" + dateDict['Day'] + "-" + dateDict['Year']
-		# Download Image
-		await Message.Embed(title=imageDisplayName, image=imageURL, url=imageURL, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, imageURL, imageDisplayName)
+	@commands.command()
+	async def randxkcd(self, ctx):
+		"""Displays a random XKCD comic from 01-01-2006 to today."""
+		await self._display_comic(ctx, "xkcd", random=True)

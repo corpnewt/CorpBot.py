@@ -38,13 +38,6 @@ class Strike(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
-
 	async def onjoin(self, member, server):
 		# Check id against the kick and ban list and react accordingly
 		kickList = self.settings.getServerStat(server, "KickList")
@@ -211,9 +204,9 @@ class Strike(commands.Cog):
 				cooldownFinal = currentTime+86400
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 				if message:
-					mutemessage = 'You have been muted in *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
+					mutemessage = 'You have been muted in *{}*.\nThe Reason:\n{}'.format(Nullify.escape_all(ctx.guild.name), message)
 				else:
-					mutemessage = 'You have been muted in *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
+					mutemessage = 'You have been muted in *{}*.'.format(Nullify.escape_all(ctx.guild.name))
 				# Check if already muted
 				alreadyMuted = self.settings.getUserStat(member, ctx.message.guild, "Muted")
 				if alreadyMuted:
@@ -224,9 +217,9 @@ class Strike(commands.Cog):
 							self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
 							timeRemains = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
 							if message:
-								mutemessage = 'Your muted time in *{}* has been extended to *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), timeRemains, message)
+								mutemessage = 'Your muted time in *{}* has been extended to *{}*.\nThe Reason:\n{}'.format(Nullify.escape_all(ctx.guild.name), timeRemains, message)
 							else:
-								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name), timeRemains)
+								mutemessage = 'You muted time in *{}* has been extended to *{}*.'.format(Nullify.escape_all(ctx.guild.name), timeRemains)
 				else:
 					self.settings.setUserStat(member, ctx.message.guild, "Muted", True)
 					self.settings.setUserStat(member, ctx.message.guild, "Cooldown", cooldownFinal)
@@ -239,9 +232,9 @@ class Strike(commands.Cog):
 					kickList.append(str(member.id))
 					self.settings.setServerStat(ctx.message.guild, "KickList", kickList)
 				if message:
-					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
+					kickmessage = 'You have been kicked from *{}*.\nThe Reason:\n{}'.format(Nullify.escape_all(ctx.guild.name), message)
 				else:
-					kickmessage = 'You have been kicked from *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
+					kickmessage = 'You have been kicked from *{}*.'.format(Nullify.escape_all(ctx.guild.name))
 				await member.send(kickmessage)
 				await ctx.guild.kick(member)
 			else:
@@ -250,9 +243,9 @@ class Strike(commands.Cog):
 					banList.append(str(member.id))
 					self.settings.setServerStat(ctx.message.guild, "BanList", banList)
 				if message:
-					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(self.suppressed(ctx.guild, ctx.guild.name), message)
+					banmessage = 'You have been banned from *{}*.\nThe Reason:\n{}'.format(Nullify.escape_all(ctx.guild.name), message)
 				else:
-					banmessage = 'You have been banned from *{}*.'.format(self.suppressed(ctx.guild, ctx.guild.name))
+					banmessage = 'You have been banned from *{}*.'.format(Nullify.escape_all(ctx.guild.name))
 				await member.send(banmessage)
 				await ctx.guild.ban(member)
 			self.settings.incrementStat(member, ctx.message.guild, "StrikeLevel", 1)
@@ -282,20 +275,11 @@ class Strike(commands.Cog):
 		if member == None:
 			member = ctx.message.author
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 			
@@ -392,20 +376,11 @@ class Strike(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 		
@@ -452,12 +427,6 @@ class Strike(commands.Cog):
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		usage = 'Usage: `{}setstrikelevel [member] [strikelevel]`'.format(ctx.prefix)
 
 		if member == None:
@@ -474,10 +443,7 @@ class Strike(commands.Cog):
 					await ctx.channel.send(usage)
 					return
 				if not nameCheck["Member"]:
-					msg = 'I couldn\'t find *{}* on the server.'.format(member)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
 					await ctx.channel.send(msg)
 					return
 				member      = nameCheck["Member"]
@@ -515,20 +481,11 @@ class Strike(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 		msg = ''
@@ -565,20 +522,11 @@ class Strike(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 		msg = ''
@@ -616,20 +564,11 @@ class Strike(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 		msg = ''
@@ -666,20 +605,11 @@ class Strike(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 		msg = ''
@@ -700,20 +630,11 @@ class Strike(commands.Cog):
 		if member == None:
 			member = ctx.message.author
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 
@@ -730,20 +651,11 @@ class Strike(commands.Cog):
 		if member == None:
 			member = ctx.message.author
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.channel.send(msg)
 				return
 

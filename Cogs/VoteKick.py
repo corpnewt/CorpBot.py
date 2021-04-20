@@ -95,7 +95,7 @@ class VoteKick(commands.Cog):
 		vote_list  = self.settings.getServerStat(ctx.guild, "VoteKickArray")
 		vote_anon  = self.settings.getServerStat(ctx.guild, "VoteKickAnon")
 
-		msg = "__**Current Vote-Kick Settings For {}:**__\n```\n".format(Nullify.clean(ctx.guild.name))
+		msg = "__**Current Vote-Kick Settings For {}:**__\n```\n".format(Nullify.escape_all(ctx.guild.name))
 
 		msg += "   Votes To Mute: {}\n".format(int(mute_votes))
 		msg += "       Muted For: {}\n".format(ReadableTime.getReadableTimeBetween(0, mute_time))
@@ -160,11 +160,11 @@ class VoteKick(commands.Cog):
 			return
 		current_role = DisplayName.roleForName(current_id, ctx.guild)
 		if current_role:
-			await ctx.send("The current role to mention is *{}*.".format(Nullify.clean(current_role.name)))
+			await ctx.send("The current role to mention is *{}*.".format(Nullify.escape_all(current_role.name)))
 			return
 		current_user = DisplayName.memberForName(current_id, ctx.guild)
 		if current_user:
-			await ctx.send("The current user to mention is *{}*.".format(Nullify.clean(DisplayName.name(current_user))))
+			await ctx.send("The current user to mention is *{}*.".format(DisplayName.name(current_user)))
 			return
 		await ctx.send("The current id ({}) does not match any users or roles - please consider updating this setting.".format(current_id))
 
@@ -192,14 +192,14 @@ class VoteKick(commands.Cog):
 		check_role = DisplayName.roleForName(user_or_role, ctx.guild)
 		if check_role:
 			self.settings.setServerStat(ctx.guild, "VoteKickMention", check_role.id)
-			await ctx.send("Vote kick will now mention the *{}* role.".format(Nullify.clean(check_role.name)))
+			await ctx.send("Vote kick will now mention the *{}* role.".format(Nullify.escape_all(check_role.name)))
 			return
 		check_user = DisplayName.memberForName(user_or_role, ctx.guild)
 		if check_user:
 			self.settings.setServerStat(ctx.guild, "VoteKickMention", check_user.id)
-			await ctx.send("Vote kick will now mention *{}.*".format(Nullify.clean(DisplayName.name(check_user))))
+			await ctx.send("Vote kick will now mention *{}.*".format(DisplayName.name(check_user)))
 			return
-		await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user_or_role)))
+		await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(user_or_role)))
 
 	@commands.command(pass_context=True)
 	async def vktomute(self, ctx, *, number_of_votes = None):
@@ -339,7 +339,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "VoteKickChannel", check_channel.id)
 			await ctx.send("Vote kick will now be mentioned in *{}.*".format(check_channel.mention))
 			return
-		await ctx.send("I couldn't find *{}*...".format(Nullify.clean(channel)))
+		await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(channel)))
 
 	@commands.command(pass_context=True)
 	async def vkmutetime(self, ctx, *, the_time = None):
@@ -528,12 +528,11 @@ class VoteKick(commands.Cog):
 			await ctx.send("You're not a member of that server!")
 			return
 
-		server_msg = " in **{}**".format(guild.name) if guild != ctx.guild else ""
+		server_msg = " in **{}**".format(Nullify.escape_all(guild.name)) if guild != ctx.guild else ""
 
 		check_user = DisplayName.memberForName(user, guild)
 		if not check_user:
-			await ctx.send("I couldn't find *{}*{}...".format(Nullify.clean(user), server_msg))
-
+			await ctx.send("I couldn't find *{}*{}...".format(Nullify.escape_all(user), server_msg))
 			return
 
 		mute_votes = self.settings.getServerStat(guild, "VotesToMute")
@@ -619,7 +618,7 @@ class VoteKick(commands.Cog):
 
 		check_user = DisplayName.memberForName(user, ctx.guild)
 		if not check_user:
-			await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user)))
+			await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(user)))
 			return
 
 		vote_list = self.settings.getServerStat(ctx.guild, "VoteKickArray")
@@ -652,7 +651,7 @@ class VoteKick(commands.Cog):
 
 		check_user = DisplayName.memberForName(user, ctx.guild)
 		if not check_user:
-			await ctx.send("I couldn't find *{}*...".format(Nullify.clean(user)))
+			await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(user)))
 			return
 
 		vote_list = self.settings.getServerStat(ctx.guild, "VoteKickArray")

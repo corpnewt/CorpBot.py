@@ -14,7 +14,13 @@ class EightBall(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command(pass_context=True)
+	@commands.command(hidden=True)
+	async def lmap(self, ctx, *, question = None):
+		"""Let me ask Pooter..."""
+
+		await ctx.invoke(self.eightball,question=question)
+
+	@commands.command(aliases=["8ball"])
 	async def eightball(self, ctx, *, question = None):
 		"""Get some answers."""
 

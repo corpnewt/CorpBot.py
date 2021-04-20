@@ -1,6 +1,7 @@
 import asyncio, discord, base64, binascii, re, math, shutil, tempfile, os
 from   discord.ext import commands
-from   Cogs import Nullify, DL
+from   Cogs import Utils, DL, Message, Nullify
+from   PIL import Image
 
 def setup(bot):
 	# Add the bot and deps
@@ -14,13 +15,8 @@ class Encode(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
+		global Utils
+		Utils = self.bot.get_cog("Utils")
 
 	async def download(self, url):
 		url = url.strip("<>")
@@ -54,8 +50,11 @@ class Encode(commands.Cog):
 	def _to_bytes(self, in_string):
 		return in_string.encode('utf-8')
 	
-	def _to_string(self, in_bytes):
-		return in_bytes.decode('utf-8')
+	def _to_string(self, in_bytes, split_hex = 0):
+		out_str = in_bytes.decode("utf-8")
+		if split_hex>0: # Break into chunks of split_hex size
+			out_str = " ".join((out_str[0+i:split_hex+i] for i in range(0, len(out_str), split_hex))).upper()
+		return out_str
 
 	# Check hex value
 	def _check_hex(self, hex_string):
@@ -85,6 +84,7 @@ class Encode(commands.Cog):
 		return self._to_string(ascii_bytes)
 
 	def _base64_to_ascii(self, base64_string):
+		if len(base64_string) % 4: base64_string+="="*(4-(len(base64_string)%4))
 		base64_bytes  = self._to_bytes(base64_string)
 		ascii_bytes   = base64.b64decode(base64_bytes)
 		return self._to_string(ascii_bytes)
@@ -93,21 +93,28 @@ class Encode(commands.Cog):
 	def _ascii_to_hex(self, ascii_string):
 		ascii_bytes = self._to_bytes(ascii_string)
 		hex_bytes   = binascii.hexlify(ascii_bytes)
-		return self._to_string(hex_bytes)
+		return self._to_string(hex_bytes,split_hex=8)
 
 	def _base64_to_hex(self, base64_string):
-		b64_string = self._to_bytes(base64_string)
+		if len(base64_string) % 4: base64_string+="="*(4-(len(base64_string)%4))
+		b64_string   = self._to_bytes(base64_string)
 		base64_bytes = base64.b64decode(b64_string)
 		hex_bytes    = binascii.hexlify(base64_bytes)
-		return self._to_string(hex_bytes)
+		return self._to_string(hex_bytes,split_hex=8)
 
 	def _rgb_to_hex(self, r, g, b):
-		return '#%02x%02x%02x' % (r, g, b)
+		return "#{:02x}{:02x}{:02x}".format(r,g,b).upper()
 
 	def _hex_to_rgb(self, _hex):
-		_hex = _hex.replace("#", "")
+		_hex = _hex.lower().replace("#", "").replace("0x","")
 		l_hex = len(_hex)
 		return tuple(int(_hex[i:i + l_hex // 3], 16) for i in range(0, l_hex, l_hex // 3))
+
+	def _hex_to_cmyk(self, _hex):
+		return self._rgb_to_cmyk(*self._hex_to_rgb(_hex))
+
+	def _cmyk_to_hex(self, c, m, y, k):
+		return self._rgb_to_hex(*self._cmyk_to_rgb(c,m,y,k))
 
 	def _cmyk_to_rgb(self, c, m, y, k):
 		c, m, y, k = [float(x)/100.0 for x in tuple([c, m, y, k])]
@@ -118,6 +125,8 @@ class Encode(commands.Cog):
 		min_cmy = min(c, m, y)
 		return tuple([0,0,0,100]) if all(x == 0 for x in [r, g, b]) else tuple([round(x*100) for x in [(x - min_cmy) / (1 - min_cmy) for x in tuple([c, m, y])] + [min_cmy]])
 
+	def _hex_int_to_tuple(self, _hex):
+		return (_hex >> 16 & 0xFF, _hex >> 8 & 0xFF, _hex & 0xFF)
 
 	@commands.command()
 	async def color(self, ctx, *, value = None):
@@ -128,94 +137,62 @@ class Encode(commands.Cog):
 		Example usage:
 		color #3399cc
 		color rgb(3, 4, 5)
+		color cmyk(1, 2, 3, 4)
+		color 0xFF00FF
 		"""
-		if not value:
-			await ctx.send("Usage: `{}color [value]`".format(ctx.prefix))
-			return
-
-		value = value.lower()
-		
-		if not any(value.startswith(x) for x in ["#", "rgb", "cmyk"]):
-			await ctx.send("Invalid value color format, please choose from rgb, cmyk or hex")
-			return
-
-		error = False
-
-		if value.startswith('rgb'):
-			count = value.count('(') + value.count(')') + value.count(',')
-			if count != 4:
-				error = True
-
-			number_list = value.lower().replace("rgb", "").replace("(", "").replace(")", "").replace(" ", "")
-			try:
-				r, g, b = map(int, number_list.split(','))
-
-				if (r < 0 or r > 255) or (g < 0 or g > 255) or (b < 0 or b > 255):
-					error = True
-
-			except:
-				error = True
-
-			if error:
-				await ctx.send("Invalid RGB color format!")
-				return
-			
-			_hex = self._rgb_to_hex(r,g,b)
-			c, m, y, k = self._rgb_to_cmyk(r, g, b)
-			
-			embed_color = int("0x{}".format(_hex.replace("#", '')), 16)
-			embed = discord.Embed(color=embed_color)
-
-			embed.title = "Color {}".format(value.replace(" ", ""))
-			embed.add_field(name="Hex", value=_hex)
-			embed.add_field(name="CMYK", value="cmyk({}, {}, {}, {})".format(c, m, y, k))
-				
-		elif value.startswith('#'):
-			match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value)
-			if not match:
-				await ctx.send("Invalid Hex color format!")
-				return
-
-			embed_color = int("0x{}".format(value.replace('#', '')), 16)
-			embed = discord.Embed(color=embed_color)
-			r, g, b = self._hex_to_rgb(value)
-			c, m, y, k = self._rgb_to_cmyk(r, g, b)
-
-			embed.title = "Color {}".format(value.replace(" ", ""))
-			embed.add_field(name="RGB", value="rgb({}, {}, {})".format(r, g, b))
-			embed.add_field(name="CMYK", value="cmyk({}, {}, {}, {})".format(c, m, y, k))
-
-		elif value.startswith('cmyk'):
-			count = value.count('(') + value.count(')') + value.count(',')
-			if count != 5:
-				error = True
-
-			number_list = value.lower().replace("cmyk", "").replace("(", "").replace(")", "").replace(" ", "")
-
-			try:
-				c, m, y, k = map(int, number_list.split(','))
-
-				if (c < 0 or c > 255) or (m < 0 or m > 255) or (y < 0 or y > 255) or (k < 0 or k > 255):
-					error = True
-
-			except:
-				error = True
-			
-			if error:
-				await ctx.send("Invalid CMYK color format!")
-				return
-	
-			r, g, b = self._cmyk_to_rgb(c, m, y, k)
-			_hex = self._rgb_to_hex(r, g, b)
-
-			embed_color = int("0x{}".format(_hex.replace("#", '')), 16)
-			embed = discord.Embed(color=embed_color)
-
-			embed.title = "Color {}".format(value.replace(" ", ""))
-			embed.add_field(name="Hex", value=_hex)
-			embed.add_field(name="RGB", value="rgb({}, {}, {})".format(r, g, b))
-
-		await ctx.send(embed=embed)
+		if not value: return await ctx.send("Usage: `{}color [value]`".format(ctx.prefix))
+		# Let's replace commas, and parethesis with spaces, then split on whitespace
+		values = value.replace(","," ").replace("("," ").replace(")"," ").replace("%"," ").split()
+		color_values  = []
+		for x in values:
+			if x.lower().startswith(("0x","#")) or any((y in x.lower() for y in "abcdef")):
+				# We likely have a hex value
+				try: color_values.append(int(x.lower().replace("#","").replace("0x",""),16))
+				except: pass # Bad value - ignore
+			else:
+				# Try to convert it to an int
+				try: color_values.append(int(x))
+				except: pass # Bad value - ignore
+		original_type = "hex" if len(color_values) == 1 else "rgb" if len(color_values) == 3 else "cmyk" if len(color_values) == 4 else None
+		if original_type == None: return await ctx.send("Incorrect number of color values!  Hex takes 1, RGB takes 3, CMYK takes 4.")
+		# Verify values
+		max_val = int("FFFFFF",16) if original_type == "hex" else 255 if original_type == "rgb" else 100
+		if not all((0 <= x <= max_val for x in color_values)):
+			return await ctx.send("Value out of range!  Valid ranges are from `#000000` to `#FFFFFF` for Hex, `0` to `255` for RGB, and `0` to `100` for CMYK.")
+		fields = []
+		# Organize the data into the Message format expectations
+		if original_type == "hex":
+			hex_value = "#"+hex(color_values[0]).replace("0x","").rjust(6,"0").upper()
+			title = "Color {}".format(hex_value)
+			color = color_values[0]
+			fields.extend([
+				{"name":"RGB","value":"rgb({}, {}, {})".format(*self._hex_to_rgb(hex_value))},
+				{"name":"CMYK","value":"cmyk({}, {}, {}, {})".format(*self._hex_to_cmyk(hex_value))}
+				])
+		elif original_type == "rgb":
+			title = "Color rgb({}, {}, {})".format(*color_values)
+			color = int(self._rgb_to_hex(*color_values).replace("#",""),16)
+			fields.extend([
+				{"name":"Hex","value":self._rgb_to_hex(*color_values)},
+				{"name":"CMYK","value":"cmyk({}, {}, {}, {})".format(*self._rgb_to_cmyk(*color_values))}
+			])
+		else:
+			title = "Color cmyk({}, {}, {}, {})".format(*color_values)
+			color = int(self._cmyk_to_hex(*color_values).replace("#",""),16)
+			fields.extend([
+				{"name":"Hex","value":self._cmyk_to_hex(*color_values)},
+				{"name":"RGB","value":"rgb({}, {}, {})".format(*self._cmyk_to_rgb(*color_values))}
+			])
+		# Create the image
+		file_path = "images/colornow.png"
+		try:
+			image = Image.new(mode="RGB",size=(512,256),color=self._hex_int_to_tuple(color))
+			image.save(file_path)
+			await Message.Embed(title=title,color=color,fields=fields,file=file_path).send(ctx)
+		except:
+			pass
+		if os.path.exists(file_path):
+			os.remove(file_path)
 
 	def get_slide(self, start_addr = 0):
 		# Setup our temp vars
@@ -381,7 +358,7 @@ class Encode(commands.Cog):
 			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
 			return
 		msg = ''.join(chr(int(new_bin[i:i+8], 2)) for i in range(0, len(new_bin), 8))
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(Nullify.escape_all(msg))
 
 	@commands.command(pass_context=True)
 	async def binint(self, ctx, *, input_binary = None):
@@ -443,24 +420,24 @@ class Encode(commands.Cog):
 		try:
 			if from_type.lower() == "base64":
 				if to_type.lower() == "hex":
-					await ctx.send(self.suppressed(ctx.guild, self._base64_to_hex(value)))
+					await ctx.send(Nullify.escape_all(self._base64_to_hex(value)))
 					return
 				elif to_type.lower() == "ascii":
-					await ctx.send(self.suppressed(ctx.guild, self._base64_to_ascii(value)))
+					await ctx.send(Nullify.escape_all(self._base64_to_ascii(value)))
 					return
 			elif from_type.lower() == "hex":
 				if to_type.lower() == "ascii":
-					await ctx.send(self.suppressed(ctx.guild, self._hex_to_ascii(value)))
+					await ctx.send(Nullify.escape_all(self._hex_to_ascii(value)))
 					return
 				elif to_type.lower() == "base64":
-					await ctx.send(self.suppressed(ctx.guild, self._hex_to_base64(value)))
+					await ctx.send(Nullify.escape_all(self._hex_to_base64(value)))
 					return
 			elif from_type.lower() == "ascii":
 				if to_type.lower() == "hex":
-					await ctx.send(self.suppressed(ctx.guild, self._ascii_to_hex(value)))
+					await ctx.send(Nullify.escape_all(self._ascii_to_hex(value)))
 					return
 				elif to_type.lower() == "base64":
-					await ctx.send(self.suppressed(ctx.guild, self._ascii_to_base64(value)))
+					await ctx.send(Nullify.escape_all(self._ascii_to_base64(value)))
 					return
 		except Exception:
 			await ctx.send("I couldn't make that conversion!")

@@ -1,6 +1,6 @@
 import asyncio, discord, time
 from   discord.ext import commands
-from   Cogs import DisplayName, ReadableTime, Nullify
+from   Cogs import DisplayName, ReadableTime, Utils, Nullify
 
 def setup(bot):
 	# Add the bot
@@ -125,7 +125,7 @@ class Invite(commands.Cog):
 		if server and any(x for x in self.temp_allowed if x[0] == server.id):
 			# Got an invite
 			return await ctx.send('Invite me to {} with this link: \n<{}>'.format(
-				Nullify.clean(server.name),
+				Nullify.escape_all(ctx,server.name),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=server)
 			))
 		return await ctx.send("You need approval from my owner{} to add me.  You can request it with `{}requestjoin guild_invite_url`.".format(
@@ -163,10 +163,10 @@ class Invite(commands.Cog):
 		msg = "{} ({} - {}#{} - {})\nhas requested the bot for: {} ({})\nvia the following invite: {}".format(
 			DisplayName.name(ctx.author),
 			ctx.author.mention,
-			Nullify.clean(ctx.author.name),
+			ctx.author.name,
 			ctx.author.discriminator,
 			ctx.author.id,
-			Nullify.clean(invite.guild.name),
+			invite.guild.name,
 			invite.guild.id,
 			invite
 		)
@@ -221,7 +221,7 @@ class Invite(commands.Cog):
 		if request:
 			await request[3].send("{}, your request for me to join {} has been approved for the next {}.  You can invite me with this link:\n<{}>".format(
 				request[0].mention,
-				Nullify.clean(request[1].name),
+				Nullify.escape_all(request[1].name),
 				ReadableTime.getReadableTimeBetween(0,self.approval_time),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=request[1])
 			))
@@ -311,17 +311,12 @@ class Invite(commands.Cog):
 		for serv in serverList:
 			if str(serv).lower() == server.lower():
 				# Found a match - already blocked.
-				msg = "*{}* is already blocked!".format(serv)
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = "*{}* is already blocked!".format(Nullify.escape_all(serv))
 				return await ctx.send(msg)
 		# Not blocked
 		serverList.append(server)
 		self.settings.setGlobalStat("BlockedServers",serverList)
-		msg = "*{}* now blocked!".format(server)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = "*{}* now blocked!".format(Nullify.escape_all(server))
 		await ctx.send(msg)
 
 	@commands.command()
@@ -343,15 +338,10 @@ class Invite(commands.Cog):
 		if len(serverList) != len(serverTest):
 			# Something changed
 			self.settings.setGlobalStat("BlockedServers",serverTest)
-			msg = "*{}* unblocked!".format(serv)
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = "*{}* unblocked!".format(Nullify.escape_all(server))
 			return await ctx.send(msg)
 		# Not found
-		msg = "I couldn't find *{}* in my blocked list.".format(server)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = "I couldn't find *{}* in my blocked list.".format(Nullify.escape_all(server))
 		await ctx.send(msg)
 
 	@commands.command()
@@ -383,8 +373,5 @@ class Invite(commands.Cog):
 		if not len(serverList):
 			msg = "There are no blocked servers or owners!"
 		else:
-			msg = "__Currently Blocked:__\n\n{}".format(', '.join(serverList))
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+			msg = "__Currently Blocked:__\n\n{}".format(', '.join([Nullify.escape_all(x) for x in serverList]))
 		await ctx.send(msg)

@@ -64,8 +64,7 @@ class DisableCommand(commands.Cog):
 	def _get_commands(self, check):
 		# Check Cogs first
 		cog = self._get_cog_commands(check)
-		if cog:
-			return cog
+		if cog: return cog
 		# Check for commands
 		return self._get_command(check)
 
@@ -73,13 +72,10 @@ class DisableCommand(commands.Cog):
 		# Returns the command in a list if it exists
 		# excludes hidden commands
 		for cog in self.bot.cogs:
-			if cog in self.exceptions:
-				# Skip exceptions
-				continue
+			if cog in self.exceptions: continue
 			for c in self.bot.get_cog(cog).get_commands():
-				if c.name == command:
-					if c.hidden or c in self.exceptions:
-						return None
+				if any((x == command for x in [c.name]+c.aliases)):
+					if c.hidden or c in self.exceptions: return None
 					return [c.name]
 		return None
 

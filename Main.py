@@ -44,7 +44,14 @@ async def get_prefix(bot, message):
 # This should be the main soul of the bot - everything should load from here
 # bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
 # Let's SHARD!
-bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
+try:
+	# Setup intents
+	intents = discord.Intents().all()
+	bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4, intents=intents)
+except:
+	# Possibly using the old gateway?
+	print("Using the old gateway - this may not be around forever...\n")
+	bot = commands.AutoShardedBot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably', shard_count=4)
 bot.settings_dict    = settings_dict
 bot.ready_dispatched = False
 

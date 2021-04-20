@@ -99,6 +99,7 @@ class PagePicker(Picker):
         self.max = 1 if self.max < 1 else 10 if self.max > 10 else self.max
         self.reactions = ["⏪","◀","▶","⏩","🔢","🛑"] # These will always be in the same order
         self.url = kwargs.get("url",None) # The URL the title of the embed will link to
+        self.description = kwargs.get("description", None)
 
     def _get_page_contents(self, page_number):
         # Returns the contents of the page passed
@@ -118,7 +119,7 @@ class PagePicker(Picker):
         embed = {
             "title":self.title,
             "url":self.url,
-            "description":self.message,
+            "description":self.description,
             "color":self.ctx.author,
             "pm_after":25,
             "fields":self._get_page_contents(page),

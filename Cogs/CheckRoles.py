@@ -3,16 +3,18 @@ import discord
 from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
-from   Cogs import Nullify
 
 def setup(bot):
     # This module isn't actually a cog
     return
 
-async def checkroles(user, channel, settings, bot, suppress : bool = False):
+async def checkroles(user, channel, settings, bot, suppress : bool = False, **kwargs):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
+    if user.bot: return # Don't apply roles to bots
     DisplayName = bot.get_cog("DisplayName")
+    Utils = bot.get_cog("Utils")
+    if not DisplayName or not Utils: return # We are missing dependencies
     
     if type(channel) is discord.Guild:
         server = channel
@@ -22,12 +24,12 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
     
     # Get our preliminary vars
     msg         = None
-    xpPromote   = settings.getServerStat(server,     "XPPromote")
-    xpDemote    = settings.getServerStat(server,     "XPDemote")
+    xpPromote   = kwargs.get("xp_promote",settings.getServerStat(server,"XPPromote"))
+    xpDemote    = kwargs.get("xp_demote",settings.getServerStat(server,"XPDemote"))
     userXP      = int(settings.getUserStat(user, server, "XP"))
-    suppProm    = settings.getServerStat(server, "SuppressPromotions")
-    suppDem     = settings.getServerStat(server, "SuppressDemotions")
-    onlyOne     = settings.getServerStat(server, "OnlyOneRole")
+    suppProm    = kwargs.get("suppress_promotions",settings.getServerStat(server,"SuppressPromotions"))
+    suppDem     = kwargs.get("suppress_demotions",settings.getServerStat(server,"SuppressDemotions"))
+    onlyOne     = kwargs.get("only_one_role",settings.getServerStat(server,"OnlyOneRole"))
 
     # Check if we're suppressing @here and @everyone mentions
     if settings.getServerStat(server, "SuppressMentions"):
@@ -148,8 +150,6 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False):
 
     # Check if we have a message to display - and display it
     if msg and channel and (not suppress):
-        # Check for suppress
-        if suppressed:
-            msg = Nullify.clean(msg)
+        msg = Utils.suppressed(server,msg)
         await channel.send(msg)
     return changed

@@ -144,13 +144,12 @@ class ChatterBot(commands.Cog):
 
 	async def _chat(self, ctx, message):
 		# Check if we're suppressing @here and @everyone mentions
-		message = DisplayName.clean_message(message, bot=self.bot, server=ctx.guild)
-		if message == None:
-			return
-		if not self.canChat(ctx.guild):
+		message = Utils.suppressed(ctx,message,force=True)
+		if message == None or not self.canChat(ctx.guild):
 			return
 		await ctx.trigger_typing()
 
 		msg = self.chatBot.respond(message)
 		msg = msg if msg else "I don't know what to say..."
+		if len(msg) > 2000: msg = msg[:1997]+"..." # Fix for > 2000 chars
 		await ctx.send(msg)

@@ -1,7 +1,7 @@
 import asyncio, discord, random, json, time, os, PIL, textwrap
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-from Cogs import Message, FuzzySearch, GetImage, Nullify, DL, DisplayName
+from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -134,8 +134,7 @@ class Humor(commands.Cog):
 		zalgo = zalgo[:2000]
 
 		# Check for suppress
-		if suppress:
-			zalgo = Nullify.clean(zalgo)
+		zalgo = Utils.suppressed(ctx,zalgo)
 		await Message.Message(message=zalgo).send(ctx)
 		#await ctx.send(zalgo)
 		
@@ -152,7 +151,7 @@ class Humor(commands.Cog):
 		"""Time to backup the Batman!"""
 		
 		if subject == None:
-			await ctx.channel.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+			await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
 			return
 		
 		# Check if we're suppressing @here and @everyone mentions
@@ -180,10 +179,8 @@ class Humor(commands.Cog):
 			subject = subject.strip().capitalize()
 			msg = "*Holy {} {}, Batman!*".format(word, subject)
 		
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
-		await ctx.channel.send(msg)
+		msg = Utils.suppressed(ctx,msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def fart(self, ctx):
@@ -191,7 +188,7 @@ class Humor(commands.Cog):
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
 		randnum = random.randint(0, len(fartList)-1)
 		msg = '{}'.format(fartList[randnum])
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
 	async def french(self, ctx):
@@ -259,39 +256,36 @@ class Humor(commands.Cog):
 			# Set as space if not included
 			text_one = " "
 
-		if template_id == None or text_zero == None or text_one == None:
+		if any((x==None for x in (template_id,text_zero,text_one))):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		templates = await self.getTemps()
 
-		chosenTemp = None
-		msg = ''
+		chosenTemp = gotName = None
 
 		idMatch   = FuzzySearch.search(template_id, templates, 'id', 1)
 		if idMatch[0]['Ratio'] == 1:
 			# Perfect match
 			chosenTemp = idMatch[0]['Item']['id']
+			gotName    = idMatch[0]['Item']['name']
 		else:
 			# Imperfect match - assume the name
 			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
 			chosenTemp = nameMatch[0]['Item']['id']
-			if nameMatch[0]['Ratio'] < 1:
-				# Less than perfect, still
-				msg = 'I\'ll assume you meant *{}*.'.format(nameMatch[0]['Item']['name'])
+			gotName    = nameMatch[0]['Item']['name']
 
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
 		result_json = await DL.async_post_json(url, payload)
-		# json.loads(r.text)
 		result = result_json["data"]["url"]
-		if msg:
-			# result = '{}\n{}'.format(msg, result)
-			await ctx.channel.send(msg)
-		# Download Image - set title as a space so it disappears on upload
-		await Message.Embed(image=result, color=ctx.author).send(ctx)
-		# await GetImage.get(ctx, result)
+		await Message.Embed(
+			url=result,
+			title=text_zero + " - " + text_one if text_one != " " else text_zero,
+			image=result,
+			color=ctx.author,
+			footer='Powered by imgflip.com - using template id {}: {}'.format(chosenTemp,gotName)
+		).send(ctx)
 
 	async def getTemps(self):
 		url = "https://api.imgflip.com/get_memes"
@@ -368,7 +362,8 @@ class Humor(commands.Cog):
 		image = self.s_image.copy()
 		if not image.width == 319 or not image.height == 111:
 			image = image.resize((319,111),resample=PIL.Image.LANCZOS)
-		message = await ctx.send("Gifting *{}* to {}...".format(random.choice(self.stardew_gifts),Nullify.clean(DisplayName.name(test_user))))
+		item = random.choice(self.stardew_gifts)
+		message = await ctx.send("Gifting *{}* to {}...".format(item,DisplayName.name(test_user)))
 		path = await GetImage.download(user)
 		if not path:
 			return await message.edit(content="I guess I couldn't gift that...  Make sure you're passing a valid user.")
@@ -382,13 +377,13 @@ class Humor(commands.Cog):
 			image.paste(img,(221,15),mask=img)
 			# Write the user's name in the name box - starts at (209,99)
 			d = ImageDraw.Draw(image)
-			name_text = DisplayName.name(test_user)
+			name_text = test_user.display_name
 			name_size = name_max_h # max size for the name to fit
 			t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 			if t_w > name_max_w:
 				name_size = int(t_h*(name_max_w/t_w))
 				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
-			d.text((210+(88-t_w)/2,88+(12-t_h)/2),DisplayName.name(test_user),font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
+			d.text((210+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
 				random.choice(self.stardew_responses),
@@ -402,7 +397,8 @@ class Humor(commands.Cog):
 			image = image.resize((319*3,111*3),PIL.Image.NEAREST)
 			image.save('images/Stardewnow.png')
 			await ctx.send(file=discord.File(fp='images/Stardewnow.png'))
-			await message.delete(delay=2)
+			# await message.delete(delay=2)
+			await message.edit(content="Gifted *{}* to {}.".format(item,DisplayName.name(test_user)))
 			os.remove('images/Stardewnow.png')
 		except Exception as e:
 			print(e)

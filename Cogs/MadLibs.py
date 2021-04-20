@@ -5,9 +5,7 @@ import os
 import random
 import string
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import Settings, DisplayName, Utils
 
 def setup(bot):
 	# Add the bot and deps
@@ -29,6 +27,11 @@ class MadLibs(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
+
+	@commands.command()
+	async def ml(self, ctx, word = None):
+		"""Used to choose your words when in the middle of a madlibs."""
+		pass
 
 	@commands.command(pass_context=True)
 	async def madlibs(self, ctx):
@@ -87,8 +90,8 @@ class MadLibs(commands.Cog):
 		randLib = choices[randnum]
 
 		# Let's load our text and get to work
-		with open("./Cogs/MadLibs/{}".format(randLib), 'r') as myfile:
-			data = myfile.read()
+		with open("./Cogs/MadLibs/{}".format(randLib), 'rb') as myfile:
+			data = myfile.read().decode("utf-8")
 
 		# Set up an empty arry
 		words = []
@@ -170,9 +173,7 @@ class MadLibs(commands.Cog):
 
 		self.playing_madlibs.pop(str(server.id),None)
 		
-		# Check for suppress
-		if suppress:
-			data = Nullify.clean(data)
+		data = Utils.suppressed(ctx,data)
 		# Message the output
 		await channel.send(data)
 

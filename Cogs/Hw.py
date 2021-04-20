@@ -1,6 +1,6 @@
 import asyncio, discord, time
 from   discord.ext import commands
-from   Cogs import Utils, ReadableTime, PCPP, DisplayName, Message
+from   Cogs import Utils, ReadableTime, PCPP, DisplayName, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -779,18 +779,8 @@ class Hw(commands.Cog):
 		if not len(buildList):
 			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
 			return await ctx.send(msg)
-		msg = "__**{}'s Builds:**__\n\n".format(DisplayName.name(member))
-		i = 1
-		for build in buildList:
-			msg += '{}. {}'.format(i, build['Name'])
-			if build['Main']:
-				msg += ' (Main Build)'
-			msg += "\n"
-			i += 1
-		# Cut the last return
-		msg = msg[:-1]
-		# Limit output to 1 page - if more than that, send to pm
-		await Message.Message(message=Utils.suppressed(ctx,msg)).send(ctx)
+		items = [{"name":"{}. {}".format(i,x["Name"]+(" (Main Build)" if x["Main"] else "")),"value":Utils.truncate_string(x["Hardware"])} for i,x in enumerate(buildList,start=1)]
+		return await PickList.PagePicker(title="{}'s Builds ({:,} total)".format(DisplayName.name(member),len(buildList)),list=items,ctx=ctx).pick()
 
 
 	@commands.command(pass_context=True)

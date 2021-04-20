@@ -1,6 +1,6 @@
 import asyncio, discord, time
 from   discord.ext import commands
-from   Cogs import Utils, ReadableTime, DisplayName, FuzzySearch, Message, PickList
+from   Cogs import Utils, ReadableTime, DisplayName, FuzzySearch, Message, PickList, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -66,6 +66,33 @@ class Lists(commands.Cog):
 				return False
 		return True
 
+	def _ensure_keys(self,ctx,l_list,item_list,l_key):
+		# Helper to walk all items in a list and ensure our keys are valid
+		valid_keys = (l_key,"Name","Created","CreatedID","CreatedBy","Updated","UpdatedID","UpdatedBy")
+		to_remove = []
+		changed = False
+		for item in item_list:
+			if l_key in item: continue
+			# We got a mismatched key - possibly due to a prior error, or failed migration?
+			changed = True
+			best_guess = next((x for x in item if not x in valid_keys),None)
+			if best_guess:
+				# Got a best_guess, let's adjust it
+				item[l_key] = item[best_guess]
+				item.pop(best_guess,None)
+			else:
+				# Nothing found
+				to_remove.append(item)
+		# Remove entries as needed
+		if to_remove:
+			for item in to_remove:
+				try: item_list.remove(item)
+				except: pass
+		if changed:
+			# Save changes
+			self.settings.setServerStat(ctx.guild, l_list, item_list)
+		return item_list
+
 	async def _get_item(self,ctx,name,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL",raw=False):
 		# Helper function to pull items from lists
 		if not name:
@@ -83,7 +110,7 @@ class Lists(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append(Utils.suppressed(ctx,"{}{} {}".format(ctx.prefix,i["command"],name)))
+				other_names.append("{}{} {}".format(ctx.prefix,i["command"],Nullify.escape_all(name)))
 				
 		if not itemList or itemList == []:
 			no_items = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
@@ -104,12 +131,15 @@ class Lists(commands.Cog):
 			# Invoke
 			return await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 
+		# Ensure our keys are proper - and save if need be
+		itemList = self._ensure_keys(ctx,l_list,itemList,l_key)
+
 		for item in itemList:
 			if item['Name'].lower() == name.lower():
-				msg = '**{}:**\n{}'.format(item['Name'], discord.utils.escape_markdown(item[l_key]) if raw else item[l_key])
+				msg = '**{}:**\n{}'.format(Nullify.escape_all(item['Name']), discord.utils.escape_markdown(item[l_key]) if raw else item[l_key])
 				return await ctx.send(Utils.suppressed(ctx,msg))
 				
-		not_found = Utils.suppressed(ctx,'`{}` not found in {} list!'.format(name.replace("`", "").replace("\\",""),l_name.lower()))
+		not_found = '{} not found in {} list!'.format(Nullify.escape_all(name),l_name.lower())
 		# No matches - let's fuzzy search
 		potentialList = FuzzySearch.search(name, itemList, 'Name')
 		if len(potentialList):
@@ -128,18 +158,18 @@ class Lists(commands.Cog):
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content="`{}`".format(other_names[index - len(potentialList)]))
+				await message.edit(content="`{}`".format(Nullify.escape_all(other_names[index - len(potentialList)])))
 				# Invoke
 				return await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 			# Display the item
 			for item in itemList:
 				if item["Name"] == potentialList[index]["Item"]["Name"]:
-					msg = '**{}:**\n{}'.format(item['Name'], discord.utils.escape_markdown(item[l_key]) if raw else item[l_key])
+					msg = '**{}:**\n{}'.format(Nullify.escape_all(item['Name']), discord.utils.escape_markdown(item[l_key]) if raw else item[l_key])
 					return await message.edit(content=Utils.suppressed(ctx,msg))
-			return await message.edit(content="{} `{}` no longer exists!".format(
+			return await message.edit(content="{} {} no longer exists!".format(
 				l_name,
-				potentialList[index]["Item"]["Name"].replace("`", "").replace("\\",""))
-			)
+				Nullify.escape_all(potentialList[index]["Item"]["Name"])
+			))
 		# Here we have no potentials
 		return await ctx.send(not_found)
 
@@ -152,42 +182,38 @@ class Lists(commands.Cog):
 		if name == None or value == None:
 			msg = 'Usage: `{}add[[name]] "[[[name]] name]" [[[key]]]`'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
-		safe_name = name.replace("`", "").replace("\\","")
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList:
 			itemList = []
 		currentTime = int(time.time())
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if item:
-			safe_name = item["Name"].replace("`", "").replace("\\","")
-			msg = Utils.suppressed(ctx,'`{}` updated!'.format(safe_name))
+			msg = '{} updated!'.format(Nullify.escape_all(item["Name"]))
 			item[l_key]       = value
 			item['UpdatedBy'] = DisplayName.name(ctx.author)
 			item['UpdatedID'] = ctx.author.id
 			item['Updated']   = currentTime
 		else:
 			itemList.append({"Name" : name, l_key : value, "CreatedBy" : DisplayName.name(ctx.author), "CreatedID": ctx.author.id, "Created" : currentTime})
-			msg = Utils.suppressed(ctx,'`{}` added to {} list!'.format(safe_name,l_name.lower()))
+			msg = '{} added to {} list!'.format(Nullify.escape_all(name),l_name.lower())
 		self.settings.setServerStat(ctx.guild, l_list, itemList)
-		return await ctx.send(Utils.suppressed(ctx,msg))
+		return await ctx.send(msg)
 
 	async def _remove_item(self,ctx,name,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		if not self._has_privs(ctx,l_role): return await ctx.send("You do not have sufficient privileges to access this command.")
 		if name == None:
 			msg = 'Usage: `{}remove{} "[{} name]"`'.format(ctx.prefix,l_name.lower(),l_name.lower())
 			return await ctx.send(msg)
-		safe_name = name.replace("`", "").replace("\\","")
 		itemList = self.settings.getServerStat(ctx.guild, l_list)
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
-			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(safe_name,l_name.lower())))
-		safe_name = item["Name"].replace("`", "").replace("\\","")
+			return await ctx.send('{} not found in {} list!'.format(Nullify.escape_all(name),l_name.lower()))
 		itemList.remove(item)
 		self.settings.setServerStat(ctx.guild, l_list, itemList)
-		return await ctx.send(Utils.suppressed(ctx,'`{}` removed from {} list!'.format(safe_name,l_name.lower())))
+		return await ctx.send('{} removed from {} list!'.format(Nullify.escape_all(item["Name"]),l_name.lower()))
 
 	async def _item_info(self,ctx,name,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		if name == None:
@@ -197,27 +223,26 @@ class Lists(commands.Cog):
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
-		safe_name = name.replace("`", "").replace("\\","")
 		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
 		if not item:
-			return await ctx.send(Utils.suppressed(ctx,'`{}` not found in {} list!'.format(safe_name,l_name.lower())))
+			return await ctx.send('{} not found in {} list!'.format(Nullify.escape_all(name),l_name.lower()))
 		current_time = int(time.time())
-		msg = "**{}:**\n".format(item["Name"])
+		msg = "**{}:**\n".format(Nullify.escape_all(item["Name"]))
 		# Get the info
-		created_by = DisplayName.memberForID(item["CreatedID"],ctx.guild)
+		created_by = DisplayName.memberForID(item.get("CreatedID",0),ctx.guild)
 		created_by = DisplayName.name(created_by) if created_by else item.get("CreatedBy","`UNKNOWN`")
 		msg += "Created by: {}\n".format(created_by)
 		created    = item.get("Created",None)
 		if created:
 			msg += "Created: {} ago\n".format(ReadableTime.getReadableTimeBetween(created, current_time, True))
 		if item.get("Updated",None):
-			updated_by = DisplayName.memberForID(item["UpdatedID"],ctx.guild)
+			updated_by = DisplayName.memberForID(item.get("UpdatedID",0),ctx.guild)
 			updated_by = DisplayName.name(updated_by) if updated_by else item.get("UpdatedBy","`UNKNOWN`")
 			msg += "Updated by: {}\n".format(updated_by)
 			updated    = item.get("Updated",None)
 			if created:
 				msg += "Updated: {} ago\n".format(ReadableTime.getReadableTimeBetween(updated, current_time, True))
-		return await ctx.send(Utils.suppressed(ctx,msg))
+		return await ctx.send(msg)
 
 	async def _list_items(self,ctx,command,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL",raw=False):
 		arg_list = ctx.message.content.split()
@@ -231,10 +256,8 @@ class Lists(commands.Cog):
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
 		# Sort by link name
-		itemList = sorted(itemList, key=lambda x:x['Name'].lower())
-		itemText = "**Current {}s:**\n".format(l_name)
-		itemText += discord.utils.escape_markdown("\n".join([x["Name"] for x in itemList])) if raw else "\n".join([x["Name"] for x in itemList])
-		return await Message.Message(message=Utils.suppressed(ctx,itemText)).send(ctx)
+		items = [{"name":"{}. {}".format(i,x["Name"]),"value":Utils.truncate_string(x[l_key])} for i,x in enumerate(sorted(itemList, key=lambda x:x["Name"].lower()),start=1)]
+		return await PickList.PagePicker(title="Current {}s ({:,} total)".format(l_name,len(itemList)),list=items,ctx=ctx).pick()
 
 	async def _get_role(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		role = self.settings.getServerStat(ctx.message.guild, l_role)
@@ -245,7 +268,7 @@ class Lists(commands.Cog):
 		listrole = ctx.guild.get_role(int(role))
 		if not listrole:
 			return await ctx.send('There is no role that matches id: `{}` - consider updating this setting.'.format(role))
-		return await ctx.send(Utils.suppressed(ctx,"You need to be a{} **{}** to add and remove links.").format("n" if listrole.name.lower()[0] in "aeiou" else "",Utils.suppressed(ctx,listrole.name)))
+		return await ctx.send(Utils.suppressed(ctx,"You need to be a{} **{}** to add and remove {}s.").format("n" if listrole.name.lower()[0] in "aeiou" else "",Nullify.escape_all(listrole.name),l_name.lower()))
 		
 	###                    ###
 	## Link-related Methods ##
@@ -411,8 +434,8 @@ class Lists(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				return await ctx.send(Utils.suppressed(ctx,msg))
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+				return await ctx.send(msg)
 		parts = self.settings.getGlobalUserStat(member, "Parts")
 		if not parts or parts == "":
 			msg = '*{}* has not added their parts yet!  ~~They can add them with the `{}setparts [parts text]` command!~~ DEPRECATED - Use `{}newhw` instead.'.format(DisplayName.name(member), ctx.prefix, ctx.prefix)
@@ -469,8 +492,8 @@ class Lists(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				return await ctx.send(Utils.suppressed(ctx,msg))
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
+				return await ctx.send(msg)
 		name = DisplayName.name(member)
 		# We have a member here
 		if not member.status == discord.Status.offline:

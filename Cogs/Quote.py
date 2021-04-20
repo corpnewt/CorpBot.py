@@ -18,39 +18,29 @@ class Quote(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.Cog.listener()
-	async def on_reaction_add(self, reaction, member):
-		# Catch reactions and see if they match our list
-		if not type(member) is discord.Member:
-			# Not in a server
-			return
-
-		# Check if the reaction is added by the bot
-		if member.id == self.bot.user.id:
-			return
-
-		r =         self.settings.getServerStat(member.guild, "QuoteReaction")
+	async def on_raw_reaction_add(self, payload):
+		# Make sure we're in a guild, then gather member info
+		if not payload.guild_id: return
+		guild = self.bot.get_guild(payload.guild_id)
+		if not guild: return
+		member = guild.get_member(payload.user_id)
+		if not member or member.bot: return
+		# Make sure we're in the right channel
 		r_channel = self.settings.getServerStat(member.guild, "QuoteChannel")
-		r_admin   = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
-
-		if r == None or r_channel == None:
-			# Not setup
-			return
-
-		# Check reactions
-		if not str(reaction.emoji) == r:
-			# Our reaction isn't in there
-			return
-
-		em = None
-		for reac in reaction.message.reactions:
-			if str(reac) == str(r):
-				em = reac
-
-		if not em:
-			# Broken for no reason?
-			return
-		ctx = await self.bot.get_context(reaction.message)
-		if em.count > 1:
+		if not r_channel: return # Not setup, or wrong channel
+		# Gather the reaction - and make sure it's the same
+		r = self.settings.getServerStat(member.guild, "QuoteReaction")
+		if not r or str(payload.emoji) != r: return # Not setup, or wrong reaction
+		r_admin = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
+		# Get the original message
+		channel = guild.get_channel(payload.channel_id)
+		try: message = await channel.fetch_message(payload.message_id)
+		except: return # Failed to get the message
+		reaction = next((x for x in message.reactions if str(x) == str(r)),None)
+		if not reaction: return # Broken for no reason?
+		# Gather the context and evaluate
+		ctx = await self.bot.get_context(message)
+		if reaction.count > 1:
 			# Our reaction is already here
 			if not r_admin:
 				# We're not worried about admin stuffs
@@ -83,27 +73,39 @@ class Quote(commands.Cog):
 			# Only quote actual text or attachments - no embeds
 			return
 		
-		# Initialize our message
+		# Initialize our message and image field
 		msg = reaction.message.content if len(reaction.message.content) else ""
-		
+		image = None
 		if len(reaction.message.attachments):
 			# We have some attachments to work through
 			attach_text = ""
 			for a in reaction.message.attachments:
 				# Add each attachment by name as a link to its own url
 				attach_text += "[{}]({}), ".format(a.filename, a.url)
+				if image == None and a.filename.lower().endswith((".jpg",".jpeg",".png",".gif")):
+					# We got the first image in the attachment list - set it
+					image = a.url
 			# Remove the last ", "
 			attach_text = attach_text[:-2]
 			msg += "\n\n" + attach_text
+		if len(reaction.message.embeds) and image == None:
+			# We have embeds to look at too, and we haven't set an image yet
+			for e in reaction.message.embeds:
+				d = e.to_dict()
+				i = d.get("thumbnail",d.get("video",d.get("image",{}))).get("url",None)
+				if not i: continue
+				image = i
+				break
 
 		# Build an embed!
 		e = {
 			"author" : reaction.message.author,
+			"image" : image,
 			"pm_after" : -1, # Don't pm quotes
 			"description" : msg + "\n\nSent by {} in {} | {} | {} UTC".format(
 				reaction.message.author.mention,
 				reaction.message.channel.mention,
-				"[Link](https://discordapp.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
+				"[Link](https://discord.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"color" : reaction.message.author,

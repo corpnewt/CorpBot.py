@@ -22,24 +22,10 @@ class Telephone(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
-
 	# Proof-of-concept placeholders
-	@commands.Cog.listener()
+	'''@commands.Cog.listener()
 	async def on_message_context(self, ctx, message):
-		return
-
-	# Now in Main.py
-	"""@commands.Cog.listener()
-	async def on_message(self, message):
-		context = await self.bot.get_context(message)
-		self.bot.dispatch("message_context", context, message)
-		return"""
+		return'''
 			
 	async def killcheck(self, message):
 		ignore = False
@@ -299,8 +285,8 @@ class Telephone(commands.Cog):
 		block_list.append(target.id)
 		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
 
-		msg = "You are now blocking *{}!*".format(target.name)
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		msg = "You are now blocking *{}!*".format(Nullify.escape_all(target.name))
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -345,16 +331,16 @@ class Telephone(commands.Cog):
 			return
 
 		if not target.id in block_list:
-			msg = "*{}* is not currently blocked."
-			await ctx.send(self.suppressed(ctx.guild, msg))
+			msg = "*{}* is not currently blocked.".format(Nullify.escape_all(target.name))
+			await ctx.send(msg)
 			return
 
 		# Here, we should have a guild to unblock
 		block_list.remove(target.id)
 		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
 
-		msg = "You have unblocked *{}!*".format(target.name)
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		msg = "You have unblocked *{}!*".format(Nullify.escape_all(target.name))
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -381,9 +367,9 @@ class Telephone(commands.Cog):
 		msg = "__Tele-Blocked Servers:__\n\n"
 
 		#msg += ", ".join(str(x) for x in block_list)
-		msg += ", ".join(block_names)
+		msg += ", ".join(Nullify.escape_all(block_names))
 
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -633,7 +619,7 @@ class Telephone(commands.Cog):
 					await receiver_chan.send(":telephone: You have hung up.")
 				return
 			else:
-				talk_msg = talk.content # Nullify.clean(talk.content)
+				talk_msg = talk.content
 				# Let's make sure we strip links out - and nullify discord.gg links to patch a spam loophole
 				# Create a set of all matches (to avoid duplicates in case of spam)
 				if self.settings.getServerStat(receiver if talk.channel==caller_chan else caller,"TeleBlockLinks",True):
@@ -646,15 +632,15 @@ class Telephone(commands.Cog):
 					for x in matches:
 						talk_msg = talk_msg.replace(x,"`link removed`")
 				# Clean out mentions from the message
-				talk_msg = DisplayName.clean_message(talk_msg, bot=self.bot, server=talk.guild)
+				talk_msg = Utils.suppressed(talk.guild,talk_msg,force=True)
 				# Must be conversation
 				if talk.channel == caller_chan:
 					# Coming from the talking channel
 					if hidden:
 						await receiver_chan.send(":telephone_receiver: " + talk_msg)
 					else:
-						user = Nullify.clean(DisplayName.name(talk.author)).replace("`","") # Remove @here and @everyone mentions in username
+						user = DisplayName.name(talk.author).replace("`","").replace("\\","") # Remove @here and @everyone mentions in username
 						await receiver_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))
 				else:
-					user = Nullify.clean(DisplayName.name(talk.author)).replace("`","") # Remove @here and @everyone mentions in username
+					user = DisplayName.name(talk.author).replace("`","").replace("\\","") # Remove @here and @everyone mentions in username
 					await caller_chan.send(":telephone_receiver: `{}`: {}".format(user, talk_msg))

@@ -4,7 +4,7 @@ from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
-from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL
+from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL, Nullify
 from   pyquery import PyQuery as pq
 try:
 	# Python 2.6-2.7
@@ -219,7 +219,7 @@ class Reddit(commands.Cog):
 		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
 		mess = '__**{}**__\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.Message(message=mess).send(ctx)
+		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def joke(self, ctx):
@@ -232,7 +232,7 @@ class Reddit(commands.Cog):
 			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.Message(message=mess).send(ctx)
+		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def dirtyjoke(self, ctx):
@@ -243,43 +243,43 @@ class Reddit(commands.Cog):
 		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
 		mess = '*{}*\n\n'.format(msg['title'])
 		mess += msg['content']
-		await Message.Message(message=mess).send(ctx)
+		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
 	
 	@commands.command(pass_context=True)
 	async def lpt(self, ctx):
 		"""Become a pro - AT LIFE."""
 		msg = await self.getTitle('https://www.reddit.com/r/LifeProTips/top.json?sort=top&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 		
 	@commands.command(pass_context=True)
 	async def shittylpt(self, ctx):
 		"""Your advise is bad, and you should feel bad."""
 		msg = await self.getTitle('https://www.reddit.com/r/ShittyLifeProTips/top.json?sort=top&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 
 	@commands.command(pass_context=True)
 	async def thinkdeep(self, ctx):
 		"""Spout out some intellectual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 
 	@commands.command(pass_context=True)
 	async def brainfart(self, ctx):
 		"""Spout out some uh... intellectual brilliance..."""
 		msg = await self.getTitle('https://www.reddit.com/r/Showerthoughts/controversial.json?sort=controversial&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 
 	@commands.command(pass_context=True)
 	async def nocontext(self, ctx):
 		"""Spout out some intersexual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/nocontext/top.json?sort=top&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 		
 	@commands.command(pass_context=True)
 	async def withcontext(self, ctx):
 		"""Spout out some contextual brilliance."""
 		msg = await self.getTitle('https://www.reddit.com/r/evenwithcontext/top.json?sort=top&t=week&limit=100')
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 
 	@commands.command(pass_context=True)
 	async def question(self, ctx):
@@ -287,14 +287,14 @@ class Reddit(commands.Cog):
 		infoDict = await self.getTitle('https://www.reddit.com/r/NoStupidQuestions/top.json?sort=top&t=week&limit=100', True)
 		self.settings.setServerStat(ctx.guild, "LastAnswer", infoDict["url"])
 		msg = '{}'.format(infoDict["title"])
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 		
 	@commands.command(pass_context=True)
 	async def answer(self, ctx):
 		"""Spout out some interstellar answering... ?"""
 		answer = self.settings.getServerStat(ctx.guild, "LastAnswer")
 		msg = "You need to ask a `{}question` first!".format(ctx.prefix) if not answer else "{}".format(answer)
-		await ctx.send(msg)
+		await ctx.send(Nullify.escape_all(msg,markdown=False))
 
 	@commands.command(pass_context=True)
 	async def redditimage(self, ctx, subreddit = None):

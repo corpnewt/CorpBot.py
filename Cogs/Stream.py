@@ -2,9 +2,7 @@ import asyncio
 import discord
 import re
 from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Message
+from   Cogs import Settings, DisplayName, Message, Nullify, Utils
 
 def setup(bot):
     # Add the bot and deps
@@ -59,21 +57,6 @@ class Stream(commands.Cog):
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         await self._stream_message(after, message, channel)
 
-    def check_bot_admin(self, member, channel):
-        # Returns whether we're at least bot-admin
-        isAdmin = member.permissions_in(channel).administrator
-        if not isAdmin:
-            checkAdmin = self.settings.getServerStat(channel.guild, "AdminArray")
-            for role in member.roles:
-                if isAdmin:
-                    break
-                for aRole in checkAdmin:
-                    # Get the role that corresponds to the id
-                    if str(aRole['ID']) == str(role.id):
-                        isAdmin = True
-                        break
-        return isAdmin
-
     @commands.command(pass_context=True)
     async def setstream(self, ctx, *, message = None):
         """Sets the stream announcement message (bot-admin only).
@@ -87,14 +70,10 @@ class Stream(commands.Cog):
         [[here]]     = @​here ping
         [[everyone]] = @​everyone ping"""
 
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
-        
+        if not await Utils.is_bot_admin_reply(ctx): return
         if message == None:
             self.settings.setServerStat(ctx.message.guild, "StreamMessage", None)
-            await ctx.channel.send('Stream announcement message removed!')
-            return
+            return await ctx.channel.send('Stream announcement message removed!')
 
         self.settings.setServerStat(ctx.message.guild, "StreamMessage", message)
         await ctx.send("Stream announcement message sent - here's a preview (note that @​here and @​everyone pings are suppressed here):")
@@ -109,13 +88,10 @@ class Stream(commands.Cog):
     @commands.command(pass_context=True)
     async def teststream(self, ctx, *, message = None):
         """Tests the stream announcement message (bot-admin only)."""
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
+        if not await Utils.is_bot_admin_reply(ctx): return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
         if not message:
-            await ctx.send("There is no stream announcement setup.")
-            return
+            return await ctx.send("There is no stream announcement setup.")
         await self._stream_message(ctx.author, message, ctx, True)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         channel = ctx.guild.get_channel(chan)
@@ -127,15 +103,12 @@ class Stream(commands.Cog):
     @commands.command(pass_context=True)
     async def rawstream(self, ctx, *, message = None):
         """Displays the raw markdown for the stream announcement message (bot-admin only)."""
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
+        if not await Utils.is_bot_admin_reply(ctx): return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
         if not message:
-            await ctx.send("There is no stream announcement setup.")
-            return
+            return await ctx.send("There is no stream announcement setup.")
         # Nullify markdown
-        message = message.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
+        message = Nullify.escape_all(message,mentions=False)
         await ctx.send(message)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         channel = ctx.guild.get_channel(chan)
@@ -147,7 +120,7 @@ class Stream(commands.Cog):
     async def _stream_message(self, member, message, dest, test = False):
         message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
         message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(dest.guild.name.replace("@here", "@​here").replace("@everyone", "@​everyone")), message)
+        message = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(dest.guild.name)), message)
         # Get the activity info
         act = next((x for x in list(member.activities) if x.type is discord.ActivityType.streaming), None)
         try:
@@ -173,46 +146,36 @@ class Stream(commands.Cog):
     @commands.command(pass_context=True)
     async def addstreamer(self, ctx, *, member = None):
         """Adds the passed member to the streamer list (bot-admin only)."""
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
+        if not await Utils.is_bot_admin_reply(ctx): return
         if member == None:
-            await ctx.send("Usage: `{}addstreamer [member]`".format(ctx.context))
-            return
+            return await ctx.send("Usage: `{}addstreamer [member]`".format(ctx.context))
         mem = DisplayName.memberForName(member, ctx.guild)
         if not mem:
-            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "\\`")))
-            return
+            return await ctx.send("I couldn't find {}...".format(Nullify.escape_all(member)))
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if mem.id in stream_list:
-            await ctx.send("I'm already watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
-            return
+            return await ctx.send("I'm already watching for streams from {}.".format(DisplayName.name(mem)))
         stream_list.append(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` added to the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+        await ctx.send("{} added to the stream list!".format(DisplayName.name(mem)))
 
     @commands.command(pass_context=True)
     async def remstreamer(self, ctx, *, member = None):
         """Removes the passed member from the streamer list (bot-admin only)."""
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
+        if not await Utils.is_bot_admin_reply(ctx): return
         if member == None:
-            await ctx.send("Usage: `{}remstreamer [member]`".format(ctx.context))
-            return
+            return await ctx.send("Usage: `{}remstreamer [member]`".format(ctx.context))
         mem = DisplayName.memberForName(member, ctx.guild)
         if not mem:
-            await ctx.send("I couldn't find `{}`...".format(member.replace("`", "").replace("\\","")))
-            return
+            return await ctx.send("I couldn't find {}...".format(Nullify.escape_all(member)))
         # Got a member
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
         if not mem.id in stream_list:
-            await ctx.send("I'm not currently watching for streams from `{}`.".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
-            return
+            return await ctx.send("I'm not currently watching for streams from {}.".format(DisplayName.name(mem)))
         stream_list.remove(mem.id)
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
-        await ctx.send("`{}` removed from the stream list!".format(DisplayName.name(mem).replace("`", "").replace("\\","")))
+        await ctx.send("{} removed from the stream list!".format(DisplayName.name(mem)))
 
     @commands.command(pass_context=True)
     async def streamers(self, ctx):
@@ -225,8 +188,7 @@ class Stream(commands.Cog):
                 continue
             streamers.append(DisplayName.name(mem))
         if not len(streamers):
-            await ctx.send("Not currently watching for any streamers.")
-            return
+            return await ctx.send("Not currently watching for any streamers.")
         stream_string = "\n".join(streamers)
         await Message.Message(message=stream_string, header="__Streamer List:__\n```\n", footer="```").send(ctx)
         
@@ -236,26 +198,21 @@ class Stream(commands.Cog):
         
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         if not chan:
-            await ctx.send("There is no channel setup for stream announcements.")
-            return
+            return await ctx.send("There is no channel setup for stream announcements.")
         channel = ctx.guild.get_channel(chan)
         if not channel:
-            await ctx.send("The stream announcement channel (`{}`) no longer exists on this server.".format(chan))
-            return
+            return await ctx.send("The stream announcement channel (`{}`) no longer exists on this server.".format(chan))
         await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
         
     @commands.command(pass_context=True)
     async def setstreamchannel(self, ctx, *, channel : discord.TextChannel = None):
         """Sets the channel for the stream announcements (bot-admin only)."""
-        if not self.check_bot_admin(ctx.author, ctx.channel):
-            await ctx.send('You do not have sufficient privileges to access this command.')
-            return
+        if not await Utils.is_bot_admin_reply(ctx): return
 
         if channel == None:
             self.settings.setServerStat(ctx.message.guild, "StreamChannel", None)
-            msg = "Stream announcements **not** be displayed."
-            await ctx.send(msg)
-            return
+            msg = "Stream announcements will **not** be displayed."
+            return await ctx.send(msg)
 
         # If we made it this far - then we can add it
         self.settings.setServerStat(ctx.message.guild, "StreamChannel", channel.id)

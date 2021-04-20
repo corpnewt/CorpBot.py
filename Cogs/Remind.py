@@ -5,9 +5,7 @@ import parsedatetime
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import ReadableTime
-from   Cogs import DisplayName
-from   Cogs import Nullify
+from   Cogs import ReadableTime, DisplayName, Utils, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -28,13 +26,6 @@ class Remind(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
@@ -162,7 +153,7 @@ class Remind(commands.Cog):
 
 		# Add reminder
 		reminders = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Reminders")
-		reminder = { 'End' : end, 'Message' : message, 'Server' : self.suppressed(ctx.guild, ctx.guild.name) }
+		reminder = { 'End' : end, 'Message' : message, 'Server' : Nullify.escape_all(ctx.guild.name) }
 		reminders.append(reminder)
 		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "Reminders", reminders)
 
@@ -188,9 +179,7 @@ class Remind(commands.Cog):
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -235,9 +224,7 @@ class Remind(commands.Cog):
 		elif remain > 1:
 			msg = '{}\n\nYou have *{}* additional reminders.'.format(msg, remain)
 
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 
 		await ctx.channel.send(msg)
 
@@ -286,7 +273,5 @@ class Remind(commands.Cog):
 		removed = reminders.pop(index-1)
 		self.settings.setUserStat(member, member.guild, "Reminders", reminders)
 		msg = "I will no longer remind you: {}".format(removed["Message"])
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.channel.send(msg)

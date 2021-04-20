@@ -2,7 +2,7 @@ import asyncio, discord, time, parsedatetime
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Utils, Settings, ReadableTime, DisplayName, Nullify, CheckRoles
+from   Cogs import Utils, Settings, ReadableTime, CheckRoles, DisplayName, Utils
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -21,13 +21,6 @@ class Admin(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 	
 	async def test_message(self, message):
 		# Implemented to bypass having this called twice
@@ -62,10 +55,10 @@ class Admin(commands.Cog):
 			if checkTime:
 				# We have a cooldown
 				checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, self.suppressed(message.guild, message.guild.name))
+				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, Utils.suppressed(message.guild, message.guild.name))
 			else:
 				# No cooldown - muted indefinitely
-				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(self.suppressed(message.guild, message.guild.name))
+				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(Utils.suppressed(message.guild, message.guild.name))
 
 			if checkTime and currentTime >= checkTime:
 				# We have passed the check time
@@ -325,9 +318,7 @@ class Admin(commands.Cog):
 			exp = nameCheck["Int"]
 			if not mem:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 			member   = mem
@@ -346,9 +337,7 @@ class Admin(commands.Cog):
 				if member in m.roles:
 					self.settings.setUserStat(m, server, "XP", xpAmount)
 		msg = '*{}\'s* xp was set to *{:,}!*'.format(DisplayName.name(member), xpAmount)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await channel.send(msg)
 		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 
@@ -390,9 +379,7 @@ class Admin(commands.Cog):
 			exp = nameCheck["Int"]
 			if not mem:
 				msg = 'I couldn\'t find *{}* on the server.'.format(member)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 			member   = mem
@@ -443,17 +430,13 @@ class Admin(commands.Cog):
 			role = DisplayName.roleForName(roleName, server)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
 		self.settings.setServerStat(server, "DefaultRole", role.id)
 		rolename = role.name
-		# Check for suppress
-		if suppress:
-			rolename = Nullify.clean(rolename)
+		msg = Utils.suppressed(ctx,rolename)
 		await channel.send('Default role set to **{}**!'.format(rolename))
 
 
@@ -493,9 +476,7 @@ class Admin(commands.Cog):
 					return
 				if not roleCheck["Role"]:
 					msg = 'I couldn\'t find *{}* on the server.'.format(role)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = Utils.suppressed(ctx,msg)
 					await ctx.message.channel.send(msg)
 					return
 				role = roleCheck["Role"]
@@ -516,10 +497,7 @@ class Admin(commands.Cog):
 				# We found it - throw an error message and return
 				aRole['XP'] = xp
 				msg = '**{}** updated!  Required xp:  *{:,}*'.format(role.name, xp)
-				# msg = '**{}** is already in the list.  Required xp: *{}*'.format(role.name, aRole['XP'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await channel.send(msg)
 				return
 
@@ -528,9 +506,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(server, "PromotionArray", promoArray)
 
 		msg = '**{}** added to list.  Required xp: *{:,}*'.format(role.name, xp)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await channel.send(msg)
 		return
 		
@@ -570,9 +546,7 @@ class Admin(commands.Cog):
 					promoArray.remove(aRole)
 					self.settings.setServerStat(server, "PromotionArray", promoArray)
 					msg = '**{}** removed successfully.'.format(aRole['Name'])
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = Utils.suppressed(ctx,msg)
 					await channel.send(msg)
 					return
 			# At this point - no name
@@ -592,17 +566,13 @@ class Admin(commands.Cog):
 						promoArray.remove(aRole)
 						self.settings.setServerStat(server, "PromotionArray", promoArray)
 						msg = '**{}** removed successfully.'.format(aRole['Name'])
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						msg = Utils.suppressed(ctx,msg)
 						await channel.send(msg)
 						return
 				
 			# If we made it this far - then we didn't find it
 			msg = '{} not found in list.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = Utils.suppressed(ctx,msg)
 			await channel.send(msg)
 			return
 
@@ -616,17 +586,13 @@ class Admin(commands.Cog):
 				promoArray.remove(aRole)
 				self.settings.setServerStat(server, "PromotionArray", promoArray)
 				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await channel.send(msg)
 				return
 
 		# If we made it this far - then we didn't find it
 		msg = '{} not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await channel.send(msg)
 
 	@commands.command(pass_context=True)
@@ -685,9 +651,7 @@ class Admin(commands.Cog):
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -695,9 +659,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "RequiredXPRole", role.id)
 
 		msg = 'Role required to give xp, gamble, or feed the bot set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 		
 	
@@ -734,9 +696,7 @@ class Admin(commands.Cog):
 						msg = 'You need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(arole.name)
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = Utils.suppressed(ctx,msg)
 			await ctx.message.channel.send(msg)
 		
 	@commands.command(pass_context=True)
@@ -764,9 +724,7 @@ class Admin(commands.Cog):
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -774,9 +732,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "RequiredStopRole", role.id)
 
 		msg = 'Role required to stop the music player set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 		
 	
@@ -814,9 +770,7 @@ class Admin(commands.Cog):
 					
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			# Check for suppress
-			if suppress:
-				msg = Nullify.clean(msg)
+			msg = Utils.suppressed(ctx,msg)
 			await ctx.message.channel.send(msg)
 
 		
@@ -845,9 +799,7 @@ class Admin(commands.Cog):
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -855,9 +807,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", role.id)
 
 		msg = 'Role required for add/remove links set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 		
 	
@@ -893,9 +843,7 @@ class Admin(commands.Cog):
 			role = DisplayName.roleForName(roleName, ctx.message.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -903,9 +851,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "RequiredHackRole", role.id)
 
 		msg = 'Role required for add/remove hacks set to **{}**.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 
 
@@ -913,6 +859,50 @@ class Admin(commands.Cog):
 	async def hackrole_error(self, error, ctx):
 		# do stuff
 		msg = 'sethackrole Error: {}'.format(error)
+		await ctx.channel.send(msg)
+
+
+	@commands.command(pass_context=True)
+	async def settagrole(self, ctx, *, role : str = None):
+		"""Sets the required role ID to add/remove tags (admin only)."""
+		
+		# Check if we're suppressing @here and @everyone mentions
+		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+			suppress = True
+		else:
+			suppress = False
+
+		if not await Utils.is_admin_reply(ctx): return
+
+		if role == None:
+			self.settings.setServerStat(ctx.message.guild, "RequiredTagRole", "")
+			msg = 'Add/remove tags now *admin-only*.'
+			await ctx.message.channel.send(msg)
+			return
+
+		if type(role) is str:
+			if role == "everyone":
+				role = "@everyone"
+			roleName = role
+			role = DisplayName.roleForName(roleName, ctx.message.guild)
+			if not role:
+				msg = 'I couldn\'t find *{}*...'.format(roleName)
+				msg = Utils.suppressed(ctx,msg)
+				await ctx.message.channel.send(msg)
+				return
+
+		# If we made it this far - then we can add it
+		self.settings.setServerStat(ctx.message.guild, "RequiredTagRole", role.id)
+
+		msg = 'Role required for add/remove tags set to **{}**.'.format(role.name)
+		msg = Utils.suppressed(ctx,msg)
+		await ctx.message.channel.send(msg)
+
+
+	@settagrole.error
+	async def tagrole_error(self, error, ctx):
+		# do stuff
+		msg = 'settagrole Error: {}'.format(error)
 		await ctx.channel.send(msg)
 		
 		
@@ -937,7 +927,7 @@ class Admin(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 		rules = self.settings.getServerStat(ctx.message.guild, "Rules")
 		rules = rules.replace('\\', '\\\\').replace('*', '\\*').replace('`', '\\`').replace('_', '\\_')
-		msg = "*{}* Rules (Raw Markdown):\n{}".format(self.suppressed(ctx.guild, ctx.guild.name), rules)
+		msg = "*{}* Rules (Raw Markdown):\n{}".format(Utils.suppressed(ctx, ctx.guild.name), rules)
 		await ctx.channel.send(msg)
 		
 		
@@ -983,9 +973,7 @@ class Admin(commands.Cog):
 				role = DisplayName.roleForName(roleName, ctx.guild)
 			if not role:
 				msg = 'I couldn\'t find *{}*...'.format(roleName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -997,9 +985,7 @@ class Admin(commands.Cog):
 			if str(aRole['ID']) == str(role.id):
 				# We found it - throw an error message and return
 				msg = '**{}** is already in the list.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -1008,9 +994,7 @@ class Admin(commands.Cog):
 		self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
 
 		msg = '**{}** added to list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 		return
 
@@ -1057,9 +1041,7 @@ class Admin(commands.Cog):
 				promoArray.remove(aRole)
 				self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
 				msg = '**{}** removed successfully.'.format(aRole['Name'])
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -1069,17 +1051,13 @@ class Admin(commands.Cog):
 				promoArray.remove(aRole)
 				self.settings.setServerStat(ctx.message.guild, "AdminArray", promoArray)
 				msg = '**{}** removed successfully.'.format(role.name)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = Utils.suppressed(ctx,msg)
 				await ctx.message.channel.send(msg)
 				return
 
 		# If we made it this far - then we didn't find it
 		msg = '**{}** not found in list.'.format(role.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await ctx.message.channel.send(msg)
 
 	@removeadmin.error
@@ -1129,9 +1107,7 @@ class Admin(commands.Cog):
 				await self.updateMOTD()
 				return		
 		msg = 'MOTD for *{}* not found.'.format(chan.name)
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
+		msg = Utils.suppressed(ctx,msg)
 		await channel.send(msg)	
 		
 	@removemotd.error

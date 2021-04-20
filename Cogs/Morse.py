@@ -5,7 +5,7 @@ from   operator import itemgetter
 import base64
 import binascii
 import re
-from   Cogs import Nullify
+from   Cogs import Utils
 
 def setup(bot):
 	# Add the bot and deps
@@ -18,6 +18,8 @@ class Morse(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		global Utils
+		Utils = self.bot.get_cog("Utils")
 		self.to_morse = { 
 			"a" : ".-",
 			"b" : "-...",
@@ -56,14 +58,6 @@ class Morse(commands.Cog):
 			"9" : "----.",
 			"0" : "-----"
 			}
-
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 		
 		
 	@commands.command(pass_context=True)
@@ -80,9 +74,7 @@ class Morse(commands.Cog):
 		row_list = [[]]
 		cur_list = []
 		sorted_list = sorted(self.to_morse)
-		print(sorted_list)
 		for key in sorted_list:
-			print(key)
 			entry = "{} : {}".format(key.upper(), self.to_morse[key])
 			if len(entry) > max_length:
 				max_length = len(entry)
@@ -98,7 +90,7 @@ class Morse(commands.Cog):
 			msg += "\n"
 		
 		msg += "```"
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -133,7 +125,7 @@ class Morse(commands.Cog):
 		# We got *something*
 		msg = "    ".join(morse_list)
 		msg = "```\n" + msg + "```"
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(msg)
 
 
 	@commands.command(pass_context=True)
@@ -144,7 +136,8 @@ class Morse(commands.Cog):
 			await ctx.send("Usage `{}unmorse [content]`".format(ctx.prefix))
 			return
 
-		# Only accept alpha numeric stuff and spaces
+		# Only accept morse symbols
+		content = "".join([x for x in content if x in " .-"])
 		word_list = content.split("    ")
 		ascii_list = []
 		for word in word_list:
@@ -169,6 +162,6 @@ class Morse(commands.Cog):
 		# We got *something* - join separated by a space
 		msg = " ".join(ascii_list)
 		msg = "```\n" + msg + "```"
-		await ctx.send(self.suppressed(ctx.guild, msg))
+		await ctx.send(Utils.suppressed(ctx, msg))
 
 	

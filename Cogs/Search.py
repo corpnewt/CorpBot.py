@@ -196,8 +196,8 @@ class Search(commands.Cog):
 			elif val.upper() in r.get("results",{}):
 				# Should have a valid type - let's add it and the type to the list
 				conv.append([last,val])
-				if len(conv) >= 2: break # We have enough values
 				last = None
+			if len(conv) >= 2 and num != None: break # We have enough info - bail
 		if num is None: num = 1
 		if len(conv) < 2:
 			return await ctx.send("Usage: `{}convert [amount] [from_currency] (to) [to_currency]` - Type `{}convert` for a list of valid currencies.".format(ctx.prefix,ctx.prefix))

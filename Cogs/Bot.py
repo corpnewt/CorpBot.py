@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct
 from   PIL         import Image
 from   discord.ext import commands
-from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, Nullify, ProgressBar, UserTime, Message, DL
+from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, ProgressBar, UserTime, Message, DL
 try:
 	from urllib.parse import urlparse
 except ImportError:
@@ -392,13 +392,11 @@ class Bot(commands.Cog):
 			msg = '**Speed Test Results:**\n'
 			msg += '```\n'
 			await message.edit(content="Running speed test...\n- Downloading...")
-			a = self.bot.loop.run_in_executor(None, st.download)
-			d = await a
-			msg += 'Download: {}Mb/s\n'.format(round(d/1024/1024, 2))
+			d = await self.bot.loop.run_in_executor(None, st.download)
+			msg += '    Ping: {} ms\nDownload: {} Mb/s\n'.format(round(st.results.ping, 2), round(d/1024/1024, 2))
 			await message.edit(content="Running speed test...\n- Downloading...\n- Uploading...")
-			a = self.bot.loop.run_in_executor(None, st.upload)
-			u = await a
-			msg += '  Upload: {}Mb/s```'.format(round(u/1024/1024, 2))
+			u = await self.bot.loop.run_in_executor(None, st.upload)
+			msg += '  Upload: {} Mb/s```'.format(round(u/1024/1024, 2))
 			await message.edit(content=msg)
 		except Exception as e:
 			await message.edit(content="Speedtest Error: {}".format(str(e)))
@@ -514,23 +512,15 @@ class Bot(commands.Cog):
 
 	# Needs rewrite!
 	@commands.command(pass_context=True)
-	async def reboot(self, ctx, force = None):
+	async def reboot(self, ctx):
 		"""Reboots the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
 
-		quiet = False
-		if force and force.lower() == 'force':
-			quiet = True		
 		# Save the return channel and flush settings
 		self.settings.setGlobalStat("ReturnChannel",ctx.channel.id)
-		if not quiet:
-			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
-		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
-		if not quiet:
-			msg = 'Flushed settings to disk.\nRebooting...'
-			await message.edit(content=msg)
+		await ctx.invoke(self.settings.flush)
+		await ctx.send("Rebooting...")
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
@@ -547,33 +537,23 @@ class Bot(commands.Cog):
 		os._exit(2)
 
 	@commands.command(pass_context=True)
-	async def shutdown(self, ctx, force = None):
+	async def shutdown(self, ctx):
 		"""Shuts down the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
-
-		quiet = False
-		if force and force.lower() == 'force':
-			quiet = True
-		if not quiet:
-			message = await ctx.send("Flushing settings to disk...")
 		# Flush settings asynchronously here
-		l = asyncio.get_event_loop()
-		await self.bot.loop.run_in_executor(None, self.settings.flushSettings)
-
-		if not quiet:
-			msg = 'Flushed settings to disk.\nShutting down...'
-			await message.edit(content=msg)
+		await ctx.invoke(self.settings.flush)
+		await ctx.send("Shutting down...")
 		# Logout, stop the event loop, close the loop, quit
 		for task in asyncio.Task.all_tasks():
 			try:
 				task.cancel()
-			except Exception:
+			except:
 				continue
 		try:
 			await self.bot.logout()
 			self.bot.loop.stop()
 			self.bot.loop.close()
-		except Exception:
+		except:
 			pass
 		# Kill this process
 		os._exit(3)		

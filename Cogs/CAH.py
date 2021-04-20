@@ -13,7 +13,6 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
-from   Cogs import Nullify
 try:
     # Python 2.6-2.7
     from HTMLParser import HTMLParser
@@ -178,7 +177,7 @@ class SenCheck:
 class CAH(commands.Cog):
 
     # Init with the bot reference, and a reference to the deck file
-    def __init__(self, bot, prefix = "$", file = None):
+    def __init__(self, bot, prefix = "$", file_path = None):
         self.prefix = prefix
         self.bot = bot
         self.games = []
@@ -200,24 +199,24 @@ class CAH(commands.Cog):
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
-        if file == None:
-            file = "deck.json"
+        file_path = "deck.json" if file_path == None else file_path
         # Let's load our deck file
         # Can be found at http://www.crhallberg.com/cah/json
-        if os.path.exists(file):
-            f = open(file,'r')
-            filedata = f.read()
-            f.close()
-
-            self.deck = json.loads(filedata)
-        else:
-            # File doesn't exist - create a placeholder
-            self.deck = {}
+        # Make sure to use the "compact.json" option when download
+        try: self.deck = json.load(open(file_path,"rb"))
+        except: self.deck = {} # File doesn't exist or isn't valid - create a placeholder
+        # Let's validate our json structure - new versions do not have universal
+        # blackCards and whiteCards keys - so we need to restructure
+        if "white" in self.deck and "black" in self.deck:
+            self.deck["whiteCards"] = self.deck.pop("white",[])
+            self.deck["blackCards"] = self.deck.pop("black",[])
+        # Check if our deck is borked and print an issue if so
+        if not all((x in self.deck for x in ("whiteCards","blackCards"))):
+            print("{} is malformed!  CAH will not work correctly!".format(file_path)) 
         # Get our bot personalities setup
         words = "cah_words.json"
-        word_dict = {}
-        if os.path.exists(words):
-            word_dict = json.load(open(words))
+        try: word_dict = json.load(open(words,"rb"))
+        except: word_dict = {}
         self.sencheck = SenCheck(word_dict)
         self.parser = HTMLParser()
         self.debug = False

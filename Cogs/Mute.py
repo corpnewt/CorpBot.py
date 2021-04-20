@@ -128,11 +128,11 @@ class Mute(commands.Cog):
         # Here - we either have surpassed our cooldown - or we're not muted anymore
         if isMute:
             await self._unmute(member, server)
-            pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(Utils.suppressed(server,server.name))
-            await member.send(pm)
+            # pm = 'You have been **Unmuted**.\n\nYou can send messages on *{}* again.'.format(Utils.suppressed(server,server.name))
+            # await member.send(pm)
         self._remove_task(task)
 
-    async def _mute(self, member, server, cooldown = None):
+    async def _mute(self, member, server, cooldown = None, muted_by = None):
         # Mutes the specified user on the specified server
         # Check for a mute role - and verify it
         mute_role = self.settings.getServerStat(server,"MuteRole")
@@ -156,6 +156,8 @@ class Mute(commands.Cog):
         self.settings.setServerStat(server, "MuteList", muteList)
         # Set a timer if we have a cooldown
         if not cooldown == None: self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+        # Dispatch and event
+        self.bot.dispatch("mute", member, server, cooldown, muted_by)
 
     async def _unmute(self, member, server):
         # Unmutes the specified user on the specified server
@@ -178,6 +180,8 @@ class Mute(commands.Cog):
         muteList = [x for x in muteList if str(x["ID"]) != str(member.id)]
         # Save the results
         self.settings.setServerStat(server, "MuteList", muteList)
+        # Dispatch the event for logging
+        self.bot.dispatch("unmute", member, server)
 
     async def _ask_perms(self, ctx, mute_role, desync=False, show_count=True):
         # Helper that asks the user if they want to sync/desync the role perms
@@ -218,9 +222,9 @@ class Mute(commands.Cog):
         guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if isinstance(ctx,discord.ext.commands.Context) else None
         if guild is None: return # Got sent some wonky values, I guess...
         for channel in guild.channels:
-            if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-            if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                if channel.permissions_synced: channel = channel.category # Get the category if we're synced
+            if isinstance(channel,(discord.TextChannel,discord.VoiceChannel)) and hasattr(channel,"permissions_synced") and channel.permissions_synced:
+                # This channel inherits its permissions from the category - let's skip it and just set that.
+                continue
             overs = channel.overwrites_for(mute_role) # Get any overrides for the role
             # Check if we qualify in this channel to sync/desync
             if desync: perm_check  = any(x[0] in self.mute_perms and x[1] != None for x in overs)
@@ -395,20 +399,16 @@ class Mute(commands.Cog):
             "" if role else " You can set up a mute role with `{}setmuterole [role]` or `{}createmuterole [role_name]` for a **much faster** muting experience.".format(ctx.prefix,ctx.prefix)
             ))
         # Do the actual muting
-        await self._mute(member, ctx.guild, cooldownFinal)
+        await self._mute(member, ctx.guild, cooldownFinal, ctx.author)
         if cooldown:
             mins = "minutes"
             checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
             msg = '*{}* has been **Muted** for *{}*.'.format(DisplayName.name(member), checkRead)
-            pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.author), checkRead, Utils.suppressed(ctx, ctx.guild.name))
+            # pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.author), checkRead, Utils.suppressed(ctx, ctx.guild.name))
         else:
             msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
-            pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
+            # pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         await mess.edit(content=Utils.suppressed(ctx,msg))
-        try:
-            await member.send(pm)
-        except Exception:
-            pass
 
     @commands.command(pass_context=True)
     async def unmute(self, ctx, *, member = None):
@@ -425,13 +425,9 @@ class Mute(commands.Cog):
                 return await ctx.send(Utils.suppressed(ctx,msg))
         mess = await ctx.send("Unmuting...")
         await self._unmute(member, ctx.guild)
-        pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
+        # pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
-        try:
-            await member.send(pm)
-        except Exception:
-            pass
 
     @commands.command(pass_context=True)
     async def ismuted(self, ctx, *, member = None):

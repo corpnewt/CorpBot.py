@@ -70,13 +70,6 @@ class Xp(commands.Cog):
 			return
 		self.is_current = True
 		self.bot.loop.create_task(self.addXP())
-
-	def suppressed(self, guild, msg):
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(guild, "SuppressMentions"):
-			return Nullify.clean(msg)
-		else:
-			return msg
 		
 	async def addXP(self):
 		print("Starting XP loop: {}".format(datetime.datetime.now().time().isoformat()))
@@ -90,7 +83,7 @@ class Xp(commands.Cog):
 				updates = await self.bot.loop.run_in_executor(None, self.update_xp)
 				t = time.time()
 				for update in updates:
-					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot)
+					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot, **update["kwargs"])
 				# Sleep after for testing
 			except Exception as e:
 				print(str(e))
@@ -124,6 +117,13 @@ class Xp(commands.Cog):
 
 			xpblock = self.settings.getServerStat(server, "XpBlockArray")
 			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+			kwargs = {
+					"xp_promote":self.settings.getServerStat(server,"XPPromote"),
+					"xp_demote":self.settings.getServerStat(server,"XPDemote"),
+					"suppress_promotions":self.settings.getServerStat(server,"SuppressPromotions"),
+					"suppress_demotions":self.settings.getServerStat(server,"SuppressDemotions"),
+					"only_one_role":self.settings.getServerStat(server,"OnlyOneRole")
+			}
 			
 			for user in server_dict[server_id]:
 
@@ -216,7 +216,7 @@ class Xp(commands.Cog):
 							if tChan:
 								# We *do* have one
 								targetChan = tChan
-						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server_id))})
+						responses.append({"user":user, "chan":targetChan if targetChan else self.bot.get_guild(int(server_id)), "kwargs":kwargs})
 		print("XP Done - took {} seconds.".format(time.time() - t))
 		return responses
 
@@ -250,10 +250,7 @@ class Xp(commands.Cog):
 				roleCheck = DisplayName.checkRoleForInt(member, server)
 				if not roleCheck:
 					# Returned nothing - means there isn't even an int
-					msg = 'I couldn\'t find *{}* on the server.'.format(member)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
 					await ctx.message.channel.send(msg)
 					return
 				if roleCheck["Role"]:
@@ -267,10 +264,7 @@ class Xp(commands.Cog):
 						await ctx.message.channel.send(usage)
 						return
 					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find *{}* on the server.'.format(member)
-						# Check for suppress
-						if suppress:
-							msg = Nullify.clean(msg)
+						msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
 						await ctx.message.channel.send(msg)
 						return
 					member   = nameCheck["Member"]
@@ -423,6 +417,12 @@ class Xp(commands.Cog):
 				if len(memSorted):
 					# There actually ARE members in said role
 					totalXP = xpAmount
+					# Gather presets
+					xp_p = self.settings.getServerStat(server,"XPPromote")
+					xp_d = self.settings.getServerStat(server,"XPDemote")
+					xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
+					xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
+					xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
 					if xpAmount > len(memSorted):
 						# More xp than members
 						leftover = xpAmount % len(memSorted)
@@ -438,25 +438,38 @@ class Xp(commands.Cog):
 								leftover -= 1
 							else:
 								self.settings.incrementStat(cMember, server, "XP", eachXP)
-							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
+							await CheckRoles.checkroles(
+								cMember,
+								channel,
+								self.settings,
+								self.bot,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo)
 					else:
 						for i in range(0, xpAmount):
 							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
 							self.settings.incrementStat(cMember, server, "XP", 1)
-							await CheckRoles.checkroles(cMember, channel, self.settings, self.bot)
+							await CheckRoles.checkroles(
+								cMember,
+								channel,
+								self.settings,
+								self.bot,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo)
 
 					# Decrement if needed
 					if decrement:
 						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
-					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, member.name)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, Nullify.escape_all(member.name))
 					await channel.send(msg)
 				else:
-					msg = 'There are no eligible members in *{}!*'.format(member.name)
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'There are no eligible members in *{}!*'.format(Nullify.escape_all(member.name))
 					await channel.send(msg)
 
 			else:
@@ -465,9 +478,6 @@ class Xp(commands.Cog):
 					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 				msg = '*{}* was given *{:,} xp!*'.format(DisplayName.name(member), xpAmount)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
 				await channel.send(msg)
 				self.settings.incrementStat(member, server, "XP", xpAmount)
 				# Now we check for promotions
@@ -500,10 +510,7 @@ class Xp(commands.Cog):
 			for arole in ctx.message.guild.roles:
 				if str(arole.id) == str(role):
 					found = True
-					msg = 'New users will be assigned to **{}**.'.format(arole.name)
-					# Check for suppress
-					if suppress:
-						msg = Nullify.clean(msg)
+					msg = 'New users will be assigned to **{}**.'.format(Nullify.escape_all(arole.name))
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await ctx.message.channel.send(msg)
@@ -658,12 +665,28 @@ class Xp(commands.Cog):
 			await channel.send('You do not have sufficient privileges to access this command.')
 			return
 		
+		# Gather presets
+		xp_p = self.settings.getServerStat(server,"XPPromote")
+		xp_d = self.settings.getServerStat(server,"XPDemote")
+		xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
+		xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
+		xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
 		message = await ctx.channel.send('Checking roles...')
 
 		changeCount = 0
 		for member in server.members:
 			# Now we check for promotions
-			if await CheckRoles.checkroles(member, channel, self.settings, self.bot, True):
+			if await CheckRoles.checkroles(
+								member,
+								channel,
+								self.settings,
+								self.bot,
+								True,
+								xp_promote=xp_p,
+								xp_demote=xp_d,
+								suppress_promotions=xp_sp,
+								suppress_demotions=xp_sd,
+								only_one_role=xp_oo):
 				changeCount += 1
 		
 		if changeCount == 1:
@@ -730,9 +753,9 @@ class Xp(commands.Cog):
 					if str(role.id) == str(arole['ID']):
 						# We found it
 						foundRole = True
-						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, role.name, arole['XP'])
+						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, Nullify.escape_all(role.name), arole['XP'])
 				if not foundRole:
-					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, arole['Name'], arole['XP'])
+					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']), arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
@@ -746,16 +769,12 @@ class Xp(commands.Cog):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
-						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
 					else:
-						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, arole.name)
+						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
 					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
 			if not found:
 				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that setting.'.format(roleText, role)
-
-		# Check for suppress
-		if suppress:
-			roleText = Nullify.clean(roleText)
 
 		await channel.send(roleText)
 		
@@ -777,10 +796,7 @@ class Xp(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.message.channel.send(msg)
 				return
 			
@@ -860,7 +876,7 @@ class Xp(commands.Cog):
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
 			startIndex = len(promoSorted)-1
-			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
+			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
@@ -906,7 +922,7 @@ class Xp(commands.Cog):
 		
 		if len(promoSorted):
 			# makes sure we have at least 1 user - shouldn't be necessary though
-			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, self.suppressed(ctx.guild, ctx.guild.name))
+			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
 
 		for i in range(0, total):
 			# Loop through from startIndex to startIndex+total-1
@@ -945,10 +961,7 @@ class Xp(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				# Check for suppress
-				if suppress:
-					msg = Nullify.clean(msg)
+				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.message.channel.send(msg)
 				return
 
@@ -985,17 +998,14 @@ class Xp(commands.Cog):
 			# Add to embed
 			stat_embed.set_author(name='{}'.format(member.name))
 		# Get localized user time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
-		j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
+		if member.joined_at != None:
+			local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
+			j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		
-		msg = "{}**Joined:** *{}*\n".format(msg, j_time_str) # I think this will work
-		msg = "{}**XP:** *{:,}*\n".format(msg, newStat)
-		msg = "{}**XP Reserve:** *{:,}*\n".format(msg, newState)
-		
-		# Add Joined
-		stat_embed.add_field(name="Joined", value=j_time_str, inline=True)
-
-		# msg = '*{}* has *{} xp*, and can gift up to *{} xp!*'.format(DisplayName.name(member), newStat, newState)
+			# Add Joined
+			stat_embed.add_field(name="Joined", value=j_time_str, inline=True)
+		else:
+			stat_embed.add_field(name="Joined", value="Unknown", inline=True)
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
@@ -1022,7 +1032,6 @@ class Xp(commands.Cog):
 						# There's more roles above this
 						nRoleIndex = promoSorted.index(role)+1
 						nextRole = promoSorted[nRoleIndex]
-
 
 		if highestRole:
 			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
@@ -1075,17 +1084,18 @@ class Xp(commands.Cog):
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
 		# Add joinpos
-		joinedList = []
-		for mem in ctx.message.guild.members:
-			joinedList.append({ 'ID' : mem.id, 'Joined' : mem.joined_at })
-		
-		# sort the users by join date
-		joinedList = sorted(joinedList, key=lambda x:x['Joined'])
-		check_item = { "ID" : member.id, "Joined" : member.joined_at }
-		total = len(joinedList)
-		position = joinedList.index(check_item) + 1
-		
-		stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+		joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in ctx.guild.members], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
+
+		if member.joined_at != None:
+			try:
+				check_item = { "ID" : member.id, "Joined" : member.joined_at }
+				total = len(joinedList)
+				position = joinedList.index(check_item) + 1
+				stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+			except:
+				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
+		else:
+			stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 		
 		# Get localized user time
 		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at, clock=False)
@@ -1117,7 +1127,7 @@ class Xp(commands.Cog):
 		else:
 			suppress = False
 
-		serverName = self.suppressed(server, server.name)
+		serverName = Nullify.escape_all(server.name)
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
 		xpPerMessage = int(self.settings.getServerStat(server, "XPPerMessage"))
@@ -1207,16 +1217,12 @@ class Xp(commands.Cog):
 					found = True
 					vowels = "aeiou"
 					if arole.name[:1].lower() in vowels:
-						msg = '{}Currently, you need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+						msg = '{}Currently, you need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, Nullify.escape_all(arole.name))
 					else:
-						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, arole.name)
+						msg = '{}Currently, you need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.\n\n'.format(msg, Nullify.escape_all(arole.name))
 			if not found:
 				msg = '{}There is no role that matches id: `{}` for using the xp system - consider updating that setting.\n\n'.format(msg, role)
 
 		msg = "{}Hopefully that clears things up!".format(msg)
-
-		# Check for suppress
-		if suppress:
-			msg = Nullify.clean(msg)
 
 		await ctx.message.channel.send(msg)

@@ -14,8 +14,8 @@ class BotAdmin(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
-		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)([^\s]+)")
-		self.mention_re = re.compile(r"\<\@!{0,1}[0-9]+\>")
+		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
+		self.mention_re = re.compile(r"[0-9]{17,21}")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -155,42 +155,52 @@ class BotAdmin(commands.Cog):
 		# Helper method to handle the lifting for kick and ban
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not members_and_reason:
-			return await ctx.send('Usage: `{}{} [space delimited member mention] [reason]`'.format(ctx.prefix, command_name))
+			return await ctx.send('Usage: `{}{} [space delimited member mention/id] [reason]`'.format(ctx.prefix, command_name))
 		# Force a mention - we don't want any ambiguity
 		args = members_and_reason.split()
 		# Get our list of targets
 		targets = []
+		missed = []
+		unable = []
 		reason = ""
 		for index,item in enumerate(args):
 			if self.mention_re.search(item): # Check if it's a mention
 				# Resolve the member
-				member = ctx.guild.get_member(int(re.sub(r'\W+', '', item)))
-				# If we have an invalid mention - bail - no ambiguity
-				if member is None: return await ctx.send("Invalid mention passed!")
+				mem_id = int(re.sub(r'\W+', '', item))
+				member = ctx.guild.get_member(mem_id)
+				# If we have an invalid mention, save it to report later
+				if member is None:
+					missed.append(str(mem_id))
+					continue
 				# We should have a valid member - let's make sure it's not:
 				# 1. The bot, 2. The command caller, 3. Another bot-admin/admin
-				if member.id == self.bot.user.id: return await ctx.send("I don't think I want to {} myself...".format(command_name))
-				if member.id == ctx.author.id: return await ctx.send("I don't think you really want to {} yourself...".format(command_name))
-				if Utils.is_bot_admin(ctx,member): return await ctx.send("You cannot {} other admins!".format(command_name))
-				targets.append(member)
+				if member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member):
+					unable.append(member.mention)
+					continue
+				if not member in targets: targets.append(member) # Only add them if we don't already have them
 			else:
 				# Not a mention - must be the reason, dump the rest of the items into a string
 				# separated by a space
 				reason = " ".join(args[index:])
 				break
-		if not len(targets): return await ctx.send("No valid members passed!")
-		if len(targets) > 5: return await ctx.send("You can only {} up to 5 members at once!".format(command_name))
-		if not len(reason): return await ctx.send("Reason is required!")
+		reason = reason if len(reason) else "No reason provided."
+		if not len(targets):
+			msg = "**With reason:**\n\n{}".format(reason)
+			if len(unable): msg = "**Unable to {}:**\n\n{}\n\n".format(command_name,"\n".join(unable)) + msg
+			if len(missed): msg = "**Unmatched ID{}:**\n\n{}\n\n".format("" if len(missed) == 1 else "s","\n".join(missed)) + msg
+			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author).send(ctx)
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
 		confirmation_code = "".join([str(random.randint(0,9)) for x in range(4)])
-		msg = "**To {} the following member{}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`".format(
+		msg = "**To {} the following member{}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`{}{}".format(
 			command_name,
 			"" if len(targets) == 1 else "s",
 			"\n".join([x.name+"#"+x.discriminator for x in targets]),
-			reason,
-			confirmation_code
+			reason if len(reason) else "None",
+			confirmation_code,
+			"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
+			"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable))
 			)
 		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author).send(ctx)
 		def check_confirmation(message):
