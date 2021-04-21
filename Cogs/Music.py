@@ -484,11 +484,9 @@ class Music(commands.Cog):
 			url = ctx.message.attachments[0].url
 		message = await Message.EmbedText(title="♫ Downloading...",color=ctx.author).send(ctx)
 		try:
-			playlist = DL.async_json(url.strip("<>"))
+			playlist = await DL.async_json(url.strip("<>"))
 		except Exception as e:
 			return await Message.EmbedText(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,message)
-		finally:
-			shutil.rmtree(os.path.dirname(path),ignore_errors=True)
 		if not len(playlist): return await Message.EmbedText(title="♫ Playlist is empty!",color=ctx.author).edit(ctx,message)
 		if not isinstance(playlist,list): return await Message.EmbedText(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,message)
 		if shuffle:
