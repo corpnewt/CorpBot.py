@@ -35,22 +35,6 @@ class Music(commands.Cog):
 		if not hasattr(self.bot,'wavelink'): self.bot.wavelink = wavelink.Client(bot=self.bot)
 		self.bot.loop.create_task(self.start_nodes())
 
-	async def download(self, url):
-		url = url.strip("<>")
-		# Set up a temp directory
-		temp = tempfile.mkdtemp()
-		temp_path = os.path.join(temp,url.rsplit('/', 1)[-1].split("?")[0])
-		try:
-			dl = await DL.async_dl(url)
-			assert dl != None
-			with open(temp_path,"wb") as f:
-				f.write(dl)
-			assert os.path.isfile(temp_path)
-		except:
-			shutil.rmtree(temp,ignore_errors=True)
-			temp_path = None
-		return temp_path
-
 	async def start_nodes(self):
 		node = self.bot.wavelink.get_best_node()
 		if not node:
@@ -499,11 +483,8 @@ class Music(commands.Cog):
 		if url == None:
 			url = ctx.message.attachments[0].url
 		message = await Message.EmbedText(title="♫ Downloading...",color=ctx.author).send(ctx)
-		path = await self.download(url)
-		if not path:
-			return await Message.EmbedText(title="♫ Couldn't download playlist!",color=ctx.author).edit(ctx,message)
 		try:
-			playlist = json.load(open(path))
+			playlist = DL.async_json(url.strip("<>"))
 		except Exception as e:
 			return await Message.EmbedText(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,message)
 		finally:
