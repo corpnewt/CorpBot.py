@@ -1,4 +1,4 @@
-import asyncio, discord, subprocess, os, re, time, math, uuid, ctypes, random, wavelink, json, tempfile, shutil
+import discord, os, re, math, random, wavelink, json, tempfile, shutil
 from   discord.ext import commands
 from   Cogs import Utils, Message, DisplayName, PickList, DL
 
@@ -38,26 +38,18 @@ class Music(commands.Cog):
 	async def download(self, url):
 		url = url.strip("<>")
 		# Set up a temp directory
-		dirpath = tempfile.mkdtemp()
-		tempFileName = url.rsplit('/', 1)[-1]
-		# Strip question mark
-		tempFileName = tempFileName.split('?')[0]
-		filePath = dirpath + "/" + tempFileName
-		rImage = None
+		temp = tempfile.mkdtemp()
+		temp_path = os.path.join(temp,url.rsplit('/', 1)[-1].split("?")[0])
 		try:
-			rImage = await DL.async_dl(url)
+			dl = await DL.async_dl(url)
+			assert dl != None
+			with open(temp_path,"wb") as f:
+				f.write(dl)
+			assert os.path.isfile(temp_path)
 		except:
-			pass
-		if not rImage:
-			self.remove(dirpath)
-			return None
-		with open(filePath, 'wb') as f:
-			f.write(rImage)
-		# Check if the file exists
-		if not os.path.exists(filePath):
-			self.remove(dirpath)
-			return None
-		return filePath
+			shutil.rmtree(temp,ignore_errors=True)
+			temp_path = None
+		return temp_path
 
 	async def start_nodes(self):
 		node = self.bot.wavelink.get_best_node()
