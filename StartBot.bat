@@ -26,7 +26,7 @@ if EXIST "%thisDir%\%ld%\%lava%" (
     echo does not exist!
     echo.
     echo You can get it from:
-    echo   https://github.com/Frederikam/Lavalink/releases/latest
+    echo   https://github.com/freyacodes/Lavalink/releases/latest
     pause
     exit /b
 )
