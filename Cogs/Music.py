@@ -740,7 +740,13 @@ class Music(commands.Cog):
 			if not server: continue
 			p = self.bot.wavelink.get_player(x)
 			if p.is_playing and not p.is_paused:
-				server_list.append({"name":server.name,"value":p.current.info.get("title","Unknown title")})
+				data = self.data.get(str(server.id))
+				server_list.append({"name":server.name,"value":"{} - at {} - Requested by {} - [Link]({})".format(
+					p.current.info.get("title","Unknown title"),
+					self.format_elapsed(p,data),
+					data.info["added_by"].mention,
+					data.uri),"inline":False
+				})
 		msg = "♫ Playing music in {:,} of {:,} server{}.".format(len(server_list), len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s")
 		if len(server_list): await PickList.PagePicker(title=msg,list=server_list,ctx=ctx).pick()
 		else: await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
