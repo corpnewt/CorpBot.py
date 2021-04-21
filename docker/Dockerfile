@@ -32,6 +32,9 @@ RUN mkdir -p ~/.ssh && \
 # Switch to the image provided work directory
 WORKDIR /usr/src/app
 
+# Set default git merge strategy
+RUN git config --global pull.rebase false
+
 # Copy the installation script and install dependencies
 COPY Install.py ./Install.py
 RUN yes '' | python ./Install.py
@@ -57,7 +60,7 @@ ENV SETTINGS_DICT_LAVALINK_REGION      "us_central"
 ENV SETTINGS_DICT_LAVALINK_PASSWORD    "youshallnotpass"
 
 # Expose volumes
-VOLUME [ "/data" ]
+VOLUME [ "/data", "/usr/local/lib/python3.8/site-packages" ]
 
 # Set the startup Python script
 CMD [ "docker/start.sh" ]

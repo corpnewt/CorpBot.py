@@ -23,6 +23,7 @@ services:
       - corpbot_network
     volumes:
       - corpbot_data:/data
+      - corpbot_packages:/usr/local/lib/python3.8/site-packages
     # The following can be used to limit resource usage
     # cpus: 0.5
     # mem_limit: 1024m
@@ -47,3 +48,4 @@ networks:
 
 volumes:
   corpbot_data:
+  corpbot_packages:
