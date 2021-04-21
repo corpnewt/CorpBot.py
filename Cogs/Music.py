@@ -741,7 +741,8 @@ class Music(commands.Cog):
 			p = self.bot.wavelink.get_player(x)
 			if p.is_playing and not p.is_paused:
 				data = self.data.get(str(server.id))
-				server_list.append({"name":server.name,"value":"{} - at {} - Requested by {} - [Link]({})".format(
+				queue = self.queue.get(str(server.id),[])
+				server_list.append({"name":server.name+(" ({:,} more in queue)".format(len(queue)) if len(queue) else ""),"value":"{} - at {} - Requested by {} - [Link]({})".format(
 					p.current.info.get("title","Unknown title"),
 					self.format_elapsed(p,data),
 					data.info["added_by"].mention,
