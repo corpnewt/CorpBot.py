@@ -422,14 +422,14 @@ class Music(commands.Cog):
 		if not user.guild or not before.channel or (user.bot and user.id != self.bot.user.id):
 			return # No guild, someone joined, or the user is a bot that's not us
 		player = self.bot.wavelink.players.get(before.channel.guild.id,None)
-		if player == None or not player.is_connected:
+		if player == None:
 			return # Player is borked or not connected - just bail
-		if int(player.channel_id) != before.channel.id:
+		if player.channel_id and int(player.channel_id) != before.channel.id:
 			return # No player to worry about, or someone left a different channel - ignore
 		if user.id == self.bot.user.id and not after.channel:
 			# We were disconnected somehow - try to reconnect and keep playing
 			return await player.connect(before.channel.id)
-		if len([x for x in before.channel.members if not x.bot]) > 0:
+		elif len([x for x in before.channel.members if not x.bot]) > 0:
 			return # At least one non-bot user
 		# if we made it here - then we're alone - disconnect and destroy
 		self.dict_pop(user.guild)
