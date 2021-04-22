@@ -74,6 +74,10 @@ class Music(commands.Cog):
 		await Message.EmbedText(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=delay).send(ctx)
 		return False
 
+	def _get_mention(self, info):
+		try: return info["added_by"].mention
+		except: return info.get("added_by","Unknown")
+
 	async def resolve_search(self, ctx, url, shuffle = False):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -394,7 +398,7 @@ class Music(commands.Cog):
 			fields=[
 				{"name":"Duration","value":self.format_duration(data.duration,data),"inline":False}
 			],
-			description="Requested by {}".format(data.info["added_by"].mention),
+			description="Requested by {}".format(self._get_mention(data.info)),
 			color=ctx.author,
 			url=data.uri,
 			thumbnail=data.thumb,
@@ -629,7 +633,7 @@ class Music(commands.Cog):
 		if song.info.get("added_by",None) == ctx.author or Utils.is_bot_admin(ctx):
 			queue.pop(song_number)
 			return await Message.EmbedText(title="♫ Removed {} at position {}!".format(song.title,song_number+1),color=ctx.author,delete_after=delay).send(ctx)
-		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(song["added_by"].mention),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.EmbedText(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(self._get_mention(song)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def unqueue(self, ctx):
@@ -697,7 +701,7 @@ class Music(commands.Cog):
 		cv = int(player.volume*2)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,data.title),
-			description="Requested by {} -- Volume at {}%".format(data.info["added_by"].mention,cv),
+			description="Requested by {} -- Volume at {}%".format(self._get_mention(data.info),cv),
 			color=ctx.author,
 			fields=[
 				{"name":"Elapsed","value":self.format_elapsed(player,data),"inline":False},
@@ -724,7 +728,7 @@ class Music(commands.Cog):
 				server_list.append({"name":server.name+(" ({:,} more in queue)".format(len(queue)) if len(queue) else ""),"value":"{} - at {} - Requested by {} - [Link]({})".format(
 					p.current.info.get("title","Unknown title"),
 					self.format_elapsed(p,data),
-					data.info["added_by"].mention,
+					self._get_mention(data.info),
 					data.uri),"inline":False
 				})
 		msg = "♫ Playing music in {:,} of {:,} server{}.".format(len(server_list), len(self.bot.guilds), "" if len(self.bot.guilds) == 1 else "s")
@@ -750,7 +754,7 @@ class Music(commands.Cog):
 		fields = [{"name":"{}".format(data.title),"value":"Currently {} - at {} - Requested by {} - [Link]({})".format(
 			play_text,
 			self.format_elapsed(player,data),
-			data.info["added_by"].mention,
+			self._get_mention(data.info),
 			data.uri),"inline":False},
 		]
 		if len(queue):
@@ -775,7 +779,7 @@ class Music(commands.Cog):
 			x += 1 # brings this up to the proper numbering
 			fields.append({
 				"name":"{}. {}".format(x,y.title),
-				"value":"{} - Requested by {} - [Link]({})".format(self.format_duration(y.duration,y),y.info["added_by"].mention,y.uri),
+				"value":"{} - Requested by {} - [Link]({})".format(self.format_duration(y.duration,y),self._get_mention(y.info),y.uri),
 				"inline":False})
 		if self.loop.get(str(ctx.guild.id),False):
 			pl_string = " - Repeat Enabled"
