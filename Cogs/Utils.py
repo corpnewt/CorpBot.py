@@ -104,8 +104,14 @@ class Utils(commands.Cog):
 		message = message.content if isinstance(message,discord.Message) else message.message.content if isinstance(message,discord.ext.commands.Context) else str(message)
 		return [x.group(0) for x in re.finditer(self.url_regex,message)]
 
-	def truncate_string(self,value=None,limit=128,suffix="...",replace_newlines=True):
+	def truncate_string(self,value=None,limit=128,suffix="...",replace_newlines=True,complete_codeblocks=True):
 		if not isinstance(value,str) : return value
 		# Truncates the string to the max chars passed
-		if replace_newlines: value = value.replace("\n"," ")
-		return (value[:limit-len(suffix)]+suffix) if len(value)>limit else value
+		if replace_newlines:
+			new_val = [line+"\n" if complete_codeblocks and line.startswith("```") and line[3:].isalpha() else line for line in value.split("\n")]
+			value = " ".join(new_val)
+		if len(value)>limit: # We need to truncate
+			value = value[:limit-len(suffix)]+suffix
+			# Check if we need to complete an orphaned codeblock
+			if complete_codeblocks and value.count("```") % 2: value += "```"
+		return value
