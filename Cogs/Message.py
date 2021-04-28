@@ -402,7 +402,7 @@ class EmbedText(Embed):
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
         # check if we can steal the color from the message
-        if self.color == None and len(message.embeds):
+        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
