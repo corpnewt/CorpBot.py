@@ -783,16 +783,23 @@ class Bot(commands.Cog):
 		"""Outputs the total count of lines of code in the currently installed repo."""
 		# Script pulled and edited from https://github.com/kyco/python-count-lines-of-code/blob/python3/cloc.py
 		
+		message = await Message.EmbedText(title="Shuffling papers...", color=ctx.author).send(ctx)
+		bot_member = self.bot.user if not ctx.guild else ctx.guild.get_member(self.bot.user.id)
+
 		# Get our current working directory - should be the bot's home
 		path = os.getcwd()
 		
 		# Set up some lists
 		extensions = []
 		code_count = []
-		include = ['py','bat','sh','command']
+		ext_dict = {
+			"py":"Python (.py)",
+			"bat":"Windows Batch (.bat)",
+			"sh":"Shell Script (.sh)",
+			"command":"Command Script (.command)"}
 		
 		# Get the extensions - include our include list
-		extensions = self.get_extensions(path, include)
+		extensions = self.get_extensions(path, list(ext_dict))
 		
 		for run in extensions:
 			extension = "*."+run
@@ -802,28 +809,15 @@ class Bot(commands.Cog):
 					value = root + "/" + items
 					temp += sum(+1 for line in open(value, 'rb'))
 			code_count.append(temp)
-			pass
 		
 		# Set up our output
-		msg = 'Some poor soul took the time to sloppily write the following to bring me life:\n```\n'
-		padTo = 0
-		for idx, val in enumerate(code_count):
-			# Find out which has the longest
-			tempLen = len(str('{:,}'.format(code_count[idx])))
-			if tempLen > padTo:
-				padTo = tempLen
-		for idx, val in enumerate(code_count):
-			lineWord = 'lines'
-			if code_count[idx] == 1:
-				lineWord = 'line'
-			# Setup a right-justified string padded with spaces
-			numString = str('{:,}'.format(code_count[idx])).rjust(padTo, ' ')
-			msg += numString + " " + lineWord + " of " + extensions[idx] + "\n"
-			# msg += extensions[idx] + ": " + str(code_count[idx]) + ' ' + lineWord + '\n'
-			# print(extensions[idx] + ": " + str(code_count[idx]))
-			pass
-		msg += '```'
-		await ctx.send(msg)
+		fields = [{"name":ext_dict.get(extensions[x],extensions[x]),"value":"{:,} line{}".format(code_count[x],"" if code_count[x]==1 else "s")} for x in range(len(code_count))]
+		return await Message.Embed(
+			title="Counted Lines of Code",
+			description="Some poor soul took the time to sloppily write the following to bring me life...",
+			fields=fields,
+			thumbnail=bot_member.avatar_url if bot_member.avatar_url else bot_member.default_avatar_url
+		).edit(ctx,message)
 
 	# Helper function to get extensions
 	def get_extensions(self, path, excl):
@@ -835,5 +829,4 @@ class Bot(commands.Cog):
 				if ext not in extensions:
 					if ext in excl:
 						extensions.append(ext)
-						pass
 		return extensions
