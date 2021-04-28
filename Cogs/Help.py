@@ -6,7 +6,7 @@ import os
 from   datetime import datetime
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch
+from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch, PickList
 
 def setup(bot):
 	# Add the cog
@@ -278,24 +278,25 @@ class Help(commands.Cog):
 			m = Message.Embed(force_pm=True,pm_after=25)
 			if type(ctx.author) is discord.Member:
 				m.color = ctx.author.color
-			m.title = "No command called \"{}\" found".format(command)
+			m.title = "Cog or command Not Found"
+			m.description = "No exact Cog or command matches for \"{}\".".format(command)
 			if len(cog_match):
-				cog_mess = "\n".join(["└─ {}".format(x["Item"]) for x in cog_match])
+				cog_mess = "\n".join(["`└─ {}`".format(x["Item"]) for x in cog_match])
 				m.add_field(name="Close Cog Matches:", value=cog_mess)
 			if len(com_match):
-				com_mess = "\n".join(["└─ {}".format(x["Item"]) for x in com_match])
+				com_mess = "\n".join(["`└─ {}`".format(x["Item"]) for x in com_match])
 				m.add_field(name="Close Command Matches:", value=com_mess)
 			'''if len(ali_match):
-				ali_mess = "\n".join(["└─ {}".format(x["Item"]) for x in ali_match])
+				ali_mess = "\n".join(["`└─ {}`".format(x["Item"]) for x in ali_match])
 				m.add_field(name="Close Command Alias Matches:", value=ali_mess)'''
-			m.footer = { "text" : "Remember that commands and cogs are case-sensitive.", "icon_url" : self.bot.user.avatar_url }
-			await m.send(ctx)
-			return
+			m.footer = { "text" : "Cog and command names are case-sensitive.", "icon_url" : self.bot.user.avatar_url }
+			return await m.send(ctx)
+		result["color"] = ctx.author
+		bot_user = ctx.guild.get_member(self.bot.user.id) if ctx.guild else self.bot.user
+		desc = "```\nGet more info with \"{}help Cog_or_command\".\nCog and command names are case-sensitive.\n\n{}: {}```".format(self._get_prefix(ctx),bot_user.display_name,self.bot.description)
+		if len(result.get("fields",[]))>1:
+			return await PickList.PagePicker(title=result["title"],list=result["fields"],ctx=ctx,description=desc).pick()
 		m = Message.Embed(**result)
-		m.force_pm = True
 		m.pm_after = 25
-		# Build the embed
-		if type(ctx.author) is discord.Member:
-			m.color = ctx.author.color
-		m.footer = self.bot.description + " - Type \"{}help command\" for more info on a command. \n".format(self._get_prefix(ctx))
+		m.footer = desc.replace("```\n","").split("\n")[0]
 		await m.send(ctx)
