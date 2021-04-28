@@ -118,18 +118,6 @@ class Help(commands.Cog):
 			})
 		return embed_list
 
-	async def _send_embed(self, ctx, embed, pm = False):
-		# Helper method to send embeds to their proper location
-		if pm == True and not ctx.channel == ctx.author.dm_channel:
-			# More than 2 pages, try to dm
-			try:
-				await ctx.author.send(embed=embed)
-				await ctx.message.add_reaction("📬")
-			except discord.Forbidden:
-				await ctx.send(embed=embed)
-			return
-		await ctx.send(embed=embed)
-
 	@commands.command(pass_context=True)
 	async def dumphelp(self, ctx, tab_indent_count = None):
 		"""Dumps a timestamped, formatted list of commands and descriptions into the same directory as the bot."""
