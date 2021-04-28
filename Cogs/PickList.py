@@ -174,7 +174,9 @@ class PagePicker(Picker):
                     await page_message.delete()
                 except:
                     pass
-            page = 0 if page < 0 else pages-1 if page > pages-1 else page
+            if not 0 <= page < pages: # Don't update if we hit the end
+                page = 0 if page < 0 else pages-1 if page > pages-1 else page
+                continue
             embed["fields"] = self._get_page_contents(page)
             embed["footer"] = "Page {} of {}".format(page+1,pages)
             await Message.Embed(**embed).edit(self.ctx,self.self_message)

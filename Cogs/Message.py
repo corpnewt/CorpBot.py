@@ -223,24 +223,18 @@ class Embed:
         return tot
 
     def _embed_with_self(self):
-        if self.color == None:
-            self.color = random.choice(self.colors)
-        elif type(self.color) is discord.Member:
+        if isinstance(self.color,discord.Member):
             self.color = self.color.color
-        elif type(self.color) is discord.User:
-            self.color = random.choice(self.colors)
-        elif type(self.color) is tuple or type(self.color) is list:
-            if len(self.color) == 3:
-                try:
-                    r, g, b = [ int(a) for a in self.color ]
-                    self.color = discord.Color.from_rgb(r, g, b)
-                except:
-                    self.color = random.choice(self.colors)
-            else:
-                self.color = random.choice(self.colors)
+        elif isinstance(self.color,discord.User):
+            self.color = None
+        elif isinstance(self.color,(tuple,list)):
+            try:
+                self.color = discord.Color.from_rgb(*[int(a) for a in self.color])
+            except:
+                self.color = None
 
         # Sends the current embed
-        em = discord.Embed(color=self.color)
+        em = discord.Embed(color=self.color if isinstance(self.color,discord.Color) else random.choice(self.colors))
         em.title = self._truncate_string(self.title, self.title_max)
         em.url = self.url
         em.description = self._truncate_string(self.description, self.desc_max)
@@ -289,7 +283,7 @@ class Embed:
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
         # check if we can steal the color from the message
-        if self.color == None and len(message.embeds):
+        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
