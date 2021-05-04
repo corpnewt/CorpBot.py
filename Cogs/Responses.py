@@ -66,7 +66,7 @@ class Responses(commands.Cog):
 		if not regex_trigger or not response: return await ctx.send("Usage: `{}addresponse regex_trigger response`".format(ctx.prefix))
 		# Ensure the regex is valid
 		try: re.compile(regex_trigger)
-		except Exception as e: return await ctx.send(Nullify.escape_all(e))
+		except Exception as e: return await ctx.send(Nullify.escape_all(str(e)))
 		# Save the trigger and response
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		context = "Updated" if regex_trigger in message_responses else "Added new"
