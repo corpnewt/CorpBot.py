@@ -1156,35 +1156,42 @@ class Admin(commands.Cog):
 
 		
 	@commands.command(pass_context=True)
-	async def setmotd(self, ctx, message : str = None, chan : discord.TextChannel = None):
-		"""Adds a message of the day to the selected channel."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
+	async def settopic(self, ctx, channel = None, *, message = ""):
+		"""Sets the channel topic of the passed channel (bot-admin only)."""
+		usage = 'Usage: `{}settopic [channel] [message]`'.format(ctx.prefix)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not channel and not message: return await ctx.send(usage)
+		resolved_channel = DisplayName.channelForName(channel,ctx.guild,"text")
+		if not resolved_channel:
+			# Not a channel - assume it's part of the message
+			message = channel + message
+			resolved_channel = ctx.channel
+		try: await resolved_channel.edit(topic=message if message else None)
+		except: return await ctx.send("Something went wrong when changing the channel topic :(")
+		return await ctx.send("Topic for {} {}!".format(resolved_channel.mention,"set" if message else "removed"))
 
-		usage = 'Usage: `{}setmotd "[message]" [channel]`'.format(ctx.prefix)
-		
-		if not await Utils.is_admin_reply(ctx): return
-		if not message:
-			await channel.send(usage)
-			return	
-		if not chan:
-			chan = channel
-		if type(chan) is str:
-			try:
-				chan = discord.utils.get(server.channels, name=chan)
-			except:
-				print("That channel does not exist")
-				return
-
-		msg = 'MOTD for *{}* added.'.format(chan.name)
-		await channel.send(msg)
-		await chan.edit(topic=message)
-
-		
-	@setmotd.error
-	async def setmotd_error(self, error, ctx):
-		# do stuff
-		msg = 'setmotd Error: {}'.format(error)
-		await ctx.channel.send(msg)
+	@commands.command()
+	async def slowmode(self, ctx, channel = None, seconds = None):
+		"""Sets the number of seconds for slow mode for the passed channel - use any number 0 or lower to disable (bot-admin only)."""
+		usage = 'Usage: `{}slowmode [channel] [seconds]`'.format(ctx.prefix)
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if channel == seconds == None: return await ctx.send(usage)
+		resolved_channel = DisplayName.channelForName(channel,ctx.guild,"text")
+		if not resolved_channel:
+			# Not a channel - assume it's part of the message
+			seconds = channel
+			resolved_channel = ctx.channel
+		if seconds == None: # Print the slow mode
+			sm = ctx.channel.slowmode_delay
+			return await ctx.send("Slow mode is {} in {}!".format(
+				"enabled with a delay of {:,} second{}".format(sm,"" if sm == 1 else "s") if sm > 0 else "" if sm > 0 else "disabled",
+				resolved_channel.mention,
+			))
+		try: seconds = int(seconds)
+		except: return await ctx.send("Invalid seconds value passed!")
+		try: await resolved_channel.edit(slowmode_delay=0 if seconds <= 0 else seconds)
+		except: return await ctx.send("Something went wrong when updating slow mode :(")
+		return await ctx.send("Slow mode is {} in {}!".format(
+			"enabled with a delay of {:,} second{}".format(seconds, "" if seconds == 1 else "s") if seconds > 0 else "disabled",
+			resolved_channel.mention
+		))
