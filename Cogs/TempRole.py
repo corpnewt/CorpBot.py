@@ -86,7 +86,7 @@ class TempRole(commands.Cog):
 					# Bail if we're not the current instance
 					return
 				temp_roles = self.settings.getUserStat(member, server, "TempRoles")
-				if len(temp_roles):
+				if temp_roles is not None and len(temp_roles):
 					# We have a list
 					remove_temps = []
 					for temp_role in temp_roles:

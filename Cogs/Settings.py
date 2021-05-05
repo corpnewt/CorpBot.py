@@ -138,10 +138,10 @@ class Settings(commands.Cog):
 	def __init__(self, bot, prefix = "$", file : str = None):
 		if file == None:
 			# We weren't given a file, default to ./Settings.json
-			file = "Settings.json"
+			file = bot.settings_dict.get("settings_path","Settings.json")
 		
 		self.file = file
-		self.backupDir = "Settings-Backup"
+		self.backupDir = bot.settings_dict.get("settings_backup_path","Settings-Backup")
 		self.backupMax = 100
 		self.backupTime = 7200 # runs every 2 hours
 		self.backupWait = 10 # initial wait time before first backup
@@ -309,14 +309,14 @@ class Settings(commands.Cog):
 
 
 	def load_json(self, file):
-		if os.path.exists(file):
+		if os.path.exists(file) and os.path.getsize(file):
 			print("Since no mongoDB instance was running, I'm reverting back to the Settings.json")
 			self.serverDict = json.load(open(file))
 		else:
 			self.serverDict = {}
 
 	def migrate(self, _file):
-		if os.path.exists(_file):
+		if os.path.exists(_file) and os.path.getsize(_file):
 			try:
 				settings_json = json.load(open(_file))
 				if "mongodb_migrated" not in settings_json:
@@ -478,7 +478,7 @@ class Settings(commands.Cog):
 				os.makedirs(self.backupDir)
 			# Flush backup
 			timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-			self.flushSettings("./{}/Backup-{}.json".format(self.backupDir, timeStamp), True)
+			self.flushSettings("{}/Backup-{}.json".format(self.backupDir, timeStamp), True)
 
 			# Get curr dir and change curr dir
 			retval = os.getcwd()

@@ -1,0 +1,51 @@
+version: "2.1" # We use v2.x for resource limit support with Docker Compose
+
+services:
+
+  corpbot:
+    image: corpnewt/corpbot:latest
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    #  ## This can be used for building a Windows image instead
+    #  #dockerfile: docker/Dockerfile.win
+    env_file: ../.env ## Use a .env file at the root
+    ## Alternatively you can comment out the
+    ## `environment:` object below and use that instead of the .env file#
+    # environment:
+    #   SETTINGS_DICT_PREFIX: "bot_prefix"
+    #   SETTINGS_DICT_TOKEN: "discord_token"
+    #   SETTINGS_DICT_WEATHER: "weather_api_key"
+    #   SETTINGS_DICT_CURRENCY: "currency_api_key"
+    depends_on:
+      - lavalink
+    networks:
+      - corpbot_network
+    volumes:
+      - corpbot_data:/data
+      - corpbot_packages:/usr/local/lib/python3.8/site-packages
+    # The following can be used to limit resource usage
+    # cpus: 0.5
+    # mem_limit: 1024m
+    # mem_reservation: 512m
+
+  # NOTE: There is no publicly available Lavalink images for Windows,
+  #       so it might be necessary to run it separately instead
+  lavalink:
+    image: 1conan/lavalink:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.lavalink
+    networks:
+      - corpbot_network
+    # The following can be used to limit resource usage
+    # cpus: 0.5
+    # mem_limit: 1024m
+    # mem_reservation: 512m
+
+networks:
+  corpbot_network:
+
+volumes:
+  corpbot_data:
+  corpbot_packages:

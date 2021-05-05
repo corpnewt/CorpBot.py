@@ -1,0 +1,3 @@
+FROM 1conan/lavalink:latest
+
+COPY lavalink.yaml /config/application.yml
