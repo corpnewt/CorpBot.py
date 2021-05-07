@@ -53,7 +53,7 @@ class TempRole(commands.Cog):
 			return
 		
 		# Here we have a member, role, and end time - apply them!
-		user_roles = self.settings.getUserStat(member, server, "TempRoles")
+		user_roles = self.settings.getUserStat(member, server, "TempRoles", [])
 		# Check and see if we're overriding a current time
 		temp_role = {}
 		# Add it anew
@@ -85,7 +85,7 @@ class TempRole(commands.Cog):
 				if not self.is_current:
 					# Bail if we're not the current instance
 					return
-				temp_roles = self.settings.getUserStat(member, server, "TempRoles")
+				temp_roles = self.settings.getUserStat(member, server, "TempRoles", [])
 				if len(temp_roles):
 					# We have a list
 					remove_temps = []
@@ -319,7 +319,7 @@ class TempRole(commands.Cog):
 			suppress = False
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "TempRoleList")
+			promoArray = self.settings.getServerStat(server, "TempRoleList", [])
 		except Exception:
 			promoArray = []
 		if member == None:
@@ -332,7 +332,7 @@ class TempRole(commands.Cog):
 				await ctx.send(msg)
 				return
 		# Got the member - let's check for roles
-		temp_roles = self.settings.getUserStat(member, ctx.guild, "TempRoles")
+		temp_roles = self.settings.getUserStat(member, ctx.guild, "TempRoles", [])
 		if not len(temp_roles):
 			await ctx.send("*{}* has no logged temp roles!".format(DisplayName.name(member)))
 			return
@@ -386,7 +386,7 @@ class TempRole(commands.Cog):
 			return
 
 		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList", [])
 
 		if role.id in [int(x["ID"]) for x in promoArray]:
 			# We found it - throw an error message and return
@@ -430,7 +430,7 @@ class TempRole(commands.Cog):
 			return
 
 		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList", [])
 
 		if role.id in [int(x["ID"]) for x in promoArray]:
 			# We found it - throw an error message and return
@@ -458,7 +458,7 @@ class TempRole(commands.Cog):
 		
 		# Get the array
 		try:
-			promoArray = self.settings.getServerStat(server, "TempRoleList")
+			promoArray = self.settings.getServerStat(server, "TempRoleList", [])
 		except Exception:
 			promoArray = []
 		if promoArray == None:
@@ -535,7 +535,7 @@ class TempRole(commands.Cog):
 			return
 
 		# Make sure our role is in the list
-		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList", [])
 		if not role_from_name.id in [int(x["ID"]) for x in promoArray]:
 			# No dice
 			await ctx.send("That role is not in the temp role list!")
@@ -551,7 +551,7 @@ class TempRole(commands.Cog):
 		# We should be able to remove it now
 		self.settings.role.rem_roles(member_from_name, [role_from_name])
 		
-		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles")
+		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles", [])
 		for r in user_roles:
 			if int(r["ID"]) == role_from_name.id:
 				user_roles.remove(r)
@@ -600,7 +600,7 @@ class TempRole(commands.Cog):
 			return await ctx.send(Utils.suppressed(ctx,msg))
 
 		# Make sure our role is in the list
-		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList")
+		promoArray = self.settings.getServerStat(ctx.guild, "TempRoleList", [])
 		if not role_from_name.id in [int(x["ID"]) for x in promoArray]:
 			# No dice
 			return await ctx.send("That role is not in the temp role list!")
@@ -634,7 +634,7 @@ class TempRole(commands.Cog):
 		message = await ctx.send("Applying...")
 
 		# Here we have a member, role, and end time - apply them!
-		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles")
+		user_roles = self.settings.getUserStat(member_from_name, ctx.guild, "TempRoles", [])
 		# Check and see if we're overriding a current time
 		found = False
 		temp_role = {}
