@@ -188,7 +188,7 @@ class Encode(commands.Cog):
 		try:
 			image = Image.new(mode="RGB",size=(512,256),color=self._hex_int_to_tuple(color))
 			image.save(file_path)
-			await Message.Embed(title=title,color=color,fields=fields,file=file_path).send(ctx)
+			await Message.Embed(title=title,color=self._hex_int_to_tuple(color),fields=fields,file=file_path).send(ctx)
 		except:
 			pass
 		if os.path.exists(file_path):
