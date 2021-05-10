@@ -42,7 +42,7 @@ A list of cogs, commands, and descriptions:
 	   └─ sp00ktober by camiel.
 
 ## Admin
-####	Admin Cog (27 commands) - Admin.py Extension:
+####	Admin Cog (28 commands) - Admin.py Extension:
 	  $addadmin [role]
 	   └─ Adds a new role to the admin list (admin only).
 	  $addxprole [role] [xp]
@@ -75,20 +75,22 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the required role ID to add/remove links (admin only).
 	  $setmadlibschannel [channel]
 	   └─ Sets the channel for MadLibs (admin only).
-	  $setmotd [message] [chan]
-	   └─ Adds a message of the day to the selected channel.
 	  $setrules [rules]
 	   └─ Set the server's rules (bot-admin only).
 	  $setstoprole [role]
 	   └─ Sets the required role ID to stop the music player (admin only).
 	  $settagrole [role]
 	   └─ Sets the required role ID to add/remove tags (admin only).
+	  $settopic [channel] [message]
+	   └─ Sets the channel topic of the passed channel (bot-admin only).
 	  $setxp [member] [xpAmount]
 	   └─ Sets an absolute value for the member's xp (admin only).
 	  $setxpreserve [member] [xpAmount]
 	   └─ Set's an absolute value for the member's xp reserve (admin only).
 	  $setxprole [role]
 	   └─ Sets the required role ID to give xp, gamble, or feed the bot (admin only).
+	  $slowmode [channel] [seconds]
+	   └─ Sets the number of seconds for slow mode for the passed channel - use any num...
 	  $stoprole 
 	   └─ Lists the required role to stop the bot from playing music.
 	  $xplimit [limit]
@@ -353,7 +355,7 @@ A list of cogs, commands, and descriptions:
 
 ## EightBall
 ####	EightBall Cog (1 command) - EightBall.py Extension:
-	  $eightball [question]
+	  $eightball [question] (AKA: 8ball)
 	   └─ Get some answers.
 
 ## Emoji
@@ -364,7 +366,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Outputs the passed emoji... but bigger!
 
 ## Encode
-####	Encode Cog (10 commands) - Encode.py Extension:
+####	Encode Cog (11 commands) - Encode.py Extension:
 	  $binint [input_binary]
 	   └─ Converts the input binary to its integer representation.
 	  $binstr [input_binary]
@@ -381,6 +383,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Byte swaps the passed hex value.
 	  $intbin [input_int]
 	   └─ Converts the input integer to its binary representation.
+	  $randomcolor 
+	   └─ Selects a random color.
 	  $slide [input_hex]
 	   └─ Calculates your slide value for Clover based on an input address (in hex).
 	  $strbin [input_string]
@@ -697,7 +701,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the currently playing song if any.
 	  $playingin 
 	   └─ Shows the number of servers the bot is currently playing music in.
-	  $playlist 
+	  $playlist  (AKA: queue)
 	   └─ Lists the queued songs in the playlist.
 	  $repeat [yes_no]
 	   └─ Checks or sets whether to repeat the current playlist.
