@@ -1,4 +1,4 @@
-import asyncio, discord, base64, binascii, re, math, shutil, tempfile, os
+import asyncio, discord, base64, binascii, re, math, shutil, tempfile, os, random
 from   discord.ext import commands
 from   Cogs import Utils, DL, Message, Nullify
 from   PIL import Image
@@ -159,30 +159,51 @@ class Encode(commands.Cog):
 		max_val = int("FFFFFF",16) if original_type == "hex" else 255 if original_type == "rgb" else 100
 		if not all((0 <= x <= max_val for x in color_values)):
 			return await ctx.send("Value out of range!  Valid ranges are from `#000000` to `#FFFFFF` for Hex, `0` to `255` for RGB, and `0` to `100` for CMYK.")
-		fields = []
 		# Organize the data into the Message format expectations
 		if original_type == "hex":
 			hex_value = "#"+hex(color_values[0]).replace("0x","").rjust(6,"0").upper()
 			title = "Color {}".format(hex_value)
 			color = color_values[0]
-			fields.extend([
+			fields = [
 				{"name":"RGB","value":"rgb({}, {}, {})".format(*self._hex_to_rgb(hex_value))},
 				{"name":"CMYK","value":"cmyk({}, {}, {}, {})".format(*self._hex_to_cmyk(hex_value))}
-				])
+				]
 		elif original_type == "rgb":
 			title = "Color rgb({}, {}, {})".format(*color_values)
 			color = int(self._rgb_to_hex(*color_values).replace("#",""),16)
-			fields.extend([
+			fields = [
 				{"name":"Hex","value":self._rgb_to_hex(*color_values)},
 				{"name":"CMYK","value":"cmyk({}, {}, {}, {})".format(*self._rgb_to_cmyk(*color_values))}
-			])
+			]
 		else:
 			title = "Color cmyk({}, {}, {}, {})".format(*color_values)
 			color = int(self._cmyk_to_hex(*color_values).replace("#",""),16)
-			fields.extend([
+			fields = [
 				{"name":"Hex","value":self._cmyk_to_hex(*color_values)},
 				{"name":"RGB","value":"rgb({}, {}, {})".format(*self._cmyk_to_rgb(*color_values))}
-			])
+			]
+		# Create the image
+		file_path = "images/colornow.png"
+		try:
+			image = Image.new(mode="RGB",size=(512,256),color=self._hex_int_to_tuple(color))
+			image.save(file_path)
+			await Message.Embed(title=title,color=self._hex_int_to_tuple(color),fields=fields,file=file_path).send(ctx)
+		except:
+			pass
+		if os.path.exists(file_path):
+			os.remove(file_path)
+
+	@commands.command()
+	async def randomcolor(self, ctx):
+		"""Selects a random color."""
+		# Pick a random color
+		hex_value = "#{}".format("".join([random.choice("0123456789ABCDEF") for x in range(6)]))
+		title = "Color {}".format(hex_value)
+		color = int(hex_value.replace("#",""),16)
+		fields = [
+			{"name":"RGB","value":"rgb({}, {}, {})".format(*self._hex_to_rgb(hex_value))},
+			{"name":"CMYK","value":"cmyk({}, {}, {}, {})".format(*self._hex_to_cmyk(hex_value))}
+		]
 		# Create the image
 		file_path = "images/colornow.png"
 		try:
