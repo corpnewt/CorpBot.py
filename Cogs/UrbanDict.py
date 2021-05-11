@@ -49,8 +49,11 @@ class UrbanDict(commands.Cog):
 					value += "\n\n__Example(s):__\n\n{}".format("\n".join(lines))
 				words.append({
 					"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
-					"value":value
+					"value":value,
+					"sort": float(x["thumbs_up"])/(float(x["thumbs_up"])+float(x["thumbs_down"]))
 				})
+			# Sort the words by their "sort" value t_u / (t_u + t_d)
+			words = sorted(words, key=lambda x: x["sort"], reverse=True)
 			return await PickList.PagePicker(title="Results For: {}".format(string.capwords(word)),list=words,ctx=ctx,max=1,url=theJSON[0]["permalink"]).pick()
 		await ctx.send(msg)
 

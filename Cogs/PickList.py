@@ -151,7 +151,7 @@ class PagePicker(Picker):
                 # We bailed - let's clear reactions and close it down
                 await self._remove_reactions(self.reactions)
                 return (page, self.self_message)
-            page = 0 if ind==0 else page-1 if ind==1 else page+1 if ind==2 else pages if ind==3 else page
+            page = 0 if ind==0 else page-1 if ind==1 else page+1 if ind==2 else pages-1 if ind==3 else page
             if ind == 4:
                 # User selects a page
                 page_instruction = await self.ctx.send("Type the number of that page to go to from {} to {}.".format(1,pages))
@@ -175,7 +175,7 @@ class PagePicker(Picker):
                 except:
                     pass
             if not 0 <= page < pages: # Don't update if we hit the end
-                page = 0 if page < 0 else pages-1 if page > pages-1 else page
+                page = 0 if page < 0 else pages-1
                 continue
             embed["fields"] = self._get_page_contents(page)
             embed["footer"] = "Page {} of {}".format(page+1,pages)
