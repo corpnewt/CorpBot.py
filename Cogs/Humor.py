@@ -30,6 +30,8 @@ class Humor(commands.Cog):
 		except: self.image = Image.new("RGBA",(500,500),(0,0,0,0))
 		try: self.s_image = Image.open("images/Stardew.png")
 		except: self.s_image = Image.new("RGBA",(319,111),(0,0,0,0))
+		try: self.slap_image = Image.open("images/slap.png")
+		except: self.slap_image = Image.new("RGBA",(800,600),(0,0,0,0))
 		self.stardew_gifts = [
 			"prismatic shard",
 			"seaweed",
@@ -405,3 +407,55 @@ class Humor(commands.Cog):
 			pass
 		if os.path.exists(path):
 			GetImage.remove(path)
+
+	@commands.command()
+	async def slap(self, ctx, *, user = None):
+		"""It's easier than talking... probably?"""
+
+		if not self.canDisplay(ctx.guild):
+			return
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(user, ctx.guild)
+		if not test_user:
+			return await ctx.send("Usage: `{}slap [user]`".format(ctx.prefix))
+		# Got a user!
+		user = ctx.author.avatar_url if len(ctx.author.avatar_url) else ctx.author.default_avatar_url
+		targ = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+		image = self.slap_image.copy()
+		# The slapper's image will be 300x300, the slaped user's image will be 350x350
+		# The top left corner of the slapper is at (487, 17)
+		# The top left of the slapped user is at (167, 124)
+		if not image.width == 800 or not image.height == 600:
+			image = image.resize((800,600),resample=PIL.Image.LANCZOS)
+		message = await Message.EmbedText(title="Winding up...",color=ctx.author).send(ctx)
+		ouch_msg = "Ouch!  That wind-up hurt my arm...  Make sure you're passing a valid user."
+		user_path = await GetImage.download(user)
+		if not user_path: return await Message.EmbedText(title=ouch_msg,description="I couldn't get the slapper's avatar :(").edit(ctx,message)
+		targ_path = await GetImage.download(targ)
+		if not targ_path: return await Message.EmbedText(title=ouch_msg,description="I couldn't get the slapped user's avatar :(").edit(ctx,message)
+		# We should have the images - let's open them and convert to a single frame
+		try:
+			# Gather the slapper image
+			user_img = Image.open(user_path)
+			user_img = user_img.convert('RGBA')
+			# Let's ensure it's the right size, and place it in the right spot
+			user_img = user_img.resize((300,300))
+			# Paste our other image on top
+			image.paste(user_img,(487,17),mask=user_img)
+			# Get the slapped user image
+			targ_img = Image.open(targ_path)
+			targ_img = targ_img.convert('RGBA')
+			# Let's ensure it's the right size, and place it in the right spot
+			targ_img = targ_img.resize((350,350))
+			# Paste our other image on top
+			image.paste(targ_img,(167,124),mask=targ_img)
+			image.save('images/slapnow.png')
+			# await ctx.send(file=discord.File(fp='images/slapnow.png'))
+			# await message.delete()
+			await Message.Embed(title="{} slapped {}!".format(ctx.author.display_name, test_user.display_name),file="images/slapnow.png").edit(ctx,message)
+			os.remove('images/slapnow.png')
+		except Exception as e:
+			print(e)
+			pass
+		for path in (user_path,targ_path):
+			if os.path.exists(path): GetImage.remove(path)
