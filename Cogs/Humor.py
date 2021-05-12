@@ -32,7 +32,8 @@ class Humor(commands.Cog):
 		except: self.s_image = Image.new("RGBA",(319,111),(0,0,0,0))
 		try: self.slap_image = Image.open("images/slap.png")
 		except: self.slap_image = Image.new("RGBA",(800,600),(0,0,0,0))
-		self.stardew_gifts = [
+		self.slap_words = ("walloped","slapped","demolished","obliterated","bonked","smacked")
+		self.stardew_gifts = (
 			"prismatic shard",
 			"seaweed",
 			"green algae",
@@ -64,8 +65,8 @@ class Humor(commands.Cog):
 			"gizmo",
 			"cloth",
 			"geode"
-			]
-		self.stardew_responses = [
+		)
+		self.stardew_responses = (
 			"I'm just here for my annual check-up! Don't worry, I'm not preg... I mean, I'm not sick! Heh.",
 			"...I hate this.",
 			"Buh... Life.",
@@ -101,7 +102,7 @@ class Humor(commands.Cog):
 			"All my customers... Here?!?",
 			"Grr... sounds like these raccoons are back again. Filthy varmints...",
 			"Sometimes I look for crawdads in the river. Don't tell Aunt Marnie... but I fed one to a cow once."
-		]
+		)
 					
 	@commands.command(pass_context=True)
 	async def zalgo(self, ctx, *, message = None):
@@ -450,9 +451,11 @@ class Humor(commands.Cog):
 			# Paste our other image on top
 			image.paste(targ_img,(167,124),mask=targ_img)
 			image.save('images/slapnow.png')
-			# await ctx.send(file=discord.File(fp='images/slapnow.png'))
-			# await message.delete()
-			await Message.Embed(title="{} slapped {}!".format(ctx.author.display_name, test_user.display_name),file="images/slapnow.png").edit(ctx,message)
+			await Message.Embed(
+				title="Looks like someone got {}!".format(random.choice(self.slap_words)),
+				description="{} was {} by {}!".format(test_user.mention,random.choice(self.slap_words),ctx.author.mention),
+				file="images/slapnow.png"
+			).edit(ctx,message)
 			os.remove('images/slapnow.png')
 		except Exception as e:
 			print(e)
