@@ -22,9 +22,9 @@ class Responses(commands.Cog):
 		self.regexServer   = re.compile(r"\[\[[server]+\]\]",   re.IGNORECASE)
 		self.regexHere     = re.compile(r"\[\[[here]+\]\]",     re.IGNORECASE)
 		self.regexEveryone = re.compile(r"\[\[[everyone]+\]\]", re.IGNORECASE)
+		self.regexDelete   = re.compile(r"\[\[[delete]+\]\]",   re.IGNORECASE)
 
-	@commands.Cog.listener()
-	async def on_message(self, message):
+	async def message(self, message):
 		if message.author.bot: return
 		if not message.guild: return
 		message_responses = self.settings.getServerStat(message.guild, "MessageResponses", {})
@@ -44,7 +44,9 @@ class Responses(commands.Cog):
 			m = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(ctx.guild.name)), m)
 			m = re.sub(self.regexHere,     "@here", m)
 			m = re.sub(self.regexEveryone, "@everyone", m)
-			return await ctx.send(m)
+			delete = True if self.regexDelete.search(m) else False
+			m = re.sub(self.regexDelete,   "", m)
+			return {"Delete":delete,"Respond":m}
 
 	@commands.command()
 	async def addresponse(self, ctx, regex_trigger = None, *, response = None):
@@ -56,6 +58,7 @@ class Responses(commands.Cog):
 		[[server]]   = server name
 		[[here]]     = @​here ping
 		[[everyone]] = @​everyone ping
+		[[delete]]   = delete the original message
 		
 		Example:  $addresponse "(?i)(hello there|\\btest\\b).*" [[atuser]], this is a test!
 		
