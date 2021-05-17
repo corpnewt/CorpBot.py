@@ -465,7 +465,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the bot's commands and cogs.
 
 ## Humor
-####	Humor Cog (9 commands) - Humor.py Extension:
+####	Humor Cog (10 commands) - Humor.py Extension:
 	  $fart 
 	   └─ PrincessZoey :P
 	  $french 
@@ -480,13 +480,15 @@ A list of cogs, commands, and descriptions:
 	   └─ Get Meme Templates
 	  $poke [url]
 	   └─ Pokes the passed url/user/uploaded image.
+	  $slap [user]
+	   └─ It's easier than talking... probably?
 	  $stardew [user]
 	   └─ Test your luck with another user.
 	  $zalgo [message]
 	   └─ Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂e...
 
 ## Hw
-####	Hw Cog (12 commands) - Hw.py Extension:
+####	Hw Cog (13 commands) - Hw.py Extension:
 	  $cancelhw 
 	   └─ Cancels a current hardware session.
 	  $delhw [build]
@@ -497,6 +499,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Searches the user's hardware for a specific search term.
 	  $hw [user] [build]
 	   └─ Lists the hardware for either the user's default build - or the passed build.
+	  $lhw [user]
+	   └─ Lists only the titles of the builds for the specified user - or yourself if n...
 	  $listhw [user]
 	   └─ Lists the builds for the specified user - or yourself if no user passed.
 	  $mainhw [build]
