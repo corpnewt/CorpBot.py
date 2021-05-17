@@ -95,9 +95,11 @@ class PagePicker(Picker):
     def __init__(self, **kwargs):
         Picker.__init__(self, **kwargs)
         # Expects self.list to contain the fields needed - each a dict with {"name":name,"value":value,"inline":inline}
-        max_val = 10 if self.list else 2048 # Must be between 1 and 25 for fields, 1 and 2048 for desc
+        max_val = 10 if self.list else 20 # Must be between 1 and 25 for fields, 1 and 2048 for desc rows
         self.max = kwargs.get("max",max_val)
         self.max = 1 if self.max < 1 else max_val if self.max > max_val else self.max
+        self.max_chars = kwargs.get("max_chars",2048)
+        self.max_chars = 1 if self.max_chars < 1 else 2048 if self.max_chars > 2048 else self.max_chars
         self.reactions = ["⏪","◀","▶","⏩","🔢","🛑"] # These will always be in the same order
         self.url = kwargs.get("url",None) # The URL the title of the embed will link to
         self.footer = kwargs.get("footer","")
@@ -109,12 +111,14 @@ class PagePicker(Picker):
 
     def _get_desc_page_list(self):
         # Returns the list of pages based on our settings
-        adj_max = self.max - len(self.d_header) - len(self.d_footer)
+        adj_max = self.max_chars - len(self.d_header) - len(self.d_footer)
         if self.newline_split:
             chunks = []
             curr   = ""
+            row    = 0
             for line in self.description.split("\n"):
                 test = curr+"\n"+line if len(curr) else line
+                row += 1
                 if len(line) > adj_max: # The line itself is too long
                     if len(curr): chunks.append(self.d_header+curr+self.d_footer)
                     chunks.extend([self.d_header+x+self.d_footer for x in textwrap.wrap(
@@ -123,9 +127,10 @@ class PagePicker(Picker):
                         break_long_words=True
                     )])
                     curr = ""
-                elif len(test) >= adj_max: # Exact or too big - adjust
+                elif len(test) >= adj_max or row > self.max: # Exact or too big - adjust
                     chunks.append(self.d_header+(test if len(test)==adj_max else curr)+self.d_footer)
                     curr = "" if len(test)==adj_max else line
+                    row = 0 if len(test)==adj_max else 1
                 else: # Not big enough yet - just append
                     curr = test
             if len(curr): chunks.append(self.d_header+curr+self.d_footer)
