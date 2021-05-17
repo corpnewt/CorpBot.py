@@ -1,6 +1,6 @@
-import asyncio, discord, time
+import discord, time, textwrap
 from discord.ext import commands
-from Cogs import Utils, DisplayName, Message, Nullify
+from Cogs import Utils, DisplayName, Message, Nullify, PickList
 
 def setup(bot):
     bot.add_cog(Lockdown(bot, bot.get_cog("Settings")))
@@ -117,7 +117,15 @@ class Lockdown(commands.Cog):
         lockdown,channels = self._get_lockdown(ctx)
         if not await self._check_lockdown(lockdown,ctx): return
         desc = "\n".join([self._get_mention(x) for x in channels])
-        await Message.EmbedText(title="Current Lockdown List - {:,} Total".format(len(lockdown)),description=desc,color=ctx.author,footer=self.key).send(ctx)
+        with open("lock.txt","wb") as f:
+            f.write(desc.encode("utf-8"))
+        await PickList.PagePicker(
+            title="Current Lockdown List - {:,} Total".format(len(lockdown)),
+            description=desc,
+            color=ctx.author,
+            footer=self.key,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def listlockall(self, ctx):
@@ -125,7 +133,13 @@ class Lockdown(commands.Cog):
         if not await Utils.is_bot_admin_reply(ctx): return
         lockdown = self.settings.getServerStat(ctx.guild,"LockdownList",[])
         desc = "\n".join([self._get_mention(x,lockdown_list=lockdown,show_lock=True) for x in self._order(ctx,ctx.guild.channels,only_id=False)])
-        await Message.EmbedText(title="All Channel Lockdown Status - {:,} Total".format(len(ctx.guild.channels)),description=desc,color=ctx.author,footer=self.key_long).send(ctx)
+        await PickList.PagePicker(
+            title="All Channel Lockdown Status - {:,} Total".format(len(ctx.guild.channels)),
+            description=desc,
+            color=ctx.author,
+            footer=self.key_long,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def addlock(self, ctx, *, channel_list = None):
@@ -150,7 +164,13 @@ class Lockdown(commands.Cog):
         lockdown.extend(resolved_id)
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
         desc = "\n".join([self._get_mention(x) for x in resolved])
-        await Message.EmbedText(title="{:,} New Entr{} Added to Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
+        await PickList.PagePicker(
+            title="{:,} New Entr{} Added to Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),
+            description=desc,
+            color=ctx.author,
+            footer=self.key,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def addlockall(self, ctx):
@@ -162,7 +182,13 @@ class Lockdown(commands.Cog):
         new_lockdown = [x for x in channels if not x.id in self.settings.getServerStat(ctx.guild,"LockdownList",[])]
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
         desc = "\n".join([self._get_mention(x) for x in new_lockdown])
-        await Message.EmbedText(title="{:,} New Entr{} Added to Lockdown List".format(len(new_lockdown),"y" if len(new_lockdown)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
+        await PickList.PagePicker(
+            title="{:,} New Entr{} Added to Lockdown List".format(len(new_lockdown),"y" if len(new_lockdown)==1 else "ies"),
+            description=desc,
+            color=ctx.author,
+            footer=self.key,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def remlock(self, ctx, *, channel_list = None):
@@ -188,7 +214,13 @@ class Lockdown(commands.Cog):
         lockdown = [x for x in lockdown if not x in resolved_id]
         self.settings.setServerStat(ctx.guild,"LockdownList",lockdown)
         desc = "\n".join([self._get_mention(x) for x in resolved])
-        await Message.EmbedText(title="{:,} Entr{} Removed from Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
+        await PickList.PagePicker(
+            title="{:,} New Entr{} Removed from Lockdown List".format(len(resolved),"y" if len(resolved)==1 else "ies"),
+            description=desc,
+            color=ctx.author,
+            footer=self.key,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def remlockall(self, ctx):
@@ -198,7 +230,13 @@ class Lockdown(commands.Cog):
         if not await self._check_lockdown(lockdown,ctx): return
         self.settings.setServerStat(ctx.guild,"LockdownList",[])
         desc = "\n".join([self._get_mention(x) for x in channels])
-        await Message.EmbedText(title="{:,} Entr{} Removed from Lockdown List".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),description=desc,color=ctx.author,footer=self.key).send(ctx)
+        await PickList.PagePicker(
+            title="{:,} New Entr{} Removed from Lockdown List".format(len(lockdown),"y" if len(lockdown)==1 else "ies"),
+            description=desc,
+            color=ctx.author,
+            footer=self.key,
+            ctx=ctx
+        ).pick()
 
     @commands.command()
     async def lockdown(self, ctx, target_channel = None):
