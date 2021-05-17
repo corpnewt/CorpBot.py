@@ -95,8 +95,8 @@ class PagePicker(Picker):
     def __init__(self, **kwargs):
         Picker.__init__(self, **kwargs)
         # Expects self.list to contain the fields needed - each a dict with {"name":name,"value":value,"inline":inline}
-        max_val = 10 if self.list else 20 # Must be between 1 and 25 for fields, 1 and 2048 for desc rows
-        self.max = kwargs.get("max",max_val)
+        self.max = kwargs.get("max",10 if self.list else 20) # Used defaults of 10 and 20 respectively
+        max_val = 25 if self.list else 2048 # Must be between 1 and 25 for fields, 1 and 2048 for desc rows
         self.max = 1 if self.max < 1 else max_val if self.max > max_val else self.max
         self.max_chars = kwargs.get("max_chars",2048)
         self.max_chars = 1 if self.max_chars < 1 else 2048 if self.max_chars > 2048 else self.max_chars
