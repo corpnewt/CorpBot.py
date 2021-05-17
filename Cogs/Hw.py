@@ -782,6 +782,24 @@ class Hw(commands.Cog):
 		items = [{"name":"{}. {}".format(i,x["Name"]+(" (Main Build)" if x["Main"] else "")),"value":Utils.truncate_string(x["Hardware"])} for i,x in enumerate(buildList,start=1)]
 		return await PickList.PagePicker(title="{}'s Builds ({:,} total)".format(DisplayName.name(member),len(buildList)),list=items,ctx=ctx).pick()
 
+	@commands.command()
+	async def lhw(self, ctx, *, user = None):
+		"""Lists only the titles of the builds for the specified user - or yourself if no user passed."""
+		usage = 'Usage: `{}lhw [user]`'.format(ctx.prefix)
+		if not user: user = ctx.author.id
+		member = DisplayName.memberForName(user, ctx.guild)
+		if not member: return await ctx.send(usage)
+		buildList = self.settings.getGlobalUserStat(member, "Hardware", [])
+		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
+		if not len(buildList):
+			msg = '*{}* has no builds on file!  They can add some with the `{}newhw` command.'.format(DisplayName.name(member), ctx.prefix)
+			return await ctx.send(msg)
+		desc = "\n".join([Utils.truncate_string("{}. {}".format(i,x["Name"]+(" (Main Build)" if x["Main"] else ""))) for i,x in enumerate(buildList,start=1)])
+		return await PickList.PagePicker(
+			title="{}'s Builds ({:,} total)".format(DisplayName.name(member),len(buildList)),
+			description=desc,
+			ctx=ctx
+		).pick()
 
 	@commands.command(pass_context=True)
 	async def newhw(self, ctx):

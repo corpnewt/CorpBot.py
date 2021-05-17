@@ -1,4 +1,4 @@
-import asyncio, discord, math
+import asyncio, discord, math, textwrap
 from   discord.ext import commands
 from   Cogs import Message
 
@@ -95,41 +95,88 @@ class PagePicker(Picker):
     def __init__(self, **kwargs):
         Picker.__init__(self, **kwargs)
         # Expects self.list to contain the fields needed - each a dict with {"name":name,"value":value,"inline":inline}
-        self.max = kwargs.get("max",10) # Must be between 1 and 25
-        self.max = 1 if self.max < 1 else 10 if self.max > 10 else self.max
+        max_val = 10 if self.list else 2048 # Must be between 1 and 25 for fields, 1 and 2048 for desc
+        self.max = kwargs.get("max",max_val)
+        self.max = 1 if self.max < 1 else max_val if self.max > max_val else self.max
         self.reactions = ["⏪","◀","▶","⏩","🔢","🛑"] # These will always be in the same order
         self.url = kwargs.get("url",None) # The URL the title of the embed will link to
+        self.footer = kwargs.get("footer","")
         self.description = kwargs.get("description", None)
+        # Description-based args
+        self.newline_split = kwargs.get("newline_split",True)
+        self.d_header = kwargs.get("d_header","")
+        self.d_footer = kwargs.get("d_footer","")
+
+    def _get_desc_page_list(self):
+        # Returns the list of pages based on our settings
+        adj_max = self.max - len(self.d_header) - len(self.d_footer)
+        if self.newline_split:
+            chunks = []
+            curr   = ""
+            for line in self.description.split("\n"):
+                test = curr+"\n"+line if len(curr) else line
+                if len(line) > adj_max: # The line itself is too long
+                    if len(curr): chunks.append(self.d_header+curr+self.d_footer)
+                    chunks.extend([self.d_header+x+self.d_footer for x in textwrap.wrap(
+                        line,
+                        adj_max,
+                        break_long_words=True
+                    )])
+                    curr = ""
+                elif len(test) >= adj_max: # Exact or too big - adjust
+                    chunks.append(self.d_header+(test if len(test)==adj_max else curr)+self.d_footer)
+                    curr = "" if len(test)==adj_max else line
+                else: # Not big enough yet - just append
+                    curr = test
+            if len(curr): chunks.append(self.d_header+curr+self.d_footer)
+            return chunks
+        # Use textwrap to wrap the words, not newlines
+        return [self.d_header+x+self.d_footer for x in textwrap.wrap(
+            self.description,
+            adj_max,
+            break_long_words=True,
+            replace_whitespace=False
+        )]
 
     def _get_page_contents(self, page_number):
         # Returns the contents of the page passed
-        start = self.max*page_number
-        return self.list[start:start+self.max]
+        if self.list:
+            start = self.max*page_number
+            return self.list[start:start+self.max]
+        return self._get_desc_page_list()[page_number]
+
+    def _get_footer(self, page, pages):
+        if pages <= 1: return self.footer
+        return "[{:,}/{:,}] - {}".format(page+1,pages,self.footer) if self.footer else "Page {:,} of {:,}".format(page+1,pages)
 
     async def pick(self):
         # This brings up the page picker and handles the events
         # It will return a tuple of (last_page_seen, message)
         # The return code is -1 for cancel, -2 for timeout, -3 for error, 0+ is index
         # Let's check our prerequisites first
-        if self.ctx == None or not len(self.list):
+        if self.ctx == None or (not self.list and not self.description):
             return (-3, None)
         page  = 0 # Set the initial page index
-        pages = int(math.ceil(len(self.list)/self.max))
+        if self.list:
+            pages = int(math.ceil(len(self.list)/self.max))
+        else:
+            pages = len(self._get_desc_page_list())
+        embed_class = Message.Embed if self.list else Message.EmbedText
         # Setup the embed
         embed = {
             "title":self.title,
             "url":self.url,
-            "description":self.description,
+            "description":self.description if self.list else self._get_page_contents(page),
             "color":self.ctx.author,
-            "pm_after":25,
-            "fields":self._get_page_contents(page),
-            "footer":"Page {} of {}".format(page+1,pages)
+            "pm_after":25, # We can leave it a huge number for desc without issue - never pm automagically
+            "fields":self._get_page_contents(page) if self.list else None,
+            "footer":self._get_footer(page,pages)
         }
         if self.message:
             self.self_message = self.message
-            await Message.Embed(**embed).edit(self.ctx,self.message)
+            await embed_class(**embed).edit(self.ctx,self.message)
         else:
-            self.self_message = await Message.Embed(**embed).send(self.ctx)
+            self.self_message = await embed_class(**embed).send(self.ctx)
         # First verify we have more than one page to display
         if pages <= 1:
             return (0,self.self_message)
@@ -157,7 +204,7 @@ class PagePicker(Picker):
                 page_instruction = await self.ctx.send("Type the number of that page to go to from {} to {}.".format(1,pages))
                 def check_page(message):
                     try:
-                        num = int(message.content)
+                        int(message.content)
                     except:
                         return False
                     return message.channel == self.self_message.channel and user == message.author
@@ -177,9 +224,6 @@ class PagePicker(Picker):
             if not 0 <= page < pages: # Don't update if we hit the end
                 page = 0 if page < 0 else pages-1
                 continue
-            embed["fields"] = self._get_page_contents(page)
-            embed["footer"] = "Page {} of {}".format(page+1,pages)
-            await Message.Embed(**embed).edit(self.ctx,self.self_message)
-        await self._remove_reactions(self.reactions)
-        # Get the adjusted index
-        return (page, self.self_message)
+            embed["fields" if self.list else "description"] = self._get_page_contents(page)
+            embed["footer"] = self._get_footer(page,pages)
+            await embed_class(**embed).edit(self.ctx,self.self_message)
