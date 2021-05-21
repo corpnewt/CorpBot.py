@@ -1,5 +1,5 @@
-import functools, asyncio, discord, json, os, string, googletrans
-from Cogs import DisplayName, Message
+import functools, string, googletrans
+from Cogs import DisplayName, Message, PickList
 from discord.ext import commands
 
 def setup(bot):
@@ -25,12 +25,12 @@ class Translate(commands.Cog):
         description = ""
         for lang in googletrans.LANGCODES:
             description += "**{}** - {}\n".format(string.capwords(lang), googletrans.LANGCODES[lang])
-        await Message.EmbedText(
+        await PickList.PagePicker(
             title="Language List",
-            force_pm=True,
             description=description,
-            color=ctx.author
-        ).send(ctx)
+            color=ctx.author,
+            ctx=ctx
+        ).pick()
 
     @commands.command(pass_context=True)
     async def detectlang(self, ctx, *, text):
