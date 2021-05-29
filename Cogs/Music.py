@@ -390,7 +390,6 @@ class Music(commands.Cog):
 		eq = wavelink.eqs.Equalizer.build(levels=self.settings.getServerStat(ctx.guild, "MusicEqualizer", wavelink.eqs.Equalizer.flat().raw))
 		if not player.volume == volume/2: await player.set_volume(volume/2)
 		if not player.eq.raw == eq.raw:   await player.set_eq(eq)
-		player._equalizer = eq # Dirty hack to work around a bug in wavelink
 		async with ctx.typing():
 			self.bot.dispatch("play_next",player,data)
 		await Message.Embed(
@@ -958,7 +957,6 @@ class Music(commands.Cog):
 		eq_list = [(x,float(0.25 if y/20 > 0.25 else -0.25 if y/20 < -0.25 else y/20)) for x,y in enumerate(band_ints)]
 		eq = wavelink.eqs.Equalizer.build(levels=eq_list)
 		await player.set_eq(eq)
-		player._equalizer = eq # Dirty hack to fix a bug in wavelink
 		eq_text = self.print_eq(player.eq.raw)
 		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
 		return await Message.EmbedText(title="♫ Set equalizer to Custom preset!",description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
@@ -988,7 +986,6 @@ class Music(commands.Cog):
 		new_bands = [(band_number-1,float(value/20)) if x == band_number-1 else (x,y) for x,y in player.eq.raw]
 		eq = wavelink.eqs.Equalizer.build(levels=new_bands)
 		await player.set_eq(eq)
-		player._equalizer = eq # Dirty hack to fix a bug in wavelink
 		eq_text = self.print_eq(player.eq.raw)
 		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
 		return await Message.EmbedText(title="♫ Set band {} to {}!".format(band_number,value),description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
@@ -1013,7 +1010,6 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Please specify a valid eq preset!",description="Options are:  Boost, Flat, Metal",color=ctx.author,delete_after=delay).send(ctx)
 		eq = wavelink.eqs.Equalizer.boost() if preset.lower() == "boost" else wavelink.eqs.Equalizer.flat() if preset.lower() == "flat" else wavelink.eqs.Equalizer.metal()
 		await player.set_eq(eq)
-		player._equalizer = eq # Dirty hack to fix a bug in wavelink
 		eq_text = self.print_eq(player.eq.raw)
 		self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
 		return await Message.EmbedText(title="♫ Set equalizer to {} preset!".format(preset.lower().capitalize()),description=eq_text,color=ctx.author,delete_after=delay).send(ctx)
