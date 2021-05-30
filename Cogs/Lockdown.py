@@ -422,7 +422,7 @@ class Lockdown(commands.Cog):
 
     @commands.command()
     async def antiraidping(self, ctx, user_or_role = None, channel = None):
-        """Sets up what user or role to ping and in what channel when anti-raid is activated (bot-admin only)."""
+        """Sets up what user or role to ping and in what channel when anti-raid is activated.  Can be disabled by passing "off" to this command (bot-admin only)."""
 
         if not await Utils.is_bot_admin_reply(ctx): return
         if user_or_role == None: # print the settings
@@ -435,7 +435,13 @@ class Lockdown(commands.Cog):
             if chan: chan = DisplayName.channelForName(chan, ctx.guild)
             if not user_role or not chan: return await ctx.send("Anti-raid ping is not setup.")
             return await ctx.send("Anti-raid activity will mention {} and be announced in {}!".format(Nullify.escape_all(user_role.display_name) if isinstance(user_role, discord.Member) else Nullify.escape_all(user_role.name),chan.mention))
-        if channel == None: return await ctx.send("Usage: `{}antiraidping user_or_role channel`".format(ctx.prefix))
+        if channel == None:
+            if user_or_role.lower() in ("no","off","disable","disabled","none","false"): # Disable the ping
+                self.settings.setServerStat(ctx.guild, "AntiRaidPing", None)
+                self.settings.setServerStat(ctx.guild, "AntiRaidChannel", None)
+                return await ctx.send("Anti-raid activity will not mention any user or role!")
+            # If we got here, we just got some unsupported values, send the usage
+            return await ctx.send("Usage: `{}antiraidping user_or_role channel`".format(ctx.prefix))
         # We're setting it up - let's check the user first, then role, then channel
         ur = DisplayName.memberForName(user_or_role, ctx.guild)
         if not ur: ur = DisplayName.roleForName(user_or_role, ctx.guild)
