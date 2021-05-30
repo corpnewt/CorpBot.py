@@ -168,7 +168,7 @@ class BotAdmin(commands.Cog):
 				# Resolve the member
 				mem_id = int(re.sub(r'\W+', '', item))
 				member = ctx.guild.get_member(mem_id)
-				if member is None and command_name == "ban": # Didn't get a valid member, let's allow a pre-ban if we can resolve them
+				if member is None and command_name in ("ban","unban"): # Didn't get a valid member, let's allow a pre-ban/unban if we can resolve them
 					try: member = await self.bot.fetch_user(mem_id)
 					except: pass
 				# If we have an invalid mention, save it to report later
@@ -215,10 +215,10 @@ class BotAdmin(commands.Cog):
 		# Verify the confirmation
 		if not confirmation_user.content == confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
 		# We got the authorization!
-		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Kick"),color=ctx.author).send(ctx)
+		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Unbann" if command_name == "unban" else "Kick"),color=ctx.author).send(ctx)
 		canned = []
 		cant = []
-		command = ctx.guild.ban if command_name == "ban" else ctx.guild.kick
+		command = {"ban":ctx.guild.ban,"kick":ctx.guild.kick,"unban":ctx.guild.unban}.get(command_name.lower(),ctx.guild.kick)
 		for target in targets:
 			try:
 				await command(target,reason="{}#{}: {}".format(ctx.author.name,ctx.author.discriminator,reason))
@@ -234,23 +234,27 @@ class BotAdmin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def kick(self, ctx, *, members = None, reason = None):
 		"""Kicks the passed members for the specified reason.
-		All kick targets must be mentions to avoid ambiguity.
-		You can kick up to 5 members at once.
-		The reason is required (bot-admin only).
+		All kick targets must be mentions or ids to avoid ambiguity (bot-admin only).
 		
 		eg:  $kick @user1#1234 @user2#5678 @user3#9012 for spamming"""
-		await self.kick_ban(ctx,members, "kick")
+		await self.kick_ban(ctx,members,"kick")
 		
 		
 	@commands.command(pass_context=True)
 	async def ban(self, ctx, *, members = None, reason = None):
 		"""Bans the passed members for the specified reason.
-		All ban targets must be mentions to avoid ambiguity.
-		You can ban up to 5 members at once.
-		The reason is required (bot-admin only).
+		All ban targets must be mentions or ids to avoid ambiguity (bot-admin only).
 		
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming"""
-		await self.kick_ban(ctx,members, "ban")
+		await self.kick_ban(ctx,members,"ban")
+
+	@commands.command(pass_context=True)
+	async def unban(self, ctx, *, members = None, reason = None):
+		"""Unbans the passed members for the specified reason.
+		All unban targets must be mentions or ids to avoid ambiguity (bot-admin only).
+		
+		eg:  $unban @user1#1234 @user2#5678 @user3#9012 because we're nice"""
+		await self.kick_ban(ctx,members,"unban")
 
 	@commands.command()
 	async def banned(self, ctx, *, user_id = None):
