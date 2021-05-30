@@ -168,13 +168,16 @@ class BotAdmin(commands.Cog):
 				# Resolve the member
 				mem_id = int(re.sub(r'\W+', '', item))
 				member = ctx.guild.get_member(mem_id)
+				if member is None and command_name == "ban": # Didn't get a valid member, let's allow a pre-ban if we can resolve them
+					try: member = await self.bot.fetch_user(mem_id)
+					except: pass
 				# If we have an invalid mention, save it to report later
 				if member is None:
 					missed.append(str(mem_id))
 					continue
-				# We should have a valid member - let's make sure it's not:
+				# Let's check if we have a valid member and make sure it's not:
 				# 1. The bot, 2. The command caller, 3. Another bot-admin/admin
-				if member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member):
+				if isinstance(member, discord.Member) and (member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member)):
 					unable.append(member.mention)
 					continue
 				if not member in targets: targets.append(member) # Only add them if we don't already have them
