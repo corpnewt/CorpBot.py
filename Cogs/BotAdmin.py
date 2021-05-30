@@ -1,7 +1,7 @@
 import asyncio, discord, re, random
 from   operator import itemgetter
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName, Message
+from   Cogs import Utils, DisplayName, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -248,3 +248,29 @@ class BotAdmin(commands.Cog):
 		
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming"""
 		await self.kick_ban(ctx,members, "ban")
+
+	@commands.command()
+	async def banned(self, ctx, *, user_id = None):
+		"""Queries the guild's ban list for the passed user id and responds with whether they've been banned and the reason (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+
+		try: all_bans = await ctx.guild.bans()
+		except: return await ctx.send("I couldn't get the ban list :(")
+		
+		if not len(all_bans): return await Message.EmbedText(title="Ban List",description="No bans found",color=ctx.author).send(ctx)
+
+		orig_user = user_id
+		try: user_id = int(user_id) if user_id != None else None
+		except: user_id = -1 # Use -1 to indicate unresolved
+
+		entries = []
+		for ban in all_bans:
+			entries.append({"name":"{}#{} ({})".format(ban.user.name,ban.user.discriminator,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
+			if user_id != None and user_id == ban.user.id:
+				# Got a match - display it
+				return await Message.Embed(
+					title="Ban Found For {}".format(user_id),
+					fields=[entries[-1]], # Send the last found entry
+					color=ctx.author
+				).send(ctx)
+		return await PickList.PagePicker(title="Ban List ({:,} total)".format(len(entries)),description=None if user_id == None else "No match found for '{}'.".format(orig_user),list=entries,ctx=ctx).pick()
