@@ -809,7 +809,7 @@ class Music(commands.Cog):
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		
 		skips = self.skips.get(str(ctx.guild.id),[])
-		if not ctx.author.id in skips: return await Message.EmbedText(title="♫ You haven't voted to skip this song!".format(len(new_skips),needed_skips),color=ctx.author,delete_after=delay).send(ctx)
+		if not ctx.author.id in skips: return await Message.EmbedText(title="♫ You haven't voted to skip this song!",color=ctx.author,delete_after=delay).send(ctx)
 		# We did vote - remove that
 		skips.remove(ctx.author.id)
 		self.skips[str(ctx.guild.id)] = skips
