@@ -398,7 +398,7 @@ class Music(commands.Cog):
 				{"name":"Duration","value":self.format_duration(data.duration,data),"inline":False}
 			],
 			description="Requested by {}".format(self._get_mention(data.info)),
-			color=ctx.author,
+			color=ctx.author if not data.info.get("ctx") else data.info["ctx"].author,
 			url=data.uri,
 			thumbnail=data.thumb,
 			delete_after=delay
