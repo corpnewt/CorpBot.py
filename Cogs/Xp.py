@@ -848,7 +848,10 @@ class Xp(commands.Cog):
 	async def _show_xp(self, ctx, reverse=False):
 		# Helper to list xp
 		message = await Message.EmbedText(title="Counting Xp...",color=ctx.author).send(ctx)
-		xp_array = sorted([{"name":x.display_name,"value":"{:,}".format(await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,ctx.guild,"XP"))} for x in ctx.guild.members], key=lambda a:int(a["value"].replace(",","")),reverse=reverse)
+		xp_array = sorted([{
+			"name":"{} - ({}#{} {})".format(x.display_name,x.name,x.discriminator,x.id),
+			"value":"{:,} XP".format(await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,ctx.guild,"XP"))
+			} for x in ctx.guild.members], key=lambda a:int(a["value"].split()[0].replace(",","")),reverse=reverse)
 		return await PickList.PagePicker(
 			title="{} Xp-Holders in {} ({:,} total)".format("Top" if reverse else "Bottom",ctx.guild.name,len(xp_array)),
 			list=xp_array,
