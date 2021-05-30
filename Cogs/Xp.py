@@ -4,12 +4,7 @@ import datetime
 import time
 import random
 from   discord.ext import commands
-from   operator import itemgetter
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Nullify
-from   Cogs import CheckRoles
-from   Cogs import UserTime
+from   Cogs import Settings, DisplayName, Nullify, CheckRoles, UserTime, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -850,109 +845,34 @@ class Xp(commands.Cog):
 		msg = 'rank Error: {}'.format(error)
 		await ctx.channel.send(msg)
 
+	async def _show_xp(self, ctx, reverse=False):
+		# Helper to list xp
+		message = await Message.EmbedText(title="Counting Xp...",color=ctx.author).send(ctx)
+		xp_array = sorted([{"name":x.display_name,"value":"{:,}".format(await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,ctx.guild,"XP"))} for x in ctx.guild.members], key=lambda a:int(a["value"].replace(",","")),reverse=reverse)
+		return await PickList.PagePicker(
+			title="{} Xp-Holders in {} ({:,} total)".format("Top" if reverse else "Bottom",ctx.guild.name,len(xp_array)),
+			list=xp_array,
+			color=ctx.author,
+			ctx=ctx,
+			message=message
+		).pick()
 
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
-	async def leaderboard(self, ctx, total : int = 10):
-		"""List the top xp-holders (max of 50)."""
-		message = await ctx.send("Counting xp...")
-		promoArray = {}
-		for x in self.bot.get_all_members():
-			if not x.guild.id == ctx.guild.id:
-				continue
-			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
-		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
-
-		startIndex = 0
-		if total > 50:
-			total = 50
-		if total < 1:
-			total = 1
-		msg = ""
-
-		if len(promoSorted) < total:
-			total = len(promoSorted)
-		
-		if len(promoSorted):
-			# makes sure we have at least 1 user - shouldn't be necessary though
-			startIndex = len(promoSorted)-1
-			msg = "**Top** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
-
-		for i in range(0, total):
-			# Loop through from startIndex to startIndex+total-1
-			index = startIndex-i
-			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index], ctx.message.guild)
-			#if ctx.message.guild.get_member_named(cMemName):
-				# Member exists
-				#cMember = ctx.message.guild.get_member_named(cMemName)
-			#else:
-				#cMember = None
-			if cMember:
-				cMemberDisplay = DisplayName.name(cMember)
-			else:
-				cMemberDisplay = promoSorted[index]
-
-			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
-
-		await message.edit(content=msg)
-
+	async def leaderboard(self, ctx):
+		"""List the top xp-holders."""
+		return await self._show_xp(ctx,reverse=True)
 		
 	# List the top 10 xp-holders
 	@commands.command(pass_context=True)
-	async def bottomxp(self, ctx, total : int = 10):
-		"""List the bottom xp-holders (max of 50)."""
-		message = await ctx.send("Counting xp...")
-		promoArray = {}
-		for x in self.bot.get_all_members():
-			if not x.guild.id == ctx.guild.id:
-				continue
-			promoArray[str(x.id)] = {"XP":await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,x.guild,"XP")}
-		promoSorted = sorted(promoArray, key=lambda x:int(promoArray[x]['XP']))
-
-		startIndex = 0
-		if total > 50:
-			total = 50
-		if total < 1:
-			total = 1
-		msg = ""
-
-		if len(promoSorted) < total:
-			total = len(promoSorted)
-		
-		if len(promoSorted):
-			# makes sure we have at least 1 user - shouldn't be necessary though
-			msg = "**Bottom** ***{}*** **XP-Holders in** ***{}***:\n".format(total, Nullify.escape_all(ctx.guild.name))
-
-		for i in range(0, total):
-			# Loop through from startIndex to startIndex+total-1
-			index = startIndex+i
-			# cMemName = "{}#{}".format(promoSorted[index]['Name'], promoSorted[index]['Discriminator'])
-			cMember = DisplayName.memberForID(promoSorted[index], ctx.message.guild)
-			#if ctx.message.guild.get_member_named(cMemName):
-				# Member exists
-				#cMember = ctx.message.guild.get_member_named(cMemName)
-			#else:
-				#cMember = None
-			if cMember:
-					cMemberDisplay = DisplayName.name(cMember)
-			else:
-				cMemberDisplay = promoSorted[index]
-			msg = '{}\n{}. *{}* - *{:,} xp*'.format(msg, i+1, cMemberDisplay, promoArray[promoSorted[index]]['XP'])
-
-		await message.edit(content=msg)
-		
+	async def bottomxp(self, ctx):
+		"""List the bottom xp-holders."""
+		return await self._show_xp(ctx,reverse=False)
 		
 	# List the xp and xp reserve of a user
 	@commands.command(pass_context=True)
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 		
 		if member is None:
 			member = ctx.message.author
@@ -970,9 +890,7 @@ class Xp(commands.Cog):
 			url = member.default_avatar_url
 
 		# Create blank embed
-		stat_embed = discord.Embed(color=member.color)
-						
-		stat_embed.set_thumbnail(url=url)
+		stat_embed = Message.Embed(color=member.color,thumbnail=url)
 
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))
@@ -982,7 +900,6 @@ class Xp(commands.Cog):
 		stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
 		stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
 		
-		memName = member.name
 		# Get member's avatar url
 		avURL = member.avatar_url
 		if not len(avURL):
@@ -992,11 +909,11 @@ class Xp(commands.Cog):
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 			
 			# Add to embed
-			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick))
+			stat_embed.author = '{}, who currently goes by {}'.format(member.name, member.nick)
 		else:
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
-			stat_embed.set_author(name='{}'.format(member.name))
+			stat_embed.author = '{}'.format(member.name)
 		# Get localized user time
 		if member.joined_at != None:
 			local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
@@ -1102,10 +1019,9 @@ class Xp(commands.Cog):
 		c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
 		# add created_at footer
 		created = "Created at " + c_time_str
-		stat_embed.set_footer(text=created)
+		stat_embed.footer = created
 
-		#await ctx.message.channel.send(msg)
-		await ctx.send(embed=stat_embed)
+		await stat_embed.send(ctx)
 		
 	@stats.error
 	async def stats_error(self, ctx, error):
