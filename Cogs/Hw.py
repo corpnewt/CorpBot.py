@@ -1,6 +1,6 @@
-import asyncio, discord, time
+import discord, time
 from   discord.ext import commands
-from   Cogs import Utils, ReadableTime, PCPP, DisplayName, Message, PickList
+from   Cogs import Utils, PCPP, DisplayName, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -436,21 +436,16 @@ class Hw(commands.Cog):
 		"""Searches the user's hardware for a specific search term."""
 		if not user:
 			usage = "Usage: `{}gethw [user] [search term]`".format(ctx.prefix)
-			await ctx.send(usage)
-			return
+			return await ctx.send(usage)
 	
 		# Let's check for username and search term
 		parts = user.split()
-
 		memFromName = None
-		buildParts  = None
-		
+		entries = []
 		for j in range(len(parts)):
 			# Reverse search direction
 			i = len(parts)-1-j
 			memFromName = None
-			buildParts  = None
-
 			# Name = 0 up to i joined by space
 			nameStr =  ' '.join(parts[0:i])
 			buildStr = ' '.join(parts[i:])
@@ -461,60 +456,33 @@ class Hw(commands.Cog):
 				if len(buildStr) < 3:
 					usage = "Search term must be at least 3 characters."
 					return await ctx.send(usage)
-				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
-					buildList = []
+				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware", [])
 				buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-				foundStr = ''
-				foundCt  = 0
 				for build in buildList:
 					bParts = build['Hardware']
 					for line in bParts.splitlines():
 						if buildStr.lower() in line.lower():
-							foundCt += 1
-							foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", "").replace("\\",""))
-
-				if len(foundStr):
+							entries.append({"name":"{}. {}".format(len(entries)+1,build["Name"]),"value":line})
+				if len(entries):
 					# We're in business
-					foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr, DisplayName.name(memFromName)) + foundStr
-					break
-				else:
-					# foundStr = 'Nothing found for "{}" in *{}\'s* builds.'.format(buildStr, DisplayName.name(memFromName))
-					# Nothing found...
-					memFromName = None
-					buildStr    = None
-		if memFromName and len(foundStr):
-			# We're in business
-			return await Message.Message(message=Utils.suppressed(ctx,foundStr)).send(ctx)
+					return await PickList.PagePicker(title="\"{}\" Results".format(buildStr),list=entries,ctx=ctx).pick()
 
 		# If we're here - then we didn't find a member - set it to the author, and run another quick search
 		buildStr  = user
-
 		if len(buildStr) < 3:
 			usage = "Search term must be at least 3 characters."
 			return await ctx.send(usage)
-
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
-			buildList = []
+		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware", [])
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
-
-		foundStr = ''
-		foundCt  = 0
 		for build in buildList:
 			bParts = build['Hardware']
 			for line in bParts.splitlines():
 				if buildStr.lower() in line.lower():
-					foundCt += 1
-					foundStr += '{}. **{}**\n   {}\n'.format(foundCt, build['Name'], line.replace("`", "").replace("\\",""))
-
-		if len(foundStr):
+					entries.append({"name":"{}. {}".format(len(entries)+1,build["Name"]),"value":line})
+		if len(entries):
 			# We're in business
-			foundStr = "__**\"{}\" Results:**__\n\n".format(buildStr) + foundStr
-		else:
-			foundStr = 'Nothing found for "{}".'.format(buildStr)
-			# Nothing found...
-		await Message.Message(message=Utils.suppressed(ctx,foundStr)).send(ctx)
+			return await PickList.PagePicker(title="\"{}\" Results".format(buildStr),list=entries,ctx=ctx).pick()
+		return await Message.EmbedText(title="Nothing found for that search.",color=ctx.author).send(ctx)
 
 
 	@commands.command(pass_context=True)
