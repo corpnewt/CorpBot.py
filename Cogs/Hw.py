@@ -465,7 +465,7 @@ class Hw(commands.Cog):
 							entries.append({"name":"{}. {}".format(len(entries)+1,build["Name"]),"value":line})
 				if len(entries):
 					# We're in business
-					return await PickList.PagePicker(title="\"{}\" Results".format(buildStr),list=entries,ctx=ctx).pick()
+					return await PickList.PagePicker(title="Search results for \"{}\" ({:,} total)".format(buildStr, len(entries)),list=entries,ctx=ctx).pick()
 
 		# If we're here - then we didn't find a member - set it to the author, and run another quick search
 		buildStr  = user
@@ -481,7 +481,7 @@ class Hw(commands.Cog):
 					entries.append({"name":"{}. {}".format(len(entries)+1,build["Name"]),"value":line})
 		if len(entries):
 			# We're in business
-			return await PickList.PagePicker(title="\"{}\" Results".format(buildStr),list=entries,ctx=ctx).pick()
+			return await PickList.PagePicker(title="Search results for \"{}\" ({:,} total)".format(buildStr, len(entries)),list=entries,ctx=ctx).pick()
 		return await Message.EmbedText(title="Nothing found for that search.",color=ctx.author).send(ctx)
 
 
