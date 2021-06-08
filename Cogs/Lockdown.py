@@ -293,7 +293,6 @@ class Lockdown(commands.Cog):
         ).edit(ctx,message)
 
     async def _anti_raid_respond(self, member, response = "kick", reason = "Anti-raid active"):
-        response = self.settings.getServerStat(member.guild, "AntiRaidResponse", "kick") # kick, mute, ban
         if response.lower() == "mute":
             mute = self.bot.get_cog("Mute")
             if mute: await mute._mute(member, member.guild)
