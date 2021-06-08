@@ -292,16 +292,14 @@ class Lockdown(commands.Cog):
             )
         ).edit(ctx,message)
 
-    async def _anti_raid_respond(self, member):
+    async def _anti_raid_respond(self, member, response = "kick", reason = "Anti-raid active"):
         response = self.settings.getServerStat(member.guild, "AntiRaidResponse", "kick") # kick, mute, ban
         if response.lower() == "mute":
             mute = self.bot.get_cog("Mute")
             if mute: await mute._mute(member, member.guild)
-        elif response.lower() == "ban":
-            try: await member.guild.ban(member, reason="Anti-raid active")
-            except: pass
         else:
-            try: await member.guild.kick(member, reason="Anti-raid active") # Assume kick if nothing specified
+            action = member.guild.ban if response.lower() == "ban" else member.guild.kick
+            try: await action(member, reason=reason)
             except: pass
 
     @commands.Cog.listener()	
@@ -311,18 +309,10 @@ class Lockdown(commands.Cog):
         for trigger in name_filters:
             match = re.fullmatch(trigger, member.name)
             if not match: continue
-            # Gather info and respond accordingly
-            response = name_filters[trigger]
-            if response.lower() == "mute":
-                mute = self.bot.get_cog("Mute")
-                if mute: await mute._mute(member, member.guild)
-                return
-            else:
-                command = member.guild.ban if response.lower() == "ban" else member.guild.kick
-                try: await command(member, reason="Name filter match")
-                except: pass
-                return
+            # Respond accordingly
+            await self._anti_raid_respond(member,response=name_filters[trigger],reason="Name filter match")
         if not self.settings.getServerStat(member.guild, "AntiRaidEnabled", False): return # Not enabled, ignore
+        ar_response = self.settings.getServerStat(member.guild, "AntiRaidResponse", "kick")
         if self.settings.getServerStat(member.guild, "AntiRaidActive", False):
             # Currently in anti-raid mode, find out what to do with the new join
             ar_cooldown = self.settings.getServerStat(member.guild, "AntiRaidCooldown", 600) # 10 minute default
@@ -330,7 +320,7 @@ class Lockdown(commands.Cog):
             if time.time() - ar_lastjoin >= ar_cooldown: # No longer watching - disable anti-raid
                 self.settings.setServerStat(member.guild, "AntiRaidActive", False)
             else: # Gather our response to the new user and put it into effect
-                await self._anti_raid_respond(member)
+                await self._anti_raid_respond(member,response=ar_response)
             # Save the last join timestamp in the anti-raid list
             self.settings.setServerStat(member.guild, "AntiRaidLastJoin", time.time())
         # Gather the settings and go from there
@@ -360,7 +350,7 @@ class Lockdown(commands.Cog):
             for m_id,t in ar_joins:
                 # Resolve the ids and react accordingly
                 m = member.guild.get_member(m_id)
-                if m: await self._anti_raid_respond(m)
+                if m: await self._anti_raid_respond(m,response=ar_response)
 
     @commands.command()
     async def addnamefilter(self, ctx, action = None, *, regex = None):
