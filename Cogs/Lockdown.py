@@ -1,4 +1,4 @@
-import discord, time, textwrap
+import discord, time, re
 from discord.ext import commands
 from Cogs import Utils, DisplayName, Message, Nullify, PickList
 
@@ -306,6 +306,22 @@ class Lockdown(commands.Cog):
 
     @commands.Cog.listener()	
     async def on_member_join(self, member):
+        name_filters = self.settings.getServerStat(member.guild, "NameFilters", {})
+        # See if the new join matches any of the name filters
+        for trigger in name_filters:
+            match = re.fullmatch(trigger, member.name)
+            if not match: continue
+            # Gather info and respond accordingly
+            response = name_filters[trigger]
+            if response.lower() == "mute":
+                mute = self.bot.get_cog("Mute")
+                if mute: await mute._mute(member, member.guild)
+                return
+            else:
+                command = member.guild.ban if response.lower() == "ban" else member.guild.kick
+                try: await command(member, reason="Name filter match")
+                except: pass
+                return
         if not self.settings.getServerStat(member.guild, "AntiRaidEnabled", False): return # Not enabled, ignore
         if self.settings.getServerStat(member.guild, "AntiRaidActive", False):
             # Currently in anti-raid mode, find out what to do with the new join
@@ -345,6 +361,64 @@ class Lockdown(commands.Cog):
                 # Resolve the ids and react accordingly
                 m = member.guild.get_member(m_id)
                 if m: await self._anti_raid_respond(m)
+
+    @commands.command()
+    async def addnamefilter(self, ctx, action = None, *, regex = None):
+        """Adds a new action (kick|ban|mute) and regex name filter (bot-admin only).
+        
+        Example:  $addnamefilter ban (?i)baduser.*
+        
+        This would look for a user joining with a name that starts with "baduser" (case-insensitive) and ban them.
+        """
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        if not action or not regex or not action.lower() in ("kick","ban","mute"): return await ctx.send("Usage: `{}addnamefilter action regex`".format(ctx.prefix))
+        # Ensure the regex is valid
+        try: re.compile(regex)
+        except Exception as e: return await ctx.send(Nullify.escape_all(str(e)))
+        # Save the trigger and response
+        name_filters = self.settings.getServerStat(ctx.guild, "NameFilters", {})
+        context = "Updated" if regex in name_filters else "Added new"
+        name_filters[regex] = action
+        self.settings.setServerStat(ctx.guild, "NameFilters", name_filters)
+        return await ctx.send("{} name filter!".format(context))
+
+    @commands.command()
+    async def namefilters(self, ctx):
+        """Lists the name filters and their actions (bot-admin only)."""
+        
+        if not await Utils.is_bot_admin_reply(ctx): return
+        name_filters = self.settings.getServerStat(ctx.guild, "NameFilters", {})
+        if not name_filters: return await ctx.send("No name filters setup!  You can use the `{}addnamefilter` command to add some.".format(ctx.prefix))
+        entries = [{"name":"{}. ".format(i)+Nullify.escape_all(x),"value":name_filters[x].capitalize()} for i,x in enumerate(name_filters,start=1)]
+        return await PickList.PagePicker(title="Current Name Filters",list=entries,ctx=ctx).pick()
+
+    @commands.command()
+    async def remnamefilter(self, ctx, *, name_filter_number = None):
+        """Removes the passed name filter (bot-admin only)."""
+        
+        if not await Utils.is_bot_admin_reply(ctx): return
+        if not name_filter_number: return await ctx.send("Usage: `{}remnamefilter name_filter_number`\nYou can get a numbered list with `{}namefilters`".format(ctx.prefix,ctx.prefix))
+        name_filters = self.settings.getServerStat(ctx.guild, "NameFilters", {})
+        if not name_filters: return await ctx.send("No name filters setup!  You can use the `{}addnamefilter` command to add some.".format(ctx.prefix))
+        # Make sure we got a number, and it's within our list range
+        try:
+            name_filter_number = int(name_filter_number)
+            assert 0 < name_filter_number <= len(name_filters)
+        except:
+            return await ctx.send("You need to pass a valid number from 1 to {:,}.\nYou can get a numbered list with `{}namefilters`".format(len(name_filters),ctx.prefix))
+        # Remove it, save, and report
+        name_filters.pop(list(name_filters)[name_filter_number-1],None)
+        self.settings.setServerStat(ctx.guild, "NameFilters", name_filters)
+        return await ctx.send("Name filter removed!")
+
+    @commands.command()
+    async def clearnamefilters(self, ctx):
+        """Removes all name filters (bot-admin only)."""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        self.settings.setServerStat(ctx.guild, "NameFilters", {})
+        return await ctx.send("All name filters removed!")
 
     @commands.command()
     async def antiraid(self, ctx, *, on_off = None, join_number = None, join_seconds = None, kick_ban_mute = None, cooldown_minutes = None):
