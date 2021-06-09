@@ -305,11 +305,18 @@ class Lockdown(commands.Cog):
     async def on_member_join(self, member):
         name_filters = self.settings.getServerStat(member.guild, "NameFilters", {})
         # See if the new join matches any of the name filters
+        r = 0
+        r_levels = (None,"mute","kick","ban")
         for trigger in name_filters:
             match = re.fullmatch(trigger, member.name)
             if not match: continue
-            # Respond accordingly
-            await self._anti_raid_respond(member,response=name_filters[trigger],reason="Name filter match")
+            # Retain the highest level
+            try: trigger_level = r_levels.index(name_filters[trigger].lower())
+            except: continue # Unknown response
+            if trigger_level < r: continue # Not a more severe punishment - bypass
+            r = trigger_level # Set it as we incremented punishment
+        # Check if we have a punishment, and send it along
+        if r_levels[r]: await self._anti_raid_respond(member,response=r_levels[r],reason="Name filter match")
         if not self.settings.getServerStat(member.guild, "AntiRaidEnabled", False): return # Not enabled, ignore
         ar_response = self.settings.getServerStat(member.guild, "AntiRaidResponse", "kick")
         if self.settings.getServerStat(member.guild, "AntiRaidActive", False):
