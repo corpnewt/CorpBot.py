@@ -277,6 +277,7 @@ class Mute(commands.Cog):
     async def createmuterole(self, ctx, *, role_name = None):
         """Sets the target role to apply when muting (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
+        if not role_name: return await ctx.send("Usage: `{}createmuterole [role_name]`".format(ctx.prefix))
         mute_role = DisplayName.roleForName(role_name, ctx.guild)
         if mute_role: # Already exists - let's update the settings
             self.settings.setServerStat(ctx.guild,"MuteRole",mute_role.id)
