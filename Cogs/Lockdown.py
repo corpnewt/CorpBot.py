@@ -92,9 +92,6 @@ class Lockdown(commands.Cog):
             # Increment counts
             if isinstance(channel,discord.CategoryChannel):
                 categories += 1
-                # Add all missing channels that do not have synced perms
-                new_chans = [x for x in channel.channels if not x in lockdown and (not hasattr(channel,"permissions_synced") or not x.permissions_synced)]
-                lockdown.extend(new_chans)
             else:
                 channels += 1
                 # Check if we even need to update perms based on syncing/category inclusion
