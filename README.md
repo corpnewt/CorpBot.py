@@ -362,6 +362,8 @@ A list of cogs, commands, and descriptions:
 ####	Emoji Cog (2 commands) - Emoji.py Extension:
 	  $addemoji [emoji] [name]
 	   └─ Adds the passed emoji, url, or attachment as a custom emoji with the passed n...
+	  $addemoji [name] (While replying to a message with an emoji)
+	   └─ Adds the emoji of a referenced message...
 	  $emoji [emoji]
 	   └─ Outputs the passed emoji... but bigger!
 

@@ -34,6 +34,29 @@ class Emoji(commands.Cog):
     async def addemoji(self, ctx, *, emoji = None, name = None):
         '''Adds the passed emoji, url, or attachment as a custom emoji with the passed name (bot-admin only, max of 10).'''
         if not await Utils.is_bot_admin_reply(ctx): return
+        # Adds an emoji in a referenced message
+        if not len(ctx.message.attachments) and name == None and ctx.message.reference is not None:
+            message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            emoji_url = self._get_emoji_url(message.content)
+            if not emoji_url: return await ctx.send("Referenced message doesn\'t have an Emoji")
+            f = await GetImage.download(emoji_url[0])
+            if not f: return await ctx.send("I couldn't get that emoji :(")
+            
+            replymessage = await ctx.send("Adding Emoji...")
+            # Open the image file
+            with open(f,"rb") as e:
+                image = e.read()
+            # Clean up
+            GetImage.remove(f)
+            if not emoji.replace("_",""): return await ctx.send("Invalid Emoji Name")
+            # Create the emoji and save it
+            try: new_emoji = await ctx.guild.create_custom_emoji(name=emoji,image=image,roles=None,reason="Added by {}#{}".format(ctx.author.name,ctx.author.discriminator))
+            except: return await ctx.send("Error Creating Emoji")
+            msg = "Created 1 Emoji"
+            msg += "\n\n"
+            msg += "{} - `:{}:`".format(self._get_emoji_mention(new_emoji),new_emoji.name)
+            return await replymessage.edit(content=msg)
+
         if not len(ctx.message.attachments) and emoji == name == None:
             return await ctx.send("Usage: `{}addemoji [emoji, url, attachment] [name]`".format(ctx.prefix))
         # Let's find out if we have an attachment, emoji, or a url
