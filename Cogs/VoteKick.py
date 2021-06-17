@@ -714,4 +714,4 @@ class VoteKick(commands.Cog):
 				if not len(user["Kicks"]) == 1:
 					kick_words = "{} users".format(len(user["Kicks"]))
 				user["Mentioned"] = True
-				await m_channel.send("{} - *{}* has had {} vote to kick them.".format(m_target.mention, member.mention, kick_words))
+				await m_channel.send("{} - *{}* has had {} vote to kick them.".format(m_target.mention, member.mention, kick_words),allowed_mentions=discord.AllowedMentions.all())

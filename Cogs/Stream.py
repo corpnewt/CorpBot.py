@@ -76,7 +76,7 @@ class Stream(commands.Cog):
             return await ctx.channel.send('Stream announcement message removed!')
 
         self.settings.setServerStat(ctx.message.guild, "StreamMessage", message)
-        await ctx.send("Stream announcement message sent - here's a preview (note that @​here and @​everyone pings are suppressed here):")
+        await ctx.send("Stream announcement message sent - here's a preview:")
         await self._stream_message(ctx.author, message, ctx, True)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         channel = ctx.guild.get_channel(chan)
@@ -86,7 +86,7 @@ class Stream(commands.Cog):
             await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
 
     @commands.command(pass_context=True)
-    async def teststream(self, ctx, *, message = None):
+    async def teststream(self, ctx):
         """Tests the stream announcement message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
@@ -101,7 +101,7 @@ class Stream(commands.Cog):
             await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
 
     @commands.command(pass_context=True)
-    async def rawstream(self, ctx, *, message = None):
+    async def rawstream(self, ctx):
         """Displays the raw markdown for the stream announcement message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
@@ -134,14 +134,13 @@ class Stream(commands.Cog):
         if test:
             message = re.sub(self.regexUrl,      "GameURL", message)
             message = re.sub(self.regexGame,     "GameName", message)
-            message = re.sub(self.regexHere,     "@​here", message)
-            message = re.sub(self.regexEveryone, "@​everyone", message)
         else:
             message = re.sub(self.regexUrl,      "{}".format(url), message)
             message = re.sub(self.regexGame,     "{}".format(name), message)
-            message = re.sub(self.regexHere,     "@here", message)
-            message = re.sub(self.regexEveryone, "@everyone", message)
-        await dest.send(message)
+        message = re.sub(self.regexHere,     "@here", message)
+        message = re.sub(self.regexEveryone, "@everyone", message)
+        am = discord.AllowedMentions.none() if test else discord.AllowedMentions.all()
+        await dest.send(message,allowed_mentions=am)
 
     @commands.command(pass_context=True)
     async def addstreamer(self, ctx, *, member = None):
