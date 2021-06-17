@@ -53,7 +53,7 @@ class Clippy(commands.Cog):
         image_width = image.size[0]
         draw = ImageDraw.Draw(image)
 
-        text = Nullify.resolve_mentions(text,ctx=ctx,escape=False)
+        text = Nullify.resolve_mentions(text,ctx=ctx,escape=False,channel_mentions=True)
         # Remove any non-ascii chars
         text = ''.join([i for i in text if ord(i) < 128])
 
