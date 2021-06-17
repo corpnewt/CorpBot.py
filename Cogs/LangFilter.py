@@ -1,7 +1,7 @@
 import asyncio, discord, re, random, os
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName, Message
+from   Cogs import Utils, DisplayName, Message, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -119,7 +119,7 @@ class LangFilter(commands.Cog):
 		new_msg = f.clean(message.content)
 		if not new_msg == message.content:
 			# Something changed
-			new_msg = "Hey *{}*, based on my calculations, here's a cleaner version of that messsage:\n\n".format(DisplayName.name(message.author)) + new_msg
+			new_msg = "Hey *{}*, based on my calculations, here's a cleaner version of that messsage:\n\n".format(DisplayName.name(message.author)) + Nullify.escape_all(new_msg, markdown=False)
 			await message.channel.send(new_msg)
 			return { "Ignore" : False, "Delete" : True }
 		return { "Ignore" : False, "Delete" : False }
