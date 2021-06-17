@@ -1,4 +1,4 @@
-import asyncio, discord, random, re, json, os, tempfile
+import discord, random, re, json, os, tempfile, shutil
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, DL
 
@@ -55,9 +55,8 @@ class SecretSanta(commands.Cog):
 		if not path == None and os.path.exists(path):
 			shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
-	async def _channel_message(self, ctx, member):
+	async def _channel_message(self, ctx, member, allow_mentions=False):
 		# Sends the welcome message when a new Secret Santa channel is created for a user
-		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		message = self.settings.getServerStat(ctx.guild, "SSMessage")
 		if message == None:
 			return None
@@ -65,7 +64,8 @@ class SecretSanta(commands.Cog):
 		message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
 		message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
 		message = re.sub(self.regexServer,   "{}".format(ctx.guild.name), message)
-		return await ctx.send(Utils.suppressed(ctx,message))
+		am = discord.AllowedMentions.all() if allow_mentions else discord.AllowedMentions.none()
+		return await ctx.send(message,allowed_mentions=am)
 
 	@commands.command()
 	async def setssrole(self, ctx, *, role = None):
@@ -73,7 +73,6 @@ class SecretSanta(commands.Cog):
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
 		# Check if we're suppressing @here and @everyone mentions
-		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# Verify perms - bot-admin
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if role == None:
@@ -99,13 +98,11 @@ class SecretSanta(commands.Cog):
 		if not self.settings.getServerStat(ctx.guild,"SSAllowed",False):
 			return await ctx.send("The Secret Santa module has not been allowed on this server.\nOne of my owners can enable it with `{}allowss yes`.".format(ctx.prefix))
 		# Check if we're suppressing @here and @everyone mentions
-		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# See if we have the setting set at all
 		role = self.settings.getServerStat(ctx.guild,"SSRole","")
 		if role in [None,""]:
 			return await ctx.send("There is no Secret Santa role set. You can set it with the `{}setssrole [role]` command.".format(ctx.prefix))
 		# Role is set - let's get its name
-		found = False
 		vowels = "aeiou"
 		arole = next((x for x in ctx.guild.roles if str(x.id) == str(role)),None)
 		if not arole:
@@ -130,7 +127,6 @@ class SecretSanta(commands.Cog):
 		if not category:
 			# Create it
 			category = await ctx.guild.create_category_channel(category_name)
-		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# Make sure we even have a role setup and that it's valid
 		role = self.settings.getServerStat(ctx.guild,"SSRole","")
 		if role in [None,""]:
@@ -157,7 +153,7 @@ class SecretSanta(commands.Cog):
 			}
 			channel = await ctx.guild.create_text_channel(str(x.id), overwrites=overwrites, category=category)
 			channels += 1
-			await self._channel_message(channel,x)
+			await self._channel_message(channel,x,allow_mentions=True)
 		await m.edit(content="Created {} Secret Santa channel{}!".format(channels,"" if channels == 1 else "s"))
 
 	@commands.command()
@@ -222,7 +218,6 @@ class SecretSanta(commands.Cog):
 		category = DisplayName.channelForName(category,ctx.guild,"category")
 		if not category:
 			return await ctx.send("I couldn't locate that category...")
-		suppress = True if self.settings.getServerStat(ctx.guild,"SuppressMentions",True) else False
 		# Get our users by resolving the text channel names to user ids, then shuffle
 		m = await ctx.send("Gathering and shuffling participants...")
 		participants = []

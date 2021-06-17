@@ -27,7 +27,7 @@ class OfflineUser(commands.Cog):
 				return await ctx.message.add_reaction("📬")
 			except discord.Forbidden:
 				pass
-		await ctx.send(msg)
+		await ctx.send(msg,allowed_mentions=discord.AllowedMentions.all())
 
 	@commands.Cog.listener()
 	async def on_message(self, message):

@@ -28,8 +28,8 @@ class Welcome(commands.Cog):
         # Welcome
         try: welcomeChannel = server.get_channel(int(self.settings.getServerStat(server,"WelcomeChannel")))
         except: welcomeChannel = None
-        if welcomeChannel: await self._welcome(member, server, welcomeChannel)
-        else: await self._welcome(member, server)
+        if welcomeChannel: await self._welcome(member, server, welcomeChannel, allow_mentions=True)
+        else: await self._welcome(member, server, allow_mentions=True)
         if not self.settings.getServerStat(server,"JoinPM",False): return
         # We need to attempt to dm the rules
         rules = self.settings.getServerStat(server, "Rules")
@@ -44,8 +44,8 @@ class Welcome(commands.Cog):
             return
         try: welcomeChannel = server.get_channel(int(self.settings.getServerStat(server,"WelcomeChannel")))
         except: welcomeChannel = None
-        if welcomeChannel: await self._goodbye(member, server, welcomeChannel)
-        else: await self._goodbye(member, server)
+        if welcomeChannel: await self._goodbye(member, server, welcomeChannel, allow_mentions=True)
+        else: await self._goodbye(member, server, allow_mentions=True)
             
     def _getDefault(self, server):
         # Returns the default channel for the server
@@ -258,7 +258,7 @@ class Welcome(commands.Cog):
                 msg = 'There is *no channel* set for goodbye messages.'
         await ctx.send(msg)
 
-    async def _send_greeting(self,member,server,channel=None,stat_name="Welcome"):
+    async def _send_greeting(self,member,server,channel=None,stat_name="Welcome",allow_mentions=False):
         # Helper to send the welcome/goodbye message
         message = self.settings.getServerStat(server, stat_name)
         if message in (None,""): return
@@ -280,17 +280,18 @@ class Welcome(commands.Cog):
         # Get online users
         online_count = len([x for x in server.members if not x.status == discord.Status.offline])
         message = re.sub(self.regexOnline, "{:,}".format(online_count), message)
-        if channel: return await channel.send(message)
+        am = discord.AllowedMentions.all() if allow_mentions else discord.AllowedMentions.none()
+        if channel: return await channel.send(message,allowed_mentions=am)
         try:
-            await self._getDefault(server).send(message)
+            await self._getDefault(server).send(message,allowed_mentions=am)
         except:
             pass
 
-    async def _welcome(self, member, server, channel = None):
-        await self._send_greeting(member,server,channel,"Welcome")
+    async def _welcome(self, member, server, channel = None, allow_mentions = False):
+        await self._send_greeting(member,server,channel,"Welcome",allow_mentions)
 
-    async def _goodbye(self, member, server, channel = None):
-        await self._send_greeting(member,server,channel,"Goodbye")
+    async def _goodbye(self, member, server, channel = None, allow_mentions = False):
+        await self._send_greeting(member,server,channel,"Goodbye",allow_mentions)
 
     @commands.command(pass_context=True)
     async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):

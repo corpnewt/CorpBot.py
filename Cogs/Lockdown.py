@@ -347,7 +347,7 @@ class Lockdown(commands.Cog):
                         if channel:
                             c = DisplayName.channelForName(channel, member.guild)
                             if c: # Got a member/role and a channel - try to post the ping
-                                try: await c.send("{} - Anti-raid has been enabled!".format(m.mention))
+                                try: await c.send("{} - Anti-raid has been enabled!".format(m.mention),allowed_mentions=discord.AllowedMentions.all())
                                 except: pass
             self.settings.setServerStat(member.guild, "AntiRaidLastJoin", time.time())
             for m_id,t in ar_joins:
