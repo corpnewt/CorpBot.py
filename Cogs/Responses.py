@@ -46,13 +46,10 @@ class Responses(commands.Cog):
 			if not Utils.is_bot_admin(ctx): # Check for non-bot-admin responses: delete, mute, kick, ban
 				delete = True if self.regexDelete.search(m) else False
 				if self.regexBan.search(m): # Start with the most extreme and go from there
-					print("Ban!")
 					await message.guild.ban(message.author,reason="Response trigger matched")
 				elif self.regexKick.search(m):
-					print("Kick!")
 					await message.guild.kick(message.author,reason="Response trigger matched")
 				elif self.regexMute.search(m):
-					print("Mute!")
 					# Let's get the mute time - if any
 					try: mute_time = int(time.time()) + int(self.regexMute.search(m).group(0).replace("]]","").split(":")[-1])
 					except: mute_time = None
