@@ -18,13 +18,13 @@ class Stream(commands.Cog):
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
         # Regex values
-        self.regexUserName = re.compile(r"\[\[[user]+\]\]",     re.IGNORECASE)
-        self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]",   re.IGNORECASE)
-        self.regexServer   = re.compile(r"\[\[[server]+\]\]",   re.IGNORECASE)
-        self.regexUrl      = re.compile(r"\[\[[url]+\]\]",      re.IGNORECASE)
-        self.regexGame     = re.compile(r"\[\[[game]+\]\]",     re.IGNORECASE)
-        self.regexHere     = re.compile(r"\[\[[here]+\]\]",     re.IGNORECASE)
-        self.regexEveryone = re.compile(r"\[\[[everyone]+\]\]", re.IGNORECASE)
+        self.regexUserName = re.compile(r"\[\[user\]\]",     re.IGNORECASE)
+        self.regexUserPing = re.compile(r"\[\[atuser\]\]",   re.IGNORECASE)
+        self.regexServer   = re.compile(r"\[\[server\]\]",   re.IGNORECASE)
+        self.regexUrl      = re.compile(r"\[\[url\]\]",      re.IGNORECASE)
+        self.regexGame     = re.compile(r"\[\[game\]\]",     re.IGNORECASE)
+        self.regexHere     = re.compile(r"\[\[here\]\]",     re.IGNORECASE)
+        self.regexEveryone = re.compile(r"\[\[everyone\]\]", re.IGNORECASE)
 
     # Check for events!
     @commands.Cog.listener()

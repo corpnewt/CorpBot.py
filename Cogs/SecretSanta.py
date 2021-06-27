@@ -16,9 +16,9 @@ class SecretSanta(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-		self.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
-		self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
-		self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
+		self.regexUserName = re.compile(r"\[\[user\]\]", re.IGNORECASE)
+		self.regexUserPing = re.compile(r"\[\[atuser\]\]", re.IGNORECASE)
+		self.regexServer   = re.compile(r"\[\[server\]\]", re.IGNORECASE)
 		""" Setting names used:
 			SSAllowed     = a boolean denoting whether this server has been allowed to use the SS module (owner only)
 			SSRole        = the id of the current SS role
