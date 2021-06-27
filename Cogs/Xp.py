@@ -895,7 +895,7 @@ class Xp(commands.Cog):
 			url = member.default_avatar_url
 
 		# Create blank embed
-		stat_embed = Message.Embed(color=member.color,thumbnail=url)
+		stat_embed = Message.Embed(color=member.color,thumbnail=url,pm_after=20)
 
 		# Get user's xp
 		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))

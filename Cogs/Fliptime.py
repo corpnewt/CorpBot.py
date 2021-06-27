@@ -35,52 +35,44 @@ class Fliptime(commands.Cog):
 		# This module doesn't need to cancel messages.
 		# Check if our server supports it
 		table = self.settings.getServerStat(message.guild, "TableFlipMute")
-
-		if not table:
-			return { 'Ignore' : False, 'Delete' : False}
-
+		if not table: return { 'Ignore' : False, 'Delete' : False}
 		# Check for admin status
 		ctx = await self.bot.get_context(message)
-		isAdmin = Utils.is_bot_admin(ctx)
+		if Utils.is_bot_admin(ctx): return {"Ignore":False,"Delete":False}
 
 		# Check if the message contains the flip chars
 		conts = message.content
-		face = table = False
-		table_list  = [ '┻', '╙', '╨', '╜', 'ǝʃqɐʇ', '┺' ]
+		table_list  = [ '┻', '╙', '╨', '╜', 'ǝʃqɐʇ', '┺', 'ㅗ' ]
 		front_list = [ '(' ]
 		back_list  = [ ')', '）' ]
-		if any(ext in conts for ext in front_list) and any(ext in conts for ext in back_list):
-			face = True
-		if any(ext in conts for ext in table_list):
-			table = True
+		# (╯⁰ㅁ⁰）╯︵ ㅗㅡㅗ
+		face = any(ext in conts for ext in front_list) and any(ext in conts for ext in back_list)
+		table = any(ext in conts for ext in table_list)
 		if face and table:	
 			# Contains all characters
 			# Table flip - add time
 			currentTime = int(time.time())
 			cooldownFinal = currentTime+60
 			alreadyMuted = self.settings.getUserStat(message.author, message.guild, "Muted")
-			if not isAdmin:
-				# Check if we're muted already
-				previousCooldown = self.settings.getUserStat(message.author, message.guild, "Cooldown")
-				if not previousCooldown:
-					if alreadyMuted:
-						# We're perma-muted - ignore
-						return { 'Ignore' : False, 'Delete' : False}
-					previousCooldown = 0
-				if int(previousCooldown) > currentTime:
-					# Already cooling down - add to it.
-					cooldownFinal = previousCooldown+60
-					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
-					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, I understand that you\'re frustrated, but we still don\'t flip tables here.  Why don\'t you cool down for *{}* instead.'.format(DisplayName.name(message.author), coolText)
-				else:
-					# Not cooling down - start it
-					coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
-					res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
-				# Do the actual muting
-				await self.mute._mute(message.author, message.guild, cooldownFinal)
-
-				await message.channel.send(res)
-				return { 'Ignore' : True, 'Delete' : True }		
+			# Check if we're muted already
+			previousCooldown = self.settings.getUserStat(message.author, message.guild, "Cooldown")
+			if not previousCooldown:
+				# Check for perma-mute
+				if alreadyMuted: return { 'Ignore' : False, 'Delete' : False}
+				previousCooldown = 0
+			if int(previousCooldown) > currentTime:
+				# Already cooling down - add to it.
+				cooldownFinal = previousCooldown+60
+				coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+				res = '┬─┬ ノ( ゜-゜ノ)  *{}*, I understand that you\'re frustrated, but we still don\'t flip tables here.  Why don\'t you cool down for *{}* instead.'.format(DisplayName.name(message.author), coolText)
+			else:
+				# Not cooling down - start it
+				coolText = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
+				res = '┬─┬ ノ( ゜-゜ノ)  *{}*, we don\'t flip tables here.  You should cool down for *{}*'.format(DisplayName.name(message.author), coolText)
+			# Do the actual muting
+			await self.mute._mute(message.author, message.guild, cooldownFinal)
+			await message.channel.send(res)
+			return { 'Ignore' : True, 'Delete' : True }		
 
 		return { 'Ignore' : False, 'Delete' : False}
 
