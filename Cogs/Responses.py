@@ -1,4 +1,4 @@
-import discord, re
+import discord, re, time
 from discord.ext import commands
 from Cogs import Settings, DisplayName, Utils, Nullify, PickList
 
@@ -17,12 +17,16 @@ class Responses(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 		# Regex values
-		self.regexUserName = re.compile(r"\[\[[user]+\]\]",     re.IGNORECASE)
-		self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]",   re.IGNORECASE)
-		self.regexServer   = re.compile(r"\[\[[server]+\]\]",   re.IGNORECASE)
-		self.regexHere     = re.compile(r"\[\[[here]+\]\]",     re.IGNORECASE)
-		self.regexEveryone = re.compile(r"\[\[[everyone]+\]\]", re.IGNORECASE)
-		self.regexDelete   = re.compile(r"\[\[[delete]+\]\]",   re.IGNORECASE)
+		self.regexUserName = re.compile(r"\[\[user\]\]",      re.IGNORECASE)
+		self.regexUserPing = re.compile(r"\[\[atuser\]\]",    re.IGNORECASE)
+		self.regexServer   = re.compile(r"\[\[server\]\]",    re.IGNORECASE)
+		self.regexHere     = re.compile(r"\[\[here\]\]",      re.IGNORECASE)
+		self.regexEveryone = re.compile(r"\[\[everyone\]\]",  re.IGNORECASE)
+		self.regexDelete   = re.compile(r"\[\[delete\]\]",    re.IGNORECASE)
+		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]", re.IGNORECASE)
+		self.regexKick     = re.compile(r"\[\[kick\]\]",      re.IGNORECASE)
+		self.regexBan      = re.compile(r"\[\[ban\]\]",       re.IGNORECASE)
+		self.regexSuppress = re.compile(r"\[\[suppress\]\]",  re.IGNORECASE)
 
 	async def message(self, message):
 		if message.author.bot: return
@@ -35,17 +39,35 @@ class Responses(commands.Cog):
 		# Check for matching response triggers here
 		content = message.content.replace("\n"," ") # Remove newlines for better matching
 		for trigger in message_responses:
-			match = re.fullmatch(trigger, content)
-			if not match: continue
+			if not re.fullmatch(trigger, content): continue
 			# Got a full match - build the message, send it and bail
 			m = message_responses[trigger]
+			delete = False
+			if not Utils.is_bot_admin(ctx): # Check for non-bot-admin responses: delete, mute, kick, ban
+				delete = True if self.regexDelete.search(m) else False
+				if self.regexBan.search(m): # Start with the most extreme and go from there
+					print("Ban!")
+					await message.guild.ban(message.author,reason="Response trigger matched")
+				elif self.regexKick.search(m):
+					print("Kick!")
+					await message.guild.kick(message.author,reason="Response trigger matched")
+				elif self.regexMute.search(m):
+					print("Mute!")
+					# Let's get the mute time - if any
+					try: mute_time = int(time.time()) + int(self.regexMute.search(m).group(0).replace("]]","").split(":")[-1])
+					except: mute_time = None
+					mute = self.bot.get_cog("Mute")
+					if mute: await mute._mute(message.author, message.guild, cooldown=mute_time)
+			elif self.regexSuppress.search(m):
+				return # An admin/bot-admin, and we're suppressing output - bail
 			m = re.sub(self.regexUserName, "{}".format(DisplayName.name(message.author)), m)
 			m = re.sub(self.regexUserPing, "{}".format(message.author.mention), m)
 			m = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(ctx.guild.name)), m)
 			m = re.sub(self.regexHere,     "@here", m)
 			m = re.sub(self.regexEveryone, "@everyone", m)
-			delete = True if self.regexDelete.search(m) else False
-			m = re.sub(self.regexDelete,   "", m)
+			# Strip out leftovers from delete, ban, kick, mute, and suppress
+			for sub in (self.regexDelete,self.regexBan,self.regexKick,self.regexMute,self.regexSuppress):
+				m = re.sub(sub,"",m)
 			return {"Delete":delete,"Respond":m}
 
 	@commands.command()
@@ -58,7 +80,15 @@ class Responses(commands.Cog):
 		[[server]]   = server name
 		[[here]]     = @​here ping
 		[[everyone]] = @​everyone ping
+		[[suppress]] = suppresses output for admin/bot-admin author matches
+
+		Non Admin/Bot-Admin Author Options:
+
 		[[delete]]   = delete the original message
+		[[ban]]      = bans the message author
+		[[kick]]     = kicks the message author
+		[[mute]]     = mutes the author indefinitely
+		[[mute:#]]   = mutes the message author for # seconds
 		
 		Example:  $addresponse "(?i)(hello there|\\btest\\b).*" [[atuser]], this is a test!
 		
