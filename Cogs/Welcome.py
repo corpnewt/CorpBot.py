@@ -14,12 +14,12 @@ class Welcome(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
-        self.regexUserName = re.compile(r"\[\[[user]+\]\]", re.IGNORECASE)
-        self.regexUserPing = re.compile(r"\[\[[atuser]+\]\]", re.IGNORECASE)
-        self.regexServer   = re.compile(r"\[\[[server]+\]\]", re.IGNORECASE)
-        self.regexCount    = re.compile(r"\[\[[count]+\]\]", re.IGNORECASE)
-        self.regexPlace    = re.compile(r"\[\[[place]+\]\]", re.IGNORECASE)
-        self.regexOnline   = re.compile(r"\[\[[online]+\]\]", re.IGNORECASE)
+        self.regexUserName = re.compile(r"\[\[user\]\]", re.IGNORECASE)
+        self.regexUserPing = re.compile(r"\[\[atuser\]\]", re.IGNORECASE)
+        self.regexServer   = re.compile(r"\[\[server\]\]", re.IGNORECASE)
+        self.regexCount    = re.compile(r"\[\[count\]\]", re.IGNORECASE)
+        self.regexPlace    = re.compile(r"\[\[place\]\]", re.IGNORECASE)
+        self.regexOnline   = re.compile(r"\[\[online\]\]", re.IGNORECASE)
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
