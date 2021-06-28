@@ -47,7 +47,7 @@ class UrbanDict(commands.Cog):
 			words.append({
 				"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 				"value":self._format_definition(x),
-				"sort": float(x["thumbs_up"])/(float(x["thumbs_up"])+float(x["thumbs_down"]))
+				"sort": float(x["thumbs_up"])/(float(x["thumbs_up"])+float(x["thumbs_down"])) if x["thumbs_up"]+x["thumbs_down"] > 0 else 0
 			})
 		# Sort the words by their "sort" value t_u / (t_u + t_d)
 		words.sort(key=lambda x:x["sort"],reverse=True)
