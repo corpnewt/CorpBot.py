@@ -129,7 +129,7 @@ class Responses(commands.Cog):
 
 	@commands.command()
 	async def editresponse(self, ctx, response_index = None, *, regex_trigger = None):
-		"""Edits the regex trigger for the passed index (bot-admin only)."""
+		"""Edits the regex trigger for the passed index.  The triggers passed here do not require quotes if there are spaces (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not regex_trigger or not response_index: return await ctx.send("Usage: `{}addresponse regex_trigger response`".format(ctx.prefix))
