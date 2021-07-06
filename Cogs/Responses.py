@@ -128,11 +128,11 @@ class Responses(commands.Cog):
 		return await ctx.send("{} response trigger!".format(context))
 
 	@commands.command()
-	async def editresponse(self, ctx, response_index = None, *, regex_trigger = None):
+	async def edittrigger(self, ctx, response_index = None, *, regex_trigger = None):
 		"""Edits the regex trigger for the passed index.  The triggers passed here do not require quotes if there are spaces (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if not regex_trigger or not response_index: return await ctx.send("Usage: `{}addresponse regex_trigger response`".format(ctx.prefix))
+		if not regex_trigger or not response_index: return await ctx.send("Usage: `{}edittrigger response_index regex_trigger`".format(ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
 		# Ensure the passed index is valid
@@ -150,6 +150,49 @@ class Responses(commands.Cog):
 			ordered_responses[regex_trigger if index==response_index else key] = message_responses[key]
 		self.settings.setServerStat(ctx.guild,"MessageResponses",ordered_responses)
 		return await ctx.send("Updated response trigger at index {:,}!".format(response_index))
+
+	@commands.command()
+	async def editresponse(self, ctx, response_index = None, *, response = None):
+		"""Edits the response for the passed index.  The response passed here does not require quotes if there are spaces (bot-admin only).
+		
+		Value substitutions:
+		
+		[[user]]     = user name
+		[[atuser]]   = user mention
+		[[server]]   = server name
+		[[here]]     = @​here ping
+		[[everyone]] = @​everyone ping
+
+		Standard user behavioral flags (do not apply to admin/bot-admin):
+
+		[[delete]]   = delete the original message
+		[[ban]]      = bans the message author
+		[[kick]]     = kicks the message author
+		[[mute]]     = mutes the author indefinitely
+		[[mute:#]]   = mutes the message author for # seconds
+
+		Admin/bot-admin behavioral flags:
+
+		[[suppress]] = suppresses output for admin/bot-admin author matches
+		
+		Example:  $editresponse 1 [[atuser]], this is a test!
+		
+		This would edit the first response trigger to respond by pinging the user and saying "this is a test!"""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not response or not response_index: return await ctx.send("Usage: `{}editresponse response_index response`".format(ctx.prefix))
+		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
+		# Ensure the passed index is valid
+		try:
+			response_index = int(response_index)
+			assert 0 < response_index <= len(message_responses)
+		except:
+			return await ctx.send("You need to pass a valid integer from 1 to {:,}.\nYou can get a numbered list with `{}responses`".format(len(message_responses),ctx.prefix))
+		# Update the response
+		message_responses[list(message_responses)[response_index-1]] = response
+		self.settings.setServerStat(ctx.guild,"MessageResponses",message_responses)
+		return await ctx.send("Updated response at index {:,}!".format(response_index))
 
 	@commands.command()
 	async def responses(self, ctx):
