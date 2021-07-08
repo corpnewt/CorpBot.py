@@ -8,22 +8,26 @@ import time
 # Set defaults
 bot = "Main.py"
 dir_path = os.path.dirname(os.path.realpath(__file__))
-bot_path = os.path.join(dir_path,bot)
+bot_path = os.path.join(dir_path, bot)
 restart_on_error = True
 wait_before_restart = 1
+
 
 def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var
     command = "where" if os.name == "nt" else "which"
     try:
-        p = subprocess.run(command+" "+binary, shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        p = subprocess.run(command+" "+binary, shell=True, check=True,
+                           stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
         return p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
     except:
         return None
-    
+
+
 def get_git():
     # Returns the local instance of git - if any
     return get_bin("git")
+
 
 def update():
     if not git:
@@ -36,8 +40,10 @@ def update():
         u = subprocess.Popen([git, 'pull'])
         u.wait()
     except:
-        print("Something went wrong!  Make sure you have git installed and in your path var!")
+        print(
+            "Something went wrong!  Make sure you have git installed and in your path var!")
     print(" ")
+
 
 def main():
     # Here we have our deps checked - let's go into a loop
@@ -61,6 +67,7 @@ def main():
             print("\nRebooting...")
             update()
         time.sleep(wait_before_restart)
+
 
 git = get_git()
 if git == None:
