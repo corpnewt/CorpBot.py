@@ -1,7 +1,9 @@
 from urllib.request import urlopen
 
+
 def setup(bot_start):
     return
+
 
 async def tiny_url(url, bot):
     apiurl = "http://tinyurl.com/api-create.php?url="

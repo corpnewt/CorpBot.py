@@ -1,8 +1,9 @@
 import asyncio
 import discord
 import re
-from   discord.ext import commands
-from   Cogs import Nullify
+from discord.ext import commands
+from Cogs import Nullify
+
 
 def setup(bot):
     # This module isn't actually a cog - but it is a place
@@ -10,11 +11,12 @@ def setup(bot):
     # house to the ground.
     bot.add_cog(DisplayName(bot))
 
+
 class DisplayName(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self, bot):
         self.bot = bot
 
-    def name(self, member : discord.Member):
+    def name(self, member: discord.Member):
         # A helper function to return the member's display name
         return Nullify.escape_all(member.display_name)
 
@@ -29,7 +31,7 @@ class DisplayName(commands.Cog):
         # Check nick first - then name
         name = str(name)
         for member in mems:
-            if not hasattr(member,"nick"):
+            if not hasattr(member, "nick"):
                 # No nick property - must be a user, bail
                 break
             if member.nick and member.nick.lower() == name.lower():
@@ -53,10 +55,10 @@ class DisplayName(commands.Cog):
         new_mem = self.memberForID(mem_id, server)
         if new_mem:
             return new_mem
-        
+
         return None
 
-    def channelForID(self, checkid, server, typeCheck = None):
+    def channelForID(self, checkid, server, typeCheck=None):
         try:
             checkid = int(checkid)
         except:
@@ -73,7 +75,7 @@ class DisplayName(commands.Cog):
                 return channel
         return None
 
-    def channelForName(self, name, server, typeCheck = None):
+    def channelForName(self, name, server, typeCheck=None):
         name = str(name)
         for channel in server.channels:
             if typeCheck:
@@ -126,13 +128,13 @@ class DisplayName(commands.Cog):
         name = str(name)
         theList = name.split()
         # We see if we have multiple parts split by a space
-        if len(theList)<2:
+        if len(theList) < 2:
             # Only one part - no int included (or not separated by space)
             # Check if member exists - and if not throw an error, if so, throw a diff error
             amember = self.memberForName(name, server)
             if amember:
                 # We at least have a member
-                return { "Member" : amember, "Int" : None }
+                return {"Member": amember, "Int": None}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -140,17 +142,17 @@ class DisplayName(commands.Cog):
                 newMem = self.memberForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Member" : newMem, "Int" : None }
+                    return {"Member": newMem, "Int": None}
                 else:
                     # Nothing was right about this...
-                    return { "Member" : None, "Int" : None }
+                    return {"Member": None, "Int": None}
         try:
             # Let's cast the last item as an int and catch any exceptions
             theInt = int(theList[len(theList)-1])
             newMemberName = " ".join(theList[:-1])
             amember = self.memberForName(newMemberName, server)
             if amember:
-                return { "Member" : amember, "Int" : theInt }
+                return {"Member": amember, "Int": theInt}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -158,16 +160,16 @@ class DisplayName(commands.Cog):
                 newMem = self.memberForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Member" : newMem, "Int" : theInt }
+                    return {"Member": newMem, "Int": theInt}
                 else:
                     # Nothing was right about this...
-                    return { "Member" : None, "Int" : None }
+                    return {"Member": None, "Int": None}
         except ValueError:
             # Last section wasn't an int
             amember = self.memberForName(name, server)
             if amember:
                 # Name was just a member - return
-                return { "Member" : amember, "Int" : None }
+                return {"Member": amember, "Int": None}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -175,10 +177,10 @@ class DisplayName(commands.Cog):
                 newMem = self.memberForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Member" : newMem, "Int" : None }
+                    return {"Member": newMem, "Int": None}
                 else:
                     # Nothing was right about this...
-                    return { "Member" : None, "Int" : None }
+                    return {"Member": None, "Int": None}
         # Should never get here
         return None
 
@@ -186,13 +188,13 @@ class DisplayName(commands.Cog):
         name = str(name)
         theList = name.split()
         # We see if we have multiple parts split by a space
-        if len(theList)<2:
+        if len(theList) < 2:
             # Only one part - no int included (or not separated by space)
             # Check if role exists - and if not throw an error, if so, throw a diff error
             amember = self.roleForName(name, server)
             if amember:
                 # We at least have a member
-                return { "Role" : amember, "Int" : None }
+                return {"Role": amember, "Int": None}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -200,17 +202,17 @@ class DisplayName(commands.Cog):
                 newMem = self.roleForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Role" : newMem, "Int" : None }
+                    return {"Role": newMem, "Int": None}
                 else:
                     # Nothing was right about this...
-                    return { "Role" : None, "Int" : None }
+                    return {"Role": None, "Int": None}
         try:
             # Let's cast the last item as an int and catch any exceptions
             theInt = int(theList[len(theList)-1])
             newMemberName = " ".join(theList[:-1])
             amember = self.roleForName(newMemberName, server)
             if amember:
-                return { "Role" : amember, "Int" : theInt }
+                return {"Role": amember, "Int": theInt}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -218,16 +220,16 @@ class DisplayName(commands.Cog):
                 newMem = self.roleForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Role" : newMem, "Int" : theInt }
+                    return {"Role": newMem, "Int": theInt}
                 else:
                     # Nothing was right about this...
-                    return { "Role" : None, "Int" : None }
+                    return {"Role": None, "Int": None}
         except ValueError:
             # Last section wasn't an int
             amember = self.roleForName(name, server)
             if amember:
                 # Name was just a role - return
-                return { "Role" : amember, "Int" : None }
+                return {"Role": amember, "Int": None}
             else:
                 # Now we check if we got an ID instead
                 # Get just the numbers
@@ -235,9 +237,9 @@ class DisplayName(commands.Cog):
                 newMem = self.roleForID(memID, server)
                 if newMem:
                     # We FOUND it!
-                    return { "Role" : newMem, "Int" : None }
+                    return {"Role": newMem, "Int": None}
                 else:
                     # Nothing was right about this...
-                    return { "Role" : None, "Int" : None }
+                    return {"Role": None, "Int": None}
         # Should never get here
         return None

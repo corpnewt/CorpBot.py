@@ -1,432 +1,433 @@
 import asyncio
 import discord
 import os
-from   datetime import datetime
-from   discord.ext import commands
-from   Cogs import DisplayName
+from datetime import datetime
+from discord.ext import commands
+from Cogs import DisplayName
+
 
 def setup(bot):
-	# Add the bot and deps
-	settings = bot.get_cog("Settings")
-	bot.add_cog(Torment(bot, settings))
+    # Add the bot and deps
+    settings = bot.get_cog("Settings")
+    bot.add_cog(Torment(bot, settings))
 
 # This is the Torment module. It spams the target with pings for awhile
 
+
 class Torment(commands.Cog):
 
-	# Init with the bot reference, and a reference to the settings var
-	def __init__(self, bot, settings):
-		self.bot = bot
-		self.waitBetween = 1 # number of seconds to wait before sending another message
-		self.settings = settings
-		self.toTorment = False
-		global Utils, DisplayName
-		Utils = self.bot.get_cog("Utils")
-		DisplayName = self.bot.get_cog("DisplayName")
-		
-	@commands.command(pass_context=True, hidden=True)
-	async def tormentdelay(self, ctx, delay : int = None):
-		"""Sets the delay in seconds between messages (owner only)."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
+    # Init with the bot reference, and a reference to the settings var
+    def __init__(self, bot, settings):
+        self.bot = bot
+        self.waitBetween = 1  # number of seconds to wait before sending another message
+        self.settings = settings
+        self.toTorment = False
+        global Utils, DisplayName
+        Utils = self.bot.get_cog("Utils")
+        DisplayName = self.bot.get_cog("DisplayName")
 
-		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-		
-		if delay == None:
-			if self.waitBetween == 1:
-				await ctx.message.author.send('Current torment delay is *1 second.*')
-			else:
-				await ctx.message.author.send('Current torment delay is *{} seconds.*'.format(self.waitBetween))
-			return
-		
-		try:
-			delay = int(delay)
-		except Exception:
-			await ctx.message.author.send('Delay must be an int.')
-			return
-		
-		if delay < 1:
-			await ctx.message.author.send('Delay must be at least *1 second*.')
-			return
-		
-		self.waitBetween = delay
-		if self.waitBetween == 1:
-			await ctx.message.author.send('Current torment delay is now *1 second.*')
-		else:
-			await ctx.message.author.send('Current torment delay is now *{} seconds.*'.format(self.waitBetween))
-		
-	
-	@commands.command(pass_context=True, hidden=True)
-	async def canceltorment(self, ctx):
-		"""Cancels tormenting if it's in progress - must be false when next torment attempt starts to work (owner only)."""
-		
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
+    @commands.command(pass_context=True, hidden=True)
+    async def tormentdelay(self, ctx, delay: int = None):
+        """Sets the delay in seconds between messages (owner only)."""
 
-		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-			
-		if not self.toTorment:
-			await ctx.message.author.send('Not currently tormenting.')
-			return
-		# Cancel it!
-		self.toTorment = False
-		await ctx.message.author.send('Tormenting cancelled.')
-		
-		
-	@commands.command(pass_context=True, hidden=True)
-	async def torment(self, ctx, *, member = None, times : int = None):
-		"""Deals some vigilante justice (owner only)."""
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		message = ctx.message
+        # Only allow owner to change server stats
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
 
-		# Only allow owner to change server stats
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+        if delay == None:
+            if self.waitBetween == 1:
+                await ctx.message.author.send('Current torment delay is *1 second.*')
+            else:
+                await ctx.message.author.send('Current torment delay is *{} seconds.*'.format(self.waitBetween))
+            return
 
-		isRole = False
+        try:
+            delay = int(delay)
+        except Exception:
+            await ctx.message.author.send('Delay must be an int.')
+            return
 
-		if member == None:
-			await ctx.channel.send(usage)
-			return
-				
-		# Check for formatting issues
-		if times == None:
-			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
-					isRole = True
-					member   = roleCheck["Role"]
-					times = roleCheck["Int"]
-				else:
-					# Role is invalid - check for member instead
-					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
-						await ctx.channel.send(usage)
-						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
-						await ctx.channel.send(msg)
-						return
-					member   = nameCheck["Member"]
-					times = nameCheck["Int"]
-					
-		# Set the torment flag
-		self.toTorment = True
+        if delay < 1:
+            await ctx.message.author.send('Delay must be at least *1 second*.')
+            return
 
-		if times == None:
-			# Still no times - roll back to default
-			times = 25
-			
-		if times > 100:
-			times = 100
-			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
-			return
-		
-		if times < 0:
-			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
-			return
-		
-		# Delete original torment message
-		await message.delete()
+        self.waitBetween = delay
+        if self.waitBetween == 1:
+            await ctx.message.author.send('Current torment delay is now *1 second.*')
+        else:
+            await ctx.message.author.send('Current torment delay is now *{} seconds.*'.format(self.waitBetween))
 
-		for i in range(0, times):
-			# Do this over time
-			try:
-				if member.name == "@everyone" and type(member) is discord.Role:
-					await channel.send("{}".format(member.name))
-				else:
-					await channel.send('{}'.format(member.mention))
-			except Exception:
-				pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
-				await asyncio.sleep(1)
-				if not self.toTorment:
-					return
+    @commands.command(pass_context=True, hidden=True)
+    async def canceltorment(self, ctx):
+        """Cancels tormenting if it's in progress - must be false when next torment attempt starts to work (owner only)."""
 
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
 
-	@commands.command(pass_context=True, hidden=True)
-	async def stealthtorment(self, ctx, *, member = None, times : int = None):
-		"""Deals some sneaky vigilante justice (owner only)."""
+        # Only allow owner to change server stats
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		message = ctx.message
+        if not self.toTorment:
+            await ctx.message.author.send('Not currently tormenting.')
+            return
+        # Cancel it!
+        self.toTorment = False
+        await ctx.message.author.send('Tormenting cancelled.')
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+    @commands.command(pass_context=True, hidden=True)
+    async def torment(self, ctx, *, member=None, times: int = None):
+        """Deals some vigilante justice (owner only)."""
 
-		isRole = False
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
+        message = ctx.message
 
-		if member == None:
-			await ctx.channel.send(usage)
-			return
-				
-		# Check for formatting issues
-		if times == None:
-			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
-					isRole = True
-					member   = roleCheck["Role"]
-					times = roleCheck["Int"]
-				else:
-					# Role is invalid - check for member instead
-					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
-						await ctx.channel.send(usage)
-						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
-						await ctx.channel.send(msg)
-						return
-					member   = nameCheck["Member"]
-					times = nameCheck["Int"]
-					
-		# Set the torment flag
-		self.toTorment = True
+        # Only allow owner to change server stats
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
 
-		if times == None:
-			# Still no times - roll back to default
-			times = 25
-			
-		if times > 100:
-			times = 100
-			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
-			return
-		
-		if times < 0:
-			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
-			return
+        usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 
-		# Delete original torment message
-		await message.delete()
-		
-		for i in range(0, times):
-			# Do this over time
-			try:
-				if member.name == "@everyone" and type(member) is discord.Role:
-					tmessage = await ctx.channel.send("{}".format(member.name))
-				else:
-					tmessage = await ctx.channel.send('{}'.format(member.mention))
-				await tmessage.delete()
-			except Exception:
-				pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
-				await asyncio.sleep(1)
-				if not self.toTorment:
-					return
+        isRole = False
 
+        if member == None:
+            await ctx.channel.send(usage)
+            return
 
-	@commands.command(pass_context=True, hidden=True)
-	async def servertorment(self, ctx, *, member = None, times : int = None):
-		"""Deals some vigilante justice in all channels (owner only)."""
+        # Check for formatting issues
+        if times == None:
+            # Either xp wasn't set - or it's the last section
+            if type(member) is str:
+                # It' a string - the hope continues
+                roleCheck = DisplayName.checkRoleForInt(member, server)
+                if roleCheck and roleCheck["Role"]:
+                    isRole = True
+                    member = roleCheck["Role"]
+                    times = roleCheck["Int"]
+                else:
+                    # Role is invalid - check for member instead
+                    nameCheck = DisplayName.checkNameForInt(member, server)
+                    if not nameCheck:
+                        await ctx.channel.send(usage)
+                        return
+                    if not nameCheck["Member"]:
+                        msg = 'I couldn\'t find that user or role on the server.'.format(
+                            member)
+                        await ctx.channel.send(msg)
+                        return
+                    member = nameCheck["Member"]
+                    times = nameCheck["Int"]
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		message = ctx.message
+        # Set the torment flag
+        self.toTorment = True
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+        if times == None:
+            # Still no times - roll back to default
+            times = 25
 
-		isRole = False
+        if times > 100:
+            times = 100
 
-		if member == None:
-			await ctx.channel.send(usage)
-			return
-				
-		# Check for formatting issues
-		if times == None:
-			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
-					isRole = True
-					member   = roleCheck["Role"]
-					times = roleCheck["Int"]
-				else:
-					# Role is invalid - check for member instead
-					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
-						await ctx.channel.send(usage)
-						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
-						await ctx.channel.send(msg)
-						return
-					member   = nameCheck["Member"]
-					times = nameCheck["Int"]
-					
-		# Set the torment flag
-		self.toTorment = True
+        if times == 0:
+            await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+            return
 
-		if times == None:
-			# Still no times - roll back to default
-			times = 25
-			
-		if times > 100:
-			times = 100
-			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
-			return
-		
-		if times < 0:
-			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
-			return
+        if times < 0:
+            await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
+            return
 
-		# Delete original torment message
-		await message.delete()
-		
-		for i in range(0, times):
-			# Do this over time
-			for channel in server.channels:
-				# Get user's permissions
-				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
-					# Only ping where they can read
-					try:
-						if member.name == "@everyone" and type(member) is discord.Role:
-							await channel.send("{}".format(member.name))
-						else:
-							await channel.send('{}'.format(member.mention))
-					except Exception:
-						pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
-				await asyncio.sleep(1)
-				if not self.toTorment:
-					return
+        # Delete original torment message
+        await message.delete()
 
+        for i in range(0, times):
+            # Do this over time
+            try:
+                if member.name == "@everyone" and type(member) is discord.Role:
+                    await channel.send("{}".format(member.name))
+                else:
+                    await channel.send('{}'.format(member.mention))
+            except Exception:
+                pass
+            for j in range(0, self.waitBetween):
+                # Wait for 1 second, then check if we should cancel - then wait some more
+                await asyncio.sleep(1)
+                if not self.toTorment:
+                    return
 
-	@commands.command(pass_context=True, hidden=True)
-	async def stealthservertorment(self, ctx, *, member = None, times : int = None):
-		"""Deals some sneaky vigilante justice in all channels (owner only)."""
+    @commands.command(pass_context=True, hidden=True)
+    async def stealthtorment(self, ctx, *, member=None, times: int = None):
+        """Deals some sneaky vigilante justice (owner only)."""
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		message = ctx.message
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
+        message = ctx.message
 
-		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return
-		elif isOwner == False:
-			return
-				
-		usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+        # Only allow owner
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
 
-		isRole = False
+        usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
 
-		if member == None:
-			await ctx.channel.send(usage)
-			return
-				
-		# Check for formatting issues
-		if times == None:
-			# Either xp wasn't set - or it's the last section
-			if type(member) is str:
-				# It' a string - the hope continues
-				roleCheck = DisplayName.checkRoleForInt(member, server)
-				if roleCheck and roleCheck["Role"]:
-					isRole = True
-					member   = roleCheck["Role"]
-					times = roleCheck["Int"]
-				else:
-					# Role is invalid - check for member instead
-					nameCheck = DisplayName.checkNameForInt(member, server)
-					if not nameCheck:
-						await ctx.channel.send(usage)
-						return
-					if not nameCheck["Member"]:
-						msg = 'I couldn\'t find that user or role on the server.'.format(member)
-						await ctx.channel.send(msg)
-						return
-					member   = nameCheck["Member"]
-					times = nameCheck["Int"]
-					
-		# Set the torment flag
-		self.toTorment = True
+        isRole = False
 
-		if times == None:
-			# Still no times - roll back to default
-			times = 25
-			
-		if times > 100:
-			times = 100
-			
-		if times == 0:
-			await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
-			return
-		
-		if times < 0:
-			await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
-			return
+        if member == None:
+            await ctx.channel.send(usage)
+            return
 
-		# Delete original torment message
-		await message.delete()
-		
-		for i in range(0, times):
-			# Do this over time
-			for channel in server.channels:
-				# Get user's permissions
-				if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
-					# Only ping where they can read
-					try:
-						if member.name == "@everyone" and type(member) is discord.Role:
-							tmessage = await channel.send("{}".format(member.name))
-						else:
-							tmessage = await channel.send('{}'.format(member.mention))
-						await tmessage.delete()
-					except Exception:
-						pass
-			for j in range(0, self.waitBetween):
-				# Wait for 1 second, then check if we should cancel - then wait some more
-				await asyncio.sleep(1)
-				if not self.toTorment:
-					return
+        # Check for formatting issues
+        if times == None:
+            # Either xp wasn't set - or it's the last section
+            if type(member) is str:
+                # It' a string - the hope continues
+                roleCheck = DisplayName.checkRoleForInt(member, server)
+                if roleCheck and roleCheck["Role"]:
+                    isRole = True
+                    member = roleCheck["Role"]
+                    times = roleCheck["Int"]
+                else:
+                    # Role is invalid - check for member instead
+                    nameCheck = DisplayName.checkNameForInt(member, server)
+                    if not nameCheck:
+                        await ctx.channel.send(usage)
+                        return
+                    if not nameCheck["Member"]:
+                        msg = 'I couldn\'t find that user or role on the server.'.format(
+                            member)
+                        await ctx.channel.send(msg)
+                        return
+                    member = nameCheck["Member"]
+                    times = nameCheck["Int"]
+
+        # Set the torment flag
+        self.toTorment = True
+
+        if times == None:
+            # Still no times - roll back to default
+            times = 25
+
+        if times > 100:
+            times = 100
+
+        if times == 0:
+            await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+            return
+
+        if times < 0:
+            await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
+            return
+
+        # Delete original torment message
+        await message.delete()
+
+        for i in range(0, times):
+            # Do this over time
+            try:
+                if member.name == "@everyone" and type(member) is discord.Role:
+                    tmessage = await ctx.channel.send("{}".format(member.name))
+                else:
+                    tmessage = await ctx.channel.send('{}'.format(member.mention))
+                await tmessage.delete()
+            except Exception:
+                pass
+            for j in range(0, self.waitBetween):
+                # Wait for 1 second, then check if we should cancel - then wait some more
+                await asyncio.sleep(1)
+                if not self.toTorment:
+                    return
+
+    @commands.command(pass_context=True, hidden=True)
+    async def servertorment(self, ctx, *, member=None, times: int = None):
+        """Deals some vigilante justice in all channels (owner only)."""
+
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
+        message = ctx.message
+
+        # Only allow owner
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
+
+        usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+
+        isRole = False
+
+        if member == None:
+            await ctx.channel.send(usage)
+            return
+
+        # Check for formatting issues
+        if times == None:
+            # Either xp wasn't set - or it's the last section
+            if type(member) is str:
+                # It' a string - the hope continues
+                roleCheck = DisplayName.checkRoleForInt(member, server)
+                if roleCheck and roleCheck["Role"]:
+                    isRole = True
+                    member = roleCheck["Role"]
+                    times = roleCheck["Int"]
+                else:
+                    # Role is invalid - check for member instead
+                    nameCheck = DisplayName.checkNameForInt(member, server)
+                    if not nameCheck:
+                        await ctx.channel.send(usage)
+                        return
+                    if not nameCheck["Member"]:
+                        msg = 'I couldn\'t find that user or role on the server.'.format(
+                            member)
+                        await ctx.channel.send(msg)
+                        return
+                    member = nameCheck["Member"]
+                    times = nameCheck["Int"]
+
+        # Set the torment flag
+        self.toTorment = True
+
+        if times == None:
+            # Still no times - roll back to default
+            times = 25
+
+        if times > 100:
+            times = 100
+
+        if times == 0:
+            await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+            return
+
+        if times < 0:
+            await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
+            return
+
+        # Delete original torment message
+        await message.delete()
+
+        for i in range(0, times):
+            # Do this over time
+            for channel in server.channels:
+                # Get user's permissions
+                if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+                    # Only ping where they can read
+                    try:
+                        if member.name == "@everyone" and type(member) is discord.Role:
+                            await channel.send("{}".format(member.name))
+                        else:
+                            await channel.send('{}'.format(member.mention))
+                    except Exception:
+                        pass
+            for j in range(0, self.waitBetween):
+                # Wait for 1 second, then check if we should cancel - then wait some more
+                await asyncio.sleep(1)
+                if not self.toTorment:
+                    return
+
+    @commands.command(pass_context=True, hidden=True)
+    async def stealthservertorment(self, ctx, *, member=None, times: int = None):
+        """Deals some sneaky vigilante justice in all channels (owner only)."""
+
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = ctx.message.guild
+        message = ctx.message
+
+        # Only allow owner
+        isOwner = self.settings.isOwner(ctx.author)
+        if isOwner == None:
+            return
+        elif isOwner == False:
+            return
+
+        usage = 'Usage: `{}torment [role/member] [times]`'.format(ctx.prefix)
+
+        isRole = False
+
+        if member == None:
+            await ctx.channel.send(usage)
+            return
+
+        # Check for formatting issues
+        if times == None:
+            # Either xp wasn't set - or it's the last section
+            if type(member) is str:
+                # It' a string - the hope continues
+                roleCheck = DisplayName.checkRoleForInt(member, server)
+                if roleCheck and roleCheck["Role"]:
+                    isRole = True
+                    member = roleCheck["Role"]
+                    times = roleCheck["Int"]
+                else:
+                    # Role is invalid - check for member instead
+                    nameCheck = DisplayName.checkNameForInt(member, server)
+                    if not nameCheck:
+                        await ctx.channel.send(usage)
+                        return
+                    if not nameCheck["Member"]:
+                        msg = 'I couldn\'t find that user or role on the server.'.format(
+                            member)
+                        await ctx.channel.send(msg)
+                        return
+                    member = nameCheck["Member"]
+                    times = nameCheck["Int"]
+
+        # Set the torment flag
+        self.toTorment = True
+
+        if times == None:
+            # Still no times - roll back to default
+            times = 25
+
+        if times > 100:
+            times = 100
+
+        if times == 0:
+            await ctx.channel.send('Oooooh - I bet they feel *sooooo* tormented...')
+            return
+
+        if times < 0:
+            await ctx.channel.send('I just uh... *un-tormented* them.  Yeah.')
+            return
+
+        # Delete original torment message
+        await message.delete()
+
+        for i in range(0, times):
+            # Do this over time
+            for channel in server.channels:
+                # Get user's permissions
+                if type(member) is discord.Role or channel.permissions_for(member).read_messages and type(channel) is discord.TextChannel:
+                    # Only ping where they can read
+                    try:
+                        if member.name == "@everyone" and type(member) is discord.Role:
+                            tmessage = await channel.send("{}".format(member.name))
+                        else:
+                            tmessage = await channel.send('{}'.format(member.mention))
+                        await tmessage.delete()
+                    except Exception:
+                        pass
+            for j in range(0, self.waitBetween):
+                # Wait for 1 second, then check if we should cancel - then wait some more
+                await asyncio.sleep(1)
+                if not self.toTorment:
+                    return

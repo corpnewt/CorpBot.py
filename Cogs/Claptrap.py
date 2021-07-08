@@ -2,8 +2,10 @@ import discord
 from discord.ext import commands
 import random
 
+
 def setup(bot):
     bot.add_cog(Claptrap(bot))
+
 
 class Claptrap(commands.Cog):
 

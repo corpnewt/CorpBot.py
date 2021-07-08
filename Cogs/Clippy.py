@@ -1,10 +1,14 @@
-import discord, os, random
+import discord
+import os
+import random
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 from Cogs import Nullify
 
+
 def setup(bot):
     bot.add_cog(Clippy(bot))
+
 
 class Clippy(commands.Cog):
 
@@ -43,9 +47,8 @@ class Clippy(commands.Cog):
                 lines.append(line)
         return lines
 
-    
     @commands.command()
-    async def clippy(self, ctx, *,text: str = ""):
+    async def clippy(self, ctx, *, text: str = ""):
         """I *know* you wanted some help with something - what was it?"""
         image = Image.open('images/clippy.png')
         image_size = image.size
@@ -53,7 +56,8 @@ class Clippy(commands.Cog):
         image_width = image.size[0]
         draw = ImageDraw.Draw(image)
 
-        text = Nullify.resolve_mentions(text,ctx=ctx,escape=False,channel_mentions=True)
+        text = Nullify.resolve_mentions(
+            text, ctx=ctx, escape=False, channel_mentions=True)
         # Remove any non-ascii chars
         text = ''.join([i for i in text if ord(i) < 128])
 
@@ -71,25 +75,25 @@ class Clippy(commands.Cog):
 
         for xs in range(30, 2, -1):
             font = ImageFont.truetype('fonts/comic.ttf', size=xs)
-            #340 is the width we want to set the image width to
+            # 340 is the width we want to set the image width to
             lines = self.text_wrap(text, font, 340)
             line_height = font.getsize('hg')[1]
             (x, y) = (25, 20)
-            color = 'rgb(0, 0, 0)' # black color
+            color = 'rgb(0, 0, 0)'  # black color
             text_size = draw.textsize(text, font=font)
 
             for line in lines:
                 text_size = draw.textsize(line, font=font)
-                image_x = (image_width /2 ) - (text_size[0]/2)
+                image_x = (image_width / 2) - (text_size[0]/2)
                 draw.text((image_x, y), line, fill=color, font=font)
                 y = y + line_height
-            if y < 182: # Check if the text overlaps. 182 was found by trial and error.
+            if y < 182:  # Check if the text overlaps. 182 was found by trial and error.
                 image = Image.open('images/clippy.png')
                 draw = ImageDraw.Draw(image)
                 (x, y) = (25, 20)
                 for line in lines:
                     text_size = draw.textsize(line, font=font)
-                    image_x = (image_width /2 ) - (text_size[0]/2)
+                    image_x = (image_width / 2) - (text_size[0]/2)
                     draw.text((image_x, y), line, fill=color, font=font)
                     y = y + line_height
                 image.save('images/clippynow.png')

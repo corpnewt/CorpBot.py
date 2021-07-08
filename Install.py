@@ -9,6 +9,7 @@ except:
 
 ON_POSIX = 'posix' in sys.builtin_module_names
 
+
 class Run:
 
     def __init__(self):
@@ -22,7 +23,7 @@ class Run:
                 pipe.close()
                 break
 
-    def _stream_output(self, comm, shell = False):
+    def _stream_output(self, comm, shell=False):
         output = error = ""
         p = ot = et = None
         try:
@@ -30,15 +31,17 @@ class Run:
                 comm = " ".join(shlex.quote(x) for x in comm)
             if not shell and type(comm) is str:
                 comm = shlex.split(comm)
-            p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True, close_fds=ON_POSIX)
+            p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, bufsize=1, universal_newlines=True, close_fds=ON_POSIX)
             # Setup the stdout thread/queue
             q = Queue()
             t = threading.Thread(target=self._read_output, args=(p.stdout, q))
-            t.daemon = True # thread dies with the program
+            t.daemon = True  # thread dies with the program
             # Setup the stderr thread/queue
             qe = Queue()
-            te = threading.Thread(target=self._read_output, args=(p.stderr, qe))
-            te.daemon = True # thread dies with the program
+            te = threading.Thread(
+                target=self._read_output, args=(p.stderr, qe))
+            te.daemon = True  # thread dies with the program
             # Start both threads
             t.start()
             te.start()
@@ -61,7 +64,7 @@ class Run:
                 sys.stdout.write(z)
                 sys.stdout.flush()
                 p.poll()
-                if c==z=="" and p.returncode != None:
+                if c == z == "" and p.returncode != None:
                     break
 
             o, e = p.communicate()
@@ -70,22 +73,27 @@ class Run:
             return (output+o, error+e, p.returncode)
         except:
             if ot or et:
-                try: ot.exit()
-                except: pass
-                try: et.exit()
-                except: pass
+                try:
+                    ot.exit()
+                except:
+                    pass
+                try:
+                    et.exit()
+                except:
+                    pass
             if p:
                 return (output, error, p.returncode)
             return ("", "Command not found!", 1)
 
-    def _run_command(self, comm, shell = False):
+    def _run_command(self, comm, shell=False):
         c = None
         try:
             if shell and type(comm) is list:
                 comm = " ".join(shlex.quote(x) for x in comm)
             if not shell and type(comm) is str:
                 comm = shlex.split(comm)
-            p = subprocess.Popen(comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(
+                comm, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             c = p.communicate()
             return (c[0].decode("utf-8", "ignore"), c[1].decode("utf-8", "ignore"), p.returncode)
         except:
@@ -93,22 +101,22 @@ class Run:
                 return ("", "Command not found!", 1)
             return (c[0].decode("utf-8", "ignore"), c[1].decode("utf-8", "ignore"), p.returncode)
 
-    def run(self, command_list, leave_on_fail = False):
+    def run(self, command_list, leave_on_fail=False):
         # Command list should be an array of dicts
         if type(command_list) is dict:
             # We only have one command
             command_list = [command_list]
         output_list = []
         for comm in command_list:
-            args   = comm.get("args",   [])
-            shell  = comm.get("shell",  False)
+            args = comm.get("args",   [])
+            shell = comm.get("shell",  False)
             stream = comm.get("stream", False)
-            sudo   = comm.get("sudo",   False)
+            sudo = comm.get("sudo",   False)
             stdout = comm.get("stdout", False)
             stderr = comm.get("stderr", False)
-            mess   = comm.get("message", None)
-            show   = comm.get("show",   False)
-            
+            mess = comm.get("message", None)
+            show = comm.get("show",   False)
+
             if not mess == None:
                 print(mess)
 
@@ -121,10 +129,12 @@ class Run:
                 if "sudo" in out[0]:
                     # Can sudo
                     if type(args) is list:
-                        args.insert(0, out[0].replace("\n", "")) # add to start of list
+                        # add to start of list
+                        args.insert(0, out[0].replace("\n", ""))
                     elif type(args) is str:
-                        args = out[0].replace("\n", "") + " " + args # add to start of string
-            
+                        # add to start of string
+                        args = out[0].replace("\n", "") + " " + args
+
             if show:
                 print(" ".join(args))
 
@@ -149,35 +159,39 @@ class Run:
             return output_list[0]
         return output_list
 
+
 if __name__ == '__main__':
     r = Run()
     modules = [
-        {"name":"discord [rewrite]", "item":"discord.py[voice]"},
-        {"name":"pillow"},
+        {"name": "discord [rewrite]", "item": "discord.py[voice]"},
+        {"name": "pillow"},
         # {"name":"youtube-dl"},
-        {"name":"Wavelink"},
-        {"name":"Requests"},
-        {"name":"parsedatetime"},
-        {"name":"psutil"},
-        {"name":"pyparsing"},
-        {"name":"pyquery"},
-        {"name":"pyaiml", "item":"git+https://github.com/paulovn/python-aiml"},
-        {"name":"speedtest-cli"},
-        {"name":"pytz"},
-        {"name":"wikipedia"},
-        {"name":"googletrans"},
-        {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
-        {"name":"numpy"},
-        {"name":"pymongo"},
-        {"name":"igdb_api_python"},
-        {"name":"redis"},
-        {"name":"geopy"}
+        {"name": "Wavelink"},
+        {"name": "Requests"},
+        {"name": "parsedatetime"},
+        {"name": "psutil"},
+        {"name": "pyparsing"},
+        {"name": "pyquery"},
+        {"name": "pyaiml", "item": "git+https://github.com/paulovn/python-aiml"},
+        {"name": "speedtest-cli"},
+        {"name": "pytz"},
+        {"name": "wikipedia"},
+        {"name": "googletrans"},
+        {"name": "giphypop",
+            "item": "git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
+        {"name": "numpy"},
+        {"name": "pymongo"},
+        {"name": "igdb_api_python"},
+        {"name": "redis"},
+        {"name": "geopy"}
     ]
     item = 0
     for module in modules:
-        item+=1
-        print("\n\nUpdating {} - {} of {}\n\n".format(module["name"], item, len(modules)))
-        r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
+        item += 1
+        print(
+            "\n\nUpdating {} - {} of {}\n\n".format(module["name"], item, len(modules)))
+        r.run({"args": [sys.executable, "-m", "pip", "install",
+              "-U", module.get("item", module["name"])], "stream": True})
     # Prompt for the users to press enter to exit
     prompt = "Done.\n\nPress [enter] to leave the script..."
     if sys.version_info >= (3, 0):
