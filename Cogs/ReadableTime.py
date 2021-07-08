@@ -1,8 +1,11 @@
-import datetime, calendar
+import datetime
+import calendar
+
 
 def setup(bot):
-	# This module isn't actually a cog
+    # This module isn't actually a cog
     return
+
 
 def get_years(timeBetween, year, reverse):
     years = 0
@@ -13,7 +16,7 @@ def get_years(timeBetween, year, reverse):
         else:
             year += 1
 
-        year_days = 366 if calendar.isleap(year) else 365 
+        year_days = 366 if calendar.isleap(year) else 365
         year_seconds = year_days * 86400
 
         if timeBetween < year_seconds:
@@ -23,6 +26,7 @@ def get_years(timeBetween, year, reverse):
         timeBetween -= year_seconds
 
     return timeBetween, years, year
+
 
 def get_months(timeBetween, year, month, reverse):
     months = 0
@@ -52,6 +56,7 @@ def get_months(timeBetween, year, month, reverse):
 
     return timeBetween, months
 
+
 def getReadableTimeBetween(first, last, reverse=False):
     # A helper function to make a readable string between two times
     timeBetween = int(last-first)
@@ -61,14 +66,15 @@ def getReadableTimeBetween(first, last, reverse=False):
 
     timeBetween, years, year = get_years(timeBetween, year, reverse)
     timeBetween, months = get_months(timeBetween, year, month, reverse)
-    
-    weeks   = int(timeBetween/604800)
-    days    = int((timeBetween-(weeks*604800))/86400)
-    hours   = int((timeBetween-(days*86400 + weeks*604800))/3600)
+
+    weeks = int(timeBetween/604800)
+    days = int((timeBetween-(weeks*604800))/86400)
+    hours = int((timeBetween-(days*86400 + weeks*604800))/3600)
     minutes = int((timeBetween-(hours*3600 + days*86400 + weeks*604800))/60)
-    seconds = int(timeBetween-(minutes*60 + hours*3600 + days*86400 + weeks*604800))
+    seconds = int(timeBetween-(minutes*60 + hours *
+                  3600 + days*86400 + weeks*604800))
     msg = ""
-    
+
     if years > 0:
         msg += "1 year, " if years == 1 else "{:,} years, ".format(years)
     if months > 0:
@@ -80,11 +86,13 @@ def getReadableTimeBetween(first, last, reverse=False):
     if hours > 0:
         msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
     if minutes > 0:
-        msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
+        msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(
+            minutes)
     if seconds > 0:
-        msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
+        msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(
+            seconds)
 
     if msg == "":
         return "0 seconds"
     else:
-        return msg[:-2]	
+        return msg[:-2]

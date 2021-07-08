@@ -1,23 +1,31 @@
-import asyncio, discord, textwrap, random, math, os
-from   discord.ext import commands
+import asyncio
+import discord
+import textwrap
+import random
+import math
+import os
+from discord.ext import commands
+
 
 def setup(bot):
     # Not a cog
     return
 
+
 class Message:
     def __init__(self, **kwargs):
         # Creates a new message - with an optional setup dictionary
         self.max_chars = 2000
-        self.pm_after = kwargs.get("pm_after", 1) # -1 to disable, 0 to always pm
+        # -1 to disable, 0 to always pm
+        self.pm_after = kwargs.get("pm_after", 1)
         self.force_pm = kwargs.get("force_pm", False)
         self.header = kwargs.get("header", "")
         self.footer = kwargs.get("footer", "")
         self.pm_react = kwargs.get("pm_react", "📬")
         self.message = kwargs.get("message", None)
-        self.file = kwargs.get("file", None) # Accepts a file path
+        self.file = kwargs.get("file", None)  # Accepts a file path
         self.max_pages = 0
-        self.delete_after = kwargs.get("delete_after",None)
+        self.delete_after = kwargs.get("delete_after", None)
 
     def _get_file(self, file_path):
         if not os.path.exists(file_path):
@@ -28,7 +36,7 @@ class Message:
         file_handle = discord.File(fp=file_path, filename=fname)
         return (file_handle, fname)
 
-    async def _send_message(self, ctx, message, pm = False, file_path = None):
+    async def _send_message(self, ctx, message, pm=False, file_path=None):
         # Helper method to send embeds to their proper location
         send_file = None
         if not file_path == None:
@@ -84,6 +92,7 @@ class Message:
             page_count += 1
         return message
 
+
 class Embed:
     def __init__(self, **kwargs):
         # Set defaults
@@ -110,9 +119,9 @@ class Embed:
         self.thumbnail = kwargs.get("thumbnail", None)
         self.author = kwargs.get("author", None)
         self.fields = kwargs.get("fields", [])
-        self.file = kwargs.get("file", None) # Accepts a file path
-        self.delete_after = kwargs.get("delete_after",None)
-        self.colors = [ 
+        self.file = kwargs.get("file", None)  # Accepts a file path
+        self.delete_after = kwargs.get("delete_after", None)
+        self.colors = [
             discord.Color.teal(),
             discord.Color.dark_teal(),
             discord.Color.green(),
@@ -141,9 +150,9 @@ class Embed:
 
     def add_field(self, **kwargs):
         self.fields.append({
-            "name" : kwargs.get("name", "None"),
-            "value" : kwargs.get("value", "None"),
-            "inline" : kwargs.get("inline", False)
+            "name": kwargs.get("name", "None"),
+            "value": kwargs.get("value", "None"),
+            "inline": kwargs.get("inline", False)
         })
 
     def clear_fields(self):
@@ -157,12 +166,12 @@ class Embed:
         fname = "Upload." + ext[-1] if len(ext) > 1 else "Upload"
         file_handle = discord.File(fp=file_path, filename=fname)
         # Check if self.url = "attachment" and react
-        #if self.url and self.url.lower() == "attachment":
+        # if self.url and self.url.lower() == "attachment":
         #    self.url = "attachment://" + fname
         return (file_handle, fname)
 
     # Embed stuff!
-    async def _send_embed(self, ctx, embed, pm = False, file_path = None):
+    async def _send_embed(self, ctx, embed, pm=False, file_path=None):
         # Helper method to send embeds to their proper location
         send_file = None
         if not file_path == None:
@@ -223,18 +232,20 @@ class Embed:
         return tot
 
     def _embed_with_self(self):
-        if isinstance(self.color,discord.Member):
+        if isinstance(self.color, discord.Member):
             self.color = self.color.color
-        elif isinstance(self.color,discord.User):
+        elif isinstance(self.color, discord.User):
             self.color = None
-        elif isinstance(self.color,(tuple,list)):
+        elif isinstance(self.color, (tuple, list)):
             try:
-                self.color = discord.Color.from_rgb(*[int(a) for a in self.color])
+                self.color = discord.Color.from_rgb(
+                    *[int(a) for a in self.color])
             except:
                 self.color = None
 
         # Sends the current embed
-        em = discord.Embed(color=self.color if isinstance(self.color,discord.Color) else random.choice(self.colors))
+        em = discord.Embed(color=self.color if isinstance(
+            self.color, discord.Color) else random.choice(self.colors))
         em.title = self._truncate_string(self.title, self.title_max)
         em.url = self.url
         em.description = self._truncate_string(self.description, self.desc_max)
@@ -244,58 +255,66 @@ class Embed:
             em.set_thumbnail(url=self.thumbnail)
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
-                name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
+                name = self.author.nick if hasattr(
+                    self.author, "nick") and self.author.nick else self.author.name
                 em.set_author(
-                    name    =self._truncate_string(name, self.auth_max),
+                    name=self._truncate_string(name, self.auth_max),
                     # Ignore the url here
                     icon_url=self.author.avatar_url
-                )      
+                )
             elif type(self.author) is dict:
                 if any(item in self.author for item in ["name", "url", "icon"]):
                     em.set_author(
-                        name    =self._truncate_string(self.author.get("name",     discord.Embed.Empty), self.auth_max),
-                        url     =self.author.get("url",      discord.Embed.Empty),
-                        icon_url=self.author.get("icon_url", discord.Embed.Empty)
+                        name=self._truncate_string(self.author.get(
+                            "name",     discord.Embed.Empty), self.auth_max),
+                        url=self.author.get("url",      discord.Embed.Empty),
+                        icon_url=self.author.get(
+                            "icon_url", discord.Embed.Empty)
                     )
                 else:
-                    em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
+                    em.set_author(name=self._truncate_string(
+                        str(self.author), self.auth_max))
             else:
                 # Cast to string and hope for the best
-                em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
+                em.set_author(name=self._truncate_string(
+                    str(self.author), self.auth_max))
         return em
 
     def _get_footer(self):
         # Get our footer if we have one
         footer_text = footer_icon = discord.Embed.Empty
         if type(self.footer) is str:
-                footer_text = self.footer
+            footer_text = self.footer
         elif type(self.footer) is dict:
-                footer_text = self.footer.get("text", discord.Embed.Empty)
-                footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+            footer_text = self.footer.get("text", discord.Embed.Empty)
+            footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
         elif self.footer == None:
-                # Never setup
-                pass
+            # Never setup
+            pass
         else:
-                # Try to cast it
-                footer_text = str(self.footer)
+            # Try to cast it
+            footer_text = str(self.footer)
         return (footer_text, footer_icon)
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
         # check if we can steal the color from the message
-        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
+        if not isinstance(self.color, (discord.Member, discord.Color)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
-        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
+        to_pm = len(
+            self.fields) > self.pm_after if self.pm_after > -1 else False
 
         if len(self.fields) <= self.pm_after and not to_pm:
             # Edit in place, nothing else needs to happen
             for field in self.fields:
                 em.add_field(
-                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
+                    name=self._truncate_string(
+                        field.get("name", "None"), self.fname_max),
+                    value=self._truncate_string(
+                        field.get("value", "None"), self.fval_max),
                     inline=field.get("inline", False)
                 )
             em.set_footer(
@@ -314,7 +333,8 @@ class Embed:
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
-            em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
+            em = Embed(title=self.title, description="📬 Check your dm's",
+                       color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
             await message.delete()
@@ -324,7 +344,7 @@ class Embed:
     async def send(self, ctx):
         if not ctx:
             return
-        
+
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
@@ -336,20 +356,24 @@ class Embed:
                 icon_url=footer_icon
             )
             return await self._send_embed(ctx, em, False, self.file)
-        
+
         # Only pm if our self.pm_after is above -1
-        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
+        to_pm = len(
+            self.fields) > self.pm_after if self.pm_after > -1 else False
 
         page_count = 1
         page_total = math.ceil(len(self.fields)/self.field_max)
 
         if page_total > 1 and self.page_count and self.title:
             add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-            em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
+            em.title = self._truncate_string(
+                self.title, self.title_max - len(add_title)) + add_title
         for field in self.fields:
             em.add_field(
-                name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                value=self._truncate_string(field.get("value", "None"), self.fval_max),
+                name=self._truncate_string(
+                    field.get("name", "None"), self.fname_max),
+                value=self._truncate_string(
+                    field.get("value", "None"), self.fval_max),
                 inline=field.get("inline", False)
             )
             # 25 field max - send the embed if we get there
@@ -374,8 +398,10 @@ class Embed:
                 em.clear_fields()
                 page_count += 1
                 if page_total > 1 and self.page_count and self.title:
-                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
+                    add_title = " (Page {:,} of {:,})".format(
+                        page_count, page_total)
+                    em.title = self._truncate_string(
+                        self.title, self.title_max - len(add_title)) + add_title
 
         if len(em.fields):
             em.set_footer(
@@ -390,19 +416,22 @@ class Embed:
                 message = await self._send_embed(ctx, em, to_pm)
         return message
 
+
 class EmbedText(Embed):
     def __init__(self, **kwargs):
         Embed.__init__(self, **kwargs)
         # Creates a new embed - with an option setup dictionary
         self.pm_after = kwargs.get("pm_after", 1)
         self.max_pages = kwargs.get("max_pages", 0)
-        self.desc_head = kwargs.get("desc_head", "") # Header for description markdown
-        self.desc_foot = kwargs.get("desc_foot", "") # Footer for description markdown
+        # Header for description markdown
+        self.desc_head = kwargs.get("desc_head", "")
+        # Footer for description markdown
+        self.desc_foot = kwargs.get("desc_foot", "")
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
         # check if we can steal the color from the message
-        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
+        if not isinstance(self.color, (discord.Member, discord.Color)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
@@ -436,7 +465,8 @@ class EmbedText(Embed):
         # Now we need to edit the first message to just a space - then send the rest
         new_message = await self.send(ctx)
         if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
-            em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
+            em = Embed(title=self.title, description="📬 Check your dm's",
+                       color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
             await message.delete()
@@ -446,7 +476,7 @@ class EmbedText(Embed):
     async def send(self, ctx):
         if not ctx:
             return
-        
+
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
@@ -458,7 +488,7 @@ class EmbedText(Embed):
                 icon_url=footer_icon
             )
             return await self._send_embed(ctx, em, False, self.file)
-        
+
         text_list = textwrap.wrap(
             self.description,
             self.desc_max - len(self.desc_head) - len(self.desc_foot),
@@ -472,7 +502,8 @@ class EmbedText(Embed):
 
         if len(text_list) > 1 and self.page_count and self.title:
             add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-            em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
+            em.title = self._truncate_string(
+                self.title, self.title_max - len(add_title)) + add_title
 
         i = 0
         for i in range(len(text_list)):
@@ -500,6 +531,8 @@ class EmbedText(Embed):
                 return None
             page_count += 1
             if len(text_list) > 1 and self.page_count and self.title:
-                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
+                add_title = " (Page {:,} of {:,})".format(
+                    page_count, page_total)
+                em.title = self._truncate_string(
+                    self.title, self.title_max - len(add_title)) + add_title
         return message
