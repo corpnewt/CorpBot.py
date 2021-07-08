@@ -1,13 +1,15 @@
 import asyncio
 import discord
 import re
-from   discord.ext import commands
-from   Cogs import Settings, DisplayName, Message, Nullify, Utils
+from discord.ext import commands
+from Cogs import Settings, DisplayName, Message, Nullify, Utils
+
 
 def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Stream(bot, settings))
+
 
 class Stream(commands.Cog):
 
@@ -20,10 +22,10 @@ class Stream(commands.Cog):
         # Regex values
         self.regexUserName = re.compile(r"\[\[user\]\]",     re.IGNORECASE)
         self.regexUserPing = re.compile(r"\[\[atuser\]\]",   re.IGNORECASE)
-        self.regexServer   = re.compile(r"\[\[server\]\]",   re.IGNORECASE)
-        self.regexUrl      = re.compile(r"\[\[url\]\]",      re.IGNORECASE)
-        self.regexGame     = re.compile(r"\[\[game\]\]",     re.IGNORECASE)
-        self.regexHere     = re.compile(r"\[\[here\]\]",     re.IGNORECASE)
+        self.regexServer = re.compile(r"\[\[server\]\]",   re.IGNORECASE)
+        self.regexUrl = re.compile(r"\[\[url\]\]",      re.IGNORECASE)
+        self.regexGame = re.compile(r"\[\[game\]\]",     re.IGNORECASE)
+        self.regexHere = re.compile(r"\[\[here\]\]",     re.IGNORECASE)
         self.regexEveryone = re.compile(r"\[\[everyone\]\]", re.IGNORECASE)
 
     # Check for events!
@@ -34,12 +36,14 @@ class Stream(commands.Cog):
             # We're not watching for them
             return
         # Find out if we weren't streaming before - and display it
-        s_before = next((x for x in list(before.activities) if x.type is discord.ActivityType.streaming), None)
+        s_before = next((x for x in list(before.activities)
+                        if x.type is discord.ActivityType.streaming), None)
         if s_before:
             # Already streaming - ignore it.
             return
         # Not streaming before, see if we are now
-        s_after = next((x for x in list(after.activities) if x.type is discord.ActivityType.streaming), None)
+        s_after = next((x for x in list(after.activities)
+                       if x.type is discord.ActivityType.streaming), None)
         if not s_after:
             # Not streaming - ignore it.
             return
@@ -58,10 +62,10 @@ class Stream(commands.Cog):
         await self._stream_message(after, message, channel)
 
     @commands.command(pass_context=True)
-    async def setstream(self, ctx, *, message = None):
+    async def setstream(self, ctx, *, message=None):
         """Sets the stream announcement message (bot-admin only).
         Available Options:
-        
+
         [[user]]     = user name
         [[atuser]]   = user mention
         [[server]]   = server name
@@ -70,12 +74,15 @@ class Stream(commands.Cog):
         [[here]]     = @​here ping
         [[everyone]] = @​everyone ping"""
 
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
         if message == None:
-            self.settings.setServerStat(ctx.message.guild, "StreamMessage", None)
+            self.settings.setServerStat(
+                ctx.message.guild, "StreamMessage", None)
             return await ctx.channel.send('Stream announcement message removed!')
 
-        self.settings.setServerStat(ctx.message.guild, "StreamMessage", message)
+        self.settings.setServerStat(
+            ctx.message.guild, "StreamMessage", message)
         await ctx.send("Stream announcement message sent - here's a preview:")
         await self._stream_message(ctx.author, message, ctx, True)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
@@ -88,7 +95,8 @@ class Stream(commands.Cog):
     @commands.command(pass_context=True)
     async def teststream(self, ctx):
         """Tests the stream announcement message (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
         if not message:
             return await ctx.send("There is no stream announcement setup.")
@@ -103,12 +111,13 @@ class Stream(commands.Cog):
     @commands.command(pass_context=True)
     async def rawstream(self, ctx):
         """Displays the raw markdown for the stream announcement message (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
         message = self.settings.getServerStat(ctx.guild, "StreamMessage")
         if not message:
             return await ctx.send("There is no stream announcement setup.")
         # Nullify markdown
-        message = Nullify.escape_all(message,mentions=False)
+        message = Nullify.escape_all(message, mentions=False)
         await ctx.send(message)
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         channel = ctx.guild.get_channel(chan)
@@ -117,12 +126,16 @@ class Stream(commands.Cog):
         else:
             await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
 
-    async def _stream_message(self, member, message, dest, test = False):
-        message = re.sub(self.regexUserName, "{}".format(DisplayName.name(member)), message)
-        message = re.sub(self.regexUserPing, "{}".format(member.mention), message)
-        message = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(dest.guild.name)), message)
+    async def _stream_message(self, member, message, dest, test=False):
+        message = re.sub(self.regexUserName, "{}".format(
+            DisplayName.name(member)), message)
+        message = re.sub(self.regexUserPing,
+                         "{}".format(member.mention), message)
+        message = re.sub(self.regexServer,   "{}".format(
+            Nullify.escape_all(dest.guild.name)), message)
         # Get the activity info
-        act = next((x for x in list(member.activities) if x.type is discord.ActivityType.streaming), None)
+        act = next((x for x in list(member.activities)
+                   if x.type is discord.ActivityType.streaming), None)
         try:
             name = act.name
         except:
@@ -140,12 +153,13 @@ class Stream(commands.Cog):
         message = re.sub(self.regexHere,     "@here", message)
         message = re.sub(self.regexEveryone, "@everyone", message)
         am = discord.AllowedMentions.none() if test else discord.AllowedMentions.all()
-        await dest.send(message,allowed_mentions=am)
+        await dest.send(message, allowed_mentions=am)
 
     @commands.command(pass_context=True)
-    async def addstreamer(self, ctx, *, member = None):
+    async def addstreamer(self, ctx, *, member=None):
         """Adds the passed member to the streamer list (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
         if member == None:
             return await ctx.send("Usage: `{}addstreamer [member]`".format(ctx.context))
         mem = DisplayName.memberForName(member, ctx.guild)
@@ -160,9 +174,10 @@ class Stream(commands.Cog):
         await ctx.send("{} added to the stream list!".format(DisplayName.name(mem)))
 
     @commands.command(pass_context=True)
-    async def remstreamer(self, ctx, *, member = None):
+    async def remstreamer(self, ctx, *, member=None):
         """Removes the passed member from the streamer list (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
         if member == None:
             return await ctx.send("Usage: `{}remstreamer [member]`".format(ctx.context))
         mem = DisplayName.memberForName(member, ctx.guild)
@@ -190,11 +205,11 @@ class Stream(commands.Cog):
             return await ctx.send("Not currently watching for any streamers.")
         stream_string = "\n".join(streamers)
         await Message.Message(message=stream_string, header="__Streamer List:__\n```\n", footer="```").send(ctx)
-        
+
     @commands.command(pass_context=True)
     async def streamchannel(self, ctx):
         """Displays the channel for the stream announcements - if any."""
-        
+
         chan = self.settings.getServerStat(ctx.message.guild, "StreamChannel")
         if not chan:
             return await ctx.send("There is no channel setup for stream announcements.")
@@ -202,21 +217,25 @@ class Stream(commands.Cog):
         if not channel:
             return await ctx.send("The stream announcement channel (`{}`) no longer exists on this server.".format(chan))
         await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
-        
+
     @commands.command(pass_context=True)
-    async def setstreamchannel(self, ctx, *, channel : discord.TextChannel = None):
+    async def setstreamchannel(self, ctx, *, channel: discord.TextChannel = None):
         """Sets the channel for the stream announcements (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
+        if not await Utils.is_bot_admin_reply(ctx):
+            return
 
         if channel == None:
-            self.settings.setServerStat(ctx.message.guild, "StreamChannel", None)
+            self.settings.setServerStat(
+                ctx.message.guild, "StreamChannel", None)
             msg = "Stream announcements will **not** be displayed."
             return await ctx.send(msg)
 
         # If we made it this far - then we can add it
-        self.settings.setServerStat(ctx.message.guild, "StreamChannel", channel.id)
+        self.settings.setServerStat(
+            ctx.message.guild, "StreamChannel", channel.id)
 
-        msg = 'Stream announcements will be displayed in **{}**.'.format(channel.mention)
+        msg = 'Stream announcements will be displayed in **{}**.'.format(
+            channel.mention)
         await ctx.send(msg)
 
     @setstreamchannel.error
@@ -224,5 +243,3 @@ class Stream(commands.Cog):
         # do stuff
         msg = 'setstreamchannel Error: {}'.format(ctx)
         await error.send(msg)
-
-    

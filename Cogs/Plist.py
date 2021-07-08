@@ -1,18 +1,20 @@
 import asyncio
 import discord
-from   discord.ext import commands
+from discord.ext import commands
 import os
 import re
 import tempfile
 import shutil
 import plistlib
-from   Cogs        import DL
-from   Cogs        import Message
+from Cogs import DL
+from Cogs import Message
+
 
 def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Plist(bot, settings))
+
 
 class Plist(commands.Cog):
 
@@ -31,7 +33,7 @@ class Plist(commands.Cog):
         tempFileName = tempFileName.split('?')[0]
         imagePath = dirpath + "/" + tempFileName
         rImage = None
-        
+
         try:
             rImage = await DL.async_dl(url)
         except:
@@ -49,11 +51,11 @@ class Plist(commands.Cog):
             return None
 
         return imagePath
-        
+
     def remove(self, path):
         if not path == None and os.path.exists(path):
             shutil.rmtree(os.path.dirname(path), ignore_errors=True)
-            
+
     def get_os(self, build_number):
         # Returns the best-guess OS version for the build number
         alpha = "abcdefghijklmnopqrstuvwxyz"
@@ -69,19 +71,19 @@ class Plist(commands.Cog):
         except:
             pass
         return os_version
-    
+
     def get_value(self, build_number):
         alpha = "abcdefghijklmnopqrstuvwxyz"
         # Split them up
         split = re.findall(r"[^\W\d_]+|\d+", build_number)
         start = split[0].rjust(4, "0")
-        alph  = split[1]
-        end   = split[2].rjust(6, "0")
+        alph = split[1]
+        end = split[2].rjust(6, "0")
         alpha_num = str(alpha.index(alph.lower())).rjust(2, "0")
         return int(start + alpha_num + end)
-            
+
     @commands.command(pass_context=True)
-    async def nvweb(self, ctx, os_build = None):
+    async def nvweb(self, ctx, os_build=None):
         """Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
         # Get the current manifest
         try:
@@ -89,8 +91,9 @@ class Plist(commands.Cog):
             plist_data = plistlib.loads(data)
         except:
             await Message.EmbedText(
-                title="⚠ An error occurred!", 
-                description="I guess I couldn't get the manifest...\n\"{}\" may no longer be valid.".format(self.nv_link),
+                title="⚠ An error occurred!",
+                description="I guess I couldn't get the manifest...\n\"{}\" may no longer be valid.".format(
+                    self.nv_link),
                 color=ctx.author
             ).send(ctx)
             return
@@ -101,28 +104,32 @@ class Plist(commands.Cog):
             alpha = "abcdefghijklmnopqrstuvwxyz"
             new_items = []
             for x in plist_data.get("updates", []):
-                new_items.append({"update" : x, "value" : self.get_value(x["OS"])})
-            sorted_list = sorted(new_items, key=lambda x:x["value"], reverse=True)
+                new_items.append(
+                    {"update": x, "value": self.get_value(x["OS"])})
+            sorted_list = sorted(
+                new_items, key=lambda x: x["value"], reverse=True)
             if not len(sorted_list):
                 await Message.EmbedText(
-                    title="⚠ An error occurred!", 
-                    description="There were no updates found at \"{}\".".format(self.nv_link),
+                    title="⚠ An error occurred!",
+                    description="There were no updates found at \"{}\".".format(
+                        self.nv_link),
                     color=ctx.author
                 ).send(ctx)
                 return
             wd = [{
-                    "name": "{} ({})".format(
+                "name": "{} ({})".format(
                         self.get_os(sorted_list[0]["update"]["OS"]),
                         sorted_list[0]["update"]["OS"]),
-                    "value": "└─ [{}]({})".format(
-                        sorted_list[0]["update"]["version"],
-                        sorted_list[0]["update"]["downloadURL"]
-                    ),
-                    "inline": False
-                }]
+                "value": "└─ [{}]({})".format(
+                    sorted_list[0]["update"]["version"],
+                    sorted_list[0]["update"]["downloadURL"]
+                ),
+                "inline": False
+            }]
         else:
             # We need to find it
-            mwd = next((x for x in plist_data.get("updates", []) if x["OS"].lower() == os_build.lower()), None)
+            mwd = next((x for x in plist_data.get("updates", [])
+                       if x["OS"].lower() == os_build.lower()), None)
             if mwd:
                 wd = [{
                     "name": "{} ({})".format(self.get_os(mwd["OS"]), mwd["OS"]),
@@ -136,7 +143,8 @@ class Plist(commands.Cog):
                 p = [x for x in p if x != ""]
                 if len(p) > 1 and len(p) < 4:
                     # We have . separated stuffs
-                    wd_list = [x for x in plist_data.get("updates", []) if self.get_os(x["OS"]).startswith(os_build)]
+                    wd_list = [x for x in plist_data.get(
+                        "updates", []) if self.get_os(x["OS"]).startswith(os_build)]
                     if len(wd_list):
                         # We got some matches
                         wd = []
@@ -148,22 +156,23 @@ class Plist(commands.Cog):
                             })
             if not wd:
                 await Message.EmbedText(
-                    title="⚠ An error occurred!", 
-                    description="There were no web drivers found for \"{}\".".format(os_build),
+                    title="⚠ An error occurred!",
+                    description="There were no web drivers found for \"{}\".".format(
+                        os_build),
                     color=ctx.author
                 ).send(ctx)
                 return
         await Message.Embed(
-            title="NVIDIA Web Driver Results For \"{}\" ({} total)".format(os_build if os_build != None else "Latest", len(wd)),
+            title="NVIDIA Web Driver Results For \"{}\" ({} total)".format(
+                os_build if os_build != None else "Latest", len(wd)),
             fields=wd,
             color=ctx.author,
             pm_after=25,
             footer="All links pulled from {}".format(self.nv_link)
         ).send(ctx)
 
-            
     @commands.command(pass_context=True)
-    async def plist(self, ctx, *, url = None):
+    async def plist(self, ctx, *, url=None):
         """Validates plist file structure.  Accepts a url - or picks the first attachment."""
         if url == None and len(ctx.message.attachments) == 0:
             await ctx.send("Usage: `{}plist [url or attachment]`".format(ctx.prefix))
@@ -171,14 +180,14 @@ class Plist(commands.Cog):
 
         if url == None:
             url = ctx.message.attachments[0].url
-            
+
         message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
-        
+
         path = await self.download(url)
         if not path:
             await Message.Embed(title="⚠ An error occurred!", description="I guess I couldn't get that plist...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
             return
-        
+
         try:
             plist_data = plistlib.readPlist(path)
         except Exception as e:

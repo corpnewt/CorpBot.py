@@ -1,35 +1,44 @@
 import asyncio
 import discord
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import DisplayName
+from discord.ext import commands
+from Cogs import Settings
+from Cogs import DisplayName
+
 
 def setup(bot):
     # This module isn't actually a cog
     return
 
-async def checkroles(user, channel, settings, bot, suppress : bool = False, **kwargs):
+
+async def checkroles(user, channel, settings, bot, suppress: bool = False, **kwargs):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
-    if user.bot: return # Don't apply roles to bots
+    if user.bot:
+        return  # Don't apply roles to bots
     DisplayName = bot.get_cog("DisplayName")
     Utils = bot.get_cog("Utils")
-    if not DisplayName or not Utils: return # We are missing dependencies
-    
+    if not DisplayName or not Utils:
+        return  # We are missing dependencies
+
     if type(channel) is discord.Guild:
         server = channel
         channel = None
     else:
         server = channel.guild
-    
+
     # Get our preliminary vars
-    msg         = None
-    xpPromote   = kwargs.get("xp_promote",settings.getServerStat(server,"XPPromote"))
-    xpDemote    = kwargs.get("xp_demote",settings.getServerStat(server,"XPDemote"))
-    userXP      = int(settings.getUserStat(user, server, "XP"))
-    suppProm    = kwargs.get("suppress_promotions",settings.getServerStat(server,"SuppressPromotions"))
-    suppDem     = kwargs.get("suppress_demotions",settings.getServerStat(server,"SuppressDemotions"))
-    onlyOne     = kwargs.get("only_one_role",settings.getServerStat(server,"OnlyOneRole"))
+    msg = None
+    xpPromote = kwargs.get(
+        "xp_promote", settings.getServerStat(server, "XPPromote"))
+    xpDemote = kwargs.get(
+        "xp_demote", settings.getServerStat(server, "XPDemote"))
+    userXP = int(settings.getUserStat(user, server, "XP"))
+    suppProm = kwargs.get("suppress_promotions",
+                          settings.getServerStat(server, "SuppressPromotions"))
+    suppDem = kwargs.get("suppress_demotions",
+                         settings.getServerStat(server, "SuppressDemotions"))
+    onlyOne = kwargs.get(
+        "only_one_role", settings.getServerStat(server, "OnlyOneRole"))
 
     # Check if we're suppressing @here and @everyone mentions
     if settings.getServerStat(server, "SuppressMentions"):
@@ -39,7 +48,7 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
 
     changed = False
     promoArray = settings.getServerStat(server, "PromotionArray")
-    promoArray = sorted(promoArray, key=lambda x:int(x['XP']))
+    promoArray = sorted(promoArray, key=lambda x: int(x['XP']))
 
     addRoles = []
     remRoles = []
@@ -50,8 +59,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
         # Only one role allowed, make sure we don't have the rest
         # Get the role we're supposed to be at
         current_role = None
-        is_higher    = False
-        target_role  = None
+        is_higher = False
+        target_role = None
         for role in promoArray:
             test_role = DisplayName.roleForID(role['ID'], server)
             # Check if it's a real role
@@ -82,7 +91,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
             if is_higher:
                 if xpDemote:
                     # We can remove roles above - but keep the last one
-                    msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), current_role.name)
+                    msg = '*{}* was demoted from **{}**!'.format(
+                        DisplayName.name(user), current_role.name)
                     for role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
                         if test_role != target_role and test_role in user.roles:
@@ -100,7 +110,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
             else:
                 if xpPromote:
                     # Remove all roles below
-                    msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), target_role.name)
+                    msg = '*{}* was promoted to **{}**!'.format(
+                        DisplayName.name(user), target_role.name)
                     for role in promoArray:
                         test_role = DisplayName.roleForID(role['ID'], server)
                         if test_role != target_role and test_role in user.roles:
@@ -128,7 +139,8 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
                         if not addRole in user.roles:
                             addRoles.append(addRole)
                             if not suppProm:
-                                msg = '*{}* was promoted to **{}**!'.format(DisplayName.name(user), addRole.name)
+                                msg = '*{}* was promoted to **{}**!'.format(
+                                    DisplayName.name(user), addRole.name)
                             changed = True
         # Allow independent promotion/demotion
         if xpDemote:
@@ -141,15 +153,17 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
                         if remRole in user.roles:
                             remRoles.append(remRole)
                             if not suppDem:
-                                msg = '*{}* was demoted from **{}**!'.format(DisplayName.name(user), remRole.name)
+                                msg = '*{}* was demoted from **{}**!'.format(
+                                    DisplayName.name(user), remRole.name)
                             changed = True
 
     # Add and remove roles as needed
     if len(addRoles) or len(remRoles):
-        settings.role.change_roles(user, add_roles=addRoles, rem_roles=remRoles)
+        settings.role.change_roles(
+            user, add_roles=addRoles, rem_roles=remRoles)
 
     # Check if we have a message to display - and display it
     if msg and channel and (not suppress):
-        msg = Utils.suppressed(server,msg)
+        msg = Utils.suppressed(server, msg)
         await channel.send(msg)
     return changed
