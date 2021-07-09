@@ -5,7 +5,7 @@ def setup(bot):
     # Add the bot
     bot.add_cog(HackAudio(bot))
 
-# layouts/alcid is a simple command that allows members to quickly retrieve all the available
+# layouts/alcids is a simple command that allows members to quickly retrieve all the available
 # layout id's for a certain audio codec by *reading* the AppleALC GitHub repository
 
 class HackAudio(commands.Cog):
@@ -14,7 +14,7 @@ class HackAudio(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["alcid"])
+    @commands.command(aliases=["alcids"])
     async def layouts(self, ctx, codec : str = None):
         """Search the AppleALC repository for available codec layouts"""
 
