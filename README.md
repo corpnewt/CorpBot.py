@@ -455,6 +455,11 @@ A list of cogs, commands, and descriptions:
 	  $groot 
 	   └─ Who... who are you?
 
+## HackAudio
+####	HackAudio Cog (1 command) - HackAudio.py Extension:
+	  $layouts [codec] (AKA: alcids)
+	   └─ Search the AppleALC repository for available codec layouts.
+
 ## Help
 ####	Help Cog (3 commands) - Help.py Extension:
 	  $dumphelp [tab_indent_count]

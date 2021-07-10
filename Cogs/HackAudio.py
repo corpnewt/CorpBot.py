@@ -16,7 +16,7 @@ class HackAudio(commands.Cog):
 
     @commands.command(aliases=["alcids"])
     async def layouts(self, ctx, codec : str = None):
-        """Search the AppleALC repository for available codec layouts"""
+        """Search the AppleALC repository for available codec layouts."""
 
         if codec is None:
             return await ctx.send("Usage: `{}layouts [codec]`".format(ctx.prefix))
