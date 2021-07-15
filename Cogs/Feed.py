@@ -130,28 +130,25 @@ class Feed(commands.Cog):
 			msg = 'I\'m *starving* ({:,}%)!  Do you want me to starve to death?'.format(hunger)
 		else:
 			msg = 'I\'m ***hangry*** ({:,}%)!  Feed me or feel my *wrath!*'.format(hunger)
-		if isKill and hunger > -150:
-			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(overweight, ctx.prefix)
+		if isKill and hunger >= -150:
+			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(ctx.prefix)
 		await ctx.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def feed(self, ctx, food : int = None):
+	async def feed(self, ctx, food = None):
 		"""Feed the bot some xp!"""
 		# feed the bot, and maybe you'll get something in return!
 		msg = 'Usage: `{}feed [xp reserve feeding]`'.format(ctx.prefix)
-		if food == None:
-			return await channel.send(msg)
-			
-		if not type(food) == int:
-			return await channel.send(msg)
+		try: food = int(food)
+		except: return await ctx.send(msg)
 
 		isAdmin    = Utils.is_admin(ctx)
 		isBotAdmin = Utils.is_bot_admin_only(ctx)
 		botAdminAsAdmin = self.settings.getServerStat(ctx.guild, "BotAdminAsAdmin")
 		adminUnlim = self.settings.getServerStat(ctx.guild, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(ctx.author, ctx.guild, "XPReserve")
-		minRole    = self.settings.getServerStat(ctx.guild, "MinimumXPRole")
-		requiredXP = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
+		# minRole    = self.settings.getServerStat(ctx.guild, "MinimumXPRole")
+		# requiredXP = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
 		isKill     = self.settings.getServerStat(ctx.guild, "Killed")
 		hunger     = int(self.settings.getServerStat(ctx.guild, "Hunger"))
 		xpblock    = self.settings.getServerStat(ctx.guild, "XpBlockArray")
@@ -294,7 +291,7 @@ class Feed(commands.Cog):
 			return await ctx.send('I am *already* kill...\n\n*{}* did it...'.format(DisplayName.name(killedby)))
 		
 		self.settings.setServerStat(ctx.guild, "Killed", True)
-		self.settings.setServerStat(ctx.guild, "KilledBy", author.id)
+		self.settings.setServerStat(ctx.guild, "KilledBy", ctx.author.id)
 		await ctx.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(ctx.author)))
 		
 	@commands.command(pass_context=True)
