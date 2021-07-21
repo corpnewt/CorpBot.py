@@ -15,13 +15,11 @@ class Emoji(commands.Cog):
         DisplayName = self.bot.get_cog("DisplayName")
 
     def _get_emoji_url(self, emoji):
-        if len(emoji) < 3:
+        emojiparts = emoji.replace("<","").replace(">","").split(":") if emoji else []
+        if not len(emojiparts) == 3:
             # Emoji is likely a built-in like :)
             h = "-".join([hex(ord(x)).lower()[2:] for x in emoji])
             return ("https://github.com/twitter/twemoji/raw/master/assets/72x72/{}.png".format(h),h)
-        # Must be a custom emoji
-        emojiparts = emoji.replace("<","").replace(">","").split(":") if emoji else []
-        if not len(emojiparts) == 3: return None
         # Build a custom emoji object
         emoji_obj = discord.PartialEmoji(animated=len(emojiparts[0]) > 0, name=emojiparts[1], id=emojiparts[2])
         # Return the url
