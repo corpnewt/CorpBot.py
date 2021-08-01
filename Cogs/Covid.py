@@ -8,8 +8,8 @@ from discord.ext import commands
 from assets import time_calc
 
 
-class CoronaTracking(commands.Cog, description="Get Covid-19 stats worldwide, or for a selected country\n"
-                                               "Powered by __[Disease.sh](https://disease.sh/)__"):
+class Covid(commands.Cog, description="Get Covid-19 stats worldwide, or for a selected country\n"
+                                               "Powered by __[disease.sh](https://disease.sh/)__"):
 
     def __init__(self, bot):
         self.bot = bot
@@ -97,4 +97,4 @@ class CoronaTracking(commands.Cog, description="Get Covid-19 stats worldwide, or
 
 
 def setup(bot):
-    bot.add_cog(CoronaTracking(bot))
+    bot.add_cog(Covid(bot))
