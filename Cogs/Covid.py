@@ -14,8 +14,9 @@ class Covid(commands.Cog, description="Get Covid-19 stats worldwide, or for a se
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="coronastats", aliases=["covidstats"], description="Status of the Corona virus worldwide")
+    @commands.command(name="coronastats", aliases=["covidstats"])
     async def corona_stats(self, ctx, country: str = None):
+        """Status of the Corona virus worldwide"""
         if country is None:
             track_url = "https://disease.sh/v3/covid-19/all"
         else:
