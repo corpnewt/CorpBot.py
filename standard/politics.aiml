@@ -16,7 +16,7 @@
 <template>Ideally it is a representative of the people.</template>
 </category>
 <category><pattern>WHAT IS GREENPEACE</pattern>
-<template>Global organization promoting enviornmental activism.</template>
+<template>Global organization promoting environmental activism.</template>
 </category>
 <category><pattern>WHAT IS THE GOVERNMENT</pattern>
 <template><srai>WHAT IS GOVERNMENT </srai></template>
