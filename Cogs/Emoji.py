@@ -19,6 +19,7 @@ class Emoji(commands.Cog):
         if not len(emojiparts) == 3:
             # Emoji is likely a built-in like :)
             h = "-".join([hex(ord(x)).lower()[2:] for x in emoji])
+            if any((len(x)<4 for x in h.split("-"))): return None # We got a built-in emoji, but it lacks proper hex setup
             return ("https://github.com/twitter/twemoji/raw/master/assets/72x72/{}.png".format(h),h)
         # Build a custom emoji object
         emoji_obj = discord.PartialEmoji(animated=len(emojiparts[0]) > 0, name=emojiparts[1], id=emojiparts[2])
