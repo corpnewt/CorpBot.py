@@ -34,68 +34,17 @@ class Admin(commands.Cog):
 		# Check the message and see if we should allow it - always yes.
 		# This module doesn't need to cancel messages.
 		ignore = False
-		delete = False
-		res    = None
-		# Check if user is muted
-		isMute = self.settings.getUserStat(message.author, message.guild, "Muted")
-
 		# Check for admin status
 		ctx = await self.bot.get_context(message)
 		isAdmin = Utils.is_bot_admin(ctx)
-
-		if isMute:
+		if not isAdmin and (self.settings.getServerStat(message.guild, "AdminLock", False) or str(message.author.id) in self.settings.getServerStat(message.guild, "IgnoredUsers", [])):
+			# Not bot-admin/admin, let's see if AdminLock is on - ignoring all regular users, alternatively let's ignore if our id is in the ignore list
 			ignore = True
-			delete = True
-			checkTime = self.settings.getUserStat(message.author, message.guild, "Cooldown")
-			if checkTime:
-				checkTime = int(checkTime)
-			currentTime = int(time.time())
-			
-			# Build our PM
-			if checkTime:
-				# We have a cooldown
-				checkRead = ReadableTime.getReadableTimeBetween(currentTime, checkTime)
-				res = 'You are currently **Muted**.  You need to wait *{}* before sending messages in *{}*.'.format(checkRead, Utils.suppressed(message.guild, message.guild.name))
-			else:
-				# No cooldown - muted indefinitely
-				res = 'You are still **Muted** in *{}* and cannot send messages until you are **Unmuted**.'.format(Utils.suppressed(message.guild, message.guild.name))
-
-			if checkTime and currentTime >= checkTime:
-				# We have passed the check time
-				ignore = False
-				delete = False
-				res    = None
-				self.settings.setUserStat(message.author, message.guild, "Cooldown", None)
-				self.settings.setUserStat(message.author, message.guild, "Muted", False)
-			
-		ignoreList = self.settings.getServerStat(message.guild, "IgnoredUsers")
-		if ignoreList:
-			for user in ignoreList:
-				if not isAdmin and str(message.author.id) == str(user["ID"]):
-					# Found our user - ignored
-					ignore = True
-
-		adminLock = self.settings.getServerStat(message.guild, "AdminLock")
-		if not isAdmin and adminLock:
-			ignore = True
-
-		if isAdmin:
-			ignore = False
-			delete = False
-
 		# Get Owner and OwnerLock
-		ownerLock = self.settings.getGlobalStat("OwnerLock",False)
-		owner = self.settings.isOwner(message.author)
-		# Check if owner exists - and we're in OwnerLock
-		if (not owner) and ownerLock:
-			# Not the owner - ignore
-			ignore = True
-				
-		if not isAdmin and res:
-			# We have a response - PM it
-			await message.author.send(res)
-		
-		return { 'Ignore' : ignore, 'Delete' : delete}
+		if self.settings.getGlobalStat("OwnerLock",False):
+			if not self.settings.isOwner(message.author):
+				ignore = True				
+		return {'Ignore':ignore}
 
 	
 	@commands.command(pass_context=True)
@@ -207,8 +156,7 @@ class Admin(commands.Cog):
 		try:
 			limit = int(limit)
 		except Exception:
-			await channel.send("Limit must be an integer.")
-			return
+			return await ctx.send("Limit must be an integer.")
 
 		if limit < 0:
 			self.settings.setServerStat(ctx.guild, "XPReserveLimit", None)
@@ -220,36 +168,8 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def onexprole(self, ctx, *, yes_no = None):
 		"""Gets and sets whether or not to remove all but the current xp role a user has acquired."""
-
-		setting_name = "One xp role at a time"
-		setting_val  = "OnlyOneRole"
-
 		if not await Utils.is_admin_reply(ctx): return
-		current = self.settings.getServerStat(ctx.guild, setting_val)
-		if yes_no == None:
-			# Output what we have
-			if current:
-				msg = "{} currently *enabled.*".format(setting_name)
-			else:
-				msg = "{} currently *disabled.*".format(setting_name)
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
-			yes_no = True
-			if current == True:
-				msg = '{} remains *enabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *enabled*.'.format(setting_name)
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
-			yes_no = False
-			if current == False:
-				msg = '{} remains *disabled*.'.format(setting_name)
-			else:
-				msg = '{} is now *disabled*.'.format(setting_name)
-		else:
-			msg = "That's not a valid setting."
-			yes_no = current
-		if not yes_no == None and not yes_no == current:
-			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
-		await ctx.send(msg)
+		await ctx.send(Utils.yes_no_setting(ctx,"One xp role at a time","OnlyOneRole",yes_no))
 
 
 	@commands.command(pass_context=True)
@@ -270,8 +190,7 @@ class Admin(commands.Cog):
 		try:
 			limit = int(limit)
 		except Exception:
-			await channel.send("Limit must be an integer.")
-			return
+			return await ctx.send("Limit must be an integer.")
 
 		if limit < 0:
 			self.settings.setServerStat(ctx.guild, "XPLimit", None)
@@ -290,13 +209,6 @@ class Admin(commands.Cog):
 		channel = ctx.message.channel
 
 		usage = 'Usage: `{}setxp [member] [amount]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		if not await Utils.is_admin_reply(ctx): return
 
 		if member == None:
@@ -351,13 +263,6 @@ class Admin(commands.Cog):
 		channel = ctx.message.channel
 
 		usage = 'Usage: `{}setxpreserve [member] [amount]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		if not await Utils.is_admin_reply(ctx): return
 
 		if member == None:
@@ -407,13 +312,6 @@ class Admin(commands.Cog):
 		author  = ctx.message.author
 		server  = ctx.message.guild
 		channel = ctx.message.channel
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
 
 		if role is None:
@@ -456,13 +354,6 @@ class Admin(commands.Cog):
 		channel = ctx.message.channel
 
 		usage = 'Usage: `{}addxprole [role] [required xp]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		if not await Utils.is_admin_reply(ctx): return
 		if xp == None:
 			# Either xp wasn't set - or it's the last section
@@ -519,13 +410,6 @@ class Admin(commands.Cog):
 		channel = ctx.message.channel
 
 		usage = 'Usage: `{}removexprole [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		if not await Utils.is_admin_reply(ctx): return
 
 		if role == None:
@@ -629,15 +513,7 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setxprole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
 			self.settings.setServerStat(ctx.message.guild, "RequiredXPRole", "")
 			msg = 'Giving xp, gambling, and feeding the bot now available to *everyone*.'
@@ -672,13 +548,6 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def xprole(self, ctx):
 		"""Lists the required role to give xp, gamble, or feed the bot."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
 		if role == None or role == "":
 			msg = '**Everyone** can give xp, gamble, and feed the bot.'
@@ -702,15 +571,7 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setstoprole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
 			self.settings.setServerStat(ctx.message.guild, "RequiredStopRole", "")
 			msg = 'Stopping the music now *admin-only*.'
@@ -745,13 +606,6 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def stoprole(self, ctx):
 		"""Lists the required role to stop the bot from playing music."""
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredStopRole")
 		if role == None or role == "":
 			msg = '**Only Admins** can use stop.'
@@ -777,15 +631,7 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setlinkrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
 			self.settings.setServerStat(ctx.message.guild, "RequiredLinkRole", "")
 			msg = 'Add/remove links now *admin-only*.'
@@ -821,15 +667,7 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def sethackrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
 			self.settings.setServerStat(ctx.message.guild, "RequiredHackRole", "")
 			msg = 'Add/remove hacks now *admin-only*.'
@@ -865,15 +703,7 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def settagrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove tags (admin only)."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
 			self.settings.setServerStat(ctx.message.guild, "RequiredTagRole", "")
 			msg = 'Add/remove tags now *admin-only*.'
@@ -952,17 +782,9 @@ class Admin(commands.Cog):
 		"""Adds a new role to the admin list (admin only)."""
 
 		usage = 'Usage: `{}addadmin [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
-			await ctx.message.channel.send(usage)
+			await ctx.send(usage)
 			return
 
 		roleName = role
@@ -1010,18 +832,9 @@ class Admin(commands.Cog):
 		"""Removes a role from the admin list (admin only)."""
 
 		usage = 'Usage: `{}removeadmin [role]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		if not await Utils.is_admin_reply(ctx): return
-
 		if role == None:
-			await ctx.message.channel.send(usage)
-			return
+			return await ctx.send(usage)
 
 		# Name placeholder
 		roleName = role
@@ -1072,16 +885,7 @@ class Admin(commands.Cog):
 		"""Removes the message of the day from the selected channel."""
 		
 		channel = ctx.message.channel
-		author  = ctx.message.author
 		server  = ctx.message.guild
-
-		usage = 'Usage: `{}broadcast [message]`'.format(ctx.prefix)
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 		
 		if not await Utils.is_admin_reply(ctx): return
 		if chan == None:
@@ -1120,25 +924,18 @@ class Admin(commands.Cog):
 	@commands.command(pass_context=True)
 	async def broadcast(self, ctx, *, message : str = None):
 		"""Broadcasts a message to all connected servers.  Can only be done by the owner."""
-
-		channel = ctx.message.channel
-		author  = ctx.message.author
-
 		if message == None:
-			await channel.send(usage)
-			return
-
+			return await ctx.send("Usage: `{}broadcast [message]`".format(ctx.prefix))
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
 		if isOwner == None:
 			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
+			await ctx.send(msg)
 			return
 		elif isOwner == False:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
+			await ctx.send(msg)
 			return
-		
 		for server in self.bot.guilds:
 			# Get the default channel
 			targetChan = server.get_channel(server.id)
