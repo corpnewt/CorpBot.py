@@ -79,10 +79,17 @@ class Mute(commands.Cog):
     async def onjoin(self, member, server):
         # Check if the new member was muted when they left
         muteList = self.settings.getServerStat(server, "MuteList")
-        for entry in muteList:
-            if str(entry['ID']) == str(member.id):
-                # Found them - mute them
-                await self._mute(member, server, entry['Cooldown'])
+        entry = next((x for x in muteList if str(x["ID"])==str(member.id)),None)
+        if not entry: return # Doesn't exist - skip
+        # We had a mute - let's validate it
+        if (entry["Cooldown"] == None and int(time.time())-entry.get("Added",int(time.time()))>3600*24*90) or (entry["Cooldown"] != None and int(entry["Cooldown"])-int(time.time())<=0):
+            # Was a permamute and 90 days have expired - or was a timed mute, and the time has expired
+            # Remove the mute from the mute list - and ignore
+            muteList.remove(entry)
+            self.settings.setServerStat(server,"MuteList",muteList)
+            return
+        # At this point - we still need to mute - so we'll just apply it
+        await self._mute(member, server, entry['Cooldown'])
             
     async def mute_list_check(self):
         while not self.bot.is_closed():
