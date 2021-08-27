@@ -1,6 +1,6 @@
 import discord, re, time
 from discord.ext import commands
-from Cogs import Settings, DisplayName, Utils, Nullify, PickList
+from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -279,3 +279,43 @@ class Responses(commands.Cog):
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
 		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx).pick()
+
+	@commands.command()
+	async def viewresponse(self, ctx, response_index = None):
+		"""Displays the response in full which corresponds to the target index (bot-admin only)."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if response_index == None: return await ctx.send("Usage: `{}viewresponse [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
+		# Make sure we got a number, and it's within our list range
+		try:
+			response_index = int(response_index)
+			assert 0 < response_index <= len(message_responses)
+		except:
+			return await ctx.send("You need to pass a valid integer from 1 to {:,}.\nYou can get a numbered list with `{}responses`".format(len(message_responses),ctx.prefix))
+		return await Message.EmbedText(
+			title="Response at index {:,}".format(response_index),
+			description=Nullify.escape_all(message_responses[list(message_responses)[response_index-1]]),
+			color=ctx.author
+		).send(ctx)
+
+	@commands.command()
+	async def viewtrigger(self, ctx, response_index = None):
+		"""Displays the regex trigger in full which corresponds to the target index (bot-admin only)."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if response_index == None: return await ctx.send("Usage: `{}viewtrigger [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
+		# Make sure we got a number, and it's within our list range
+		try:
+			response_index = int(response_index)
+			assert 0 < response_index <= len(message_responses)
+		except:
+			return await ctx.send("You need to pass a valid integer from 1 to {:,}.\nYou can get a numbered list with `{}responses`".format(len(message_responses),ctx.prefix))
+		return await Message.EmbedText(
+			title="Trigger at index {:,}".format(response_index),
+			description=Nullify.escape_all(list(message_responses)[response_index-1]),
+			color=ctx.author
+		).send(ctx)
