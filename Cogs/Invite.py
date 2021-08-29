@@ -224,7 +224,7 @@ class Invite(commands.Cog):
 				Nullify.escape_all(request[1].name),
 				ReadableTime.getReadableTimeBetween(0,self.approval_time),
 				discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8),guild=request[1])
-			))
+			),allowed_mentions=discord.AllowedMentions.all())
 			try:
 				self.current_requests.remove(request)
 			except:

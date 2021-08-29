@@ -218,7 +218,7 @@ class Bot(commands.Cog):
 		after_typing = time.monotonic()
 		ms = int((after_typing - before_typing) * 1000)
 		msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
-		await ctx.channel.send(msg)
+		await ctx.send(msg,allowed_mentions=discord.AllowedMentions.all())
 		
 	@commands.command(pass_context=True)
 	async def nickname(self, ctx, *, name : str = None):

@@ -25,25 +25,25 @@ def escape_all(string, mentions = True, markdown = True):
     if markdown: string = discord.utils.escape_markdown(string)
     return string
 
-def resolve_mentions(string, ctx = None, escape = True, show_mentions = True):
+def resolve_mentions(string, ctx = None, escape = True, show_mentions = True, channel_mentions = False):
     guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if hasattr(ctx,"guild") else None
     if guild:
         # We have a guild - let's try to resolve!
-        matches = re.finditer(r"\<\@[!&]?\d+\>", string)
+        matches = re.finditer(r"\<[\@#][!&]?\d+\>", string)
         # Iterate the mention matches, and resolve them to their names
         d = re.compile("\\d+")
         i_adjust = 0
         for m in matches:
             try: id_match = int(d.search(m.group(0)).group(0))
             except: continue
-            check_func = guild.get_role if "@&" in m.group(0) else guild.get_member
+            check_func = guild.get_role if "@&" in m.group(0) else guild.get_channel if "#" in m.group(0) else guild.get_member
             check_entry = check_func(id_match)
             if not check_entry: continue
             # Let's replace the indices in the original string - but then also update our adjusted index
             name = check_entry.display_name if hasattr(check_entry,"display_name") else check_entry.name
             if escape: name = escape_all(name)
             # Add the @ prefix if we're showing mentions
-            if show_mentions: name = "@"+name
+            if show_mentions: name = ("#" if "#" in m.group(0) else "@")+name
             string = string[0:m.start()+i_adjust] + name + string[i_adjust+m.end():]
             i_adjust += len(name)-len(m.group(0))
     return escape_all(string,markdown=False) if escape else string # Catch any missing mentions as needed

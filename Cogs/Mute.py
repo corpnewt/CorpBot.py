@@ -20,6 +20,28 @@ class Mute(commands.Cog):
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
 
+    async def message(self,message):
+        # Check for admin status
+        ctx = await self.bot.get_context(message)
+        if Utils.is_bot_admin(ctx) or not self.settings.getUserStat(message.author,message.guild,"Muted",False):
+            return
+        # We're not admin/bot-admin, and we've been muted - let's see if the server
+        # requires we delete messages that sneak through
+        if not self.settings.getServerStat(message.guild,"MuteAutoDelete",True):
+            return
+        # At this point - assume we're muted, and need to delete messages
+        # Time to verify if we're past the mute time
+        checkTime = self.settings.getUserStat(message.author, message.guild, "Cooldown")
+        if checkTime: checkTime = int(checkTime)
+        currentTime = int(time.time())
+        if checkTime and currentTime >= checkTime:
+            # We have passed the check time
+            self.settings.setUserStat(message.author, message.guild, "Cooldown", None)
+            self.settings.setUserStat(message.author, message.guild, "Muted", False)
+            return
+        # If we got here, we're still muted, and slipped past - ignore commands, and delete the message
+        return {"Ignore":True,"Delete":True}
+
     def _is_submodule(self, parent, child):
         return parent == child or child.startswith(parent + ".")
 
@@ -57,10 +79,17 @@ class Mute(commands.Cog):
     async def onjoin(self, member, server):
         # Check if the new member was muted when they left
         muteList = self.settings.getServerStat(server, "MuteList")
-        for entry in muteList:
-            if str(entry['ID']) == str(member.id):
-                # Found them - mute them
-                await self._mute(member, server, entry['Cooldown'])
+        entry = next((x for x in muteList if str(x["ID"])==str(member.id)),None)
+        if not entry: return # Doesn't exist - skip
+        # We had a mute - let's validate it
+        if (entry["Cooldown"] == None and int(time.time())-entry.get("Added",int(time.time()))>3600*24*90) or (entry["Cooldown"] != None and int(entry["Cooldown"])-int(time.time())<=0):
+            # Was a permamute and 90 days have expired - or was a timed mute, and the time has expired
+            # Remove the mute from the mute list - and ignore
+            muteList.remove(entry)
+            self.settings.setServerStat(server,"MuteList",muteList)
+            return
+        # At this point - we still need to mute - so we'll just apply it
+        await self._mute(member, server, entry['Cooldown'])
             
     async def mute_list_check(self):
         while not self.bot.is_closed():
@@ -331,6 +360,12 @@ class Mute(commands.Cog):
         message = await ctx.send("Syncing permissions for **{}**...".format(Utils.suppressed(ctx,mute_role.name)))
         await self._sync_perms(ctx,mute_role,True)
         await message.edit(content="**{}** has been **desynced**.  It will **__no longer work__** for muting!".format(Utils.suppressed(ctx,mute_role.name)))
+
+    @commands.command()
+    async def muteautodelete(self, ctx, *, yes_no = None):
+        """Enables/Disables auto-delete of any messages that slip by from muted users (bot-admin only)."""
+        if not await Utils.is_bot_admin_reply(ctx): return
+        await ctx.send(Utils.yes_no_setting(ctx,"Muted user auto-delete","MuteAutoDelete",yes_no=yes_no,default=True))
 
     @commands.command(pass_context=True)
     async def mute(self, ctx, *, member = None, cooldown = None):
