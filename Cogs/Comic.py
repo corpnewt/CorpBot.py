@@ -144,9 +144,13 @@ class Comic(commands.Cog):
 		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(x) for x in date.split("-")]
 		return {"month":m,"day":d,"year":y}
 
-	async def _get_last_comic_number(self,comic_data,date=None):
+	async def _get_last_comic_number(self,comic_data,date=None,month_adjust=0):
+		if month_adjust >= 10: return (None,None) # Adjusted too far :(
+		today = dt.datetime.today()
+		if month_adjust: # We need to adjust months
+			today = dt.datetime(today.year-1,12,1) if today.month == 1 else dt.datetime(today.year,today.month-1,1)
 		# Helper to return the highest comic number for a given comic and source html
-		date_dict = self._date_dict(dt.datetime.today().strftime("%m-%d-%Y") if date == None else date,padded=comic_data.get("padded",True))
+		date_dict = self._date_dict(today.strftime("%m-%d-%Y") if date == None else date,padded=comic_data.get("padded",True))
 		try: 
 			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
 			archive_html = await DL.async_text(archive_url)
@@ -154,7 +158,10 @@ class Comic(commands.Cog):
 			return (None,None)
 		latest_comic = self._walk_replace(archive_html,comic_data["latest_url"])
 		if not latest_comic: return (None,None)
-		return (int(latest_comic),archive_html)
+		# Try to cast the number as int - if not possible, set the month back by one
+		try: latest_comic = int(latest_comic)
+		except: return await self._get_last_comic_number(comic_data,date,month_adjust+1)
+		return (latest_comic,archive_html)
 
 	async def _get_random_comic(self,comic_data):
 		# Try to get a random comic between the first_date/last_date, or between custom indexes (XKCD)
