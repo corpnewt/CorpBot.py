@@ -111,7 +111,9 @@ class Comic(commands.Cog):
 				"url": "https://xkcd.com/{}/",
 				"comic_url": [
 					{"find":"(for hotlinking/embedding): ","index":1},
-					{"find":"\n","index":0}
+					{"find":"\n","index":0},
+					{"find":'<a href= "',"index":-1},
+					{"find":'">',"index":0}
 				],
 				"comic_desc": [
 					{"find":'<div id="comic">',"index":-1},
