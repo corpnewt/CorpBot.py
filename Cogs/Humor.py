@@ -239,55 +239,44 @@ class Humor(commands.Cog):
 		"""Get Meme Templates"""
 		url = "https://api.imgflip.com/get_memes"
 		result_json = await DL.async_json(url)
-		templates = result_json["data"]["memes"]
-
-		templates_string_list = []
-		
+		templates = result_json["data"]["memes"]		
 		fields = []
 		for template in templates:
 			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
 		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
 
 	@commands.command(pass_context=True)
-	async def meme(self, ctx, template_id = None, text_zero = None, text_one = None):
+	async def meme(self, ctx, template_id = None, *box_text):
 		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
 
-		if not self.canDisplay(ctx.message.guild):
-			return
+		if not self.canDisplay(ctx.message.guild): return
 
-		if text_one == None:
-			# Set as space if not included
-			text_one = " "
-
-		if any((x==None for x in (template_id,text_zero,text_one))):
+		if template_id == None or not len(box_text):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
 			return await ctx.send(msg)
 
 		templates = await self.getTemps()
-
-		chosenTemp = gotName = None
-
-		idMatch   = FuzzySearch.search(template_id, templates, 'id', 1)
-		if idMatch[0]['Ratio'] == 1:
-			# Perfect match
-			chosenTemp = idMatch[0]['Item']['id']
-			gotName    = idMatch[0]['Item']['name']
-		else:
-			# Imperfect match - assume the name
-			nameMatch = FuzzySearch.search(template_id, templates, 'name', 1)
-			chosenTemp = nameMatch[0]['Item']['id']
-			gotName    = nameMatch[0]['Item']['name']
+		idMatch = FuzzySearch.search(template_id, templates, 'id', 1)
+		# Match by id first - and if that's not perfectly found, use name
+		chosenTemp = idMatch[0]["Item"] if idMatch[0]["Ratio"] == 1 else FuzzySearch.search(template_id, templates, 'name', 1)[0]["Item"]
+		
+		if chosenTemp["box_count"] != len(box_text):
+			# Pad our box_text as needed with empty spaces
+			box_text = list(box_text) + [" "]*(chosenTemp["box_count"]-len(box_text))
 
 		url = "https://api.imgflip.com/caption_image"
-		payload = {'template_id': chosenTemp, 'username':'CorpBot', 'password': 'pooter123', 'text0': text_zero, 'text1': text_one }
+		payload = {'template_id': chosenTemp["id"], 'username':'CorpBot', 'password': 'pooter123'}
+		# Add the text to the payload
+		for i,x in enumerate(box_text):
+			payload["boxes[{}][text]".format(i)] = x.upper()
 		result_json = await DL.async_post_json(url, payload)
 		result = result_json["data"]["url"]
 		await Message.Embed(
 			url=result,
-			title=text_zero + " - " + text_one if text_one != " " else text_zero,
+			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
 			image=result,
 			color=ctx.author,
-			footer='Powered by imgflip.com - using template id {}: {}'.format(chosenTemp,gotName)
+			footer='Powered by imgflip.com - using template id {}: {}'.format(chosenTemp["id"],chosenTemp["name"])
 		).send(ctx)
 
 	async def getTemps(self):
