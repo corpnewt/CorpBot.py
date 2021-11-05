@@ -10,7 +10,7 @@ class ThatsTrue(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-		self.regex = re.compile(r"(?i)\b(bodymind|body mind|body-mind|earthdating|earth dating|earth-dating)\b")
+		self.regex = re.compile(r"(?i)\b(bodymind|body mind|body-mind|earthdating|earth dating|earth-dating|impostor sus)\b")
 
 	async def message(self, message):
 		# Check the message - and if it contains "body-mind" or "earth dating"
