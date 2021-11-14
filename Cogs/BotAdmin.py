@@ -163,6 +163,8 @@ class BotAdmin(commands.Cog):
 		missed = []
 		unable = []
 		reason = ""
+		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name == "ban" else None
+		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name == "ban" else None
 		for index,item in enumerate(args):
 			if self.mention_re.search(item): # Check if it's a mention
 				# Resolve the member
@@ -182,16 +184,33 @@ class BotAdmin(commands.Cog):
 					continue
 				if not member in targets: targets.append(member) # Only add them if we don't already have them
 			else:
+				# Check if we're banning - and if so, check the rest of the args for `-r=#`
+				# then apply that override and remove from the reason
+				if command_name == "ban":
+					for i,x in enumerate(args[index:]):
+						if x.lower().startswith("-r="):
+							try:
+								days = int(x.split("=")[-1])
+								assert 0<=days<8
+							except:
+								continue
+							args.pop(index+i)
+							footer="Message Removal Override: {:,} day{}".format(days,"" if days==1 else "s")
+							break
+					# Bail if we don't have any args left for a reason
+					if index >= len(args): break
 				# Not a mention - must be the reason, dump the rest of the items into a string
 				# separated by a space
 				reason = " ".join(args[index:])
 				break
 		reason = reason if len(reason) else "No reason provided."
 		if not len(targets):
-			msg = "**With reason:**\n\n{}".format(reason)
-			if len(unable): msg = "**Unable to {}:**\n\n{}\n\n".format(command_name,"\n".join(unable)) + msg
-			if len(missed): msg = "**Unmatched ID{}:**\n\n{}\n\n".format("" if len(missed) == 1 else "s","\n".join(missed)) + msg
-			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author).send(ctx)
+			msg = "**With reason:**\n\n{}{}{}".format(
+				reason,
+				"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
+				"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable))
+			)
+			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author,footer=footer).send(ctx)
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
@@ -205,7 +224,7 @@ class BotAdmin(commands.Cog):
 			"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
 			"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable))
 			)
-		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author).send(ctx)
+		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author,footer=footer).send(ctx)
 		def check_confirmation(message):
 			return message.channel == ctx.channel and ctx.author == message.author # Just making sure it's the same user/channel
 		try: confirmation_user = await self.bot.wait_for('message', timeout=60, check=check_confirmation)
@@ -215,13 +234,15 @@ class BotAdmin(commands.Cog):
 		# Verify the confirmation
 		if not confirmation_user.content == confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
 		# We got the authorization!
-		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Unbann" if command_name == "unban" else "Kick"),color=ctx.author).send(ctx)
+		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Unbann" if command_name == "unban" else "Kick"),color=ctx.author,footer=footer).send(ctx)
 		canned = []
 		cant = []
 		command = {"ban":ctx.guild.ban,"kick":ctx.guild.kick,"unban":ctx.guild.unban}.get(command_name.lower(),ctx.guild.kick)
 		for target in targets:
 			try:
-				await command(target,reason="{}#{}: {}".format(ctx.author.name,ctx.author.discriminator,reason))
+				args = {"reason":"{}#{}: {}".format(ctx.author.name,ctx.author.discriminator,reason)}
+				if days is not None: args["delete_message_days"] = days
+				await command(target,**args)
 				canned.append(target)
 			except: cant.append(target)
 		msg = ""
@@ -229,7 +250,7 @@ class BotAdmin(commands.Cog):
 			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
 		if len(cant):
 			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in cant]))
-		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg).edit(ctx,message)
+		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg,footer=footer).edit(ctx,message)
 
 	@commands.command(pass_context=True)
 	async def kick(self, ctx, *, members = None, reason = None):
@@ -245,7 +266,12 @@ class BotAdmin(commands.Cog):
 		"""Bans the passed members for the specified reason.
 		All ban targets must be mentions or ids to avoid ambiguity (bot-admin only).
 		
-		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming"""
+		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming
+		
+		Can take '-r=#' within the reason to specify the number of days to remove the banned users' messages.
+		This is limited to 0-7 days, and will override the value set by the rembanmessages command.
+		
+		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -r=5"""
 		await self.kick_ban(ctx,members,"ban")
 
 	@commands.command(pass_context=True)
@@ -281,3 +307,20 @@ class BotAdmin(commands.Cog):
 					color=ctx.author
 				).send(ctx)
 		return await PickList.PagePicker(title="Ban List ({:,} total)".format(len(entries)),description=None if user_id == None else "No match found for '{}'.".format(orig_user),list=entries,ctx=ctx).pick()
+
+	@commands.command()
+	async def rembanmessages(self, ctx, number_of_days = None):
+		"""Gets or sets the default number of days worth of messages to remove when banning a user.  Must be between 0-7 and uses a default of 1 (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if number_of_days == None: # No setting passed, just output the current
+			days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1)
+			return await ctx.send("Banning a user will remove {:,} day{} worth of messages.".format(days,"" if days==1 else "s"))
+		# Try to cast the days as an int - and ensure they're between 0 and 7
+		try:
+			days = int(number_of_days)
+			assert 0<=days<8
+		except:
+			return await ctx.send("Number of days must be an integer between 0 and 7!")
+		# At this point, we should have the default number of days - let's tell the user!
+		self.settings.setServerStat(ctx.guild,"BanMessageRemoveDays",days)
+		return await ctx.send("Banning a user will now remove {:,} day{} worth of messages.".format(days,"" if days==1 else "s"))
