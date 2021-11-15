@@ -874,7 +874,7 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def seek(self, ctx, position = None):
-		"""Seeks to the passed position in the song if possible.  Position should be in seconds or in HH:MM:SS format."""
+		"""Seeks to the passed position in the song if possible.  Position should be in seconds or in HH:MM:SS format.  Prepend a + or - to seek relative to the current position."""
 
 		if position == None or position.lower() in ["moon","moons","moonme","moon me"]: # Show the playing status
 			return await ctx.invoke(self.playing,moons=position)
@@ -885,6 +885,13 @@ class Music(commands.Cog):
 		if not player.is_playing:
 			return await Message.EmbedText(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Try to resolve the position - first in seconds, then with the HH:MM:SS format
+		relative = False
+		positive = True
+		current = player.last_position
+		if position.startswith(("-","+")):
+			relative = True
+			positive = position.startswith("+")
+			position = position[1:]
 		vals = position.split(":")
 		seconds = 0
 		multiplier = [3600,60,1]
@@ -893,6 +900,10 @@ class Music(commands.Cog):
 			try: seconds += mult * float("".join([x for x in vals[index] if x in "0123456789."])) # Try to avoid h, m, s suffixes
 			except: return await Message.EmbedText(title="♫ Malformed seek value!",description="Please make sure the seek time is in seconds, or using HH:MM:SS format.",color=ctx.author,delete_after=delay).send(ctx)
 		ms = int(seconds*1000)
+		if relative:
+			if not positive: ms *= -1
+			ms += current
+			if ms < 0: ms = 0
 		await player.seek(ms)
 		return await Message.EmbedText(title="♫ Seeking to {}!".format(self.format_duration(ms)),color=ctx.author,delete_after=delay).send(ctx)
 
