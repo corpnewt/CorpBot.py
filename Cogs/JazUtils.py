@@ -74,6 +74,11 @@ class JazUtils(commands.Cog):
 		# filters the full role hierarchy based on the predefined lists above
 		return [role for role in roles if int(role.id) in id_list]
 
+	def get_named_role(self, server, rolename):
+		# finds a role in a server by name
+		check_name = self.alphanum_filter(rolename)
+		return next((role for role in server.roles if self.alphanum_filter(role.name) == check_name),None)
+
 	def role_accumulate(self, check_roles, members):
 		## iterate over the members to accumulate a count of each role
 		rolecounts = {}
@@ -142,7 +147,8 @@ class JazUtils(commands.Cog):
 		"""Counts the number of members with a specific role."""
 		check_role = DisplayName.roleForName(rolename,ctx.guild)
 		if not check_role:
-			return await ctx.send("I can't find that role!")
+			check_role = self.get_named_role(ctx.guild,rolename)
+			if not check_role: return await ctx.send("I can't find that role!")
 
 		count = 0
 		online = 0
@@ -171,7 +177,8 @@ class JazUtils(commands.Cog):
 
 		check_role = DisplayName.roleForName(rolename,ctx.guild)
 		if not check_role:
-			return await ctx.send("I can't find that role!")
+			check_role = self.get_named_role(ctx.guild,rolename)
+			if not check_role: return await ctx.send("I can't find that role!")
 
 		users = [member for member in ctx.guild.members if check_role in member.roles]
 
