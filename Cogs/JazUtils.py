@@ -22,6 +22,8 @@ class JazUtils(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
+		global DisplayName
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command(pass_context=True)
 	async def snowflake(self, ctx, *, sid : str = None):
@@ -71,11 +73,6 @@ class JazUtils(commands.Cog):
 	def rolelist_filter(self, roles, id_list):
 		# filters the full role hierarchy based on the predefined lists above
 		return [role for role in roles if int(role.id) in id_list]
-
-	def get_named_role(self, server, rolename):
-		# finds a role in a server by name
-		check_name = self.alphanum_filter(rolename)
-		return next((role for role in server.roles if self.alphanum_filter(role.name) == check_name),None)
 
 	def role_accumulate(self, check_roles, members):
 		## iterate over the members to accumulate a count of each role
@@ -143,7 +140,7 @@ class JazUtils(commands.Cog):
 	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, rolename):
 		"""Counts the number of members with a specific role."""
-		check_role = self.get_named_role(ctx.guild, rolename)
+		check_role = DisplayName.roleForName(rolename,ctx.guild)
 		if not check_role:
 			return await ctx.send("I can't find that role!")
 
@@ -172,7 +169,7 @@ class JazUtils(commands.Cog):
 			mode = 2
 			rolename = rolename.replace('-username','')
 
-		check_role = self.get_named_role(ctx.guild, rolename)
+		check_role = DisplayName.roleForName(rolename,ctx.guild)
 		if not check_role:
 			return await ctx.send("I can't find that role!")
 
