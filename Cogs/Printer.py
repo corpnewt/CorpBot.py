@@ -48,7 +48,7 @@ class Printer(commands.Cog):
 			
 			# Let's scale down
 			w, h = 0, 0
-			adjust = 2
+			adjust = 2.25
 			w = img.size[0]*adjust
 			h = img.size[1]
 
