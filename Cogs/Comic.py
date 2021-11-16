@@ -230,6 +230,7 @@ class Comic(commands.Cog):
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
 		if not comic_url: return None
 		if comic_url.startswith("//"): comic_url = "https:"+comic_url
+		if not comic_url.lower().startswith(("http://","https://")): return None
 		h = HTMLParser()
 		# Check if we need to get title text
 		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
