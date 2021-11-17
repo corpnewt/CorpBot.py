@@ -5,7 +5,6 @@ from   Cogs import Message
 from   Cogs import DL
 from   Cogs import PickList
 import urllib
-import requests
 
 def setup(bot):
 	# Add the bot
@@ -202,25 +201,29 @@ class IntelArk(commands.Cog):
 			"(G)": "℠",
 			"CPU": "",
 			"@": "",
+			" ": "%20"
 		}
 
 		for key, val in replace_dict.items():
 			if key in search_term:
 				search_term = search_term.replace(key, val)
 
-		sanitised_term = ""
-		sanitised = search_term.split(' ')
+		if not "-" in search_term:
+			sanitised_term = ""
+			sanitised = search_term.split('%20')
 
-		if len(sanitised) == 1:
+			if len(sanitised) == 1:
+				return search_term
+			elif len(sanitised) == 2:
+				return "-".join(sanitised)
+
+			for i in range(len(sanitised)):
+				if i == (len(sanitised) - 2) and not "-" in search_term:
+					sanitised_term += sanitised[i] + '-' + sanitised[i + 1]
+					break
+			
+				sanitised_term += sanitised[i] + '%20' if i != (len(sanitised) - 1) else ''
+
+			return sanitised_term
+		else:
 			return search_term
-		elif len(sanitised) == 2:
-			return "-".join(sanitised)
-
-		for i in range(len(sanitised)):
-			if i == (len(sanitised) - 2):
-				sanitised_term += sanitised[i] + '-' + sanitised[i + 1]
-				break
-		
-			sanitised_term += sanitised[i] + ' '
-
-		return sanitised_term
