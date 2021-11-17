@@ -71,7 +71,7 @@ class IntelArk(commands.Cog):
 
 		elif len(response) == 1:
 			# Set it to the first item
-			response = response[0]
+			response = await self.get_match_data(response[0])
 
 		# Check if we got more than one result (either not exact, or like 4790 vs 4790k)
 		elif len(response) > 1:
@@ -114,9 +114,55 @@ class IntelArk(commands.Cog):
 
 		for line_index in range(len(lines)):
 			for key, value in self.fields.items():
+				"""
+				Grabs the image URL of the current item, if possible.
+
+				For example, we might have an element like this:
+
+					<img ptype="processors" alt="Intel® Core™2 Duo Processor P8600 " 
+					src="https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif" 
+					onerror="ValidateImage(this);" 
+					onload="checkImgSize(this);" 
+					width="" 
+					height=""
+					>
+
+				From here, we'd want to isolate what's inside of `src="*"`;
+				In order to achieve this, we can simply divide the string into a list.
+				
+					lines[line_index].split('src="')
+
+				Which will yield something like:
+
+					->  [  
+							'<img ptype="processors" alt="Intel® Core™2 Duo Processor P8600 "',     
+							'https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif" onerror="ValidateImage(this);" onload="checkImgSize(this);" width="" height="">'
+						]
+
+				From here, we can select the second element, as it contains the URL we're looking for, and split by `"`.
+
+					lines[line_index].split('src="')[1].split('"')
+
+				Which will yield something like:
+
+					->  [
+							'https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif',
+							' onerror=', 
+							'ValidateImage(this);', 
+							' onload=', 
+							'checkImgSize(this);', 
+							' width=', 
+							'', 
+							' height=', 
+							'', 
+							'>'
+						]
+
+				From here, we can simply select the first element, which is the URL.
+				"""
 				if 'ptype="processors"' in lines[line_index].lower():
 					data['BrandBadge'] = lines[line_index].split('src="')[1].split('"')[0]
-					
+
 				if 'data-key="{}"'.format(key.lower()) in lines[line_index].lower():
 					if 'codename' in key.lower():
 						data[key] = lines[line_index + 1].strip().split('>')[1].split('<')[0].replace('Products formerly', '').strip()
