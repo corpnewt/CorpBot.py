@@ -97,7 +97,8 @@ class AmdArk(commands.Cog):
             return []
         results = []
         for line in contents.split("\n"):
-            if not all((x in line for x in ('<div class="views-field views-field-title">','<a href="/en/products/cpu/'))): continue
+            if not any((x in line for x in ('<a href="/en/products/apu/','<a href="/en/products/cpu/'))):
+                continue
             try:
                 name = line.split("</a>")[0].split(">")[-1]
                 url  = "https://www.amd.com"+line.split('<a href="')[1].split('"')[0]
