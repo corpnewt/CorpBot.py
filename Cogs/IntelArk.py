@@ -5,6 +5,7 @@ from   Cogs import Message
 from   Cogs import DL
 from   Cogs import PickList
 import urllib
+import re
 
 def setup(bot):
 	# Add the bot
@@ -44,9 +45,9 @@ class IntelArk(commands.Cog):
 
 		# Strip single quotes
 		text = text.replace("'","")
-		if not len(text): return await Message.EmbedText(**args).send(ctx)
-		
-		text = self.simplified_name(text)
+		if not len(text):
+			await Message.EmbedText(**args).send(ctx)
+			return
 
 		args["description"] = "Gathering info..."
 		message = await Message.EmbedText(**args).send(ctx)
@@ -199,29 +200,36 @@ class IntelArk(commands.Cog):
 			"(G)": "℠",
 			"CPU": "",
 			"@": "",
-			" ": "%20"
+			" ": "+"
 		}
+
+		capture = re.search(r"((e|i)\d{1}\s\d{3,4}(\w{1}\d{1}?)?)", search_term)
+
+		if capture:
+			capture = capture.group()
+			search_term = search_term.replace(capture, capture.replace(" ", "-"))
 
 		for key, val in replace_dict.items():
 			if key in search_term:
 				search_term = search_term.replace(key, val)
 
-		if not "-" in search_term:
-			sanitised_term = ""
-			sanitised = search_term.split('%20')
+		return search_term
+		# if not "-" in search_term:
+		# 	sanitised_term = ""
+		# 	sanitised = search_term.split('%20')
 
-			if len(sanitised) == 1:
-				return search_term
-			elif len(sanitised) == 2:
-				return "-".join(sanitised)
+		# 	if len(sanitised) == 1:
+		# 		return search_term
+		# 	elif len(sanitised) == 2:
+		# 		return "-".join(sanitised)
 
-			for i in range(len(sanitised)):
-				if i == (len(sanitised) - 2) and not "-" in search_term:
-					sanitised_term += sanitised[i] + '-' + sanitised[i + 1]
-					break
+		# 	for i in range(len(sanitised)):
+		# 		if i == (len(sanitised) - 2) and not "-" in search_term:
+		# 			sanitised_term += sanitised[i] + '-' + sanitised[i + 1]
+		# 			break
 			
-				sanitised_term += sanitised[i] + '%20' if i != (len(sanitised) - 1) else ''
+		# 		sanitised_term += sanitised[i] + '%20' if i != (len(sanitised) - 1) else ''
 
-			return sanitised_term
-		else:
-			return search_term
+		# 	return sanitised_term
+		# else:
+		# 	return search_term
