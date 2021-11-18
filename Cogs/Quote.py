@@ -109,7 +109,7 @@ class Quote(commands.Cog):
 				reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"color" : reaction.message.author,
-			"footer" : "Quoted by {}#{}".format(member.name, member.discriminator)
+			"footer" : "Quoted by {}#{} ({})".format(member.name, member.discriminator, member.id)
 		}
 		await Message.EmbedText(**e).send(r_channel)
 
