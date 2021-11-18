@@ -18,6 +18,7 @@ class AmdArk(commands.Cog):
         self.exclude_key_prefixes = (
             "Product ID",
             "*OS Support",
+            "OS Support",
             "Supported Technologies",
             "Workload Affinity"
         )
@@ -140,5 +141,10 @@ class AmdArk(commands.Cog):
                         fields.append({"name":last_key,"value":val,"inline":True})
                 except:
                     pass
-        info["fields"]=fields
+        # Ensure we don't duplicate fields (some amd entries have things listed twice for whatever reason)
+        unique_fields = []
+        for field in fields:
+            if not any((x["name"] == field["name"] for x in unique_fields)):
+                unique_fields.append(field)
+        info["fields"]=unique_fields
         return info
