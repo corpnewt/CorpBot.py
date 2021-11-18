@@ -40,8 +40,8 @@ class IntelArk(commands.Cog):
 			"color":ctx.author
 		}
 
-		original_text = text # Retain the original text sent by the user
 		if text is None: return await Message.EmbedText(**args).send(ctx)
+		original_text = text # Retain the original text sent by the user
 
 		# Strip single quotes
 		text = text.replace("'","")
