@@ -99,8 +99,9 @@ class AmdArk(commands.Cog):
         except:
             return []
         results = []
+        search_list = ('<a href="/en/products/apu/','<a href="/en/products/cpu/','<a href="/en/products/graphics/', '<a href="/en/products/professional-graphics/')
         for line in contents.split("\n"):
-            if not any((x in line for x in ('<a href="/en/products/apu/','<a href="/en/products/cpu/','<a href="/en/products/graphics/'))):
+            if not any((x in line for x in search_list)):
                 continue
             try:
                 name = line.split("</a>")[0].split(">")[-1]
