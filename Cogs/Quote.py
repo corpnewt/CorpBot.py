@@ -1,4 +1,4 @@
-import asyncio, discord
+from datetime import datetime, timezone
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message
 
@@ -102,11 +102,11 @@ class Quote(commands.Cog):
 			"author" : reaction.message.author,
 			"image" : image,
 			"pm_after" : -1, # Don't pm quotes
-			"description" : msg + "\n\nSent by {} in {} | {} | {} UTC".format(
+			"description" : msg + "\n\nSent by {} in {} | {} | {}".format(
 				reaction.message.author.mention,
 				reaction.message.channel.mention,
 				"[Link](https://discord.com/channels/{}/{}/{})".format(reaction.message.guild.id, reaction.message.channel.id, reaction.message.id),
-				reaction.message.created_at.strftime("%I:%M %p")
+				"<t:{}>".format(int(datetime.timestamp(reaction.message.created_at.replace(tzinfo=timezone.utc)))) #reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"color" : reaction.message.author,
 			"footer" : "Quoted by {}#{} ({})".format(member.name, member.discriminator, member.id)
