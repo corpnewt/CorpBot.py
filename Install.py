@@ -153,6 +153,7 @@ if __name__ == '__main__':
     r = Run()
     modules = [
         {"name":"discord [rewrite]", "item":"discord.py[voice]"},
+        {"name":"certifi"},
         {"name":"pillow"},
         # {"name":"youtube-dl"},
         {"name":"Wavelink"},
