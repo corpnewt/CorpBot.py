@@ -29,7 +29,7 @@ class WikiChip(commands.Cog):
             "TDP": "TDP",
         }
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True,aliases=("iamd",))
     async def wikichip(self, ctx, *, text: str = None):
         """Searches WikiChip for AMD CPU info."""
 
@@ -78,7 +78,7 @@ class WikiChip(commands.Cog):
 
         await Message.Embed(
             pm_after=12,
-            title=response.get("WikiChip AMD Search"),
+            title=response.get("Title","WikiChip AMD Search"),
             fields=fields,
             url=response.get("URL"),
             footer="Powered by https://en.wikichip.org/wiki/amd",
@@ -90,37 +90,20 @@ class WikiChip(commands.Cog):
         Queries the AMD section from wikichip,
         parses the contents, and looks for the codename/µarch.
         """
-
-        if len(cpu_name.split(" ")) > 1:
-            BASE_URL = "https://en.wikichip.org/wiki/amd"
-
-            formatted = re.sub(
-                r"(\d{1,2}?(-Core\s?)?(Processor))", "", cpu_name.replace("AMD", "")
-            ).strip()
-
-            family = ""
-            model = ""
-
-            # Format data for request properly
-            if "ryzen" in formatted.lower():
-                family = "_".join(formatted.split(" ")[:2]).lower()
-                model = formatted.split(" ")[2].lower()
-            else:
-                model = formatted.lower()
-
-            URL = ""
-
-            if family:
-                URL = "{0}/{1}/{2}".format(BASE_URL, family, model)
-            else:
-                URL = "{0}/{1}".format(BASE_URL, model)
-
-            URL = URL.replace(" ", "_")
-        else:
-            URL = "https://en.wikichip.org/wiki/{}".format(cpu_name)
+        formatted = re.sub(r"(?i)(ryzen|amd|ep(y|i)c)","",cpu_name)
+        formatted = next((x for x in formatted.split() if len(x) > 1),None)
+        if formatted is None: return
+        
+        URL = "https://en.wikichip.org/wiki/{}".format(formatted)
 
         contents = await DL.async_text(URL)
         data = {"URL": URL}
+
+        try:
+            # <td class="header-main" colspan="2">Name Here</td>
+            data["Title"] = contents.split('<td class="header-main"')[1].split(">")[1].split("</")[0]
+        except:
+            pass
 
         try:
             data["Codename"] = re.search(
