@@ -253,7 +253,7 @@ class Help(commands.Cog):
 					if comm.hidden: continue
 					hid = False
 					if comm.name in com_name_list: continue
-					com_name_list.extend([comm.name]+comm.aliases)
+					com_name_list.extend([comm.name]+list(comm.aliases))
 				if not hid:
 					cog_name_list.append(cog)
 			
