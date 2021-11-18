@@ -77,14 +77,16 @@ class AmdArk(commands.Cog):
             args["description"] = "Something went wrong getting search data!"
             return await Message.EmbedText(**args).edit(ctx, message)
 
-        await Message.Embed(
-            pm_after=25,
+        await PickList.PagePicker(
             title=response.get("name","AMD Search"),
-            fields=response["fields"],
+            list=response["fields"],
             url=response.get("url"),
             footer="Powered by https://www.amd.com",
-            color=ctx.author
-        ).edit(ctx, message)
+            color=ctx.author,
+            ctx=ctx,
+            max=18,
+            message=message
+        ).pick()
 
     async def get_search(self, search_term):
         """
@@ -97,7 +99,7 @@ class AmdArk(commands.Cog):
             return []
         results = []
         for line in contents.split("\n"):
-            if not any((x in line for x in ('<a href="/en/products/apu/','<a href="/en/products/cpu/'))):
+            if not any((x in line for x in ('<a href="/en/products/apu/','<a href="/en/products/cpu/','<a href="/en/products/graphics/'))):
                 continue
             try:
                 name = line.split("</a>")[0].split(">")[-1]
