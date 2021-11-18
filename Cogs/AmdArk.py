@@ -15,6 +15,12 @@ class AmdArk(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.exclude_key_prefixes = (
+            "Product ID",
+            "*OS Support",
+            "Supported Technologies",
+            "Workload Affinity"
+        )
         self.h = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
     @commands.command(no_pm=True,aliases=("iamd","aark"))
@@ -118,7 +124,7 @@ class AmdArk(commands.Cog):
             elif 'class="field__label' in line:
                 try:
                     last_key = unescape(line.split('class="field__label')[1].split("<")[0].split(">")[-1])
-                    assert len(last_key) and not "Product ID" in last_key
+                    assert len(last_key) and not last_key.startswith(self.exclude_key_prefixes)
                 except:
                     last_key = None
             elif 'class="field__item">' in line and last_key is not None:
