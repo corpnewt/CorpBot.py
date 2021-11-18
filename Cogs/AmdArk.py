@@ -2,7 +2,7 @@ from discord.ext import commands
 from Cogs import Message
 from Cogs import DL
 from Cogs import PickList
-import urllib.parse, json
+import urllib.parse
 from html import unescape
 
 
@@ -71,8 +71,6 @@ class AmdArk(commands.Cog):
             args["description"] = "Something went wrong getting search data!"
             return await Message.EmbedText(**args).edit(ctx, message)
 
-        print(json.dumps(response,indent=2))
-
         await Message.Embed(
             pm_after=20,
             title=response.get("name","AMD Search"),
@@ -111,8 +109,6 @@ class AmdArk(commands.Cog):
             contents = await DL.async_text(match["url"],headers=self.h)
         except:
             return
-        with open("amd_cpu.html","wb") as f:
-            f.write(contents.encode())
         last_key = None
         info = {"url":match["url"],"name":match["name"]}
         fields = []
