@@ -91,13 +91,16 @@ class WikiChip(commands.Cog):
         Queries the AMD section from wikichip,
         parses the contents, and looks for the codename/µarch.
         """
-        formatted = re.sub(r"(?i)(ryzen|amd|ep(y|i)c)","",cpu_name)
-        formatted = next((x for x in formatted.split() if len(x) > 1),None)
+        formatted = next((x for x in re.sub(r"(?i)(ryzen|amd|ep(y|i)c|threadripper|tr)","",cpu_name).split() if len(x) > 1),None)
         if formatted is None: return
         
-        URL = "https://en.wikichip.org/wiki/{}".format(formatted)
+        for URL in ("https://en.wikichip.org/wiki/{}".format(formatted),"https://en.wikichip.org/wiki/amd/ryzen_threadripper/{}".format(formatted)):
+            try:
+                contents = await DL.async_text(URL)
+            except AssertionError:
+                continue
+            break
 
-        contents = await DL.async_text(URL)
         data = {"URL": URL}
 
         try:
