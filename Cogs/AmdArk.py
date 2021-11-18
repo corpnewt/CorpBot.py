@@ -127,7 +127,6 @@ class AmdArk(commands.Cog):
                     if not len(val): continue
                     if len(fields) and fields[-1]["name"] == last_key: # Already there, append
                         fields[-1]["value"] = fields[-1]["value"]+", "+val
-                        print(fields[-1])
                     else:
                         fields.append({"name":last_key,"value":val,"inline":True})
                 except:
