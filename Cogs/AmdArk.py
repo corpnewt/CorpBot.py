@@ -17,7 +17,7 @@ class AmdArk(commands.Cog):
         self.bot = bot
         self.h = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
-    @commands.command(no_pm=True,aliases=("iamd",))
+    @commands.command(no_pm=True,aliases=("iamd","aark"))
     async def amdark(self, ctx, *, text: str = None):
         """Searches AMD's site for CPU info."""
 
