@@ -113,17 +113,17 @@ class AmdArk(commands.Cog):
         info = {"url":match["url"],"name":match["name"]}
         fields = []
         for line in contents.split("\n"):
-            if '<div class="field__label">' in line and not "Product ID" in line:
+            if 'class="field__label">' in line and not "Product ID" in line:
                 try:
-                    last_key = unescape(line.split('<div class="field__label">')[1].split("<")[0])
+                    last_key = unescape(line.split('class="field__label">')[1].split("<")[0])
                     if not len(last_key):
                         last_key = None
                         continue
                 except:
                     pass
-            elif '<div class="field__item">' in line and last_key is not None:
+            elif 'class="field__item">' in line and last_key is not None:
                 try:
-                    val = unescape(line.split('<div class="field__item">')[1].split("</")[-2].split(">")[-1])
+                    val = unescape(line.split('class="field__item">')[1].split("</")[-2].split(">")[-1])
                     if not len(val): continue
                     fields.append({"name":last_key,"value":val,"inline":True})
                 except:
