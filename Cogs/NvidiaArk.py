@@ -3,6 +3,7 @@ from Cogs import Message
 from Cogs import DL
 from Cogs import PickList
 from urllib.parse import quote
+import re
 
 
 def setup(bot):
@@ -30,6 +31,7 @@ class NvidiaArk(commands.Cog):
 
         # Strip single quotes
         text = text.replace("'", "")
+        text = re.sub(r"(N|n)(V|v)(I|i)(D|d)(I|i)(A|a)", "", text)
 
         if not text:
             return await Message.EmbedText(**args).send(ctx)
@@ -71,8 +73,6 @@ class NvidiaArk(commands.Cog):
             # Got something
             response = await self.get_match_data(response[index])
 
-        print(response.get("image"))
-
         # At this point - we should have a single response
         # Let's display the data.
         await PickList.PagePicker(
@@ -96,11 +96,21 @@ class NvidiaArk(commands.Cog):
         if not "vendor-nvidia" in contents.lower():
             return -1
 
+        nvidia = True
         lines = contents.split("\n")
         data = []
 
         for line_index in range(len(lines)):
             line = lines[line_index].strip()
+
+            if "<td class=\"vendor-" in line.lower():
+                if not "vendor-nvidia" in line.lower():
+                    nvidia = False
+                elif "vendor-nvidia" in line.lower():
+                    nvidia = True
+
+            if not nvidia:
+                continue
 
             if '<a href="' in line.lower():
                 try:
