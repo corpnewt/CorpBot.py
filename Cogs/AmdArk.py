@@ -72,7 +72,7 @@ class AmdArk(commands.Cog):
             return await Message.EmbedText(**args).edit(ctx, message)
 
         await Message.Embed(
-            pm_after=20,
+            pm_after=25,
             title=response.get("name","AMD Search"),
             fields=response["fields"],
             url=response.get("url"),
@@ -113,21 +113,24 @@ class AmdArk(commands.Cog):
         info = {"url":match["url"],"name":match["name"]}
         fields = []
         for line in contents.split("\n"):
-            if 'class="field__label">' in line and not "Product ID" in line:
+            if line.strip() == "</div>":
+                last_key = None
+            elif 'class="field__label' in line:
                 try:
-                    last_key = unescape(line.split('class="field__label">')[1].split("<")[0])
-                    if not len(last_key):
-                        last_key = None
-                        continue
+                    last_key = unescape(line.split('class="field__label')[1].split("<")[0].split(">")[-1])
+                    assert len(last_key) and not "Product ID" in last_key
                 except:
-                    pass
+                    last_key = None
             elif 'class="field__item">' in line and last_key is not None:
                 try:
                     val = unescape(line.split('class="field__item">')[1].split("</")[-2].split(">")[-1])
                     if not len(val): continue
-                    fields.append({"name":last_key,"value":val,"inline":True})
+                    if len(fields) and fields[-1]["name"] == last_key: # Already there, append
+                        fields[-1]["value"] = fields[-1]["value"]+", "+val
+                        print(fields[-1])
+                    else:
+                        fields.append({"name":last_key,"value":val,"inline":True})
                 except:
                     pass
-                last_key = None
         info["fields"]=fields
         return info
