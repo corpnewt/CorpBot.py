@@ -78,6 +78,7 @@ class WikiChip(commands.Cog):
 
         await Message.Embed(
             pm_after=12,
+            thumbnail=response.get("Thumbnail",None),
             title=response.get("Title","WikiChip AMD Search"),
             fields=fields,
             url=response.get("URL"),
@@ -102,6 +103,17 @@ class WikiChip(commands.Cog):
         try:
             # <td class="header-main" colspan="2">Name Here</td>
             data["Title"] = contents.split('<td class="header-main"')[1].split(">")[1].split("</")[0]
+        except:
+            pass
+
+        try:
+            # Get the parent family image url if we can
+            test_cont = contents
+            if not "wikichip_ogimage" in test_cont: # No icon, get the family if possible
+                family_url = "https://en.wikichip.org"+contents.split('<span class="subpages"')[1].split("</span")[0].split('<a href="')[-1].split('"')[0]
+                test_cont = await DL.async_text(family_url)
+            # Try to get any available icon url from the srcset
+            data["Thumbnail"] = "https://en.wikichip.org"+test_cont.split("wikichip_ogimage")[0].split('src="')[-1].split('"')[0]
         except:
             pass
 
