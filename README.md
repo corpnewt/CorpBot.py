@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -110,6 +110,11 @@ A list of cogs, commands, and descriptions:
 	  $xprole 
 	   └─ Lists the required role to give xp, gamble, or feed the bot.
 
+## AmdArk
+####	AmdArk Cog (1 command) - AmdArk.py Extension:
+	  $amdark [text] (AKA: iamd, aark)
+	   └─ Searches AMD's site for CPU info.
+
 ## Ascii
 ####	Ascii Cog (1 command) - Ascii.py Extension:
 	  $ascii [text]
@@ -165,9 +170,11 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the watching status of the bot (owner-only).
 
 ## BotAdmin
-####	BotAdmin Cog (7 commands) - BotAdmin.py Extension:
+####	BotAdmin Cog (10 commands) - BotAdmin.py Extension:
 	  $ban [members] [reason]
 	   └─ Bans the passed members for the specified reason.
+	  $banned [user_id]
+	   └─ Queries the guild's ban list for the passed user id and responds with whether...
 	  $ignore [member]
 	   └─ Adds a member to the bot's "ignore" list (bot-admin only).
 	  $ignored 
@@ -176,10 +183,14 @@ A list of cogs, commands, and descriptions:
 	   └─ Kicks the passed members for the specified reason.
 	  $listen [member]
 	   └─ Removes a member from the bot's "ignore" list (bot-admin only).
+	  $rembanmessages [number_of_days]
+	   └─ Gets or sets the default number of days worth of messages to remove when bann...
 	  $removeinvitelinks [yes_no]
 	   └─ Enables/Disables auto-deleting discord invite links in chat (bot-admin only).
 	  $setuserparts [member] [parts]
 	   └─ Set another user's parts list (owner only).
+	  $unban [members] [reason]
+	   └─ Unbans the passed members for the specified reason.
 
 ## CAH
 ####	CAH Cog (17 commands) - CAH.py Extension:
@@ -484,7 +495,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Speaking German... probably...
 	  $holy [subject]
 	   └─ Time to backup the Batman!
-	  $meme [template_id] [text_zero] [text_one]
+	  $meme [template_id] [box_text...]
 	   └─ Generate Memes!  You can get a list of meme templates with the memetemps comm...
 	  $memetemps 
 	   └─ Get Meme Templates
@@ -651,25 +662,33 @@ A list of cogs, commands, and descriptions:
 	   └─ List all tag in the tag list.
 
 ## Lockdown
-####	Lockdown Cog (10 commands) - Lockdown.py Extension:
+####	Lockdown Cog (14 commands) - Lockdown.py Extension:
 	  $addlock [channel_list]
 	   └─ Adds the passed space-delimited list of channels and categories to the lockdo...
 	  $addlockall 
 	   └─ Adds all channels and categories to the lockdown list (bot-admin only).
+	  $addnamefilter [action] [regex]
+	   └─ Adds a new action (kick|ban|mute) and regex name filter (bot-admin only).
 	  $antiraid [on_off] [join_number] [join_seconds] [kick_ban_mute] [cooldown_minutes]
 	   └─ Sets up the anti-raid module (bot-admin only).
 	  $antiraidping [user_or_role] [channel]
 	   └─ Sets up what user or role to ping and in what channel when anti-raid is activ...
+	  $clearnamefilters 
+	   └─ Removes all name filters (bot-admin only).
 	  $listlock 
 	   └─ Lists the channels and categories configured for lockdown (bot-admin only).
 	  $listlockall 
 	   └─ Lists all channels and categories and their lockdown/sync status (bot-admin o...
 	  $lockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and revoke the send_message...
+	  $namefilters 
+	   └─ Lists the name filters and their actions (bot-admin only).
 	  $remlock [channel_list]
 	   └─ Removes the passed space-delimited list of channels and categories from the l...
 	  $remlockall 
 	   └─ Removes all channels and categories from the lockdown list (bot-admin only).
+	  $remnamefilter [name_filter_number]
+	   └─ Removes the passed name filter (bot-admin only).
 	  $unlockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and clear the send_message,...
 
@@ -755,7 +774,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Changes the player's volume (0-150%).
 
 ## Mute
-####	Mute Cog (8 commands) - Mute.py Extension:
+####	Mute Cog (9 commands) - Mute.py Extension:
 	  $createmuterole [role_name]
 	   └─ Sets the target role to apply when muting (bot-admin only).
 	  $desyncmuterole 
@@ -764,6 +783,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Says whether a member is muted in chat.
 	  $mute [member] [cooldown]
 	   └─ Prevents a member from sending messages in chat or speaking in voice (bot-adm...
+	  $muteautodelete [yes_no]
+	   └─ Enables/Disables auto-delete of any messages that slip by from muted users (b...
 	  $muterole 
 	   └─ Lists the target role to apply when muting (bot-admin only).
 	  $setmuterole [role]
@@ -924,15 +945,27 @@ A list of cogs, commands, and descriptions:
 	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
 
 ## Responses
-####	Responses Cog (4 commands) - Responses.py Extension:
+####	Responses Cog (10 commands) - Responses.py Extension:
 	  $addresponse [regex_trigger] [response]
-	   └─ Adds a new response for the regex trigger.  If the trigger has spaces, it mus...
+	   └─ Adds a new response for the regex trigger - or updates the response if the tr...
+	  $chkresponse [check_string]
+	   └─ Reports a breakdown of the first match (if any) in the responses for the pass...
 	  $clearresponses 
 	   └─ Removes all response triggers (bot-admin only).
+	  $editresponse [response_index] [response]
+	   └─ Edits the response for the passed index.  The response passed here does not r...
+	  $edittrigger [response_index] [regex_trigger]
+	   └─ Edits the regex trigger for the passed index.  The triggers passed here do no...
+	  $mvresponse [response_index] [target_index]
+	   └─ Moves the passed response index to the target index (bot-admin only).
 	  $remresponse [regex_trigger_number]
 	   └─ Removes the passed response trigger (bot-admin only).
 	  $responses 
 	   └─ Lists the response triggers and their responses (bot-admin only).
+	  $viewresponse [response_index]
+	   └─ Displays the response in full which corresponds to the target index (bot-admi...
+	  $viewtrigger [response_index]
+	   └─ Displays the regex trigger in full which corresponds to the target index (bot...
 
 ## Search
 ####	Search Cog (8 commands) - Search.py Extension:
@@ -1071,7 +1104,7 @@ A list of cogs, commands, and descriptions:
 ####	Stream Cog (8 commands) - Stream.py Extension:
 	  $addstreamer [member]
 	   └─ Adds the passed member to the streamer list (bot-admin only).
-	  $rawstream [message]
+	  $rawstream 
 	   └─ Displays the raw markdown for the stream announcement message (bot-admin only).
 	  $remstreamer [member]
 	   └─ Removes the passed member from the streamer list (bot-admin only).
@@ -1083,7 +1116,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Displays the channel for the stream announcements - if any.
 	  $streamers 
 	   └─ Lists the current members in the streamer list.
-	  $teststream [message]
+	  $teststream 
 	   └─ Tests the stream announcement message (bot-admin only).
 
 ## Strike
@@ -1316,14 +1349,14 @@ A list of cogs, commands, and descriptions:
 
 ## Xp
 ####	Xp Cog (11 commands) - Xp.py Extension:
-	  $bottomxp [total=10]
-	   └─ List the bottom xp-holders (max of 50).
+	  $bottomxp 
+	   └─ List the bottom xp-holders.
 	  $defaultrole 
 	   └─ Lists the default role that new users are assigned.
 	  $gamble [bet]
 	   └─ Gamble your xp reserves for a chance at winning xp!
-	  $leaderboard [total=10]
-	   └─ List the top xp-holders (max of 50).
+	  $leaderboard 
+	   └─ List the top xp-holders.
 	  $listxproles 
 	   └─ Lists all roles, id's, and xp requirements for the xp promotion/demotion system.
 	  $rank [member]
