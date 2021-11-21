@@ -64,7 +64,8 @@ class NvidiaArk(commands.Cog):
                 title="Multiple Matches Returned For `{}`:".format(
                     text.replace("`", "").replace("\\", "")
                 ),
-                list=[x.get("name", "UNDETERMINABLE") for x in self.prettify(response)],
+                list=[x.get("name", "UNDETERMINABLE")
+                      for x in self.prettify(response)],
                 ctx=ctx,
             ).pick()
 
@@ -133,7 +134,8 @@ class NvidiaArk(commands.Cog):
                         data.append({"name": temp_name, "url": url})
                         temp_name = ""
 
-                    url = BASE_URL + lines[line_index].split('href="')[1].split('">')[0]
+                    url = BASE_URL + \
+                        lines[line_index].split('href="')[1].split('">')[0]
                     temp_name = name
 
                 if "nvidia-" in line.lower():
@@ -195,7 +197,8 @@ class NvidiaArk(commands.Cog):
 
                 try:
                     if "<dt>" in lines[line_index + 1].strip():
-                        title = lines[line_index + 1].split(">")[1].split("<")[0]
+                        title = lines[line_index +
+                                      1].split(">")[1].split("<")[0]
                         value = (
                             lines[line_index + 3].strip()
                             if "<dd >" in lines[line_index + 2].strip()
@@ -204,9 +207,11 @@ class NvidiaArk(commands.Cog):
                         )
 
                         if '<a href="' in value.lower():
-                            value_url = value.split('href="')[1].split('"')[0].strip()
+                            value_url = value.split(
+                                'href="')[1].split('"')[0].strip()
                             value = (
-                                value.split('<a href="{}">'.format(value_url))[1]
+                                value.split(
+                                    '<a href="{}">'.format(value_url))[1]
                                 .split("</a>")[0]
                                 .strip()
                             )
@@ -217,7 +222,8 @@ class NvidiaArk(commands.Cog):
                             value = value.split("<")[0].strip()
 
                     elif '<dl class="clearfix">' in lines[line_index + 1].strip():
-                        title = lines[line_index + 2].split(">")[1].split("<")[0]
+                        title = lines[line_index +
+                                      2].split(">")[1].split("<")[0]
                         value = (
                             lines[line_index + 4].strip()
                             if "<dd >" in lines[line_index + 3].strip()
@@ -226,9 +232,11 @@ class NvidiaArk(commands.Cog):
                         )
 
                         if '<a href="' in value.lower():
-                            value_url = value.split('href="')[1].split('"')[0].strip()
+                            value_url = value.split(
+                                'href="')[1].split('"')[0].strip()
                             value = (
-                                value.split('<a href="{}">'.format(value_url))[1]
+                                value.split(
+                                    '<a href="{}">'.format(value_url))[1]
                                 .split("</a>")[0]
                                 .strip()
                             )
@@ -263,23 +271,26 @@ class NvidiaArk(commands.Cog):
         return data
 
     def prettify(self, items):
-        longest = 0
-
-        for i in range(len(items)):
-            # GeForce 940M (GM107) -> { 2GB, DDR3, 64 bit }
-            #
-            #   => [ 'Geforce 940M', 'GM107) -> { 2GB, DDR3, 64 bit }' ]
-            #
-            item = items[i].get("name", "").split(" (")[0]
-
-            if len(item) > longest:
-                longest = len(item)
+        # Extracts the longest item from a filtered list.
+        #
+        # FILTERING:
+        # For each item, we do the following:
+        #
+        #     GeForce 940M (GM107) -> { 2GB, DDR3, 64 bit }   <-- split by ' (' here
+        #
+        #           => [ 'GeForce 940M', 'GM107) -> { 2GB, DDR3, 64 bit }
+        #       [0] -> [ 'GeForce 940M']
+        #       ^ index after splitting on ' ('
+        #
+        # We are essentially mapping each item by
+        # capturing what comes before `(GM107)`
+        longest = len(max([x.get("name", "").split(" (")[0]
+                      for x in items], key=len))
 
         for index in range(len(items)):
             try:
-                first = items[index].get("name", "").split(" (")[0]
-                second = items[index].get("name", "").split(" (")[1]
-            except IndexError:
+                first, second = items[index].get("name", "").split(" (")
+            except ValueError:
                 continue
 
             items[index]["name"] = "{0}{1}{2}".format(
@@ -289,23 +300,28 @@ class NvidiaArk(commands.Cog):
         return self._prettify_ram(items)
 
     def _prettify_ram(self, items):
-        longest = 0
-
-        for i in range(len(items)):
-            # GeForce 940M (GM107) -> { 2GB, DDR3, 64 bit }
-            #
-            #   => [ 'Geforce 940M (GM107) -> ', '2GB, DDR3, 64 bit' ]
-            #
-            item = items[i].get("name", "").split("{ ")[1].split(" }")[0]
-
-            if len(item) > longest:
-                longest = len(item)
+        # Extracts the longest item from a filtered list.
+        #
+        # FILTERING:
+        # For each item, we do the following:
+        #
+        #     GeForce 940M (GM107) -> { 2GB, DDR3, 64 bit }   <-- split by '{' here
+        #
+        #           => [ 'GeForce 940M (GM107) -> ', '2GB, DDR3, 64 bit }' ]
+        #       [1] -> [ '2GB, DDR3, 64 bit }'] <-- split by '}' here
+        #       [0] -> [ '2GB, DDR3, 64 bit' ]
+        #       ^ index after splitting on '}'
+        #
+        # We are essentially mapping each item by
+        # capturing what's inside of `{` and `}`
+        longest = len(max([x.get("name", "").split(
+            "{ ")[1].split(" }")[0] for x in items], key=len))
 
         for index in range(len(items)):
             try:
-                first = items[index].get("name", "").split("{ ")[0]
-                item = items[index].get("name", "").split("{ ")[1].split(" }")[0]
-            except IndexError:
+                first, item = [
+                    x.replace(" }", "") for x in items[index].get("name", "").split("{ ")]
+            except ValueError:
                 continue
 
             from math import floor, ceil
@@ -313,7 +329,6 @@ class NvidiaArk(commands.Cog):
             total = longest + 4
             N = len(" " * (ceil((total - len(item)) / 2)))
             J = len(" " * (floor((total - len(item)) / 2)))
-            M = (N * 2) + len(item)
 
             items[index]["name"] = "{0}{1}{2}{3}{4}{5}".format(
                 first, "{", " " * (N + 1), item, " " * (J + 1), "}"
