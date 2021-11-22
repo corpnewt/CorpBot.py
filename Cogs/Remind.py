@@ -115,8 +115,11 @@ class Remind(commands.Cog):
 						if not message:
 							message = 'You wanted me to remind you of something...'
 						msg = 'In *{}*, you wanted me to remind you:\n\n{}'.format(server, message)
-						await member.send(msg)
-						removeList.append(reminder)
+						try:
+							await member.send(msg)
+							removeList.append(reminder)
+						except: # Something went wrong - continue on
+							continue
 			if len(removeList):
 				# We have spent reminders
 				for reminder in removeList:
