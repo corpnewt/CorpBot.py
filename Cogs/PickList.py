@@ -102,6 +102,7 @@ class PagePicker(Picker):
         self.max_chars = 1 if self.max_chars < 1 else 2048 if self.max_chars > 2048 else self.max_chars
         self.reactions = ["⏪","◀","▶","⏩","🔢","🛑"] # These will always be in the same order
         self.url = kwargs.get("url",None) # The URL the title of the embed will link to
+        self.thumbnail = kwargs.get("thumbnail",None)
         self.footer = kwargs.get("footer","")
         self.description = kwargs.get("description", None)
         # Description-based args
@@ -171,6 +172,7 @@ class PagePicker(Picker):
         embed = {
             "title":self.title,
             "url":self.url,
+            "thumbnail": self.thumbnail,
             "description":self.description if self.list else self._get_page_contents(page),
             "color":self.ctx.author,
             "pm_after":25, # We can leave it a huge number for desc without issue - never pm automagically
