@@ -31,7 +31,10 @@ class NvidiaArk(commands.Cog):
 
         # Strip single quotes
         text = text.replace("'", "")
-        text = re.sub(r"(N|n)(V|v)(I|i)(D|d)(I|i)(A|a)", "", text)
+        text = re.sub(r"(?i)(nvidia)", "", text)
+
+        # Ensure we have a space between models and "ti"
+        text = " ".join([x[:-2]+" "+x[-2:] if len(x) > 4 and x[-2:].lower() == "ti" and x[:-2].isdigit() else x for x in text.split()])
 
         if not text:
             return await Message.EmbedText(**args).send(ctx)
