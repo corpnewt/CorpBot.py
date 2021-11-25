@@ -1,4 +1,3 @@
-import asyncio
 import discord
 import os
 import dis
@@ -358,35 +357,35 @@ class CogManager(commands.Cog):
 			await message.edit(content="{}/{} connected {} reloaded!".format(result[0], result[1], e_string))
 				
 	@commands.command(pass_context=True)
-	async def update(self, ctx):
-		"""Updates from git."""
+	async def update(self, ctx, reset=None):
+		"""Updates from git, pass "reset" or "-reset" to this command to first run "git reset --hard" (owner only)."""
 		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
-		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+		if isOwner == None: return await ctx.send("I have not been claimed, *yet*.")
+		elif isOwner == False: return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 		
 		# Let's find out if we *have* git first
-		if os.name == 'nt':
-			# Check for git
-			command = "where"
-		else:
-			command = "which"
+		command = "where" if os.name == "nt" else "which"
 		try:
 			p = subprocess.run(command + " git", shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
 			git_location = p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
 		except:
 			git_location = None
 			
-		if not git_location:
-			await ctx.send("It looks like my host environment doesn't have git in its path var :(")
-			return
+		if not git_location: return await ctx.send("It looks like my host environment doesn't have git in its path var :(")
+
+		# Check if we first reset
+		message = None
+		reset = reset is not None and "reset" in reset.lower()
+		if reset:
+			message = await Message.EmbedText(title="Resetting...", description="```\ngit reset --hard\n```", color=ctx.author).send(ctx)
+			try:
+				u = subprocess.Popen([git_location, "reset", "--hard"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				out, err = u.communicate()
+			except:
+				return await Message.EmbedText(title="Something went wrong!", description="Make sure you have `git` in your PATH var.", color=ctx.author).edit(ctx, message)
 		# Try to update
-		message = await Message.EmbedText(title="Updating...", description="git pull", color=ctx.author).send(ctx)
+		args = {"title":"Updating...","description":"```\ngit pull\n```","color":ctx.author}
+		message = await Message.EmbedText(**args).edit(ctx, message) if message else await Message.EmbedText(**args).send(ctx)
 		try:
 			u = subprocess.Popen([git_location, 'pull'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			out, err = u.communicate()
@@ -396,8 +395,7 @@ class CogManager(commands.Cog):
 			if len(err.decode("utf-8")):
 				msg += err.decode("utf-8").replace("`", "\`") + "\n"
 			msg += "```"
-			await Message.EmbedText(title="Update Results:", description=msg, color=ctx.author).edit(ctx, message)
+			await Message.EmbedText(title="{}Update Results:".format("Reset and " if reset else ""), description=msg, color=ctx.author).edit(ctx, message)
 		except:
-			await ctx.send("Something went wrong!  Make sure you have git installed and in your path var!")
-			return
+			await Message.EmbedText(title="Something went wrong!", description="Make sure you have `git` in your PATH var.", color=ctx.author).edit(ctx, message)
 		
