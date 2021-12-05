@@ -233,8 +233,8 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":"{} ({})".format(guild.name, guild.id),
-                    "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "name":"{}".format(guild.name),
+                    "value":"{:,} member{} ({})".format(len(guild.members),"" if len(guild.members)==1 else "s",guild.id),
                     "users":len(guild.members)
                 }
             )
@@ -247,8 +247,8 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":"{} ({})".format(guild.name, guild.id),
-                    "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "name":"{}".format(guild.name),
+                    "value":"{:,} member{} ({})".format(len(guild.members),"" if len(guild.members)==1 else "s",guild.id),
                     "users":len(guild.members)
                 }
             )
@@ -262,8 +262,8 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":"{} ({})".format(guild.name, guild.id),
-                    "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "name":"{}".format(guild.name),
+                    "value":"{:,} member{} ({})".format(len(guild.members),"" if len(guild.members)==1 else "s",guild.id),
                     "users":len(guild.members)
                 }
             )
@@ -383,8 +383,8 @@ class ServerStats(commands.Cog):
         for member in ctx.guild.members:
             our_list.append(
                 {
-                    "name":"{}#{} ({}{})".format(member.name,member.discriminator,"AKA: {} - ".format(member.nick) if member.nick else "",member.id),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),
+                    "name":"{}#{}".format(member.name,member.discriminator," (AKA: {})".format(member.nick) if member.nick else ""),
+                    "value":"{} UTC ({})".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown",member.id),
                     "date":member.joined_at
                 }
             )
@@ -398,8 +398,8 @@ class ServerStats(commands.Cog):
         for member in ctx.guild.members:
             our_list.append(
                 {
-                    "name":"{}#{} ({}{})".format(member.name,member.discriminator,"AKA: {} - ".format(member.nick) if member.nick else "",member.id),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),
+                    "name":"{}#{}".format(member.name,member.discriminator," (AKA: {})".format(member.nick) if member.nick else ""),
+                    "value":"{} UTC ({})".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown",member.id),
                     "date":member.joined_at
                 }
             )
@@ -415,8 +415,8 @@ class ServerStats(commands.Cog):
             bot = guild.me
             our_list.append(
                 {
-                    "name":"{} ({:,} member{} - {})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s", guild.id),
-                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
+                    "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "value":"{} UTC ({})".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown",guild.id),
                     "date":bot.joined_at
                 }
             )
@@ -432,8 +432,8 @@ class ServerStats(commands.Cog):
             bot = DisplayName.memberForID(self.bot.user.id, guild)
             our_list.append(
                 {
-                    "name":"{} ({:,} member{} - {})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s", guild.id),
-                    "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
+                    "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "value":"{} UTC ({})".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown",guild.id),
                     "date":bot.joined_at
                 }
             )
