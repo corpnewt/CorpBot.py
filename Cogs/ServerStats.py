@@ -200,13 +200,6 @@ class ServerStats(commands.Cog):
     @commands.command()
     async def sharedservers(self, ctx, *, member = None):
         """Lists how many servers you share with the bot."""
-
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
         if member == None:
             member = ctx.author
         
@@ -240,7 +233,7 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":guild.name,
+                    "name":"{} ({})".format(guild.name, guild.id),
                     "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
                     "users":len(guild.members)
                 }
@@ -254,7 +247,7 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":guild.name,
+                    "name":"{} ({})".format(guild.name, guild.id),
                     "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
                     "users":len(guild.members)
                 }
@@ -269,7 +262,7 @@ class ServerStats(commands.Cog):
         for guild in self.bot.guilds:
             our_list.append(
                 {
-                    "name":guild.name,
+                    "name":"{} ({})".format(guild.name, guild.id),
                     "value":"{:,} member{}".format(len(guild.members),"" if len(guild.members)==1 else "s"),
                     "users":len(guild.members)
                 }
@@ -318,12 +311,6 @@ class ServerStats(commands.Cog):
     @commands.command()
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""
-        # Check if we're suppressing @here and @everyone mentions
-        if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-            suppress = True
-        else:
-            suppress = False
-
         if member == None:
             member = ctx.author
         
@@ -396,8 +383,8 @@ class ServerStats(commands.Cog):
         for member in ctx.guild.members:
             our_list.append(
                 {
-                    "name":DisplayName.name(member),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
+                    "name":"{}#{} ({}{})".format(member.name,member.discriminator,"AKA: {} - ".format(member.nick) if member.nick else "",member.id),
+                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),
                     "date":member.joined_at
                 }
             )
@@ -408,12 +395,11 @@ class ServerStats(commands.Cog):
     async def recentjoins(self, ctx):
         """Lists the most recent users to join."""
         our_list = []
-        # offset = self.settings.getGlobalUserStat(ctx.author,"TimeZone",self.settings.getGlobalUserStat(ctx.author,"UTCOffset",None))
         for member in ctx.guild.members:
             our_list.append(
                 {
-                    "name":DisplayName.name(member),
-                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,member.joined_at,force=offset)["vanity"],
+                    "name":"{}#{} ({}{})".format(member.name,member.discriminator,"AKA: {} - ".format(member.nick) if member.nick else "",member.id),
+                    "value":"{} UTC".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown"),
                     "date":member.joined_at
                 }
             )
@@ -429,7 +415,7 @@ class ServerStats(commands.Cog):
             bot = guild.me
             our_list.append(
                 {
-                    "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "name":"{} ({:,} member{} - {})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s", guild.id),
                     "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
                     "date":bot.joined_at
                 }
@@ -446,7 +432,7 @@ class ServerStats(commands.Cog):
             bot = DisplayName.memberForID(self.bot.user.id, guild)
             our_list.append(
                 {
-                    "name":"{} ({} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "name":"{} ({:,} member{} - {})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s", guild.id),
                     "value":"{} UTC".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown"),#UserTime.getUserTime(ctx.author,self.settings,bot.joined_at,force=offset)["vanity"],
                     "date":bot.joined_at
                 }
