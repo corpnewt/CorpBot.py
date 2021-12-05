@@ -164,6 +164,8 @@ class BotAdmin(commands.Cog):
 		unable = []
 		reason = ""
 		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name == "ban" else None
+		try: days = int(days)
+		except: days = None
 		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name == "ban" else None
 		for index,item in enumerate(args):
 			if self.mention_re.search(item): # Check if it's a mention
