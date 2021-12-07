@@ -245,6 +245,15 @@ class Humor(commands.Cog):
 			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
 		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
 
+	async def _get_meme(self,chosenTemp,box_text):
+		url = "https://api.imgflip.com/caption_image"
+		payload = {'template_id': chosenTemp["id"], 'username':'CorpBot', 'password': 'pooter123'}
+		# Add the text to the payload
+		for i,x in enumerate(box_text):
+			payload["boxes[{}][text]".format(i)] = x.upper()
+		result_json = await DL.async_post_json(url, payload)
+		return result_json["data"]["url"]
+
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, template_id = None, *box_text):
 		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
@@ -256,27 +265,24 @@ class Humor(commands.Cog):
 			return await ctx.send(msg)
 
 		templates = await self.getTemps()
-		idMatch = FuzzySearch.search(template_id, templates, 'id', 1)
-		# Match by id first - and if that's not perfectly found, use name
-		chosenTemp = idMatch[0]["Item"] if idMatch[0]["Ratio"] == 1 else FuzzySearch.search(template_id, templates, 'name', 1)[0]["Item"]
+		# Check if the template_id is a valid int, and try to load that one
+		try:
+			int(template_id)
+			chosenTemp = {"id":template_id,"name":next((x["name"] for x in templates if x["id"] == template_id),template_id),"box_count":len(box_text)}
+			result = await self._get_meme(chosenTemp,box_text)
+		except:
+			idMatch = FuzzySearch.search(template_id, templates, 'id', 1)
+			# Match by id first - and if that's not perfectly found, use name
+			chosenTemp = idMatch[0]["Item"] if idMatch[0]["Ratio"] == 1 else FuzzySearch.search(template_id, templates, 'name', 1)[0]["Item"]
+			try: result = await self._get_meme(chosenTemp,box_text)
+			except: return await ctx.send("Something went wrong :(")
 		
-		if chosenTemp["box_count"] != len(box_text):
-			# Pad our box_text as needed with empty spaces
-			box_text = list(box_text) + [" "]*(chosenTemp["box_count"]-len(box_text))
-
-		url = "https://api.imgflip.com/caption_image"
-		payload = {'template_id': chosenTemp["id"], 'username':'CorpBot', 'password': 'pooter123'}
-		# Add the text to the payload
-		for i,x in enumerate(box_text):
-			payload["boxes[{}][text]".format(i)] = x.upper()
-		result_json = await DL.async_post_json(url, payload)
-		result = result_json["data"]["url"]
 		await Message.Embed(
 			url=result,
 			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
 			image=result,
 			color=ctx.author,
-			footer='Powered by imgflip.com - using template id {}: {}'.format(chosenTemp["id"],chosenTemp["name"])
+			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
 		).send(ctx)
 
 	async def getTemps(self):
