@@ -271,9 +271,8 @@ class Humor(commands.Cog):
 			chosenTemp = next((x for x in templates if x["id"] == template_id),{"id":template_id,"name":template_id,"box_count":len(box_text)})
 			result = await self._get_meme(chosenTemp,box_text)
 		except:
-			idMatch = FuzzySearch.search(template_id, templates, 'id', 1)
-			# Match by id first - and if that's not perfectly found, use name
-			chosenTemp = idMatch[0]["Item"] if idMatch[0]["Ratio"] == 1 else FuzzySearch.search(template_id, templates, 'name', 1)[0]["Item"]
+			# Fuzzy match by name
+			chosenTemp = FuzzySearch.search(template_id, templates,"name",1)[0]["Item"]
 			try: result = await self._get_meme(chosenTemp,box_text)
 			except: return await ctx.send("Something went wrong :(")
 		
