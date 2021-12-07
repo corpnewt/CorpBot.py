@@ -267,7 +267,7 @@ class Humor(commands.Cog):
 		templates = await self.getTemps()
 		# Check if the template_id is a valid int, and try to load that one
 		try:
-			int(template_id)
+			template_id = str(int(template_id))
 			chosenTemp = next((x for x in templates if x["id"] == template_id),{"id":template_id,"name":template_id,"box_count":len(box_text)})
 			result = await self._get_meme(chosenTemp,box_text)
 		except:
