@@ -1,7 +1,7 @@
 import asyncio, discord, random, json, time, os, PIL, textwrap
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName
+from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -107,26 +107,15 @@ class Humor(commands.Cog):
 	@commands.command(pass_context=True)
 	async def zalgo(self, ctx, *, message = None):
 		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
-		if message == None:
-			await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))
-			return
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
+		if message == None: return await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))		
 		words = message.split()
 		try:
 			iterations = int(words[len(words)-1])
 			words = words[:-1]
 		except Exception:
 			iterations = 1
-			
-		if iterations > 100:
-			iterations = 100
-		if iterations < 1:
-			iterations = 1
+
+		iterations = 100 if iterations > 100 else 1 if iterations < 1 else iterations
 			
 		zalgo = " ".join(words)
 		for i in range(iterations):
@@ -136,10 +125,8 @@ class Humor(commands.Cog):
 		
 		zalgo = zalgo[:2000]
 
-		# Check for suppress
 		zalgo = Utils.suppressed(ctx,zalgo)
 		await Message.Message(message=zalgo).send(ctx)
-		#await ctx.send(zalgo)
 		
 	def _zalgo(self, text):
 		words = text.split()
@@ -153,34 +140,13 @@ class Humor(commands.Cog):
 	async def holy(self, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
 		
-		if subject == None:
-			await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
-			return
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		matchList = []
-		for a in self.adj:
-			if a[:1].lower() == subject[:1].lower():
-				matchList.append(a)
-		
-		if not len(matchList):
-			# Nothing in there - get random entry
-			# msg = "*Whoah there!* That was *too* holy for Robin!"
-			word = random.choice(self.adj)
-			word = word.strip().capitalize()
-			subject = subject.strip().capitalize()
-			msg = "*Holy {} {}, Batman!*".format(word, subject)
-		else:
-			# Get a random one
-			word = random.choice(matchList)
-			word = word.strip().capitalize()
-			subject = subject.strip().capitalize()
-			msg = "*Holy {} {}, Batman!*".format(word, subject)
+		if subject == None: return await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+
+		matchList = [a for a in self.adj if a[0].lower() == subject[0].lower()]
+		word = random.choice(matchList if len(matchList) else self.adj)
+		word = word.strip().capitalize()
+		subject = subject.strip().capitalize()
+		msg = "*Holy {} {}, Batman!*".format(word, subject)
 		
 		msg = Utils.suppressed(ctx,msg)
 		await ctx.send(msg)
@@ -189,20 +155,16 @@ class Humor(commands.Cog):
 	async def fart(self, ctx):
 		"""PrincessZoey :P"""
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
-		randnum = random.randint(0, len(fartList)-1)
-		msg = '{}'.format(fartList[randnum])
-		await ctx.send(msg)
+		await ctx.send(random.choice(fartList))
 		
 	@commands.command(pass_context=True)
 	async def french(self, ctx):
 		"""Speaking French... probably..."""
 		fr_list = [ "hon", "fromage", "baguette" ]
 		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
-		fr_sentence = []
-		for i in range(random.randint(3, 20)):
-			fr_sentence.append(random.choice(fr_list))
+		fr_sentence = [random.choice(fr_list) for i in range(random.randint(3,20))]
 		# Capitalize the first letter of the first word
-		fr_sentence[0] = fr_sentence[0][:1].upper() + fr_sentence[0][1:]
+		fr_sentence[0] = fr_sentence[0].capitalize()
 		totally_french = " ".join(fr_sentence) + random.choice(punct)
 		await ctx.send(totally_french)
 
@@ -211,14 +173,12 @@ class Humor(commands.Cog):
 		"""Speaking German... probably..."""
 		de_list = [ "BIER", "sauerkraut", "auto", "weißwurst", "KRANKENWAGEN" ]
 		punct   = [ ".", "!", "?", "...", "!!!", "?!" ]
-		de_sentence = []
-		for i in range(random.randint(3, 20)):
-			de_sentence.append(random.choice(de_list))
+		de_sentence = [random.choice(de_list) for i in range(random.randint(3,20))]
 		if random.randint(0,1):
 			# Toss "rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz" in there somewhere
 			de_sentence[random.randint(0,len(de_sentence)-1)] = "rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz"
 		# Capitalize the first letter of the first word
-		de_sentence[0] = de_sentence[0][:1].upper() + de_sentence[0][1:]
+		de_sentence[0] = de_sentence[0].capitalize()
 		totally_german = " ".join(de_sentence) + random.choice(punct)
 		await ctx.send(totally_german)
 
@@ -242,8 +202,8 @@ class Humor(commands.Cog):
 		templates = result_json["data"]["memes"]		
 		fields = []
 		for template in templates:
-			fields.append({ "name" : template["name"], "value" : "`" + str(template["id"]) + "`", "inline" : False })
-		await Message.Embed(title="Meme Templates", fields=fields).send(ctx)
+			fields.append({ "name" : template["name"], "value" : "`{}` [Link]({})".format(template["id"],"https://imgflip.com/memegenerator/{}".format(template["id"])) })
+		await PickList.PagePicker(title="Meme Templates",color=ctx.author,list=fields,ctx=ctx).pick()
 
 	async def _get_meme(self,chosenTemp,box_text):
 		url = "https://api.imgflip.com/caption_image"
