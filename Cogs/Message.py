@@ -244,9 +244,9 @@ class Embed:
         em.url = self.url
         em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
-            em.set_image(url=self.image)
+            em.set_image(url=self.image.get("url") if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
-            em.set_thumbnail(url=self.thumbnail)
+            em.set_thumbnail(url=self.thumbnail.get("url") if isinstance(self.thumbnail,dict) else self.thumbnail)
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
