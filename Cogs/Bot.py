@@ -378,7 +378,7 @@ class Bot(commands.Cog):
 				if not isinstance(embed_dict["color"],int) or not 0<=embed_dict["color"]<=16777215:
 					# let's try to resolve it to a user
 					embed_dict["color"] = DisplayName.memberForName(str(embed_dict["color"]),ctx.guild)
-			if embed_dict.get("author"):
+			if embed_dict.get("author") and not isinstance(embed_dict["author"],dict):
 				# Again - got *something* for the author - try to resolve it
 				embed_dict["author"] = DisplayName.memberForName(str(embed_dict["author"]),ctx.guild)
 		except Exception as e:
