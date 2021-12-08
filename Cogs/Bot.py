@@ -1,4 +1,4 @@
-import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct
+import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct, shutil, tempfile
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, ProgressBar, UserTime, Message, DL
@@ -295,8 +295,11 @@ class Bot(commands.Cog):
 		GetImage.remove(file_path)
 
 	@commands.command(pass_context=True)
-	async def embed(self, ctx, *, embed = None):
+	async def embed(self, ctx, *, embed_json = None):
 		"""Builds an embed using json formatting.
+		Accepts json passed directly to the command, or an attachment/url pointing to a json file.
+		
+		Note:  More complex json embeds dumped using the embedjson command may require edits to wrok.
 
 		Types:
 		
@@ -329,8 +332,8 @@ class Bot(commands.Cog):
 		image       (str)
 		footer      (str or dict { text, icon_url })
 		thumbnail   (str)
-		author      (str, dict, or User/Member)
-		color       (user/member)
+		author      (str, dict, or user/member)
+		color       (user/member, rgb array, int)
 
 		----------------------------------
 
@@ -347,11 +350,37 @@ class Bot(commands.Cog):
 		max_pages    (int)
 		"""
 
-		if embed == None:
-			return await ctx.send("Usage: `{}embed [type] [embed json]`".format(ctx.prefix))
-		embed_type = embed.split()[0].lower() if embed.split()[0].lower() in ["field","text"] else "field"
+		if embed_json is None and not len(ctx.message.attachments):
+			return await ctx.send("Usage: `{}embed [type] [embed_json]`".format(ctx.prefix))
+		
+		embed_json = "field" if embed_json is None else embed_json # Ensure it's a string
+		embed_type = embed_json.split()[0].lower() if embed_json.split()[0].lower() in ["field","text"] else "field"
+
+		# Check for attachments - and try to load/serialize the first
+		if len(ctx.message.attachments):
+			try: embed_json = await DL.async_text(ctx.message.attachments[0].url)
+			except: return await Message.EmbedText(title="Something went wrong...", description="Could not download that url.").send(ctx)
+		else:
+			if embed_json.lower().startswith(embed_type):
+				# We passed the type, strip it.  We only consider this
+				# info if we don't have an attachment
+				embed_json = embed_json[len(embed_type):].strip()
+			if Utils.url_regex.match(embed_json):
+				# It's a URL - let's try to download it
+				try: embed_json = await DL.async_text(embed_json)
+				except: return await Message.EmbedText(title="Something went wrong...", description="Could not download that url.").send(ctx)
+		# Let's attempt to serialize the json
 		try:
-			embed_dict = json.loads(embed)
+			embed_dict = json.loads(embed_json)
+			# Let's parse the author and color
+			if embed_dict.get("color") and not isinstance(embed_dict["color"],list):
+				# We got *something* for the color - let's first check if it's an int between 0 and 16777215
+				if not isinstance(embed_dict["color"],int) or not 0<=embed_dict["color"]<=16777215:
+					# let's try to resolve it to a user
+					embed_dict["color"] = DisplayName.memberForName(str(embed_dict["color"]),ctx.guild)
+			if embed_dict.get("author"):
+				# Again - got *something* for the author - try to resolve it
+				embed_dict["author"] = DisplayName.memberForName(str(embed_dict["author"]),ctx.guild)
 		except Exception as e:
 			return await Message.EmbedText(title="Something went wrong...", description=str(e)).send(ctx)
 		
@@ -378,6 +407,34 @@ class Bot(commands.Cog):
 			except:
 				e = "An error occurred :("
 			await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
+
+	@commands.command()
+	async def embedjson(self, ctx, message_url = None):
+		"""Gets any embeds for the passed message url and uploads their data as json files."""
+		if message_url is None: return await ctx.send("Usage: `{}embedjson [message_url]`".format(ctx.prefix))
+		# We are setting a message - let's split the url and get the last 2 integers - then save them.
+		parts = [x for x in message_url.replace("/"," ").split() if len(x)]
+		try: channel_id,message_id = [int(x) for x in parts[-2:]]
+		except: return await ctx.send("Improperly formatted message url!")
+		# Let's actually get the channel+message and ensure it exists
+		channel = ctx.guild.get_channel(channel_id)
+		if not channel: return await ctx.send("I couldn't find the channel connected to that id.")
+		try: message = await channel.fetch_message(message_id)
+		except: return await ctx.send("I couldn't find the message connected to that id.")
+		if not len(message.embeds): return await ctx.send("There are not embeds attached to that message.")
+		# At this point - we should have the embeds - let's iterate them, and upload them
+		# as json files
+		tmp = tempfile.mkdtemp()
+		for index,embed in enumerate(message.embeds):
+			name = "{}-{}-{}.json".format(channel_id,message_id,index)
+			fp = os.path.join(tmp,name)
+			m_dict = embed.to_dict()
+			try:
+				json.dump(m_dict,open(fp,"w"),indent=2)
+				await ctx.send(file=discord.File(fp=fp))
+			except Exception as e:
+				pass
+		shutil.rmtree(tmp,ignore_errors=True)
 
 	@commands.command(pass_context=True)
 	async def speedtest(self, ctx):
