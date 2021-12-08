@@ -227,6 +227,11 @@ class Embed:
             self.color = self.color.color
         elif isinstance(self.color,discord.User):
             self.color = None
+        elif isinstance(self.color,int):
+            try:
+                self.color = discord.Color(value=self.color)
+            except:
+                self.color = None
         elif isinstance(self.color,(tuple,list)):
             try:
                 self.color = discord.Color.from_rgb(*[int(a) for a in self.color])
@@ -282,8 +287,9 @@ class Embed:
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
-        # check if we can steal the color from the message
-        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
+        # check if we can steal the color from the message - but only if using a User color in dm,
+        # or if the color is set to None and the message we're editing has an embed
+        if (self.color is None or isinstance(self.color,discord.User)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
@@ -303,7 +309,6 @@ class Embed:
                 icon_url=footer_icon
             )
             # Get the file if one exists
-            send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
                 await message.delete()
@@ -401,8 +406,9 @@ class EmbedText(Embed):
 
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
-        # check if we can steal the color from the message
-        if not isinstance(self.color,(discord.Member,discord.Color)) and len(message.embeds):
+        # check if we can steal the color from the message - but only if using a User color in dm,
+        # or if the color is set to None and the message we're editing has an embed
+        if (self.color is None or isinstance(self.color,discord.User)) and len(message.embeds):
             self.color = message.embeds[0].color
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
@@ -425,7 +431,6 @@ class EmbedText(Embed):
                 icon_url=footer_icon
             )
             # Get the file if one exists
-            send_file = None
             if self.file:
                 m = await self._send_embed(ctx, em, to_pm, self.file)
                 await message.delete()
