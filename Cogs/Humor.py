@@ -209,7 +209,7 @@ class Humor(commands.Cog):
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp["id"], 'username':'CorpBot', 'password': 'pooter123'}
 		# Add the text to the payload
-		for i,x in enumerate(box_text):
+		for i,x in enumerate(box_text[:chosenTemp["box_count"]]):
 			payload["boxes[{}][text]".format(i)] = x.upper()
 		result_json = await DL.async_post_json(url, payload)
 		return result_json["data"]["url"]
