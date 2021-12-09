@@ -299,7 +299,9 @@ class Bot(commands.Cog):
 		"""Builds an embed using json formatting.
 		Accepts json passed directly to the command, or an attachment/url pointing to a json file.
 		
-		Note:  More complex json embeds dumped using the getembed command may require edits to wrok.
+		Note:  More complex json embeds dumped using the getembed command may require edits to work.
+
+		Admins/bot-admins can pass -nodm before the json content to prevent the bot from dming on long messages.
 
 		Types:
 		
@@ -351,20 +353,26 @@ class Bot(commands.Cog):
 		"""
 
 		if embed_json is None and not len(ctx.message.attachments):
-			return await ctx.send("Usage: `{}embed [type] [embed_json]`".format(ctx.prefix))
+			return await ctx.send("Usage: `{}embed [-nodm] [type] [embed_json]`".format(ctx.prefix))
 		
-		embed_json = "field" if embed_json is None else embed_json # Ensure it's a string
-		embed_type = embed_json.split()[0].lower() if embed_json.split()[0].lower() in ["field","text"] else "field"
+		# embed_json = "field" if embed_json is None else embed_json # Ensure it's a string
+		# embed_type = embed_json.split()[0].lower() if embed_json.split()[0].lower() in ["field","text"] else "field"
+
+		if embed_json is None: embed_json = ""
+
+		embed_type = next((x for x in ("field","text") if x in embed_json.lower().split()[:2]),None)
+		no_dm      = "-nodm" in embed_json.lower().split()[:2]
 
 		# Check for attachments - and try to load/serialize the first
 		if len(ctx.message.attachments):
 			try: embed_json = await DL.async_text(ctx.message.attachments[0].url)
 			except: return await Message.EmbedText(title="Something went wrong...", description="Could not download that url.").send(ctx)
 		else:
-			if embed_json.lower().startswith(embed_type):
-				# We passed the type, strip it.  We only consider this
-				# info if we don't have an attachment
-				embed_json = embed_json[len(embed_type):].strip()
+			# Strip out the embed_type and no_dm if found
+			if embed_type: # It's not None, assume we set it
+				embed_json = re.sub("(?i){}".format(embed_type),"",embed_json,count=1).strip()
+			if no_dm: # Same as above
+				embed_json = re.sub("(?i)-nodm","",embed_json,count=1).strip()
 			if Utils.url_regex.match(embed_json):
 				# It's a URL - let's try to download it
 				try: embed_json = await DL.async_text(embed_json)
@@ -394,8 +402,10 @@ class Bot(commands.Cog):
 			embed_dict["foot_max"] = 2048
 			embed_dict["auth_max"] = 256
 			embed_dict["total_max"] = 6000
+		if no_dm and Utils.is_bot_admin(ctx):
+			embed_dict["pm_after"] = -1
 		try:
-			if embed_type.lower() == "field":
+			if embed_type is None or embed_type.lower() == "field":
 				await Message.Embed(**embed_dict).send(ctx)
 			elif embed_type.lower() == "text":
 				await Message.EmbedText(**embed_dict).send(ctx)
