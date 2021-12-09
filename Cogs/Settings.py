@@ -427,13 +427,7 @@ class Settings(commands.Cog):
 						self.loop_list.append(self.bot.loop.create_task(self.giveRole(member, server)))
 
 	async def giveRole(self, member, server):
-		# Let the api settle
-		# Add 2 second delay to hopefully prevent the api from hating us :(
-		# await asyncio.sleep(2)
-		# Pls no hate
-		
 		# Start the countdown
-		task = asyncio.Task.current_task()
 		verifiedAt  = self.getUserStat(member, server, "VerificationTime")
 		try:
 			verifiedAt = int(verifiedAt)
