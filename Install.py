@@ -171,7 +171,7 @@ if __name__ == '__main__':
         {"name":"numpy"},
         {"name":"pymongo"},
         {"name":"igdb_api_python"},
-        {"name":"redis"},
+        {"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3"},
         {"name":"geopy"}
     ]
     item = 0
