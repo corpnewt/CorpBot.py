@@ -299,7 +299,7 @@ class Bot(commands.Cog):
 		"""Builds an embed using json formatting.
 		Accepts json passed directly to the command, or an attachment/url pointing to a json file.
 		
-		Note:  More complex json embeds dumped using the embedjson command may require edits to wrok.
+		Note:  More complex json embeds dumped using the getembed command may require edits to wrok.
 
 		Types:
 		
@@ -409,9 +409,9 @@ class Bot(commands.Cog):
 			await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
 
 	@commands.command()
-	async def embedjson(self, ctx, message_url = None):
+	async def getembed(self, ctx, message_url = None):
 		"""Gets any embeds for the passed message url and uploads their data as json files."""
-		if message_url is None: return await ctx.send("Usage: `{}embedjson [message_url]`".format(ctx.prefix))
+		if message_url is None: return await ctx.send("Usage: `{}getembed [message_url]`".format(ctx.prefix))
 		# We are setting a message - let's split the url and get the last 2 integers - then save them.
 		parts = [x for x in message_url.replace("/"," ").split() if len(x)]
 		try: channel_id,message_id = [int(x) for x in parts[-2:]]
