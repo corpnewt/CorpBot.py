@@ -579,7 +579,13 @@ class Bot(commands.Cog):
 		await ctx.invoke(self.settings.flush)
 		await ctx.send("Rebooting...")
 		# Logout, stop the event loop, close the loop, quit
-		for task in asyncio.Task.all_tasks():
+		try:
+			task_list = asyncio.Task.all_tasks()
+		except AttributeError:
+			try: task_list = asyncio.all_tasks()
+			except: task_list = [] # wut
+
+		for task in task_list:
 			try:
 				task.cancel()
 			except:
@@ -601,7 +607,13 @@ class Bot(commands.Cog):
 		await ctx.invoke(self.settings.flush)
 		await ctx.send("Shutting down...")
 		# Logout, stop the event loop, close the loop, quit
-		for task in asyncio.Task.all_tasks():
+		try:
+			task_list = asyncio.Task.all_tasks()
+		except AttributeError:
+			try: task_list = asyncio.all_tasks()
+			except: task_list = [] # wut
+
+		for task in task_list:
 			try:
 				task.cancel()
 			except:
