@@ -174,7 +174,7 @@ class PandorasDB:
         # Get the original user data or an empty dict if it doesn't exist
         mem = self.get_hash_redis("globalmember",user,{})
         # Remove if exist
-        d = mem.pop(value,None)
+        d = mem.pop(stat,None)
         # Save the result
         self.set_hash_redis("globalmember",user,mem)
         # Return the popped key - just in case
