@@ -326,17 +326,17 @@ class Bot(commands.Cog):
 		
 		Options     (All):
 
-		pm_after    (int - fields, or pages - admin/bot-admin only)
+		pm_after    (int - fields, or pages - hard limit of 3 messages)
 		pm_react    (str)
 		title       (str)
 		page_count  (bool)
 		url         (str)
 		description (str)
-		image       (str)
+		image       (str or dict { url })
 		footer      (str or dict { text, icon_url })
-		thumbnail   (str)
-		author      (str, dict, or user/member)
-		color       (user/member, rgb array, int)
+		thumbnail   (str or dict { url })
+		author      (str, dict { name, url, icon_url }, or user/member)
+		color       (user/member, rgb int array, int)
 
 		----------------------------------
 
@@ -410,12 +410,12 @@ class Bot(commands.Cog):
 			embed_dict.pop("pm_after",None)
 		try:
 			if embed_type is None or embed_type.lower() == "field":
-				if not Utils.is_bot_admin(ctx): # Not (bot-)admin, limit fields to 75 max
-					embed_dict["fields"] = embed_dict.get("fields",[])[:75]
+				# Hard limit of 3 messages
+				embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*3]
 				await Message.Embed(**embed_dict).send(ctx)
 			elif embed_type.lower() == "text":
-				if not Utils.is_bot_admin(ctx): # Not (bot-)admin, limit fields to 75 max
-					embed_dict["description"] = embed_dict.get("description","")[:6144]
+				# Hard limit of 3 messages
+				embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*3]
 				await Message.EmbedText(**embed_dict).send(ctx)
 			else:
 				await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
