@@ -298,7 +298,6 @@ class Bot(commands.Cog):
 	async def embed(self, ctx, *, embed_json = None):
 		"""Builds an embed using json formatting.
 		Accepts json passed directly to the command, or an attachment/url pointing to a json file.
-		
 		Note:  More complex json embeds dumped using the getembed command may require edits to work.
 
 		Admins/bot-admins can pass -nodm before the json content to prevent the bot from dming on long messages.
@@ -321,11 +320,13 @@ class Bot(commands.Cog):
 		auth_max    (256)
 		total_max   (6000)
 
+		There is a non (bot-)admin limit of 3 pages per embed as well.
+
 		----------------------------------
 		
 		Options     (All):
 
-		pm_after    (int - fields, or pages)
+		pm_after    (int - fields, or pages - admin/bot-admin only)
 		pm_react    (str)
 		title       (str)
 		page_count  (bool)
@@ -404,10 +405,17 @@ class Bot(commands.Cog):
 			embed_dict["total_max"] = 6000
 		if no_dm and Utils.is_bot_admin(ctx):
 			embed_dict["pm_after"] = -1
+		else:
+			# We don't have perms to set this - remove it if it exists
+			embed_dict.pop("pm_after",None)
 		try:
 			if embed_type is None or embed_type.lower() == "field":
+				if not Utils.is_bot_admin(ctx): # Not (bot-)admin, limit fields to 75 max
+					embed_dict["fields"] = embed_dict.get("fields",[])[:75]
 				await Message.Embed(**embed_dict).send(ctx)
 			elif embed_type.lower() == "text":
+				if not Utils.is_bot_admin(ctx): # Not (bot-)admin, limit fields to 75 max
+					embed_dict["description"] = embed_dict.get("description","")[:6144]
 				await Message.EmbedText(**embed_dict).send(ctx)
 			else:
 				await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
