@@ -286,7 +286,8 @@ class BotAdmin(commands.Cog):
 
 	@commands.command()
 	async def banned(self, ctx, *, user_id = None):
-		"""Queries the guild's ban list for the passed user id and responds with whether they've been banned and the reason (bot-admin only)."""
+		"""Queries the guild's ban list for the passed user id and responds with whether they've been banned and the reason.
+		Use with no user_id to show all bans and reasons (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
 		try: all_bans = await ctx.guild.bans()
@@ -308,7 +309,11 @@ class BotAdmin(commands.Cog):
 					fields=[entries[-1]], # Send the last found entry
 					color=ctx.author
 				).send(ctx)
-		return await PickList.PagePicker(title="Ban List ({:,} total)".format(len(entries)),description=None if user_id == None else "No match found for '{}'.".format(orig_user),list=entries,ctx=ctx).pick()
+		if orig_user is None:
+			# Just passed None - show the whole ban list
+			return await PickList.PagePicker(title="Ban List ({:,} total)".format(len(entries)),list=entries,ctx=ctx).pick()
+		# We searched for something and didn't find it
+		return await Message.Embed(title="Ban List ({:,} total)".format(len(entries)),description="No match found for '{}'.".format(orig_user),color=ctx.author).send(ctx)
 
 	@commands.command()
 	async def rembanmessages(self, ctx, number_of_days = None):
