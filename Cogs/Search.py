@@ -156,13 +156,23 @@ class Search(commands.Cog):
 		await ctx.channel.send(result_string)
 
 
+	async def _get_api_status(self):
+		try:
+			api_status_html = await DL.async_text("https://www.currencyconverterapi.com/server-status")
+			api_status = api_status_html.split("<td>Free API</td>")[-1].split(">")[1].split("<")[0]
+		except:
+			api_status = "UNKNOWN"
+		return api_status
+
 	@commands.command(pass_context=True)
 	async def convert(self, ctx, *, amount = None, frm = None, to = None):
 		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
 		
 		# Get the list of currencies
 		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
-		except: return await ctx.send("Something went wrong!  The API I use may be down :(")
+		except:
+			api_status = await self._get_api_status()
+			return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
 		
 		if amount == None:
 			# Gather our currency list
@@ -217,7 +227,9 @@ class Search(commands.Cog):
 
 		# At this point, we should be able to convert
 		try: o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
-		except: return await ctx.send("Something went wrong getting that conversion.  The API I use may be down :(")
+		except:
+			api_status = await self._get_api_status()
+			return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
 
 		if not o:
 			return await ctx.send("Whoops!  I couldn't get that :(")
