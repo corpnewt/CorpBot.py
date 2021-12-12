@@ -35,7 +35,11 @@ class Monitor(commands.Cog):
 			print('Command success below threshold - rebooting...')
 			self.settings.flushSettings(self.settings.file, True)
 			# Logout, stop the event loop, close the loop, quit
-			for task in asyncio.Task.all_tasks():
+			try:
+				tasks = asyncio.Task.all_tasks()
+			except AttributeError:
+				tasks = asyncio.all_tasks()
+			for task in tasks:
 				try:
 					task.cancel()
 				except Exception:

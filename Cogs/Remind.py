@@ -65,7 +65,10 @@ class Remind(commands.Cog):
 
 	async def checkRemind(self, member, reminder):
 		# Get our current task
-		task = asyncio.Task.current_task()
+		try:
+			task = asyncio.Task.current_task()
+		except AttributeError:
+			task = asyncio.current_task()
 		# Start our countdown
 		countDown = int(reminder['End'])-int(time.time())
 		if countDown > 0:

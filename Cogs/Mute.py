@@ -132,7 +132,10 @@ class Mute(commands.Cog):
 
     async def checkMute(self, member, server, cooldown):
         # Get the current task
-        task = asyncio.Task.current_task()
+        try:
+            task = asyncio.Task.current_task()
+        except AttributeError:
+            task = asyncio.current_task()
         # Check if we have a cooldown left - and unmute accordingly
         timeleft = int(cooldown)-int(time.time())
         if timeleft > 0:
