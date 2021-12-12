@@ -167,7 +167,7 @@ if __name__ == '__main__':
         {"name":"pytz"},
         {"name":"wikipedia"},
         #{"name":"googletrans"},
-        {"name":"googletrans (direct api branch)","item":"git+https://github.com/ssut/py-googletrans/tree/feature/enhance-use-of-direct-api"},
+        {"name":"googletrans (direct api branch)","item":"git+https://github.com/ssut/py-googletrans@feature/enhance-use-of-direct-api"},
         {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
