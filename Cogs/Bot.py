@@ -600,8 +600,7 @@ class Bot(commands.Cog):
 		try:
 			task_list = asyncio.Task.all_tasks()
 		except AttributeError:
-			try: task_list = asyncio.all_tasks()
-			except: task_list = [] # wut
+			task_list = asyncio.all_tasks()
 
 		for task in task_list:
 			try:
@@ -628,8 +627,7 @@ class Bot(commands.Cog):
 		try:
 			task_list = asyncio.Task.all_tasks()
 		except AttributeError:
-			try: task_list = asyncio.all_tasks()
-			except: task_list = [] # wut
+			task_list = asyncio.all_tasks()
 
 		for task in task_list:
 			try:
