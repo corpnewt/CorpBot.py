@@ -1,7 +1,7 @@
 import asyncio, discord, json, os
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, TinyURL, Message, DL
+from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -182,14 +182,14 @@ class Search(commands.Cog):
 				curr_list.append("{} - {}".format(r["results"][l]["id"], r["results"][l]["currencyName"]))
 			if len(curr_list):
 				curr_list = sorted(curr_list)
-				return await Message.EmbedText(
+				return await PickList.PagePicker(
 					title="Currency List",
 					description="\n".join(curr_list),
-					desc_head="```\n",
-					desc_foot="```",
-					pm_after=0,
-					color=ctx.author
-				).send(ctx)
+					d_header="```\n",
+					d_footer="```",
+					color=ctx.author,
+					ctx=ctx
+				).pick()
 		
 		# Set up our args
 		num = frm = to = None
