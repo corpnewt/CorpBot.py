@@ -1,13 +1,6 @@
-import asyncio
-import discord
 from   discord.ext import commands
-import os
-import re
-import tempfile
-import shutil
-import plistlib
-from   Cogs        import DL
-from   Cogs        import Message
+import os, re, tempfile, shutil, plistlib
+from Cogs import DL, Message, PickList
 
 def setup(bot):
     # Add the bot and deps
@@ -140,9 +133,9 @@ class Plist(commands.Cog):
                     if len(wd_list):
                         # We got some matches
                         wd = []
-                        for i in wd_list:
+                        for x,i in enumerate(wd_list,start=1):
                             wd.append({
-                                "name": "{} ({})".format(self.get_os(i["OS"]), i["OS"]),
+                                "name": "{}. {} ({})".format(x,self.get_os(i["OS"]), i["OS"]),
                                 "value": "└─ [{}]({})".format(i["version"], i["downloadURL"]),
                                 "inline": False
                             })
@@ -153,13 +146,14 @@ class Plist(commands.Cog):
                     color=ctx.author
                 ).send(ctx)
                 return
-        await Message.Embed(
+        await PickList.PagePicker(
             title="NVIDIA Web Driver Results For \"{}\" ({} total)".format(os_build if os_build != None else "Latest", len(wd)),
-            fields=wd,
+            list=wd,
             color=ctx.author,
             pm_after=25,
-            footer="All links pulled from {}".format(self.nv_link)
-        ).send(ctx)
+            footer="All links pulled from {}".format(self.nv_link),
+            ctx=ctx
+        ).pick()
 
             
     @commands.command(pass_context=True)
