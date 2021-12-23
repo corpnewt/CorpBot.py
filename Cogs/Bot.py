@@ -271,7 +271,8 @@ class Bot(commands.Cog):
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
 		msg += '```\n'
 		msg += 'OS       : {}\n'.format(currentOS)
-		msg += 'Hostname : {}\n'.format(platform.node())
+		if not self.bot.settings_dict.get("hide_hostname",False):
+			msg += 'Hostname : {}\n'.format(platform.node())
 		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
 		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
 		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
