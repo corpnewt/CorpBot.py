@@ -285,7 +285,7 @@ class Bot(commands.Cog):
 
 	@commands.command()
 	async def hidehostname(self, ctx, *, yes_no = None):
-		""""""
+		"""Queries or turns on/off hostname hiding in the hostinfo command (owner-only)."""
 		if not await Utils.is_owner_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(
 			ctx,
