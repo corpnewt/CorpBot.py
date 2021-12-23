@@ -106,6 +106,10 @@ class IntelArk(commands.Cog):
 		"""Returns the data of a matched entry."""
 
 		if not "prodUrl" in match: return
+		# Force the prodUrl to start with /content/www/us/en/
+		en_prefix = "/content/www/us/en/"
+		if len(match["prodUrl"]) >= len(en_prefix) and not match["prodUrl"].startswith(en_prefix):
+			match["prodUrl"] = en_prefix+match["prodUrl"][len(en_prefix):]
 		data = {"Link":"https://ark.intel.com{}".format(match["prodUrl"]),"ProductName":match.get("label","Intel Ark Search")}
 		text = await DL.async_text(data["Link"])
 		lines = text.split('\n')
