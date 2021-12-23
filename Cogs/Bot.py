@@ -271,7 +271,7 @@ class Bot(commands.Cog):
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
 		msg += '```\n'
 		msg += 'OS       : {}\n'.format(currentOS)
-		if not self.bot.settings_dict.get("hide_hostname",False):
+		if not self.settings.getGlobalStat("HideHostname",False):
 			msg += 'Hostname : {}\n'.format(platform.node())
 		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
 		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
@@ -282,6 +282,19 @@ class Bot(commands.Cog):
 		msg += '{} uptime```'.format(timeString)
 
 		await message.edit(content=msg)
+
+	@commands.command()
+	async def hidehostname(self, ctx, *, yes_no = None):
+		""""""
+		if not await Utils.is_owner_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(
+			ctx,
+			"Hostname hiding in `hostinfo`".format(ctx.prefix),
+			"HideHostname",
+			yes_no,
+			default=False,
+			is_global=True
+		))
 		
 	@commands.command(pass_context=True)
 	async def getimage(self, ctx, *, image):
