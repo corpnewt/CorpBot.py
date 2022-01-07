@@ -53,7 +53,7 @@ class Wiki(commands.Cog):
 		
 		# Try to get a hit
 		try:
-			wik = wikipedia.page(newSearch)
+			wik = wikipedia.page(title=newSearch,auto_suggest=False)
 		except wikipedia.DisambiguationError:
 			msg = "That search wasn't specific enough - try again with more detail."
 			if message:
