@@ -74,7 +74,7 @@ class DisableCommand(commands.Cog):
 		for cog in self.bot.cogs:
 			if cog in self.exceptions: continue
 			for c in self.bot.get_cog(cog).get_commands():
-				if any((x == command for x in [c.name]+c.aliases)):
+				if any((x == command for x in [c.name]+list(c.aliases))):
 					if c.hidden or c in self.exceptions: return None
 					return [c.name]
 		return None
