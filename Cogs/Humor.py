@@ -1,6 +1,6 @@
-import asyncio, discord, random, json, time, os, PIL, textwrap
+import discord, random, time, os, PIL, textwrap
 from discord.ext import commands
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
 
 def setup(bot):
@@ -291,6 +291,54 @@ class Humor(commands.Cog):
 			await ctx.send(file=discord.File(fp='images/dosomethingnow.png'))
 			await message.delete()
 			os.remove('images/dosomethingnow.png')
+		except Exception as e:
+			print(e)
+			pass
+		if os.path.exists(path):
+			GetImage.remove(path)
+
+	@commands.command()
+	async def fry(self, ctx, *, url = None):
+		"""Fry up some memes."""
+
+		if not self.canDisplay(ctx.guild): return
+		if url == None and len(ctx.message.attachments) == 0:
+			return await ctx.send("Usage: `{}fry [url, user, or attachment]`".format(ctx.prefix))
+		if url == None: url = ctx.message.attachments[0].url
+		# Let's check if the "url" is actually a user
+		test_user = DisplayName.memberForName(url, ctx.guild)
+		if test_user:
+			# Got a user!
+			url = test_user.avatar_url
+			if not len(url): url = test_user.default_avatar_url
+		message = await ctx.send("Preparing to fry...")
+		path = await GetImage.download(url)
+		if not path:
+			return await message.edit(content="I guess I couldn't fry that...  Make sure you're passing a valid url, user, or attachment.")
+		# We should have the image - let's open it and convert to a single frame
+		try:
+			# Credit for the frying goes to Flame442
+			img = Image.open(path).convert("RGBA")
+			e = ImageEnhance.Sharpness(img)
+			img = e.enhance(100)
+			e = ImageEnhance.Contrast(img)
+			img = e.enhance(100)
+			e = ImageEnhance.Brightness(img)
+			img = e.enhance(.27)
+			r, b, g, a = img.split()
+			e = ImageEnhance.Brightness(r)
+			r = e.enhance(4)
+			e = ImageEnhance.Brightness(g)
+			g = e.enhance(1.75)
+			e = ImageEnhance.Brightness(b)
+			b = e.enhance(.6)
+			img = Image.merge('RGBA', (r, g, b, a))
+			e = ImageEnhance.Brightness(img)
+			img = e.enhance(1.5)
+			img.save('images/fried.png')
+			await ctx.send(file=discord.File(fp='images/fried.png'))
+			await message.delete()
+			os.remove('images/fried.png')
 		except Exception as e:
 			print(e)
 			pass
