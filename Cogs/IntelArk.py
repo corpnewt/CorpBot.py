@@ -16,6 +16,7 @@ class IntelArk(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.fields = {
+			'MarketSegment': 'Vertical Segment',
 			'CodeNameText': 'Codename',
 			'ProcessorNumber': 'Name',
 			'CoreCount': '# of Cores',
