@@ -160,7 +160,9 @@ class Embed(commands.Cog):
 
         The json follows the same guidelines as the embed command - with the addition of the following:
 
-        message     (str - an optional message to send after the embed - useful for pings)
+        before    (str - an optional message to send before the embed)
+        after     (str - an optional message to send after the embed)
+        message   (str - alias to after)
 
         ----------------------------------
 
@@ -187,21 +189,37 @@ class Embed(commands.Cog):
             return await Message.EmbedText(title="Something went wrong...", description=str(embed_dict)).send(ctx)
         # Don't ever pm as we're posting
         embed_dict["pm_after"] = -1
+        return_message = None
         try:
-            if len(embed_dict.get("fields",[])) > embed_dict.get("field_max",25): # Assume field-based
-                # Hard limit of 10 messages
-                embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*10]
-                await Message.Embed(**embed_dict).send(channel)
-            else: # Assume description-based
-                # Hard limit of 10 messages
-                embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*10]
-                await Message.EmbedText(**embed_dict).send(channel)
-            if embed_dict.get("message"): # Check for a message to send after
-                await channel.send(str(embed_dict["message"][:2000]),allowed_mentions=discord.AllowedMentions.all())
+            # Check for a message to send before
+            if embed_dict.get("before"):
+                return_message = await channel.send(str(embed_dict["before"][:2000]),allowed_mentions=discord.AllowedMentions.all())
+            # Make sure we have either fields or description - might just be
+            # a message we're sending
+            if any((x in embed_dict for x in ("fields","description"))):
+                if len(embed_dict.get("fields",[])) > embed_dict.get("field_max",25): # Assume field-based
+                    # Hard limit of 10 messages
+                    embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*10]
+                    return_message = await Message.Embed(**embed_dict).send(channel)
+                else: # Assume description-based
+                    # Hard limit of 10 messages
+                    embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*10]
+                    return_message = await Message.EmbedText(**embed_dict).send(channel)
+            # Check for a message to send after
+            if embed_dict.get("after",embed_dict.get("message")):
+                return_message = await channel.send(str(embed_dict.get("after",embed_dict["message"])[:2000]),allowed_mentions=discord.AllowedMentions.all())
         except Exception as e:
             try: e = str(e)
             except: e = "An error occurred :("
-            await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
+            return await Message.EmbedText(title="Something went wrong...", description=e).send(ctx)
+        # If we got here - it posted successfully to a different channel,
+        # let's send a confirmation message with a link to the successful post.
+        if return_message and not ctx.channel == channel:
+            await Message.EmbedText(
+                title="Post Successful",
+                color=ctx.author,
+                description="Last message sent [here]({}).".format(return_message.jump_url)
+            ).send(ctx)
 
     @commands.command()
     async def getembed(self, ctx, message_url = None):
