@@ -186,7 +186,15 @@ class Embed(commands.Cog):
                 except: return await Message.EmbedText(title="Something went wrong...", description="Could not download that url.").send(ctx)
         embed_dict = self._get_embed_from_json(ctx,embed_json)
         if isinstance(embed_dict,Exception):
-            return await Message.EmbedText(title="Something went wrong...", description=str(embed_dict)).send(ctx)
+            return await Message.EmbedText(title="Something went wrong...", description=str(embed_dict),color=ctx.author).send(ctx)
+        # Make sure we have *something* to post
+        required = ["description","fields","before","after","message"]
+        if not any((x in embed_dict for x in required)):
+            return await Message.EmbedText(
+                title="Missing Information",
+                description="The passed json data is missing one or more required field.\nIt needs at least one of the following:\n```\n{}\n```".format("\n".join(required)),
+                color=ctx.author
+            ).send(ctx)
         # Don't ever pm as we're posting
         embed_dict["pm_after"] = -1
         return_message = None
