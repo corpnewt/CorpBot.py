@@ -215,7 +215,7 @@ class Embed(commands.Cog):
                     return_message = await Message.EmbedText(**embed_dict).send(channel)
             # Check for a message to send after
             if embed_dict.get("after",embed_dict.get("message")):
-                return_message = await channel.send(str(embed_dict.get("after",embed_dict["message"])[:2000]),allowed_mentions=discord.AllowedMentions.all())
+                return_message = await channel.send(str(embed_dict.get("after",embed_dict.get("message"))[:2000]),allowed_mentions=discord.AllowedMentions.all())
         except Exception as e:
             try: e = str(e)
             except: e = "An error occurred :("
