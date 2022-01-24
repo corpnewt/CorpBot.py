@@ -24,6 +24,8 @@ class Responses(commands.Cog):
 		self.regexEveryone = re.compile(r"\[\[everyone\]\]",  re.IGNORECASE)
 		self.regexDelete   = re.compile(r"\[\[delete\]\]",    re.IGNORECASE)
 		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]", re.IGNORECASE)
+		self.regexRoleMent = re.compile(r"\[\[(m_role|role_m):\d+\]\]",re.IGNORECASE)
+		self.regexUserMent = re.compile(r"\[\[(m_user|user_m):\d+\]\]",re.IGNORECASE)
 		self.regexKick     = re.compile(r"\[\[kick\]\]",      re.IGNORECASE)
 		self.regexBan      = re.compile(r"\[\[ban\]\]",       re.IGNORECASE)
 		self.regexSuppress = re.compile(r"\[\[suppress\]\]",  re.IGNORECASE)
@@ -52,6 +54,30 @@ class Responses(commands.Cog):
 			m = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(ctx.guild.name)), m)
 			m = re.sub(self.regexHere,     "@here", m)
 			m = re.sub(self.regexEveryone, "@everyone", m)
+			d = re.compile("\\d+")
+			mentions = {
+				"user": {
+					"list":self.regexUserMent.finditer(m),
+					"func":ctx.guild.get_member
+				},
+				"role": {
+					"list":self.regexRoleMent.finditer(m),
+					"func":ctx.guild.get_role
+				}
+			}
+			for type in mentions:
+				if not "func" in mentions[type]: continue # borken
+				func = mentions[type]["func"]
+				for mention in mentions[type].get("list",[]):
+					# Convert the id to a member - make sure that resolves, then replace
+					try:
+						check_id = int(d.search(mention.group(0)).group(0))
+						resolved = func(check_id)
+						assert resolved
+					except:
+						continue # Broken, or didn't resolve
+					m = m.replace(mention.group(0),resolved.mention)
+
 			# Strip out leftovers from delete, ban, kick, mute, and suppress
 			for sub in (self.regexDelete,self.regexBan,self.regexKick,self.regexMute,self.regexSuppress):
 				m = re.sub(sub,"",m)
@@ -92,11 +118,16 @@ class Responses(commands.Cog):
 		
 		Value substitutions:
 		
-		[[user]]     = user name
-		[[atuser]]   = user mention
-		[[server]]   = server name
-		[[here]]     = @​here ping
-		[[everyone]] = @​everyone ping
+		[[user]]      = sender's name
+		[[server]]    = server name
+
+		Mention options:
+
+		[[atuser]]    = sender mention
+		[[m_role:id]] = role mention where id is the role id
+		[[m_user:id]] = user mention where id is the user id
+		[[here]]      = @here ping
+		[[everyone]]  = @everyone ping
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
