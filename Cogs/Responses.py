@@ -36,8 +36,10 @@ class Responses(commands.Cog):
 		# Check for matching response triggers here
 		content = message.replace("\n"," ") # Remove newlines for better matching
 		for trigger in message_responses:
+			check_time = time.perf_counter_ns()
 			if not re.fullmatch(trigger, content): continue
-			response = {"matched":trigger}
+			match_time = time.perf_counter_ns()-check_time
+			response = {"matched":trigger,"match_time_ms":match_time/1000000}
 			# Got a full match - build the message, send it and bail
 			m = message_responses[trigger]
 			if self.regexDelete.search(m): response["delete"] = True
@@ -309,7 +311,7 @@ class Responses(commands.Cog):
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
-		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx).pick()
+		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms".format(response["match_time_ms"])).pick()
 
 	@commands.command()
 	async def viewresponse(self, ctx, response_index = None):
