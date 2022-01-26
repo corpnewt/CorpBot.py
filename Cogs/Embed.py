@@ -211,7 +211,8 @@ class Embed(commands.Cog):
                     return_message = await Message.Embed(**embed_dict).send(channel)
                 else: # Assume description-based
                     # Hard limit of 10 messages
-                    embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*10]
+                    if "description" in embed_dict:
+                        embed_dict["description"] = embed_dict["description"][:embed_dict.get("desc_max",2048)*10]
                     return_message = await Message.EmbedText(**embed_dict).send(channel)
             # Check for a message to send after
             if embed_dict.get("after",embed_dict.get("message")):
