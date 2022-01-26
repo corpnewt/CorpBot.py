@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -132,10 +132,10 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists some general stats about the bot.
 	  $cloc 
 	   └─ Outputs the total count of lines of code in the currently installed repo.
-	  $embed [embed]
-	   └─ Builds an embed using json formatting.
 	  $getimage <image>
 	   └─ Tests downloading - owner only
+	  $hidehostname [yes_no]
+	   └─ Queries or turns on/off hostname hiding in the hostinfo command (owner-only).
 	  $hostinfo 
 	   └─ List info about the bot's host environment.
 	  $joinpm [yes_no]
@@ -171,7 +171,7 @@ A list of cogs, commands, and descriptions:
 
 ## BotAdmin
 ####	BotAdmin Cog (10 commands) - BotAdmin.py Extension:
-	  $ban [members] [reason]
+	  $ban [members] [reason] (AKA: yote)
 	   └─ Bans the passed members for the specified reason.
 	  $banned [user_id]
 	   └─ Queries the guild's ban list for the passed user id and responds with whether...
@@ -179,7 +179,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Adds a member to the bot's "ignore" list (bot-admin only).
 	  $ignored 
 	   └─ Lists the users currently being ignored.
-	  $kick [members] [reason]
+	  $kick [members] [reason] (AKA: yeet)
 	   └─ Kicks the passed members for the specified reason.
 	  $listen [member]
 	   └─ Removes a member from the bot's "ignore" list (bot-admin only).
@@ -274,8 +274,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Outputs the extensions imported by the passed extension.
 	  $reload [extension]
 	   └─ Reloads the passed extension - or all if none passed.
-	  $update 
-	   └─ Updates from git.
+	  $update [reset]
+	   └─ Updates from git, pass "reset" or "-reset" to this command to first run "git ...
 
 ## Comic
 ####	Comic Cog (14 commands) - Comic.py Extension:
@@ -378,6 +378,15 @@ A list of cogs, commands, and descriptions:
 ####	EightBall Cog (1 command) - EightBall.py Extension:
 	  $eightball [question] (AKA: 8ball)
 	   └─ Get some answers.
+
+## Embed
+####	Embed Cog (3 commands) - Embed.py Extension:
+	  $embed [embed_json]
+	   └─ Builds an embed using json formatting.
+	  $getembed [message_url]
+	   └─ Gets any embeds for the passed message url and uploads their data as json files.
+	  $post [channel_id] [embed_json]
+	   └─ Builds an embed using json formatting and sends it to the specified channel (...
 
 ## Emoji
 ####	Emoji Cog (2 commands) - Emoji.py Extension:
@@ -486,11 +495,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the bot's commands and cogs.
 
 ## Humor
-####	Humor Cog (10 commands) - Humor.py Extension:
+####	Humor Cog (11 commands) - Humor.py Extension:
 	  $fart 
 	   └─ PrincessZoey :P
 	  $french 
 	   └─ Speaking French... probably...
+	  $fry [url]
+	   └─ Fry up some memes.
 	  $german 
 	   └─ Speaking German... probably...
 	  $holy [subject]
@@ -793,6 +804,11 @@ A list of cogs, commands, and descriptions:
 	   └─ Ensures that the mute role has the send_messages, add_reactions, and speak ov...
 	  $unmute [member]
 	   └─ Allows a muted member to send messages in chat (bot-admin only).
+
+## NvidiaArk
+####	NvidiaArk Cog (1 command) - NvidiaArk.py Extension:
+	  $nvidiaark [text] (AKA: nark, nvark)
+	   └─ Searches TechPowerUP's site for GPU info.
 
 ## OfflineUser
 ####	OfflineUser Cog (1 command) - OfflineUser.py Extension:
