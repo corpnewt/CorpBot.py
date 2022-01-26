@@ -188,7 +188,7 @@ class Embed(commands.Cog):
         if isinstance(embed_dict,Exception):
             return await Message.EmbedText(title="Something went wrong...", description=str(embed_dict),color=ctx.author).send(ctx)
         # Make sure we have *something* to post
-        required = ["description","fields","before","after","message"]
+        required = ["title","description","fields","before","after","message"]
         if not any((x in embed_dict for x in required)):
             return await Message.EmbedText(
                 title="Missing Information",
