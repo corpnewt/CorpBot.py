@@ -31,13 +31,13 @@ class BotAdmin(commands.Cog):
 		# At this point - we need to delete the message
 		return { 'Ignore' : True, 'Delete' : True}
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removeinvitelinks(self, ctx, *, yes_no = None):
 		"""Enables/Disables auto-deleting discord invite links in chat (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Remove discord invite links","RemoveInviteLinks",yes_no))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setuserparts(self, ctx, member : discord.Member = None, *, parts : str = None):
 		"""Set another user's parts list (owner only)."""
 		# Only allow owner
@@ -72,7 +72,7 @@ class BotAdmin(commands.Cog):
 		msg = 'setuserparts Error: {}'.format(error)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ignore(self, ctx, *, member = None):
 		"""Adds a member to the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -107,7 +107,7 @@ class BotAdmin(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listen(self, ctx, *, member = None):
 		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -140,7 +140,7 @@ class BotAdmin(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ignored(self, ctx):
 		"""Lists the users currently being ignored."""
 		ignoreArray = self.settings.getServerStat(ctx.guild, "IgnoredUsers")
@@ -254,7 +254,7 @@ class BotAdmin(commands.Cog):
 			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in cant]))
 		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg,footer=footer).edit(ctx,message)
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["yeet"])
 	async def kick(self, ctx, *, members = None, reason = None):
 		"""Kicks the passed members for the specified reason.
 		All kick targets must be mentions or ids to avoid ambiguity (bot-admin only).
@@ -263,7 +263,7 @@ class BotAdmin(commands.Cog):
 		await self.kick_ban(ctx,members,"kick")
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["yote"])
 	async def ban(self, ctx, *, members = None, reason = None):
 		"""Bans the passed members for the specified reason.
 		All ban targets must be mentions or ids to avoid ambiguity (bot-admin only).
@@ -276,7 +276,7 @@ class BotAdmin(commands.Cog):
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -r=5"""
 		await self.kick_ban(ctx,members,"ban")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def unban(self, ctx, *, members = None, reason = None):
 		"""Unbans the passed members for the specified reason.
 		All unban targets must be mentions or ids to avoid ambiguity (bot-admin only).
