@@ -204,7 +204,7 @@ class Embed(commands.Cog):
                 return_message = await channel.send(str(embed_dict["before"][:2000]),allowed_mentions=discord.AllowedMentions.all())
             # Make sure we have either fields or description - might just be
             # a message we're sending
-            if any((x in embed_dict for x in ("fields","description"))):
+            if any((x in embed_dict for x in ("fields","description","title"))):
                 if len(embed_dict.get("fields",[])) > embed_dict.get("field_max",25): # Assume field-based
                     # Hard limit of 10 messages
                     embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*10]
