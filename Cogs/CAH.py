@@ -14,10 +14,8 @@ from   Cogs import Settings
 from   Cogs import DisplayName
 from   Cogs import ReadableTime
 try:
-    # Python 2.6-2.7
-    from HTMLParser import HTMLParser
+    from html import unescape
 except ImportError:
-    # Python 3
     from html.parser import HTMLParser
 
 def setup(bot):
@@ -218,7 +216,11 @@ class CAH(commands.Cog):
         try: word_dict = json.load(open(words,"rb"))
         except: word_dict = {}
         self.sencheck = SenCheck(word_dict)
-        self.parser = HTMLParser()
+        try:
+            self.unescape = unescape
+        except NameError:
+            h = HTMLParser()
+            self.unescape = h.unescape
         self.debug = False
 
     # Proof of concept stuff for reloading cog/extension
@@ -765,7 +767,7 @@ class CAH(commands.Cog):
             blackNum  = 0
 
         # msg = '{} the judge.\n\n'.format(judge)
-        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.parser.unescape(blackCard))
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.unescape(blackCard))
         
         totalUsers = len(game['Members'])-1
         submitted  = len(game['Submitted'])
@@ -809,10 +811,10 @@ class CAH(commands.Cog):
                     points = '{} points'.format(member['Points'])
                 for card in member['Hand']:
                     i += 1
-                    msg += '{}. {}\n'.format(i, self.parser.unescape(card['Text']))
+                    msg += '{}. {}\n'.format(i, self.unescape(card['Text']))
 
         try:
-            blackCard = '**{}**'.format(self.parser.unescape(game['BlackCard']['Text']))
+            blackCard = '**{}**'.format(self.unescape(game['BlackCard']['Text']))
         except Exception:
             blackCard = '**None.**'
         stat_embed.add_field(name="Your Hand - {}".format(points), value=msg)
@@ -841,7 +843,7 @@ class CAH(commands.Cog):
                 judge = '*{}* is'.format(DisplayName.name(game['Members'][game['Judge']]['User']))
         blackCard = game['BlackCard']['Text']
 
-        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.parser.unescape(blackCard))
+        msg = '__Black Card:__\n\n**{}**\n\n'.format(self.unescape(blackCard))
         msg += '__Submitted White Cards:__\n\n'
 
         i = 0
