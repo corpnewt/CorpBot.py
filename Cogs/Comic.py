@@ -1,8 +1,11 @@
-import discord, random, time
+import random
 import datetime as dt
 from discord.ext import commands
 from urllib.parse import unquote
-from html.parser import HTMLParser
+try:
+	from html import unescape
+except ImportError:
+	from html.parser import HTMLParser
 from Cogs import DL, Message
 
 def setup(bot):
@@ -231,15 +234,19 @@ class Comic(commands.Cog):
 		if not comic_url: return None
 		if comic_url.startswith("//"): comic_url = "https:"+comic_url
 		if not comic_url.lower().startswith(("http://","https://")): return None
-		h = HTMLParser()
+		try:
+			u = unescape
+		except NameError:
+			h = HTMLParser()
+			u = h.unescape
 		# Check if we need to get title text
 		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
 		if not comic_title: comic_title = comic_data["name"]
 		comic_title += " ({}{})".format("#" if isinstance(date,int) else "", date)
-		comic_title = h.unescape(unquote(comic_title))
+		comic_title = u(unquote(comic_title))
 		# Check if we need to get a description
 		comic_desc = self._walk_replace(html, comic_data["comic_desc"]) if len(comic_data.get("comic_desc",[])) else None
-		comic_desc = h.unescape(unquote(comic_desc)) if comic_desc else None
+		comic_desc = u(unquote(comic_desc)) if comic_desc else None
 		return {"image":comic_url,"url":url,"title":comic_title,"description":comic_desc}
 
 	async def _display_comic(self, ctx, comic, date = None, random = False):
@@ -256,7 +263,9 @@ class Comic(commands.Cog):
 		else:
 			desc = "{} comic {}".format(self.comic_data[comic]["name"],date if isinstance(date,int) else "for today" if date==None else "for "+date)
 			try: comic_out = await self._get_comic(self.comic_data[comic],date)
-			except: comic_out = None
+			except Exception as e:
+				print(e)
+				comic_out = None
 		if not comic_out:
 			return await Message.EmbedText(
 				title=self.comic_data[comic]["name"]+" Error",

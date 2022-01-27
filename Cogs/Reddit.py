@@ -7,15 +7,13 @@ from   discord.ext import commands
 from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL, Nullify
 from   pyquery import PyQuery as pq
 try:
-	# Python 2.6-2.7
-	from HTMLParser import HTMLParser
-except ImportError:
-	# Python 3
-	from html.parser import HTMLParser
-try:
 	from urllib.parse import urlparse
 except ImportError:
 	from urlparse import urlparse
+try:
+	from html import unescape
+except ImportError:
+	pass
 
 def setup(bot):
 	# Add the bot and deps
@@ -51,8 +49,12 @@ class Reddit(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def strip_tags(self, html):
-		parser = HTMLParser()
-		html = parser.unescape(html)
+		try:
+			u = unescape
+		except NameError:
+			h = HTMLParser()
+			u = h.unescape
+		html = u(html)
 		s = MLStripper()
 		s.feed(html)
 		return s.get_data()
@@ -151,9 +153,14 @@ class Reddit(commands.Cog):
 							theURL = imageURL				
 				if not theURL:
 					continue
+				try:
+					u = unescape
+				except NameError:
+					h = HTMLParser()
+					u = h.unescape
 				returnDict = { 
 					'title': theJSON['title'], 
-					'url': HTMLParser().unescape(theURL), 
+					'url': u(theURL), 
 					'over_18': theJSON['over_18'], 
 					'permalink': theJSON['permalink'], 
 					'score' : theJSON['score'], 
