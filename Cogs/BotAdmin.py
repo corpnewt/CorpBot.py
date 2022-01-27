@@ -16,6 +16,7 @@ class BotAdmin(commands.Cog):
 		self.settings = settings
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
 		self.mention_re = re.compile(r"[0-9]{17,21}")
+		self.removal = re.compile(r"(?i)-?r(em|emove|emoval)?=\d+")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -190,7 +191,7 @@ class BotAdmin(commands.Cog):
 				# then apply that override and remove from the reason
 				if command_name == "ban":
 					for i,x in enumerate(args[index:]):
-						if x.lower().startswith("-r="):
+						if self.removal.match(x):
 							try:
 								days = int(x.split("=")[-1])
 								assert 0<=days<8
@@ -246,7 +247,8 @@ class BotAdmin(commands.Cog):
 				if days is not None: args["delete_message_days"] = days
 				await command(target,**args)
 				canned.append(target)
-			except: cant.append(target)
+			except:
+				cant.append(target)
 		msg = ""
 		if len(canned):
 			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
@@ -270,10 +272,10 @@ class BotAdmin(commands.Cog):
 		
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming
 		
-		Can take '-r=#' within the reason to specify the number of days to remove the banned users' messages.
+		Can take r=#, rem=#, remove=# or removal=# (optionally prefixed with -) within the reason to specify the number of days worth of the banned users' messages to remove.
 		This is limited to 0-7 days, and will override the value set by the rembanmessages command.
 		
-		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -r=5"""
+		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -rem=5"""
 		await self.kick_ban(ctx,members,"ban")
 
 	@commands.command()
