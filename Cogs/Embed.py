@@ -25,12 +25,14 @@ class Embed(commands.Cog):
             if embed_dict.get("color") and not isinstance(embed_dict["color"],list):
                 # We got *something* for the color - let's first check if it's an int between 0 and 16777215
                 if not isinstance(embed_dict["color"],int) or not 0<=embed_dict["color"]<=16777215:
+                    color_value = None
                     if str(embed_dict["color"]).lower().startswith(("#","0x")):
                         # Should be a hex color code
                         try:
                             color_value = int(str(embed_dict["color"]).lower().lstrip("#").lstrip("0x"),16)
                             if not 0<=color_value<=16777215: color_value = None # Out of range
-                        except: color_value = None
+                        except:
+                            pass
                     # Let's try to resolve it to a user
                     embed_dict["color"] = color_value if color_value is not None else DisplayName.memberForName(str(embed_dict["color"]),ctx.guild)
             if embed_dict.get("author") and not isinstance(embed_dict["author"],dict):
