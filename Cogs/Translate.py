@@ -10,11 +10,13 @@ def setup(bot):
 # Requires the mtranslate module be installed
 
 class Translate(commands.Cog):
-            
+
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
         self.translator = googletrans.Translator(service_urls=["translate.googleapis.com"])
+        self.langcodes = googletrans.LANGCODES
+        self.languages = googletrans.LANGUAGES
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
@@ -49,70 +51,90 @@ class Translate(commands.Cog):
 
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate = None):
-        """Translate some stuff!  Takes a phrase, the from language identifier (optional), and the to language identifier.
+        """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
-        
+
         Example Translation:
         $tr Hello there, how are you? en es
-        
+
         Would translate from English to Spanish resulting in:
         ¿Hola como estás?
-        
-        If you do not specify the from language, Google translate will attempt to automatically determine it."""
 
-        usage = "Usage: `{}tr [words] [from code (optional)] [to code]`".format(ctx.prefix)
+        If you do not specify the from language, Google translate will attempt to automatically determine it.
+        If you do not specify the to language, it will default to English."""
+
+        usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
         if translate == None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
+        if len(word_list) < 1: return await ctx.send(usage)
 
-        if len(word_list) < 2: return await ctx.send(usage)
+        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # Check for to_lang
+        if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
+        else: to_lang = "en"  # Default to english
 
-        to_lang   = word_list[len(word_list)-1]
-        from_lang = word_list[len(word_list)-2] if len(word_list) >= 3 else ""
+        # There cannot be a from_lang if there is no to_lang, which means there should be at least 3 words
+        from_lang = word_list[-1] if len(word_list) >= 2 and word_list[-1] in self.langcodes.values() else None
+        if from_lang: word_list.pop()  # Remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
 
         # Get the from language name from the passed code
-        from_lang_name = googletrans.LANGUAGES.get(from_lang.lower(),None)
+        if from_lang: from_lang_name = self.languages.get(from_lang.lower(), None)
+        else: from_lang_name = None
+
         # Get the to language name from the passed code
-        to_lang_name   = googletrans.LANGUAGES.get(to_lang.lower(),None)
-        if not to_lang_name: # No dice on the language :(
+        if to_lang: to_lang_name = self.languages.get(to_lang.lower(), None)
+        else: to_lang_name = None
+
+        if not to_lang_name:  # No dice on the language :(
             return await Message.EmbedText(
-                    title="Something went wrong...",
-                    description="I couldn't find that language!",
-                    color=ctx.author
-                ).send(ctx)
-        # Get all but our language codes joined with spaces
-        trans = " ".join(word_list[:-2] if from_lang_name else word_list[:-1])
-        # If our from_lang_name is None, we need to auto-detect it
-        if not from_lang_name:
-            from_output = await self.bot.loop.run_in_executor(None, self.translator.detect, trans)
-            from_lang = from_output.lang
-            from_lang_name = googletrans.LANGUAGES.get(from_lang,"Unknown")
-        # Let's actually translate now
-        result_output = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, trans, dest=to_lang, src=from_lang))
-        result = result_output.text
-        
+                title="Something went wrong...",
+                description="I couldn't find that language!",
+                color=ctx.author
+            ).send(ctx)
+
+        # Get our words joined with spaces
+        to_translate = " ".join(word_list) if word_list else ""
+
+        if from_lang_name:
+            result = self.translator.translate(text=to_translate, src=from_lang, dest=to_lang)
+        else:
+            # We'll leave Google Translate to figure out the source language if we don't have it
+            result = self.translator.translate(text=to_translate, dest=to_lang)
+
         # Explore the results!
-        if not result:
-            await Message.EmbedText(
+        if not result.text:
+            return await Message.EmbedText(
                 title="Something went wrong...",
                 description="I wasn't able to translate that!",
                 color=ctx.author
             ).send(ctx)
-            return
-        
-        if result == trans:
+
+        if result.text == to_translate:
             # We got back what we put in...
-            await Message.EmbedText(
+            return await Message.EmbedText(
                 title="Something went wrong...",
-                description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language (en -> en)",
+                description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language ({src} -> {src})".format(
+                    src=result.src
+                ),
                 color=ctx.author
             ).send(ctx)
-            return
 
-        await Message.EmbedText(
+        # Get the language names from the codes, and make them title case
+        footer = "{} --> {}".format(
+            self.languages.get(result.src.lower(), "Unknown").title(),
+            self.languages.get(result.dest.lower(), "Unknown").title()
+        )
+
+        embed = Message.Embed(
             title="{}, your translation is:".format(DisplayName.name(ctx.author)),
             force_pm=True,
             color=ctx.author,
-            description=result,
-            footer="{} --> {} - Powered by Google Translate".format(string.capwords(from_lang_name), string.capwords(to_lang_name))
-        ).send(ctx)
+            description=result.text,
+            footer=footer
+        )
+
+        if result.pronunciation:
+            # If we have a pronunciation, add it to the embed!
+            embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
+
+        await embed.send(ctx)
