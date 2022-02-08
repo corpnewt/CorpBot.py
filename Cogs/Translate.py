@@ -10,16 +10,16 @@ def setup(bot):
 # Requires the mtranslate module be installed
 
 class Translate(commands.Cog):
-
+            
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
         self.translator = googletrans.Translator(service_urls=["translate.googleapis.com"])
-        self.langcodes = googletrans.LANGCODES
-        self.languages = googletrans.LANGUAGES
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
+        self.langcodes = googletrans.LANGCODES
+        self.languages = googletrans.LANGUAGES
 
     @commands.command(pass_context=True)
     async def langlist(self, ctx):
@@ -69,13 +69,13 @@ class Translate(commands.Cog):
         word_list = translate.split(" ")
         if len(word_list) < 1: return await ctx.send(usage)
 
-        to_lang = word_list[-1].lower() if word_list[-1].lower() in self.langcodes.values() else None  # Check for to_lang
+        to_lang = word_list[-1].lower() if word_list[-1].lower() in self.langcodes.values() else None  # check for to_lang
         if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
         else: to_lang = "en"  # Default to english
 
-        # There cannot be a from_lang if there is no to_lang, which means there should be at least 3 words
+        # there should be at least 2 words left after we remove the to_lang, in case the user specifies a source language
         from_lang = word_list[-1].lower() if len(word_list) >= 2 and word_list[-1].lower() in self.langcodes.values() else None
-        if from_lang: word_list.pop()  # Remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
+        if from_lang: word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
 
         # Get the from language name from the passed code
         if from_lang: from_lang_name = self.languages.get(from_lang, None)
@@ -96,10 +96,10 @@ class Translate(commands.Cog):
         to_translate = " ".join(word_list) if word_list else ""
 
         if from_lang_name:
-            result = self.translator.translate(text=to_translate, src=from_lang, dest=to_lang)
+            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=to_translate, src=from_lang, dest=to_lang))
         else:
             # We'll leave Google Translate to figure out the source language if we don't have it
-            result = self.translator.translate(text=to_translate, dest=to_lang)
+            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=to_translate, dest=to_lang))
 
         # Explore the results!
         if not result.text:
@@ -108,7 +108,7 @@ class Translate(commands.Cog):
                 description="I wasn't able to translate that!",
                 color=ctx.author
             ).send(ctx)
-
+        
         if result.text == to_translate:
             # We got back what we put in...
             return await Message.EmbedText(
@@ -124,7 +124,6 @@ class Translate(commands.Cog):
             self.languages.get(result.src.lower(), "Unknown").title(),
             self.languages.get(result.dest.lower(), "Unknown").title()
         )
-
         embed = Message.Embed(
             title="{}, your translation is:".format(DisplayName.name(ctx.author)),
             force_pm=True,
