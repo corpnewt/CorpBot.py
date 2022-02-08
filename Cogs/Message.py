@@ -413,6 +413,14 @@ class EmbedText(Embed):
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
+        if len(self.fields):
+            for field in self.fields[:self.field_max]:
+                em.add_field(
+                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
+                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
+                    inline=field.get("inline", False)
+                )
+
         if self.description == None or not len(self.description):
             text_list = []
         else:
@@ -455,6 +463,14 @@ class EmbedText(Embed):
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
+        if len(self.fields):
+            for field in self.fields[:self.field_max]:
+                em.add_field(
+                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
+                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
+                    inline=field.get("inline", False)
+                )
+
         # First check if we have any fields at all - and try to send
         # as one page if not
         if self.description == None or not len(self.description):
@@ -463,7 +479,6 @@ class EmbedText(Embed):
                 icon_url=footer_icon
             )
             return await self._send_embed(ctx, em, False, self.file)
-        
         text_list = textwrap.wrap(
             self.description,
             self.desc_max - len(self.desc_head) - len(self.desc_foot),
