@@ -51,23 +51,23 @@ class Translate(commands.Cog):
 
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate = None):
-        """Translate some stuff!  Takes a phrase, the from language identifier (optional), and the to language identifier.
+        """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
-        
+
         Example Translation:
         $tr Hello there, how are you? en es
-        
+
         Would translate from English to Spanish resulting in:
         ¿Hola como estás?
-        
+
         If you do not specify the from language, Google translate will attempt to automatically determine it."""
 
-        usage = "Usage: `{}tr [words] [from code (optional)] [to code]`".format(ctx.prefix)
+        usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
         if translate == None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
 
-        if len(word_list) > 1: return await ctx.send(usage)
+        if len(word_list) < 1: return await ctx.send(usage)
 
         to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None
 
@@ -125,17 +125,19 @@ class Translate(commands.Cog):
             return
 
         # Get the language names from the codes, and make them title case
-        footer = "{} ({}) --> {} ({})".format(
+        footer = "{} --> {}".format(
             self.languages.get(result.src.lower(), "Unknown").title(),
-            result.src.lower(),
-            self.languages.get(result.dest.lower(), "Unknown").title(),
-            result.dest.lower()
+            self.languages.get(result.dest.lower(), "Unknown").title()
         )
-
-        await Message.EmbedText(
+        embed = Message.Embed(
             title="{}, your translation is:".format(DisplayName.name(ctx.author)),
             force_pm=True,
             color=ctx.author,
             description=result.text,
             footer=footer
-        ).send(ctx)
+        )
+        if result.pronunciation:
+            # If we have a pronunciation, add it to the embed!
+            embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
+
+        await embed.send(ctx)
