@@ -60,7 +60,8 @@ class Translate(commands.Cog):
         Would translate from English to Spanish resulting in:
         ¿Hola como estás?
 
-        If you do not specify the from language, Google translate will attempt to automatically determine it."""
+        If you do not specify the from language, Google translate will attempt to automatically determine it.
+        If you do not specify the to language, it will default to English."""
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
         if translate == None: return await ctx.send(usage)
