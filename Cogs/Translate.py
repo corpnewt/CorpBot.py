@@ -69,15 +69,13 @@ class Translate(commands.Cog):
         word_list = translate.split(" ")
         if len(word_list) < 1: return await ctx.send(usage)
 
-        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # check for to_lang
+        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # Check for to_lang
         if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
         else: to_lang = "en"  # Default to english
 
-        # there cannot be a from_lang if there is no to_lang, which means there should be at least 3 words
+        # There cannot be a from_lang if there is no to_lang, which means there should be at least 3 words
         from_lang = word_list[-1] if len(word_list) >= 2 and word_list[-1] in self.langcodes.values() else None
-        if from_lang:
-            word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
-
+        if from_lang: word_list.pop()  # Remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
 
         # Get the from language name from the passed code
         if from_lang: from_lang_name = self.languages.get(from_lang.lower(), None)
@@ -126,6 +124,7 @@ class Translate(commands.Cog):
             self.languages.get(result.src.lower(), "Unknown").title(),
             self.languages.get(result.dest.lower(), "Unknown").title()
         )
+
         embed = Message.Embed(
             title="{}, your translation is:".format(DisplayName.name(ctx.author)),
             force_pm=True,
@@ -133,6 +132,7 @@ class Translate(commands.Cog):
             description=result.text,
             footer=footer
         )
+
         if result.pronunciation:
             # If we have a pronunciation, add it to the embed!
             embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
