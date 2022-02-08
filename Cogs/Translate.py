@@ -69,20 +69,20 @@ class Translate(commands.Cog):
         word_list = translate.split(" ")
         if len(word_list) < 1: return await ctx.send(usage)
 
-        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # check for to_lang
+        to_lang = word_list[-1].lower() if word_list[-1].lower() in self.langcodes.values() else None  # check for to_lang
         if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
         else: to_lang = "en"  # Default to english
 
         # there should be at least 2 words left after we remove the to_lang, in case the user specifies a source language
-        from_lang = word_list[-1] if len(word_list) >= 2 and word_list[-1] in self.langcodes.values() else None
+        from_lang = word_list[-1].lower() if len(word_list) >= 2 and word_list[-1].lower() in self.langcodes.values() else None
         if from_lang: word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
 
         # Get the from language name from the passed code
-        if from_lang: from_lang_name = self.languages.get(from_lang.lower(), None)
+        if from_lang: from_lang_name = self.languages.get(from_lang, None)
         else: from_lang_name = None
 
         # Get the to language name from the passed code
-        if to_lang: to_lang_name = self.languages.get(to_lang.lower(), None)
+        if to_lang: to_lang_name = self.languages.get(to_lang, None)
         else: to_lang_name = None
 
         if not to_lang_name:  # No dice on the language :(
