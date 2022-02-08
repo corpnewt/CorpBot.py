@@ -66,28 +66,25 @@ class Translate(commands.Cog):
         if translate == None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
-
         if len(word_list) < 1: return await ctx.send(usage)
 
-        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None
+        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # check for to_lang
+        if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
+        else: to_lang = "en"  # Default to english
 
         # there cannot be a from_lang if there is no to_lang, which means there should be at least 3 words
-        from_lang = word_list[-2] if len(word_list) >= 3 and word_list[-2] in self.langcodes.values() else None
-
-        if to_lang:
-            word_list.pop()  # Remove the last element, ie the to_lang
-        else:
-            to_lang = "en"  # Default to english
-
+        from_lang = word_list[-1] if len(word_list) >= 2 and word_list[-1] in self.langcodes.values() else None
         if from_lang:
-            word_list.pop()  # Remove the last element, ie the from_lang (since to_lang is already removed if present)
-        else:
-            from_lang = ""  # Default to empty string
+            word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
+
 
         # Get the from language name from the passed code
-        from_lang_name = self.languages.get(from_lang.lower(), None)
+        if from_lang: from_lang_name = self.languages.get(from_lang.lower(), None)
+        else: from_lang_name = None
+
         # Get the to language name from the passed code
-        to_lang_name = self.languages.get(to_lang.lower(), None)
+        if to_lang: to_lang_name = self.languages.get(to_lang.lower(), None)
+        else: to_lang_name = None
 
         if not to_lang_name:  # No dice on the language :(
             return await Message.EmbedText(
@@ -95,34 +92,33 @@ class Translate(commands.Cog):
                 description="I couldn't find that language!",
                 color=ctx.author
             ).send(ctx)
-        # Get all but our language codes joined with spaces
+
+        # Get our words joined with spaces
         to_translate = " ".join(word_list) if word_list else ""
 
         if from_lang_name:
             result = self.translator.translate(text=to_translate, src=from_lang, dest=to_lang)
         else:
+            # We'll leave Google Translate to figure out the source language if we don't have it
             result = self.translator.translate(text=to_translate, dest=to_lang)
 
         # Explore the results!
         if not result.text:
-            await Message.EmbedText(
+            return await Message.EmbedText(
                 title="Something went wrong...",
                 description="I wasn't able to translate that!",
                 color=ctx.author
             ).send(ctx)
-            return
 
         if result.text == to_translate:
             # We got back what we put in...
-            await Message.EmbedText(
+            return await Message.EmbedText(
                 title="Something went wrong...",
-                description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language ({} -> {})".format(
-                    result.src,
-                    result.src
+                description="The text returned from Google was the same as the text put in.  Either the translation failed - or you were translating from/to the same language ({src} -> {src})".format(
+                    src=result.src
                 ),
                 color=ctx.author
             ).send(ctx)
-            return
 
         # Get the language names from the codes, and make them title case
         footer = "{} --> {}".format(
