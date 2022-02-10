@@ -50,7 +50,7 @@ class Translate(commands.Cog):
         ).send(ctx)
 
     @commands.command(pass_context=True)
-    async def tr(self, ctx, *, translate = None):
+    async def tr(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
 
@@ -69,16 +69,16 @@ class Translate(commands.Cog):
         word_list = translate.split(" ")
         if len(word_list) < 1: return await ctx.send(usage)
 
-        to_lang = word_list[-1] if word_list[-1] in self.langcodes.values() else None  # check for to_lang
+        to_lang = word_list[-1].lower() if word_list[-1].lower() in self.langcodes.values() else None  # check for to_lang
         if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
         else: to_lang = "en"  # Default to english
 
         # there should be at least 2 words left after we remove the to_lang, in case the user specifies a source language
-        from_lang = word_list[-1] if len(word_list) >= 2 and word_list[-1] in self.langcodes.values() else None
+        from_lang = word_list[-1].lower() if len(word_list) >= 2 and word_list[-1].lower() in self.langcodes.values() else None
         if from_lang: word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
 
         # Get the from language name from the passed code
-        if from_lang: from_lang_name = self.languages.get(from_lang.lower(), None)
+        if from_lang: from_lang_name = self.languages.get(from_lang, None)
         else: from_lang_name = None
 
         # Get the to language name from the passed code
@@ -108,7 +108,7 @@ class Translate(commands.Cog):
                 description="I wasn't able to translate that!",
                 color=ctx.author
             ).send(ctx)
-        
+
         if result.text == to_translate:
             # We got back what we put in...
             return await Message.EmbedText(
@@ -132,8 +132,22 @@ class Translate(commands.Cog):
             footer=footer
         )
 
-        if result.pronunciation:
-            # If we have a pronunciation, add it to the embed!
+        # The condition to check if the result has a valid pronunciation returned
+        def check_for_pronunciation(result):
+            if isinstance(result.pronunciation, list):  # Sometimes it returns a list object, and sometimes a string
+                if len(result.pronunciation) == 0:
+                    return False
+                else:
+                    result.pronunciation = result.pronunciation[0]
+            if not result.pronunciation:
+                return False
+            if result.text == result.pronunciation:
+                return False
+
+            return True
+
+        if check_for_pronunciation(result):
+            # If we have a valid pronunciation, add it to the embed!
             embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
         await embed.send(ctx)
