@@ -132,8 +132,22 @@ class Translate(commands.Cog):
             footer=footer
         )
 
-        if result.pronunciation:
-            # If we have a pronunciation, add it to the embed!
+        # The condition to check if the result has a valid pronunciation returned
+        def check_for_pronunciation(result):
+            if isinstance(result.pronunciation, list):
+                if len(result.pronunciation) == 0:
+                    return False
+                else:
+                    result.pronunciation = result.pronunciation[0]
+            if not result.pronunciation:
+                return False
+            if result.text == result.pronunciation:
+                return False
+
+            return True
+
+        if check_for_pronunciation(result):
+            # If we have a valid pronunciation, add it to the embed!
             embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
         await embed.send(ctx)
