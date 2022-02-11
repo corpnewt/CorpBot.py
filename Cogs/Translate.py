@@ -82,7 +82,7 @@ class Translate(commands.Cog):
         else: from_lang_name = None
 
         # Get the to language name from the passed code
-        if to_lang: to_lang_name = self.languages.get(to_lang.lower(), None)
+        if to_lang: to_lang_name = self.languages.get(to_lang, None)
         else: to_lang_name = None
 
         if not to_lang_name:  # No dice on the language :(
