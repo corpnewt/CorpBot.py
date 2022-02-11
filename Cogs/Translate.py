@@ -132,16 +132,10 @@ class Translate(commands.Cog):
         )
 
         # If we have a valid pronunciation, add it to the embed!
-        pronunciation = result.pronunciation
-        if isinstance(pronunciation, list):  # Sometimes it returns a list object, and sometimes a string
-            if len(pronunciation) == 0:  # If it's an empty list, we don't have a pronunciation
-                pronunciation = None
-            else:
-                pronunciation = pronunciation[0]  # We only care about the first pronunciation
-        if result.text == result.pronunciation:
-            pronunciation = None  # We don't want to show the same text as the pronunciation
-
-        if pronunciation:  # We have a pronunciation!
-            embed.add_field(name="Pronunciation", value=pronunciation, inline=False)
+        if result.pronunciation:
+            if isinstance(result.pronunciation,list):
+                result.pronunciation = result.pronunciation[0]
+            if not any(result.pronunciation == x for x in (result.text,to_translate)):
+                embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
         await embed.send(ctx)
