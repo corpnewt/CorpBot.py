@@ -49,6 +49,14 @@ class Translate(commands.Cog):
             color=ctx.author
         ).send(ctx)
 
+    def _unpack(self,value):
+        if isinstance(value,list):
+            while True:
+                if any((isinstance(x,list) for x in value)): value = sum(value,[])
+                else: break
+            if value: value = value[0]
+        return value
+
     @commands.command(pass_context=True)
     async def tr(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
@@ -102,6 +110,7 @@ class Translate(commands.Cog):
             result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=to_translate, dest=to_lang))
 
         # Explore the results!
+        result.text = self._unpack(result.text)
         if not result.text:
             return await Message.EmbedText(
                 title="Something went wrong...",
@@ -132,6 +141,7 @@ class Translate(commands.Cog):
         )
 
         # If we have a valid pronunciation, add it to the embed!
+        result.pronunciation = self._unpack(result.pronunciation)
         if result.pronunciation:
             if isinstance(result.pronunciation,list):
                 result.pronunciation = result.pronunciation[0]
