@@ -413,7 +413,7 @@ class EmbedText(Embed):
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
-        if len(self.fields):
+        if isinstance(self.fields,list) and len(self.fields):
             for field in self.fields[:self.field_max]:
                 em.add_field(
                     name=self._truncate_string(field.get("name", "None"), self.fname_max),
@@ -463,7 +463,7 @@ class EmbedText(Embed):
         em = self._embed_with_self()
         footer_text, footer_icon = self._get_footer()
 
-        if len(self.fields):
+        if isinstance(self.fields,list) and len(self.fields):
             for field in self.fields[:self.field_max]:
                 em.add_field(
                     name=self._truncate_string(field.get("name", "None"), self.fname_max),
