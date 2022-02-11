@@ -50,7 +50,7 @@ class Translate(commands.Cog):
         ).send(ctx)
 
     @commands.command(pass_context=True)
-    async def tr(self, ctx, *, translate = None):
+    async def tr(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
 
@@ -108,7 +108,7 @@ class Translate(commands.Cog):
                 description="I wasn't able to translate that!",
                 color=ctx.author
             ).send(ctx)
-        
+
         if result.text == to_translate:
             # We got back what we put in...
             return await Message.EmbedText(
@@ -119,35 +119,29 @@ class Translate(commands.Cog):
                 color=ctx.author
             ).send(ctx)
 
-        # Get the language names from the codes, and make them title case
-        footer = "{} --> {}".format(
-            self.languages.get(result.src.lower(), "Unknown").title(),
-            self.languages.get(result.dest.lower(), "Unknown").title()
-        )
+        # We got a translation!
         embed = Message.Embed(
             title="{}, your translation is:".format(DisplayName.name(ctx.author)),
             force_pm=True,
             color=ctx.author,
             description=result.text,
-            footer=footer
+            footer="{} --> {}".format(
+                self.languages.get(result.src.lower(), "Unknown").title(),
+                self.languages.get(result.dest.lower(), "Unknown").title()
+            )
         )
 
-        # The condition to check if the result has a valid pronunciation returned
-        def check_for_pronunciation(result):
-            if isinstance(result.pronunciation, list):
-                if len(result.pronunciation) == 0:
-                    return False
-                else:
-                    result.pronunciation = result.pronunciation[0]
-            if not result.pronunciation:
-                return False
-            if result.text == result.pronunciation:
-                return False
+        # If we have a valid pronunciation, add it to the embed!
+        pronunciation = result.pronunciation
+        if isinstance(pronunciation, list):  # Sometimes it returns a list object, and sometimes a string
+            if len(pronunciation) == 0:  # If it's an empty list, we don't have a pronunciation
+                pronunciation = None
+            else:
+                pronunciation = pronunciation[0]  # We only care about the first pronunciation
+        if result.text == result.pronunciation:
+            pronunciation = None  # We don't want to show the same text as the pronunciation
 
-            return True
-
-        if check_for_pronunciation(result):
-            # If we have a valid pronunciation, add it to the embed!
-            embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
+        if pronunciation:  # We have a pronunciation!
+            embed.add_field(name="Pronunciation", value=pronunciation, inline=False)
 
         await embed.send(ctx)
