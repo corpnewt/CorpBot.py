@@ -48,13 +48,16 @@ class Reddit(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 		
-	def strip_tags(self, html):
+	def unescape(self,text):
 		try:
 			u = unescape
 		except NameError:
 			h = HTMLParser()
 			u = h.unescape
-		html = u(html)
+		return u(text)
+
+	def strip_tags(self, html):
+		html = self.unescape(html)
 		s = MLStripper()
 		s.feed(html)
 		return s.get_data()
@@ -90,24 +93,20 @@ class Reddit(commands.Cog):
 					theJSON = { "url" : "" }
 		if not (answer or image):
 			# Just return the title
-			return '{}'.format(theJSON["title"])
+			return '{}'.format(self.unescape(theJSON["title"]))
 		if answer or image:
 			# We need the image or the answer
-			return {'title' : theJSON['title'], 'url' : theJSON["url"]}
+			return {'title' : self.unescape(theJSON['title']), 'url' : theJSON["url"]}
 
 	async def getText(self, url):
 		# Load url - with self.posts number of posts
 		r = await DL.async_json(url, {'User-agent': self.ua})
-		gotLink = False
 		returnDict = None
 		for i in range(0, 10):
 			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r["data"]["children"][randnum]["data"]
-				if 'over_18' in theJSON:
-					returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': theJSON['over_18'] }
-				else:
-					returnDict = { 'title': theJSON['title'], 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': False }
+				returnDict = { 'title': self.unescape(theJSON['title']), 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': theJSON.get('over_18',False) }
 				break
 			except IndexError:
 				continue
@@ -123,7 +122,6 @@ class Reddit(commands.Cog):
 		if numPosts <= 0:
 			# No links
 			return None
-		gotLink = False
 		returnDict = None
 		for i in range(0, 10):
 			randnum = random.randint(0, numPosts-1)
@@ -153,15 +151,10 @@ class Reddit(commands.Cog):
 							theURL = imageURL				
 				if not theURL:
 					continue
-				try:
-					u = unescape
-				except NameError:
-					h = HTMLParser()
-					u = h.unescape
 				returnDict = { 
-					'title': theJSON['title'], 
-					'url': u(theURL), 
-					'over_18': theJSON['over_18'], 
+					'title': self.unescape(theJSON['title']), 
+					'url': self.unescape(theURL), 
+					'over_18': theJSON.get('over_18',False), 
 					'permalink': theJSON['permalink'], 
 					'score' : theJSON['score'], 
 					'num_comments' : theJSON['num_comments'] }

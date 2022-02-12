@@ -362,8 +362,7 @@ class Music(commands.Cog):
 	async def on_next_song(self,ctx,error=None):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		task = "playing"
-		if error:
-			print(error)
+		if error: print(error)
 		# Gather our player
 		player = self.bot.wavelink.players.get(ctx.guild.id,None)
 		if player == None: return # Nothing to do here
@@ -790,7 +789,7 @@ class Music(commands.Cog):
 				color=ctx.author,
 				fields=fields,
 				delete_after=delay,
-				pm_after=15
+				pm_after_fields=15
 			).send(ctx)
 		else:
 			page,message = await PickList.PagePicker(title="♫ Current Playlist{}".format(pl_string),list=fields,timeout=60 if not delay else delay,ctx=ctx).pick()

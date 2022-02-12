@@ -96,17 +96,16 @@ class Embed:
         self.auth_max = kwargs.get("auth_max", 256)
         self.total_max = kwargs.get("total_max", 6000)
         # Creates a new embed - with an option setup dictionary
-        self.pm_after = kwargs.get("pm_after", 10)
+        self.pm_after_fields = kwargs.get("pm_after_fields", 10)
         self.force_pm = kwargs.get("force_pm", False)
         self.pm_react = kwargs.get("pm_react", "📬")
         self.title = kwargs.get("title", None)
         self.page_count = kwargs.get("page_count", False)
+        self.max_pages = kwargs.get("max_pages",0) # 1 or above to limit
         self.url = kwargs.get("url", None)
         self.description = kwargs.get("description", None)
         self.image = kwargs.get("image", None)
         self.footer = kwargs.get("footer", None)
-        # self.footer_text = kwargs.get("footer_text", discord.Embed.Empty)
-        # self.footer_icon = kwargs.get("footer_icon", discord.Embed.Empty)
         self.thumbnail = kwargs.get("thumbnail", None)
         self.author = kwargs.get("author", None)
         self.fields = kwargs.get("fields", [])
@@ -138,6 +137,12 @@ class Embed:
             discord.Color.default()
         ]
         self.color = kwargs.get("color", None)
+        # Description-based args
+        self.pm_after_pages = kwargs.get("pm_after_pages",1)
+        self.newline_split = kwargs.get("newline_split",False)
+        self.max_rows = kwargs.get("max_rows",10) # used with newline_split for max rows per page
+        self.d_header = kwargs.get("d_header","")
+        self.d_footer = kwargs.get("d_footer","")
 
     def add_field(self, **kwargs):
         self.fields.append({
@@ -156,9 +161,6 @@ class Embed:
         ext = file_path.split(".")
         fname = "Upload." + ext[-1] if len(ext) > 1 else "Upload"
         file_handle = discord.File(fp=file_path, filename=fname)
-        # Check if self.url = "attachment" and react
-        #if self.url and self.url.lower() == "attachment":
-        #    self.url = "attachment://" + fname
         return (file_handle, fname)
 
     # Embed stuff!
@@ -182,10 +184,7 @@ class Embed:
         if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
             # More than 2 pages and targeting context - try to dm
             try:
-                if send_file:
-                    message = await ctx.author.send(embed=embed, file=send_file, delete_after=self.delete_after)
-                else:
-                    message = await ctx.author.send(embed=embed, delete_after=self.delete_after)
+                message = await ctx.author.send(embed=embed,file=send_file,delete_after=self.delete_after)
                 await ctx.message.add_reaction(self.pm_react)
                 return message
             except discord.Forbidden:
@@ -197,15 +196,10 @@ class Embed:
                         # We tried...
                         pass
                     return None
-                pass
-        if send_file:
-            return await ctx.send(embed=embed, file=send_file, delete_after=self.delete_after)
-        else:
-            return await ctx.send(embed=embed, delete_after=self.delete_after)
+        return await ctx.send(embed=embed,file=send_file,delete_after=self.delete_after)
 
     def _truncate_string(self, value, max_chars):
-        if not type(value) is str:
-            return value
+        if not type(value) is str: return value
         # Truncates the string to the max chars passed
         return (value[:max_chars-3]+"...") if len(value) > max_chars else value
 
@@ -242,7 +236,7 @@ class Embed:
         em = discord.Embed(color=self.color if isinstance(self.color,discord.Color) else random.choice(self.colors))
         em.title = self._truncate_string(self.title, self.title_max)
         em.url = self.url
-        em.description = self._truncate_string(self.description, self.desc_max)
+        # em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
             em.set_image(url=self.image.get("url",discord.Embed.Empty) if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
@@ -251,16 +245,16 @@ class Embed:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
                 em.set_author(
-                    name    =self._truncate_string(name, self.auth_max),
+                    name = self._truncate_string(name, self.auth_max),
                     # Ignore the url here
                     icon_url=self.author.avatar_url
                 )      
             elif type(self.author) is dict:
                 if any(item in self.author for item in ["name", "url", "icon"]):
                     em.set_author(
-                        name    =self._truncate_string(self.author.get("name",     discord.Embed.Empty), self.auth_max),
-                        url     =self.author.get("url",      discord.Embed.Empty),
-                        icon_url=self.author.get("icon_url", discord.Embed.Empty)
+                        name = self._truncate_string(self.author.get("name",     discord.Embed.Empty), self.auth_max),
+                        url = self.author.get("url",      discord.Embed.Empty),
+                        icon_url = self.author.get("icon_url", discord.Embed.Empty)
                     )
                 else:
                     em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
@@ -273,253 +267,150 @@ class Embed:
         # Get our footer if we have one
         footer_text = footer_icon = discord.Embed.Empty
         if type(self.footer) is str:
-                footer_text = self.footer
+            footer_text = self.footer
         elif type(self.footer) is dict:
-                footer_text = self.footer.get("text", discord.Embed.Empty)
-                footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+            footer_text = self.footer.get("text", discord.Embed.Empty)
+            footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
         elif self.footer == None:
-                # Never setup
-                pass
+            # Never setup
+            pass
         else:
-                # Try to cast it
-                footer_text = str(self.footer)
+            # Try to cast it
+            footer_text = str(self.footer)
         return (footer_text, footer_icon)
 
+    def _get_desc_page_list(self):
+        # Returns the list of pages based on our settings
+        if not self.description: return [] # Empty list
+        adj_max = self.desc_max - len(self.d_header) - len(self.d_footer)
+        if self.newline_split:
+            chunks = []
+            curr   = ""
+            row    = 0
+            for line in self.description.split("\n"):
+                test = curr+"\n"+line if len(curr) else line
+                row += 1
+                if len(line) > adj_max: # The line itself is too long
+                    if len(curr): chunks.append(self.d_header+curr+self.d_footer)
+                    chunks.extend([self.d_header+x+self.d_footer for x in textwrap.wrap(
+                        line,
+                        adj_max,
+                        break_long_words=True
+                    )])
+                    curr = ""
+                elif len(test) >= adj_max or row > self.max_rows: # Exact or too big - adjust
+                    chunks.append(self.d_header+(test if len(test)==adj_max else curr)+self.d_footer)
+                    curr = "" if len(test)==adj_max else line
+                    row = 0 if len(test)==adj_max else 1
+                else: # Not big enough yet - just append
+                    curr = test
+            if len(curr): chunks.append(self.d_header+curr+self.d_footer)
+            return chunks
+        # Use textwrap to wrap the words, not newlines
+        return [self.d_header+x+self.d_footer for x in textwrap.wrap(
+            self.description,
+            adj_max,
+            break_long_words=True,
+            replace_whitespace=False
+        )]
+
+    def _to_pm(self,field_pages=None,desc_pages=None):
+        if field_pages is None or desc_pages is None:
+            # Missing info - regen
+            field_pages,desc_pages = self._get_pages()
+        return len(self.fields)>self.pm_after_fields or len(desc_pages)>self.pm_after_pages if self.pm_after_fields>-1 and self.pm_after_pages>-1 else False
+
+    def _get_pages(self):
+        # Returns a tuple of (pages_of_fields, pages_of_descriptions)
+        if not isinstance(self.fields,list): self.fields = []
+        field_pages = [self.fields[i:i+self.field_max] for i in range(0, len(self.fields), self.field_max)]
+        desc_pages = self._get_desc_page_list()
+        return (field_pages,desc_pages)
+
     async def edit(self, ctx, message):
         # Edits the passed message - and sends any remaining pages
         # check if we can steal the color from the message - but only if using a User color in dm,
         # or if the color is set to None and the message we're editing has an embed
         if (self.color is None or isinstance(self.color,discord.User)) and len(message.embeds):
             self.color = message.embeds[0].color
-        em = self._embed_with_self()
-        footer_text, footer_icon = self._get_footer()
+        # Pipe to our send() function
+        return await self.send(ctx,original_message=message)
 
-        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
-
-        if len(self.fields) <= self.pm_after and not to_pm:
-            # Edit in place, nothing else needs to happen
-            for field in self.fields:
-                em.add_field(
-                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
-                    inline=field.get("inline", False)
-                )
-            em.set_footer(
-                text=self._truncate_string(footer_text, self.foot_max),
-                icon_url=footer_icon
-            )
-            # Get the file if one exists
-            if self.file:
-                m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.delete()
-                # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
-                return m
-            await message.edit(content=None, embed=em, delete_after=self.delete_after)
-            return message
-        # Now we need to edit the first message to just a space - then send the rest
-        new_message = await self.send(ctx)
-        if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
+    async def _edit_embed(self, ctx, embed, to_pm, original_message):
+        # Helper to determine how to edit a message - then actually edit it
+        if not to_pm and not self.file:
+            # Edit in place
+            await original_message.edit(content=None,embed=embed,delete_after=self.delete_after)
+            return original_message
+        # We're dming this message - send the new, and edit the original
+        message = await self._send_embed(ctx,embed,to_pm,self.file)
+        if message.channel == ctx.author.dm_channel != ctx.channel:
+            # We sent a dm - edit the original message to reflect this
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            await message.delete()
-            # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
-        return new_message
-
-    async def send(self, ctx):
-        if not ctx:
-            return
-        
-        em = self._embed_with_self()
-        footer_text, footer_icon = self._get_footer()
-
-        # First check if we have any fields at all - and try to send
-        # as one page if not
-        if not len(self.fields):
-            em.set_footer(
-                text=self._truncate_string(footer_text, self.foot_max),
-                icon_url=footer_icon
-            )
-            return await self._send_embed(ctx, em, False, self.file)
-        
-        # Only pm if our self.pm_after is above -1
-        to_pm = len(self.fields) > self.pm_after if self.pm_after > -1 else False
-
-        page_count = 1
-        page_total = math.ceil(len(self.fields)/self.field_max)
-
-        if page_total > 1 and self.page_count and self.title:
-            add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-            em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
-        for field in self.fields:
-            em.add_field(
-                name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                value=self._truncate_string(field.get("value", "None"), self.fval_max),
-                inline=field.get("inline", False)
-            )
-            # 25 field max - send the embed if we get there
-            if len(em.fields) >= self.field_max:
-                if page_count > 1 and not self.page_count:
-                    # Clear the title
-                    em.title = None
-                if page_total == page_count:
-                    em.set_footer(
-                        text=self._truncate_string(footer_text, self.foot_max),
-                        icon_url=footer_icon
-                    )
-                if page_count == 1 and self.file:
-                    message = await self._send_embed(ctx, em, to_pm, self.file)
-                else:
-                    # Clear any image if needed
-                    # em.set_image(url="")
-                    message = await self._send_embed(ctx, em, to_pm)
-                # Break if things didn't work
-                if not message:
-                    return None
-                em.clear_fields()
-                page_count += 1
-                if page_total > 1 and self.page_count and self.title:
-                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
-
-        if len(em.fields):
-            em.set_footer(
-                text=self._truncate_string(footer_text, self.foot_max),
-                icon_url=footer_icon
-            )
-            if page_total == 1 and self.file:
-                message = await self._send_embed(ctx, em, to_pm, self.file)
-            else:
-                # Clear any image if needed
-                # em.set_image(url="")
-                message = await self._send_embed(ctx, em, to_pm)
+            # No dm - just delete the original
+            await original_message.delete()
         return message
 
-class EmbedText(Embed):
-    def __init__(self, **kwargs):
-        Embed.__init__(self, **kwargs)
-        # Creates a new embed - with an option setup dictionary
-        self.pm_after = kwargs.get("pm_after", 1)
-        self.max_pages = kwargs.get("max_pages", 0)
-        self.desc_head = kwargs.get("desc_head", "") # Header for description markdown
-        self.desc_foot = kwargs.get("desc_foot", "") # Footer for description markdown
-
-    async def edit(self, ctx, message):
-        # Edits the passed message - and sends any remaining pages
-        # check if we can steal the color from the message - but only if using a User color in dm,
-        # or if the color is set to None and the message we're editing has an embed
-        if (self.color is None or isinstance(self.color,discord.User)) and len(message.embeds):
-            self.color = message.embeds[0].color
+    async def send(self, ctx, original_message=None):
+        if not ctx: return
+        # Create the shell embed with our self properties
         em = self._embed_with_self()
+        # Gather our footer - if any
         footer_text, footer_icon = self._get_footer()
-
-        if isinstance(self.fields,list) and len(self.fields):
-            for field in self.fields[:self.field_max]:
-                em.add_field(
-                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
-                    inline=field.get("inline", False)
-                )
-
-        if self.description == None or not len(self.description):
-            text_list = []
-        else:
-            text_list = textwrap.wrap(
-                self.description,
-                self.desc_max - len(self.desc_head) - len(self.desc_foot),
-                break_long_words=True,
-                replace_whitespace=False)
-        to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
-        if len(text_list) <= 1 and not to_pm:
-            # Edit in place, nothing else needs to happen
-            if len(text_list):
-                em.description = self.desc_head + text_list[0] + self.desc_foot
+        # Gather our field and description pages
+        field_pages,desc_pages = self._get_pages()
+        # Total is whichever is largest
+        total_pages = max((len(field_pages),len(desc_pages)))
+        if self.max_pages > 0: # Need to limit the total_pages
+            total_pages = self.max_pages
+        # First check if we have any pages at all - and if not, try to send
+        # an embed with what we have
+        if not total_pages:
             em.set_footer(
                 text=self._truncate_string(footer_text, self.foot_max),
                 icon_url=footer_icon
             )
-            # Get the file if one exists
-            if self.file:
-                m = await self._send_embed(ctx, em, to_pm, self.file)
-                await message.delete()
-                # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
-                return m
-            await message.edit(content=None, embed=em, delete_after=self.delete_after)
-            return message
-        # Now we need to edit the first message to just a space - then send the rest
-        new_message = await self.send(ctx)
-        if new_message.channel == ctx.author.dm_channel and not ctx.channel == ctx.author.dm_channel:
-            em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(content=None, embed=em, delete_after=self.delete_after)
-        else:
-            await message.delete()
-            # await message.edit(content=" ", embed=None, delete_after=self.delete_after)
-        return new_message
-
-    async def send(self, ctx):
-        if not ctx:
-            return
-        
-        em = self._embed_with_self()
-        footer_text, footer_icon = self._get_footer()
-
-        if isinstance(self.fields,list) and len(self.fields):
-            for field in self.fields[:self.field_max]:
-                em.add_field(
-                    name=self._truncate_string(field.get("name", "None"), self.fname_max),
-                    value=self._truncate_string(field.get("value", "None"), self.fval_max),
-                    inline=field.get("inline", False)
-                )
-
-        # First check if we have any fields at all - and try to send
-        # as one page if not
-        if self.description == None or not len(self.description):
-            em.set_footer(
-                text=self._truncate_string(footer_text, self.foot_max),
-                icon_url=footer_icon
-            )
-            return await self._send_embed(ctx, em, False, self.file)
-        text_list = textwrap.wrap(
-            self.description,
-            self.desc_max - len(self.desc_head) - len(self.desc_foot),
-            break_long_words=True,
-            replace_whitespace=False)
-
-        # Only pm if our self.pm_after is above -1
-        to_pm = len(text_list) > self.pm_after if self.pm_after > -1 else False
-        page_count = 1
-        page_total = len(text_list)
-
-        if len(text_list) > 1 and self.page_count and self.title:
-            add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-            em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
-
-        i = 0
-        for i in range(len(text_list)):
-            m = text_list[i]
-            if self.max_pages > 0 and i >= self.max_pages:
-                break
-            # Strip the title if not the first page and not counting
-            if i > 0 and not self.page_count:
-                em.title = None
-            if i == len(text_list)-1:
-                # Last item - apply footer
+            # If we're editing - remove/update messages as needed
+            if original_message: return await self._edit_embed(ctx,em,False,original_message)
+            else: return await self._send_embed(ctx,em,False,self.file)
+                
+        # Take note of whether or not we should try to pm
+        to_pm = self._to_pm(field_pages=field_pages,desc_pages=desc_pages)
+        # Let's walk the pages and send the slices of our fields/desc as needed
+        for page in range(total_pages):
+            em.description = None
+            em.clear_fields() # Start with a clean slate
+            if len(field_pages)>page: # We have fields to add
+                for field in field_pages[page]:
+                    em.add_field(
+                        name=self._truncate_string(field.get("name", "None"), self.fname_max),
+                        value=self._truncate_string(field.get("value", "None"), self.fval_max),
+                        inline=field.get("inline", False)
+                    )
+            if len(desc_pages)>page: # We have description to add
+                em.description = desc_pages[page]
+            # Check if we need to adjust the title
+            if total_pages > 1 and self.page_count and self.title:
+                add_title = " (Page {:,} of {:,})".format(page+1,total_pages)
+                em.title = self._truncate_string(self.title,self.title_max-len(add_title))+add_title
+            # If we're on the last message - set the footer
+            if page+1 == total_pages:
                 em.set_footer(
                     text=self._truncate_string(footer_text, self.foot_max),
                     icon_url=footer_icon
                 )
-            em.description = self.desc_head + m + self.desc_foot
-            if i == 0 and self.file != None:
-                message = await self._send_embed(ctx, em, to_pm, self.file)
+            if original_message and page==0:
+                message = await self._edit_embed(ctx,em,False,original_message)
             else:
-                # Clear any image if needed
-                # em.set_image(url="")
-                message = await self._send_embed(ctx, em, to_pm)
-            # Break if things didn't work
-            if not message:
-                return None
-            page_count += 1
-            if len(text_list) > 1 and self.page_count and self.title:
-                    add_title = " (Page {:,} of {:,})".format(page_count, page_total)
-                    em.title = self._truncate_string(self.title, self.title_max - len(add_title)) + add_title
+                # Send the embed - and include a file if present and we're on the first page
+                message = await self._send_embed(ctx,em,to_pm,self.file if page==0 else None)
+            # Check if our message didn't send - and bail if that's the case
+            if not message: return None
+        # Return the last message we sent
         return message
+
+class EmbedText(Embed): # Kept as a placeholder
+    def __init__(self, **kwargs):
+        Embed.__init__(self, **kwargs)

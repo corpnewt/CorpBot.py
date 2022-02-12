@@ -60,11 +60,6 @@ class Embed(commands.Cog):
 
         Admins/bot-admins can pass -nodm before the json content to prevent the bot from dming on long messages.
 
-        Types:
-        
-        field
-        description
-
         ----------------------------------
 
         Limits      (All - owner only):
@@ -84,17 +79,18 @@ class Embed(commands.Cog):
         
         Options     (All):
 
-        pm_after    (int - fields, or pages - hard limit of 10 messages, admin/bot-admin only)
-        pm_react    (str)
-        title       (str)
-        page_count  (bool)
-        url         (str)
-        description (str)
-        image       (str or dict { url })
-        footer      (str or dict { text, icon_url })
-        thumbnail   (str or dict { url })
-        author      (str, dict { name, url, icon_url }, or user/member)
-        color       (user/member, rgb int array, int)
+        pm_after_fields (int - fields - hard limit of 10, admin/bot-admin only)
+        pm_after_pages  (int - pages - hard limit of 10, admin/bot-admin only)
+        pm_react        (str)
+        title           (str)
+        page_count      (bool)
+        url             (str)
+        description     (str)
+        image           (str or dict { url })
+        footer          (str or dict { text, icon_url })
+        thumbnail       (str or dict { url })
+        author          (str, dict { name, url, icon_url }, or user/member)
+        color           (user/member, rgb int array, int)
 
         ----------------------------------
 
@@ -120,18 +116,15 @@ class Embed(commands.Cog):
 
         if embed_json is None: embed_json = ""
 
-        embed_type = next((x for x in ("field","description") if x in embed_json.lower().split()[:2]),None)
-        no_dm      = "-nodm" in embed_json.lower().split()[:2]
+        no_dm = "-nodm" in embed_json.lower().split()[:2]
 
         # Check for attachments - and try to load/serialize the first
         if len(ctx.message.attachments):
             try: embed_json = await DL.async_text(ctx.message.attachments[0].url)
             except: return await Message.EmbedText(title="Something went wrong...", description="Could not download that url.").send(ctx)
         else:
-            # Strip out the embed_type and no_dm if found
-            if embed_type: # It's not None, assume we set it
-                embed_json = re.sub("(?i){}".format(embed_type),"",embed_json,count=1).strip()
-            if no_dm: # Same as above
+            # Strip out the no_dm if found
+            if no_dm:
                 embed_json = re.sub("(?i)-nodm","",embed_json,count=1).strip()
             if Utils.url_regex.match(embed_json):
                 # It's a URL - let's try to download it
@@ -141,21 +134,15 @@ class Embed(commands.Cog):
         if isinstance(embed_dict,Exception):
             return await Message.EmbedText(title="Something went wrong...", description=str(embed_dict)).send(ctx)
         if no_dm and Utils.is_bot_admin(ctx):
-            embed_dict["pm_after"] = -1
+            embed_dict["pm_after_fields"] = -1
         else:
-            # We don't have perms to set this - remove it if it exists
-            embed_dict.pop("pm_after",None)
+            # We don't have perms to set this - remove them if they exist
+            embed_dict.pop("pm_after_fields",None)
+            embed_dict.pop("pm_after_pages",None)
         try:
-            if embed_type is None or embed_type.lower() == "field":
-                # Hard limit of 10 messages
-                embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*10]
-                await Message.Embed(**embed_dict).send(ctx)
-            elif embed_type.lower() == "description":
-                # Hard limit of 10 messages
-                embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*10]
-                await Message.EmbedText(**embed_dict).send(ctx)
-            else:
-                await Message.EmbedText(title="Something went wrong...", description="\"{}\" is not one of the available embed types...".format(embed_type)).send(ctx)
+            # Hard limit of 10 messages
+            embed_dict["max_pages"] = 10
+            await Message.Embed(**embed_dict).send(ctx)
         except Exception as e:
             try: e = str(e)
             except: e = "An error occurred :("
@@ -204,7 +191,7 @@ class Embed(commands.Cog):
                 color=ctx.author
             ).send(ctx)
         # Don't ever pm as we're posting
-        embed_dict["pm_after"] = -1
+        embed_dict["pm_after_fields"] = -1
         return_message = None
         try:
             # Check for a message to send before
@@ -213,14 +200,9 @@ class Embed(commands.Cog):
             # Make sure we have either fields or description - might just be
             # a message we're sending
             if any((x in embed_dict for x in ("fields","description","title"))):
-                if len(embed_dict.get("fields",[])) > embed_dict.get("field_max",25): # Assume field-based
-                    # Hard limit of 10 messages
-                    embed_dict["fields"] = embed_dict.get("fields",[])[:embed_dict.get("field_max",25)*10]
-                    return_message = await Message.Embed(**embed_dict).send(channel)
-                else: # Assume description-based
-                    # Hard limit of 10 messages
-                    embed_dict["description"] = embed_dict.get("description","")[:embed_dict.get("desc_max",2048)*10]
-                    return_message = await Message.EmbedText(**embed_dict).send(channel)
+                # Hard limit of 10 messages
+                embed_dict["max_pages"] = 10
+                return_message = await Message.Embed(**embed_dict).send(channel)
             # Check for a message to send after
             if embed_dict.get("after",embed_dict.get("message")):
                 return_message = await channel.send(str(embed_dict.get("after",embed_dict.get("message"))[:2000]),allowed_mentions=discord.AllowedMentions.all())

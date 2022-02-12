@@ -150,7 +150,7 @@ class Plist(commands.Cog):
             title="NVIDIA Web Driver Results For \"{}\" ({} total)".format(os_build if os_build != None else "Latest", len(wd)),
             list=wd,
             color=ctx.author,
-            pm_after=25,
+            pm_after_fields=25,
             footer="All links pulled from {}".format(self.nv_link),
             ctx=ctx
         ).pick()

@@ -101,7 +101,7 @@ class Quote(commands.Cog):
 		e = {
 			"author" : reaction.message.author,
 			"image" : image,
-			"pm_after" : -1, # Don't pm quotes
+			"pm_after_fields" : -1, # Don't pm quotes
 			"description" : msg + "\n\nSent by {} in {} | {} | {}".format(
 				reaction.message.author.mention,
 				reaction.message.channel.mention,
