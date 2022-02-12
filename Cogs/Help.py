@@ -240,7 +240,7 @@ class Help(commands.Cog):
 			# Get a list of all commands and modules and server up the 3 closest
 			cog_name_list = []
 			com_name_list = []
-			ali_name_list = []
+			# ali_name_list = []
 			
 			for cog in self.bot.cogs:
 				if cog in cog_name_list: continue
@@ -263,7 +263,7 @@ class Help(commands.Cog):
 			# ali_match = FuzzySearch.search(command, ali_name_list)
 
 			# Build the embed
-			m = Message.Embed(force_pm=True,pm_after=25)
+			m = Message.Embed()
 			if type(ctx.author) is discord.Member:
 				m.color = ctx.author.color
 			m.title = "Cog or command Not Found"
@@ -285,6 +285,6 @@ class Help(commands.Cog):
 		if len(result.get("fields",[]))>1:
 			return await PickList.PagePicker(title=result["title"],list=result["fields"],ctx=ctx,description=desc).pick()
 		m = Message.Embed(**result)
-		m.pm_after = 25
+		m.pm_after_fields = 25
 		m.footer = desc.replace("```\n","").split("\n")[0]
 		await m.send(ctx)

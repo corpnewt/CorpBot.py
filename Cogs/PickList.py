@@ -175,7 +175,7 @@ class PagePicker(Picker):
             "thumbnail": self.thumbnail,
             "description":self.description if self.list else self._get_page_contents(page),
             "color":self.ctx.author,
-            "pm_after":25, # We can leave it a huge number for desc without issue - never pm automagically
+            "pm_after_fields":-1, # Disable pm_after entirely
             "fields":self._get_page_contents(page) if self.list else None,
             "footer":self._get_footer(page,pages)
         }
