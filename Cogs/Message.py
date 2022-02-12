@@ -363,7 +363,7 @@ class Embed:
         field_pages,desc_pages = self._get_pages()
         # Total is whichever is largest
         total_pages = max((len(field_pages),len(desc_pages)))
-        if self.max_pages > 0: # Need to limit the total_pages
+        if self.max_pages > 0 and total_pages > self.max_pages: # Need to limit the total_pages
             total_pages = self.max_pages
         # First check if we have any pages at all - and if not, try to send
         # an embed with what we have
