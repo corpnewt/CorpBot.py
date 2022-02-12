@@ -140,7 +140,7 @@ class Embed:
         # Description-based args
         self.pm_after_pages = kwargs.get("pm_after_pages",1)
         self.newline_split = kwargs.get("newline_split",False)
-        self.max_rows = kwargs.get("max_rows",10) # used with newline_split for max rows per page
+        self.max_rows = kwargs.get("max_rows",20) # used with newline_split for max rows per page
         self.d_header = kwargs.get("d_header","")
         self.d_footer = kwargs.get("d_footer","")
 
