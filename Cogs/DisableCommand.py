@@ -130,12 +130,12 @@ class DisableCommand(commands.Cog):
 		# Make sure we're not trying to block anything in this cog
 		if command_or_cog_name in self._get_our_comms():
 			msg = "You can't disable any commands from this cog."
-			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
+			return await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 		# At this point - we should check if we have a command
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
+			return await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title="Disable Commands").send(ctx)
 		# Build a list of the commands we disable
 		disabled = []
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
@@ -149,7 +149,7 @@ class DisableCommand(commands.Cog):
 		# Now we give some output
 		msg = "All eligible passed commands are already disabled." if len(disabled) == 0 else ", ".join(sorted(disabled))
 		title = "Disabled 1 Command" if len(disabled) == 1 else "Disabled {} Commands".format(len(disabled))
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def enable(self, ctx, *, command_or_cog_name = None):
@@ -161,7 +161,7 @@ class DisableCommand(commands.Cog):
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
+			return await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title="Enable Commands").send(ctx)
 		# Build a list of the commands we disable
 		enabled = []
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
@@ -179,7 +179,7 @@ class DisableCommand(commands.Cog):
 		# Now we give some output
 		msg = "All eligible passed commands are already enabled." if len(enabled) == 0 else ", ".join(sorted(enabled))
 		title = "Enabled 1 Command" if len(enabled) == 1 else "Enabled {} Commands".format(len(enabled))
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def listdisabled(self, ctx):
@@ -188,7 +188,7 @@ class DisableCommand(commands.Cog):
 		dis_com = self.settings.getServerStat(ctx.guild, "DisabledCommands")
 		msg = "No commands have been disabled." if len(dis_com) == 0 else ", ".join(sorted(dis_com))
 		title = "1 Disabled Command" if len(dis_com) == 1 else "{} Disabled Commands".format(len(dis_com))
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def isdisabled(self, ctx, *, command_or_cog_name = None):
@@ -199,7 +199,7 @@ class DisableCommand(commands.Cog):
 		comm = self._get_commands(command_or_cog_name)
 		if comm == None:
 			msg = "\"{}\" is not a cog or command name that is eligible for this system.".format(command_or_cog_name)
-			return await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title="Disabled Commands").send(ctx)
+			return await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title="Disabled Commands").send(ctx)
 		is_cog = True if self.bot.get_cog(command_or_cog_name) else False
 		# Now we check if they're all disabled
 		disabled = []
@@ -218,7 +218,7 @@ class DisableCommand(commands.Cog):
 			title = "{} Command Status".format(command_or_cog_name)
 			footer = None
 			msg = "Disabled" if len(disabled) else "Enabled"
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title, footer=footer).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title, footer=footer).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def disableall(self, ctx):
@@ -242,7 +242,7 @@ class DisableCommand(commands.Cog):
 		# Give some output
 		msg = "All eligible commands are already disabled." if len(disabled) == 0 else ", ".join(sorted(disabled))
 		title = "Disabled 1 Command" if len(disabled) == 1 else "Disabled {} Commands".format(len(disabled))
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
 	@commands.command(pass_context=True)
 	async def enableall(self, ctx):
@@ -258,4 +258,4 @@ class DisableCommand(commands.Cog):
 		# Give some output
 		msg = "All eligible commands are already enabled." if len(dis_com) == 0 else ", ".join(sorted(dis_com))
 		title = "Enabled 1 Command" if len(dis_com) == 1 else "Enabled {} Commands".format(len(dis_com))
-		await Message.EmbedText(desc_head="```\n", desc_foot="```", color=ctx.author, description=msg, title=title).send(ctx)
+		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
