@@ -454,8 +454,8 @@ class Debugging(commands.Cog):
 				description=log_message,
 				color=color,
 				thumbnail=thumbnail,
-				desc_head="```\n",
-				desc_foot="\n```",
+				d_header="```\n",
+				d_footer="\n```",
 				footer=footer
 			).send(logChan)
 			if filename: await logChan.send(file=discord.File(filename))
