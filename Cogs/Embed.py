@@ -102,8 +102,8 @@ class Embed(commands.Cog):
 
         Options      (text only):
 
-        desc_head    (str)
-        desc_foot    (str)
+        d_header     (str)
+        d_footer     (str)
         max_pages    (int)
 
         ----------------------------------
