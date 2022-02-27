@@ -733,7 +733,7 @@ class Music(commands.Cog):
 		if len(server_list): await PickList.PagePicker(title=msg,list=server_list,ctx=ctx).pick()
 		else: await Message.EmbedText(title=msg,color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(aliases=["queue"])
+	@commands.command(aliases=["queue","q"])
 	async def playlist(self, ctx):
 		"""Lists the queued songs in the playlist."""
 
