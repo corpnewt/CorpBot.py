@@ -158,9 +158,9 @@ class Torment(commands.Cog):
 			# Do this over time
 			try:
 				if member.name == "@everyone" and type(member) is discord.Role:
-					await channel.send("{}".format(member.name))
+					await channel.send("{}".format(member.name),allowed_mentions=discord.AllowedMentions.all())
 				else:
-					await channel.send('{}'.format(member.mention))
+					await channel.send('{}'.format(member.mention),allowed_mentions=discord.AllowedMentions.all())
 			except Exception:
 				pass
 			for j in range(0, self.waitBetween):
@@ -242,9 +242,9 @@ class Torment(commands.Cog):
 			# Do this over time
 			try:
 				if member.name == "@everyone" and type(member) is discord.Role:
-					tmessage = await ctx.channel.send("{}".format(member.name))
+					tmessage = await ctx.channel.send("{}".format(member.name),allowed_mentions=discord.AllowedMentions.all())
 				else:
-					tmessage = await ctx.channel.send('{}'.format(member.mention))
+					tmessage = await ctx.channel.send('{}'.format(member.mention),allowed_mentions=discord.AllowedMentions.all())
 				await tmessage.delete()
 			except Exception:
 				pass
@@ -331,9 +331,9 @@ class Torment(commands.Cog):
 					# Only ping where they can read
 					try:
 						if member.name == "@everyone" and type(member) is discord.Role:
-							await channel.send("{}".format(member.name))
+							await channel.send("{}".format(member.name),allowed_mentions=discord.AllowedMentions.all())
 						else:
-							await channel.send('{}'.format(member.mention))
+							await channel.send('{}'.format(member.mention),allowed_mentions=discord.AllowedMentions.all())
 					except Exception:
 						pass
 			for j in range(0, self.waitBetween):
@@ -419,9 +419,9 @@ class Torment(commands.Cog):
 					# Only ping where they can read
 					try:
 						if member.name == "@everyone" and type(member) is discord.Role:
-							tmessage = await channel.send("{}".format(member.name))
+							tmessage = await channel.send("{}".format(member.name),allowed_mentions=discord.AllowedMentions.all())
 						else:
-							tmessage = await channel.send('{}'.format(member.mention))
+							tmessage = await channel.send('{}'.format(member.mention),allowed_mentions=discord.AllowedMentions.all())
 						await tmessage.delete()
 					except Exception:
 						pass
