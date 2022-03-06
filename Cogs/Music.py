@@ -114,9 +114,9 @@ class Music(commands.Cog):
 	@commands.Cog.listener()
 	async def on_wavelink_track_end(self,player,track,reason):
 		await player.stop() # Stop the player - prevents issues with it thinking it's still playing
-		print("TRACK ENDED",player)
-		print(track)
-		print(reason)
+		# print("TRACK ENDED",player)
+		# print(track)
+		# print(reason)
 		if hasattr(player,"repeat") and player.repeat:
 			# We're repeating tracks - add it to the end
 			if not hasattr(player,"track_ctx"): return # No context - probably stopped.
