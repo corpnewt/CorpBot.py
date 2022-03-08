@@ -864,21 +864,22 @@ class Music(commands.Cog):
 			total_streams = 0
 			time_string = ""
 			for x in player.queue:
-				if x.duration: total_time+=x.duration
+				if x.duration: total_time+=x.duration-getattr(x,"seek",0)
 				else: total_streams+=1
 			if total_time:
 				# Got time at least
 				time_string += "{} total -- ".format(self.format_duration(total_time))
 			if total_streams:
 				# Got at least one stream
-				time_string += "{:,} Stream{} -- ".format(total_streams, "" if total_streams == 1 else "s") 
+				time_string += "{:,} Stream{} -- ".format(total_streams, "" if total_streams == 1 else "s")
 			q_text = "-- {:,} Song{} in Queue -- {}".format(len(player.queue), "" if len(player.queue) == 1 else "s", time_string)
 			fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
 		for x,y in enumerate(player.queue,start=1):
 			t_ctx = getattr(y,"ctx",None)
 			fields.append({
 				"name":"{}. {}".format(x,y.title),
-				"value":"{} - Requested by {} - [Link]({})".format(
+				"value":"{}{} - Requested by {} - [Link]({})".format(
+					self.format_duration(y.seek,y)+" -> " if hasattr(y,"seek") else "",
 					self.format_duration(y.duration,y),
 					t_ctx.author.mention if t_ctx else "Unknown",
 					y.uri
@@ -914,7 +915,7 @@ class Music(commands.Cog):
 		if Utils.is_bot_admin(ctx):
 			await Message.Embed(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=delay).send(ctx)
 			to_skip = True
-		elif getattr(player,"track_ctx",None) == ctx.author:
+		elif hasattr(player,"track_ctx") and player.track_ctx.author == ctx.author:
 			await Message.Embed(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=delay).send(ctx)
 			to_skip = True
 		# At this point, we're not admin, and not the requestor, let's make sure we're in the same vc
