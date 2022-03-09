@@ -2,15 +2,17 @@ import functools, string, googletrans
 from Cogs import DisplayName, Message, PickList
 from discord.ext import commands
 
+
 def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Translate(bot, settings))
 
+
 # Requires the mtranslate module be installed
 
 class Translate(commands.Cog):
-            
+
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
@@ -42,23 +44,23 @@ class Translate(commands.Cog):
         await Message.EmbedText(
             title="Detected Language",
             description="Detected **{}** ({}) with {:.0%} confidence.".format(
-                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang.lower(),"Martian?")),
+                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang.lower(), "Martian?")),
                 lang_detect.lang.lower(),
                 lang_detect.confidence
             ),
             color=ctx.author
         ).send(ctx)
 
-    def _unpack(self,value):
-        if isinstance(value,list):
+    def _unpack(self, value):
+        if isinstance(value, list):
             while True:
-                if any((isinstance(x,list) for x in value)): value = sum(value,[])
+                if any((isinstance(x, list) for x in value)): value = sum(value, [])
                 else: break
             if value: value = value[0]
         return value
 
-    @commands.command(pass_context=True)
-    async def tr(self, ctx, *, translate=None):
+    @commands.command(name="translate", aliases=["tr"], pass_context=True)
+    async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
 
@@ -143,9 +145,58 @@ class Translate(commands.Cog):
         # If we have a valid pronunciation, add it to the embed!
         result.pronunciation = self._unpack(result.pronunciation)
         if result.pronunciation:
-            if isinstance(result.pronunciation,list):
+            if isinstance(result.pronunciation, list):
                 result.pronunciation = result.pronunciation[0]
-            if not any(result.pronunciation == x for x in (result.text,to_translate)):
+            if not any(result.pronunciation == x for x in (result.text, to_translate)):
                 embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
+        await embed.send(ctx)
+
+    @commands.command(name="pronounce", aliases=["pr"])
+    async def pronounce(self, ctx, *, text):
+        """Pronunciation for a sentence in the English language.\n
+        $pronounce こんにちは --> returns \"Kon'nichiwa\""""
+
+        if text.split()[-1] in self.langcodes.values():
+            source_lang = text.split()[-1]
+            text = " ".join(text.split()[:-1])
+        else:
+            source_lang = None
+
+        if len(text) > 2000:
+            return await ctx.send("Text too long. Please keep it under 2000 characters.")
+
+        detect_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.detect, text))  # We are detecting the language of the text
+
+        if not source_lang:
+            if isinstance(detect_result.confidence, list):  # We got multiple results
+                source_lang = detect_result.lang[0]
+                lang_confidence = detect_result.confidence[0]
+            else:
+                source_lang = detect_result.lang
+                lang_confidence = detect_result.confidence
+        else:
+            lang_confidence = 1  # When the user specifies a source language, we assume they know what they're doing
+
+        pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
+        # We don't need to translate to another language, we just get the pronunciation
+        english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
+        if not self.languages.get(source_lang):
+            return await ctx.send("I couldn't detect the language of the text!")
+
+        embed = Message.Embed(title="{}, your pronunciation is:".format(ctx.author.display_name),
+                              color=ctx.author.color)
+        embed.description = pronunciation_result.pronunciation
+        embed.add_field(name="Source Text", value=pronunciation_result.text, inline=False)
+        embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
+        if int(lang_confidence) != 1:
+            embed.footer = {
+                "text": "Language: {} (Confidence: {}%)".format(
+                    self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown',
+                    round(lang_confidence * 100, 2))
+            }
+        else:
+            embed.footer = {
+                "text": "Language: {}".format(self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown')
+            }
         await embed.send(ctx)
