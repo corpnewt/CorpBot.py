@@ -153,18 +153,20 @@ class Translate(commands.Cog):
         await embed.send(ctx)
 
     @commands.command(name="pronounce", aliases=["pr"])
-    async def pronounce(self, ctx, *, text):
+    async def pronounce(self, ctx, *, text=None):
         """Pronunciation for a sentence in the English language.\n
         $pronounce こんにちは --> returns \"Kon'nichiwa\""""
 
+        if text == None: return await ctx.send("Usage: `{}pronounce [text to identify]`".format(ctx.prefix))
+
         if text.split()[-1] in self.langcodes.values():
             source_lang = text.split()[-1]
-            text = " ".join(text.split()[:-1])
+            text = " ".join(text.split()[:-1])  # We are removing the last word from the list, since it's the language code
         else:
             source_lang = None
 
-        if len(text) > 2000:
-            return await ctx.send("Text too long. Please keep it under 2000 characters.")
+        if len(text) > 1000:  # We need to keep it under 1024 characters due to field size limits
+            return await ctx.send("Text too long. Please keep it under 1000 characters.")
 
         detect_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.detect, text))  # We are detecting the language of the text
 
@@ -180,6 +182,9 @@ class Translate(commands.Cog):
 
         pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
         # We don't need to translate to another language, we just get the pronunciation
+        if not pronunciation_result.pronunciation or pronunciation_result.pronunciation == pronunciation_result.src:
+            return await ctx.send("I couldn't find a pronunciation for that text!")  # We don't want a pronunciation that's the same as the text
+
         english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
         if not self.languages.get(source_lang):
             return await ctx.send("I couldn't detect the language of the text!")
