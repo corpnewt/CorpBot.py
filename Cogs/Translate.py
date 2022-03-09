@@ -57,8 +57,8 @@ class Translate(commands.Cog):
             if value: value = value[0]
         return value
 
-    @commands.command(pass_context=True)
-    async def tr(self, ctx, *, translate=None):
+    @commands.command(name="translate", aliases=["tr"], pass_context=True)
+    async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
 
