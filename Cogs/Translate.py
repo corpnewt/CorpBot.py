@@ -166,7 +166,7 @@ class Translate(commands.Cog):
         if len(text) > 2000:
             return await ctx.send("Text too long. Please keep it under 2000 characters.")
 
-        detect_result = self.translator.detect(text)  # We are detecting the language of the text
+        detect_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.detect, text))  # We are detecting the language of the text
 
         if not source_lang:
             if isinstance(detect_result.confidence, list):  # We got multiple results
@@ -178,19 +178,17 @@ class Translate(commands.Cog):
         else:
             lang_confidence = 1  # When the user specifies a source language, we assume they know what they're doing
 
-        pronunciation_result = self.translator.translate(text, src=source_lang, dest=source_lang)
+        pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
         # We don't need to translate to another language, we just get the pronunciation
-        english_translation = self.translator.translate(text, src=source_lang, dest="en")
-
+        english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
         if not self.languages.get(source_lang):
             return await ctx.send("I couldn't detect the language of the text!")
 
         embed = Message.Embed(title="{}, your pronunciation is:".format(ctx.author.display_name),
                               color=ctx.author.color)
-        embed.description = "{}".format(pronunciation_result.pronunciation)
-        embed.add_field(name="Source Text", value="{}".format(pronunciation_result.text), inline=False)
-        # embed.add_field(name="Pronunciation", value=f"```{pronunciation_result.pronunciation}```", inline=False)
-        embed.add_field(name="Translated to English", value="{}".format(english_translation.text), inline=False)
+        embed.description = pronunciation_result.pronunciation
+        embed.add_field(name="Source Text", value=pronunciation_result.text, inline=False)
+        embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
         if int(lang_confidence) != 1:
             embed.footer = {
                 "text": "Language: {} (Confidence: {}%)".format(
