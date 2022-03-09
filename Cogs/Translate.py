@@ -2,17 +2,15 @@ import functools, string, googletrans
 from Cogs import DisplayName, Message, PickList
 from discord.ext import commands
 
-
 def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Translate(bot, settings))
 
-
 # Requires the mtranslate module be installed
 
 class Translate(commands.Cog):
-
+            
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
@@ -39,22 +37,22 @@ class Translate(commands.Cog):
     @commands.command(pass_context=True)
     async def detectlang(self, ctx, *, text):
         """Reports the detected language and certainty of the passed text."""
-        if text == None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
+        if text is None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
         lang_detect = await self.bot.loop.run_in_executor(None, self.translator.detect, text)
         await Message.EmbedText(
             title="Detected Language",
             description="Detected **{}** ({}) with {:.0%} confidence.".format(
-                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang.lower(), "Martian?")),
+                string.capwords(googletrans.LANGUAGES.get(lang_detect.lang.lower(),"Martian?")),
                 lang_detect.lang.lower(),
                 lang_detect.confidence
             ),
             color=ctx.author
         ).send(ctx)
 
-    def _unpack(self, value):
-        if isinstance(value, list):
+    def _unpack(self,value):
+        if isinstance(value,list):
             while True:
-                if any((isinstance(x, list) for x in value)): value = sum(value, [])
+                if any((isinstance(x,list) for x in value)): value = sum(value,[])
                 else: break
             if value: value = value[0]
         return value
@@ -74,7 +72,7 @@ class Translate(commands.Cog):
         If you do not specify the to language, it will default to English."""
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
-        if translate == None: return await ctx.send(usage)
+        if translate is None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
         if len(word_list) < 1: return await ctx.send(usage)
@@ -145,9 +143,9 @@ class Translate(commands.Cog):
         # If we have a valid pronunciation, add it to the embed!
         result.pronunciation = self._unpack(result.pronunciation)
         if result.pronunciation:
-            if isinstance(result.pronunciation, list):
+            if isinstance(result.pronunciation,list):
                 result.pronunciation = result.pronunciation[0]
-            if not any(result.pronunciation == x for x in (result.text, to_translate)):
+            if not any(result.pronunciation == x for x in (result.text,to_translate)):
                 embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
         await embed.send(ctx)
@@ -157,7 +155,7 @@ class Translate(commands.Cog):
         """Pronunciation for a sentence in the English language.\n
         $pronounce こんにちは --> returns \"Kon'nichiwa\""""
 
-        if text == None: return await ctx.send("Usage: `{}pronounce [text to identify]`".format(ctx.prefix))
+        if text is None: return await ctx.send("Usage: `{}pronounce [text to identify]`".format(ctx.prefix))
 
         if text.split()[-1] in self.langcodes.values():
             source_lang = text.split()[-1]
@@ -166,7 +164,11 @@ class Translate(commands.Cog):
             source_lang = None
 
         if len(text) > 1000:  # We need to keep it under 1024 characters due to field size limits
-            return await ctx.send("Text too long. Please keep it under 1000 characters.")
+            return await Message.EmbedText(
+                title="Something went wrong...",
+                description="Text entered is too long. Please keep it under 1000 characters.",
+                color=ctx.author
+            ).send(ctx)
 
         detect_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.detect, text))  # We are detecting the language of the text
 
@@ -183,11 +185,19 @@ class Translate(commands.Cog):
         pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
         # We don't need to translate to another language, we just get the pronunciation
         if not pronunciation_result.pronunciation or pronunciation_result.pronunciation == pronunciation_result.src:
-            return await ctx.send("I couldn't find a pronunciation for that text!")  # We don't want a pronunciation that's the same as the text
+            return await Message.EmbedText(
+                title="Something went wrong...",
+                description="I couldn't find a pronunciation for that text!",
+                color=ctx.author
+            ).send(ctx) # We don't want a pronunciation that's the same as the text
 
         english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
         if not self.languages.get(source_lang):
-            return await ctx.send("I couldn't detect the language of the text!")
+            return await Message.EmbedText(
+                title="Something went wrong...",
+                description="I couldn't detect the language of the text!",
+                color=ctx.author
+            ).send(ctx)
 
         embed = Message.Embed(title="{}, your pronunciation is:".format(ctx.author.display_name),
                               color=ctx.author.color)
