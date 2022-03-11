@@ -996,13 +996,17 @@ class Xp(commands.Cog):
 		
 		if member.activity and member.activity.name:
 			# Playing a game!
-			play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
-			try:
-				play_string = play_list[member.activity.type]
-			except:
-				play_string = "Playing"
+			play_dict = {
+				discord.ActivityType.playing:"Playing",
+				discord.ActivityType.streaming:"Streaming",
+				discord.ActivityType.listening:"Listening to",
+				discord.ActivityType.watching:"Watching",
+				discord.ActivityType.custom:"Currently",
+				discord.ActivityType.competing:"Competing in"
+			}
+			play_string = play_dict.get(member.activity.type,"Playing")
 			stat_embed.add_field(name=play_string, value=str(member.activity.name), inline=True)
-			if member.activity.type == 1:
+			if member.activity.type == discord.ActivityType.streaming:
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
 		# Add joinpos
