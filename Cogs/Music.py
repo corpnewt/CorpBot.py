@@ -1341,7 +1341,7 @@ class Music(commands.Cog):
 			{"band": 13, "gain": -0.025}
 		]
 
-	@commands.command()
+	@commands.command(aliases=["eq"])
 	async def geteq(self, ctx):
 		"""Prints the current equalizer settings."""
 
@@ -1353,7 +1353,7 @@ class Music(commands.Cog):
 		eq = getattr(player,"eq",self.flat_eq())
 		return await Message.Embed(title="♫ Current Equalizer Settings",description=self.print_eq(eq),color=ctx.author,delete_after=delay).send(ctx)
 	
-	@commands.command()
+	@commands.command(aliases=["seq"])
 	async def seteq(self, ctx, *, bands = None):
 		"""Sets the equalizer to the passed 15 space-delimited values from -5 (silent) to 5 (double volume)."""
 		
@@ -1380,7 +1380,7 @@ class Music(commands.Cog):
 			footer="Filter changes may take a bit to apply"
 		).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["sb"])
 	async def setband(self, ctx, band_number = None, value = None):
 		"""Sets the value of the passed eq band (1-15) to the passed value from -5 (silent) to 5 (double volume)."""
 
@@ -1413,7 +1413,7 @@ class Music(commands.Cog):
 			footer="Filter changes may take a bit to apply"
 		).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["req"])
 	async def reseteq(self, ctx):
 		"""Resets the current eq to the flat preset."""
 
@@ -1433,7 +1433,7 @@ class Music(commands.Cog):
 			footer="Filter changes may take a bit to apply"
 		).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["eqp"])
 	async def eqpreset(self, ctx, preset = None):
 		"""Sets the current eq to one of the following presets:  Boost, Flat, Metal"""
 
@@ -1454,3 +1454,42 @@ class Music(commands.Cog):
 			delete_after=delay,
 			footer="Filter changes may take a bit to apply"
 		).send(ctx)
+
+	@commands.command(aliases=["freq"])
+	async def setfreq(self, ctx, freq_family=None, value=None):
+		"""Sets the frequency family to the passed value.  Valid families are bass, mid, treble."""
+
+		player = await self.get_player(ctx.guild)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if not player or not player.is_connected():
+			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if not freq_family or not freq_family.lower() in ("b","m","t","bass","mid","midrange","middle","treble"):
+			return await Message.Embed(title="♫ Please specify a valid frequency family!",description="Options are:  Bass, Mid, Treble",color=ctx.author,delete_after=delay).send(ctx)
+		freq_family = freq_family[0].lower()
+		try:
+			value = int(value)
+			value = -5 if value < -5 else 5 if value > 5 else value
+		except:
+			return await Message.Embed(title="♫ Invalid value passed!",description="Frequency family eq values can be between -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
+		# Get the current eq
+		eq = getattr(player,"eq",self.flat_eq())
+		# [0  1  2  3  4]  5  6  7  8  9  [10 11 12 13 14]
+		merge_values = (0,4) if freq_family=="b" else (5,9) if freq_family=="m" else (10,14)
+		for entry in eq:
+			if merge_values[0]<=entry["band"]<=merge_values[1]:
+				# Adjust
+				entry["gain"] = float(value/20)
+			elif merge_values[0]-entry["band"]==1 or entry["band"]-merge_values[1]==1:
+				# Next nearest - go half
+				entry["gain"] = (entry["gain"]+float(value/20))/2
+		await self.apply_filters(player,eq,name="equalizer")
+		player.eq = eq
+		f_name = {"b":"Bass","m":"Mid Range","t":"Treble"}
+		return await Message.Embed(
+			title="♫ Set {} to {}!".format(f_name.get(freq_family,"Unknown Family"),value),
+			description=self.print_eq(eq),
+			color=ctx.author,
+			delete_after=delay,
+			footer="Filter changes may take a bit to apply"
+		).send(ctx)
+		
