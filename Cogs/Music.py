@@ -23,7 +23,7 @@ class Music(commands.Cog):
 		# Setup wavelink defaults
 		self.NodePool = wavelink.NodePool()
 		# Setup player specifics to remember
-		self.player_attrs = ("skips","ctx","track_ctx","track_seek","repeat","vol")
+		self.player_attrs = ("skips","ctx","track_ctx","track_seek","repeat","vol","eq")
 		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol")] # Attributes to strip on start
 		# Ratio to equalize volume
 		self.vol_ratio = 0.75
@@ -97,7 +97,10 @@ class Music(commands.Cog):
 		# Check for the "eq" attr - and if we don't have it, ensure we have a flat
 		# eq setup.
 		if not hasattr(player,"eq"):
-			await self.apply_filters(player,self.flat_eq(),name="equalizer")
+			await self.reset_eq(player)
+		if hasattr(player,"timescale"):
+			# We just remove it as Lavalink doesn't retain it on new songs
+			delattr(player,"timescale")
 		# let's get our next track
 		# and context and send the resulting message.
 		track = await player.queue.get_wait()
@@ -376,6 +379,12 @@ class Music(commands.Cog):
 				"search":url
 			}
 		return None
+
+	def apply_scale(self, player, time_value):
+		if not isinstance(time_value,(int,float)): return time_value
+		# Helper to get the current player's timescale and apply it to whatever passed time
+		timescale = getattr(player,"timescale",self.default_timescale())
+		return time_value / timescale.get("speed",1.0) / timescale.get("rate",1.0)
 	
 	def format_duration(self, dur, track=None):
 		if isinstance(track,wavelink.abc.Playable) and hasattr(track,"is_stream") and track.is_stream():
@@ -389,14 +398,14 @@ class Music(commands.Cog):
 		return "{:02d}h:{:02d}m:{:02d}s".format(hours, minutes, seconds)
 
 	def format_elapsed(self, player, track):
-		progress = player.position
-		total    = track.duration
+		progress = self.apply_scale(player,player.position)
+		total    = self.apply_scale(player,track.duration)
 		return "{} -- {}".format(self.format_duration(progress),self.format_duration(total,track))
 
 	def progress_bar(self,player,track,bar_width=27,show_percent=True,include_time=False):
 		# Returns a [#####-----] XX.x% style progress bar
-		progress = player.position
-		total    = track.duration if not hasattr(track,"is_stream") or not track.is_stream() else 0
+		progress = self.apply_scale(player,player.position)
+		total    = self.apply_scale(player,track.duration) if not hasattr(track,"is_stream") or not track.is_stream() else 0
 		bar = ""
 		# Account for the brackets
 		bar_width = 10 if bar_width-2 < 10 else bar_width-2
@@ -417,8 +426,8 @@ class Music(commands.Cog):
 
 	def progress_moon(self,player,track,moon_count=10,show_percent=True,include_time=False):
 		# Make some shitty moon memes or something... thanks Midi <3
-		progress = player.position
-		total    = track.duration if not hasattr(track,"is_stream") or not track.is_stream() else 0
+		progress = self.apply_scale(player,player.position)
+		total    = self.apply_scale(player,track.duration) if not hasattr(track,"is_stream") or not track.is_stream() else 0
 		if total == 0:
 			# No idea how long this song is - let's make a repeating pattern
 			# of moons - keeping this rotating moon code in, because it's kinda cool
@@ -1240,7 +1249,6 @@ class Music(commands.Cog):
 		v = max(min(float(band),1.),-1.) # Get the value as a float and force -1 to 1 range
 		ep = self.gc.get("ep"," ")
 		se = self.gc.get("se","─")
-		if v == 0: return [ep*max_len+se+ep*max_len]*3 # Just return 3 blank bars
 		ab = math.ceil(abs(v)*max_len)
 		l = self.gc.get("tl","┌") if v>0 else self.gc.get("bl","└")
 		r = self.gc.get("tr","┐") if v>0 else self.gc.get("bl","┘")
@@ -1255,7 +1263,7 @@ class Music(commands.Cog):
 				ep*(max_len-(ab if v>0 else 0)),
 				t[0]*(1 if v>0 else 0),
 				t[1]*(ab-1 if v>0 else 0),
-				t[2],
+				t[2] if v!=0 else se,
 				t[1]*(ab-1 if v<0 else 0),
 				t[0]*(1 if v<0 else 0),
 				ep*(max_len-(ab if v<0 else 0))
@@ -1349,6 +1357,76 @@ class Music(commands.Cog):
 			{"band": 12, "gain": 0.25},
 			{"band": 13, "gain": -0.025}
 		]
+
+	async def reset_eq(self, player):
+		# Remove the attribute and set a flat eq
+		if hasattr(player,"eq"):
+			delattr(player,"eq")
+		await self.apply_filters(player,self.flat_eq(),name="equalizer")
+
+	def default_timescale(self):
+		return {
+			"speed":1.0,
+			"pitch":1.0,
+			"rate":1.0
+		}
+
+	def print_timescale(self,timescale):
+		return "```\nSpeed: {}\nPitch: {}\nRate:  {}\n```".format(
+			timescale.get("speed","Unknown"),
+			timescale.get("pitch","Unknown"),
+			timescale.get("rate","Unknown")
+		)
+
+	@commands.command(aliases=["ts","tscale"])
+	async def timescale(self, ctx, *, speed = None, pitch = None, rate = None):
+		"""Gets or sets the current player's time scale values.  Speed, pitch, and rate can be any number between 0 and 10 with 1 being default."""
+		# All values just get dumped into speed
+		player = await self.get_player(ctx.guild)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if not player or not player.is_connected():
+			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		ts = getattr(player,"timescale",self.default_timescale())
+		if speed is None: # Print the current settings
+			return await Message.Embed(title="♫ Current Timescale Settings",description=self.print_timescale(ts),color=ctx.author,delete_after=delay).send(ctx)
+		# We got... something.  Let's try to parse it
+		try:
+			for i,x in enumerate(speed.replace(",","").lower().split()):
+				if "=" in x: # Let's see if we are setting a specific value
+					y,x = x.split("=")
+					i = ["s","p","r"].index(y[0].lower())
+				x = float(x)
+				ts[list(ts)[i]]=x
+		except:
+			return await Message.Embed(title="♫ Invalid Timescale Value",description="Valid speed, pitch, and rate values are numbers from 0 to 10 with 1 being default.",color=ctx.author,delete_after=delay).send(ctx)
+		await self.apply_filters(player,ts,name="timescale")
+		player.timescale = ts # Set the player's timescale value
+		return await Message.Embed(
+			title="♫ Timescale Settings Updated!",
+			description=self.print_timescale(ts),
+			color=ctx.author,
+			delete_after=delay,
+			footer="Filter changes may take a bit to apply"
+		).send(ctx)
+
+	@commands.command(aliases=["rts","resetts"])
+	async def resettimescale(self, ctx):
+		"""Resets the current player's time scale values."""
+
+		player = await self.get_player(ctx.guild)
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if not player or not player.is_connected():
+			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		ts = self.default_timescale()
+		await self.apply_filters(player,ts,name="timescale")
+		player.timescale = ts # Set the player's timescale value
+		return await Message.Embed(
+			title="♫ Timescale Settings Updated!",
+			description=self.print_timescale(ts),
+			color=ctx.author,
+			delete_after=delay,
+			footer="Filter changes may take a bit to apply"
+		).send(ctx)
 
 	@commands.command(aliases=["eq"])
 	async def geteq(self, ctx):
