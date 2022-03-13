@@ -380,10 +380,18 @@ class Music(commands.Cog):
 			}
 		return None
 
-	def apply_scale(self, player, time_value):
+	def format_scale(self, player, prefix="", hide_100=True):
+		# Returns a percent for the time scale
+		timescale = getattr(player,"timescale",self.default_timescale())
+		ts_perc = math.ceil(timescale.get("speed",1.0)/timescale.get("rate",1.0)*100)
+		if hide_100 and ts_perc==100: return ""
+		return "{}{:,}%".format(prefix,ts_perc)
+
+	def apply_scale(self, player, time_value, reversed=False):
 		if not isinstance(time_value,(int,float)): return time_value
 		# Helper to get the current player's timescale and apply it to whatever passed time
 		timescale = getattr(player,"timescale",self.default_timescale())
+		if reversed: return time_value * timescale.get("speed",1.0) * timescale.get("rate",1.0)
 		return time_value / timescale.get("speed",1.0) / timescale.get("rate",1.0)
 	
 	def format_duration(self, dur, track=None):
@@ -398,13 +406,13 @@ class Music(commands.Cog):
 		return "{:02d}h:{:02d}m:{:02d}s".format(hours, minutes, seconds)
 
 	def format_elapsed(self, player, track):
-		progress = self.apply_scale(player,player.position)
+		progress = player.position # self.apply_scale(player,player.position)
 		total    = self.apply_scale(player,track.duration)
 		return "{} -- {}".format(self.format_duration(progress),self.format_duration(total,track))
 
 	def progress_bar(self,player,track,bar_width=27,show_percent=True,include_time=False):
 		# Returns a [#####-----] XX.x% style progress bar
-		progress = self.apply_scale(player,player.position)
+		progress = player.position # self.apply_scale(player,player.position)
 		total    = self.apply_scale(player,track.duration) if not hasattr(track,"is_stream") or not track.is_stream() else 0
 		bar = ""
 		# Account for the brackets
@@ -426,7 +434,7 @@ class Music(commands.Cog):
 
 	def progress_moon(self,player,track,moon_count=10,show_percent=True,include_time=False):
 		# Make some shitty moon memes or something... thanks Midi <3
-		progress = self.apply_scale(player,player.position)
+		progress = player.position # self.apply_scale(player,player.position)
 		total    = self.apply_scale(player,track.duration) if not hasattr(track,"is_stream") or not track.is_stream() else 0
 		if total == 0:
 			# No idea how long this song is - let's make a repeating pattern
@@ -862,7 +870,11 @@ class Music(commands.Cog):
 			).send(ctx)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,track.title),
-			description="Requested by {} -- Volume at {}%".format(track_ctx.author.mention,cv),
+			description="Requested by {}\n -- Volume at {}%{}".format(
+				track_ctx.author.mention,
+				cv,
+				self.format_scale(player,prefix="\n -- Speed at ")
+			),
 			color=ctx.author,
 			fields=[
 				{"name":"Elapsed","value":self.format_elapsed(player,track),"inline":False},
@@ -1378,7 +1390,7 @@ class Music(commands.Cog):
 			timescale.get("rate","Unknown")
 		)
 
-	@commands.command(aliases=["ts","tscale"])
+	'''@commands.command(aliases=["ts","tscale"])
 	async def timescale(self, ctx, *, speed = None, pitch = None, rate = None):
 		"""Gets or sets the current player's time scale values.  Speed, pitch, and rate can be any number between 0 and 10 with 1 being default."""
 		# All values just get dumped into speed
@@ -1426,7 +1438,7 @@ class Music(commands.Cog):
 			color=ctx.author,
 			delete_after=delay,
 			footer="Filter changes may take a bit to apply"
-		).send(ctx)
+		).send(ctx)'''
 
 	@commands.command(aliases=["eq"])
 	async def geteq(self, ctx):
