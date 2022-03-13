@@ -11,7 +11,7 @@ def setup(bot):
 
 class Music(commands.Cog):
 
-	__slots__ = ("bot","settings","ll_host","ll_port","ll_pass","NodePool","player_attrs","player_clear","vol_ratio")
+	__slots__ = ("bot","settings","ll_host","ll_port","ll_pass","NodePool","player_attrs","player_clear","vol_ratio","gc")
 
 	def __init__(self, bot, settings):
 		self.bot      = bot
@@ -27,6 +27,20 @@ class Music(commands.Cog):
 		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol")] # Attributes to strip on start
 		# Ratio to equalize volume
 		self.vol_ratio = 0.75
+		# Graphing char set - allows for theming-type overrides
+		self.gc = bot.settings_dict.get("music_graph_chars",{})
+		'''	"b"  :"│",  # "║" # Bar outline
+			"tl" :"┌",  # "╔" # Top left outline
+			"tr" : "┐", # "╗" # Top right outline
+			"bl" : "└", # "╚" # Bottom left outline
+			"br" : "┘", # "╝" # Bottom right oultine
+			"cp" : "─", # "═" # Top/bottom cap
+			"ep" : " ", #       Empty space
+			"in" : " ", #       Inner fill char
+			"se" : "─", # "═" # Netral Separator
+			"su" : "┴", # "╩" # Separator up
+			"sd" : "┬", # "╦" # Separator down
+			"lp" : ""   #       Left pad'''
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -1222,57 +1236,52 @@ class Music(commands.Cog):
 		# Send the payload to the websocket and pray
 		await player.node._websocket.send(**filter_json)
 
-	def print_eq(self, eq, max_len = 5):
+	def _draw_band(self, band, max_len=5):
+		v = max(min(float(band),1.),-1.) # Get the value as a float and force -1 to 1 range
+		ep = self.gc.get("ep"," ")
+		se = self.gc.get("se","─")
+		if v == 0: return [ep*max_len+se+ep*max_len]*3 # Just return 3 blank bars
+		ab = math.ceil(abs(v)*max_len)
+		l = self.gc.get("tl","┌") if v>0 else self.gc.get("bl","└")
+		r = self.gc.get("tr","┐") if v>0 else self.gc.get("bl","┘")
+		s = self.gc.get("su","┴") if v>0 else self.gc.get("sd","┬")
+		c = self.gc.get("cp","─")
+		i = self.gc.get("in"," ")
+		b = self.gc.get("b","│")
+		# Iterate and draw
+		return [
+			# Draws top->down; Empty, Cap, Fill, Sep, Fill, Cap, Empty
+			"{}{}{}{}{}{}{}".format(
+				ep*(max_len-(ab if v>0 else 0)),
+				t[0]*(1 if v>0 else 0),
+				t[1]*(ab-1 if v>0 else 0),
+				t[2],
+				t[1]*(ab-1 if v<0 else 0),
+				t[0]*(1 if v<0 else 0),
+				ep*(max_len-(ab if v<0 else 0))
+			)
+			for t in ((l,b,s),(c,i,se),(r,b,s))
+		]
+
+	def print_eq(self, eq, max_len=5):
 		# EQ values are from -0.25 (muted) to 0.25 (doubled)
-		bar      = "│" # "║"
-		topleft  = "┌" # "╔"
-		topright = "┐" # "╗"
-		botleft  = "└" # "╚"
-		botright = "┘" # "╝"
-		cap      = "─" # "═"
-		emp      = " "
-		inner    = " "
-		sep      = "─" # "═"
-		sup      = "┴" # "╩"
-		sdn      = "┬" # "╦"
-		lpad     = ""
 		eq_list  = []
-		nums     = ""
-		vals     = ""
+		vals = ""
+		se = self.gc.get("se","─")
+		lp = self.gc.get("lp","")
 		for entry in eq:
-			band = entry.get("band",0)
-			value = entry.get("gain",0.0)
-			value *= 4 # Quadruple it for -1 to 1 range
-			ourbar = math.ceil(abs(value)*max_len)
-			vals += str(ourbar if value > 0 else -1*ourbar).rjust(2)+" "
-			nums += str(band+1).rjust(2)+" "
-			# Check if positive or negative
-			if value == 0:
-				# They're all 0, nothing to display
-				our_cent = our_left = our_right = emp*max_len + sep + emp*max_len
-			elif value > 0:
-				# Let's draw a bar going up
-				our_left  = emp*max_len + sup + bar*(ourbar-1)   + topleft  + emp*(max_len-ourbar)
-				our_cent  = emp*max_len + sep + inner*(ourbar-1) + cap      + emp*(max_len-ourbar)
-				our_right = emp*max_len + sup + bar*(ourbar-1)   + topright + emp*(max_len-ourbar)
-			else:
-				# Let's draw a bar going down
-				our_left  = emp*(max_len-ourbar) + botleft  + bar*(ourbar-1) + sdn + emp*max_len
-				our_cent  = emp*(max_len-ourbar) + cap    + inner*(ourbar-1) + sep + emp*max_len
-				our_right = emp*(max_len-ourbar) + botright + bar*(ourbar-1) + sdn + emp*max_len
-			our_left  = [x for x in our_left][::-1]
-			our_cent  = [x for x in our_cent][::-1]
-			our_right = [x for x in our_right][::-1]
-			eq_list.extend([our_left,our_cent,our_right])
+			value = entry.get("gain",.0)*4. # Quadrupled for -1 to 1 range
+			eq_list.extend(self._draw_band(value,max_len=max_len))
+			vals += str(math.ceil(abs(value)*max_len)*(1 if value>0 else -1)).rjust(2)+" "
 		# Rotate the eq 90 degrees
 		graph = "```\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n```".format(
-			"Bands".center(len(nums),sep),
-			nums,
-			sep*(len(nums)),
-			"\n".join(["{}{}{}".format(lpad,x,lpad) for x in map("".join, zip(*eq_list))]),
-			"Values".center(len(vals),sep),
+			"Bands".center(len(vals),se),
+			" ".join([str(x+1).rjust(2) for x in range(len(eq))]),
+			se*(len(vals)),
+			"\n".join([lp+x+lp for x in map("".join, zip(*eq_list))]),
+			"Values".center(len(vals),se),
 			vals,
-			sep*(len(vals))
+			se*(len(vals))
 		)
 		return graph
 
@@ -1463,9 +1472,11 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected():
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if not freq_family or not freq_family.lower() in ("b","m","t","bass","mid","midrange","middle","treble"):
+		if not freq_family or not freq_family[0].lower() in ("b","l","m","t","h"): # Bass/Low, Middle, High/Treble
 			return await Message.Embed(title="♫ Please specify a valid frequency family!",description="Options are:  Bass, Mid, Treble",color=ctx.author,delete_after=delay).send(ctx)
+		# Normalize to the first letter - and change h->t and l->b
 		freq_family = freq_family[0].lower()
+		if freq_family in ("h","l"): freq_family = "t" if freq_family=="h" else "b"
 		try:
 			value = int(value)
 			value = -5 if value < -5 else 5 if value > 5 else value
