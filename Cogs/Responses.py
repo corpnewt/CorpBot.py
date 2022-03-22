@@ -29,6 +29,11 @@ class Responses(commands.Cog):
 		self.regexKick     = re.compile(r"\[\[kick\]\]",      re.IGNORECASE)
 		self.regexBan      = re.compile(r"\[\[ban\]\]",       re.IGNORECASE)
 		self.regexSuppress = re.compile(r"\[\[suppress\]\]",  re.IGNORECASE)
+		self.toggle_ur     = re.compile(r"\[\[t_ur:\d+\]\]",  re.IGNORECASE)
+		self.add_ur        = re.compile(r"\[\[add_ur:\d+\]\]",re.IGNORECASE)
+		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",re.IGNORECASE)
+		self.rem_ur        = re.compile(r"\[\[rem_ur:\d+\]\]",re.IGNORECASE)
+		self.phrase_ur     = re.compile(r"\[\[phrase_ur:.*\]\]",re.IGNORECASE)
 
 	async def _get_response(self, ctx, message):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
@@ -79,9 +84,47 @@ class Responses(commands.Cog):
 					except:
 						continue # Broken, or didn't resolve
 					m = m.replace(mention.group(0),resolved.mention)
-
-			# Strip out leftovers from delete, ban, kick, mute, and suppress
-			for sub in (self.regexDelete,self.regexBan,self.regexKick,self.regexMute,self.regexSuppress):
+			
+			# Walk the user role options if any - use the following priority: toggle, 
+			ur = next((x for x in (self.toggle_ur,self.add_ur,self.set_ur,self.rem_ur) if x.search(m)),None)
+			if ur: # Got one - let's verify it's valid, and apply if needed
+				ur_block = self.settings.getServerStat(ctx.guild,"UserRoleBlock",[])
+				if Utils.is_bot_admin(ctx) or not ctx.author.id in ur_block: # Not blocked - keep going
+					ur_list = [x.get("ID",0) for x in self.settings.getServerStat(ctx.guild,"UserRoles",[])]
+					try: role = ctx.guild.get_role(int(ur.search(m).group(0).replace("]]","").split(":")[-1]))
+					except: role = None
+					if role is not None and role.id in ur_list:
+						one_role = self.settings.getServerStat(ctx.guild,"OnlyOneUserRole",True)
+						role_add = []
+						role_rem = []
+						if ur == self.add_ur or (self.toggle_ur and not role in ctx.author.roles) and one_role: ur = self.set_ur # Force set instead of
+						# We got a role id, and it's in the user list - let's resolve it to a role
+						if ur == self.toggle_ur:
+							if role in ctx.author.roles: # Remove it
+								role_rem.append(role)
+							else:
+								role_add.append(role)
+						elif ur == self.add_ur and not role in ctx.author.roles: # Add it
+							role_add.append(role)
+						elif ur == self.rem_ur and role in ctx.author.roles: # Remove it
+							role_rem.append(role)
+						elif ur == self.set_ur: # Remove all user roles *but* this one
+							role_rem = [x for x in map(ctx.guild.get_role,ur_list) if x and x in ctx.author.roles and x.id!=role.id]
+							if not role in ctx.author.roles:
+								role_add.append(role)
+						# Retain the added and removed roles
+						if role_add: response["roles_added"] = role_add
+						if role_rem: response["roles_removed"] = role_rem
+						try:
+							parts = self.phrase_ur.search(m).group(0).replace("]]","").split(":")[1:]
+							if len(parts)<3: # We need to pad to 3
+								parts = parts + [parts[-1]]*(3-len(parts))
+							i = -3 if role in role_add else -2 if role in role_rem else -1
+							m = re.sub(self.phrase_ur,parts[i],m)
+						except:
+							pass
+			# Strip out leftovers from delete, ban, kick, mute, suppress, and the user role options
+			for sub in (self.regexDelete,self.regexBan,self.regexKick,self.regexMute,self.regexSuppress,self.toggle_ur,self.add_ur,self.set_ur,self.rem_ur,self.phrase_ur):
 				m = re.sub(sub,"",m)
 			response["message"] = m
 			return response
@@ -99,7 +142,12 @@ class Responses(commands.Cog):
 		if not response: return
 		# See if we're admin/bot-admin - and bail if suppressed
 		if Utils.is_bot_admin(ctx) and response.get("suppress"): return
-		# Walk punishments first in order of severity (ban -> kick -> mute)
+		# Check for role changes
+		if response.get("roles_added"):
+			self.settings.role.add_roles(ctx.author, response["roles_added"])
+		if response.get("roles_removed"):
+			self.settings.role.rem_roles(ctx.author, response["roles_removed"])
+		# Walk punishments in order of severity (ban -> kick -> mute)
 		if response.get("action") in ("ban","kick"):
 			action = ctx.guild.ban if response["action"] == "ban" else ctx.guild.kick
 			await action(ctx.author,reason="Response trigger matched")
@@ -133,11 +181,26 @@ class Responses(commands.Cog):
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
-		[[delete]]   = delete the original message
-		[[ban]]      = bans the message author
-		[[kick]]     = kicks the message author
-		[[mute]]     = mutes the author indefinitely
-		[[mute:#]]   = mutes the message author for # seconds
+		[[delete]]    = delete the original message
+		[[ban]]       = bans the message author
+		[[kick]]      = kicks the message author
+		[[mute]]      = mutes the author indefinitely
+		[[mute:#]]    = mutes the message author for # seconds
+
+		User role options (roles must be setup per the UserRole cog):
+
+		[[t_ur:id]]   = Add or remove the user role based on whether the author has it
+		[[add_ur:id]] = Add the user role if the author does not have it
+		[[set_ur:id]] = Same as above, but removes any other user roles the author has
+		[[rem_ur:id]] = Remove the user role if the author has it
+		[[phrase_ur:got:lost:nochange]] = Replaced with the "got" phrase on add, the "lost"
+		                                  phrase on removal, and the "nochange" phrase if nothing
+										  changes.
+
+		(id = the user role id)
+
+		*If multiple user role options are passed, they are processed in the order above,
+		and only the first detected is used.
 
 		Admin/bot-admin behavioral flags:
 
@@ -311,6 +374,10 @@ class Responses(commands.Cog):
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
+		if response.get("roles_added",[]):
+			entries.append({"name":"Roles Added:","value":", ".join([x.mention for x in response["roles_added"]])})
+		if response.get("roles_removed",[]):
+			entries.append({"name":"Roles Removed:","value":", ".join([x.mention for x in response["roles_removed"]])})
 		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms".format(response["match_time_ms"])).pick()
 
 	@commands.command()
