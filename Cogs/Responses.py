@@ -34,8 +34,9 @@ class Responses(commands.Cog):
 		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",re.IGNORECASE)
 		self.rem_ur        = re.compile(r"\[\[rem_ur:\d+\]\]",re.IGNORECASE)
 		self.phrase_ur     = re.compile(r"\[\[phrase_ur:.*\]\]",re.IGNORECASE)
+		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",re.IGNORECASE)
 
-	async def _get_response(self, ctx, message):
+	async def _get_response(self, ctx, message, check_chan=True):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return {}
 		# Check for matching response triggers here
@@ -47,6 +48,15 @@ class Responses(commands.Cog):
 			response = {"matched":trigger,"match_time_ms":match_time/1000000}
 			# Got a full match - build the message, send it and bail
 			m = message_responses[trigger]
+			# Let's check for a channel - and make sure we're searching there
+			try:
+				channel_list = [int(x) for x in self.in_chan.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				check_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
+			except:
+				check_channels = []
+			response["channels"] = check_channels
+			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
+				continue
 			if self.regexDelete.search(m): response["delete"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
 			action = "ban" if self.regexBan.search(m) else "kick" if self.regexKick.search(m) else "mute" if self.regexMute.search(m) else None
@@ -124,7 +134,19 @@ class Responses(commands.Cog):
 						except:
 							pass
 			# Strip out leftovers from delete, ban, kick, mute, suppress, and the user role options
-			for sub in (self.regexDelete,self.regexBan,self.regexKick,self.regexMute,self.regexSuppress,self.toggle_ur,self.add_ur,self.set_ur,self.rem_ur,self.phrase_ur):
+			for sub in (
+				self.regexDelete,
+				self.regexBan,
+				self.regexKick,
+				self.regexMute,
+				self.regexSuppress,
+				self.toggle_ur,
+				self.add_ur,
+				self.set_ur,
+				self.rem_ur,
+				self.phrase_ur,
+				self.in_chan
+			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
 			return response
@@ -186,16 +208,17 @@ class Responses(commands.Cog):
 		[[kick]]      = kicks the message author
 		[[mute]]      = mutes the author indefinitely
 		[[mute:#]]    = mutes the message author for # seconds
+		[[in:id]]     = locks the check to the channel id passed
 
 		User role options (roles must be setup per the UserRole cog):
 
-		[[t_ur:id]]   = Add or remove the user role based on whether the author has it
-		[[add_ur:id]] = Add the user role if the author does not have it
-		[[set_ur:id]] = Same as above, but removes any other user roles the author has
-		[[rem_ur:id]] = Remove the user role if the author has it
-		[[phrase_ur:got:lost:nochange]] = Replaced with the "got" phrase on add, the "lost"
+		[[t_ur:id]]   = add or remove the user role based on whether the author has it
+		[[add_ur:id]] = add the user role if the author does not have it
+		[[set_ur:id]] = same as above, but removes any other user roles the author has
+		[[rem_ur:id]] = remove the user role if the author has it
+		[[phrase_ur:got:lost:nochange]] = replaced with the "got" phrase on add, the "lost"
 		                                  phrase on removal, and the "nochange" phrase if nothing
-										  changes.
+										  changes
 
 		(id = the user role id)
 
@@ -360,13 +383,15 @@ class Responses(commands.Cog):
 		if check_string == None: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
-		response = await self._get_response(ctx,check_string)
+		response = await self._get_response(ctx,check_string,check_chan=False)
 		if not response: return await ctx.send("No matches!")
 		# Got a match - let's print out what it will do
 		description = Nullify.escape_all(response.get("matched","Unknown match"))
 		entries = []
 		# Let's walk the reponse and add values
 		entries.append({"name":"Output Suppressed for Admin/Bot-Admin:","value":"Yes" if response.get("suppress") else "No"})
+		if response.get("channels"):
+			entries.append({"name":"Limited To:","value":", ".join([x.mention for x in response["channels"]])})
 		if response.get("action") == "mute":
 			mute_time = "indefinitely" if not response.get("mute_time") else "for {:,} second{}".format(response["mute_time"],"" if response["mute_time"]==1 else "s")
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
