@@ -715,8 +715,8 @@ class Music(commands.Cog):
 		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(track.ctx.author.mention),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
-	async def unqueue(self, ctx):
-		"""Removes all songs you've added from the queue (does not include the currently playing song).  Admins remove all songs from the queue."""
+	async def unqueue(self, ctx, *, unqueue_all = None):
+		"""Removes all songs you've added from the queue (does not include the currently playing song).  Admins and bot-admins can pass 'all' to remove all songs from the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -725,15 +725,13 @@ class Music(commands.Cog):
 		if player.queue.is_empty:
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
-		removed = 0
+		clear_all = isinstance(unqueue_all,str) and "all" in unqueue_all.lower() and Utils.is_bot_admin(ctx)
 		queue = list(player.queue)
-		player.queue.clear()
-		for song in queue:
-			if song.ctx.author == ctx.author or Utils.is_bot_admin(ctx):
-				removed += 1
-			else:
-				await self.add_to_queue(player,song)
-		if removed > 0:
+		new_queue = [] if clear_all else [song for song in queue if song.ctx.author!=ctx.author]
+		removed = len(queue)-len(new_queue)
+		if removed:
+			player.queue.clear()
+			if new_queue: await self.add_to_queue(player,new_queue)
 			return await Message.Embed(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=delay).send(ctx)
 
