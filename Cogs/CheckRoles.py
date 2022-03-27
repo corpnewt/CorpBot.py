@@ -11,7 +11,7 @@ def setup(bot):
 async def checkroles(user, channel, settings, bot, suppress : bool = False, **kwargs):
     # This method checks whether we need to promote, demote, or whatever
     # then performs the said action, and outputs.
-    if user.bot: return # Don't apply roles to bots
+    if getattr(user,"bot",True): return # Don't apply roles to bots - assume it's a role or otherwise if no "bot" attr
     DisplayName = bot.get_cog("DisplayName")
     Utils = bot.get_cog("Utils")
     if not DisplayName or not Utils: return # We are missing dependencies
