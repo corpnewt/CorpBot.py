@@ -16,7 +16,7 @@ class DisplayName(commands.Cog):
 
     def name(self, member : discord.Member):
         # A helper function to return the member's display name
-        return Nullify.escape_all(member.display_name)
+        return Nullify.escape_all(getattr(member,"display_name",member.name))
 
     def memberForID(self, checkid, server):
         try:
