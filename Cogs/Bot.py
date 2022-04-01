@@ -439,6 +439,24 @@ class Bot(commands.Cog):
 				os.remove(filename)
 		await status.edit(content='Avatar set!')
 
+	@commands.command()
+	async def setname(self, ctx, *, name = None):
+		"""Sets the bot's name - may take awhile to reflect (owner only)."""
+
+		if not await Utils.is_owner_reply(ctx): return
+
+		if not name: return await ctx.send("Usage: `{}setname [new name]`".format(ctx.prefix))
+		if name == self.bot.user.name: return await ctx.send("That's already my name!")
+
+		try:
+			await self.bot.user.edit(username=name)
+		except discord.errors.HTTPException as e:
+			return await ctx.send(content="Looks like I can't do that right now.  Try again later!")
+		
+		# Must have gone through - we'll state that it was updated, but may take awhile for the changes
+		# to show up.
+		return await ctx.send("Username updated - may take some time to show!")
+
 	# Needs rewrite!
 	@commands.command(pass_context=True)
 	async def reboot(self, ctx):
