@@ -714,9 +714,10 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Removed {} at position {}!".format(track.title,song_number+1),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(track.ctx.author.mention),color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command()
-	async def unqueue(self, ctx, *, unqueue_all = None):
-		"""Removes all songs you've added from the queue (does not include the currently playing song).  Admins and bot-admins can pass 'all' to remove all songs from the queue."""
+	@commands.command(aliases=["unq"])
+	async def unqueue(self, ctx, *, unqueue_from = None):
+		"""Removes all songs you've added from the queue (does not include the currently playing song).
+		Admins and bot-admins can pass a user to remove all of that user's queued songs, or 'all' to remove all songs from the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -724,16 +725,31 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.queue.is_empty:
 			# No songs in queue
-			return await Message.Embed(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
-		clear_all = isinstance(unqueue_all,str) and "all" in unqueue_all.lower() and Utils.is_bot_admin(ctx)
-		queue = list(player.queue)
-		new_queue = [] if clear_all else [song for song in queue if song.ctx.author!=ctx.author]
-		removed = len(queue)-len(new_queue)
-		if removed:
-			player.queue.clear()
-			if new_queue: await self.add_to_queue(player,new_queue)
-			return await Message.Embed(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
-		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only an admin can remove all queued songs!",color=ctx.author,delete_after=delay).send(ctx)
+			return await Message.Embed(title="♫ No songs in queue!",description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
+		clear_from = ctx.author # Default to the author
+		if unqueue_from: # We got something passed here - check for "all" first, as that has priority - and user next
+			if unqueue_from.lower() in ("-all","all"):
+				clear_from = True # Use "true" as a placeholder for everyone
+			else: # Check if a user was passed
+				check_user = DisplayName.memberForName(unqueue_from,ctx.guild)
+				if check_user: # Got one - set it
+					clear_from = check_user
+		if Utils.is_bot_admin(ctx) or clear_from == ctx.author:
+			queue = player.queue.copy()
+			new_queue = [] if clear_from is True else [song for song in queue if song.ctx.author!=clear_from]
+			removed = len(queue)-len(new_queue)
+			if removed:
+				player.queue.clear()
+				if new_queue: await self.add_to_queue(player,new_queue)
+				return await Message.Embed(title="♫ Removed {} song{} from queue!".format(removed,"" if removed == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+			title = "♫ No songs in queue!" if clear_from is True else "♫ {} has no songs in the queue!".format(DisplayName.name(clear_from))
+			return await Message.Embed(
+				title=title,
+				description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),
+				color=ctx.author,
+				delete_after=delay
+			).send(ctx)
+		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only an admin or bot-admin can remove all queued songs or those requested by other users!",color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def shuffle(self, ctx, *, url = None):
