@@ -219,7 +219,7 @@ class BotAdmin(commands.Cog):
 							if member.joined_at and t-member.joined_at.timestamp() <= seconds:
 								# Check if we *can* kick/ban them first
 								if member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member):
-									unable.append(member.mention)
+									unable.append(member.name+"#"+member.discriminator)
 									continue
 								# Check our counter
 								if len(last) >= self.max_last:
@@ -263,7 +263,7 @@ class BotAdmin(commands.Cog):
 		msg = "**To {} the following {}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`{}{}{}".format(
 			command_name,
 			"member" if len(targets) == 1 else "{:,} members".format(len(targets)),
-			"\n".join([x.name+"#"+x.discriminator if isinstance(x,discord.User) else x.mention for x in targets]),
+			"\n".join([x.name+"#"+x.discriminator for x in targets]),
 			reason if len(reason) else "None",
 			confirmation_code,
 			"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
