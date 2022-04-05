@@ -1,4 +1,4 @@
-import asyncio, discord, re, random
+import discord, re, random, time
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message, PickList
@@ -17,6 +17,7 @@ class BotAdmin(commands.Cog):
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
 		self.mention_re = re.compile(r"[0-9]{17,21}")
 		self.removal = re.compile(r"(?i)-?r(em(ove|oval)?)?=\d+")
+		self.max_last = 50 # Semi-arbitrary limit for the number of resolved last=[time] members
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -151,6 +152,25 @@ class BotAdmin(commands.Cog):
 		ignored = ["*{}*".format(DisplayName.name(ctx.guild.get_member(int(x["ID"])))) for x in promoSorted if ctx.guild.get_member(int(x["ID"]))]
 		await ctx.send("Currently Ignored Users:\n{}".format("\n".join(ignored)))
 
+
+	def get_seconds(self, time_string=None):
+		if not isinstance(time_string,str): return 0
+		allowed = {"w":604800,"d":86400,"h":3600,"m":60,"s":1}
+		total_seconds = 0
+		last_time = ""
+		for char in time_string:
+			# Check if we have a number
+			if char.isdigit():
+				last_time += char
+				continue
+			# Check if it's a valid suffix and we have a time so far
+			if char.lower() in allowed and last_time:
+				total_seconds += int(last_time)*allowed[char.lower()]
+			last_time = ""
+		# Check if we have any left - and add it
+		if last_time: total_seconds += int(last_time) # Assume seconds at this point
+		return total_seconds
+
 	
 	async def kick_ban(self, ctx, members_and_reason = None, command_name = "kick"):
 		# Helper method to handle the lifting for kick and ban
@@ -163,6 +183,8 @@ class BotAdmin(commands.Cog):
 		targets = []
 		missed = []
 		unable = []
+		skipped = []
+		last = []
 		reason = ""
 		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name == "ban" else None
 		try: days = int(days)
@@ -187,6 +209,25 @@ class BotAdmin(commands.Cog):
 					continue
 				if not member in targets: targets.append(member) # Only add them if we don't already have them
 			else:
+				# Check for the last=timestamp keyword - and append matching valid members
+				if item.lower().startswith("last="):
+					# Check the timestamp
+					seconds = self.get_seconds(item.split("=")[-1])
+					if seconds: # We got a valid time - let's walk the users
+						t = time.time()
+						for member in ctx.guild.members:
+							if member.joined_at and t-member.joined_at.timestamp() <= seconds:
+								# Check if we *can* kick/ban them first
+								if member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member):
+									unable.append(member.mention)
+									continue
+								# Check our counter
+								if len(last) >= self.max_last:
+									skipped.append(member)
+								else:
+									if not member in last: last.append(member)
+									if not member in targets: targets.append(member)
+					continue
 				# Check if we're banning - and if so, check the rest of the args for `-r=#`
 				# then apply that override and remove from the reason
 				if command_name == "ban":
@@ -208,24 +249,26 @@ class BotAdmin(commands.Cog):
 				break
 		reason = reason if len(reason) else "No reason provided."
 		if not len(targets):
-			msg = "**With reason:**\n\n{}{}{}".format(
+			msg = "**With reason:**\n\n{}{}{}{}".format(
 				reason,
 				"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
-				"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable))
+				"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable)),
+				"" if not len(skipped) else "\n\n{:,} skipped - can only {} {:,} with last keyword".format(len(skipped),command_name,self.max_last)
 			)
 			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author,footer=footer).send(ctx)
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
 		confirmation_code = "".join([str(random.randint(0,9)) for x in range(4)])
-		msg = "**To {} the following member{}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`{}{}".format(
+		msg = "**To {} the following {}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`{}{}{}".format(
 			command_name,
-			"" if len(targets) == 1 else "s",
-			"\n".join([x.name+"#"+x.discriminator for x in targets]),
+			"member" if len(targets) == 1 else "{:,} members".format(len(targets)),
+			"\n".join([x.name+"#"+x.discriminator if isinstance(x,discord.User) else x.mention for x in targets]),
 			reason if len(reason) else "None",
 			confirmation_code,
 			"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
-			"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable))
+			"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable)),
+			"" if not len(skipped) else "\n\n**{:,} skipped** - can only {} {:,} with `last=` keyword".format(len(skipped),command_name,self.max_last)
 			)
 		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author,footer=footer).send(ctx)
 		def check_confirmation(message):
@@ -235,7 +278,7 @@ class BotAdmin(commands.Cog):
 		# Delete the confirmation message
 		await confirmation_message.delete()
 		# Verify the confirmation
-		if not confirmation_user.content == confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
+		if getattr(confirmation_user,"content",None) != confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
 		# We got the authorization!
 		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Unbann" if command_name == "unban" else "Kick"),color=ctx.author,footer=footer).send(ctx)
 		canned = []
@@ -260,8 +303,13 @@ class BotAdmin(commands.Cog):
 	async def kick(self, ctx, *, members = None, reason = None):
 		"""Kicks the passed members for the specified reason.
 		All kick targets must be mentions or ids to avoid ambiguity (bot-admin only).
+
+		eg:  $kick @user1#1234 @user2#5678 @user3#9012 for spamming
+
+		Accepts last=[time] to kick all valid members that joined in that time (up to 50).
+		The [time] format allows for w=Weeks, d=Days, h=Hours, m=Minutes, s=Seconds.
 		
-		eg:  $kick @user1#1234 @user2#5678 @user3#9012 for spamming"""
+		eg:  $kick last=10m30s raid"""
 		await self.kick_ban(ctx,members,"kick")
 		
 		
@@ -272,10 +320,15 @@ class BotAdmin(commands.Cog):
 		
 		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming
 		
-		Can take r=#, rem=#, remove=# or removal=# (optionally prefixed with -) within the reason to specify the number of days worth of the banned users' messages to remove.
+		Accepts r=#, rem=#, remove=# or removal=# (optionally prefixed with -) within the reason to specify the number of days worth of the banned users' messages to remove.
 		This is limited to 0-7 days, and will override the value set by the rembanmessages command.
-		
-		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -rem=5"""
+
+		eg:  $ban @user1#1234 @user2#5678 @user3#9012 for spamming -rem=5
+
+		Accepts last=[time] to kick all valid members that joined in that time (up to 50).
+		The [time] format allows for w=Weeks, d=Days, h=Hours, m=Minutes, s=Seconds.
+
+		eg:  $ban last=10m30s raid"""
 		await self.kick_ban(ctx,members,"ban")
 
 	@commands.command()
