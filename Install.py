@@ -152,7 +152,7 @@ class Run:
 if __name__ == '__main__':
     r = Run()
     modules = [
-        {"name":"discord [rewrite]", "item":"discord.py[voice]"},
+        {"name":"pycord", "item":"py-cord[voice]"},
         {"name":"certifi"},
         {"name":"pillow"},
         # {"name":"youtube-dl"},
