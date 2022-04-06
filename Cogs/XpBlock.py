@@ -30,24 +30,7 @@ class XpBlock(commands.Cog):
 
 		usage = 'Usage: `{}xpblock [user_or_role]`'.format(ctx.prefix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if user_or_role == None:
 			await ctx.message.channel.send(usage)
@@ -71,35 +54,12 @@ class XpBlock(commands.Cog):
 				await ctx.message.channel.send(msg)
 				return
 		
+		# Check if they're admin or bot admin
+		if Utils.is_bot_admin(user_or_role):
+			return await ctx.send("You can't block other admins with this command.")
 		if is_user:
-			# Check if they're admin or bot admin
-			isAdmin = user_or_role.permissions_in(ctx.message.channel).administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-				for role in user_or_role.roles:
-					for aRole in checkAdmin:
-						# Get the role that corresponds to the id
-						if str(aRole['ID']) == str(role.id):
-							isAdmin = True
-			if isAdmin:
-				msg = "You can't block other admins with this command."
-				await ctx.send(msg)
-				return
 			ur_name = DisplayName.name(user_or_role)
 		else:
-			# Check if the role is admin or bot admin
-			isAdmin = user_or_role.permissions.administrator
-			if not isAdmin:
-				checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(user_or_role.id):
-						isAdmin = True
-			if isAdmin:
-				msg = "You can't block other admins with this command."
-				await ctx.send(msg)
-				return
-
 			ur_name = Nullify.escape_all(user_or_role.name)
 
 		# Now we see if we already have that role in our list
@@ -126,24 +86,7 @@ class XpBlock(commands.Cog):
 	async def xpunblockall(self, ctx):
 		"""Removes all users and roles from the xp block list (bot-admin only)."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		xparray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
 		self.settings.setServerStat(ctx.message.guild, "XpBlockArray", [])
@@ -159,24 +102,7 @@ class XpBlock(commands.Cog):
 
 		usage = 'Usage: `{}xpunblock [user_or_role]`'.format(ctx.prefix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if user_or_role == None:
 			await ctx.message.channel.send(usage)

@@ -61,11 +61,7 @@ class XpStack(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setxpcount(self, ctx, count = None):
 		"""Sets the number of xp transactions to keep (default is 10)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if count == None:
 			# Reset to default
@@ -92,11 +88,7 @@ class XpStack(commands.Cog):
 	@commands.command(pass_context=True)
 	async def xpcount(self, ctx, count = None):
 		"""Returns the number of xp transactions to keep (default is 10)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		num = self.settings.getServerStat(ctx.guild, "XP Count")
 		if num == None:
@@ -108,17 +100,7 @@ class XpStack(commands.Cog):
 	@commands.command(pass_context=True)
 	async def clearxp(self, ctx):
 		"""Clears the xp transaction list (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		
 		xp_array = self.settings.getServerStat(ctx.guild, "XP Array")
 		if xp_array == None:
@@ -134,23 +116,7 @@ class XpStack(commands.Cog):
 	@commands.command(pass_context=True)
 	async def checkxp(self, ctx):
 		"""Displays the last xp transactions (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		xp_array = self.settings.getServerStat(ctx.guild, "XP Array")
 		if xp_array == None:
