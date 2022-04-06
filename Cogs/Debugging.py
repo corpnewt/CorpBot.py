@@ -391,7 +391,7 @@ class Debugging(commands.Cog):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
 				msg += a.url + "\n"
-		pfpurl = Utils.get_avatar(before)
+		pfpurl = Utils.get_avatar(before.author)
 		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
 		return
 		
