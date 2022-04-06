@@ -302,9 +302,7 @@ class Strike(commands.Cog):
 		stat_embed.add_field(name="Strike Level", value=strikeLevel, inline=True)
 
 		# Get member's avatar url
-		avURL = member.avatar_url
-		if not len(avURL):
-			avURL = member.default_avatar_url
+		avURL = Utils.get_avatar(member)
 
 		if member.nick:
 			# We have a nickname

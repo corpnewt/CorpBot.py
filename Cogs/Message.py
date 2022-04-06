@@ -246,8 +246,7 @@ class Embed:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
                 em.set_author(
                     name = self._truncate_string(name, self.auth_max),
-                    # Ignore the url here
-                    icon_url=self.author.avatar_url
+                    icon_url=next((x for x in (self.author.avatar_url,self.author.default_avatar_url) if x),None) if hasattr(self.author,"avatar_url") else self.author.display_avatar.url
                 )      
             elif type(self.author) is dict:
                 if any(item in self.author for item in ["name", "url", "icon"]):

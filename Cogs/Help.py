@@ -277,7 +277,7 @@ class Help(commands.Cog):
 			'''if len(ali_match):
 				ali_mess = "\n".join(["`└─ {}`".format(x["Item"]) for x in ali_match])
 				m.add_field(name="Close Command Alias Matches:", value=ali_mess)'''
-			m.footer = { "text" : "Cog and command names are case-sensitive.", "icon_url" : self.bot.user.avatar_url }
+			m.footer = "Cog and command names are case-sensitive."
 			return await m.send(ctx)
 		result["color"] = ctx.author
 		bot_user = ctx.guild.get_member(self.bot.user.id) if ctx.guild else self.bot.user

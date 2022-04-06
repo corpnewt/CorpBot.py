@@ -267,9 +267,7 @@ class Humor(commands.Cog):
 		test_user = DisplayName.memberForName(url, ctx.guild)
 		if test_user:
 			# Got a user!
-			url = test_user.avatar_url
-			if not len(url):
-				url = test_user.default_avatar_url
+			url = Utils.get_avatar(test_user)
 		image = self.image.copy()
 		message = await ctx.send("Preparing to poke...")
 		path = await GetImage.download(url)
@@ -309,8 +307,7 @@ class Humor(commands.Cog):
 		test_user = DisplayName.memberForName(url, ctx.guild)
 		if test_user:
 			# Got a user!
-			url = test_user.avatar_url
-			if not len(url): url = test_user.default_avatar_url
+			url = Utils.get_avatar(test_user)
 		message = await ctx.send("Preparing to fry...")
 		path = await GetImage.download(url)
 		if not path:
@@ -359,9 +356,7 @@ class Humor(commands.Cog):
 		if not test_user:
 			return await ctx.send("Usage: `{}stardew [user]`".format(ctx.prefix))
 		# Got a user!
-		user = test_user.avatar_url
-		if not len(user):
-			user = test_user.default_avatar_url
+		user = Utils.get_avatar(test_user)
 		# User profile pic needs to be formatted to 64x65 pixels - and the top left corner is at
 		# (221,15)
 		image = self.s_image.copy()
@@ -422,8 +417,8 @@ class Humor(commands.Cog):
 		if not test_user:
 			return await ctx.send("Usage: `{}slap [user]`".format(ctx.prefix))
 		# Got a user!
-		user = ctx.author.avatar_url if len(ctx.author.avatar_url) else ctx.author.default_avatar_url
-		targ = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+		user = Utils.get_avatar(ctx.author)
+		targ = Utils.get_avatar(test_user)
 		image = self.slap_image.copy()
 		# The slapper's image will be 300x300, the slaped user's image will be 350x350
 		# The top left corner of the slapper is at (487, 17)

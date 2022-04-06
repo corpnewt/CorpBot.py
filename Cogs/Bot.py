@@ -165,9 +165,7 @@ class Bot(commands.Cog):
 			owners = ', '.join(userList)
 			
 		# Get bot's avatar url
-		avatar = bot_member.avatar_url
-		if not len(avatar):
-			avatar = bot_member.default_avatar_url
+		avatar = Utils.get_avatar(bot_member)
 		
 		# Build the embed
 		fields = [
@@ -369,7 +367,7 @@ class Bot(commands.Cog):
 		test_user = DisplayName.memberForName(filename, ctx.guild)
 		if test_user:
 			# Got a user!
-			filename = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+			filename = Utils.get_avatar(test_user)
 		# Ensure string
 		filename = str(filename)
 
@@ -773,7 +771,7 @@ class Bot(commands.Cog):
 			title="Counted Lines of Code",
 			description="Some poor soul took the time to sloppily write the following to bring me life...",
 			fields=fields,
-			thumbnail=bot_member.avatar_url if bot_member.avatar_url else bot_member.default_avatar_url
+			thumbnail=Utils.get_avatar(bot_member)
 		).edit(ctx,message)
 
 	# Helper function to get extensions

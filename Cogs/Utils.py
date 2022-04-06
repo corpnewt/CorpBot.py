@@ -9,8 +9,6 @@ def setup(bot):
 	# This module isn't actually a cog - but it is a place
 	# we can call "a trash fire"
 	bot.add_cog(Utils(bot))
-	# global bot
-	# bot = bot_start
 
 class Utils(commands.Cog):
 	def __init__(self,bot):
@@ -115,3 +113,19 @@ class Utils(commands.Cog):
 			# Check if we need to complete an orphaned codeblock
 			if complete_codeblocks and value.count("```") % 2: value += "```"
 		return value
+
+	def get_avatar(self,member,server=True):
+		# Check for the old syntax
+		if hasattr(member,"avatar_url"):
+			return next((x for x in (member.avatar_url,member.default_avatar_url) if x),None)
+		# Check for new - and leverage the display_avatar first
+		if server:
+			return member.display_avatar.url
+		return next((x.url for x in (member.avatar,member.display_avatar) if x),None)
+
+	def get_default_avatar(self):
+		# Check for the old syntax
+		if hasattr(self.bot.user,"default_avatar_url"):
+			return self.bot.user.default_avatar_url
+		# Use the new
+		return self.bot.user.default_avatar.url
