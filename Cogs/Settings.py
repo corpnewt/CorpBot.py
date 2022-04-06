@@ -1050,7 +1050,7 @@ class Settings(commands.Cog):
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
-		isAdmin = author.permissions_in(ctx.message.channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
 		if not isAdmin:
 			await channel.send('You do not have sufficient privileges to access this command.')
@@ -1075,7 +1075,7 @@ class Settings(commands.Cog):
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 		
-		isAdmin = author.permissions_in(channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
 		if not isAdmin:
 			await ctx.channel.send('You do not have sufficient privileges to access this command.')
