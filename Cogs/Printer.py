@@ -84,27 +84,30 @@ class Printer(commands.Cog):
 			pass
 		return False
 
-	@commands.command(pass_context=True)
-	async def printavi(self, ctx, *, member = None):
-		"""Returns a the passed member's avatar."""
-		if member == None:
+	async def _print_avi(self,ctx,member,server=True):
+		if member is None:
 			# Assume author
 			member = ctx.author
-		if type(member) is str:
+		if isinstance(member,str):
 			new_mem = DisplayName.memberForName(member, ctx.guild)
-			if not new_mem:
-				await ctx.send("I couldn't find that member...")
-				return
+			if not new_mem: return await ctx.send("I couldn't find that member...")
 			member = new_mem
-		url = Utils.get_avatar(member)
+		url = Utils.get_avatar(member,server=server)
 		name = DisplayName.name(member)
-		if name[-1].lower() == "s":
-			name += "' Avatar"
-		else:
-			name += "'s Avatar"
+		name += "'{} Avatar".format("" if name[-1].lower() == "s" else "s")
 		await Message.Embed(title=name, image=url, color=ctx.author).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
+	async def printavi(self, ctx, *, member = None):
+		"""Returns a the passed member's avatar."""
+		await self._print_avi(ctx,member,server=False)
+
+	@commands.command()
+	async def printguildavi(self, ctx, *, member=None):
+		"""Returns a the passed member's guild avatar if available."""
+		await self._print_avi(ctx,member,server=True)
+
+	@commands.command()
 	async def print(self, ctx, *, url = None):
 		"""DOT MATRIX.  Accepts a url - or picks the first attachment."""
 		if not self.canDisplay(ctx.guild):
