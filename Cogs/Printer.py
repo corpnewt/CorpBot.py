@@ -86,7 +86,7 @@ class Printer(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def printavi(self, ctx, *, member = None):
-		"""Returns a url to the passed member's avatar."""
+		"""Returns a the passed member's avatar."""
 		if member == None:
 			# Assume author
 			member = ctx.author
@@ -96,9 +96,7 @@ class Printer(commands.Cog):
 				await ctx.send("I couldn't find that member...")
 				return
 			member = new_mem
-		url = member.avatar_url
-		if not len(url):
-			url = member.default_avatar_url
+		url = Utils.get_avatar(member)
 		name = DisplayName.name(member)
 		if name[-1].lower() == "s":
 			name += "' Avatar"
@@ -122,9 +120,7 @@ class Printer(commands.Cog):
 		test_user = DisplayName.memberForName(url, ctx.guild)
 		if test_user:
 			# Got a user!
-			url = test_user.avatar_url
-			if not len(url):
-				url = test_user.default_avatar_url
+			url = Utils.get_avatar(test_user)
 
 		message = await ctx.send("Downloading...")
 		

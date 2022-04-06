@@ -70,7 +70,7 @@ class Jpeg(commands.Cog):
 		test_user = DisplayName.memberForName(url, ctx.guild)
 		if test_user:
 			# Got a user!
-			url = test_user.avatar_url if len(test_user.avatar_url) else test_user.default_avatar_url
+			url = Utils.get_avatar(test_user)
 		
 		message = await Message.Embed(description="Downloading...", color=ctx.author).send(ctx)
 		

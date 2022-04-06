@@ -777,12 +777,6 @@ class Xp(commands.Cog):
 	@commands.command(pass_context=True)
 	async def rank(self, ctx, *, member = None):
 		"""Say the highest rank of a listed member."""
-		
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 
 		if member is None:
 			member = ctx.message.author
@@ -805,9 +799,7 @@ class Xp(commands.Cog):
 		
 		memName = member.name
 		# Get member's avatar url
-		avURL = member.avatar_url
-		if not len(avURL):
-			avURL = member.default_avatar_url
+		avURL = Utils.get_avatar(member)
 		if member.nick:
 			# We have a nickname
 			# Add to embed
@@ -890,9 +882,7 @@ class Xp(commands.Cog):
 				await ctx.message.channel.send(msg)
 				return
 
-		url = member.avatar_url
-		if not len(url):
-			url = member.default_avatar_url
+		url = Utils.get_avatar(member)
 
 		# Create blank embed
 		stat_embed = Message.Embed(color=member.color,thumbnail=url,pm_after_fields=20)
@@ -904,11 +894,7 @@ class Xp(commands.Cog):
 		# Add XP and XP Reserve
 		stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
 		stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
-		
-		# Get member's avatar url
-		avURL = member.avatar_url
-		if not len(avURL):
-			avURL = member.default_avatar_url
+
 		if member.nick:
 			# We have a nickname
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)

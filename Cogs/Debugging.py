@@ -125,7 +125,7 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
 		guild = from_user.guild
-		pfpurl = from_user.avatar_url if len(from_user.avatar_url) else from_user.default_avatar_url
+		pfpurl = Utils.get_avatar(from_user)
 		if not self.shouldLog('xp', guild):
 			return
 		if type(to_user) is discord.Role:
@@ -139,7 +139,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.ban', guild):
 			return
 		# A member was banned
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
@@ -148,7 +148,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.unban', guild):
 			return
 		# A member was unbanned
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
@@ -156,7 +156,7 @@ class Debugging(commands.Cog):
 	async def on_mute(self, member, guild, cooldown, muted_by):
 		if not self.shouldLog('user.mute', guild): return
 		# A memeber was muted
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		msg = "🔇 {}#{} ({}) was muted.".format(member.name, member.discriminator, member.id)
 		message = "Muted by {}.\nMuted {}.".format(
 			"Auto-Muted" if not muted_by else "{}#{} ({})".format(muted_by.name, muted_by.discriminator, muted_by.id),
@@ -168,7 +168,7 @@ class Debugging(commands.Cog):
 	async def on_unmute(self, member, guild):
 		if not self.shouldLog('user.unmute', guild): return
 		# A memeber was muted
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		msg = "🔊 {}#{} ({}) was unmuted.".format(member.name, member.discriminator, member.id)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
@@ -178,8 +178,8 @@ class Debugging(commands.Cog):
 		if invite.guild == None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
-		pfpurl = self.bot.user.default_avatar_url
-		if invite.inviter != None and len(invite.inviter.avatar_url): pfpurl = invite.inviter.avatar_url
+		pfpurl = Utils.get_avatar(self.bot.user)
+		if invite.inviter != None: pfpurl = invite.inviter.display_avatar.url
 		# Store the invite in our working list
 		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
 		if not self.shouldLog('invite.create', invite.guild): return
@@ -193,7 +193,7 @@ class Debugging(commands.Cog):
 		if invite.guild == None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
-		pfpurl = guild.icon_url if len(guild.icon_url) else self.bot.user.default_avatar_url
+		pfpurl = guild.icon_url if len(guild.icon_url) else Utils.get_default_avatar()
 		# Refresh the list omitting the deleted invite
 		self.invite_list[str(guild.id)] = [x for x in self.invite_list.get(str(guild.id),[]) if x.code != invite.code]
 		if not self.shouldLog('invite.delete', guild): return
@@ -204,7 +204,7 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()	
 	async def on_member_join(self, member):
 		guild = member.guild
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		# Try and determine which invite was used
 		invite = None
 		invite_list = self.invite_list.get(str(guild.id),[])
@@ -226,7 +226,7 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		guild = member.guild
-		pfpurl = member.avatar_url if len(member.avatar_url) else member.default_avatar_url
+		pfpurl = Utils.get_avatar(member)
 		if not self.shouldLog('user.leave', guild):
 			return
 		# A member left
@@ -270,7 +270,7 @@ class Debugging(commands.Cog):
 			return
 		# A member changed something about their user-profile
 		server = before.guild
-		pfpurl = before.avatar_url if len(before.avatar_url) else before.default_avatar_url
+		pfpurl = Utils.get_avatar(before)
 		if not before.status == after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
@@ -316,9 +316,9 @@ class Debugging(commands.Cog):
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
 					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not str(before.avatar_url) == str(after.avatar_url) and self.shouldLog('user.avatar', server):
+		if not Utils.get_avatar(before) == Utils.get_avatar(after) and self.shouldLog('user.avatar', server):
 			# Avatar changed
-			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(before.avatar_url, after.avatar_url)
+			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(Utils.get_avatar(before), Utils.get_avatar(after))
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if not before.nick == after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
@@ -344,7 +344,7 @@ class Debugging(commands.Cog):
 				msg += "\n\n--- Attachments ---\n\n"
 				for a in message.attachments:
 					msg += a.url + "\n"
-			pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+			pfpurl = Utils.get_avatar(message.author)
 			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
 			return
 		elif self.shouldLog('invite.send', message.guild):
@@ -362,7 +362,7 @@ class Debugging(commands.Cog):
 				return
 			title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 			msg = self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True)
-			pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+			pfpurl = Utils.get_avatar(message.author)
 			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
 			return
 		
@@ -391,7 +391,7 @@ class Debugging(commands.Cog):
 			msg += "\n--- Attachments ---\n\n"
 			for a in after.attachments:
 				msg += a.url + "\n"
-		pfpurl = before.author.avatar_url if len(before.author.avatar_url) else before.author.default_avatar_url
+		pfpurl = Utils.get_avatar(before)
 		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
 		return
 		
@@ -416,7 +416,7 @@ class Debugging(commands.Cog):
 			msg += "\n\n--- Attachments ---\n\n"
 			for a in message.attachments:
 				msg += a.url + "\n"
-		pfpurl = message.author.avatar_url if len(message.author.avatar_url) else message.author.default_avatar_url
+		pfpurl = Utils.get_avatar(message.author)
 		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange(), thumbnail = pfpurl)
 	
 	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None):
@@ -424,10 +424,6 @@ class Debugging(commands.Cog):
 		# Check if we're suppressing @here and @everyone mentions
 		if color == None:
 			color = discord.Color.default()
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
 		# Get log channel
 		logChanID = self.settings.getServerStat(server, "LogChannel")
 		if not logChanID:
@@ -553,7 +549,7 @@ class Debugging(commands.Cog):
 		if self.shouldLog('message.delete', ctx.guild):
 			# We're logging
 			logmess = '{}#{} cleaned in #{}'.format(ctx.author.name, ctx.author.discriminator, chan.name)
-			pfpurl = ctx.author.avatar_url if len(ctx.author.avatar_url) else ctx.author.default_avatar_url
+			pfpurl = Utils.get_avatar(ctx.author)
 			await self._logEvent(ctx.guild, "{:,} message{} removed.".format(counter, "" if counter == 1 else "s"), title=logmess, filename=filename, thumbnail=pfpurl)
 		# Delete the remaining file
 		os.remove(filename)
