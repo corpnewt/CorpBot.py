@@ -258,38 +258,14 @@ class UserRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def urblock(self, ctx, *, member = None):
 		"""Blocks a user from using the UserRole system and removes applicable roles (bot-admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-						break
-		# Only allow bot-admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
-			await ctx.send("I couldn't find {}.".format(Nullify.escape_all(member)))
-			return
-		# Check if we're trying to block a bot-admin
-		isAdmin = mem.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in mem.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-						break
+			return await ctx.send("I couldn't find {}.".format(Nullify.escape_all(member)))
 		# Only allow bot-admins to change server stats
-		if isAdmin:
-			await ctx.send("You can't block other admins or bot-admins from the UserRole module.")
-			return
+		if Utils.is_bot_admin(ctx,mem):
+			return await ctx.send("You can't block other admins or bot-admins from the UserRole module.")
 		# At this point - we have someone to block - see if they're already blocked
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
 		m = ""
@@ -326,19 +302,7 @@ class UserRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def urunblock(self, ctx, *, member = None):
 		"""Unblocks a user from the UserRole system (bot-admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-						break
-		# Only allow bot-admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		# Get the target user
 		mem = DisplayName.memberForName(member, ctx.guild)
 		if not mem:
@@ -380,11 +344,7 @@ class UserRole(commands.Cog):
 
 		usage = 'Usage: `{}adduserrole [role]`'.format(ctx.prefix)
 		
-		isAdmin = author.permissions_in(channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		
 		if role == None:
 			await ctx.send(usage)
@@ -441,17 +401,7 @@ class UserRole(commands.Cog):
 
 		usage = 'Usage: `{}removeuserrole [role]`'.format(ctx.prefix)
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		isAdmin = author.permissions_in(channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if role == None:
 			await channel.send(usage)

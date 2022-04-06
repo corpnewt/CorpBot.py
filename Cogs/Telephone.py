@@ -184,31 +184,19 @@ class Telephone(commands.Cog):
 	@commands.command(pass_context=True)
 	async def callerid(self, ctx):
 		"""Reveals the last number to call regardless of *67 settings (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		
+
 		target = self.settings.getServerStat(ctx.guild, "LastCall")
 		if target == None:
 			await ctx.send(":telephone: No prior calls recorded.")
 		else:
-			if self.settings.getServerStat(ctx.guild, "LastCallHidden") and not isAdmin:
+			if self.settings.getServerStat(ctx.guild, "LastCallHidden") and not Utils.is_bot_admin(ctx):
 				target = "UNKNOWN CALLER (bot-admins and admins can reveal this)"
 			await ctx.send(":telephone: Last number recorded: {}".format(target[:3] + "-" + target[3:]))
 
 	@commands.command(pass_context=True)
 	async def settelechannel(self, ctx, *, channel = None):
 		"""Sets the channel for telephone commands - or disables that if nothing is passed (admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 		if channel == None:
 			self.settings.setServerStat(ctx.message.guild, "TeleChannel", "")
 			self.settings.setServerStat(ctx.guild, "TeleNumber", None)
@@ -242,18 +230,7 @@ class Telephone(commands.Cog):
 	@commands.command(pass_context=True)
 	async def teleblock(self, ctx, *, guild_name = None):
 		"""Blocks all tele-numbers associated with the passed guild (bot-admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if guild_name == None:
 			await ctx.send("Usage: `{}teleblock [guild_name]`".format(ctx.prefix))
@@ -292,18 +269,7 @@ class Telephone(commands.Cog):
 	@commands.command(pass_context=True)
 	async def teleunblock(self, ctx, *, guild_name = None):
 		"""Unblocks all tele-numbers associated with the passed guild (bot-admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if guild_name == None:
 			await ctx.send("Usage: `{}teleunblock [guild_name]`".format(ctx.prefix))

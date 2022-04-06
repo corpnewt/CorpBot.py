@@ -141,18 +141,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vkmention(self, ctx):
 		"""Gets which user or role is mentioned when enough votes against a user are reached."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		
 		current_id = self.settings.getServerStat(ctx.guild, "VoteKickMention")
 		if not current_id:
@@ -171,18 +160,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setvkmention(self, ctx, *, user_or_role = None):
 		"""Sets which user or role is mentioned when enough votes against a user are reached."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if user_or_role == None:
 			self.settings.setServerStat(ctx.guild, "VoteKickMention", None)
@@ -204,18 +182,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vktomute(self, ctx, *, number_of_votes = None):
 		"""Sets the number of votes before a user is muted.  Anything less than 1 will disable, and nothing will output the current setting."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if number_of_votes == None:
 			# Output the current setting
@@ -247,18 +214,7 @@ class VoteKick(commands.Cog):
 	async def vktomention(self, ctx, *, number_of_votes = None):
 		"""Sets the number of votes before the selected role or user is mentioned.  Anything less than 1 will disable, and nothing will output the current setting.
 		You will also want to make sure you have a role/user to mention - and a channel in which to mention them setup."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if number_of_votes == None:
 			# Output the current setting
@@ -289,18 +245,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vkchannel(self, ctx):
 		"""Gets which channel then mention posts to when enough votes against a user are reached."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 		
 		current_id = self.settings.getServerStat(ctx.guild, "VoteKickChannel")
 		if not current_id:
@@ -316,18 +261,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setvkchannel(self, ctx, *, channel = None):
 		"""Sets which channel then mention posts to when enough votes against a user are reached."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if channel == None:
 			self.settings.setServerStat(ctx.guild, "VoteKickChannel", None)
@@ -344,18 +278,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vkmutetime(self, ctx, *, the_time = None):
 		"""Sets the number of time a user is muted when the mute votes are reached - 0 or less will disable the system."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if the_time == None:
 			# Output the current setting
@@ -397,18 +320,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vkexpiretime(self, ctx, *, the_time = None):
 		"""Sets the amount of time before a vote expires.  0 or less will make them permanent."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if the_time == None:
 			# Output the current setting
@@ -451,18 +363,7 @@ class VoteKick(commands.Cog):
 	async def vkanon(self, ctx, *, yes_no = None):
 		"""Sets whether vote messages are removed after voting (bot-admin only; always off by default)."""
 
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		setting_name = "Vote kick anon"
 		setting_val  = "VoteKickAnon"
@@ -555,18 +456,8 @@ class VoteKick(commands.Cog):
 			await ctx.send("You should probably find a way to be okay with yourself.  Kicking yourself will get you nowhere.")
 			return
 
-		# Check if we're trying to kick an admin
-		isAdmin = check_user.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(guild, "AdminArray")
-			for role in check_user.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if isAdmin:
-			await ctx.channel.send('You cannot vote to kick the admins.  Please work out any issues you may have with them in a civil manner.')
-			return
+		if Utils.is_bot_admin(ctx,check_user):
+			return await ctx.channel.send('You cannot vote to kick the admins.  Please work out any issues you may have with them in a civil manner.')
 
 		vote_list = self.settings.getServerStat(guild, "VoteKickArray")
 		for member in vote_list:
@@ -598,19 +489,7 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vkclear(self, ctx, *, user = None):
 		"""Clears the votes against the passed user (bot-admin only)."""
-		# Check if we're trying to kick an admin
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if user == None:
 			await ctx.send("Usage: `{}vkclear [user]`".format(ctx.prefix))
@@ -634,16 +513,9 @@ class VoteKick(commands.Cog):
 	@commands.command(pass_context=True)
 	async def vks(self, ctx, *, user = None):
 		"""Lists the vote count of the passed user (bot-admin only) or the author if no user was passed."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
+
 		# Default to author if not admin/bot-admin
-		if not isAdmin:
+		if not Utils.is_bot_admin(ctx):
 			user = None
 
 		if user == None:

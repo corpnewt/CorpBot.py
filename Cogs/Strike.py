@@ -112,18 +112,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def strike(self, ctx, member : discord.Member = None, days = None, *, message : str = None):
 		"""Give a user a strike (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}strike [member] [strike timeout (in days) - 0 = forever] [message (optional)]`'.format(ctx.prefix)
@@ -142,17 +131,8 @@ class Strike(commands.Cog):
 			return
 		
 		# Check if we're striking another admin/bot-admin
-		isAdmin = member.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in member.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if isAdmin:
-			await ctx.channel.send('You can\'t give other admins/bot-admins strikes, bub.')
-			return
+		if Utils.is_bot_admin(ctx,member):
+			return await ctx.channel.send('You can\'t give other admins/bot-admins strikes, bub.')
 
 		# Check if days is an int - otherwise assume it's part of the message
 		try:
@@ -263,14 +243,6 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def strikes(self, ctx, *, member = None):
 		"""Check a your own, or another user's total strikes (bot-admin needed to check other users)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
 
 		if member == None:
 			member = ctx.message.author
@@ -284,7 +256,7 @@ class Strike(commands.Cog):
 				return
 			
 		# Only allow admins to check others' strikes
-		if not isAdmin:
+		if not Utils.is_bot_admin(ctx):
 			if member:
 				if not member.id == ctx.message.author.id:
 					await ctx.channel.send('You are not a bot-admin.  You can only see your own strikes.')
@@ -356,18 +328,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def removestrike(self, ctx, *, member = None):
 		"""Removes a strike given to a member (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}removestrike [member]`'.format(ctx.prefix)
@@ -408,18 +369,7 @@ class Strike(commands.Cog):
 	async def setstrikelevel(self, ctx, *, member = None, strikelevel : int = None):
 		"""Sets the strike level of the passed user (bot-admin only)."""
 
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		author  = ctx.message.author
 		server  = ctx.message.guild
@@ -461,18 +411,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def addkick(self, ctx, *, member = None):
 		"""Adds the passed user to the kick list (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}addkick [member]`'.format(ctx.prefix)
@@ -502,18 +441,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def removekick(self, ctx, *, member = None):
 		"""Removes the passed user from the kick list (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}removekick [member]`'.format(ctx.prefix)
@@ -544,18 +472,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def addban(self, ctx, *, member = None):
 		"""Adds the passed user to the ban list (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}addban [member]`'.format(ctx.prefix)
@@ -585,18 +502,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def removeban(self, ctx, *, member = None):
 		"""Removes the passed user from the ban list (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		if member == None:
 			msg = 'Usage: `{}removeban [member]`'.format(ctx.prefix)
@@ -674,18 +580,7 @@ class Strike(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setstrikelimit(self, ctx, limit = None):
 		"""Sets the number of strikes before advancing to the next consequence (bot-admin only)."""
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for role in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if not limit:
 			await ctx.channel.send('Strike limit must be *at least* one.')

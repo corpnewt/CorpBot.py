@@ -33,6 +33,8 @@ class Utils(commands.Cog):
 	def is_admin(self,ctx,member=None):
 		# Checks if the user in the passed context is admin
 		member = ctx.author if not member else member
+		if hasattr(ctx.channel,"permissions_for"):
+			return ctx.channel.permissions_for(member).administrator
 		return member.permissions_in(ctx.channel).administrator
 
 	def is_bot_admin_only(self,ctx,member=None):
@@ -45,8 +47,7 @@ class Utils(commands.Cog):
 
 	def is_bot_admin(self,ctx,member=None):
 		# Checks if the user in the passed context is admin or bot admin
-		member = ctx.author if not member else member
-		return member.permissions_in(ctx.channel).administrator or self.is_bot_admin_only(ctx,member)
+		return self.is_admin(ctx,member) or self.is_bot_admin_only(ctx,member)
 
 	async def is_owner_reply(self,ctx,member=None,not_claimed="I have not been claimed, *yet*.",not_owner="You are not the *true* owner of me.  Only the rightful owner can use this command."):
 		# Auto-replies if the user isn't an owner

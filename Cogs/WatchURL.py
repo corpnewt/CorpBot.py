@@ -1,6 +1,6 @@
 import asyncio, discord, re
 from   discord.ext import commands
-from   Cogs import PickList, Message
+from   Cogs import PickList, Message,Utils
 
 def setup(bot):
 	# Add the bot
@@ -15,10 +15,8 @@ class WatchURL(commands.Cog):
 		# Regex for extracting urls from strings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.limit = 200 # Set to 0 or less for unlimited
-
-	def is_bot_admin(self, ctx):
-		# Checks if the passed user is bot admin
-		return ctx.author.permissions_in(ctx.channel).administrator or next((role for role in ctx.author.roles for check in self.settings.getServerStat(ctx.guild, "AdminArray", []) if str(role.id) == str(check["ID"])),False)
+		global Utils
+		Utils = self.bot.get_cog("Utils")
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -46,16 +44,14 @@ class WatchURL(commands.Cog):
 	@commands.command()
 	async def clearwatchedurls(self, ctx):
 		"""Clears all URLs to watch for (bot-admin only)."""
-		if not self.is_bot_admin(ctx):
-			return await ctx.send("You do not have sufficient privileges to access this command.")
+		if not await Utils.is_bot_admin_reply(ctx): return
 		self.settings.setServerStat(ctx.guild,"URLWatchList",[])
 		await Message.EmbedText(description="No longer watching for any URLs!",title="Watched URLs",color=ctx.author).send(ctx)
 
 	@commands.command()
 	async def clearwatchurlmatches(self, ctx):
 		"""Clears all URL watch list matches (bot-admin only)."""
-		if not self.is_bot_admin(ctx):
-			return await ctx.send("You do not have sufficient privileges to access this command.")
+		if not await Utils.is_bot_admin_reply(ctx): return
 		self.settings.setServerStat(ctx.guild,"URLWatchListMatches",[])
 		await Message.EmbedText(description="All matches cleared!",title="Watched URLs",color=ctx.author).send(ctx)
 
@@ -69,8 +65,7 @@ class WatchURL(commands.Cog):
 	@commands.command()
 	async def addwatchurl(self, ctx, url = None):
 		"""Adds a new URL to watch for (bot-admin only)."""
-		if not self.is_bot_admin(ctx):
-			return await ctx.send("You do not have sufficient privileges to access this command.")
+		if not await Utils.is_bot_admin_reply(ctx): return
 		url_list = self.settings.getServerStat(ctx.guild,"URLWatchList",[])
 		if url.lower() in url_list:
 			return await Message.EmbedText(description="That URL is already being watched!",title="Watched URLs Error",color=ctx.author).send(ctx)
@@ -81,8 +76,7 @@ class WatchURL(commands.Cog):
 	@commands.command()
 	async def delwatchurl(self, ctx, url = None):
 		"""Removes a URL from the watch list (bot-admin only)."""
-		if not self.is_bot_admin(ctx):
-			return await ctx.send("You do not have sufficient privileges to access this command.")
+		if not await Utils.is_bot_admin_reply(ctx): return
 		url_list = self.settings.getServerStat(ctx.guild,"URLWatchList",[])
 		if not url.lower() in url_list:
 			return await Message.EmbedText(description="That URL is not being watched!",title="Watched URLs Error",color=ctx.author).send(ctx)
@@ -93,8 +87,7 @@ class WatchURL(commands.Cog):
 	@commands.command()
 	async def watchboturls(self, ctx, *, yes_no = None):
 		"""Sets whether we watch for URLs from other bots (bot-admin only - disabled by default)."""
-		if not self.is_bot_admin(ctx):
-			return await ctx.send("You do not have sufficient privileges to access this command.")
+		if not await Utils.is_bot_admin_reply(ctx): return
 		setting_name = "Watch bot URLs"
 		setting_val  = "URLWatchListAllowBots"
 		current = self.settings.getServerStat(ctx.guild, setting_val, False)

@@ -277,16 +277,10 @@ class Xp(commands.Cog):
 			return
 
 		# Get our user/server stats
-		isAdmin         = author.permissions_in(channel).administrator
+		isAdmin         = Utils.is_admin(ctx)
 		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
 		# Check for bot admin
-		isBotAdmin      = False
-		for role in ctx.message.author.roles:
-			for aRole in checkAdmin:
-				# Get the role that corresponds to the id
-				if str(aRole['ID']) == str(role.id):
-					isBotAdmin = True
-					break
+		isBotAdmin      = Utils.is_bot_admin_only(ctx)
 
 		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
 		adminUnlim      = self.settings.getServerStat(server, "AdminUnlimited")
@@ -529,16 +523,10 @@ class Xp(commands.Cog):
 			await channel.send(msg)
 			return
 
-		isAdmin    = author.permissions_in(channel).administrator
+		isAdmin    = Utils.is_admin(ctx)
 		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
 		# Check for bot admin
-		isBotAdmin      = False
-		for role in ctx.message.author.roles:
-			for aRole in checkAdmin:
-				# Get the role that corresponds to the id
-				if str(aRole['ID']) == str(role.id):
-					isBotAdmin = True
-					break
+		isBotAdmin = Utils.is_bot_admin_only(ctx)
 		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
 		adminUnlim = self.settings.getServerStat(server, "AdminUnlimited")
 		reserveXP  = self.settings.getUserStat(author, server, "XPReserve")
@@ -653,7 +641,7 @@ class Xp(commands.Cog):
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		isAdmin = author.permissions_in(channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 
 		# Only allow admins to change server stats
 		if not isAdmin:
@@ -699,7 +687,7 @@ class Xp(commands.Cog):
 		server  = ctx.message.guild
 		channel = ctx.message.channel
 
-		isAdmin = author.permissions_in(channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 
 		# Only allow admins to change server stats
 		if not isAdmin:

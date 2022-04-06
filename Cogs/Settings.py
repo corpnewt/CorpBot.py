@@ -747,7 +747,7 @@ class Settings(commands.Cog):
 	@commands.command(pass_context=True)
 	async def setsstat(self, ctx, stat : str = None, value : str = None):
 		"""Sets a server stat (admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
 		if not isAdmin:
 			await ctx.send('You do not have sufficient privileges to access this command.')
@@ -763,7 +763,7 @@ class Settings(commands.Cog):
 	@commands.command(pass_context=True)
 	async def getsstat(self, ctx, stat : str = None):
 		"""Gets a server stat (admin only)."""
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
+		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
 		if not isAdmin:
 			await ctx.send('You do not have sufficient privileges to access this command.')

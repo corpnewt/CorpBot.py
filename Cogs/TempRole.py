@@ -162,18 +162,7 @@ class TempRole(commands.Cog):
 	async def temppm(self, ctx, *, yes_no = None):
 		"""Sets whether to inform users that they've been given a temp role."""
 
-		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		setting_name = "Temp role pm"
 		setting_val  = "TempRolePM"
@@ -207,17 +196,7 @@ class TempRole(commands.Cog):
 	async def autotemp(self, ctx, *, role = None):
 		"""Sets the temp role to apply to each new user that joins."""
 		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if role == None:
 			self.settings.setServerStat(ctx.guild, "TempRole", None)
@@ -240,17 +219,7 @@ class TempRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def getautotemp(self, ctx):
 		"""Gets the temp role applied to each new user that joins."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		temp_id = self.settings.getServerStat(ctx.guild, "TempRole")
 		if temp_id == None:
@@ -270,17 +239,7 @@ class TempRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def temptime(self, ctx, *, minutes = None):
 		"""Sets the number of minutes for the temp role - must be greater than 0 (admin-only)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		try:
 			minutes = int(minutes)
@@ -301,22 +260,7 @@ class TempRole(commands.Cog):
 	async def hastemp(self, ctx, *, member = None):
 		"""Displays any temp roles the passed user has, and the remaining time."""
 		# Check for admin status
-		isAdmin = ctx.author.permissions_in(ctx.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
-			for role in ctx.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(role.id):
-						isAdmin = True
-		if not isAdmin:
-			await ctx.send("You do not have permission to use this command.")
-			return
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
+		if not await Utils.is_bot_admin_reply(ctx): return
 		# Get the array
 		try:
 			promoArray = self.settings.getServerStat(server, "TempRoleList", [])
@@ -362,17 +306,7 @@ class TempRole(commands.Cog):
 	async def addtemprole(self, ctx, *, role : str = None):
 		"""Adds a new role to the temp role list (admin only)."""
 		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if role == None:
 			await ctx.message.channel.send(usage)
@@ -406,17 +340,7 @@ class TempRole(commands.Cog):
 	async def removetemprole(self, ctx, *, role : str = None):
 		"""Removes a role from the temp role list (admin only)."""
 		usage = 'Usage: `{}removetemprole [role]`'.format(ctx.prefix)
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.message.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_admin_reply(ctx): return
 
 		if role == None:
 			await ctx.message.channel.send(usage)
@@ -491,24 +415,7 @@ class TempRole(commands.Cog):
 	@commands.command(pass_context=True)
 	async def untemp(self, ctx, member = None, role = None):
 		"""Removes the passed temp role from the passed user (bot-admin only)."""
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
-		isAdmin = ctx.message.author.permissions_in(ctx.message.channel).administrator
-		if not isAdmin:
-			checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
-			for arole in ctx.message.author.roles:
-				for aRole in checkAdmin:
-					# Get the role that corresponds to the id
-					if str(aRole['ID']) == str(arole.id):
-						isAdmin = True
-		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.channel.send('You do not have sufficient privileges to access this command.')
-			return
+		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if member == None or role == None:
 			msg = 'Usage: `{}untemp "[member]" "[role]"`'.format(ctx.prefix)
