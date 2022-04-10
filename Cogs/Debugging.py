@@ -99,26 +99,26 @@ class Debugging(commands.Cog):
 	def format_invite(self, invite, sent = False):
 		# Gather prelim info
 		guild = invite.guild
-		channel = None if guild == None else invite.channel
+		channel = None if guild is None else invite.channel
 		url = invite.url if invite.url else "https://discord.gg/{}".format(invite.code)
-		expires_after = None if invite.max_age == None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
-		max_uses = None if invite.max_uses == None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
-		uses = None if invite.uses == None else "{:,}".format(invite.uses)
-		created_by = None if invite.inviter == None else "{}#{} ({})".format(invite.inviter.name, invite.inviter.discriminator, invite.inviter.id)
-		created_at = None if invite.created_at == None else invite.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC"
-		temp = None if invite.temporary == None else invite.temporary
+		expires_after = None if invite.max_age is None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
+		max_uses = None if invite.max_uses is None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
+		uses = None if invite.uses is None else "{:,}".format(invite.uses)
+		created_by = None if invite.inviter is None else "{}#{} ({})".format(invite.inviter.name, invite.inviter.discriminator, invite.inviter.id)
+		created_at = None if invite.created_at is None else invite.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC"
+		temp = None if invite.temporary is None else invite.temporary
 		# Build the description
 		desc = "Invite URL:      {}".format(url)
 		if sent == True:
-			if guild != None:		  desc += "\nName:            {}".format(guild.name)
-			if invite.approximate_member_count != None:		  desc += "\nUsers:           {}\{}".format(invite.approximate_presence_count,invite.approximate_member_count)
-		if created_by != None:    desc += "\nCreated By:      {}".format(created_by)
-		if created_at != None:    desc += "\nCreated At:      {}".format(created_at)
-		if channel != None:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
-		if expires_after != None: desc += "\nExpires:         {}".format(expires_after)
-		if temp != None:          desc += "\nTemporary:       {}".format(temp)
-		if uses != None:          desc += "\nUses:            {}".format(uses)
-		if max_uses != None:      desc += "\nMax Uses:        {}".format(max_uses)
+			if guild:	  desc += "\nName:            {}".format(guild.name)
+			if invite.approximate_member_count:		  desc += "\nUsers:           {}\{}".format(invite.approximate_presence_count,invite.approximate_member_count)
+		if created_by:    desc += "\nCreated By:      {}".format(created_by)
+		if created_at:    desc += "\nCreated At:      {}".format(created_at)
+		if channel:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
+		if expires_after: desc += "\nExpires:         {}".format(expires_after)
+		if temp:          desc += "\nTemporary:       {}".format(temp)
+		if uses:          desc += "\nUses:            {}".format(uses)
+		if max_uses:      desc += "\nMax Uses:        {}".format(max_uses)
 		return desc
 
 	# Catch custom xp event
@@ -175,11 +175,11 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_invite_create(self, invite):
 		# Add the invite to our list
-		if invite.guild == None: return # Nothing to do here
+		if invite.guild is None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
 		pfpurl = Utils.get_avatar(self.bot.user)
-		if invite.inviter != None: pfpurl = invite.inviter.display_avatar.url
+		if invite.inviter: pfpurl = Utils.get_avatar(invite.inviter)
 		# Store the invite in our working list
 		self.invite_list[str(guild.id)] = self.invite_list.get(str(guild.id),[])+[invite]
 		if not self.shouldLog('invite.create', invite.guild): return
@@ -190,7 +190,7 @@ class Debugging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_invite_delete(self, invite):
-		if invite.guild == None: return # Nothing to do here
+		if invite.guild is None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
 		pfpurl = guild.icon_url if len(guild.icon_url) else Utils.get_default_avatar()
@@ -219,7 +219,7 @@ class Debugging(commands.Cog):
 			return
 		# A new member joined
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		log_msg = "Account Created: {}".format("Unknown" if member.created_at == None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
+		log_msg = "Account Created: {}".format("Unknown" if member.created_at is None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
 		if invite: log_msg += "\n"+self.format_invite(invite)
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
 		
@@ -422,7 +422,7 @@ class Debugging(commands.Cog):
 	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
-		if color == None:
+		if color is None:
 			color = discord.Color.default()
 		# Get log channel
 		logChanID = self.settings.getServerStat(server, "LogChannel")
@@ -560,7 +560,7 @@ class Debugging(commands.Cog):
 		"""Can select one of 4 available presets - off, quiet, normal, verbose (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		
-		if preset == None:
+		if preset is None:
 			return await ctx.send('Usage: `{}logpreset [off/quiet/normal/verbose]`'.format(ctx.prefix))
 		if preset.lower() in ["0", "off"]:
 			currentVars = []
@@ -600,7 +600,7 @@ class Debugging(commands.Cog):
 		"""Enables the passed, comma-delimited log vars (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		
-		if options == None:
+		if options is None:
 			msg = 'Usage: `{}logenable option1, option2, option3...`\nAvailable options:\n{}'.format(ctx.prefix, ', '.join(self.logvars))
 			return await ctx.send(msg)
 		
@@ -628,7 +628,7 @@ class Debugging(commands.Cog):
 		"""Disables the passed, comma-delimited log vars.  If run with no arguments, disables all current logging options (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		
-		if options == None:
+		if options is None:
 			msg = 'Cleared all logging options.'
 			self.settings.setServerStat(ctx.guild, "LogVars", [])
 			return await ctx.send(msg)
@@ -656,7 +656,7 @@ class Debugging(commands.Cog):
 		"""Sets the channel for Logging (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		if channel == None:
+		if channel is None:
 			self.settings.setServerStat(ctx.guild, "LogChannel", "")
 			return await ctx.send('Logging is now *disabled*.')
 
@@ -677,13 +677,9 @@ class Debugging(commands.Cog):
 	async def setdebug(self, ctx, *, debug = None):
 		"""Turns on/off debugging (owner only - always off by default)."""
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return await ctx.send('I have not been claimed, *yet*.')
-		elif isOwner == False:
-			return await ctx.send('You are not the *true* owner of me.  Only the rightful owner can use this command.')
+		if not await Utils.is_owner_reply(ctx): return
 
-		if debug == None:
+		if debug is None:
 			# Output debug status
 			return await ctx.send("Debugging is {}.".format("enabled" if self.debug else "disabled"))
 		elif debug.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
@@ -706,12 +702,8 @@ class Debugging(commands.Cog):
 	async def cleardebug(self, ctx):
 		"""Deletes the debug.txt file (owner only)."""
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return await ctx.send('I have not been claimed, *yet*.')
-		elif isOwner == False:
-			return await ctx.send('You are not the *true* owner of me.  Only the rightful owner can use this command.')
-		
+		if not await Utils.is_owner_reply(ctx): return
+
 		if not os.path.exists('debug.txt'):
 			return await ctx.send("No *debug.txt* found.")
 		# Exists - remove it
@@ -723,12 +715,8 @@ class Debugging(commands.Cog):
 	async def heartbeat(self, ctx):
 		"""Write to the console and attempt to send a message (owner only)."""
 		# Only allow owner
-		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
-			return await ctx.send('I have not been claimed, *yet*.')
-		elif isOwner == False:
-			return await ctx.send('You are not the *true* owner of me.  Only the rightful owner can use this command.')
-
+		if not await Utils.is_owner_reply(ctx): return
+		
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
 		print('Heartbeat tested at {}.'.format(timeStamp))
 		# Message send
