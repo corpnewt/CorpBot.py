@@ -55,4 +55,6 @@ class Ascii(commands.Cog):
 			# We got a font!
 			font = parts[0]
 			text = " ".join(parts[1:])
-		await ctx.send("```\n{}```".format(pyfiglet.figlet_format(text,font=font if font else pyfiglet.DEFAULT_FONT)))
+		output = pyfiglet.figlet_format(text,font=font if font else pyfiglet.DEFAULT_FONT)
+		if not output: return await ctx.send("I couldn't beautify that text :(")
+		await ctx.send("```\n{}```".format(output))
