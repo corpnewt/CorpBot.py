@@ -602,7 +602,8 @@ class Hw(commands.Cog):
 				return await ctx.send(msg)
 		
 		# At this point - we *should* have a user and a build
-		msg_head = "__**{}'s {}:**__\n\n".format(DisplayName.name(memFromName), buildParts['Name'])
+		name = DisplayName.name(memFromName)
+		msg_head = "__**{}'{} {}:**__\n\n".format(name,"" if name[-1:].lower()=="s" else "s", buildParts['Name'])
 		msg = msg_head + buildParts['Hardware']
 		if len(msg) > 2000: # is there somwhere the discord char count is defined, to avoid hardcoding?
 			msg = buildParts['Hardware'] # if the header pushes us over the limit, omit it and send just the string
@@ -727,7 +728,8 @@ class Hw(commands.Cog):
 		
 		# At this point - we *should* have a user and a build
 		p = discord.utils.escape_markdown(buildParts['Hardware'])
-		msg = "__**{}'s {} (Raw Markdown):**__\n\n{}".format(DisplayName.name(memFromName), buildParts['Name'], p)
+		name = DisplayName.name(memFromName)
+		msg = "__**{}'{} {} (Raw Markdown):**__\n\n{}".format(name,"" if name[-1:].lower()=="s" else "s", buildParts['Name'], p)
 		await ctx.send(Utils.suppressed(ctx,msg))
 			
 
