@@ -120,7 +120,7 @@ class Music(commands.Cog):
 				description="Requested by {}".format(ctx.author.mention),
 				color=ctx.author,
 				url=track.uri,
-				thumbnail=track.thumb,
+				thumbnail=getattr(track,"thumb",None),
 				delete_after=delay
 			).send(ctx)
 		# Regardless of whether we can post - go to the next song.
@@ -501,7 +501,7 @@ class Music(commands.Cog):
 				description="Requested by {}".format(ctx.author.mention),
 				fields=fields,
 				color=ctx.author,
-				thumbnail=track.thumbnail,
+				thumbnail=getattr(track,"thumbnail",None),
 				url=track.uri,
 				delete_after=delay
 			)
