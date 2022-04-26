@@ -501,7 +501,7 @@ class Music(commands.Cog):
 				description="Requested by {}".format(ctx.author.mention),
 				fields=fields,
 				color=ctx.author,
-				thumbnail=getattr(track,"thumbnail",None),
+				thumbnail=getattr(track,"thumb",None),
 				url=track.uri,
 				delete_after=delay
 			)
@@ -895,7 +895,7 @@ class Music(commands.Cog):
 				{"name":"Progress","value":self.progress_moon(player,track) if moons and moons.lower() in ["moon","moons","moonme","moon me"] else self.progress_bar(player,track),"inline":False}
 			],
 			url=track.uri,
-			thumbnail=track.thumb,
+			thumbnail=getattr(track,"thumb",None),
 			delete_after=delay
 		).send(ctx)
 
