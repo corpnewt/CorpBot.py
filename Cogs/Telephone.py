@@ -287,7 +287,6 @@ class Telephone(commands.Cog):
 		found = False
 		target = None
 		for guild in self.bot.guilds:
-			teleNum = self.settings.getServerStat(guild, "TeleNumber")
 			if guild.name.lower() == guild_name.lower():
 				found = True
 				target = guild
@@ -321,21 +320,17 @@ class Telephone(commands.Cog):
 			await ctx.send("No blocked numbers!")
 			return
 
-		block_names = []
-		for block in block_list:
-			server = self.bot.get_guild(block)
-			if not server:
-				block_list.remove(block)
-				continue
-			block_names.append("*" + server.name + "*")
+		block_servers = [self.bot.get_guild(x) for x in block_list if self.bot.get_guild(x)]
+		block_list = [x.id for x in block_servers]
+		block_names = ["{} ({})".format(x.name,x.id) for x in block_servers]
+
 		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
-
-		msg = "__Tele-Blocked Servers:__\n\n"
-
-		#msg += ", ".join(str(x) for x in block_list)
-		msg += ", ".join(Nullify.escape_all(block_names))
-
-		await ctx.send(msg)
+		desc = "\n".join([Utils.truncate_string("{}. {}".format(i,x)) for i,x in enumerate(block_names,start=1)])
+		return await PickList.PagePicker(
+			title="Tele-Blocked Servers ({:,} total):".format(len(block_names)),
+			description=desc,
+			ctx=ctx
+		).pick()
 
 
 	@commands.command(pass_context=True)
