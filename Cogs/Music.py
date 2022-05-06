@@ -705,12 +705,9 @@ class Music(commands.Cog):
 		if song_number < 0 or song_number > len(player.queue):
 			return await Message.Embed(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=delay).send(ctx)
 		# Get the song at the index
-		queue = list(player.queue)
-		track = queue[song_number]
+		track = player.queue[song_number]
 		if track.ctx.author == ctx.author or Utils.is_bot_admin(ctx):
-			queue.pop(song_number)
-			player.queue.clear()
-			await self.add_to_queue(player,queue)
+			del player.queue[song_number]
 			return await Message.Embed(title="♫ Removed {} at position {}!".format(track.title,song_number+1),color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(track.ctx.author.mention),color=ctx.author,delete_after=delay).send(ctx)
 
@@ -769,8 +766,8 @@ class Music(commands.Cog):
 				return await Message.Embed(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
 			# Get a list of current items, clear the existing queue, shuffle and add back
 			queue = list(player.queue)
-			player.queue.clear()
 			random.shuffle(queue)
+			player.queue.clear()
 			await self.add_to_queue(player,queue)
 			return await Message.Embed(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 		# We're adding a new song/playlist/search shuffled to the queue
