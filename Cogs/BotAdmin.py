@@ -22,6 +22,30 @@ class BotAdmin(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		await self.bot.wait_until_ready()
+		if not self.settings: return # No settings to check
+		print("Verifying ignore lists...")
+		t = time.time()
+		updated = []
+		for guild in self.bot.guilds:
+			old_ignore = self.settings.getServerStat(guild,"IgnoredUsers",[])
+			if old_ignore and not all((isinstance(x,str) for x in old_ignore)):
+				# We have a list - and not all elements are strings.
+				updated.append(guild)
+				# First we walk all elements and pull the ID values out of the dicts
+				new_ignore = [x if isinstance(x,str) else str(x.get("ID",0)) for x in old_ignore if isinstance(x,(str,dict))]
+				# Then we gather all valid elments and reset the settings
+				self.settings.setServerStat(guild,"IgnoredUsers",[x for x in new_ignore if x])
+		print("Ignore list verified - {:,} guild{} updated - took {} seconds.".format(len(updated),"" if len(updated)==1 else "s",time.time()-t))
+
 	async def message(self, message):
 		# Check for discord invite links and remove them if found - per server settings
 		if not self.dregex.search(message.content): return None # No invite in the passed message - nothing to do
@@ -78,79 +102,60 @@ class BotAdmin(commands.Cog):
 	async def ignore(self, ctx, *, member = None):
 		"""Adds a member to the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-			
-		if member == None:
-			msg = 'Usage: `{}ignore [member]`'.format(ctx.prefix)
-			return await ctx.send(msg)
+		if not member: return await ctx.send("Usage: `{}ignore [member]`".format(ctx.prefix))
 
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
-			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				return await ctx.send(Utils.suppressed(ctx,msg))
+			if not member: return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
 
-		ignoreList = self.settings.getServerStat(ctx.guild, "IgnoredUsers")
-
-		for user in ignoreList:
-			if str(member.id) == str(user["ID"]):
-				# Found our user - already ignored
-				return await ctx.send('*{}* is already being ignored.'.format(DisplayName.name(member)))
-		# Let's ignore someone
-		ignoreList.append({ "Name" : member.name, "ID" : member.id })
-		self.settings.setServerStat(ctx.guild, "IgnoredUsers", ignoreList)
-
+		ignoreList = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+		if str(member.id) in ignoreList: return await ctx.send("*{}* is already being ignored.".format(DisplayName.name(member)))
+		ignoreList.append(str(member.id))
+		self.settings.setServerStat(ctx.guild,"IgnoredUsers",ignoreList)
 		await ctx.send('*{}* is now being ignored.'.format(DisplayName.name(member)))
-		
-	@ignore.error
-	async def ignore_error(self, error, ctx):
-		# do stuff
-		msg = 'ignore Error: {}'.format(error)
-		await ctx.send(msg)
 
 
 	@commands.command()
 	async def listen(self, ctx, *, member = None):
 		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-			
-		if member == None:
-			return await ctx.send('Usage: `{}listen [member]`'.format(ctx.prefix))
+		if not member: return await ctx.send("Usage: `{}listen [member]`".format(ctx.prefix))
 
 		if type(member) is str:
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
-			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(memberName)
-				return await ctx.send(Utils.suppressed(ctx,msg))
+			if not member: return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
 
-		ignoreList = self.settings.getServerStat(ctx.guild, "IgnoredUsers")
+		ignoreList = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+		if not str(member.id) in ignoreList: return await ctx.send("*{}* wasn't being ignored...".format(DisplayName.name(member)))
+		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[x for x in ignoreList if x != str(member.id)])
+		await ctx.send("*{}* is no longer being ignored.".format(DisplayName.name(member)))
 
-		for user in ignoreList:
-			if str(member.id) == str(user["ID"]):
-				# Found our user - already ignored
-				ignoreList.remove(user)
-				self.settings.setServerStat(ctx.guild, "IgnoredUsers", ignoreList)
-				return await ctx.send("*{}* is no longer being ignored.".format(DisplayName.name(member)))
 
-		await ctx.send('*{}* wasn\'t being ignored...'.format(DisplayName.name(member)))
-		
-	@listen.error
-	async def listen_error(self, error, ctx):
-		# do stuff
-		msg = 'listen Error: {}'.format(error)
-		await ctx.send(msg)
+	@commands.command()
+	async def listenall(self,ctx):
+		"""Clears the bot's ignore list (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
 
+		ignore_list = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+		if not ignore_list: return await ctx.send("I'm not currently ignoring anyone.")
+
+		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[])
+		return await ctx.send("*{:,}* user{} no longer being ignored.".format(len(ignore_list)," is" if len(ignore_list)==1 else "s are"))
 
 	@commands.command()
 	async def ignored(self, ctx):
 		"""Lists the users currently being ignored."""
-		ignoreArray = self.settings.getServerStat(ctx.guild, "IgnoredUsers")
-		promoSorted = sorted(ignoreArray, key=itemgetter('Name'))
-		if not len(promoSorted):
-			return await ctx.send("I'm not currently ignoring anyone.")
-		ignored = ["*{}*".format(DisplayName.name(ctx.guild.get_member(int(x["ID"])))) for x in promoSorted if ctx.guild.get_member(int(x["ID"]))]
-		await ctx.send("Currently Ignored Users:\n{}".format("\n".join(ignored)))
+		ignoreList = [ctx.guild.get_member(int(x)) for x in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])]
+		ignoreList = sorted([x for x in ignoreList if x],key=lambda x:x.name.lower()) # Skip all None values
+		if not ignoreList: return await ctx.send("I'm not currently ignoring anyone.")
+		desc = "\n".join(["{}. {}#{} ({})".format(i,Utils.suppressed(ctx,x.name),x.discriminator,x.id) for i,x in enumerate(ignoreList,start=1)])
+		return await PickList.PagePicker(
+			title="Ignored Users ({:,} total)".format(len(ignoreList)),
+			description=desc,
+			ctx=ctx
+		).pick()
 
 
 	def get_seconds(self, time_string=None):
@@ -345,8 +350,8 @@ class BotAdmin(commands.Cog):
 		Use with no user_id to show all bans and reasons (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		try: all_bans = await ctx.guild.bans()
-		except: return await ctx.send("I couldn't get the ban list :(")
+		try: all_bans = [entry async for entry in ctx.guild.bans()]
+		except Exception as e: print(e); return await ctx.send("I couldn't get the ban list :(")
 		
 		if not len(all_bans): return await Message.EmbedText(title="Ban List",description="No bans found",color=ctx.author).send(ctx)
 
@@ -355,8 +360,8 @@ class BotAdmin(commands.Cog):
 		except: user_id = -1 # Use -1 to indicate unresolved
 
 		entries = []
-		for ban in all_bans:
-			entries.append({"name":"{}#{} ({})".format(ban.user.name,ban.user.discriminator,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
+		for i,ban in enumerate(all_bans,start=1):
+			entries.append({"name":"{}. {}#{} ({})".format(i,ban.user.name,ban.user.discriminator,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
 			if user_id != None and user_id == ban.user.id:
 				# Got a match - display it
 				return await Message.Embed(
