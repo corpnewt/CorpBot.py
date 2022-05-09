@@ -1,8 +1,6 @@
-import asyncio, discord, time, parsedatetime
-from   datetime import datetime
-from   operator import itemgetter
+import discord
 from   discord.ext import commands
-from   Cogs import Utils, Settings, ReadableTime, CheckRoles, DisplayName, Utils
+from   Cogs import Utils, Settings, CheckRoles, DisplayName, Utils
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -22,29 +20,25 @@ class Admin(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 	
-	async def test_message(self, message):
-		# Implemented to bypass having this called twice
-		return { "Ignore" : False, "Delete" : False }
 
 	async def message_edit(self, before_message, message):
 		# Pipe the edit into our message func to respond if needed
 		return await self.message(message)
 		
 	async def message(self, message):
-		# Check the message and see if we should allow it - always yes.
-		# This module doesn't need to cancel messages.
-		ignore = False
-		# Check for admin status
+		if message.author.bot: return {} # Just bail
 		ctx = await self.bot.get_context(message)
-		isAdmin = Utils.is_bot_admin(ctx)
-		if not isAdmin and (self.settings.getServerStat(message.guild, "AdminLock", False) or str(message.author.id) in self.settings.getServerStat(message.guild, "IgnoredUsers", [])):
-			# Not bot-admin/admin, let's see if AdminLock is on - ignoring all regular users, alternatively let's ignore if our id is in the ignore list
-			ignore = True
-		# Get Owner and OwnerLock
+		if Utils.is_owner(ctx):
+			return {}# Always let the owner through
 		if self.settings.getGlobalStat("OwnerLock",False):
-			if not self.settings.isOwner(message.author):
-				ignore = True				
-		return {'Ignore':ignore}
+			return {"Ignore":True} # Owner locked - ignore everyone else
+		if Utils.is_bot_admin(ctx):
+			return {}# Not owner locked - and we're a (bot-)admin, allow
+		if self.settings.getServerStat(ctx.guild,"AdminLock",False):
+			return {"Ignore":True} # Admin locked
+		if str(ctx.author.id) in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[]):
+			return {"Ignore":True}
+		return {}
 
 	
 	@commands.command(pass_context=True)

@@ -1,7 +1,7 @@
 import asyncio, discord, time, os
 from discord.ext import commands
 from aiml import Kernel
-from Cogs import Utils, FuzzySearch, DisplayName
+from Cogs import Utils, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -22,8 +22,7 @@ class ChatterBot(commands.Cog):
 		self.botDir = 'standard'
 		self.botBrain = 'standard.brn'
 		self.botList = []
-		self.ownerName = "CorpNewt"
-		self.ownerGender = "man"
+		self.lastChat = None
 		self.timeout = 3
 		self.chatBot = Kernel()
 		global Utils, DisplayName
@@ -45,13 +44,6 @@ class ChatterBot(commands.Cog):
 		else:
 			# Already have a brain - load it
 			self.chatBot.bootstrap(brainFile=self.botBrain)
-		# Learned by this point - let's set our owner's name/gender
-		# Start the convo
-		self.chatBot.respond('Hello')
-		# Bot asks for our Name
-		self.chatBot.respond('My name is {}'.format(self.ownerName))
-		# Bot asks for our gender
-		self.chatBot.respond('I am a {}'.format(self.ownerGender))
 
 	def canChat(self, server):
 		if not server: return True # No settings to check here
@@ -68,28 +60,16 @@ class ChatterBot(commands.Cog):
 		return True
 	
 	async def killcheck(self, message):
-		ignore = False
 		for cog in self.bot.cogs:
 			real_cog = self.bot.get_cog(cog)
-			if real_cog == self:
-				# Don't check ourself
-				continue
-			try:
-				check = await real_cog.test_message(message)
+			if real_cog == self: continue
+			try: check = await real_cog.test_message(message)
 			except AttributeError:
-				try:
-					check = await real_cog.message(message)
-				except AttributeError:
-					continue
-			if not type(check) is dict:
-				# Force it to be a dict
-				check = {}
-			try:
-				if check['Ignore']:
-					ignore = True
-			except KeyError:
-				pass
-		return ignore
+				try: check = await real_cog.message(message)
+				except AttributeError: continue
+			if not isinstance(check,dict): continue
+			if check.get("Ignore"): return True
+		return False
 
 
 	async def message(self, message):
@@ -149,6 +129,13 @@ class ChatterBot(commands.Cog):
 			return
 		await ctx.trigger_typing()
 
+		# Check if the message we're responding to is from a new user
+		# and retain that info as needed.
+		if ctx.author != self.lastChat:
+			self.lastChat = ctx.author
+			self.chatBot.respond("My name is {}".format(DisplayName.name(ctx.author)))
+			self.chatBot.respond("I am genderless")
+		
 		msg = self.chatBot.respond(message)
 		msg = msg if msg else "I don't know what to say..."
 		if len(msg) > 2000: msg = msg[:1997]+"..." # Fix for > 2000 chars
