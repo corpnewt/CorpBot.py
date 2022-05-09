@@ -351,7 +351,9 @@ class BotAdmin(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 
 		try: all_bans = [entry async for entry in ctx.guild.bans()]
-		except Exception as e: print(e); return await ctx.send("I couldn't get the ban list :(")
+		except:
+			try: all_bans = await ctx.guild.bans()
+			except: return await ctx.send("I couldn't get the ban list :(")
 		
 		if not len(all_bans): return await Message.EmbedText(title="Ban List",description="No bans found",color=ctx.author).send(ctx)
 
