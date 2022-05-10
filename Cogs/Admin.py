@@ -19,26 +19,6 @@ class Admin(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-	
-
-	async def message_edit(self, before_message, message):
-		# Pipe the edit into our message func to respond if needed
-		return await self.message(message)
-		
-	async def message(self, message):
-		if message.author.bot: return {} # Just bail
-		ctx = await self.bot.get_context(message)
-		if Utils.is_owner(ctx):
-			return {}# Always let the owner through
-		if self.settings.getGlobalStat("OwnerLock",False):
-			return {"Ignore":True} # Owner locked - ignore everyone else
-		if Utils.is_bot_admin(ctx):
-			return {}# Not owner locked - and we're a (bot-)admin, allow
-		if self.settings.getServerStat(ctx.guild,"AdminLock",False):
-			return {"Ignore":True} # Admin locked
-		if str(ctx.author.id) in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[]):
-			return {"Ignore":True}
-		return {}
 
 	
 	@commands.command(pass_context=True)

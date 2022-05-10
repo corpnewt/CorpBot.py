@@ -46,16 +46,24 @@ class BotAdmin(commands.Cog):
 				self.settings.setServerStat(guild,"IgnoredUsers",[x for x in new_ignore if x])
 		print("Ignore list verified - {:,} guild{} updated - took {} seconds.".format(len(updated),"" if len(updated)==1 else "s",time.time()-t))
 
+	async def message_edit(self, before_message, message):
+		# Pipe the edit into our message func to ignore if needed
+		return await self.message(message)
+		
 	async def message(self, message):
-		# Check for discord invite links and remove them if found - per server settings
-		if not self.dregex.search(message.content): return None # No invite in the passed message - nothing to do
-		# Got an invite - let's see if we care
-		if not self.settings.getServerStat(message.guild,"RemoveInviteLinks",False): return None # We don't care
-		# We *do* care, let's see if the author is admin/bot-admin as they'd have power to post invites
+		if message.author.bot: return {} # Just bail
 		ctx = await self.bot.get_context(message)
-		if Utils.is_bot_admin(ctx): return None # We are immune!
-		# At this point - we need to delete the message
-		return { 'Ignore' : True, 'Delete' : True}
+		# Save our delete value based on whether or not we have an invite, and are looking for one
+		# Should only affect non-(bot-)admin users
+		is_admin = Utils.is_bot_admin(ctx)
+		delete = False if is_admin else self.dregex.search(message.content) and self.settings.getServerStat(ctx.guild,"RemoveInviteLinks",False)
+		ignore = False
+		if not Utils.is_owner(ctx): # Only check for ignoring if we're not owner - never ignore the owners
+			if self.settings.getGlobalStat("OwnerLock",False):
+				ignore = True # Owner locked - ignore everyone else
+			elif not is_admin: # Check if admin locked or ignored
+				ignore = self.settings.getServerStat(ctx.guild,"AdminLock",False) or str(ctx.author.id) in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+		return {"Ignore":ignore,"Delete":delete} # Return our ignore and delete status
 
 	@commands.command()
 	async def removeinvitelinks(self, ctx, *, yes_no = None):
