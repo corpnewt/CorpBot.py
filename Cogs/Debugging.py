@@ -582,7 +582,7 @@ class Debugging(commands.Cog):
 	
 	@commands.command(pass_context=True)
 	async def logging(self, ctx):
-		"""Outputs whether or not we're logging is enabled (bot-admin only)."""
+		"""Outputs whether or not we're logging is enabled, the log channel, and any set logging options (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		
 		logChannel = self.settings.getServerStat(ctx.guild, "LogChannel")
