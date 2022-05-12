@@ -1,4 +1,4 @@
-import asyncio, discord, os, re
+import discord, os, re
 from   datetime import datetime
 from   discord.ext import commands
 from   Cogs import Utils, Message, PCPP
@@ -47,6 +47,22 @@ class Server(commands.Cog):
 			return { "Ignore" : False, "Delete" : False }
 		ret = await PCPP.getMarkdown(pcpplink, autopcpp)
 		return { "Ignore" : False, "Delete" : False, "Respond" : ret }
+
+	@commands.command()
+	async def poll(self, ctx, *, poll = None):
+		"""Starts a poll."""
+		if not poll: return await ctx.send("Usage: `{}poll [poll inquiry]`".format(ctx.prefix))
+		# Remove the original message first
+		try: await ctx.message.delete()
+		except: pass # Maybe we don't have perms?  Ignore and continue
+		message = await Message.Embed(
+			description="**__New Poll by {}:__**\n\n{}".format(ctx.author.mention,poll),
+			color=ctx.author,
+			thumbnail=Utils.get_avatar(ctx.author)
+		).send(ctx)
+		# Add our poll reactions
+		await message.add_reaction("👍")
+		await message.add_reaction("👎")
 
 	@commands.command(pass_context=True)
 	async def setprefix(self, ctx, *, prefix : str = None):
