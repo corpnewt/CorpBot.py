@@ -49,20 +49,38 @@ class Server(commands.Cog):
 		return { "Ignore" : False, "Delete" : False, "Respond" : ret }
 
 	@commands.command()
-	async def poll(self, ctx, *, poll = None):
-		"""Starts a poll."""
-		if not poll: return await ctx.send("Usage: `{}poll [poll inquiry]`".format(ctx.prefix))
+	async def poll(self, ctx, *, poll_options = None):
+		"""Starts a poll.  Input poll_options are separated by commas - if only one option is present, will use thumbs up/down reactions.
+		
+		If 2-10 options are present, will use numbered reactions for each.
+		
+		eg for a thumbsup/down poll:  $poll Who likes pizza?
+		eg for a multi-option poll:   $poll macOS, Windows, Linux"""
+		if not poll_options: return await ctx.send("Usage: `{}poll [option 1(, option 2, option 3...)]`".format(ctx.prefix))
+		# Let's see how many poll_options we have
+		options = [option.strip() for option in poll_options.split(",") if option.strip()]
+		desc = "**__New Poll by {}:__**\n\n".format(ctx.author.mention)
+		if len(options) == 1: # Use thumbsup/thumbsdown
+			desc += poll_options
+			reactions = ("👍","👎")
+		elif len(options) <= 10: # Have the right amount
+			reactions = []
+			for i,x in enumerate(options):
+				reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(i+1) if i < 9 else "🔟")
+				desc += "{} - {}\n".format(reactions[i],x.strip())
+		else:
+			return await ctx.send("Polls max out at 10 options.")
 		# Remove the original message first
 		try: await ctx.message.delete()
 		except: pass # Maybe we don't have perms?  Ignore and continue
 		message = await Message.Embed(
-			description="**__New Poll by {}:__**\n\n{}".format(ctx.author.mention,poll),
+			description=desc,
 			color=ctx.author,
 			thumbnail=Utils.get_avatar(ctx.author)
 		).send(ctx)
 		# Add our poll reactions
-		await message.add_reaction("👍")
-		await message.add_reaction("👎")
+		for r in reactions:
+			await message.add_reaction(r)
 
 	@commands.command(pass_context=True)
 	async def setprefix(self, ctx, *, prefix : str = None):
