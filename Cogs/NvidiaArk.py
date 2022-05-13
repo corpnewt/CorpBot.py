@@ -68,7 +68,7 @@ class NvidiaArk(commands.Cog):
                     text.replace("`", "").replace("\\", "")
                 ),
                 list=[x.get("name", "UNDETERMINABLE")
-                      for x in self.prettify(response)],
+                      for x in self.prettify(response[:10])],
                 ctx=ctx,
             ).pick()
 
