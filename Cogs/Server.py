@@ -57,6 +57,7 @@ class Server(commands.Cog):
 		eg for a thumbsup/down poll:  $poll Who likes pizza?
 		eg for a multi-option poll:   $poll macOS, Windows, Linux"""
 		if not poll_options: return await ctx.send("Usage: `{}poll [option 1(, option 2, option 3...)]`".format(ctx.prefix))
+		poll_options = poll_options.replace("\n"," ")
 		# Let's see how many poll_options we have
 		options = [option.strip() for option in poll_options.split(",") if option.strip()]
 		desc = "**__New Poll by {}:__**\n\n".format(ctx.author.mention)
