@@ -50,17 +50,50 @@ class Server(commands.Cog):
 
 	@commands.command()
 	async def poll(self, ctx, *, poll_options = None):
-		"""Starts a poll.  Input poll_options are separated by commas - if only one option is present, will use thumbs up/down reactions.
+		"""Starts a poll - which can take a custom title/question, as well as one or up to 10 options.
+
+		You can provide an optional poll prompt as your first option by ending it with a colon (:).
+
+		Poll options are separated by commas - if only one option is present, the poll will use thumbs up/down reactions.
+		If 2-10 options are present, the poll will use numbered reactions for each.
+
+		If you need to use commas or a colon in your prompt or options, you can use a backslash to escape them.
 		
-		If 2-10 options are present, will use numbered reactions for each.
+		Examples:
+		- Thumbs up/down poll:
+		    $poll Who likes pizza?
+		- Multi-option poll:
+		    $poll macOS, Windows, Linux
+		- Thumbs up/down poll with a prompt:
+		    $poll Days of the week:  Wednesday is the best
+		- Multi-option poll with a prompt:
+		    $poll Favorite day of the weekend?: Saturday, Sunday
+		- Thumbs up/down poll using escaped comma:
+		    $poll April\, May\, and June are the best months
+		- Multi-option poll with prompt with escaped colon:
+		    $poll Escaped\: Rest of Prompt: option 1, option 2, option 3
+		"""
+
+		if not poll_options: return await ctx.send("Usage: `{}poll (prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
 		
-		eg for a thumbsup/down poll:  $poll Who likes pizza?
-		eg for a multi-option poll:   $poll macOS, Windows, Linux"""
-		if not poll_options: return await ctx.send("Usage: `{}poll [option 1(, option 2, option 3...)]`".format(ctx.prefix))
+		# Helper to replace escaped characters
+		def replace_escaped(val,esc = ",:"):
+			for e in esc: val = val.replace("\\"+e,e)
+			return val
+
 		poll_options = poll_options.replace("\n"," ")
+		desc = "**__New Poll by {}__**\n\n".format(ctx.author.mention)
+		# First we check for a title
+		title_check = [x for x in re.split(r"(?<!\\):",poll_options) if x]
+		if len(title_check) > 1: # We have a valid title
+			p_check = poll_options[len(title_check[0])+1:].strip()
+			if p_check: # We have something left - parse
+				# Add the title to our desc with escaped vars replaced
+				desc += "{}:\n\n".format(replace_escaped(title_check[0]))
+				# Update our poll options to skip the title
+				poll_options = p_check
 		# Let's see how many poll_options we have
-		options = [option.strip() for option in poll_options.split(",") if option.strip()]
-		desc = "**__New Poll by {}:__**\n\n".format(ctx.author.mention)
+		options = [replace_escaped(option.strip()) for option in re.split(r"(?<!\\),",poll_options) if option.strip()]
 		if len(options) == 1: # Use thumbsup/thumbsdown
 			desc += poll_options
 			reactions = ("👍","👎")
