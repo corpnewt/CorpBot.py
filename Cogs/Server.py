@@ -50,7 +50,7 @@ class Server(commands.Cog):
 
 	@commands.command()
 	async def poll(self, ctx, *, poll_options = None):
-		"""Starts a poll - which can take a custom title/question, as well as one or up to 10 options.
+		"""Starts a poll - which can take a custom prompt/question, as well as one or up to 10 options.
 
 		You can provide an optional poll prompt as your first option by ending it with a colon (:).
 
@@ -58,6 +58,9 @@ class Server(commands.Cog):
 		If 2-10 options are present, the poll will use numbered reactions for each.
 
 		If you need to use commas or a colon in your prompt or options, you can use a backslash to escape them.
+
+		Note:  A colon followed by // (for example, in a URL) will also not be interpreted as a prompt.
+		       You can escape the first forward slash after your colon to have it interpreted (eg. some_prompt:\//option1,option2...)
 		
 		Examples:
 		- Thumbs up/down poll:
@@ -77,14 +80,14 @@ class Server(commands.Cog):
 		if not poll_options: return await ctx.send("Usage: `{}poll (prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
 		
 		# Helper to replace escaped characters
-		def replace_escaped(val,esc = ",:"):
+		def replace_escaped(val,esc = ",:/"):
 			for e in esc: val = val.replace("\\"+e,e)
 			return val
 
 		poll_options = poll_options.replace("\n"," ")
 		desc = "**__New Poll by {}__**\n\n".format(ctx.author.mention)
 		# First we check for a title
-		title_check = [x for x in re.split(r"(?<!\\):",poll_options) if x]
+		title_check = [x for x in re.split(r"(?<!\\):(?!\/\/)",poll_options) if x]
 		if len(title_check) > 1: # We have a valid title
 			p_check = poll_options[len(title_check[0])+1:].strip()
 			if p_check: # We have something left - parse
@@ -104,13 +107,32 @@ class Server(commands.Cog):
 				desc += "{} - {}\n".format(reactions[i],x.strip())
 		else:
 			return await ctx.send("Polls max out at 10 options.")
+		# Check for any image attachments or embeds in the source message
+		image = None
+		if ctx.message.attachments:
+			# We have some attachments to work through
+			for a in ctx.message.attachments:
+				# Add each attachment by name as a link to its own url
+				if not a.filename.lower().endswith((".jpg",".jpeg",".png",".gif")): continue
+				# We got the first image in the attachment list - set it
+				image = a.url
+				break
+		if image is None and ctx.message.embeds:
+			# We have embeds to look at too, and we haven't set an image yet
+			for e in ctx.message.embeds:
+				d = e.to_dict()
+				i = d.get("thumbnail",d.get("video",d.get("image",{}))).get("url",None)
+				if not i: continue
+				image = i
+				break
 		# Remove the original message first
 		try: await ctx.message.delete()
 		except: pass # Maybe we don't have perms?  Ignore and continue
 		message = await Message.Embed(
 			description=desc,
 			color=ctx.author,
-			thumbnail=Utils.get_avatar(ctx.author)
+			thumbnail=Utils.get_avatar(ctx.author),
+			image=image
 		).send(ctx)
 		# Add our poll reactions
 		for r in reactions:
