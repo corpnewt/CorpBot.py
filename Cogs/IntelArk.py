@@ -90,7 +90,12 @@ class IntelArk(commands.Cog):
 			response = await self.get_match_data(response[index])
 		
 		if not response or all((response.get(x) is None for x in self.fields)):
-			args["description"] = "Something went wrong getting search data!"
+			try: # Maybe we got a product line - or something other than a specific CPU?
+				args["title"] = response["ProductName"]
+				args["url"] = response["Link"]
+				args["description"] = "Could not retrieve specific data for this search.\nPlease follow the title link (or click [here]({})) to open your search results in your browser.".format(response["Link"])
+			except: # Fall back on a generic error
+				args["description"] = "Something went wrong getting search data!"
 			return await Message.EmbedText(**args).edit(ctx, message)
 		# At this point - we should have a single response
 		# Let's format and display.
