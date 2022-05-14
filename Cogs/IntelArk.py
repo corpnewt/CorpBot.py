@@ -1,10 +1,7 @@
-import asyncio
-import discord
 from   discord.ext import commands
 from   Cogs import Message
 from   Cogs import DL
 from   Cogs import PickList
-import urllib
 import re
 
 def setup(bot):
@@ -16,10 +13,12 @@ class IntelArk(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.fields = {
-			'MarketSegment': 'Vertical Segment',
 			'CodeNameText': 'Codename',
+			'MarketSegment': 'Vertical Segment',
 			'ProcessorNumber': 'Name',
 			'CoreCount': '# of Cores',
+			'PerfCoreCount': '# of Performance-cores',
+			'EffCoreCount': '# of Efficient-cores',
 			'ThreadCount': '# of Threads',
 			'ClockSpeed': 'Base Clock Speed',
 			'ClockSpeedMax': 'Max Clock Speed',
@@ -29,6 +28,10 @@ class IntelArk(commands.Cog):
 			'InstructionSet': 'Instruction Set',
 			'InstructionSetExtensions': 'Extensions'
 		}
+		self.optional_fields = [
+			'PerfCoreCount',
+			'EffCoreCount'
+		]
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def iark(self, ctx, *, text : str = None):
@@ -86,12 +89,12 @@ class IntelArk(commands.Cog):
 			# Got something
 			response = await self.get_match_data(response[index])
 		
-		if not response:
+		if not response or all((response.get(x) is None for x in self.fields)):
 			args["description"] = "Something went wrong getting search data!"
 			return await Message.EmbedText(**args).edit(ctx, message)
 		# At this point - we should have a single response
 		# Let's format and display.
-		fields = [{"name":self.fields[x], "value":response.get(x,None), "inline":True} for x in self.fields]
+		fields = [{"name":self.fields[x], "value":response.get(x), "inline":True} for x in self.fields if not x in self.optional_fields or response.get(x)]
 
 		await Message.Embed(
 			thumbnail=response.get("BrandBadge",None),
