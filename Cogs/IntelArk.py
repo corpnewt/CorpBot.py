@@ -32,6 +32,7 @@ class IntelArk(commands.Cog):
 			'PerfCoreCount',
 			'EffCoreCount'
 		]
+		self.match_threshold = 0.5 # Lower match limit before showing only those that matched
 
 	@commands.command(pass_context=True, no_pm=True)
 	async def iark(self, ctx, *, text : str = None):
@@ -100,6 +101,10 @@ class IntelArk(commands.Cog):
 		# At this point - we should have a single response
 		# Let's format and display.
 		fields = [{"name":self.fields[x], "value":response.get(x), "inline":True} for x in self.fields if not x in self.optional_fields or response.get(x)]
+		matched = [x for x in fields if x["value"]]
+		if len(matched)/len(fields) <= self.match_threshold:
+			# We're under our threshold - but have at least one match, let's only show the matched entries
+			fields = matched
 
 		await Message.Embed(
 			thumbnail=response.get("BrandBadge",None),
