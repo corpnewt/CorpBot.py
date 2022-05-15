@@ -17,24 +17,25 @@ class Responses(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 		# Regex values
-		self.regexUserName = re.compile(r"\[\[user\]\]",      re.IGNORECASE)
-		self.regexUserPing = re.compile(r"\[\[atuser\]\]",    re.IGNORECASE)
-		self.regexServer   = re.compile(r"\[\[server\]\]",    re.IGNORECASE)
-		self.regexHere     = re.compile(r"\[\[here\]\]",      re.IGNORECASE)
-		self.regexEveryone = re.compile(r"\[\[everyone\]\]",  re.IGNORECASE)
-		self.regexDelete   = re.compile(r"\[\[delete\]\]",    re.IGNORECASE)
-		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]", re.IGNORECASE)
+		self.regexUserName = re.compile(r"\[\[user\]\]",        re.IGNORECASE)
+		self.regexUserPing = re.compile(r"\[\[atuser\]\]",      re.IGNORECASE)
+		self.regexServer   = re.compile(r"\[\[server\]\]",      re.IGNORECASE)
+		self.regexHere     = re.compile(r"\[\[here\]\]",        re.IGNORECASE)
+		self.regexEveryone = re.compile(r"\[\[everyone\]\]",    re.IGNORECASE)
+		self.regexDelete   = re.compile(r"\[\[delete\]\]",      re.IGNORECASE)
+		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]",   re.IGNORECASE)
 		self.regexRoleMent = re.compile(r"\[\[(m_role|role_m):\d+\]\]",re.IGNORECASE)
 		self.regexUserMent = re.compile(r"\[\[(m_user|user_m):\d+\]\]",re.IGNORECASE)
-		self.regexKick     = re.compile(r"\[\[kick\]\]",      re.IGNORECASE)
-		self.regexBan      = re.compile(r"\[\[ban\]\]",       re.IGNORECASE)
-		self.regexSuppress = re.compile(r"\[\[suppress\]\]",  re.IGNORECASE)
-		self.toggle_ur     = re.compile(r"\[\[t_ur:\d+\]\]",  re.IGNORECASE)
-		self.add_ur        = re.compile(r"\[\[add_ur:\d+\]\]",re.IGNORECASE)
-		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",re.IGNORECASE)
-		self.rem_ur        = re.compile(r"\[\[rem_ur:\d+\]\]",re.IGNORECASE)
+		self.regexKick     = re.compile(r"\[\[kick\]\]",        re.IGNORECASE)
+		self.regexBan      = re.compile(r"\[\[ban\]\]",         re.IGNORECASE)
+		self.regexSuppress = re.compile(r"\[\[suppress\]\]",    re.IGNORECASE)
+		self.toggle_ur     = re.compile(r"\[\[t_ur:\d+\]\]",    re.IGNORECASE)
+		self.add_ur        = re.compile(r"\[\[add_ur:\d+\]\]",  re.IGNORECASE)
+		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",  re.IGNORECASE)
+		self.rem_ur        = re.compile(r"\[\[rem_ur:\d+\]\]",  re.IGNORECASE)
 		self.phrase_ur     = re.compile(r"\[\[phrase_ur:.*\]\]",re.IGNORECASE)
-		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",re.IGNORECASE)
+		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",   re.IGNORECASE)
+		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
 
 	async def _get_response(self, ctx, message, check_chan=True):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
@@ -57,6 +58,22 @@ class Responses(commands.Cog):
 			response["channels"] = check_channels
 			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
 				continue
+			# Let's check for output channels
+			output_channels = []
+			try:
+				for x in self.out_chan.search(m).group(0).replace("]]","").split(":")[-1].split(","):
+					if not x: continue # Skip empty entries
+					if x.isdigit(): # Got a channel id
+						check_channel = self.bot.get_channel(int(x))
+						if check_channel: output_channels.append(check_channel)
+					elif x.lower().startswith("o"): # Got the original channel
+						output_channels.append(ctx.channel)
+					else: # dm/pm/etc
+						output_channels.append(ctx.author)
+			except:
+				pass
+			if not output_channels: output_channels = [ctx.channel] # Ensure the original if none resolved
+			response["outputs"] = output_channels
 			if self.regexDelete.search(m): response["delete"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
 			action = "ban" if self.regexBan.search(m) else "kick" if self.regexKick.search(m) else "mute" if self.regexMute.search(m) else None
@@ -95,7 +112,7 @@ class Responses(commands.Cog):
 						continue # Broken, or didn't resolve
 					m = m.replace(mention.group(0),resolved.mention)
 			
-			# Walk the user role options if any - use the following priority: toggle, 
+			# Walk the user role options if any - use the following priority: toggle -> add -> set -> rem
 			ur = next((x for x in (self.toggle_ur,self.add_ur,self.set_ur,self.rem_ur) if x.search(m)),None)
 			if ur: # Got one - let's verify it's valid, and apply if needed
 				ur_block = self.settings.getServerStat(ctx.guild,"UserRoleBlock",[])
@@ -145,7 +162,8 @@ class Responses(commands.Cog):
 				self.set_ur,
 				self.rem_ur,
 				self.phrase_ur,
-				self.in_chan
+				self.in_chan,
+				self.out_chan
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
@@ -182,7 +200,10 @@ class Responses(commands.Cog):
 			try: await message.delete()
 			except: pass # RIP - couldn't delete that one, I guess
 		if response.get("message","").strip(): # Don't send an empty message, or one with just whitespace
-			return await ctx.send(response["message"],allowed_mentions=discord.AllowedMentions.all())
+			for output in response.get("outputs",[]):
+				# Try to send the response to all defined outputs
+				try: await output.send(response["message"],allowed_mentions=discord.AllowedMentions.all())
+				except: continue
 
 	@commands.command()
 	async def addresponse(self, ctx, regex_trigger = None, *, response = None):
@@ -208,7 +229,10 @@ class Responses(commands.Cog):
 		[[kick]]      = kicks the message author
 		[[mute]]      = mutes the author indefinitely
 		[[mute:#]]    = mutes the message author for # seconds
-		[[in:id]]     = locks the check to the channel id passed
+		[[in:id]]     = locks the check to the comma-delimited channel ids passed
+		[[out:id]]    = sets the output targets to the comma-delimited channel ids passed
+		                - can also accept "dm" to dm the author, and "original" to send in
+						  the original channel where the response was triggered
 
 		User role options (roles must be setup per the UserRole cog):
 
@@ -391,7 +415,7 @@ class Responses(commands.Cog):
 		# Let's walk the reponse and add values
 		entries.append({"name":"Output Suppressed for Admin/Bot-Admin:","value":"Yes" if response.get("suppress") else "No"})
 		if response.get("channels"):
-			entries.append({"name":"Limited To:","value":", ".join([x.mention for x in response["channels"]])})
+			entries.append({"name":"Limited To:","value":"\n".join([x.mention for x in response["channels"]])})
 		if response.get("action") == "mute":
 			mute_time = "indefinitely" if not response.get("mute_time") else "for {:,} second{}".format(response["mute_time"],"" if response["mute_time"]==1 else "s")
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
@@ -400,9 +424,11 @@ class Responses(commands.Cog):
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
 		if response.get("roles_added",[]):
-			entries.append({"name":"Roles Added:","value":", ".join([x.mention for x in response["roles_added"]])})
+			entries.append({"name":"Roles Added:","value":"\n".join([x.mention for x in response["roles_added"]])})
 		if response.get("roles_removed",[]):
-			entries.append({"name":"Roles Removed:","value":", ".join([x.mention for x in response["roles_removed"]])})
+			entries.append({"name":"Roles Removed:","value":"\n".join([x.mention for x in response["roles_removed"]])})
+		if response.get("outputs",[]):
+			entries.append({"name":"Output Targets:","value":"\n".join([x.mention for x in response["outputs"]])})
 		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms".format(response["match_time_ms"])).pick()
 
 	@commands.command()
