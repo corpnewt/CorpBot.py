@@ -130,3 +130,11 @@ class Utils(commands.Cog):
 			return self.bot.user.default_avatar_url
 		# Use the new
 		return self.bot.user.default_avatar.url
+
+	def get_guild_icon(self,guild):
+		# Returns the icon for the passed guild - or the default avatar if none exists
+		if hasattr(guild,"icon_url") and guild.icon_url:
+			return guild.icon_url
+		elif getattr(guild,"icon",None):
+			return guild.icon.url
+		return self.get_default_avatar()

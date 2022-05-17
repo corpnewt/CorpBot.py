@@ -193,7 +193,7 @@ class Debugging(commands.Cog):
 		if invite.guild is None: return # Nothing to do here
 		guild = self.bot.get_guild(int(invite.guild.id))
 		if not guild: return # Didn't find it
-		pfpurl = guild.icon_url if len(guild.icon_url) else Utils.get_default_avatar()
+		pfpurl = Utils.get_guild_icon(guild)
 		# Refresh the list omitting the deleted invite
 		self.invite_list[str(guild.id)] = [x for x in self.invite_list.get(str(guild.id),[]) if x.code != invite.code]
 		if not self.shouldLog('invite.delete', guild): return
