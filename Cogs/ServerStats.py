@@ -178,7 +178,7 @@ class ServerStats(commands.Cog):
         if twitchemojis:   emojifields.append("{:,} managed".format(twitchemojis))
         if disabledemojis: emojifields.append("{:,} unavailable".format(disabledemojis)) # Add the disabled if any
 
-        server_embed.set_thumbnail(url=guild.icon_url if len(guild.icon_url) else ctx.author.default_avatar_url)
+        server_embed.set_thumbnail(url=Utils.get_guild_icon(guild))
         server_embed.set_footer(text="Server ID: {}".format(guild.id))
         # Let's send all the embeds we need finishing off with extra emojis as needed
         for i,e in enumerate(emojifields):
@@ -189,7 +189,7 @@ class ServerStats(commands.Cog):
                 await ctx.send(embed=server_embed)
                 server_embed = discord.Embed(color=ctx.author.color)
                 server_embed.title = guild.name
-                server_embed.set_thumbnail(url=guild.icon_url if len(guild.icon_url) else ctx.author.default_avatar_url)
+                server_embed.set_thumbnail(url=Utils.get_guild_icon(guild))
                 server_embed.set_footer(text="Server ID: {}".format(guild.id))
                 server_embed.description = "Continued Emojis:"
                 server_embed.add_field(name=name,value=e,inline=True)
