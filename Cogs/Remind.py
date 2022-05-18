@@ -94,7 +94,7 @@ class Remind(commands.Cog):
 				pass
 			reminders.remove(reminder)
 			self.settings.setUserStat(member, member.guild, "Reminders", reminders)
-		self._remove_task(task)
+		if task in self.loop_list: self.loop_list.remove(task)
 					
 	async def member_update(self, before, member):
 		# Not sure why I was using this "status" method before... seems to only show up here
