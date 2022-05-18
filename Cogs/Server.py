@@ -199,8 +199,9 @@ class Server(commands.Cog):
 
 		If you need to use commas, =, -, or a colon in your prompt or options, you can use a backslash to escape them.
 
-		Note:  A colon followed by // (for example, in a URL) will also not be interpreted as a prompt.
+		Note:  A colon followed by / (for example, in a URL) will also not be interpreted as a prompt.
 		       You can escape the first forward slash after your colon to have it interpreted (eg. some_prompt:\//option1,option2...)
+			   For the sake of preserving emojis - the format <a:name:01234> is also reserved.
 		
 		Examples:
 		- Thumbs up/down poll:
@@ -268,7 +269,7 @@ class Server(commands.Cog):
 		# Let's strip by whitespace, and rejoin with single spaces
 		poll_options = " ".join([x for x in poll_options.split() if x])
 		# Now that we have our functional elements taken care of - we check for a title
-		title_check = [x for x in re.split(r"(?<!\\):(?!\/\/)",poll_options) if x]
+		title_check = [x for x in re.split(r"(?<![\\<a]):(?![\/\d])",poll_options) if x]
 		if len(title_check) > 1: # We have a valid title
 			p_check = poll_options[len(title_check[0])+1:].strip()
 			if p_check: # We have something left - parse
@@ -314,7 +315,7 @@ class Server(commands.Cog):
 			color=ctx.author,
 			thumbnail=Utils.get_avatar(ctx.author),
 			image=image,
-			footer="You can vote for multiple items" if allow_multiple else "Your vote only counts if you react once."
+			footer=None if not poll_time else "You can vote for multiple items" if allow_multiple else "Your vote only counts if you react once."
 		).send(ctx)
 		# Check if we have a timer
 		if poll_time > 0:
