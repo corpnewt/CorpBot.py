@@ -1,4 +1,4 @@
-import discord, os, re
+import asyncio, discord, os, re, time
 from   datetime import datetime
 from   discord.ext import commands
 from   Cogs import Utils, Message, PCPP
@@ -18,9 +18,137 @@ class Server(commands.Cog):
 		self.settings = settings
 		# Regex for extracting urls from strings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.loop_list = []
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__): return
+		for task in self.loop_list:
+			task.cancel()
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__): return
+		self.bot.loop.create_task(self.start_loading())
+
+	async def start_loading(self):
+		await self.bot.wait_until_ready()
+		await self.bot.loop.run_in_executor(None, self.check_polls)
+
+	def check_polls(self):
+		# Check all polls - and start timers
+		print("Checking polls...")
+		t = time.time()
+		for guild in self.bot.guilds:
+			for poll in self.settings.getServerStat(guild, "Polls", []):
+				self.loop_list.append(self.bot.loop.create_task(self.check_poll(guild,poll)))
+		print("Polls checked - took {} seconds.".format(time.time() - t))
+
+	async def check_poll(self, guild, poll):
+		# Get our current task
+		task = getattr(asyncio.Task,"current_task",asyncio.current_task)()
+		# Get our current task's countdown
+		count_down = int(poll["end"])-int(time.time())
+		# Check if we have remaining time
+		if count_down > 0: await asyncio.sleep(count_down)
+		# We've waited long enough - let's remove our current task from the list
+		if task in self.loop_list: self.loop_list.remove(task)
+		# At this point - we need to recheck if our poll's task has already been removed
+		# and if so, ignore it.  If not - we remove it, then tally the results.
+		polls = self.settings.getServerStat(guild,"Polls",[])
+		if not poll in polls: return # Not here - nothing to do.
+		# We have a valid poll, let's remove it from the settings, and update stats.
+		self.settings.setServerStat(guild,"Polls",[x for x in polls if x != poll])
+		# Let's make sure the message still exists
+		c,m = poll["message_ids"].split() # Assumes "channel_id message_id" string pair
+		try: channel = guild.get_channel(int(c))
+		except: channel = None
+		if not channel: return # No channel - likely deleted.
+		try: message = await channel.fetch_message(int(m))
+		except: message = None
+		if not message: return # No message - likely deleted.
+		ctx = await self.bot.get_context(message)
+		# Get the original embed
+		if not message.embeds: return # None - bail.
+		embed = message.embeds[0] # Get the first embed
+		embed_dict = embed.to_dict()
+		if not embed_dict.get("description"): return # Broken embed :(
+		if not "color" in embed_dict:
+			# Attempt to get the original poller's color
+			try: embed_dict["color"] = guild.get_member(poll["author_id"])
+			except: pass
+		# Gather the valid reactions - then see what corresponds with the message
+		valid_reactions = self.get_reactions(poll["options"])
+		reactions = {}
+		for reaction in message.reactions:
+			if not reaction.emoji in valid_reactions: continue # Ignore if not valid
+			# Keep a list of all non-bot users that reacted with this valid reaction
+			reactions[reaction.emoji] = [user async for user in reaction.users() if not user.bot]
+		# At this point, we have all the non-bot users that have reacted with all the valid
+		# reactions.  We need to check if we omit any users that reacted to more than one.
+		if not poll["allow_multiple"]:
+			# Let's build a set of unique users first
+			user_list = []
+			for v in reactions.values(): user_list.extend(v)
+			user_set = set(user_list)
+			# Now we walk unique users and see if they show up in more than one list
+			omit_users = [user for user in user_set if user_list.count(user) > 1]
+			# Finally - we walk each reaction and strip the omitted users
+			for reaction in reactions:
+				reactions[reaction] = [user for user in reactions[reaction] if not user in omit_users]
+		# Let's count each finalized reaction total and tally everything up
+		totals = {}
+		for reaction in reactions:
+			totals[reaction] = len(reactions[reaction])
+		total = sum((len(reactions[x]) for x in reactions))
+		# Now that we have our totals - let's update the description
+		desc_lines = embed_dict["description"].split("\n")
+		# We can find out if we have a title by looking at the 6th item in desc_lines
+		# and ensuring it's "" if it exists
+		has_title = len(desc_lines)>5 and not desc_lines[5]
+		# The title is at index 0
+		desc_lines[0] = desc_lines[0].replace("New","Finished")
+		# The time limit is at index 2
+		desc_lines[2] = desc_lines[2].replace("Ending","Ended")
+		# At this point - we see if we have 2 or more options - and tally up
+		if poll["options"] > 1:
+			for i,r in enumerate(list(totals)[::-1]):
+				test_line = " - ".join(desc_lines[-(i+1)].split(" - ")[1:])
+				if total: desc_lines[-(i+1)] = "{} - ({}/{}: {}%) {}".format(r,totals[r],total,self.get_perc(totals[r]/total*100),test_line)
+				else: desc_lines[-(i+1)] = "{} - (0/0: 0%) {}".format(r,test_line)
+		else: # Should just be thumbs up or thumbs down
+			# Add a newline for padding
+			desc_lines.append("")
+			for r in totals:
+				if total: desc_lines.append("{} - {}/{}: {}%".format(r,totals[r],total,self.get_perc(totals[r]/total*100)))
+				else: desc_lines.append("{} - 0/0: 0%".format(r))
+		# Update the footer
+		embed_dict["footer"] = {
+			"text":embed_dict["footer"].get("text","").replace("can","could").replace("counts","counted").replace("react","reacted")
+		}
+		# Update the target embed
+		embed_dict["description"] = "\n".join(desc_lines)
+		await Message.Embed(**embed_dict).edit(ctx,message)
+
+	def get_perc(self, value):
+		# Helper to take a float and round to the nearest decimal if needed,
+		# or to truncate to an int if possible.
+		if value == int(value): # No rounding - drop the decimal
+			return str(int(value))
+		if value - int(value) > 0.5:
+			return "~"+str(int(value+1))
+		return "~"+str(int(value))
+
+	def get_reactions(self, option_count = 0):
+		return ("👍","👎") if option_count<2 else ["{}\N{COMBINING ENCLOSING KEYCAP}".format(i+1) if i<9 else "🔟" for i in range(min(option_count,10))]
 
 	async def message(self, message):
 		if not type(message.channel) is discord.TextChannel:
@@ -57,7 +185,19 @@ class Server(commands.Cog):
 		Poll options are separated by commas - if only one option is present, the poll will use thumbs up/down reactions.
 		If 2-10 options are present, the poll will use numbered reactions for each.
 
-		If you need to use commas or a colon in your prompt or options, you can use a backslash to escape them.
+		You can add a time limit to the poll with t=WwDdHhMmSs where:
+		    w = Weeks
+			d = Days
+			h = Hours
+			m = Minutes
+			s = Seconds
+
+		By default, users' votes in polls with time limits only count if they choose a single option.
+		You can allow multiple choices by passing -multi or -multiple to the $poll command as well.
+
+		Note:  -multi(ple) is only interpreted if a t= time limit is set.
+
+		If you need to use commas, =, -, or a colon in your prompt or options, you can use a backslash to escape them.
 
 		Note:  A colon followed by // (for example, in a URL) will also not be interpreted as a prompt.
 		       You can escape the first forward slash after your colon to have it interpreted (eg. some_prompt:\//option1,option2...)
@@ -75,18 +215,59 @@ class Server(commands.Cog):
 		    $poll April\, May\, and June are the best months
 		- Multi-option poll with prompt with escaped colon:
 		    $poll Escaped\: Rest of Prompt: option 1, option 2, option 3
+		- Multi-option poll with a 2 week, 15 hour, 30 second time limit:
+		    $poll t=2w15h30s Blue, Purple, Yellow
+		- Multi-option, 2 day poll that allows users to react multiple times:
+		    $poll -multiple Fast, Medium, Slow t=2d
 		"""
 
-		if not poll_options: return await ctx.send("Usage: `{}poll (prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
+		if not poll_options: return await ctx.send("Usage: `{}poll (-mutli t=)(prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
 		
 		# Helper to replace escaped characters
-		def replace_escaped(val,esc = ",:/"):
+		def replace_escaped(val,esc = ",:/=-"):
 			for e in esc: val = val.replace("\\"+e,e)
 			return val
 
+		def get_seconds(time):
+			allowed = {"w":604800,"d":86400,"h":3600,"m":60,"s":1}
+			total_seconds = 0
+			last_time = ""
+			for char in time:
+				# Check if we have a number
+				if char.isdigit():
+					last_time += char
+					continue
+				# Check if it's a valid suffix and we have a time so far
+				if char.lower() in allowed and last_time:
+					total_seconds += int(last_time)*allowed[char.lower()]
+				last_time = ""
+			# Check if we have any left - and add it
+			if last_time: total_seconds += int(last_time) # Assume seconds at this point
+			return total_seconds
+
 		poll_options = poll_options.replace("\n"," ")
 		desc = "**__New Poll by {}__**\n\n".format(ctx.author.mention)
-		# First we check for a title
+		# Let's get any timestamps or -multi(ple) strings, and strip them out as needed.
+		time_check = re.compile(r"(?i)t=(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
+		try: poll_time_str = time_check.search(poll_options).group(0)
+		except: poll_time_str = ""
+		poll_time = end_time = 0
+		allow_multiple = False
+		if poll_time_str: # We have a time frame - let's strip - and then process it
+			poll_options = re.sub(time_check,"",poll_options,count=1) # Only strip the first occurrence though
+			poll_time = get_seconds(poll_time_str)
+		if poll_time: # We got a valid time string - let's check for -multi(ple)
+			end_time = int(time.time())+poll_time
+			desc += "Ending <t:{}:R>\n\n".format(end_time)
+			poll_list = poll_options.split()
+			multi = next((x for x in poll_list if x.lower() in ("-m","-multi","-multiple")),None)
+			if multi: # We got a hit - let's remove the first match
+				allow_multiple = True
+				poll_list.remove(multi)
+			poll_options = " ".join(poll_list)
+		# Let's strip by whitespace, and rejoin with single spaces
+		poll_options = " ".join([x for x in poll_options.split() if x])
+		# Now that we have our functional elements taken care of - we check for a title
 		title_check = [x for x in re.split(r"(?<!\\):(?!\/\/)",poll_options) if x]
 		if len(title_check) > 1: # We have a valid title
 			p_check = poll_options[len(title_check[0])+1:].strip()
@@ -97,14 +278,14 @@ class Server(commands.Cog):
 				poll_options = p_check
 		# Let's see how many poll_options we have
 		options = [replace_escaped(option.strip()) for option in re.split(r"(?<!\\),",poll_options) if option.strip()]
-		if len(options) == 1: # Use thumbsup/thumbsdown
-			desc += poll_options
-			reactions = ("👍","👎")
-		elif len(options) <= 10: # Have the right amount
-			reactions = []
-			for i,x in enumerate(options):
-				reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(i+1) if i < 9 else "🔟")
-				desc += "{} - {}\n".format(reactions[i],x.strip())
+		if len(options) <= 10: # Have the right amount
+			reactions = self.get_reactions(len(options))
+			if len(options) == 1:
+				desc += poll_options
+			else:
+				for i,x in enumerate(options):
+					reactions.append("{}\N{COMBINING ENCLOSING KEYCAP}".format(i+1) if i < 9 else "🔟")
+					desc += "{} - {}\n".format(reactions[i],x.strip())
 		else:
 			return await ctx.send("Polls max out at 10 options.")
 		# Check for any image attachments or embeds in the source message
@@ -132,8 +313,24 @@ class Server(commands.Cog):
 			description=desc,
 			color=ctx.author,
 			thumbnail=Utils.get_avatar(ctx.author),
-			image=image
+			image=image,
+			footer="You can vote for multiple items" if allow_multiple else "Your vote only counts if you react once."
 		).send(ctx)
+		# Check if we have a timer
+		if poll_time > 0:
+			# Build our task - and add it to the servers Polls list
+			poll_task = {
+				"author_id": ctx.author.id,
+				"message_ids": "{} {}".format(message.channel.id,message.id),
+				"options": len(options),
+				"allow_multiple": allow_multiple,
+				"end": end_time
+			}
+			polls = self.settings.getServerStat(ctx.guild,"Polls",[])
+			polls.append(poll_task)
+			self.settings.setServerStat(ctx.guild,"Polls",polls)
+			# Add it to the task queue
+			self.loop_list.append(self.bot.loop.create_task(self.check_poll(ctx.guild, poll_task)))
 		# Add our poll reactions
 		for r in reactions:
 			await message.add_reaction(r)
