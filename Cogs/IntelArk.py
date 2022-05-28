@@ -25,6 +25,7 @@ class IntelArk(commands.Cog):
 			'MaxTDP': 'TDP',
 			'MaxMem': 'Max Memory',
 			'ProcessorGraphicsModelId': 'iGPU',
+			'GraphicsDeviceId': 'iGPU Device ID',
 			'InstructionSet': 'Instruction Set',
 			'InstructionSetExtensions': 'Extensions'
 		}
