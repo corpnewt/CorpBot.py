@@ -117,7 +117,7 @@ class Server(commands.Cog):
 		# The title is at index 0
 		desc_lines[0] = desc_lines[0].replace("New","Finished")
 		# The time limit is at index 2
-		desc_lines[2] = desc_lines[2].replace("Ending","Ended")
+		desc_lines[2] = "Ended <t:{}:R>".format(poll["end"])
 		# At this point - we see if we have 2 or more options - and tally up
 		sort_lines = []
 		if poll["options"] > 1:
@@ -341,6 +341,31 @@ class Server(commands.Cog):
 		for r in reactions:
 			await message.add_reaction(r)
 
+	@commands.command(aliases=["pollend","epoll","endp"])
+	async def endpoll(self, ctx, *, message_url = None):
+		"""Ends the poll that resides at the passed message url.  Must be either the original poll author, or a bot-admin."""
+		if not message_url: return await ctx.send("Usage: `{}endpoll [message_url]`".format(ctx.prefix))
+		# We are setting a message - let's split the url and get the last 2 integers - then save them.
+		polls = self.settings.getServerStat(ctx.guild,"Polls",[])
+		if not polls: return await ctx.send("I'm not currently watching any polls.")
+		parts = [x for x in message_url.replace("/"," ").split() if len(x)]
+		try: channel,message = [int(x) for x in parts[-2:]]
+		except: return await ctx.send("Improperly formatted message url!")
+		check_string = "{} {}".format(channel,message)
+		poll = next((x for x in polls if x.get("message_ids")==check_string),None)
+		if not poll: return await ctx.send("I'm not currently watching a poll attached to that message.")
+		# We have a poll - let's see if we're either the author - or a bot-admin
+		if not ctx.author.id == poll.get("author_id") and not Utils.is_bot_admin(ctx):
+			return await ctx.send("You can only end your own polls.")
+		# We're the author - or at least have authorization to end it.
+		# Let's change the end time and set a timer for it.
+		poll["end"] = int(time.time())
+		# Make sure we save our changes - or else the original will also trigger edits
+		self.settings.setServerStat(ctx.guild,"Polls",polls)
+		# Add our adjusted poll to the task list
+		self.loop_list.append(self.bot.loop.create_task(self.check_poll(ctx.guild, poll)))
+		await ctx.send("Poll has ended.")
+		
 	@commands.command(pass_context=True)
 	async def setprefix(self, ctx, *, prefix : str = None):
 		"""Sets the bot's prefix (bot-admin only)."""
