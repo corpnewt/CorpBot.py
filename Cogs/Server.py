@@ -119,17 +119,22 @@ class Server(commands.Cog):
 		# The time limit is at index 2
 		desc_lines[2] = desc_lines[2].replace("Ending","Ended")
 		# At this point - we see if we have 2 or more options - and tally up
+		sort_lines = []
 		if poll["options"] > 1:
 			for i,r in enumerate(list(totals)[::-1]):
 				test_line = " - ".join(desc_lines[-(i+1)].split(" - ")[1:])
-				if total: desc_lines[-(i+1)] = "{} - ({}/{}: {}%) {}".format(r,totals[r],total,self.get_perc(totals[r]/total*100),test_line)
-				else: desc_lines[-(i+1)] = "{} - (0/0: 0%) {}".format(r,test_line)
+				if total: sort_lines.append("{} - ({}/{}: {}%) {}".format(r,totals[r],total,self.get_perc(totals[r]/total*100),test_line))
+				else: sort_lines.append("{} - (0/0: 0%) {}".format(r,test_line))
+			# Remove the original lines
+			desc_lines = desc_lines[:-poll["options"]]
 		else: # Should just be thumbs up or thumbs down
 			# Add a newline for padding
 			desc_lines.append("")
 			for r in totals:
-				if total: desc_lines.append("{} - {}/{}: {}%".format(r,totals[r],total,self.get_perc(totals[r]/total*100)))
-				else: desc_lines.append("{} - 0/0: 0%".format(r))
+				if total: sort_lines.append("{} - {}/{}: {}%".format(r,totals[r],total,self.get_perc(totals[r]/total*100)))
+				else: sort_lines.append("{} - 0/0: 0%".format(r))
+		# Sort our results by most votes
+		desc_lines.extend(sorted(sort_lines,key=lambda x: (-int(x.replace("~","").split(": ")[1].split("%")[0]),x)))
 		# Update the footer
 		embed_dict["footer"] = {
 			"text":embed_dict["footer"].get("text","").replace("can","could").replace("counts","counted").replace("react","reacted")
