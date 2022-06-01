@@ -28,9 +28,9 @@ class Stream(commands.Cog):
 
     # Check for events!
     @commands.Cog.listener()
-	async def on_presence_update(self, before, after):
-		# Workaround to keep all member/presence updates in the on_member_update() check
-		await self.on_member_update(before,after)
+    async def on_presence_update(self, before, after):
+        # Workaround to keep all member/presence updates in the on_member_update() check
+        await self.on_member_update(before,after)
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
