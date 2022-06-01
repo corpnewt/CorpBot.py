@@ -236,6 +236,11 @@ async def on_member_join(member):
 			continue
 
 @bot.event
+async def on_presence_update(before, after):
+	# Workaround to keep all member/presence updates in the on_member_update() check
+	await on_member_update(before,after)
+
+@bot.event
 async def on_member_update(before, after):	
 	# Check for cogs that accept updates
 	for cog in bot.cogs:
