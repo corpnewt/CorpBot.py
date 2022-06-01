@@ -20,7 +20,7 @@ class Debugging(commands.Cog):
 		self.settings = settings
 		self.debug = debug
 		self.logvars = [ 'invite.create', 'invite.delete', 'invite.send', 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave', 'user.status',
-				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar',
+				'user.game.name', 'user.game.url', 'user.game.type', 'user.avatar', 'user.spotify',
 				'user.nick', 'user.name', 'message.send', 'message.delete',
 				'message.edit', "xp" ]
 		self.quiet = [ 'user.ban', 'user.unban', 'user.mute', 'user.unmute', 'user.join', 'user.leave' ]
@@ -235,47 +235,38 @@ class Debugging(commands.Cog):
 
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
-		if activity_type is discord.ActivityType.unknown:
-			return "None"
-		if activity_type is discord.ActivityType.playing:
-			return "Playing"
-		if activity_type is discord.ActivityType.streaming:
-			return "Streaming"
-		if activity_type is discord.ActivityType.listening:
-			return "Listening"
-		if activity_type is discord.ActivityType.watching:
-			return "Watching"
-		return "None"
+		return {
+			discord.ActivityType.unknown:"None",
+			discord.ActivityType.playing:"Playing",
+			discord.ActivityType.streaming:"Streaming",
+			discord.ActivityType.listening:"Listening",
+			discord.ActivityType.watching:"Watching"
+		}.get(activity_type,"None")
 
 	def activity_to_dict(self, activity):
 		# Only gathers name, url, and type
-		d = {}
-		try:
-			d["name"] = activity.name
-		except:
-			d["name"] = None
-		try:
-			d["url"] = activity.url
-		except:
-			d["url"] = None
-		try:
-			d["type"] = self.type_to_string(activity.type)
-		except:
-			d["type"] = "Unknown"
-		return d
+		return {
+			"name":str(getattr(activity,"name",None)),
+			"url":str(getattr(activity,"url",None)),
+			"type":self.type_to_string(getattr(activity,"type",None))
+		}
+
+	@commands.Cog.listener()
+	async def on_presence_update(self, before, after):
+		# Workaround to keep all member/presence updates in the on_member_update() check
+		await self.on_member_update(before,after)
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
-		if before.bot:
-			return
+		if not before or before.bot: return
 		# A member changed something about their user-profile
 		server = before.guild
 		pfpurl = Utils.get_avatar(before)
-		if not before.status == after.status and self.shouldLog('user.status', server):
+		if before.status != after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not before.activities == after.activities:
-			# Something changed
+		if before.activities != after.activities and not discord.Status.offline in (before.status,after.status):
+			# Something changed - and it wasn't just us going on/offline
 			msg = ''
 			# We need to explore the activities and see if any changed
 			# we plan to ignore Spotify song changes though - as those don't matter.
@@ -300,31 +291,27 @@ class Debugging(commands.Cog):
 				# We need to gather our changed values and print the changes if logging
 				b = self.activity_to_dict(changes[k].get("before",discord.Activity(name=None,url=None,type=None)))
 				a = self.activity_to_dict(changes[k].get("after",discord.Activity(name=None,url=None,type=None)))
+				if "spotify" in (a["name"].lower(),b["name"].lower()) and "listening" in (a["type"].lower(),b["type"].lower()) and not self.shouldLog("user.spotify",server):
+					# Skip spotify changes as they're spammy
+					continue
 				# Check the name, url, and type
-				if not b["name"] == a["name"] and self.shouldLog('user.game.name', server):
-					# Name change
-					msg += 'Name:\n   {}\n   --->\n   {}\n'.format(b["name"], a["name"])
-				if not b["url"] == a["url"] and self.shouldLog('user.game.url', server):
-					# URL changed
-					msg += 'URL:\n   {}\n   --->\n   {}\n'.format(b["url"], a["url"])
-				if not b["type"] == a["type"] and self.shouldLog('user.game.type', server):
-					# URL changed
-					msg += 'Type:\n   {}\n   --->\n   {}\n'.format(b["type"], a["type"])
-
+				for x,y in (("name","Name"),("url","URL"),("type","Type")):
+					if b[x]!=a[x] and self.shouldLog("user.game.{}".format(x),server):
+						msg += "{}:\n   {}\n   --->\n   {}\n".format(y,b[x],a[x])
 			if len(msg):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
 					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not Utils.get_avatar(before) == Utils.get_avatar(after) and self.shouldLog('user.avatar', server):
+		if Utils.get_avatar(before) != Utils.get_avatar(after) and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(Utils.get_avatar(before), Utils.get_avatar(after))
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not before.nick == after.nick and self.shouldLog('user.nick', server):
+		if before.nick != after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
 			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not before.name == after.name and self.shouldLog('user.name', server):
+		if before.name != after.name and self.shouldLog('user.name', server):
 			# Name changed
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
