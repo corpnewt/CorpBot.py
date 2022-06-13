@@ -249,6 +249,7 @@ class Debugging(commands.Cog):
 		return {
 			"name":str(getattr(activity,"name",None)),
 			"url":str(getattr(activity,"url",None)),
+			"title":str(getattr(activity,"title",None)),
 			"type":self.type_to_string(getattr(activity,"type",None))
 		}
 
@@ -257,23 +258,14 @@ class Debugging(commands.Cog):
 		# Workaround to keep all member/presence updates in the on_member_update() check
 		await self.on_member_update(before,after)
 
-	def act_eq(self,act1,act2):
-		# Helper to check 2 activities to work around the "start" key error when checking equality
-		if not dir(act1) == dir(act2): return False
-		return all((getattr(act1,x,None)==getattr(act2,x,None) for x in dir(act1) if not x.startswith("__") and not x.endswith("__")))
-
-	def act_list_eq(self,act_list1,act_list2):
-		# Helper to check 2 activity lists to work around the "start" key error when checking equality
-		if not len(act_list1) == len(act_list2): return False
-		# They're the same length - let's just check if all elements from act_list1 exist in act_list2
-		for act in act_list1:
-			if not self.act_in(act,act_list2): return False
-		return True
-
-	def act_in(self,act,act_list):
-		# Helper to check if act is inside a passed list - works around the "key" error when checking equality
-		found = next((a for a in act_list if self.act_eq(act,a)),None)
-		return True if found else False
+	def sanitize_activity(self, activity):
+		# If our activity has _timestamps, make sure we have *something* for "start" and "end"
+		if hasattr(activity,"_timestamps"):
+			t = int(time.time())
+			for key in ("start","end"):
+				if not key in activity._timestamps:
+					activity._timestamps[key] = t
+		return activity
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
@@ -284,15 +276,18 @@ class Debugging(commands.Cog):
 		if before.status != after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if not self.act_list_eq(before.activities,after.activities) and not discord.Status.offline in (before.status,after.status):
+		# Sanitize activities - fixes an issue where the "start" and "end" keys may not be visible
+		before.activities = [self.sanitize_activity(x) for x in before.activities]
+		after.activities = [self.sanitize_activity(x) for x in after.activities]
+		if before.activities != after.activities and not discord.Status.offline in (before.status,after.status):
 			# Something changed - and it wasn't just us going on/offline
 			msg = ''
 			# We need to explore the activities and see if any changed
 			# we plan to ignore Spotify song changes though - as those don't matter.
 			# 
 			# First let's gather a list of activity changes, then find out which changed
-			bact = [x for x in list(before.activities) if not self.act_in(x,after.activities)]
-			aact = [x for x in list(after.activities) if not self.act_in(x,before.activities)]
+			bact = [x for x in list(before.activities) if not x in after.activities]
+			aact = [x for x in list(after.activities) if not x in before.activities]
 			# Now we format
 			changes = {}
 			for x in bact:
@@ -319,6 +314,9 @@ class Debugging(commands.Cog):
 				for x,y in (("name","Name"),("url","URL"),("type","Type")):
 					if b[x]!=a[x] and self.shouldLog("user.game.{}".format(x),server):
 						msg += "{}:\n   {}\n   --->\n   {}\n".format(y,b[x],a[x])
+				# Check for spotify title logging
+				if b["title"]!=a["title"] and self.shouldLog("user.spotify",server):
+					msg += "Title:\n   {}\n   --->\n   {}\n".format(b["title"],a["title"])
 			if len(msg):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
