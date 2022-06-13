@@ -236,11 +236,12 @@ class Debugging(commands.Cog):
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
 		return {
-			discord.ActivityType.unknown:"None",
 			discord.ActivityType.playing:"Playing",
 			discord.ActivityType.streaming:"Streaming",
 			discord.ActivityType.listening:"Listening",
-			discord.ActivityType.watching:"Watching"
+			discord.ActivityType.watching:"Watching",
+			discord.ActivityType.custom:"Custom",
+			discord.ActivityType.competing:"Competing"
 		}.get(activity_type,"None")
 
 	def activity_to_dict(self, activity):
@@ -256,6 +257,24 @@ class Debugging(commands.Cog):
 		# Workaround to keep all member/presence updates in the on_member_update() check
 		await self.on_member_update(before,after)
 
+	def act_eq(self,act1,act2):
+		# Helper to check 2 activities to work around the "start" key error when checking equality
+		if not dir(act1) == dir(act2): return False
+		return all((getattr(act1,x,None)==getattr(act2,x,None) for x in dir(act1) if not x.startswith("__") and not x.endswith("__")))
+
+	def act_list_eq(self,act_list1,act_list2):
+		# Helper to check 2 activity lists to work around the "start" key error when checking equality
+		if not len(act_list1) == len(act_list2): return False
+		# They're the same length - let's just check if all elements from act_list1 exist in act_list2
+		for act in act_list1:
+			if not self.act_in(act,act_list2): return False
+		return True
+
+	def act_in(self,act,act_list):
+		# Helper to check if act is inside a passed list - works around the "key" error when checking equality
+		found = next((a for a in act_list if self.act_eq(act,a)),None)
+		return True if found else False
+
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
 		if not before or before.bot: return
@@ -265,15 +284,15 @@ class Debugging(commands.Cog):
 		if before.status != after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
 			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
-		if before.activities != after.activities and not discord.Status.offline in (before.status,after.status):
+		if not self.act_list_eq(before.activities,after.activities) and not discord.Status.offline in (before.status,after.status):
 			# Something changed - and it wasn't just us going on/offline
 			msg = ''
 			# We need to explore the activities and see if any changed
 			# we plan to ignore Spotify song changes though - as those don't matter.
 			# 
 			# First let's gather a list of activity changes, then find out which changed
-			bact = [x for x in list(before.activities) if not x in list(after.activities)]
-			aact = [x for x in list(after.activities) if not x in list(before.activities)]
+			bact = [x for x in list(before.activities) if not self.act_in(x,after.activities)]
+			aact = [x for x in list(after.activities) if not self.act_in(x,before.activities)]
 			# Now we format
 			changes = {}
 			for x in bact:
@@ -281,11 +300,13 @@ class Debugging(commands.Cog):
 				# and update if need be - or add it if it doesn't
 				t = self.type_to_string(x.type)
 				# Verify that it has name, url, and type
-				changes[t] = {"before":x}
+				if not t in changes: changes[t] = {}
+				changes[t]["before"] = x
 			for y in aact:
 				# Same as above, but from the after standpoint
 				t = self.type_to_string(y.type)
-				changes[t] = {"after":y}
+				if not t in changes: changes[t] = {}
+				changes[t]["after"] = y
 			# Format the data
 			for k in changes:
 				# We need to gather our changed values and print the changes if logging
