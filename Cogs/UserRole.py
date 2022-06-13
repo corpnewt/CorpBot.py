@@ -91,7 +91,7 @@ class UserRole(commands.Cog):
 	async def _check_react(self, payload):
 		guild = self.bot.get_guild(payload.guild_id)
 		member = guild.get_member(payload.user_id)
-		if not guild or member.bot: return
+		if getattr(member,"bot",True): return
 		block_list = self.settings.getServerStat(member.guild,"UserRoleBlock",[])
 		if member.id in block_list: return # User is blocked
 		m = await self._get_message(member)
