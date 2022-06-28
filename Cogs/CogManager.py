@@ -83,7 +83,7 @@ class CogManager(commands.Cog):
 	async def _load_extension(self, extension = None):
 		# Loads extensions - if no extension passed, loads all
 		# starts with Settings, then Mute
-		if extension == None:
+		if extension is None:
 			# Load them all!
 			for x in self.preloads:
 				if x in self.bot.extensions:
@@ -121,7 +121,7 @@ class CogManager(commands.Cog):
 						print("{} failed to load!".format(ext[:-3]))
 						print("    {}".format(e))
 						pass
-			return ( cog_loaded, cog_count )
+			return cog_loaded, cog_count
 		else:
 			for ext in os.listdir("Cogs"):
 				if ext[:-3].lower() == extension.lower():
