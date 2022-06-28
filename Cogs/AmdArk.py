@@ -6,7 +6,7 @@ import urllib.parse
 from html import unescape
 
 
-def setup(bot):
+async def setup(bot):
     # Add the bot
     bot.add_cog(AmdArk(bot))
 

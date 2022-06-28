@@ -2,7 +2,7 @@ import asyncio, discord
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(OfflineUser(bot))
 

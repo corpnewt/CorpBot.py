@@ -3,7 +3,7 @@ from geopy.geocoders import Nominatim
 from   discord.ext import commands
 from   Cogs import Message, PickList, DL
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(Weather(bot))
 

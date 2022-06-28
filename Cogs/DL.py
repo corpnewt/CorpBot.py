@@ -1,6 +1,6 @@
 import aiohttp, json
 
-def setup(bot):
+async def setup(bot):
 	# Not a cog
 	pass
 

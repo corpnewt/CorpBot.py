@@ -3,7 +3,7 @@ from discord.ext import commands
 from collections import OrderedDict
 from Cogs import Utils, DisplayName, Nullify, FuzzySearch, PickList, Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Telephone(bot, settings))

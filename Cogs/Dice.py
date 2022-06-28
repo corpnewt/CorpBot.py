@@ -150,7 +150,7 @@ class Roller:
         roll_string += "{:,}".format(roll["rolls"][0]["total"])
         return roll_string
 
-def setup(bot):
+async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Dice())

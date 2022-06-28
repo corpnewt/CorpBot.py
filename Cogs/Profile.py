@@ -3,7 +3,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message, Nullify
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Profile(bot, settings))

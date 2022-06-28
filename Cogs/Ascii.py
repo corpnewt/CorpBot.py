@@ -2,7 +2,7 @@ from   discord.ext import commands
 from   Cogs import Utils, DisplayName, PickList, FuzzySearch, Message
 import pyfiglet
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(Ascii(bot))
 	

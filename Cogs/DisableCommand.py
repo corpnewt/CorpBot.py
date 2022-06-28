@@ -2,7 +2,7 @@ import asyncio, discord
 from   discord.ext import commands
 from   Cogs import Utils, ReadableTime, Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(DisableCommand(bot, settings))

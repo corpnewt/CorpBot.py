@@ -3,7 +3,7 @@ from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 from Cogs import Nullify
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(Clippy(bot))
 
 class Clippy(commands.Cog):

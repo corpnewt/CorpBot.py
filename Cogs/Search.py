@@ -3,7 +3,7 @@ from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	bot.add_cog(Search(bot))
 

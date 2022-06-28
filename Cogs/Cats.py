@@ -8,7 +8,7 @@ from   Cogs import Settings
 from   Cogs import GetImage
 from   Cogs import DL
 
-def setup(bot):
+async def setup(bot):
 	# Currently the api is broken - picked up in the Reddit cog
 	return
 	# Add the bot and deps

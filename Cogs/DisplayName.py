@@ -4,7 +4,7 @@ import re
 from   discord.ext import commands
 from   Cogs import Nullify
 
-def setup(bot):
+async def setup(bot):
     # This module isn't actually a cog - but it is a place
     # we can start small fires and watch them burn the entire
     # house to the ground.

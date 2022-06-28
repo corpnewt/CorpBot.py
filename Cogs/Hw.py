@@ -2,7 +2,7 @@ import discord, time
 from   discord.ext import commands
 from   Cogs import Utils, PCPP, DisplayName, Message, PickList
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Hw(bot, settings))

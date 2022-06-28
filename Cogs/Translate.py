@@ -2,7 +2,7 @@ import functools, string, googletrans
 from Cogs import DisplayName, Message, PickList
 from discord.ext import commands
 
-def setup(bot):
+async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Translate(bot, settings))

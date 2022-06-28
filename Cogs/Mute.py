@@ -3,7 +3,7 @@ from discord.ext import commands
 from datetime import datetime
 from Cogs import Utils, DisplayName, ReadableTime
 
-def setup(bot):
+async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Mute(bot, settings))

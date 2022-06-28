@@ -3,7 +3,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, GetImage, Message, DisplayName
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Giphy(bot, settings))

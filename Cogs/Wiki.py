@@ -6,7 +6,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import PickList
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(Wiki(bot))
 

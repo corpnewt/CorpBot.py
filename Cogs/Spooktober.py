@@ -3,7 +3,7 @@ from   datetime    import datetime
 from   discord.ext import commands
 from   Cogs        import Utils
 
-def setup(bot):
+async def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Spooktober(bot, settings))
 

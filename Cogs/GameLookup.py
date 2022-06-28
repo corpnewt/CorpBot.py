@@ -166,7 +166,7 @@ Platform_Lookup ={3:'Linux',
         164:'Daydream',
         165:'PlayStation VR'}
 
-def setup(bot):
+async def setup(bot):
     if not LOADED:
         print("Missing IGDB API - skipping")
         return

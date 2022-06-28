@@ -8,7 +8,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	try:
 		settings = bot.get_cog("Settings")
@@ -80,7 +80,7 @@ class CogManager(commands.Cog):
 				ext_list.append(ext)
 		return ext_list
 
-	def _load_extension(self, extension = None):
+	async def _load_extension(self, extension = None):
 		# Loads extensions - if no extension passed, loads all
 		# starts with Settings, then Mute
 		if extension == None:
@@ -88,10 +88,10 @@ class CogManager(commands.Cog):
 			for x in self.preloads:
 				if x in self.bot.extensions:
 					self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
-					try: self.bot.unload_extension(x)
+					try: await self.bot.unload_extension(x)
 					except: print("{} failed to unload!".format(x))
 				try:
-					self.bot.load_extension(x)
+					await self.bot.load_extension(x)
 					self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
 				except: print("{} failed to load!".format(x))
 			cog_count = len(self.preloads) # Assumes the prior 2 loaded correctly

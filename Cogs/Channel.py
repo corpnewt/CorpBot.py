@@ -4,7 +4,7 @@ from   datetime import datetime
 from   operator import itemgetter
 from   Cogs import Utils, Settings, ReadableTime, DisplayName
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Channel(bot, settings))

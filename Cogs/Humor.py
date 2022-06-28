@@ -3,7 +3,7 @@ from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Humor(bot, settings))

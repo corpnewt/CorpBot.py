@@ -14,7 +14,7 @@ STATUSMAP1 = {discord.Status.online:'1',discord.Status.dnd:'2',discord.Status.id
 STATUSMAP2 = {discord.Status.online:':green_circle:',discord.Status.dnd:':no_entry_sign:',discord.Status.idle:':crescent_moon:',discord.Status.offline:':black_circle:'}
 
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(JazUtils(bot))
 

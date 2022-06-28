@@ -18,7 +18,7 @@ try:
 except ImportError:
     from html.parser import HTMLParser
 
-def setup(bot):
+async def setup(bot):
     # Add the bot
     bot.add_cog(CAH(bot))
 

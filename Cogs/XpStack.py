@@ -10,7 +10,7 @@ from   Cogs import Nullify
 from   Cogs import CheckRoles
 from   Cogs import Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(XpStack(bot, settings))

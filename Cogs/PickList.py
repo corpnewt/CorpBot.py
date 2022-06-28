@@ -2,7 +2,7 @@ import asyncio, discord, math, textwrap
 from   discord.ext import commands
 from   Cogs import Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	bot.add_cog(PickList(bot))
 

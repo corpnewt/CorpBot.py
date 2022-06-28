@@ -3,7 +3,7 @@ from   datetime import datetime
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message, Nullify
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(LangFilter(bot, settings))

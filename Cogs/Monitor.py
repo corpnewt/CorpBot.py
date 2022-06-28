@@ -2,7 +2,7 @@ import asyncio
 import discord
 from   discord.ext import commands
 
-def setup(bot):
+async def setup(bot):
 	# Disabled for now
 	return
 	# Add the bot and deps

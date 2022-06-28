@@ -10,7 +10,7 @@ from pyparsing import (Literal,CaselessLiteral,Word,Combine,Group,Optional,
 import math
 import operator
 
-def setup(bot):
+async def setup(bot):
     # Add the bot
     bot.add_cog(Calc(bot))
 

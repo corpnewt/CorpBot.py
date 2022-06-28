@@ -2,7 +2,7 @@ from xml.sax.saxutils import unescape
 from Cogs import DL
 from Cogs import Nullify
 
-def setup(bot):
+async def setup(bot):
 	# Not a cog
 	return
 

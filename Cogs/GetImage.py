@@ -16,7 +16,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-def setup(bot):
+async def setup(bot):
 	# This module isn't actually a cog
     return
 

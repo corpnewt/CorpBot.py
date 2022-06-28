@@ -4,7 +4,7 @@ import re
 from   discord.ext import commands
 from   Cogs import Settings, DisplayName, Message, Nullify, Utils
 
-def setup(bot):
+async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Stream(bot, settings))

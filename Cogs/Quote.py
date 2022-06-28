@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Quote(bot, settings))

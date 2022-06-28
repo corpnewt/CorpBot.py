@@ -8,7 +8,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch, PickList
 
-def setup(bot):
+async def setup(bot):
 	# Add the cog
 	bot.remove_command("help")
 	bot.add_cog(Help(bot))

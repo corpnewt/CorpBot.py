@@ -5,7 +5,7 @@ from Cogs import Utils, Message, DisplayName, PickList, DL
 # This file was originally based on Rapptz's basic_voice.py:
 # https://github.com/Rapptz/discord.py/blob/master/examples/basic_voice.py
 
-def setup(bot):
+async def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Music(bot,settings))
 

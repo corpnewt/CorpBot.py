@@ -1,7 +1,7 @@
 import difflib
 from   operator    import itemgetter
 
-def setup(bot):
+async def setup(bot):
 	# This module isn't actually a cog
     return
 

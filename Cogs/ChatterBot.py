@@ -3,7 +3,7 @@ from discord.ext import commands
 from aiml import Kernel
 from Cogs import Utils, DisplayName
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	c_bot = ChatterBot(bot, settings)

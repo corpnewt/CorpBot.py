@@ -2,7 +2,7 @@ import asyncio, discord, random
 from   discord.ext import commands
 from   Cogs import Utils
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(DrBeer(bot, settings))

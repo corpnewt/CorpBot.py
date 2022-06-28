@@ -5,7 +5,7 @@ from   Cogs import Nullify
 # bot = None
 # url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 
-def setup(bot):
+async def setup(bot):
 	# This module isn't actually a cog - but it is a place
 	# we can call "a trash fire"
 	bot.add_cog(Utils(bot))

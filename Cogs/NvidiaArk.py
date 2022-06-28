@@ -6,7 +6,7 @@ from urllib.parse import quote
 import re
 
 
-def setup(bot):
+async def setup(bot):
     # Add the bot
     bot.add_cog(NvidiaArk(bot))
 

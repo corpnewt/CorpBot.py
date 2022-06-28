@@ -6,7 +6,7 @@ from   discord.ext import commands
 from   discord import errors
 from   Cogs import Message
 
-def setup(bot):
+async def setup(bot):
 	bot.add_cog(Errors())
 
 class Errors(commands.Cog):

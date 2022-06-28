@@ -5,7 +5,7 @@ import datetime
 from   discord.ext import commands
 from   Cogs import DisplayName, Utils
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(Actions(bot))
 

@@ -2,7 +2,7 @@ import asyncio, discord, time
 from   discord.ext import commands
 from   Cogs import DisplayName, ReadableTime, Utils, Nullify
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Invite(bot, settings))

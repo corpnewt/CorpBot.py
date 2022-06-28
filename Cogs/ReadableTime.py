@@ -1,6 +1,6 @@
 import datetime, calendar
 
-def setup(bot):
+async def setup(bot):
 	# This module isn't actually a cog
     return
 

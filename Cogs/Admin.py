@@ -5,7 +5,7 @@ from   Cogs import Utils, Settings, CheckRoles, DisplayName, Utils
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Admin(bot, settings))

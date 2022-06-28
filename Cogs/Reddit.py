@@ -15,7 +15,7 @@ try:
 except ImportError:
 	pass
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Reddit(bot, settings))

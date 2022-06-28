@@ -4,7 +4,7 @@ from   discord.ext import commands
 from   Cogs import Settings
 from   Cogs import CheckRoles
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(MessageXp(bot, settings))

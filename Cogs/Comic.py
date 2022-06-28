@@ -8,7 +8,7 @@ except ImportError:
 	from html.parser import HTMLParser
 from Cogs import DL, Message
 
-def setup(bot):
+async def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Comic(bot, settings))
 

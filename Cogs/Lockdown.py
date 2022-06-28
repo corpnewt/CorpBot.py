@@ -2,7 +2,7 @@ import discord, time, re
 from discord.ext import commands
 from Cogs import Utils, DisplayName, Message, Nullify, PickList
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(Lockdown(bot, bot.get_cog("Settings")))
 
 class Lockdown(commands.Cog):

@@ -2,7 +2,7 @@ import asyncio, discord, re
 from   discord.ext import commands
 from   Cogs import PickList, Message,Utils
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
 	bot.add_cog(WatchURL(bot,settings))

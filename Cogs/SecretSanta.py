@@ -2,7 +2,7 @@ import discord, random, re, json, os, tempfile, shutil
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, DL
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
 	bot.add_cog(SecretSanta(bot,settings))

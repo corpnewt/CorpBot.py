@@ -7,7 +7,7 @@ import binascii
 import re
 from   Cogs import Utils
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Morse(bot, settings))

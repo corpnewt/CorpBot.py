@@ -1,7 +1,7 @@
 import asyncio, discord, textwrap, random, math, os
 from   discord.ext import commands
 
-def setup(bot):
+async def setup(bot):
     # Not a cog
     return
 

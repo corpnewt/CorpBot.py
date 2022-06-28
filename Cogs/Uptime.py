@@ -5,7 +5,7 @@ from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(Uptime(bot))
 

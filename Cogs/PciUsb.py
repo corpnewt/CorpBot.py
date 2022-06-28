@@ -3,7 +3,7 @@ from   discord.ext import commands
 from   Cogs import DL
 from   Cogs import Message
 
-def setup(bot):
+async def setup(bot):
 	# Add the bot
 	bot.add_cog(PciUsb(bot))
 

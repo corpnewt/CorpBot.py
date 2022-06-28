@@ -1,6 +1,6 @@
 import re, discord
 
-def setup(bot):
+async def setup(bot):
 	# This module isn't actually a cog
     return
 

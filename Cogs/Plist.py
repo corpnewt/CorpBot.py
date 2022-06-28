@@ -2,7 +2,7 @@ from   discord.ext import commands
 import os, re, tempfile, shutil, plistlib
 from Cogs import DL, Message, PickList
 
-def setup(bot):
+async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Plist(bot, settings))
