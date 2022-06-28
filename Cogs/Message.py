@@ -210,7 +210,7 @@ class Embed:
             tot += len(embed.title)
         if embed.description:
             tot += len(embed.description)
-        if not embed.footer is discord.Embed.Empty:
+        if not embed.footer is discord.Embed(title=None):
             tot += len(embed.footer)
         for field in embed.fields:
             tot += len(field.name) + len(field.value)
@@ -238,9 +238,9 @@ class Embed:
         em.url = self.url
         # em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
-            em.set_image(url=self.image.get("url",discord.Embed.Empty) if isinstance(self.image,dict) else self.image)
+            em.set_image(url=self.image.get("url",discord.Embed(title=None)) if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
-            em.set_thumbnail(url=self.thumbnail.get("url",discord.Embed.Empty) if isinstance(self.thumbnail,dict) else self.thumbnail)
+            em.set_thumbnail(url=self.thumbnail.get("url",discord.Embed(title=None)) if isinstance(self.thumbnail,dict) else self.thumbnail)
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
@@ -251,9 +251,9 @@ class Embed:
             elif type(self.author) is dict:
                 if any(item in self.author for item in ["name", "url", "icon"]):
                     em.set_author(
-                        name = self._truncate_string(self.author.get("name",     discord.Embed.Empty), self.auth_max),
-                        url = self.author.get("url",      discord.Embed.Empty),
-                        icon_url = self.author.get("icon_url", discord.Embed.Empty)
+                        name = self._truncate_string(self.author.get("name",     discord.Embed(title=None)), self.auth_max),
+                        url = self.author.get("url",      discord.Embed(title=None)),
+                        icon_url = self.author.get("icon_url", discord.Embed(title=None))
                     )
                 else:
                     em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
@@ -264,19 +264,18 @@ class Embed:
 
     def _get_footer(self):
         # Get our footer if we have one
-        footer_text = footer_icon = discord.Embed.Emptys
+        footer_text = discord.Embed(title=None)
         if type(self.footer) is str:
             footer_text = self.footer
         elif type(self.footer) is dict:
-            footer_text = self.footer.get("text", discord.Embed.Empty)
-            footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+            footer_text = self.footer.get("text", discord.Embed(title=None))
         elif self.footer == None:
             # Never setup
             pass
         else:
             # Try to cast it
             footer_text = str(self.footer)
-        return (footer_text, footer_icon)
+        return (footer_text)
 
     def _get_desc_page_list(self):
         # Returns the list of pages based on our settings
@@ -357,7 +356,7 @@ class Embed:
         # Create the shell embed with our self properties
         em = self._embed_with_self()
         # Gather our footer - if any
-        footer_text, footer_icon = self._get_footer()
+        footer_text = self._get_footer()
         # Gather our field and description pages
         field_pages,desc_pages = self._get_pages()
         # Total is whichever is largest
@@ -368,8 +367,7 @@ class Embed:
         # an embed with what we have
         if not total_pages:
             em.set_footer(
-                text=self._truncate_string(footer_text, self.foot_max),
-                icon_url=footer_icon
+                text=self._truncate_string(footer_text, self.foot_max)
             )
             # If we're editing - remove/update messages as needed
             if original_message: return await self._edit_embed(ctx,em,False,original_message)
@@ -398,7 +396,6 @@ class Embed:
             if page+1 == total_pages:
                 em.set_footer(
                     text=self._truncate_string(footer_text, self.foot_max),
-                    icon_url=footer_icon
                 )
             if original_message and page==0:
                 message = await self._edit_embed(ctx,em,False,original_message)

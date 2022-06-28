@@ -86,18 +86,20 @@ class CogManager(commands.Cog):
 		if extension is None:
 			# Load them all!
 			for x in self.preloads:
+				print(x)
 				if x in self.bot.extensions:
-					await self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
+					self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
 					try: await self.bot.unload_extension(x)
 					except: print("{} failed to unload!".format(x))
 				try:
 					await self.bot.load_extension(x)
-					await self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
+					self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
 				except: print("{} failed to load!".format(x))
 			cog_count = len(self.preloads) # Assumes the prior 2 loaded correctly
 			cog_loaded = len(self.preloads) # Again, assumes success above
 			# Load the rest of the cogs
 			for ext in os.listdir("Cogs"):
+				print(ext)
 				# Avoid reloading Settings and Mute
 				if ext.lower().endswith(".py") and not (ext.lower() in ["settings.py", "mute.py"]):
 					# Valid cog - load it
@@ -106,7 +108,7 @@ class CogManager(commands.Cog):
 					try:
 						# Only unload if loaded
 						if "Cogs."+ext[:-3] in self.bot.extensions:
-							await self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 							await self.bot.unload_extension("Cogs."+ext[:-3])
 					except Exception as e:
 						print("{} failed to unload!".format(ext[:-3]))
@@ -115,7 +117,7 @@ class CogManager(commands.Cog):
 					# Try to load
 					try:
 						await self.bot.load_extension("Cogs." + ext[:-3])
-						await self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 						cog_loaded += 1
 					except Exception as e:
 						print("{} failed to load!".format(ext[:-3]))
@@ -139,14 +141,14 @@ class CogManager(commands.Cog):
 							# Only unload if loaded
 							if "Cogs."+e[:-3] in self.bot.extensions:
 								self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+e[:-3]))
-								self.bot.unload_extension("Cogs."+e[:-3])
+								await self.bot.unload_extension("Cogs."+e[:-3])
 						except Exception as er:
 							print("{} failed to unload!".format(e[:-3]))
 							print("    {}".format(er))
 							pass
 						# Try to load
 						try:
-							self.bot.load_extension("Cogs."+e[:-3])
+							await self.bot.load_extension("Cogs."+e[:-3])
 							self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+e[:-3]))
 							success += 1
 						except Exception as er:
