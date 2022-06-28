@@ -5,7 +5,7 @@ from   Cogs import Utils
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(DrBeer(bot, settings))
+	await bot.add_cog(DrBeer(bot, settings))
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
@@ -19,7 +19,7 @@ class DrBeer(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def drbeer(self, ctx):
 		"""Put yourself in your place."""
 		if not Utils.is_admin(ctx): return

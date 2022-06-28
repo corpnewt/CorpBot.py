@@ -20,9 +20,9 @@ from   Cogs        import DisplayName
 from   Cogs        import Nullify
 
 
-def setup(bot):
+async def setup(bot):
 	# Add the cog
-	bot.add_cog(Settings(bot))
+	await bot.add_cog(Settings(bot))
 
 class MemberRole:
 
@@ -797,7 +797,7 @@ class Settings(commands.Cog):
 		self.serverDict["Servers"][str(server.id)][stat] = value
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dumpsettings(self, ctx):
 		"""Sends the Settings.json file to the owner."""
 		author  = ctx.message.author
@@ -819,7 +819,7 @@ class Settings(commands.Cog):
 		await ctx.message.author.send(file=discord.File('Settings.json'))
 		await message.edit(content='Uploaded *Settings.json!*')
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ownerlock(self, ctx):
 		"""Locks/unlocks the bot to only respond to the owner."""
 		author  = ctx.message.author
@@ -863,7 +863,7 @@ class Settings(commands.Cog):
 
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def owners(self, ctx):
 		"""Lists the bot's current owners."""
 		author  = ctx.message.author
@@ -890,7 +890,7 @@ class Settings(commands.Cog):
 		await channel.send(msg)
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def claim(self, ctx):
 		"""Claims the bot if disowned - once set, can only be changed by the current owner."""
 		author  = ctx.message.author
@@ -911,7 +911,7 @@ class Settings(commands.Cog):
 			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(member))
 		await channel.send(msg)
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addowner(self, ctx, *, member : str = None):
 		"""Adds an owner to the owner list.  Can only be done by a current owner."""
 		
@@ -948,7 +948,7 @@ class Settings(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remowner(self, ctx, *, member : str = None):
 		"""Removes an owner from the owner list.  Can only be done by a current owner."""
 		
@@ -984,7 +984,7 @@ class Settings(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def disown(self, ctx):
 		"""Revokes all ownership of the bot."""
 		owned = self.isOwner(ctx.author)
@@ -1003,7 +1003,7 @@ class Settings(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getstat(self, ctx, stat : str = None, member : discord.Member = None):
 		"""Gets the value for a specific stat for the listed member (case-sensitive)."""
 		
@@ -1042,7 +1042,7 @@ class Settings(commands.Cog):
 		await channel.send(msg)
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setsstat(self, ctx, stat : str = None, value : str = None):
 		"""Sets a server stat (admin only)."""
 		
@@ -1067,7 +1067,7 @@ class Settings(commands.Cog):
 		await channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getsstat(self, ctx, stat : str = None):
 		"""Gets a server stat (admin only)."""
 		
@@ -1091,7 +1091,7 @@ class Settings(commands.Cog):
 		msg = '**{}** is currently *{}!*'.format(stat, value)
 		await channel.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def flush(self, ctx):
 		"""Flush the bot settings to disk (admin only)."""
 		# Only allow owner
@@ -1216,7 +1216,7 @@ class Settings(commands.Cog):
 			pass
 		self.flush_lock = False
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prunelocalsettings(self, ctx):
 		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
 
@@ -1333,7 +1333,7 @@ class Settings(commands.Cog):
 		return removed
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prunesettings(self, ctx):
 		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
 
@@ -1382,7 +1382,7 @@ class Settings(commands.Cog):
 		await message.edit(content=msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prune(self, ctx):
 		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
 		

@@ -5,7 +5,7 @@ from   Cogs import Utils, ReadableTime, Message
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(DisableCommand(bot, settings))
+	await bot.add_cog(DisableCommand(bot, settings))
 
 # This is the DisableCommand module. It allows servers to enable/disable specific commands
 
@@ -103,25 +103,25 @@ class DisableCommand(commands.Cog):
 					command_list.append(c.name)
 		return command_list
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def disabledreact(self, ctx, *, yes_no = None):
 		"""Sets whether the bot reacts to disabled commands when attempted (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Disabled command reactions","DisabledReactions",yes_no))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def adminallow(self, ctx, *, yes_no = None):
 		"""Sets whether admins can access disabled commands (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Admin disabled command access","AdminDisabledAccess",yes_no))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def badminallow(self, ctx, *, yes_no = None):
 		"""Sets whether bot-admins can access disabled commands (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Bot-admin disabled command access","BAdminDisabledAccess",yes_no))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def disable(self, ctx, *, command_or_cog_name = None):
 		"""Disables the passed command or all commands in the passed cog (admin-only).  Command and cog names are case-sensitive."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -151,7 +151,7 @@ class DisableCommand(commands.Cog):
 		title = "Disabled 1 Command" if len(disabled) == 1 else "Disabled {} Commands".format(len(disabled))
 		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def enable(self, ctx, *, command_or_cog_name = None):
 		"""Enables the passed command or all commands in the passed cog (admin-only).  Command and cog names are case-sensitive."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -181,7 +181,7 @@ class DisableCommand(commands.Cog):
 		title = "Enabled 1 Command" if len(enabled) == 1 else "Enabled {} Commands".format(len(enabled))
 		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listdisabled(self, ctx):
 		"""Lists all disabled commands (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -190,7 +190,7 @@ class DisableCommand(commands.Cog):
 		title = "1 Disabled Command" if len(dis_com) == 1 else "{} Disabled Commands".format(len(dis_com))
 		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def isdisabled(self, ctx, *, command_or_cog_name = None):
 		"""Outputs whether the passed command - or all commands in a passed cog are disabled (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -220,7 +220,7 @@ class DisableCommand(commands.Cog):
 			msg = "Disabled" if len(disabled) else "Enabled"
 		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title, footer=footer).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def disableall(self, ctx):
 		"""Disables all enabled commands outside this module (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -244,7 +244,7 @@ class DisableCommand(commands.Cog):
 		title = "Disabled 1 Command" if len(disabled) == 1 else "Disabled {} Commands".format(len(disabled))
 		await Message.EmbedText(d_header="```\n", d_footer="```", color=ctx.author, description=msg, title=title).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def enableall(self, ctx):
 		"""Enables all disabled commands (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return

@@ -8,7 +8,7 @@ from   Cogs import DisplayName
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Torment(bot, settings))
+	await bot.add_cog(Torment(bot, settings))
 
 # This is the Torment module. It spams the target with pings for awhile
 
@@ -24,7 +24,7 @@ class Torment(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 		
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def tormentdelay(self, ctx, delay : int = None):
 		"""Sets the delay in seconds between messages (owner only)."""
 		
@@ -63,7 +63,7 @@ class Torment(commands.Cog):
 			await ctx.message.author.send('Current torment delay is now *{} seconds.*'.format(self.waitBetween))
 		
 	
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def canceltorment(self, ctx):
 		"""Cancels tormenting if it's in progress - must be false when next torment attempt starts to work (owner only)."""
 		
@@ -86,7 +86,7 @@ class Torment(commands.Cog):
 		await ctx.message.author.send('Tormenting cancelled.')
 		
 		
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def torment(self, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice (owner only)."""
 
@@ -170,7 +170,7 @@ class Torment(commands.Cog):
 					return
 
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def stealthtorment(self, ctx, *, member = None, times : int = None):
 		"""Deals some sneaky vigilante justice (owner only)."""
 
@@ -255,7 +255,7 @@ class Torment(commands.Cog):
 					return
 
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def servertorment(self, ctx, *, member = None, times : int = None):
 		"""Deals some vigilante justice in all channels (owner only)."""
 
@@ -343,7 +343,7 @@ class Torment(commands.Cog):
 					return
 
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def stealthservertorment(self, ctx, *, member = None, times : int = None):
 		"""Deals some sneaky vigilante justice in all channels (owner only)."""
 

@@ -5,7 +5,7 @@ from   Cogs import Utils, Xp, DisplayName, CheckRoles
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Feed(bot, settings))
+	await bot.add_cog(Feed(bot, settings))
 
 # This is the feed module.  It allows the bot to be fed,
 # get hungry, die, be resurrected, etc.
@@ -92,13 +92,13 @@ class Feed(commands.Cog):
 					hunger = 100 if hunger > 100 else hunger
 					self.settings.setServerStat(server, "Hunger", hunger)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ignoredeath(self, ctx, *, yes_no = None):
 		"""Sets whether the bot ignores its own death and continues to respond post-mortem (bot-admin only; always off by default)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Ignore death","IgnoreDeath",yes_no))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hunger(self, ctx):
 		"""How hungry is the bot?"""
 		hunger = int(self.settings.getServerStat(ctx.guild, "Hunger"))
@@ -134,7 +134,7 @@ class Feed(commands.Cog):
 			msg = 'I *AM* dead.  Likely from *lack* of care.  You will have to `{}resurrect` me to get me back.'.format(ctx.prefix)
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def feed(self, ctx, food = None):
 		"""Feed the bot some xp!"""
 		# feed the bot, and maybe you'll get something in return!
@@ -271,7 +271,7 @@ class Feed(commands.Cog):
 		
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def kill(self, ctx):
 		"""Kill the bot... you heartless soul."""
 		# Check for role requirements
@@ -294,7 +294,7 @@ class Feed(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "KilledBy", ctx.author.id)
 		await ctx.send('I am kill...\n\n*{}* did it...'.format(DisplayName.name(ctx.author)))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def resurrect(self, ctx):
 		"""Restore life to the bot.  What magic is this?"""
 		# Check for role requirements
@@ -317,7 +317,7 @@ class Feed(commands.Cog):
 		killedBy = DisplayName.memberForID(killedBy, ctx.guild)
 		await ctx.send('Guess who\'s back??\n\n*{}* may have tried to keep me down - but I *just keep coming back!*'.format(DisplayName.name(killedBy)))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def iskill(self, ctx):
 		"""Check the ded of the bot."""
 		isKill = self.settings.getServerStat(ctx.guild, "Killed")
@@ -330,7 +330,7 @@ class Feed(commands.Cog):
 			msg = 'Wait - are you asking if I\'m *dead*?  Why would you wanna know *that?*'
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setkillrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role to kill/resurrect the bot (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -355,7 +355,7 @@ class Feed(commands.Cog):
 		msg = 'setkillrole Error: {}'.format(error)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def killrole(self, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
 		role = self.settings.getServerStat(ctx.guild, "RequiredKillRole")

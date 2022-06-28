@@ -5,7 +5,7 @@ from   Cogs import Settings, DisplayName, Nullify, Utils, PickList
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(UserRole(bot, settings))
+	await bot.add_cog(UserRole(bot, settings))
 
 class UserRole(commands.Cog):
 	
@@ -255,7 +255,7 @@ class UserRole(commands.Cog):
 			role_list.append({"name":name,"value":value})
 		return await PickList.PagePicker(title="Current Reaction Roles",list=role_list,description=desc,ctx=ctx).pick()
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def urblock(self, ctx, *, member = None):
 		"""Blocks a user from using the UserRole system and removes applicable roles (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -299,7 +299,7 @@ class UserRole(commands.Cog):
 		m += "\n\n*{} {}* removed.".format(len(remRole), "role" if len(remRole) == 1 else "roles")
 		await ctx.send(m)
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def urunblock(self, ctx, *, member = None):
 		"""Unblocks a user from the UserRole system (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -317,7 +317,7 @@ class UserRole(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "UserRoleBlock", block_list)
 		await ctx.send("{} has been unblocked from the UserRole module.".format(DisplayName.name(mem)))
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def isurblocked(self, ctx, *, member = None):
 		"""Outputs whether or not the passed user is blocked from the UserRole module."""
 		if member == None:
@@ -334,7 +334,7 @@ class UserRole(commands.Cog):
 		else:
 			await ctx.send(name + " not blocked from the UserRole module.")
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def adduserrole(self, ctx, *, role = None):
 		"""Adds a new role to the user role system (admin only)."""
 		
@@ -391,7 +391,7 @@ class UserRole(commands.Cog):
 		msg = 'adduserrole Error: {}'.format(ctx)
 		await error.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removeuserrole(self, ctx, *, role = None):
 		"""Removes a role from the user role system (admin only)."""
 		
@@ -497,7 +497,7 @@ class UserRole(commands.Cog):
 		msg = 'removeuserrole Error: {}'.format(ctx)
 		await error.channel.send(msg)'''
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listuserroles(self, ctx):
 		"""Lists all roles for the user role system."""
 		
@@ -542,13 +542,13 @@ class UserRole(commands.Cog):
 
 		await channel.send(roleText)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def oneuserrole(self, ctx, *, yes_no = None):
 		"""Turns on/off one user role at a time (bot-admin only; always on by default)."""
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"One user role at a time","OnlyOneUserRole",yes_no,True))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearroles(self, ctx):
 		"""Removes all user roles from your roles."""
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
@@ -583,7 +583,7 @@ class UserRole(commands.Cog):
 			await ctx.send("{} user roles removed from your roles.".format(len(remRole)))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remrole(self, ctx, *, role = None):
 		"""Removes a role from the user role list from your roles."""
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
@@ -657,7 +657,7 @@ class UserRole(commands.Cog):
 		await channel.send(msg)
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addrole(self, ctx, *, role = None):
 		"""Adds a role from the user role list to your roles.  You can have multiples at a time."""
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")
@@ -728,7 +728,7 @@ class UserRole(commands.Cog):
 		msg = '*{}* has acquired **{}!**'.format(DisplayName.name(ctx.message.author), Nullify.escape_all(role.name))
 		await channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setrole(self, ctx, *, role = None):
 		"""Sets your role from the user role list.  You can only have one at a time."""
 		block_list = self.settings.getServerStat(ctx.guild, "UserRoleBlock")

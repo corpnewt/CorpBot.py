@@ -102,10 +102,10 @@ async def on_all_shards_ready():
 		print("Invite Link:\nhttps://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=8\n".format(bot.user.id))
 		# Let's try to use the CogManager class to load things
 		print("Loading CogManager...")
-		bot.load_extension("Cogs.CogManager")
+		await bot.load_extension("Cogs.CogManager")
 		cg_man = bot.get_cog("CogManager")
 		# Load up the rest of the extensions
-		cog_loaded, cog_count = cg_man._load_extension()
+		cog_loaded, cog_count = await cg_man._load_extension()
 		# Output the load counts
 		if cog_count == 1:
 			print("Loaded {} of {} cog.".format(cog_loaded, cog_count))
@@ -401,4 +401,8 @@ async def on_message_edit(before, message):
 
 # Run the bot
 print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count == 1 else "s"))
-bot.run(settings_dict.get("token",""))
+async def main():
+    async with bot:
+        await bot.start(settings_dict.get("token",""))
+
+asyncio.run(main())

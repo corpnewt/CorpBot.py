@@ -6,7 +6,7 @@ from   Cogs import Utils, DisplayName
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(DJRoles(bot, settings))
+	await bot.add_cog(DJRoles(bot, settings))
 
 class DJRoles(commands.Cog):
 
@@ -18,7 +18,7 @@ class DJRoles(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def adddj(self, ctx, *, role : str = None):
 		"""Adds a new role to the dj list (bot-admin only)."""
 		usage = 'Usage: `{}adddj [role]`'.format(ctx.prefix)
@@ -51,7 +51,7 @@ class DJRoles(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removedj(self, ctx, *, role : str = None):
 		"""Removes a role from the dj list (bot-admin only)."""
 		usage = 'Usage: `{}removedj [role]`'.format(ctx.prefix)
@@ -81,7 +81,7 @@ class DJRoles(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listdj(self, ctx):
 		"""Lists dj roles and id's."""
 		promoArray = self.settings.getServerStat(ctx.guild, "DJArray")

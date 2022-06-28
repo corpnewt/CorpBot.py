@@ -12,7 +12,7 @@ import operator
 
 async def setup(bot):
     # Add the bot
-    bot.add_cog(Calc(bot))
+    await bot.add_cog(Calc(bot))
 
 __author__='Paul McGuire'
 __version__ = '$Revision: 0.0 $'
@@ -125,7 +125,7 @@ class Calc(commands.Cog):
         global Utils
         Utils = self.bot.get_cog("Utils")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def calc(self, ctx, *, formula = None):
         """Do some math."""
 

@@ -6,7 +6,7 @@ from   Cogs import Utils, DisplayName, Message, Nullify
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(LangFilter(bot, settings))
+	await bot.add_cog(LangFilter(bot, settings))
 
 class ProfanitiesFilter(object):
 	def __init__(self, filterlist, ignore_case=True, replacements="$@%-?!", 
@@ -125,7 +125,7 @@ class LangFilter(commands.Cog):
 		return { "Ignore" : False, "Delete" : False }
 		
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addfilter(self, ctx, *, words = None):
 		"""Adds comma delimited words to the word list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -157,7 +157,7 @@ class LangFilter(commands.Cog):
 			await ctx.send('*{}* words added to language filter.'.format(len(addedOptions)))
 			
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remfilter(self, ctx, *, words = None):
 		"""Removes comma delimited words from the word list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -194,7 +194,7 @@ class LangFilter(commands.Cog):
 			await ctx.send('*{}* words removed from language filter.'.format(len(addedOptions)))
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listfilter(self, ctx):
 		"""Prints out the list of words that will be filtered (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -210,7 +210,7 @@ class LangFilter(commands.Cog):
 		
 		await Message.Message(message=msg).send(ctx)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearfilter(self, ctx):
 		"""Empties the list of words that will be filtered (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -223,7 +223,7 @@ class LangFilter(commands.Cog):
 		else:
 			await ctx.send('*{}* words removed from language filter.'.format(len(serverOptions)))
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dumpfilter(self, ctx):
 		"""Saves the filtered word list to a text file and uploads it to the requestor (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -245,7 +245,7 @@ class LangFilter(commands.Cog):
 		os.remove(filename)
 		
 	
-	'''@commands.command(pass_context=True)
+	'''@commands.command()
 	async def setfilter(self, ctx, url = None):
 		"""Sets the word list to a passed text file url, or attachment contents (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

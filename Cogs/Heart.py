@@ -6,7 +6,7 @@ from   Cogs import DisplayName
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Heart(bot))
+	await bot.add_cog(Heart(bot))
 
 class Heart(commands.Cog):
 

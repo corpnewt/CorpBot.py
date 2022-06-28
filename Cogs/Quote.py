@@ -5,7 +5,7 @@ from   Cogs import Utils, DisplayName, Message
 async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Quote(bot, settings))
+	await bot.add_cog(Quote(bot, settings))
 
 class Quote(commands.Cog):
 
@@ -114,7 +114,7 @@ class Quote(commands.Cog):
 		await Message.EmbedText(**e).send(r_channel)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setquotechannel(self, ctx, channel = None):
 		"""Sets the channel for quoted messages or disables it if no channel sent (admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -131,7 +131,7 @@ class Quote(commands.Cog):
 		await ctx.send(msg)
 	
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def quotechannel(self, ctx):
 		"""Prints the current quote channel."""
 		qChan = self.settings.getServerStat(ctx.guild, "QuoteChannel")
@@ -143,7 +143,7 @@ class Quote(commands.Cog):
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(qChan))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearquotereaction(self, ctx):
 		"""Clears the trigger reaction for quoting messages (admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -151,7 +151,7 @@ class Quote(commands.Cog):
 		await ctx.send("Quote reaction *cleared*.")
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setquotereaction(self, ctx):
 		"""Sets the trigger reaction for quoting messages (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -175,14 +175,14 @@ class Quote(commands.Cog):
 		await message.edit(content="Quote reaction set to {}".format(str(reaction.emoji)))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getquotereaction(self, ctx):
 		"""Displays the quote reaction if there is one."""
 		r = self.settings.getServerStat(ctx.guild, "QuoteReaction")
 		await ctx.send("No quote reaction set." if not r else "Current quote reaction is {}".format(r))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def quoteadminonly(self, ctx, *, yes_no = None):
 		"""Sets whether only admins/bot-admins can quote or not (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

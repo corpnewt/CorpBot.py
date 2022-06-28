@@ -6,7 +6,7 @@ from   PIL import Image
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Encode(bot, settings))
+	await bot.add_cog(Encode(bot, settings))
 
 class Encode(commands.Cog):
 
@@ -250,7 +250,7 @@ class Encode(commands.Cog):
 				except:	continue
 		return available
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def slide(self, ctx, *, input_hex = None):
 		"""Calculates your slide value for Clover based on an input address (in hex)."""
 		if input_hex == None and len(ctx.message.attachments) == 0: # No info passed - bail!
@@ -290,7 +290,7 @@ class Encode(commands.Cog):
 		pad = max([len(x[0]) for x in slides])
 		await ctx.send("**Applicable Slide Values:**\n```\n{}\n```".format("\n".join(["{}: slide={}".format(x[0].rjust(pad),x[1]) for x in slides])))
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hexswap(self, ctx, *, input_hex = None):
 		"""Byte swaps the passed hex value."""
 		if input_hex == None:
@@ -307,7 +307,7 @@ class Encode(commands.Cog):
 		hex_str = "".join(["".join(x) for x in hex_rev])
 		await ctx.send(hex_str.upper())
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hexdec(self, ctx, *, input_hex = None):
 		"""Converts hex to decimal."""
 		if input_hex == None:
@@ -327,7 +327,7 @@ class Encode(commands.Cog):
 
 		await ctx.send(dec)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dechex(self, ctx, *, input_dec = None):
 		"""Converts an int to hex."""
 		if input_dec == None:
@@ -345,7 +345,7 @@ class Encode(commands.Cog):
 		await ctx.send("0x"+hex_str)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def strbin(self, ctx, *, input_string = None):
 		"""Converts the input string to its binary representation."""
 		if input_string == None:
@@ -364,7 +364,7 @@ class Encode(commands.Cog):
 			return
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def binstr(self, ctx, *, input_binary = None):
 		"""Converts the input binary to its string representation."""
 		if input_binary == None:
@@ -381,7 +381,7 @@ class Encode(commands.Cog):
 		msg = ''.join(chr(int(new_bin[i:i+8], 2)) for i in range(0, len(new_bin), 8))
 		await ctx.send(Nullify.escape_all(msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def binint(self, ctx, *, input_binary = None):
 		"""Converts the input binary to its integer representation."""
 		if input_binary == None:
@@ -393,7 +393,7 @@ class Encode(commands.Cog):
 			msg = "I couldn't make that conversion!"
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def intbin(self, ctx, *, input_int = None):
 		"""Converts the input integer to its binary representation."""
 		if input_int == None:
@@ -409,7 +409,7 @@ class Encode(commands.Cog):
 
 	
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def encode(self, ctx, from_type = None , to_type = None, *, value = None):
 		"""Data converter from ascii <--> hex <--> base64."""
 

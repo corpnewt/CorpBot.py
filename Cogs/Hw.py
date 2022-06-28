@@ -5,7 +5,7 @@ from   Cogs import Utils, PCPP, DisplayName, Message, PickList
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Hw(bot, settings))
+	await bot.add_cog(Hw(bot, settings))
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
@@ -26,7 +26,7 @@ class Hw(commands.Cog):
 		# manages to do this twice in < 1 second)
 		return str(time.time())
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def cancelhw(self, ctx):
 		"""Cancels a current hardware session."""
 		if str(ctx.author.id) in self.hwactive:
@@ -39,7 +39,7 @@ class Hw(commands.Cog):
 		if str(author.id) in self.hwactive:
 			del self.hwactive[str(author.id)]
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def sethwchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets the channel for hardware (admin only)."""
 		
@@ -62,7 +62,7 @@ class Hw(commands.Cog):
 		msg = 'sethwchannel Error: {}'.format(error)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def pcpp(self, ctx, url = None, style = None, escape = None):
 		"""Convert a pcpartpicker.com link into markdown parts. Available styles: normal, md, mdblock, bold, and bolditalic."""
 		usage = "Usage: `{}pcpp [url] [style=normal, md, mdblock, bold, bolditalic] [escape=yes/no (optional)]`".format(ctx.prefix)
@@ -84,7 +84,7 @@ class Hw(commands.Cog):
 			return await ctx.send(msg)
 		await ctx.send(Utils.suppressed(ctx,output))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def mainhw(self, ctx, *, build = None):
 		"""Sets a new main build from your build list."""
 
@@ -138,7 +138,7 @@ class Hw(commands.Cog):
 		await ctx.send(msg)
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def delhw(self, ctx, *, build = None):
 		"""Removes a build from your build list."""
 
@@ -176,7 +176,7 @@ class Hw(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def edithw(self, ctx, *, build = None):
 		"""Edits a build from your build list."""
 		hwChannel = None
@@ -322,7 +322,7 @@ class Hw(commands.Cog):
 		await hwChannel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def renhw(self, ctx, *, build = None):
 		"""Renames a build from your build list."""
 		hwChannel = None
@@ -431,7 +431,7 @@ class Hw(commands.Cog):
 		await hwChannel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def gethw(self, ctx, *, user = None, search = None):
 		"""Searches the user's hardware for a specific search term."""
 		if not user:
@@ -485,7 +485,7 @@ class Hw(commands.Cog):
 		return await Message.EmbedText(title="Nothing found for that search.",color=ctx.author).send(ctx)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hw(self, ctx, *, user : str = None, build = None):
 		"""Lists the hardware for either the user's default build - or the passed build."""
 		if not user:
@@ -610,7 +610,7 @@ class Hw(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawhw(self, ctx, *, user : str = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
 		if not user:
@@ -733,7 +733,7 @@ class Hw(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 			
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listhw(self, ctx, *, user = None):
 		"""Lists the builds for the specified user - or yourself if no user passed."""
 		usage = 'Usage: `{}listhw [user]`'.format(ctx.prefix)
@@ -771,7 +771,7 @@ class Hw(commands.Cog):
 			ctx=ctx
 		).pick()
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot.  The hardware added will also be set as the Main Build."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")

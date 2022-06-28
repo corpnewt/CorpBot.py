@@ -3,7 +3,7 @@ from   discord.ext import commands
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(ThatsTrue(bot))
+	await bot.add_cog(ThatsTrue(bot))
 
 class ThatsTrue(commands.Cog):
 

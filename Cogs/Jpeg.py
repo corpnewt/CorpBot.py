@@ -11,7 +11,7 @@ from   Cogs import Message
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Jpeg(bot, settings))
+	await bot.add_cog(Jpeg(bot, settings))
 
 class Jpeg(commands.Cog):
 
@@ -54,7 +54,7 @@ class Jpeg(commands.Cog):
 		return image
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def jpeg(self, ctx, *, url = None):
 		"""MOAR JPEG!  Accepts a url - or picks the first attachment."""
 		if not self.canDisplay(ctx.guild):

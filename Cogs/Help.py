@@ -11,7 +11,7 @@ from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch, PickList
 async def setup(bot):
 	# Add the cog
 	bot.remove_command("help")
-	bot.add_cog(Help(bot))
+	await bot.add_cog(Help(bot))
 
 # This is the Help module. It replaces the built-in help command
 
@@ -118,7 +118,7 @@ class Help(commands.Cog):
 			})
 		return embed_list
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dumphelp(self, ctx, tab_indent_count = None):
 		"""Dumps a timestamped, formatted list of commands and descriptions into the same directory as the bot."""
 		try:
@@ -174,7 +174,7 @@ class Help(commands.Cog):
 		await message.edit(content='Uploaded *{}!*'.format(serverFile))
 		os.remove(serverFile)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dumpmarkdown(self, ctx):
 		"""Dumps a timestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
 		tab_indent_count = 1
@@ -229,7 +229,7 @@ class Help(commands.Cog):
 		await message.edit(content='Uploaded *{}!*'.format(serverFile))
 		os.remove(serverFile)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def help(self, ctx, *, command = None):
 		"""Lists the bot's commands and cogs.
 		You can pass a command or cog to this to get more info (case-sensitive)."""

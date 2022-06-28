@@ -4,7 +4,7 @@ from   Cogs import Message
 
 async def setup(bot):
 	# Add the bot and deps
-	bot.add_cog(PickList(bot))
+	await bot.add_cog(PickList(bot))
 
 class PickList(commands.Cog):
     def __init__(self, bot):

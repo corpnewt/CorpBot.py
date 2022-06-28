@@ -10,7 +10,7 @@ from   Cogs import Settings, DisplayName, Utils
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(MadLibs(bot, settings))
+	await bot.add_cog(MadLibs(bot, settings))
 
 class MadLibs(commands.Cog):
 
@@ -33,7 +33,7 @@ class MadLibs(commands.Cog):
 		"""Used to choose your words when in the middle of a madlibs."""
 		pass
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def madlibs(self, ctx):
 		"""Let's play MadLibs!"""
 

@@ -3,7 +3,7 @@ from discord.ext import commands
 import random
 
 async def setup(bot):
-    bot.add_cog(Groot(bot))
+    await bot.add_cog(Groot(bot))
 
 class Groot(commands.Cog):
 

@@ -7,7 +7,7 @@ from   Cogs import Utils, DisplayName, Message, ReadableTime
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Debugging(bot, settings))
+	await bot.add_cog(Debugging(bot, settings))
 
 # This is the Debugging module. It keeps track of how long the bot's been up
 
@@ -465,7 +465,7 @@ class Debugging(commands.Cog):
 			# We don't have perms in this channel or something - silently cry
 			pass
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clean(self, ctx, messages = None, *, chan : discord.TextChannel = None):
 		"""Cleans the passed number of messages from the given channel (admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -561,7 +561,7 @@ class Debugging(commands.Cog):
 		os.remove(filename)
 	
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def logpreset(self, ctx, *, preset = None):
 		"""Can select one of 4 available presets - off, quiet, normal, verbose (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -586,7 +586,7 @@ class Debugging(commands.Cog):
 		await ctx.send(msg)
 		
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def logging(self, ctx):
 		"""Outputs whether or not we're logging is enabled, the log channel, and any set logging options (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -601,7 +601,7 @@ class Debugging(commands.Cog):
 		await ctx.send('Logging is currently *disabled*.')
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def logenable(self, ctx, *, options = None):
 		"""Enables the passed, comma-delimited log vars (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -629,7 +629,7 @@ class Debugging(commands.Cog):
 		await ctx.send("*{}* logging option{} enabled.".format(len(addedOptions),"" if len(addedOptions) == 1 else "s"))
 		
 				
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def logdisable(self, ctx, *, options = None):
 		"""Disables the passed, comma-delimited log vars.  If run with no arguments, disables all current logging options (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -657,7 +657,7 @@ class Debugging(commands.Cog):
 		await ctx.send("*{}* logging option{} disabled.".format(len(addedOptions),"" if len(addedOptions) == 1 else "s"))		
 			
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setlogchannel(self, ctx, *, channel : discord.TextChannel = None):
 		"""Sets the channel for Logging (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -679,7 +679,7 @@ class Debugging(commands.Cog):
 		await error.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setdebug(self, ctx, *, debug = None):
 		"""Turns on/off debugging (owner only - always off by default)."""
 		# Only allow owner
@@ -704,7 +704,7 @@ class Debugging(commands.Cog):
 		await ctx.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def cleardebug(self, ctx):
 		"""Deletes the debug.txt file (owner only)."""
 		# Only allow owner
@@ -717,7 +717,7 @@ class Debugging(commands.Cog):
 		await ctx.send('*debug.txt* removed!')
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def heartbeat(self, ctx):
 		"""Write to the console and attempt to send a message (owner only)."""
 		# Only allow owner

@@ -8,7 +8,7 @@ from   discord.ext import commands
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(RateLimit(bot, settings))
+	await bot.add_cog(RateLimit(bot, settings))
 
 # This is the RateLimit module. It keeps users from being able to spam commands
 
@@ -61,7 +61,7 @@ class RateLimit(commands.Cog):
 		self.settings.setUserStat(ctx.message.author, ctx.message.guild, "LastCommand", int(time.time()))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ccooldown(self, ctx, delay : int = None):
 		"""Sets the cooldown in seconds between each command (owner only)."""
 		

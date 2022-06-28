@@ -6,7 +6,7 @@ from   Cogs import Utils, ReadableTime, DisplayName, Nullify
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(TempRole(bot))
+	await bot.add_cog(TempRole(bot))
 
 class TempRole(commands.Cog):
 
@@ -158,7 +158,7 @@ class TempRole(commands.Cog):
 		# Remove it from our TempRoles setting
 		self.settings.setUserStat(member, member.guild, "TempRoles", [x for x in temp_roles if not x["ID"] == found_role["ID"]])
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def temppm(self, ctx, *, yes_no = None):
 		"""Sets whether to inform users that they've been given a temp role."""
 
@@ -192,7 +192,7 @@ class TempRole(commands.Cog):
 			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def autotemp(self, ctx, *, role = None):
 		"""Sets the temp role to apply to each new user that joins."""
 		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
@@ -216,7 +216,7 @@ class TempRole(commands.Cog):
 		msg = "**{}** is now the default temp role - will be active for *{}*.".format(Nullify.escape_all(role.name), ReadableTime.getReadableTimeBetween(0, role_time * 60))
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getautotemp(self, ctx):
 		"""Gets the temp role applied to each new user that joins."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -236,7 +236,7 @@ class TempRole(commands.Cog):
 		msg = "**{}** is the default temp role - will be active for *{}*.".format(Nullify.escape_all(temp_role.name), ReadableTime.getReadableTimeBetween(0, role_time * 60))
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def temptime(self, ctx, *, minutes = None):
 		"""Sets the number of minutes for the temp role - must be greater than 0 (admin-only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -256,7 +256,7 @@ class TempRole(commands.Cog):
 		msg = "Temp role will last *{}*.".format(ReadableTime.getReadableTimeBetween(0, minutes*60))
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hastemp(self, ctx, *, member = None):
 		"""Displays any temp roles the passed user has, and the remaining time."""
 		# Check for admin status
@@ -302,7 +302,7 @@ class TempRole(commands.Cog):
 				roleText = '{}**{}** (removed from server)\n'.format(roleText, arole['Name'])
 		await ctx.send(roleText)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addtemprole(self, ctx, *, role : str = None):
 		"""Adds a new role to the temp role list (admin only)."""
 		usage = 'Usage: `{}addtemprole [role]`'.format(ctx.prefix)
@@ -336,7 +336,7 @@ class TempRole(commands.Cog):
 		await ctx.message.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removetemprole(self, ctx, *, role : str = None):
 		"""Removes a role from the temp role list (admin only)."""
 		usage = 'Usage: `{}removetemprole [role]`'.format(ctx.prefix)
@@ -367,7 +367,7 @@ class TempRole(commands.Cog):
 		await ctx.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listtemproles(self, ctx):
 		"""Lists all roles for the temp role system."""
 		
@@ -412,7 +412,7 @@ class TempRole(commands.Cog):
 
 		await channel.send(roleText)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def untemp(self, ctx, member = None, role = None):
 		"""Removes the passed temp role from the passed user (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -478,7 +478,7 @@ class TempRole(commands.Cog):
 				pass
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def temp(self, ctx, member = None, role = None, *, cooldown = None):
 		"""Gives the passed member the temporary role for the passed amount of time - needs quotes around member and role (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

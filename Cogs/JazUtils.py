@@ -16,7 +16,7 @@ STATUSMAP2 = {discord.Status.online:':green_circle:',discord.Status.dnd:':no_ent
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(JazUtils(bot))
+	await bot.add_cog(JazUtils(bot))
 
 class JazUtils(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
@@ -25,7 +25,7 @@ class JazUtils(commands.Cog):
 		global DisplayName
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def snowflake(self, ctx, *, sid : str = None):
 		"""show the date a snowflake ID was created"""
 
@@ -35,7 +35,7 @@ class JazUtils(commands.Cog):
 		msg = "Snowflake created {}".format(cdate.strftime('%A, %B %d %Y at %H:%M:%S UTC'))
 		return await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def fullsnowflake(self, ctx, *, sid : str = None):
 		"""show all available data about a snowflake ID"""
 		sid = int(sid)
@@ -111,7 +111,7 @@ class JazUtils(commands.Cog):
 			embed = discord.Embed(title='{} page {:,}/{:,}'.format(title, index+1, len(pages)), description=page)
 			await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def roles(self, ctx, sort_order:str='name'):
 		"""Shows roles and their member counts. Takes one argument,
 		sort_order, which can be default, name, count, or rainbow."""
@@ -142,7 +142,7 @@ class JazUtils(commands.Cog):
 
 		await self.rolelist_paginate(ctx,sorted_list) # send the list to get actually printed to discord
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rolecall(self, ctx, *, rolename):
 		"""Counts the number of members with a specific role."""
 		check_role = DisplayName.roleForName(rolename,ctx.guild)
@@ -162,7 +162,7 @@ class JazUtils(commands.Cog):
 		embed.set_footer(text='ID: {}'.format(check_role.id))
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def whohas(self, ctx, *, rolename):
 		"""Lists the people who have the specified role alongside their online status.
 		Can take a -nick or -username argument to enhance output."""
@@ -201,12 +201,12 @@ class JazUtils(commands.Cog):
 		embed.set_footer(text='ID: {}'.format(check_role.id))
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rolecount(self, ctx):
 		"""Simply counts the number of roles on the server. (excluding @everyone)"""
 		await ctx.send('This server has {:,} total roles.'.format(len(ctx.guild.roles) - 1))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def emptyroles(self, ctx):
 		"""Shows a list of roles that have zero members."""
 

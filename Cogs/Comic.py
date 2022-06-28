@@ -10,7 +10,7 @@ from Cogs import DL, Message
 
 async def setup(bot):
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Comic(bot, settings))
+	await bot.add_cog(Comic(bot, settings))
 
 class Comic(commands.Cog):
 

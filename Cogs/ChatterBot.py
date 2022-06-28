@@ -8,7 +8,7 @@ async def setup(bot):
 	settings = bot.get_cog("Settings")
 	c_bot = ChatterBot(bot, settings)
 	c_bot._load()
-	bot.add_cog(c_bot)
+	await bot.add_cog(c_bot)
 	
 
 class ChatterBot(commands.Cog):
@@ -93,7 +93,7 @@ class ChatterBot(commands.Cog):
 		return { 'Ignore' : False, 'Delete' : False}
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setchatchannel(self, ctx, *, channel : discord.TextChannel = None):
 		"""Sets the channel for bot chatter."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -116,7 +116,7 @@ class ChatterBot(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def chat(self, ctx, *, message = None):
 		"""Chats with the bot."""
 		await self._chat(ctx, message)

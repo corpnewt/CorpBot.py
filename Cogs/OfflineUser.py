@@ -4,7 +4,7 @@ from   Cogs import Utils, DisplayName
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(OfflineUser(bot))
+	await bot.add_cog(OfflineUser(bot))
 
 # This is the OfflineUser module
 
@@ -52,7 +52,7 @@ class OfflineUser(commands.Cog):
 			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
 		await self._send_message(ctx, msg, True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remindoffline(self, ctx, *, yes_no = None):
 		"""Sets whether to inform users that pinged members are offline or not."""
 		if not await Utils.is_bot_admin_reply(ctx): return

@@ -6,7 +6,7 @@ from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickLis
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Humor(bot, settings))
+	await bot.add_cog(Humor(bot, settings))
 
 # This module is for random funny things I guess...
 
@@ -104,7 +104,7 @@ class Humor(commands.Cog):
 			"Sometimes I look for crawdads in the river. Don't tell Aunt Marnie... but I fed one to a cow once."
 		)
 					
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def zalgo(self, ctx, *, message = None):
 		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
 		if message == None: return await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))		
@@ -136,7 +136,7 @@ class Humor(commands.Cog):
 				for i, word in enumerate(words))
 		return zalgo
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def holy(self, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
 		
@@ -151,13 +151,13 @@ class Humor(commands.Cog):
 		msg = Utils.suppressed(ctx,msg)
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def fart(self, ctx):
 		"""PrincessZoey :P"""
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
 		await ctx.send(random.choice(fartList))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def french(self, ctx):
 		"""Speaking French... probably..."""
 		fr_list = [ "hon", "fromage", "baguette" ]
@@ -168,7 +168,7 @@ class Humor(commands.Cog):
 		totally_french = " ".join(fr_sentence) + random.choice(punct)
 		await ctx.send(totally_french)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def german(self, ctx):
 		"""Speaking German... probably..."""
 		de_list = [ "BIER", "sauerkraut", "auto", "weißwurst", "KRANKENWAGEN" ]
@@ -194,7 +194,7 @@ class Humor(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def memetemps(self, ctx):
 		"""Get Meme Templates"""
 		url = "https://api.imgflip.com/get_memes"
@@ -214,7 +214,7 @@ class Humor(commands.Cog):
 		result_json = await DL.async_post_json(url, payload)
 		return result_json["data"]["url"]
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def meme(self, ctx, template_id = None, *box_text):
 		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
 

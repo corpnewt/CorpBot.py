@@ -5,7 +5,7 @@ from Cogs import Message, DL, DisplayName, Utils
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Embed(bot, settings))
+    await bot.add_cog(Embed(bot, settings))
 
 class Embed(commands.Cog):
 

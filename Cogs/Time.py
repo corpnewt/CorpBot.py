@@ -14,7 +14,7 @@ from   Cogs import PickList
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Time(bot, settings))
+	await bot.add_cog(Time(bot, settings))
 
 class Time(commands.Cog):
 
@@ -27,7 +27,7 @@ class Time(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def settz(self, ctx, *, tz : str = None):
 		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DST."""
 		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list of available TimeZones with `{}listtz`'.format(ctx.prefix, ctx.prefix)
@@ -61,7 +61,7 @@ class Time(commands.Cog):
 		message = await ctx.send(msg)
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listtz(self, ctx, *, tz_search = None):
 		"""List all the supported TimeZones in PM."""
 
@@ -79,7 +79,7 @@ class Time(commands.Cog):
 		await Message.EmbedText(title=title, color=ctx.author, description=msg).send(ctx)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tz(self, ctx, *, member = None):
 		"""See a member's TimeZone."""
 		# Check if we're suppressing @here and @everyone mentions
@@ -111,7 +111,7 @@ class Time(commands.Cog):
 		await ctx.channel.send(msg)
 
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setoffset(self, ctx, *, offset : str = None):
 		"""Set your UTC offset."""
 
@@ -139,7 +139,7 @@ class Time(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def offset(self, ctx, *, member = None):
 		"""See a member's UTC offset."""
 
@@ -192,7 +192,7 @@ class Time(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def time(self, ctx, *, offset : str = None):
 		"""Get UTC time +- an offset."""
 		timezone = None

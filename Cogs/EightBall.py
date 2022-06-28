@@ -6,7 +6,7 @@ from   Cogs import Settings
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(EightBall(bot))
+	await bot.add_cog(EightBall(bot))
 
 class EightBall(commands.Cog):
 

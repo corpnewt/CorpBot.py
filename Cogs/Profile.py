@@ -6,7 +6,7 @@ from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message, Nullify
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Profile(bot, settings))
+	await bot.add_cog(Profile(bot, settings))
 
 # This is the profiles module.
 
@@ -21,7 +21,7 @@ class Profile(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addprofile(self, ctx, name = None, *, link = None):
 		"""Add a profile to your profile list."""
 		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
@@ -45,7 +45,7 @@ class Profile(commands.Cog):
 		await ctx.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removeprofile(self, ctx, *, name = None):
 		"""Remove a profile from your profile list."""
 		name = None if name == None else name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
@@ -116,17 +116,17 @@ class Profile(commands.Cog):
 		itemText += discord.utils.escape_markdown("\n".join([x["Name"] for x in itemList])) if raw else "\n".join([x["Name"] for x in itemList])
 		return await Message.Message(message=Utils.suppressed(ctx,itemText)).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def profile(self, ctx, *, member = None, name = None):
 		"""Retrieve a profile from the passed user's profile list."""
 		await self._get_profile_reply(ctx,member)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawprofile(self, ctx, *, member = None, name = None):
 		"""Retrieve a profile's raw markdown from the passed user's profile list."""
 		await self._get_profile_reply(ctx,member,raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def profileinfo(self, ctx, *, member = None, name = None):
 		"""Displays info about a profile from the passed user's profile list."""
 		if not member:
@@ -144,12 +144,12 @@ class Profile(commands.Cog):
 			msg += "Updated: {} ago\n".format(ReadableTime.getReadableTimeBetween(item["Updated"], current_time, True))
 		return await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def profiles(self, ctx, *, member = None):
 		"""List all profiles in the passed user's profile list."""
 		await self._list_profiles(ctx,member)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawprofiles(self, ctx, *, member = None):
 		"""List all profiles' raw markdown in the passed user's profile list."""
 		await self._list_profiles(ctx,member,raw=True)

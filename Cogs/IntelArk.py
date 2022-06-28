@@ -6,7 +6,7 @@ import re
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(IntelArk(bot))
+	await bot.add_cog(IntelArk(bot))
 	
 class IntelArk(commands.Cog):
     
@@ -35,7 +35,7 @@ class IntelArk(commands.Cog):
 		]
 		self.match_threshold = 0.5 # Lower match limit before showing only those that matched
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command()
 	async def iark(self, ctx, *, text : str = None):
 		"""Search Ark for Intel CPU info."""
 

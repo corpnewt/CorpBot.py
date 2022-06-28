@@ -5,7 +5,7 @@ from   Cogs import Message
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(PciUsb(bot))
+	await bot.add_cog(PciUsb(bot))
 
 class PciUsb(commands.Cog):
 
@@ -13,7 +13,7 @@ class PciUsb(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def pci(self, ctx, ven_dev = None):
 		"""Searches pci-ids.ucw.cz for the passed PCI ven:dev id."""
 		if not ven_dev:
@@ -62,7 +62,7 @@ class PciUsb(commands.Cog):
 		# Got data
 		await Message.EmbedText(description="`{}`\n\n{}".format(ven_dev,out),title="{} PCI Device Results".format(vendor),footer="Powered by http://pci-ids.ucw.cz",color=ctx.author).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def usb(self, ctx, ven_dev = None):
 		"""Searches usb-ids.gowdy.us for the passed USB ven:dev id."""
 		if not ven_dev:

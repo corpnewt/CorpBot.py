@@ -6,7 +6,7 @@ from   Cogs import Utils, GetImage, Message, DisplayName
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Giphy(bot, settings))
+	await bot.add_cog(Giphy(bot, settings))
 
 class Giphy(commands.Cog):
 
@@ -34,7 +34,7 @@ class Giphy(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addgif(self, ctx, *, role : str = None):
 		"""Adds a new role to the gif list (admin only)."""
 		usage = 'Usage: `{}addgif [role]`'.format(ctx.prefix)
@@ -61,7 +61,7 @@ class Giphy(commands.Cog):
 		msg = '**{}** added to list.'.format(role.name)
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removegif(self, ctx, *, role : str = None):
 		"""Removes a role from the gif list (admin only)."""
 		usage = 'Usage: `{}removegif [role]`'.format(ctx.prefix)
@@ -90,7 +90,7 @@ class Giphy(commands.Cog):
 		msg = '**{}** not found in list.'.format(role)
 		await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listgif(self, ctx):
 		"""Lists gif roles and id's."""
 		promoArray = self.settings.getServerStat(ctx.guild, "GifArray")
@@ -104,7 +104,7 @@ class Giphy(commands.Cog):
 			roleText += "**{}** (removed from server)\n".format(arole["Name"]) if role is None else "**{}** (ID : `{}`)\n".format(role.name, arole["ID"])
 		await ctx.send(Utils.suppressed(ctx,roleText))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def gif(self, ctx, *, gif = None):
 		"""Search for some giphy!"""
 		if not Utils.is_bot_admin(ctx):

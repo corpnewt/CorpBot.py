@@ -5,7 +5,7 @@ from   Cogs import Message, PickList, DL
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Weather(bot))
+	await bot.add_cog(Weather(bot))
 
 # This is the Weather module
 class Weather(commands.Cog):
@@ -58,7 +58,7 @@ class Weather(commands.Cog):
 	def _k_to_f(self, k):
 		return self._c_to_f(self._k_to_c(int(k)))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
 		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 		(F)ahrenheit
@@ -141,7 +141,7 @@ class Weather(commands.Cog):
 		)
 		return desc
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def weather(self, ctx, *, city_name = None):
 		"""Gets some weather."""
 		if city_name == None:
@@ -169,7 +169,7 @@ class Weather(commands.Cog):
 			footer="Powered by OpenWeatherMap"
 		).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def forecast(self, ctx, *, city_name = None):
 		"""Gets some weather, for 5 days or whatever."""
 		if city_name == None:

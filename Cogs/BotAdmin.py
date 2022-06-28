@@ -6,7 +6,7 @@ from   Cogs import Utils, DisplayName, Message, PickList
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(BotAdmin(bot, settings))
+	await bot.add_cog(BotAdmin(bot, settings))
 
 class BotAdmin(commands.Cog):
 

@@ -8,7 +8,7 @@ async def setup(bot):
     # This module isn't actually a cog - but it is a place
     # we can start small fires and watch them burn the entire
     # house to the ground.
-    bot.add_cog(DisplayName(bot))
+    await bot.add_cog(DisplayName(bot))
 
 class DisplayName(commands.Cog):
     def __init__(self,bot):

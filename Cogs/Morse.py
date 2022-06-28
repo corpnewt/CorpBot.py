@@ -10,7 +10,7 @@ from   Cogs import Utils
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Morse(bot, settings))
+	await bot.add_cog(Morse(bot, settings))
 
 class Morse(commands.Cog):
 
@@ -60,7 +60,7 @@ class Morse(commands.Cog):
 			}
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def morsetable(self, ctx, num_per_row = None):
 		"""Prints out the morse code lookup table."""
 		try:
@@ -93,7 +93,7 @@ class Morse(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def morse(self, ctx, *, content = None):
 		"""Converts ascii to morse code.  Accepts a-z and 0-9.  Each letter is comprised of "-" or "." and separated by 1 space.  Each word is separated by 4 spaces."""
 
@@ -128,7 +128,7 @@ class Morse(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def unmorse(self, ctx, *, content = None):
 		"""Converts morse code to ascii.  Each letter is comprised of "-" or "." and separated by 1 space.  Each word is separated by 4 spaces."""
 

@@ -8,7 +8,7 @@ from   Cogs import PickList
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Wiki(bot))
+	await bot.add_cog(Wiki(bot))
 
 # This is the Face module. It sends faces.
 
@@ -18,7 +18,7 @@ class Wiki(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def wiki(self, ctx, *, search : str = None):
 		"""Search Wikipedia!"""
 		if search == None:

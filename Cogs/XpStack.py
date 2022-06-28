@@ -13,7 +13,7 @@ from   Cogs import Message
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(XpStack(bot, settings))
+	await bot.add_cog(XpStack(bot, settings))
 
 # This is the xp module.  It's likely to be retarded.
 
@@ -40,7 +40,7 @@ class XpStack(commands.Cog):
 			return
 		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearallxp(self, ctx):
 		"""Clears all xp transactions from the transaction list for all servers (owner-only)."""
 		# Only allow owner
@@ -58,7 +58,7 @@ class XpStack(commands.Cog):
 		
 		await ctx.send("All xp transactions from the transaction list for all servers cleared!")
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setxpcount(self, ctx, count = None):
 		"""Sets the number of xp transactions to keep (default is 10)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -85,7 +85,7 @@ class XpStack(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "XP Count", count)
 		await ctx.send("Set the xp count to {}.".format(count))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpcount(self, ctx, count = None):
 		"""Returns the number of xp transactions to keep (default is 10)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -97,7 +97,7 @@ class XpStack(commands.Cog):
 		await ctx.send("The current number of xp transactions to save is {}.".format(num))
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearxp(self, ctx):
 		"""Clears the xp transaction list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -113,7 +113,7 @@ class XpStack(commands.Cog):
 			await ctx.send("Cleared {} entries from the xp transactions list.".format(len(xp_array)))
 
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def checkxp(self, ctx):
 		"""Displays the last xp transactions (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

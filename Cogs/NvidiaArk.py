@@ -8,7 +8,7 @@ import re
 
 async def setup(bot):
     # Add the bot
-    bot.add_cog(NvidiaArk(bot))
+    await bot.add_cog(NvidiaArk(bot))
 
 
 class NvidiaArk(commands.Cog):

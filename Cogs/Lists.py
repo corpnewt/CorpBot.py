@@ -5,7 +5,7 @@ from   Cogs import Utils, ReadableTime, DisplayName, FuzzySearch, Message, PickL
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Lists(bot, settings))
+	await bot.add_cog(Lists(bot, settings))
 
 # This is the lists module.
 
@@ -274,42 +274,42 @@ class Lists(commands.Cog):
 	## Link-related Methods ##
 	###                    ###
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addlink(self, ctx, name : str = None, *, link : str = None):
 		"""Add a link to the link list."""
 		await self._add_item(ctx,name,link,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removelink(self, ctx, *, name : str = None):
 		"""Remove a link from the link list."""
 		await self._remove_item(ctx,name,**self.presets["Link"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def link(self, ctx, *, name : str = None):
 		"""Retrieve a link from the link list."""
 		await self._get_item(ctx,name,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawlink(self, ctx, *, name : str = None):
 		"""Retrieve a link's raw markdown from the link list."""
 		await self._get_item(ctx,name,**self.presets["Link"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def linkinfo(self, ctx, *, name : str = None):
 		"""Displays info about a link from the link list."""
 		await self._item_info(ctx,name,**self.presets["Link"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def links(self, ctx):
 		"""List all links in the link list."""
 		await self._list_items(ctx,self.link,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawlinks(self, ctx):
 		"""List raw markdown of all links in the link list."""
 		await self._list_items(ctx,self.link,**self.presets["Link"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def linkrole(self, ctx):
 		"""Lists the required role to add links."""
 		await self._get_role(ctx,**self.presets["Link"])
@@ -318,42 +318,42 @@ class Lists(commands.Cog):
 	## Hack-related Methods ##
 	###                    ###
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addhack(self, ctx, name : str = None, *, hack : str = None):
 		"""Add a hack to the hack list."""
 		await self._add_item(ctx,name,hack,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removehack(self, ctx, *, name : str = None):
 		"""Remove a hack from the hack list."""
 		await self._remove_item(ctx,name,**self.presets["Hack"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hack(self, ctx, *, name : str = None):
 		"""Retrieve a hack from the hack list."""
 		await self._get_item(ctx,name,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawhack(self, ctx, *, name : str = None):
 		"""Retrieve a hack's raw markdown from the hack list."""
 		await self._get_item(ctx,name,**self.presets["Hack"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hackinfo(self, ctx, *, name : str = None):
 		"""Displays info about a hack from the hack list."""
 		await self._item_info(ctx,name,**self.presets["Hack"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hacks(self, ctx):
 		"""List all hack in the hack list."""
 		await self._list_items(ctx,self.hack,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawhacks(self, ctx):
 		"""List raw markdown of all hacks in the hack list."""
 		await self._list_items(ctx,self.hack,**self.presets["Hack"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hackrole(self, ctx):
 		"""Lists the required role to add hacks."""
 		await self._get_role(ctx,**self.presets["Hack"])
@@ -362,42 +362,42 @@ class Lists(commands.Cog):
 	## Tag-related Methods ##
 	###                   ###
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addtag(self, ctx, name : str = None, *, tag : str = None):
 		"""Add a tag to the tag list."""
 		await self._add_item(ctx,name,tag,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removetag(self, ctx, *, name : str = None):
 		"""Remove a tag from the tag list."""
 		await self._remove_item(ctx,name,**self.presets["Tag"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tag(self, ctx, *, name : str = None):
 		"""Retrieve a tag from the tag list."""
 		await self._get_item(ctx,name,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawtag(self, ctx, *, name : str = None):
 		"""Retrieve a tag's raw markdown from the tag list."""
 		await self._get_item(ctx,name,**self.presets["Tag"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def taginfo(self, ctx, *, name : str = None):
 		"""Displays info about a tag from the tag list."""
 		await self._item_info(ctx,name,**self.presets["Tag"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tags(self, ctx):
 		"""List all tag in the tag list."""
 		await self._list_items(ctx,self.tag,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawtags(self, ctx):
 		"""List raw markdown of all tags in the tag list."""
 		await self._list_items(ctx,self.tag,**self.presets["Tag"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tagrole(self, ctx):
 		"""Lists the required role to add tags."""
 		await self._get_role(ctx,**self.presets["Tag"])
@@ -406,7 +406,7 @@ class Lists(commands.Cog):
 	## Parts-related Methods ##
 	###                     ###
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def parts(self, ctx, *, member = None):
 		"""Retrieve a member's parts list. DEPRECATED - Use hw instead."""
 		if member is None:
@@ -425,7 +425,7 @@ class Lists(commands.Cog):
 		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawparts(self, ctx, *, member = None):
 		"""Retrieve the raw markdown for a member's parts list. DEPRECATED - Use rawhw instead."""
 		if member is None:
@@ -444,7 +444,7 @@ class Lists(commands.Cog):
 		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setparts(self, ctx, *, parts : str = None):
 		"""Set your own parts - can be a url, formatted text, or nothing to clear. DEPRECATED - Use newhw instead."""
 		if not parts:
@@ -453,13 +453,13 @@ class Lists(commands.Cog):
 		msg = '*{}\'s* parts have been set to (DEPRECATED - Use {}newhw instead):\n{}'.format(DisplayName.name(ctx.author), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
 		msg = '\{}setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'.format(ctx.prefix)	
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def online(self, ctx):
 		"""Lists the number of users online."""
 		members = membersOnline = bots = botsOnline = 0
@@ -482,7 +482,7 @@ class Lists(commands.Cog):
 			],
 			color=ctx.author).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lastonline(self, ctx, *, member = None):
 		"""Lists the last time a user was online if known."""
 		if not member:

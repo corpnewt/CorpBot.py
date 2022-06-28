@@ -5,7 +5,7 @@ from   Cogs import Utils, DisplayName, Xp
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Promote(bot, settings))
+    await bot.add_cog(Promote(bot, settings))
 
 # This module is for auto promoting/demoting of roles - admin only
 
@@ -27,7 +27,7 @@ class Promote(commands.Cog):
         if reply: await ctx.send("You do not have sufficient privileges to access this command.")
         return False
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def promote(self, ctx, *, member = None):
         """Auto-adds the required xp to promote the passed user to the next role (admin only)."""
         # Only allow admins to change server stats
@@ -75,7 +75,7 @@ class Promote(commands.Cog):
             self.bot.dispatch("xp", member, ctx.author, neededXp)
         await ctx.send(Utils.suppressed(ctx,msg))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def promoteto(self, ctx, *, member = None, role = None):
         """Auto-adds the required xp to promote the passed user to the passed role (admin only)."""
         if not await self._can_run(ctx): return
@@ -166,7 +166,7 @@ class Promote(commands.Cog):
             self.bot.dispatch("xp", member, ctx.author, neededXp)
         return await ctx.send(Utils.suppressed(ctx,msg))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def demote(self, ctx, *, member = None):
         """Auto-removes the required xp to demote the passed user to the previous role (admin only)."""
         if not await self._can_run(ctx): return 
@@ -229,7 +229,7 @@ class Promote(commands.Cog):
             self.bot.dispatch("xp", member, ctx.author, neededXp)
         return await ctx.send(Utils.suppressed(ctx,msg))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def demoteto(self, ctx, *, member = None, role = None):
         """Auto-removes the required xp to demote the passed user to the passed role (admin only)."""
         if not await self._can_run(ctx): return

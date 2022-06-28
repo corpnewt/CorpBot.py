@@ -14,7 +14,7 @@ async def setup(bot):
 		settings = bot.get_cog("Settings")
 	except:
 		settings = None
-	bot.add_cog(CogManager(bot, settings))
+	await bot.add_cog(CogManager(bot, settings))
 
 class CogManager(commands.Cog):
 
@@ -87,12 +87,12 @@ class CogManager(commands.Cog):
 			# Load them all!
 			for x in self.preloads:
 				if x in self.bot.extensions:
-					self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
+					await self.bot.dispatch("unloaded_extension", self.bot.extensions.get(x))
 					try: await self.bot.unload_extension(x)
 					except: print("{} failed to unload!".format(x))
 				try:
 					await self.bot.load_extension(x)
-					self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
+					await self.bot.dispatch("loaded_extension", self.bot.extensions.get(x))
 				except: print("{} failed to load!".format(x))
 			cog_count = len(self.preloads) # Assumes the prior 2 loaded correctly
 			cog_loaded = len(self.preloads) # Again, assumes success above
@@ -106,16 +106,16 @@ class CogManager(commands.Cog):
 					try:
 						# Only unload if loaded
 						if "Cogs."+ext[:-3] in self.bot.extensions:
-							self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
-							self.bot.unload_extension("Cogs."+ext[:-3])
+							await self.bot.dispatch("unloaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+							await self.bot.unload_extension("Cogs."+ext[:-3])
 					except Exception as e:
 						print("{} failed to unload!".format(ext[:-3]))
 						print("    {}".format(e))
 						pass
 					# Try to load
 					try:
-						self.bot.load_extension("Cogs." + ext[:-3])
-						self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
+						await self.bot.load_extension("Cogs." + ext[:-3])
+						await self.bot.dispatch("loaded_extension", self.bot.extensions.get("Cogs."+ext[:-3]))
 						cog_loaded += 1
 					except Exception as e:
 						print("{} failed to load!".format(ext[:-3]))
@@ -184,7 +184,7 @@ class CogManager(commands.Cog):
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def imports(self, ctx, *, extension = None):
 		"""Outputs the extensions imported by the passed extension."""
 		if extension == None:
@@ -206,7 +206,7 @@ class CogManager(commands.Cog):
 		await cxt.send("I couldn't find that extension...")
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def extension(self, ctx, *, extension = None):
 		"""Outputs the cogs attatched to the passed extension."""
 		if extension == None:
@@ -253,7 +253,7 @@ class CogManager(commands.Cog):
 		await ctx.send("I couldn't find that extension.")
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def extensions(self, ctx):
 		"""Lists all extensions and their corresponding cogs."""
 		# Build the embed
@@ -326,7 +326,7 @@ class CogManager(commands.Cog):
 			await self._send_embed(ctx, help_embed, to_pm)
 		
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def reload(self, ctx, *, extension = None):
 		"""Reloads the passed extension - or all if none passed."""
 		# Only allow owner
@@ -356,7 +356,7 @@ class CogManager(commands.Cog):
 			e_string = "extension" if result[1] == 1 else "extensions"
 			await message.edit(content="{}/{} connected {} reloaded!".format(result[0], result[1], e_string))
 				
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def update(self, ctx, reset=None):
 		"""Updates from git, pass "reset" or "-reset" to this command to first run "git reset --hard" (owner only)."""
 		isOwner = self.settings.isOwner(ctx.author)

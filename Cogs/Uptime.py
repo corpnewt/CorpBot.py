@@ -7,7 +7,7 @@ from   Cogs import ReadableTime
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Uptime(bot))
+	await bot.add_cog(Uptime(bot))
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
@@ -18,7 +18,7 @@ class Uptime(commands.Cog):
 		self.bot = bot
 		self.startTime = int(time.time())
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def uptime(self, ctx):
 		"""Lists the bot's uptime."""
 		currentTime = int(time.time())

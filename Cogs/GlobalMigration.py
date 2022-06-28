@@ -8,7 +8,7 @@ from   discord.ext import commands
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(GlobalMigration(bot, settings))
+	await bot.add_cog(GlobalMigration(bot, settings))
 
 # This is the GlobalMigration module.
 
@@ -20,7 +20,7 @@ class GlobalMigration(commands.Cog):
 		self.settings = settings
 
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def clearlocal(self, ctx, setting = None):
 		"""Clears a local setting from a user."""
 		# Only allow owner
@@ -47,7 +47,7 @@ class GlobalMigration(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True, hidden=True)
+	@commands.command()
 	async def migrate(self, ctx, setting = None):
 		"""Migrates a local setting to global (owner only)."""
 		# Only allow owner

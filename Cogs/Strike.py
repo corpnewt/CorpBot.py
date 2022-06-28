@@ -13,7 +13,7 @@ async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	mute     = bot.get_cog("Mute")
-	bot.add_cog(Strike(bot, settings, mute))
+	await bot.add_cog(Strike(bot, settings, mute))
 
 # This is the Strike module. It keeps track of warnings and kicks/bans accordingly
 
@@ -109,7 +109,7 @@ class Strike(commands.Cog):
 		self.settings.setUserStat(member, member.guild, "Strikes", strikes)
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def strike(self, ctx, member : discord.Member = None, days = None, *, message : str = None):
 		"""Give a user a strike (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -240,7 +240,7 @@ class Strike(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def strikes(self, ctx, *, member = None):
 		"""Check a your own, or another user's total strikes (bot-admin needed to check other users)."""
 
@@ -325,7 +325,7 @@ class Strike(commands.Cog):
 		await ctx.channel.send(embed=stat_embed)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removestrike(self, ctx, *, member = None):
 		"""Removes a strike given to a member (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -365,7 +365,7 @@ class Strike(commands.Cog):
 		await ctx.channel.send('*{}* has one less strike.  They are down to *{}*.'.format(DisplayName.name(member), len(strikes)))
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setstrikelevel(self, ctx, *, member = None, strikelevel : int = None):
 		"""Sets the strike level of the passed user (bot-admin only)."""
 
@@ -406,9 +406,7 @@ class Strike(commands.Cog):
 		msg = '*{}\'s* strike level has been set to *{}!*'.format(DisplayName.name(member), strikelevel)
 		await ctx.channel.send(msg)
 
-
-
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addkick(self, ctx, *, member = None):
 		"""Adds the passed user to the kick list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -438,7 +436,7 @@ class Strike(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removekick(self, ctx, *, member = None):
 		"""Removes the passed user from the kick list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -469,7 +467,7 @@ class Strike(commands.Cog):
 
 	
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addban(self, ctx, *, member = None):
 		"""Adds the passed user to the ban list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -499,7 +497,7 @@ class Strike(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removeban(self, ctx, *, member = None):
 		"""Removes the passed user from the ban list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -528,7 +526,7 @@ class Strike(commands.Cog):
 		
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def iskicked(self, ctx, *, member = None):
 		"""Lists whether the user is in the kick list."""
 		if member == None:
@@ -549,7 +547,7 @@ class Strike(commands.Cog):
 			msg = '*{}* is **not** in the kick list.'.format(DisplayName.name(member))
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def isbanned(self, ctx, *, member = None):
 		"""Lists whether the user is in the ban list."""
 		if member == None:
@@ -570,14 +568,14 @@ class Strike(commands.Cog):
 			msg = '*{}* is **not** in the ban list.'.format(DisplayName.name(member))
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def strikelimit(self, ctx):
 		"""Lists the number of strikes before advancing to the next consequence."""
 		strikeout = int(self.settings.getServerStat(ctx.message.guild, "StrikeOut"))
 		msg = '*{}* strikes are required to strike out.'.format(strikeout)
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setstrikelimit(self, ctx, limit = None):
 		"""Sets the number of strikes before advancing to the next consequence (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

@@ -7,7 +7,7 @@ from   Cogs import Settings, DisplayName, Message, Nullify, Utils
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Stream(bot, settings))
+    await bot.add_cog(Stream(bot, settings))
 
 class Stream(commands.Cog):
 
@@ -62,7 +62,7 @@ class Stream(commands.Cog):
         # Let's regex and replace [[user]] [[atuser]] and [[server]]
         await self._stream_message(after, message, channel)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setstream(self, ctx, *, message = None):
         """Sets the stream announcement message (bot-admin only).
         Available Options:
@@ -90,7 +90,7 @@ class Stream(commands.Cog):
         else:
             await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def teststream(self, ctx):
         """Tests the stream announcement message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -105,7 +105,7 @@ class Stream(commands.Cog):
         else:
             await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def rawstream(self, ctx):
         """Displays the raw markdown for the stream announcement message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -147,7 +147,7 @@ class Stream(commands.Cog):
         am = discord.AllowedMentions.none() if test else discord.AllowedMentions.all()
         await dest.send(message,allowed_mentions=am)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def addstreamer(self, ctx, *, member = None):
         """Adds the passed member to the streamer list (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -164,7 +164,7 @@ class Stream(commands.Cog):
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
         await ctx.send("{} added to the stream list!".format(DisplayName.name(mem)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def remstreamer(self, ctx, *, member = None):
         """Removes the passed member from the streamer list (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -181,7 +181,7 @@ class Stream(commands.Cog):
         self.settings.setServerStat(ctx.guild, "StreamList", stream_list)
         await ctx.send("{} removed from the stream list!".format(DisplayName.name(mem)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def streamers(self, ctx):
         """Lists the current members in the streamer list."""
         stream_list = self.settings.getServerStat(ctx.guild, "StreamList")
@@ -196,7 +196,7 @@ class Stream(commands.Cog):
         stream_string = "\n".join(streamers)
         await Message.Message(message=stream_string, header="__Streamer List:__\n```\n", footer="```").send(ctx)
         
-    @commands.command(pass_context=True)
+    @commands.command()
     async def streamchannel(self, ctx):
         """Displays the channel for the stream announcements - if any."""
         
@@ -208,7 +208,7 @@ class Stream(commands.Cog):
             return await ctx.send("The stream announcement channel (`{}`) no longer exists on this server.".format(chan))
         await ctx.send("Stream announcements will be displayed in {}.".format(channel.mention))
         
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setstreamchannel(self, ctx, *, channel : discord.TextChannel = None):
         """Sets the channel for the stream announcements (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return

@@ -7,7 +7,7 @@ async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	mute     = bot.get_cog("Mute")
-	bot.add_cog(Fliptime(bot, settings, mute))
+	await bot.add_cog(Fliptime(bot, settings, mute))
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
@@ -76,7 +76,7 @@ class Fliptime(commands.Cog):
 
 		return { 'Ignore' : False, 'Delete' : False}
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tableflip(self, ctx, *, yes_no = None):
 		"""Turns on/off table flip muting (bot-admin only; always off by default)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

@@ -5,7 +5,7 @@ from   Cogs import Utils, DisplayName, DL
 async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
-	bot.add_cog(SecretSanta(bot,settings))
+	await bot.add_cog(SecretSanta(bot,settings))
 
 class SecretSanta(commands.Cog):
 

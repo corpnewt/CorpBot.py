@@ -7,7 +7,7 @@ from Cogs import Utils, DisplayName, Nullify
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Welcome(bot, settings))
+    await bot.add_cog(Welcome(bot, settings))
 
 class Welcome(commands.Cog):
 
@@ -59,7 +59,7 @@ class Welcome(commands.Cog):
                 targetChan = tChan
         return targetChan
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setwelcome(self, ctx, *, message = None):
         """Sets the welcome message for your server (bot-admin only). 
         Available Options:
@@ -92,7 +92,7 @@ class Welcome(commands.Cog):
                 msg = 'There is *no channel* set for welcome messages.'
         await ctx.send(msg)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def testwelcome(self, ctx, *, member = None):
         """Prints the current welcome message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -124,7 +124,7 @@ class Welcome(commands.Cog):
         await ctx.send(msg)
         
         
-    @commands.command(pass_context=True)
+    @commands.command()
     async def rawwelcome(self, ctx, *, member = None):
         """Prints the current welcome message's markdown (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -158,7 +158,7 @@ class Welcome(commands.Cog):
         await ctx.send(msg)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setgoodbye(self, ctx, *, message = None):
         """Sets the goodbye message for your server (bot-admin only).
         Available Options:
@@ -192,7 +192,7 @@ class Welcome(commands.Cog):
         await ctx.send(msg)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def testgoodbye(self, ctx, *, member = None):
         """Prints the current goodbye message (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -225,7 +225,7 @@ class Welcome(commands.Cog):
         await ctx.send(msg)
         
         
-    @commands.command(pass_context=True)
+    @commands.command()
     async def rawgoodbye(self, ctx, *, member = None):
         """Prints the current goodbye message's markdown (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -293,7 +293,7 @@ class Welcome(commands.Cog):
     async def _goodbye(self, member, server, channel = None, allow_mentions = False):
         await self._send_greeting(member,server,channel,"Goodbye",allow_mentions)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setwelcomechannel(self, ctx, *, channel : discord.TextChannel = None):
         """Sets the channel for the welcome and goodbye messages (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return

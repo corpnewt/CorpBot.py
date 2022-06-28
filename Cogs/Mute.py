@@ -6,7 +6,7 @@ from Cogs import Utils, DisplayName, ReadableTime
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Mute(bot, settings))
+    await bot.add_cog(Mute(bot, settings))
 
 class Mute(commands.Cog):
 
@@ -267,7 +267,7 @@ class Mute(commands.Cog):
                 try: await channel.set_permissions(mute_role, overwrite=overs if other_perms or not desync else None)
                 except: pass
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setmuterole(self, ctx, *, role = None):
         """Sets the target role to apply when muting.  Passing nothing will disable the mute role and remove send_messages, add_reactions, and speak overrides (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -293,7 +293,7 @@ class Mute(commands.Cog):
         await self._ask_perms(ctx,target_role,desync=False,show_count=True)
         await ctx.send("The mute role has been set to **{}**!".format(Utils.suppressed(ctx,target_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def muterole(self, ctx):
         """Lists the target role to apply when muting (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -305,7 +305,7 @@ class Mute(commands.Cog):
         if not mute_role: return await ctx.send("The prior mute role (ID: `{}`) no longer exists.  You can set one with `{}setmuterole [role]` - or have me create one with `{}createmuterole [role_name]`".format(role,ctx.prefix,ctx.prefix))
         await ctx.send("Muted users will be given **{}**.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def createmuterole(self, ctx, *, role_name = None):
         """Sets the target role to apply when muting (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -334,7 +334,7 @@ class Mute(commands.Cog):
         self.settings.setServerStat(ctx.guild,"MuteRole",mute_role.id)
         await message.edit(content="Muted users will be given **{}**.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def syncmuterole(self, ctx):
         """Ensures that the mute role has the send_messages, add_reactions, and speak overrides disabled in all channels (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -349,7 +349,7 @@ class Mute(commands.Cog):
         await self._sync_perms(ctx,mute_role)
         await message.edit(content="**{}** has been synced for muting.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def desyncmuterole(self, ctx):
         """Removes send_messages, add_reactions, and speak overrides from the mute role - helpful if you plan to repurpose the existing mute role (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -370,7 +370,7 @@ class Mute(commands.Cog):
         if not await Utils.is_bot_admin_reply(ctx): return
         await ctx.send(Utils.yes_no_setting(ctx,"Muted user auto-delete","MuteAutoDelete",yes_no=yes_no,default=True))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def mute(self, ctx, *, member = None, cooldown = None):
         """Prevents a member from sending messages in chat or speaking in voice (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -449,7 +449,7 @@ class Mute(commands.Cog):
             # pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         await mess.edit(content=Utils.suppressed(ctx,msg))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def unmute(self, ctx, *, member = None):
         """Allows a muted member to send messages in chat (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -468,7 +468,7 @@ class Mute(commands.Cog):
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ismuted(self, ctx, *, member = None):
         """Says whether a member is muted in chat."""
         if member == None:

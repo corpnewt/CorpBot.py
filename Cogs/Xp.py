@@ -9,7 +9,7 @@ from   Cogs import Settings, DisplayName, Nullify, CheckRoles, UserTime, Message
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Xp(bot, settings))
+	await bot.add_cog(Xp(bot, settings))
 
 # This is the xp module.  It's likely to be retarded.
 
@@ -215,7 +215,7 @@ class Xp(commands.Cog):
 		print("XP Done - took {} seconds.".format(time.time() - t))
 		return responses
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
 
@@ -479,7 +479,7 @@ class Xp(commands.Cog):
 		msg = 'xp Error: {}'.format(error)
 		await ctx.channel.send(msg)'''
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def defaultrole(self, ctx):
 		"""Lists the default role that new users are assigned."""
 
@@ -504,7 +504,7 @@ class Xp(commands.Cog):
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await ctx.message.channel.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def gamble(self, ctx, bet : int = None):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
@@ -633,7 +633,7 @@ class Xp(commands.Cog):
 			
 		await ctx.message.channel.send(msg)
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def recheckroles(self, ctx):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
@@ -679,7 +679,7 @@ class Xp(commands.Cog):
 			await message.edit(content='Done checking roles.\n\n*{:,} users* updated.'.format(changeCount))
 			#await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def recheckrole(self, ctx, *, user : discord.Member = None):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
@@ -705,7 +705,7 @@ class Xp(commands.Cog):
 
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 		
@@ -762,7 +762,7 @@ class Xp(commands.Cog):
 		await channel.send(roleText)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rank(self, ctx, *, member = None):
 		"""Say the highest rank of a listed member."""
 
@@ -843,19 +843,19 @@ class Xp(commands.Cog):
 		).pick()
 
 	# List the top 10 xp-holders
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def leaderboard(self, ctx):
 		"""List the top xp-holders."""
 		return await self._show_xp(ctx,reverse=True)
 		
 	# List the top 10 xp-holders
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def bottomxp(self, ctx):
 		"""List the bottom xp-holders."""
 		return await self._show_xp(ctx,reverse=False)
 		
 	# List the xp and xp reserve of a user
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
 		
@@ -1013,7 +1013,7 @@ class Xp(commands.Cog):
 
 
 	# List the xp and xp reserve of a user
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpinfo(self, ctx):
 		"""Gives a quick rundown of the xp system."""
 

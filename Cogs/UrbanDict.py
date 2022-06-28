@@ -6,7 +6,7 @@ from   Cogs import Settings, PickList, Nullify, DL
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(UrbanDict(bot, settings))
+	await bot.add_cog(UrbanDict(bot, settings))
 
 # This module grabs Urban Dictionary definitions
 
@@ -33,7 +33,7 @@ class UrbanDict(commands.Cog):
 			value = value.replace(match,"__{}({})__".format(match,"https://www.urbandictionary.com/define.php?term={}".format(quote(match[1:-1]))))
 		return value
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def define(self, ctx, *, word : str = None):
 		"""Gives the definition of the word passed."""
 
@@ -52,7 +52,7 @@ class UrbanDict(commands.Cog):
 		words.sort(key=lambda x:x["sort"],reverse=True)
 		return await PickList.PagePicker(title="Results For: {}".format(string.capwords(word)),list=words,ctx=ctx,max=1,url=theJSON[0]["permalink"]).pick()
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def randefine(self, ctx):
 		"""Gives a random word and its definition."""
 

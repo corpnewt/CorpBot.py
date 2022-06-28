@@ -6,7 +6,7 @@ from   Cogs import Utils, Message, PCPP
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Server(bot, settings))
+	await bot.add_cog(Server(bot, settings))
 
 # This module sets/gets some server info
 
@@ -366,7 +366,7 @@ class Server(commands.Cog):
 		self.loop_list.append(self.bot.loop.create_task(self.check_poll(ctx.guild, poll)))
 		await ctx.send("Poll has ended.")
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setprefix(self, ctx, *, prefix : str = None):
 		"""Sets the bot's prefix (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -381,7 +381,7 @@ class Server(commands.Cog):
 			msg = 'Custom server prefix is now: {}'.format(prefix)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getprefix(self, ctx):
 		"""Output's the server's prefix - custom or otherwise."""
 		# Get the current prefix
@@ -390,7 +390,7 @@ class Server(commands.Cog):
 		msg = 'Prefix{}: {}'.format("es are" if len(prefix) > 1 else " is",prefixlist)
 		await ctx.send(msg)
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def autopcpp(self, ctx, *, setting : str = None):
 		"""Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). Setting can be normal, md, mdblock, bold, bolditalic, or nothing."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -417,7 +417,7 @@ class Server(commands.Cog):
 			msg = "That's not one of the options."
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setinfo(self, ctx, *, word : str = None):
 		"""Sets the server info (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -427,7 +427,7 @@ class Server(commands.Cog):
 		msg = "Server info *{}*.".format("updated" if word else "removed")
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def info(self, ctx):
 		"""Displays the server info if any."""
 		serverInfo = self.settings.getServerStat(ctx.guild, "Info")
@@ -436,7 +436,7 @@ class Server(commands.Cog):
 			msg = '*{}*:\n\n{}'.format(ctx.guild.name, serverInfo)
 		await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dumpservers(self, ctx):
 		"""Dumps a timpestamped list of servers into the same directory as the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
@@ -458,7 +458,7 @@ class Server(commands.Cog):
 		await message.edit(content='Uploaded *{}!*'.format(serverFile))
 		os.remove(serverFile)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def leaveserver(self, ctx, *, targetServer = None):
 		"""Leaves a server - can take a name or id (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return

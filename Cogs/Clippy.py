@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from Cogs import Nullify
 
 async def setup(bot):
-    bot.add_cog(Clippy(bot))
+    await bot.add_cog(Clippy(bot))
 
 class Clippy(commands.Cog):
 

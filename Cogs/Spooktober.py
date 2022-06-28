@@ -5,7 +5,7 @@ from   Cogs        import Utils
 
 async def setup(bot):
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Spooktober(bot, settings))
+	await bot.add_cog(Spooktober(bot, settings))
 
 class Spooktober(commands.Cog):
 	
@@ -23,7 +23,7 @@ class Spooktober(commands.Cog):
 			if self.spoop_re.search(message.content.lower()):
 				await message.add_reaction("🎃")
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def spooking(self, ctx, *, yes_no = None):
 		"""Enables/Disables reacting 🎃 to every sp00py message on Halloween (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return

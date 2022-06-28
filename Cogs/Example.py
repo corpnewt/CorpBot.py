@@ -5,7 +5,7 @@ from   Cogs import Utils, DisplayName, UserTime, PickList
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Example(bot, settings))
+    await bot.add_cog(Example(bot, settings))
 
 class Example(commands.Cog):
 
@@ -26,7 +26,7 @@ class Example(commands.Cog):
         """Chooses between multiple choices."""
         await ctx.send(Utils.suppressed(ctx,random.choice(choices)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def joined(self, ctx, *, member : str = None):
         """Says when a member joined."""
         if member is None:

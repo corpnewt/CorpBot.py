@@ -5,7 +5,7 @@ from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList
 
 async def setup(bot):
 	# Add the bot and deps
-	bot.add_cog(Search(bot))
+	await bot.add_cog(Search(bot))
 
 class Search(commands.Cog):
 
@@ -35,7 +35,7 @@ class Search(commands.Cog):
 			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		return msg
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def google(self, ctx, *, query = None):
 		"""Get some searching done."""
 
@@ -48,7 +48,7 @@ class Search(commands.Cog):
 		# Say message
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def bing(self, ctx, *, query = None):
 		"""Get some uh... more searching done."""
 
@@ -61,7 +61,7 @@ class Search(commands.Cog):
 		# Say message
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def duck(self, ctx, *, query = None):
 		"""Duck Duck... GOOSE."""
 
@@ -74,7 +74,7 @@ class Search(commands.Cog):
 		# Say message
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def yahoo(self, ctx, *, query = None):
 		"""Let Yahoo! answer your questions."""
 
@@ -87,7 +87,7 @@ class Search(commands.Cog):
 		# Say message
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def aol(self, ctx, *, query = None):
 		"""The OG search engine."""
 
@@ -100,7 +100,7 @@ class Search(commands.Cog):
 		# Say message
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ask(self, ctx, *, query = None):
 		"""Jeeves, please answer these questions."""
 
@@ -114,7 +114,7 @@ class Search(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def searchsite(self, ctx, category_name = None, *, query = None):
 		"""Search corpnewt.com forums."""
 
@@ -164,7 +164,7 @@ class Search(commands.Cog):
 			api_status = "UNKNOWN"
 		return api_status
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def convert(self, ctx, *, amount = None, frm = None, to = None):
 		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
 		

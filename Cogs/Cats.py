@@ -13,7 +13,7 @@ async def setup(bot):
 	return
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Cats(bot, settings))
+	await bot.add_cog(Cats(bot, settings))
 
 # This module grabs Reddit posts and selects one at random
 
@@ -40,7 +40,7 @@ class Cats(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def randomcat(self, ctx):
 		"""Meow."""
 		

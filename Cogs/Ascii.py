@@ -4,7 +4,7 @@ import pyfiglet
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Ascii(bot))
+	await bot.add_cog(Ascii(bot))
 	
 class Ascii(commands.Cog):
 	
@@ -42,7 +42,7 @@ class Ascii(commands.Cog):
 			color=ctx.author
 		).send(ctx)
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command(no_pm=True)
 	async def ascii(self, ctx, *, text : str = None):
 		"""Beautify some text."""
 

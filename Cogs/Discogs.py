@@ -5,7 +5,7 @@ from   Cogs import Settings, DisplayName, Message, DL
 
 async def setup(bot):
 	# Add the bot and deps
-	bot.add_cog(Discogs(bot))
+	await bot.add_cog(Discogs(bot))
 
 class Discogs(commands.Cog):
 
@@ -46,7 +46,7 @@ class Discogs(commands.Cog):
 			footer="Powered by discogs.com"
 		).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def discogs(self, ctx, *, search = None):
 		"""Perform a general discogs.com search. Could return albums, artits, etc.
 		By default, all searches are interpreted as song title searches, but you can refine them with the following:

@@ -20,7 +20,7 @@ except ImportError:
 
 async def setup(bot):
     # Add the bot
-    bot.add_cog(CAH(bot))
+    await bot.add_cog(CAH(bot))
 
 class SenCheck:
 
@@ -1022,7 +1022,7 @@ class CAH(commands.Cog):
             # await self.botPick(ctx, member, game)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def game(self, ctx, *, message = None):
         """Displays the game's current status."""
         if not await self.checkPM(ctx.message):
@@ -1035,7 +1035,7 @@ class CAH(commands.Cog):
         await self.showPlay(ctx, ctx.message.author)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def say(self, ctx, *, message = None):
         """Broadcasts a message to the other players in your game."""
         if not await self.checkPM(ctx.message):
@@ -1078,7 +1078,7 @@ class CAH(commands.Cog):
         await ctx.author.send(embed=stat_embed)
             
                 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def lay(self, ctx, *, card = None):
         """Lays a card or cards from your hand.  If multiple cards are needed, separate them by a comma (1,2,3)."""
         if not await self.checkPM(ctx.message):
@@ -1185,7 +1185,7 @@ class CAH(commands.Cog):
         await self.checkSubmissions(ctx, userGame, user)
             
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def pick(self, ctx, *, card = None):
         """As the judge - pick the winning card(s)."""
         if not await self.checkPM(ctx.message):
@@ -1234,7 +1234,7 @@ class CAH(commands.Cog):
         await self.winningCard(ctx, userGame, card)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def hand(self, ctx):
         """Shows your hand."""
         if not await self.checkPM(ctx.message):
@@ -1250,7 +1250,7 @@ class CAH(commands.Cog):
         userGame['Time'] = currentTime = int(time.time())
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def newcah(self, ctx):
         """Starts a new Cards Against Humanity game."""
         #if not await self.checkPM(ctx.message):
@@ -1282,7 +1282,7 @@ class CAH(commands.Cog):
         # await self.nextPlay(ctx, newGame)
     
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def leavecah(self, ctx):        
         """Leaves the current game you're in."""
         removeCheck = await self.removeMember(ctx.message.author)
@@ -1300,7 +1300,7 @@ class CAH(commands.Cog):
             await self.checkSubmissions(ctx, removeCheck)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def joincah(self, ctx, *, id = None):
         """Join a Cards Against Humanity game.  If no id or user is passed, joins a random game."""
         #if not await self.checkPM(ctx.message):
@@ -1421,7 +1421,7 @@ class CAH(commands.Cog):
         game['Time'] = int(time.time())
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def addbot(self, ctx):
         """Adds a bot to the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
@@ -1484,7 +1484,7 @@ class CAH(commands.Cog):
             lobot['Task'] = task
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def addbots(self, ctx, number = None):
         """Adds bots to the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
@@ -1571,7 +1571,7 @@ class CAH(commands.Cog):
                 task = asyncio.ensure_future(self.botPick(ctx, bot, userGame))
                 bot['Task'] = task
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def removebot(self, ctx, *, id = None):
         """Removes a bot from the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
@@ -1628,7 +1628,7 @@ class CAH(commands.Cog):
         await self.checkSubmissions(ctx, userGame)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def cahgames(self, ctx):
         """Displays up to 10 CAH games in progress."""
         shuffledGames = list(self.games)
@@ -1664,7 +1664,7 @@ class CAH(commands.Cog):
 
             
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def score(self, ctx):
         """Display the score of the current game."""
         if not await self.checkPM(ctx.message):
@@ -1708,7 +1708,7 @@ class CAH(commands.Cog):
         await ctx.author.send(embed=stat_embed)
         # await ctx.author.send(msg)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def laid(self, ctx):
         """Shows who laid their cards and who hasn't."""
         if not await self.checkPM(ctx.message):
@@ -1755,7 +1755,7 @@ class CAH(commands.Cog):
                     msg += '{}. *{} ({})* - Waiting for cards...\n'.format(i, user.get("Name", self.botName), user['ID'])
         await ctx.author.send(msg)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def removeplayer(self, ctx, *, name = None):
         """Removes a player from the game.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):
@@ -1816,7 +1816,7 @@ class CAH(commands.Cog):
             await ctx.author.send(msg)
             return
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def flushhand(self, ctx):
         """Flushes the cards in your hand - can only be done once per game."""
         if not await self.checkPM(ctx.message):
@@ -1854,7 +1854,7 @@ class CAH(commands.Cog):
                     await self.showHand(ctx, ctx.message.author)
                     return
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def idlekick(self, ctx, *, setting = None):
         """Sets whether or not to kick members if idle for 5 minutes or more.  Can only be done by the player who created the game."""
         if not await self.checkPM(ctx.message):

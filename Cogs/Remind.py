@@ -10,7 +10,7 @@ from   Cogs import ReadableTime, DisplayName, Utils, Nullify
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Remind(bot, settings))
+	await bot.add_cog(Remind(bot, settings))
 
 # This is the Remind module. It sends a pm to a user after a specified amount of time
 
@@ -130,7 +130,7 @@ class Remind(commands.Cog):
 				self.settings.setUserStat(member, member.guild, "Reminders", reminders)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remindme(self, ctx, message : str = None, *, endtime : str = None):
 		"""Set a reminder.  If the message contains spaces, it must be wrapped in quotes."""
 
@@ -170,7 +170,7 @@ class Remind(commands.Cog):
 		msg = 'Okay *{}*, I\'ll remind you in *{}*.'.format(DisplayName.name(ctx.message.author), readableTime)
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def reminders(self, ctx, *, member = None):
 		"""List up to 10 pending reminders - pass a user to see their reminders."""
 
@@ -235,7 +235,7 @@ class Remind(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearmind(self, ctx, *, index = None):
 		"""Clear the reminder index passed - or all if none passed."""
 		member = ctx.message.author

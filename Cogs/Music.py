@@ -7,7 +7,7 @@ from Cogs import Utils, Message, DisplayName, PickList, DL
 
 async def setup(bot):
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Music(bot,settings))
+	await bot.add_cog(Music(bot,settings))
 
 class Music(commands.Cog):
 
@@ -611,7 +611,7 @@ class Music(commands.Cog):
 			shutil.rmtree(temp,ignore_errors=True)
 		return await Message.Embed(title="♫ Uploaded playlist!",color=ctx.author).edit(ctx,message)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def searchlist(self, ctx, yes_no = None):
 		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -1204,7 +1204,7 @@ class Music(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "MusicDeleteDelay", real)
 		return await Message.Embed(title="♫ Music related messages will be auto-deleted after {} second{}!".format(real, "" if real == 1 else "s"),color=ctx.author,delete_after=real).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def searchlist(self, ctx, yes_no = None):
 		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return

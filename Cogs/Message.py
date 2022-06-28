@@ -264,7 +264,7 @@ class Embed:
 
     def _get_footer(self):
         # Get our footer if we have one
-        footer_text = footer_icon = discord.Embed.Empty
+        footer_text = footer_icon = discord.Embed.Emptys
         if type(self.footer) is str:
             footer_text = self.footer
         elif type(self.footer) is dict:

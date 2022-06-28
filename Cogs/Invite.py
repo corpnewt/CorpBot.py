@@ -5,7 +5,7 @@ from   Cogs import DisplayName, ReadableTime, Utils, Nullify
 async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Invite(bot, settings))
+	await bot.add_cog(Invite(bot, settings))
 
 class Invite(commands.Cog):
 

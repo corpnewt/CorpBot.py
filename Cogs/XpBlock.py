@@ -12,7 +12,7 @@ from   Cogs import DisplayName
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(XpBlock(bot, settings))
+	await bot.add_cog(XpBlock(bot, settings))
 
 class XpBlock(commands.Cog):
 
@@ -24,7 +24,7 @@ class XpBlock(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpblock(self, ctx, *, user_or_role : str = None):
 		"""Adds a new user or role to the xp block list (bot-admin only)."""
 
@@ -82,7 +82,7 @@ class XpBlock(commands.Cog):
 		return
 		
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpunblockall(self, ctx):
 		"""Removes all users and roles from the xp block list (bot-admin only)."""
 
@@ -96,7 +96,7 @@ class XpBlock(commands.Cog):
 			await ctx.send("*{}* users/roles unblocked from the xp system.".format(len(xparray)))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpunblock(self, ctx, *, user_or_role : str = None):
 		"""Removes a user or role from the xp block list (bot-admin only)."""
 
@@ -149,7 +149,7 @@ class XpBlock(commands.Cog):
 		await ctx.message.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listxpblock(self, ctx):
 		"""Lists xp blocked users and roles."""
 

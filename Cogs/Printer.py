@@ -14,7 +14,7 @@ from   Cogs import Message
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Printer(bot, settings))
+	await bot.add_cog(Printer(bot, settings))
 
 class Printer(commands.Cog):
 

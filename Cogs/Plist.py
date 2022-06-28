@@ -5,7 +5,7 @@ from Cogs import DL, Message, PickList
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Plist(bot, settings))
+    await bot.add_cog(Plist(bot, settings))
 
 class Plist(commands.Cog):
 
@@ -73,7 +73,7 @@ class Plist(commands.Cog):
         alpha_num = str(alpha.index(alph.lower())).rjust(2, "0")
         return int(start + alpha_num + end)
             
-    @commands.command(pass_context=True)
+    @commands.command()
     async def nvweb(self, ctx, os_build = None):
         """Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
         # Get the current manifest
@@ -156,7 +156,7 @@ class Plist(commands.Cog):
         ).pick()
 
             
-    @commands.command(pass_context=True)
+    @commands.command()
     async def plist(self, ctx, *, url = None):
         """Validates plist file structure.  Accepts a url - or picks the first attachment."""
         if url == None and len(ctx.message.attachments) == 0:

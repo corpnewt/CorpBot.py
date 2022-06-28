@@ -8,7 +8,7 @@ from html import unescape
 
 async def setup(bot):
     # Add the bot
-    bot.add_cog(AmdArk(bot))
+    await bot.add_cog(AmdArk(bot))
 
 
 class AmdArk(commands.Cog):

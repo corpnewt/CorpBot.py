@@ -13,7 +13,7 @@ async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
 	mute     = bot.get_cog("Mute")
-	bot.add_cog(VoteKick(bot, settings, mute))
+	await bot.add_cog(VoteKick(bot, settings, mute))
 
 class VoteKick(commands.Cog):
 
@@ -82,7 +82,7 @@ class VoteKick(commands.Cog):
 					vote_list.remove(rem)
 				self.settings.setServerStat(guild, "VoteKickArray", vote_list)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkinfo(self, ctx):
 		"""Lists the vote-kick info."""
 
@@ -138,7 +138,7 @@ class VoteKick(commands.Cog):
 
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkmention(self, ctx):
 		"""Gets which user or role is mentioned when enough votes against a user are reached."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -157,7 +157,7 @@ class VoteKick(commands.Cog):
 			return
 		await ctx.send("The current id ({}) does not match any users or roles - please consider updating this setting.".format(current_id))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setvkmention(self, ctx, *, user_or_role = None):
 		"""Sets which user or role is mentioned when enough votes against a user are reached."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -179,7 +179,7 @@ class VoteKick(commands.Cog):
 			return
 		await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(user_or_role)))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vktomute(self, ctx, *, number_of_votes = None):
 		"""Sets the number of votes before a user is muted.  Anything less than 1 will disable, and nothing will output the current setting."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -210,7 +210,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "VotesToMute", number_of_votes)
 			await ctx.send("Number of votes to mute set to {}.".format(number_of_votes))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vktomention(self, ctx, *, number_of_votes = None):
 		"""Sets the number of votes before the selected role or user is mentioned.  Anything less than 1 will disable, and nothing will output the current setting.
 		You will also want to make sure you have a role/user to mention - and a channel in which to mention them setup."""
@@ -242,7 +242,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "VotesToMention", number_of_votes)
 			await ctx.send("Number of votes to mention set to {}.".format(number_of_votes))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkchannel(self, ctx):
 		"""Gets which channel then mention posts to when enough votes against a user are reached."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -258,7 +258,7 @@ class VoteKick(commands.Cog):
 		await ctx.send("The current id ({}) does not match any channels - please consider updating this setting.".format(current_id))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setvkchannel(self, ctx, *, channel = None):
 		"""Sets which channel then mention posts to when enough votes against a user are reached."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -275,7 +275,7 @@ class VoteKick(commands.Cog):
 			return
 		await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(channel)))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkmutetime(self, ctx, *, the_time = None):
 		"""Sets the number of time a user is muted when the mute votes are reached - 0 or less will disable the system."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -317,7 +317,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "VotesMuteTime", seconds)
 			await ctx.send("Mute time set to {}.".format(ReadableTime.getReadableTimeBetween(0, seconds)))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkexpiretime(self, ctx, *, the_time = None):
 		"""Sets the amount of time before a vote expires.  0 or less will make them permanent."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -359,7 +359,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "VotesResetTime", seconds)
 			await ctx.send("Votes will expire after {}.".format(ReadableTime.getReadableTimeBetween(0, seconds)))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkanon(self, ctx, *, yes_no = None):
 		"""Sets whether vote messages are removed after voting (bot-admin only; always off by default)."""
 
@@ -393,7 +393,7 @@ class VoteKick(commands.Cog):
 			self.settings.setServerStat(ctx.guild, setting_val, yes_no)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vk(self, ctx, user = None, *, server = None):
 		"""Places your vote to have the passed user kicked."""
 		# Should be a dict like this:
@@ -486,7 +486,7 @@ class VoteKick(commands.Cog):
 		await ctx.send("Vote kick added for *{}*{}!".format(DisplayName.name(check_user), server_msg))
 		await self._check_votes(ctx, check_user)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vkclear(self, ctx, *, user = None):
 		"""Clears the votes against the passed user (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -510,7 +510,7 @@ class VoteKick(commands.Cog):
 		await ctx.send("*{}* has no votes against them - nothing to clear.".format(DisplayName.name(check_user)))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def vks(self, ctx, *, user = None):
 		"""Lists the vote count of the passed user (bot-admin only) or the author if no user was passed."""
 

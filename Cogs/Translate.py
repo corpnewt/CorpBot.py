@@ -5,7 +5,7 @@ from discord.ext import commands
 async def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(Translate(bot, settings))
+    await bot.add_cog(Translate(bot, settings))
 
 # Requires the mtranslate module be installed
 
@@ -21,7 +21,7 @@ class Translate(commands.Cog):
         self.langcodes = googletrans.LANGCODES
         self.languages = googletrans.LANGUAGES
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def langlist(self, ctx):
         """Lists available languages."""
         description = ""
@@ -34,7 +34,7 @@ class Translate(commands.Cog):
             ctx=ctx
         ).pick()
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def detectlang(self, ctx, *, text):
         """Reports the detected language and certainty of the passed text."""
         if text is None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
@@ -57,7 +57,7 @@ class Translate(commands.Cog):
             if value: value = value[0]
         return value
 
-    @commands.command(name="translate", aliases=["tr"], pass_context=True)
+    @commands.command(name="translate", aliases=["tr"])
     async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.

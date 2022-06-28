@@ -7,7 +7,7 @@ from   Cogs import DisplayName, Utils
 
 async def setup(bot):
 	# Add the bot
-	bot.add_cog(Actions(bot))
+	await bot.add_cog(Actions(bot))
 
 class Actions(commands.Cog):
 	## class that handles storing and computing action messages
@@ -218,7 +218,7 @@ class Actions(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def eat(self, ctx, *, member : str = None):
 		"""Eat like a boss."""
 
@@ -226,7 +226,7 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def drink(self, ctx, *, member : str = None):
 		"""Drink like a boss."""
 
@@ -234,7 +234,7 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def boop(self, ctx, *, member : str = None):
 		"""Boop da snoot."""
 
@@ -242,7 +242,7 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def spook(self, ctx, *, member : str = None):
 		"""sp00ktober by camiel."""
 
@@ -253,7 +253,7 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def highfive(self, ctx, *, member : str = None):
 		"""High five like a boss."""
 
@@ -261,7 +261,7 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def pet(self, ctx, *, member : str = None):
 		"""pet kitties."""
 

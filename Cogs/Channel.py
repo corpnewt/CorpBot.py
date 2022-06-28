@@ -7,7 +7,7 @@ from   Cogs import Utils, Settings, ReadableTime, DisplayName
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Channel(bot, settings))
+	await bot.add_cog(Channel(bot, settings))
 
 # This is the admin module.  It holds the admin-only commands
 # Everything here *requires* that you're an admin
@@ -29,14 +29,14 @@ class Channel(commands.Cog):
 			self.settings.setUserStat(after, after.guild, "LastOnline", currentTime)
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
 		isLocked = self.settings.getServerStat(ctx.message.guild, "AdminLock")
 		await ctx.send("Admin lock is *On*." if isLocked else "Admin lock is *Off*.")
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rules(self, ctx):
 		"""Display the server's rules."""
 		rules = self.settings.getServerStat(ctx.guild, "Rules")
@@ -44,7 +44,7 @@ class Channel(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listmuted(self, ctx):
 		"""Lists the names of those that are muted."""
 		muteList = self.settings.getServerStat(ctx.guild, "MuteList")
@@ -66,7 +66,7 @@ class Channel(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listadmin(self, ctx):
 		"""Lists admin roles and id's."""
 		promoArray = self.settings.getServerStat(ctx.message.guild, "AdminArray")		
@@ -92,7 +92,7 @@ class Channel(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,roleText))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def log(self, ctx, messages : int = 25, *, chan : discord.TextChannel = None):
 		"""Logs the passed number of messages from the given channel - 25 by default (admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return

@@ -7,7 +7,7 @@ async def setup(bot):
 	return
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Monitor(bot, settings))
+	await bot.add_cog(Monitor(bot, settings))
 
 # This is the Monitor module. It keeps track of how many messages fail
 

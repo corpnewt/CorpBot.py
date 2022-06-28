@@ -8,7 +8,7 @@ from   Cogs import Nullify
 async def setup(bot):
 	# This module isn't actually a cog - but it is a place
 	# we can call "a trash fire"
-	bot.add_cog(Utils(bot))
+	await bot.add_cog(Utils(bot))
 
 class Utils(commands.Cog):
 	def __init__(self,bot):

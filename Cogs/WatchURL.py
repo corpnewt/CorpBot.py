@@ -5,7 +5,7 @@ from   Cogs import PickList, Message,Utils
 async def setup(bot):
 	# Add the bot
 	settings = bot.get_cog("Settings")
-	bot.add_cog(WatchURL(bot,settings))
+	await bot.add_cog(WatchURL(bot,settings))
 	
 class WatchURL(commands.Cog):
     

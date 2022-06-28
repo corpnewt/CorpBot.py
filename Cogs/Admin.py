@@ -8,7 +8,7 @@ from   Cogs import Utils, Settings, CheckRoles, DisplayName, Utils
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Admin(bot, settings))
+	await bot.add_cog(Admin(bot, settings))
 
 class Admin(commands.Cog):
 
@@ -21,7 +21,7 @@ class Admin(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def defaultchannel(self, ctx):
 		"""Lists the server's default channel, whether custom or not."""
 		# Returns the default channel for the server
@@ -48,7 +48,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setdefaultchannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets a replacement default channel for bot messages (admin only)."""
 		
@@ -79,7 +79,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 	
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setmadlibschannel(self, ctx, *, channel: discord.TextChannel = None):
 		"""Sets the channel for MadLibs (admin only)."""
 		
@@ -112,7 +112,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpreservelimit(self, ctx, *, limit = None):
 		"""Gets and sets a limit to the maximum xp reserve a member can get.  Pass a negative value for unlimited."""
 
@@ -139,14 +139,14 @@ class Admin(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "XPReserveLimit", limit)
 			await ctx.send("Xp reserve limit set to *{:,}*.".format(limit))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def onexprole(self, ctx, *, yes_no = None):
 		"""Gets and sets whether or not to remove all but the current xp role a user has acquired."""
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"One xp role at a time","OnlyOneRole",yes_no))
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xplimit(self, ctx, *, limit = None):
 		"""Gets and sets a limit to the maximum xp a member can get.  Pass a negative value for unlimited."""
 
@@ -174,7 +174,7 @@ class Admin(commands.Cog):
 			await ctx.send("Xp limit set to *{:,}*.".format(limit))
 			
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setxp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Sets an absolute value for the member's xp (admin only)."""
 		
@@ -228,7 +228,7 @@ class Admin(commands.Cog):
 		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setxpreserve(self, ctx, *, member = None, xpAmount : int = None):
 		"""Set's an absolute value for the member's xp reserve (admin only)."""
 		
@@ -280,7 +280,7 @@ class Admin(commands.Cog):
 		await channel.send(msg)
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setdefaultrole(self, ctx, *, role : str = None):
 		"""Sets the default role or position for auto-role assignment."""
 		author  = ctx.message.author
@@ -319,7 +319,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addxprole(self, ctx, *, role = None, xp : int = None):
 		"""Adds a new role to the xp promotion/demotion system (admin only)."""
 		
@@ -375,7 +375,7 @@ class Admin(commands.Cog):
 		await channel.send(msg)
 		return
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removexprole(self, ctx, *, role = None):
 		"""Removes a role from the xp promotion/demotion system (admin only)."""
 		
@@ -453,7 +453,7 @@ class Admin(commands.Cog):
 		msg = Utils.suppressed(ctx,msg)
 		await channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prunexproles(self, ctx):
 		"""Removes any roles from the xp promotion/demotion system that are no longer on the server (admin only)."""
 
@@ -484,7 +484,7 @@ class Admin(commands.Cog):
 		await ctx.message.channel.send(msg)
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setxprole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to give xp, gamble, or feed the bot (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -519,7 +519,7 @@ class Admin(commands.Cog):
 		msg = 'xprole Error: {}'.format(error)
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xprole(self, ctx):
 		"""Lists the required role to give xp, gamble, or feed the bot."""
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
@@ -542,7 +542,7 @@ class Admin(commands.Cog):
 			msg = Utils.suppressed(ctx,msg)
 			await ctx.message.channel.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setstoprole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to stop the music player (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -577,7 +577,7 @@ class Admin(commands.Cog):
 		msg = 'setstoprole Error: {}'.format(error)
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def stoprole(self, ctx):
 		"""Lists the required role to stop the bot from playing music."""
 		role = self.settings.getServerStat(ctx.message.guild, "RequiredStopRole")
@@ -602,7 +602,7 @@ class Admin(commands.Cog):
 			await ctx.message.channel.send(msg)
 
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setlinkrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove links (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -638,7 +638,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def sethackrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove hacks (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -674,7 +674,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def settagrole(self, ctx, *, role : str = None):
 		"""Sets the required role ID to add/remove tags (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -710,7 +710,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setrules(self, ctx, *, rules : str = None):
 		"""Set the server's rules (bot-admin only)."""
 		
@@ -725,7 +725,7 @@ class Admin(commands.Cog):
 		await ctx.message.channel.send(Utils.suppressed(ctx,msg))
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawrules(self, ctx):
 		"""Display the markdown for the server's rules (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -735,7 +735,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lock(self, ctx):
 		"""Toggles whether the bot only responds to admins (admin only)."""
 		
@@ -751,7 +751,7 @@ class Admin(commands.Cog):
 		await ctx.message.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addadmin(self, ctx, *, role : str = None):
 		"""Adds a new role to the admin list (admin only)."""
 
@@ -801,7 +801,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removeadmin(self, ctx, *, role : str = None):
 		"""Removes a role from the admin list (admin only)."""
 
@@ -854,7 +854,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def removemotd(self, ctx, *, chan = None):
 		"""Removes the message of the day from the selected channel."""
 		
@@ -895,7 +895,7 @@ class Admin(commands.Cog):
 		await ctx.channel.send(msg)
 				
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def broadcast(self, ctx, *, message : str = None):
 		"""Broadcasts a message to all connected servers.  Can only be done by the owner."""
 		if message == None:
@@ -926,7 +926,7 @@ class Admin(commands.Cog):
 				pass
 
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def settopic(self, ctx, channel = None, *, message = ""):
 		"""Sets the channel topic of the passed channel (bot-admin only)."""
 		usage = 'Usage: `{}settopic [channel] [message]`'.format(ctx.prefix)

@@ -3,7 +3,7 @@ from discord.ext import commands
 from Cogs import GetImage, Utils
 
 async def setup(bot):
-    bot.add_cog(Emoji(bot))
+    await bot.add_cog(Emoji(bot))
 
 class Emoji(commands.Cog):
 

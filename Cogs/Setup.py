@@ -8,7 +8,7 @@ from   Cogs import Nullify
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Setup(bot, settings))
+	await bot.add_cog(Setup(bot, settings))
 
 # This is the Uptime module. It keeps track of how long the bot's been up
 
@@ -22,7 +22,7 @@ class Setup(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setup(self, ctx):
 		"""Runs first-time setup (server owner only)."""
 

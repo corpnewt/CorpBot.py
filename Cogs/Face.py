@@ -6,7 +6,7 @@ from   Cogs import Settings, DisplayName, Utils
 async def setup(bot):
 	# Add the bot and deps
 	settings = bot.get_cog("Settings")
-	bot.add_cog(Face(bot, settings))
+	await bot.add_cog(Face(bot, settings))
 
 # This is the Face module. It sends faces.
 
@@ -20,7 +20,7 @@ class Face(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lenny(self, ctx, *, message : str = None):
 		"""Give me some Lenny."""
 
@@ -37,7 +37,7 @@ class Face(commands.Cog):
 		# Remove original message
 		await ctx.message.delete()
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lastlenny(self, ctx):
 		"""Who Lenny'ed last?"""
 		lastLen = self.settings.getServerStat(ctx.message.guild, "LastLenny")
@@ -52,7 +52,7 @@ class Face(commands.Cog):
 		await ctx.channel.send(msg)
 		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def shrug(self, ctx, *, message : str = None):
 		"""Shrug it off."""
 
@@ -70,7 +70,7 @@ class Face(commands.Cog):
 		await ctx.message.delete()
 
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lastshrug(self, ctx):
 		"""Who shrugged last?"""
 		lastLen = self.settings.getServerStat(ctx.message.guild, "LastShrug")

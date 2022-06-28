@@ -3,7 +3,7 @@ from discord.ext import commands
 import random
 
 async def setup(bot):
-    bot.add_cog(Turret(bot))
+    await bot.add_cog(Turret(bot))
 
 class Turret(commands.Cog):
 
