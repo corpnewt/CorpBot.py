@@ -3,8 +3,7 @@ from   discord.ext import commands
 from   discord import errors
 from   Cogs import DisplayName
 
-# Let's migrate any specific txt settings files into a single json file
-# called settings_dict.json
+# Let's migrate any specific txt settings files into a single json file called settings_dict.json
 if os.path.exists("settings_dict.json"):
 	try: settings_dict = json.load(open("settings_dict.json"))
 	except Exception as e:
