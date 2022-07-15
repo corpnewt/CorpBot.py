@@ -63,20 +63,27 @@ class Time(commands.Cog):
 	
 	@commands.command(pass_context=True)
 	async def listtz(self, ctx, *, tz_search = None):
-		"""List all the supported TimeZones in PM."""
+		"""List all the supported TimeZones."""
 
 		msg = ""
 		if not tz_search:
 			title = "Available TimeZones"
-			for tz in pytz.all_timezones:
-				msg += tz + "\n"
+			pad = len(str(len(pytz.all_timezones)))
+			for i,tz in enumerate(pytz.all_timezones,start=1):
+				msg += "{}. {}\n".format(str(i).rjust(pad),tz)
 		else:
 			tz_list = FuzzySearch.search(tz_search, pytz.all_timezones)
 			title = "Top 3 TimeZone Matches"
-			for tz in tz_list:
-				msg += tz['Item'] + "\n"
+			for i,tz in enumerate(tz_list,start=1):
+				msg += "{}. {}\n".format(i,tz["Item"])
 
-		await Message.EmbedText(title=title, color=ctx.author, description=msg).send(ctx)
+		return await PickList.PagePicker(
+			title=title,
+			description=msg,
+			ctx=ctx,
+			d_header="```\n",
+			d_footer="```"
+		).pick()
 
 
 	@commands.command(pass_context=True)
