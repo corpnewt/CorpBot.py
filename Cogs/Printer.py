@@ -99,12 +99,12 @@ class Printer(commands.Cog):
 
 	@commands.command()
 	async def printavi(self, ctx, *, member = None):
-		"""Returns a the passed member's avatar."""
+		"""Returns a the passed member's global avatar - use the printguildavi command for their guild avatar if available."""
 		await self._print_avi(ctx,member,server=False)
 
-	@commands.command()
+	@commands.command(aliases=["printgavi","printserveravi","printsavi"])
 	async def printguildavi(self, ctx, *, member=None):
-		"""Returns a the passed member's guild avatar if available."""
+		"""Returns a the passed member's guild avatar if available - use the printavi command for their global avatar."""
 		await self._print_avi(ctx,member,server=True)
 
 	@commands.command()
