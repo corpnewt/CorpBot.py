@@ -94,7 +94,7 @@ class Printer(commands.Cog):
 			member = new_mem
 		url = Utils.get_avatar(member,server=server)
 		name = DisplayName.name(member)
-		name += "'{} Avatar".format("" if name[-1].lower() == "s" else "s")
+		name += "'{}{} Avatar".format("" if name[-1].lower() == "s" else "s"," Guild" if server else "")
 		await Message.Embed(title=name, image=url, color=ctx.author).send(ctx)
 
 	@commands.command()
