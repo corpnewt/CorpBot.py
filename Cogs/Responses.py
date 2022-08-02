@@ -37,7 +37,7 @@ class Responses(commands.Cog):
 		self.phrase_ur     = re.compile(r"\[\[phrase_ur:.*\]\]",re.IGNORECASE)
 		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",   re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
-		self.match_time    = 0.01
+		self.match_time    = 0.025
 
 	async def _get_response(self, ctx, message, check_chan=True):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
