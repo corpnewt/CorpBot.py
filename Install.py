@@ -173,7 +173,8 @@ if __name__ == '__main__':
         {"name":"pymongo"},
         {"name":"igdb_api_python"},
         {"name":"geopy"},
-        {"name":"pyfiglet"}
+        {"name":"pyfiglet"},
+        {"name":"regex"}
     ]
     item = 0
     for module in modules:
