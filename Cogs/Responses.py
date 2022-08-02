@@ -1,4 +1,5 @@
-import discord, re, time
+import discord, time
+import regex as re
 from discord.ext import commands
 from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message
 
@@ -36,17 +37,25 @@ class Responses(commands.Cog):
 		self.phrase_ur     = re.compile(r"\[\[phrase_ur:.*\]\]",re.IGNORECASE)
 		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",   re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
+		self.match_time    = 0.01
 
 	async def _get_response(self, ctx, message, check_chan=True):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return {}
 		# Check for matching response triggers here
 		content = message.replace("\n"," ") # Remove newlines for better matching
+		response = {}
 		for trigger in message_responses:
 			check_time = time.perf_counter_ns()
-			if not re.fullmatch(trigger, content): continue
+			try:
+				if not re.fullmatch(trigger, content, timeout=self.match_time):
+					continue
+			except TimeoutError:
+				response["catastrophies"] = response.get("catastrophies",[])+[trigger]
+				continue
 			match_time = time.perf_counter_ns()-check_time
-			response = {"matched":trigger,"match_time_ms":match_time/1000000}
+			response["matched"] = trigger
+			response["match_time_ms"] = match_time/1000000
 			# Got a full match - build the message, send it and bail
 			m = message_responses[trigger]
 			# Let's check for a channel - and make sure we're searching there
@@ -167,8 +176,8 @@ class Responses(commands.Cog):
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
-			return response
-		return {}
+			break
+		return response
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -179,7 +188,7 @@ class Responses(commands.Cog):
 		if ctx.command: return
 		# Gather the response info - if any
 		response = await self._get_response(ctx,message.content)
-		if not response: return
+		if not response.get("matched"): return
 		# See if we're admin/bot-admin - and bail if suppressed
 		if Utils.is_bot_admin(ctx) and response.get("suppress"): return
 		# Check for role changes
@@ -408,7 +417,26 @@ class Responses(commands.Cog):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
 		response = await self._get_response(ctx,check_string,check_chan=False)
-		if not response: return await ctx.send("No matches!")
+		catastrophies = None
+		if response.get("catastrophies"):
+			catastrophies = "\n".join(["**{}.** {}".format(i,Nullify.escape_all(x)) for i,x in enumerate(response["catastrophies"],start=1)])
+		if not response.get("matched"):
+			if catastrophies:
+				return await PickList.PagePicker(
+					title="No Matches",
+					description="The following timed out (>{:,} second{}) while checking - likely due to catastrophic backtracking ({:,} total):\n\n{}".format(
+						self.match_time,
+						"" if self.match_time==1 else "s",
+						len(response["catastrophies"]),
+						catastrophies
+					),
+					ctx=ctx
+				).pick()
+			return await Message.Embed(
+				title="No Matches",
+				description="No triggers matched the passed message",
+				color=ctx.author
+			).send(ctx)
 		# Got a match - let's print out what it will do
 		description = Nullify.escape_all(response.get("matched","Unknown match"))
 		entries = []
@@ -429,6 +457,8 @@ class Responses(commands.Cog):
 			entries.append({"name":"Roles Removed:","value":"\n".join([x.mention for x in response["roles_removed"]])})
 		if response.get("outputs",[]):
 			entries.append({"name":"Output Targets:","value":"\n".join([x.mention for x in response["outputs"]])})
+		if catastrophies:
+			entries.append({"name":"Catastrophically Backtracked ({:,} total):".format(len(response["catastrophies"])),"value":catastrophies})
 		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms".format(response["match_time_ms"])).pick()
 
 	@commands.command()
