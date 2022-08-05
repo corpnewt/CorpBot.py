@@ -284,7 +284,7 @@ class Help(commands.Cog):
 			bot_user.display_name,
 			self.bot.description
 		)
-		p = PickList.PagePicker(
+		return await PickList.PagePicker(
 			title=result["title"],
 			list=result["fields"],
 			ctx=ctx,
@@ -292,5 +292,4 @@ class Help(commands.Cog):
 			d_header=result.get("com_name","")+"```\n",
 			d_footer="```",
 			footer=result.get("footer","" if len(result["fields"]) else desc.replace("```\n","").split("\n")[0])
-		)
-		return await p.pick()
+		).pick()
