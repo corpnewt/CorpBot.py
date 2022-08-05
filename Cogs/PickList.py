@@ -172,7 +172,7 @@ class PagePicker(Picker):
             "title":self.title,
             "url":self.url,
             "thumbnail": self.thumbnail,
-            "description":self.description if self.list else self._get_page_contents(page),
+            "description":self.d_header+self.description+self.d_footer if self.list else self._get_page_contents(page),
             "color":self.ctx.author,
             "pm_after_fields":-1, # Disable pm_after entirely
             "fields":self._get_page_contents(page) if self.list else None,
