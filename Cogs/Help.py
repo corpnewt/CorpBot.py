@@ -1,10 +1,5 @@
-import asyncio
-import discord
-import random
-import math
-import os
+import discord, os
 from   datetime import datetime
-from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch, PickList
 
@@ -94,9 +89,11 @@ class Help(commands.Cog):
 					the_com.signature,
 					"" if not len(the_com.aliases) else " (AKA: {})".format(", ".join(the_com.aliases))
 				)
+				embed_list["com_name"] = "~~"+name+"~~ (Disabled)" if the_com.name in disabled_list else name
+				embed_list["com_desc"] = the_com.help
 				embed_list["description"] = "{}\n```\n{}\n```".format(
-					"~~"+name+"~~ (Disabled)" if the_com.name in disabled_list else name,
-					the_com.help
+					embed_list["com_name"],
+					embed_list["com_desc"]
 				)
 				return embed_list
 			return None
@@ -281,10 +278,19 @@ class Help(commands.Cog):
 			return await m.send(ctx)
 		result["color"] = ctx.author
 		bot_user = ctx.guild.get_member(self.bot.user.id) if ctx.guild else self.bot.user
-		desc = "```\nGet more info with \"{}help Cog_or_command\".\nCog and command names are case-sensitive.\n\n{}: {}```".format(self._get_prefix(ctx),bot_user.display_name,self.bot.description)
-		if len(result.get("fields",[]))>1:
-			return await PickList.PagePicker(title=result["title"],list=result["fields"],ctx=ctx,description=desc).pick()
-		m = Message.Embed(**result)
-		m.pm_after_fields = 25
-		m.footer = desc.replace("```\n","").split("\n")[0]
-		await m.send(ctx)
+		desc = "Get more info with \"{}help Cog\" or \"{}help command\".\nCog and command names are case-sensitive.\n\n{}: {}".format(
+			self._get_prefix(ctx),
+			self._get_prefix(ctx),
+			bot_user.display_name,
+			self.bot.description
+		)
+		p = PickList.PagePicker(
+			title=result["title"],
+			list=result["fields"],
+			ctx=ctx,
+			description=result.get("com_desc",desc),
+			d_header=result.get("com_name","")+"```\n",
+			d_footer="```",
+			footer=result.get("footer","" if len(result["fields"]) else desc.replace("```\n","").split("\n")[0])
+		)
+		return await p.pick()
