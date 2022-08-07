@@ -1,4 +1,4 @@
-import discord, wavelink, re, random, math, tempfile, json, os, shutil
+import asyncio, discord, wavelink, re, random, math, tempfile, json, os, shutil
 from discord.ext import commands
 from Cogs import Utils, Message, DisplayName, PickList, DL
 
@@ -25,8 +25,10 @@ class Music(commands.Cog):
 		# Setup player specifics to remember
 		self.player_attrs = ("skips","ctx","track_ctx","track_seek","repeat","vol","eq")
 		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol")] # Attributes to strip on start
-		# Ratio to equalize volume
-		self.vol_ratio = 0.75
+		# Ratio to equalize volume - can be useful to account for changes in the Wavelink module
+		# which used to use 0 -> 100, and now uses 0.0 -> 1.0 for 0 to 100% volume
+		self.vol_ratio = 0.0075
+		self.reconnect_wait = 0.5 # Number of seconds to wait before reconnecting
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
 		'''	"b"  :"│",  # "║" # Bar outline
@@ -80,7 +82,8 @@ class Music(commands.Cog):
 			if node.is_connected():
 				# Seems to cause a "Cannot write to closing transport" error, but it's
 				# the suggested way in the docs... ¯\_(ツ)_/¯
-				pass # await node.disconnect()
+				pass
+				# await node.disconnect()
 
 	@commands.Cog.listener()
 	async def on_check_play(self,player):
@@ -125,12 +128,10 @@ class Music(commands.Cog):
 			).send(ctx)
 		# Regardless of whether we can post - go to the next song.
 		# Make sure volume is setup properly - equalized per the volume ratio
-		volume = player.vol if hasattr(player,"vol") else self.settings.getServerStat(ctx.guild, "MusicVolume", 100) * self.vol_ratio
-		if not player.volume == volume:
-			await player.set_volume(volume)
-			player.vol = player.volume # Retain the setting
-		await player.play(track)
-		if getattr(player,"track_seek",None): await player.seek(player.track_seek*1000)
+		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild, "MusicVolume", 100)*self.vol_ratio)
+		await player.set_volume(volume)
+		player.vol = player.volume # Retain the setting
+		await player.play(track,start=int(getattr(player,"track_seek",0)*1000))
 
 	@commands.Cog.listener()
 	async def on_wavelink_track_end(self,player,track,reason):
@@ -156,19 +157,32 @@ class Music(commands.Cog):
 		# Dispatch our check play command
 		self.bot.dispatch("check_play",player)
 
+	async def _print_track_issue(self,issue,player,track,error):
+		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+		color_ctx = getattr(player,"track_ctx",ctx)
+		if not ctx: return # Nowhere to post our error message.
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		return await Message.Embed(
+			title="♫ Track {}!".format(str(issue).capitalize()),
+			description="Something went wrong playing \"{}\".\n\n{}".format(track,error),
+			color=color_ctx.author,
+			delete_after=delay
+		).send(ctx)
+
 	@commands.Cog.listener()
 	async def on_wavelink_track_exception(self,player,track,error):
 		await player.stop() # Stop the player - prevents issues with it thinking it's still playing
 		print("TRACK EXCEPTION",player)
 		print(track)
 		print(error)
+		await self._print_track_issue("Exception",player,track,error)
 
 	@commands.Cog.listener()
-	async def on_wavelink_track_stuck(self,player,track,threshold):
+	async def on_wavelink_track_stuck(self,player,track):
 		await player.stop() # Stop the player - prevents issues with it thinking it's still playing
 		print("TRACK STUCK",player)
 		print(track)
-		print(threshold)
+		await self._print_track_issue("Stuck",player,track,"The track got stuck - you may need to skip it if the issue persists.")
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, user, before, after):
@@ -189,7 +203,8 @@ class Music(commands.Cog):
 			#   already connected to a voice channel.
 			#   As a workaround - we manually update the voice state and reconnect to
 			#   the prior channel.
-			return await player.guild.change_voice_state(channel=before.channel)
+			# return await before.channel.connect(cls=wavelink.Player)
+			pass
 		elif len([x for x in before.channel.members if not x.bot]) > 0:
 			return # At least one non-bot user
 		# if we made it here - then we're alone - disconnect and destroy
@@ -527,6 +542,25 @@ class Music(commands.Cog):
 			return True # Made it through the checks
 		return False # Didn't make it..'''
 
+	async def _get_playlist_data(self,player,timestamp=True):
+		# Helper method to save the passed player's playlist to native objects for json serialization
+		current = player.track.info
+		current["id"] = player.track.id
+		queue = []
+		for x in player.queue.copy():
+			x.info["id"] = x.id
+			queue.append(x.info)
+		if current and (player.is_playing() or player.is_paused()):
+			if timestamp: current["position"] = player.position
+			queue.insert(0,current)
+		return queue
+
+	async def _load_playlist_data(self,ctx,player,playlist_data=[]):
+		# Helper method to apply loaded json data to the passed player
+		valid_tracks = self.get_tracks_from_data({"tracks":playlist_data},check_start=False,check_seek=True,ctx=ctx)
+		added_tracks = await self.add_to_queue(player,valid_tracks)
+		return (valid_tracks,added_tracks)
+
 	async def _load_playlist_from_url(self, url, ctx, shuffle = False):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -545,9 +579,28 @@ class Music(commands.Cog):
 		if not isinstance(playlist,list): return await Message.Embed(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,message)
 		if shuffle: random.shuffle(playlist)
 		# Let's walk the items and add them
-		valid_tracks = self.get_tracks_from_data({"tracks":playlist},check_start=False,check_seek=True,ctx=ctx)
-		await self.add_to_queue(player,valid_tracks)
-		await Message.Embed(title="♫ Added {} {}song{} from playlist!".format(len(valid_tracks),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
+		valid_tracks,added_tracks = await self._load_playlist_data(ctx,player,playlist_data=playlist)
+		await Message.Embed(title="♫ Added {:,}/{:,} {}song{} from playlist!".format(added_tracks,len(valid_tracks),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
+		self.bot.dispatch("check_play",player)
+
+	@commands.command(aliases=["recon","rec"])
+	async def reconnect(self, ctx):
+		"""Attempts to have the bot save the current playlist to memory, leave the voice chat, reconnect, and reload the playlist.
+		May help if the bot states it is playing, but makes no sound."""
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = await self.get_player(ctx.guild)
+		if not player or not player.is_connected():
+			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		# We have a connected player - let's save the playlist
+		playlist = await self._get_playlist_data(player)
+		channel = player.channel # Preserve the channel the player was using
+		await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
+		await asyncio.sleep(self.reconnect_wait) # Wait to let everything settle
+		await channel.connect(cls=wavelink.Player)
+		# Get a new player
+		player = await self.get_player(ctx.guild)
+		# Load the playlist data we had saved from before and dispatch the check_play event
+		await self._load_playlist_data(ctx,player,playlist_data=playlist)
 		self.bot.dispatch("check_play",player)
 
 	@commands.command()
@@ -586,19 +639,11 @@ class Music(commands.Cog):
 		for x in options.split():
 			if x.lower() == "ts":
 				timestamp = False
-		# Let's save the playlist
-		current = player.track.info
-		current["id"] = player.track.id
-		queue = []
-		for x in player.queue.copy():
-			x.info["id"] = x.id
-			queue.append(x.info)
-		if current and (player.is_playing() or player.is_paused()):
-			if timestamp: current["position"] = player.position
-			queue.insert(0,current)
-		if not len(queue):
-			return await Message.Embed(title="♫ No playlist to save!",color=ctx.author,delete_after=delay).send(ctx)
 		message = await Message.Embed(title="♫ Gathering info...",color=ctx.author).send(ctx)
+		# Let's save the playlist
+		queue = await self._get_playlist_data(player,timestamp=timestamp)
+		if not len(queue):
+			return await Message.Embed(title="♫ No playlist to save!",color=ctx.author,delete_after=delay).send(ctx,message)
 		await Message.Embed(title="♫ Saving and uploading...",color=ctx.author).edit(ctx,message)
 		temp = tempfile.mkdtemp()
 		temp_json = os.path.join(temp,"playlist.json")
@@ -1105,7 +1150,7 @@ class Music(commands.Cog):
 		except:
 			return await Message.Embed(title="♫ Volume must be an integer between 0-150.",color=ctx.author,delete_after=delay).send(ctx)
 		# Ensure our volume is between 0 and 150
-		volume = 150 if volume > 150 else 0 if volume < 0 else volume
+		volume = max(min(150,volume),0)
 		await player.set_volume(volume*self.vol_ratio)
 		player.vol = player.volume
 		# Save it to the server stats with range 10-100
