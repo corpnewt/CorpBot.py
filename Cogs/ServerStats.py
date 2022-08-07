@@ -56,15 +56,13 @@ class ServerStats(commands.Cog):
             await Message.EmbedText(title=guild.name, description="This server has no bots.", color=ctx.author).send(ctx)
         else:
             # Got some bots!
-            bot_text_list = []
-            last = 0
-            for y,x in enumerate(bot_list,1):
-                if y > 20:
-                    break
-                last = y
-                bot_text_list.append({"name":"{}#{} ({})".format(x.name,x.discriminator,x.id),"value":x.mention,"inline":False})
-            header = "__**Showing {} of {} bot{}:**__".format(last, len(bot_list), "" if len(bot_list) == 1 else "s")
-            await Message.Embed(title=guild.name, description="{}".format(header), fields=bot_text_list, color=ctx.author).send(ctx)
+            fields = [{"name":"{:,}. {}#{} ({})".format(i,x.name,x.discriminator,x.id),"value":x.mention,"inline":False} for i,x in enumerate(bot_list,1)]
+            header = "__**Showing {:,} bot{}:**__".format(len(bot_list), "" if len(bot_list) == 1 else "s")
+            return await PickList.PagePicker(
+                title="Bots in {} ({:,} total)".format(guild.name,len(bot_list)),
+                list=fields,
+                ctx=ctx
+            ).pick()
 
     @commands.command()
     async def serverinfo(self, ctx, *, guild_name = None):
