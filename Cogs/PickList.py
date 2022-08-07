@@ -111,33 +111,37 @@ class PagePicker(Picker):
 
     def _get_desc_page_list(self):
         # Returns the list of pages based on our settings
-        adj_max = self.max_chars - len(self.d_header) - len(self.d_footer)
+        # Let's sanitize the description, header, and footer
+        d = self.description if isinstance(self.description,str) else ""
+        h = self.d_header if isinstance(self.d_header,str) else ""
+        f = self.d_footer if isinstance(self.d_footer,str) else ""
+        adj_max = self.max_chars - len(h) - len(h)
         if self.newline_split:
             chunks = []
             curr   = ""
             row    = 0
-            for line in self.description.split("\n"):
+            for line in d.split("\n"):
                 test = curr+"\n"+line if len(curr) else line
                 row += 1
                 if len(line) > adj_max: # The line itself is too long
-                    if len(curr): chunks.append(self.d_header+curr+self.d_footer)
-                    chunks.extend([self.d_header+x+self.d_footer for x in textwrap.wrap(
+                    if len(curr): chunks.append(h+curr+f)
+                    chunks.extend([h+x+f for x in textwrap.wrap(
                         line,
                         adj_max,
                         break_long_words=True
                     )])
                     curr = ""
                 elif len(test) >= adj_max or row > self.max: # Exact or too big - adjust
-                    chunks.append(self.d_header+(test if len(test)==adj_max else curr)+self.d_footer)
+                    chunks.append(h+(test if len(test)==adj_max else curr)+f)
                     curr = "" if len(test)==adj_max else line
                     row = 0 if len(test)==adj_max else 1
                 else: # Not big enough yet - just append
                     curr = test
-            if len(curr): chunks.append(self.d_header+curr+self.d_footer)
+            if len(curr): chunks.append(h+curr+f)
             return chunks
         # Use textwrap to wrap the words, not newlines
-        return [self.d_header+x+self.d_footer for x in textwrap.wrap(
-            self.description,
+        return [h+x+f for x in textwrap.wrap(
+            d,
             adj_max,
             break_long_words=True,
             replace_whitespace=False
@@ -167,12 +171,16 @@ class PagePicker(Picker):
         else:
             pages = len(self._get_desc_page_list())
         embed_class = Message.Embed if self.list else Message.EmbedText
+        # Let's ensure our description, header, and footer are setup properly
+        desc = None if not isinstance(self.description,str) or self.description == "" else self.description
+        if desc is not None: # Check if we have a description - then attempt to append our header + footer
+            desc = (self.d_header if isinstance(self.d_header,str) else "") + desc + (self.d_footer if isinstance(self.d_footer,str) else "")
         # Setup the embed
         embed = {
             "title":self.title,
             "url":self.url,
             "thumbnail": self.thumbnail,
-            "description":self.d_header+self.description+self.d_footer if self.list else self._get_page_contents(page),
+            "description":desc if self.list else self._get_page_contents(page),
             "color":self.ctx.author,
             "pm_after_fields":-1, # Disable pm_after entirely
             "fields":self._get_page_contents(page) if self.list else None,
