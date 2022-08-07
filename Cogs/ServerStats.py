@@ -128,7 +128,7 @@ class ServerStats(commands.Cog):
         server_embed.add_field(name="Owner", value=guild.owner.name + "#" + guild.owner.discriminator, inline=True)
         server_embed.add_field(name="AFK Channel", value=guild.afk_channel, inline=True)
         server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
-        server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
+        # server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
         server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id+1, self.bot.shard_count), inline=True)
         server_embed.add_field(name="Nitro Boosts",value="{} (level {})".format(guild.premium_subscription_count,guild.premium_tier))
