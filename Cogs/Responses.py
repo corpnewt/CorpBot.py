@@ -434,13 +434,13 @@ class Responses(commands.Cog):
 						catastrophies
 					),
 					ctx=ctx,
-					footer="Check took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
+					footer="All checks took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
 				).pick()
 			return await Message.Embed(
 				title="No Matches",
 				description="No triggers matched the passed message",
 				color=ctx.author,
-				footer="Check took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
+				footer="All checks took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
 			).send(ctx)
 		# Got a match - let's print out what it will do
 		description = Nullify.escape_all(response.get("matched","Unknown match"))
