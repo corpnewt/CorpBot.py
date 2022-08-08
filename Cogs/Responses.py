@@ -45,6 +45,7 @@ class Responses(commands.Cog):
 		# Check for matching response triggers here
 		content = message.replace("\n"," ") # Remove newlines for better matching
 		response = {}
+		start_time = time.perf_counter_ns()
 		for trigger in message_responses:
 			check_time = time.perf_counter_ns()
 			try:
@@ -53,9 +54,9 @@ class Responses(commands.Cog):
 			except TimeoutError:
 				response["catastrophies"] = response.get("catastrophies",[])+[trigger]
 				continue
-			match_time = time.perf_counter_ns()-check_time
 			response["matched"] = trigger
-			response["match_time_ms"] = match_time/1000000
+			response["match_time_ms"] = (time.perf_counter_ns()-check_time)/1000000
+			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
 			# Got a full match - build the message, send it and bail
 			m = message_responses[trigger]
 			# Let's check for a channel - and make sure we're searching there
@@ -177,6 +178,8 @@ class Responses(commands.Cog):
 				m = re.sub(sub,"",m)
 			response["message"] = m
 			break
+		if not "total_time_ms" in response: # Get the total time to check
+			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
 		return response
 
 	@commands.Cog.listener()
@@ -430,12 +433,14 @@ class Responses(commands.Cog):
 						len(response["catastrophies"]),
 						catastrophies
 					),
-					ctx=ctx
+					ctx=ctx,
+					footer="Check took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
 				).pick()
 			return await Message.Embed(
 				title="No Matches",
 				description="No triggers matched the passed message",
-				color=ctx.author
+				color=ctx.author,
+				footer="Check took {:,} ms".format(response["total_time_ms"]) if "total_time_ms" in response else None
 			).send(ctx)
 		# Got a match - let's print out what it will do
 		description = Nullify.escape_all(response.get("matched","Unknown match"))
@@ -459,7 +464,7 @@ class Responses(commands.Cog):
 			entries.append({"name":"Output Targets:","value":"\n".join([x.mention for x in response["outputs"]])})
 		if catastrophies:
 			entries.append({"name":"Catastrophically Backtracked ({:,} total):".format(len(response["catastrophies"])),"value":catastrophies})
-		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms".format(response["match_time_ms"])).pick()
+		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms (total checks took {:,} ms)".format(response["match_time_ms"],response["total_time_ms"])).pick()
 
 	@commands.command()
 	async def viewresponse(self, ctx, response_index = None):
