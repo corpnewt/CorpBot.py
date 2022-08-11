@@ -1,6 +1,5 @@
-import asyncio, discord, os, textwrap, time
+import discord, os, textwrap, time, re, shutil, tempfile
 from   datetime import datetime
-from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message, ReadableTime
 
@@ -111,7 +110,7 @@ class Debugging(commands.Cog):
 		desc = "Invite URL:      {}".format(url)
 		if sent == True:
 			if guild:	  desc += "\nName:            {}".format(guild.name)
-			if invite.approximate_member_count:		  desc += "\nUsers:           {}\{}".format(invite.approximate_presence_count,invite.approximate_member_count)
+			if invite.approximate_member_count:		  desc += "\nUsers:           {}/{}".format(invite.approximate_presence_count,invite.approximate_member_count)
 		if created_by:    desc += "\nCreated By:      {}".format(created_by)
 		if created_at:    desc += "\nCreated At:      {}".format(created_at)
 		if channel:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
@@ -337,10 +336,7 @@ class Debugging(commands.Cog):
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if not message.guild:
-			return
-		
-		if message.author.bot:
+		if not message.guild or message.author.bot:
 			return
 		if self.shouldLog('message.send', message.guild):
 			# A message was sent
@@ -352,78 +348,131 @@ class Debugging(commands.Cog):
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
 			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
-			return
-		elif self.shouldLog('invite.send', message.guild):
+		if self.shouldLog('invite.send', message.guild):
 			# A message was sent
-			mes = message.content
-			if "discord.gg/" in mes or "discordapp.com/invite/" in mes:
-				for b in mes.split(" "):
-					if "discord.gg/" in b or "discordapp.com/invite/" in b:
-						c = b.split("/")
-						if c[-1] != "":
-							invite = c[-1]
-						else:
-							invite = c[-2]
-			else:
-				return
-			title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
-			msg = self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True)
-			pfpurl = Utils.get_avatar(message.author)
-			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
-			return
-		
+			matches = re.finditer(r"(?i)((discord\.gg|discordapp\.com\/invite)\/\S+)",message.content)
+			invites = []
+			for match in matches:
+				invite = match.group(0).split("/")[-1]
+				if not invite in invites: invites.append(invite)
+			if invites:
+				title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+				msg = ""
+				for invite in invites:
+					msg += self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True) + "\n\n"
+				pfpurl = Utils.get_avatar(message.author)
+				await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
+
 	@commands.Cog.listener()
-	async def on_message_edit(self, before, after):
-
-		if not before.guild:
-			return
-
-		if before.author.bot:
-			return
-		if not self.shouldLog('message.edit', before.guild):
-			return
-		if before.content == after.content:
-			# Edit was likely a preview happening
-			return
-		# A message was edited
-		title = '✏️ {}#{} ({}), in #{}, edited:'.format(before.author.name, before.author.discriminator, before.author.id, before.channel.name)
-		msg = before.content
-		if len(before.attachments):
-			msg += "\n\n--- Attachments ---\n\n"
-			for a in before.attachments:
-				msg += a.url + "\n"
-		msg += '\n\n--- To ---\n\n{}\n'.format(after.content)
-		if len(after.attachments):
+	async def on_raw_message_edit(self, payload):
+		# Let's get all message edits - regardless of whether or not they're in the cache
+		guild = self.bot.get_guild(payload.guild_id)
+		if not guild: return # Not in a guild
+		try: author = guild.get_member(int(payload.data["author"]["id"]))
+		except:
+			try: author = await self.bot.fetch_user(int(payload.data.get("author",{}).get("id","0")))
+			except: author = None
+		if not author or author.bot: return # Author doesn't exist - or is a bot
+		if not self.shouldLog("message.edit",guild): return # We're not logging edits
+		channel = guild.get_channel(payload.channel_id)
+		title = '✏️ {}#{} ({}), in {}, edited:'.format(
+			author.name,
+			author.discriminator,
+			author.id,
+			"#"+channel.name if channel else payload.channel_id
+		)
+		before = payload.cached_message
+		if before:
+			msg = before.content
+			if before.attachments:
+				msg += "\n\n--- Attachments ---\n\n"
+				for a in before.attachments:
+					msg += a.url + "\n"
+		else:
+			msg = "[ Message ID {} Not Found In Cache ]".format(payload.message_id)
+		msg += "\n\n--- To ---\n\n{}\n".format(payload.data.get("content",""))
+		if payload.data.get("attachments"):
 			msg += "\n--- Attachments ---\n\n"
-			for a in after.attachments:
-				msg += a.url + "\n"
-		pfpurl = Utils.get_avatar(before.author)
-		await self._logEvent(before.guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
-		return
-		
+			for a in payload.data["attachments"]:
+				msg += a.get("url","Unknown URL") + "\n"
+		pfpurl = Utils.get_avatar(author)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
+
 	@commands.Cog.listener()
-	async def on_message_delete(self, message):
+	async def on_raw_message_delete(self, payload):
+		guild = self.bot.get_guild(payload.guild_id)
+		if not guild: return # Not in a guild
+		if not self.shouldLog("message.delete",guild): return # Not logging deletes
+		if not payload.cached_message:
+			channel = guild.get_channel(payload.channel_id)
+			title = '❌ Message in {} deleted.'.format(
+				"#"+channel.name if channel else payload.channel_id
+			)
+			msg = "[ Message ID {} Not Found In Cache ]".format(payload.message_id)
+			pfpurl = Utils.get_default_avatar()
+		else:
+			message = payload.cached_message
+			if message.author.bot:
+				return # Don't log bots
+			title = '❌ {}#{} ({}), in #{}, deleted:'.format(
+				message.author.name,
+				message.author.discriminator,
+				message.author.id,
+				message.channel.name
+			)
+			msg = message.content
+			if len(message.attachments):
+				msg += "\n\n--- Attachments ---\n\n"
+				for a in message.attachments:
+					msg += a.url + "\n"
+			pfpurl = Utils.get_guild_icon(guild)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl)
 
-		if not message.guild:
-			return
-
-		if message.author.bot:
-			return
-		if not self.shouldLog('message.delete', message.guild):
-			return
-		# Check if we're cleaning from said channel
-		if message.channel in self.cleanChannels:
-			# Don't log these - as they'll spit out a text file later
-			return
-		# A message was deleted
-		title = '❌ {}#{} ({}), in #{}, deleted:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
-		msg = message.content
-		if len(message.attachments):
-			msg += "\n\n--- Attachments ---\n\n"
-			for a in message.attachments:
-				msg += a.url + "\n"
-		pfpurl = Utils.get_avatar(message.author)
-		await self._logEvent(message.guild, msg, title=title, color=discord.Color.orange(), thumbnail = pfpurl)
+	@commands.Cog.listener()
+	async def on_raw_bulk_message_delete(self, payload):
+		guild = self.bot.get_guild(payload.guild_id)
+		if not guild: return # Not in a guild
+		if not self.shouldLog("message.delete",guild): return # Not logging deletes
+		# Generate a timestamp for the delete event
+		name = "Bulk-Delete-{}.txt".format(datetime.utcnow().strftime("%Y-%m-%d %H.%M"))
+		channel = guild.get_channel(payload.channel_id)
+		cached_ids = [x.id for x in payload.cached_messages] if payload.cached_messages else []
+		missing_ids = [x for x in payload.message_ids if not x in cached_ids]
+		msg = "Bulk Delete in {} -> {}:\n\n".format(
+			guild.name,
+			"#"+channel.name if channel else payload.channel_id
+		)
+		if cached_ids:
+			msg += "--- Cached Messages ---\n\n"
+			for message in payload.cached_messages:
+				msg += "Sent By: {}#{} ({}) at {}{}:\n{}{}\n\n".format(
+					message.author.name,
+					message.author.discriminator,
+					message.author.id,
+					message.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+					"(edited at {} UTC)".format(message.edited_at.strftime("%b %d %Y - %I:%M %p")) if message.edited_at else "",
+					message.content,
+					"\n\n--- Attachments ---\n\n{}".format("\n".join([x.url for x in message.attachments])) if message.attachments else ""
+				)
+		if missing_ids:
+			msg += "--- Message IDs Not Found In Cache ---\n\n"+"\n".join(missing_ids)
+		# Log the event
+		title = '❌ Bulk Message Deletion in {}:'.format(
+			"#"+channel.name if channel else payload.channel_id
+		)
+		event_msg = "{:,}/{:,} bulk deleted message{} were found in cache.\n\nSaved to {}".format(
+			len(payload.cached_messages),
+			len(payload.message_ids),
+			"" if len(payload.message_ids)==1 else "s",
+			name
+		)
+		# Save to a local file
+		temp = tempfile.mkdtemp()
+		temp_file = os.path.join(temp,name)
+		with open(temp_file,"wb") as f:
+			f.write(msg.encode("utf-8"))
+		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
+		shutil.rmtree(temp,ignore_errors=True)
 	
 	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None):
 		# Here's where we log our info
@@ -451,7 +500,7 @@ class Debugging(commands.Cog):
 			if self.wrap:
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
-			await Message.EmbedText(
+			message = await Message.Embed(
 				title=title,
 				description=log_message,
 				color=color,
@@ -460,7 +509,7 @@ class Debugging(commands.Cog):
 				d_footer="\n```",
 				footer=footer
 			).send(logChan)
-			if filename: await logChan.send(file=discord.File(filename))
+			if filename: await message.edit(file=discord.File(filename))
 		except:
 			# We don't have perms in this channel or something - silently cry
 			pass
