@@ -445,14 +445,14 @@ class Debugging(commands.Cog):
 		if cached_ids:
 			msg += "--- Cached Messages ---\n\n"
 			for message in payload.cached_messages:
-				msg += "Sent By: {}#{} ({}) at {}{}:\n{}{}\n\n".format(
+				msg += "Sent By: {}#{} ({}) at {}{}:{}{}\n\n".format(
 					message.author.name,
 					message.author.discriminator,
 					message.author.id,
 					message.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
 					"(edited at {} UTC)".format(message.edited_at.strftime("%b %d %Y - %I:%M %p")) if message.edited_at else "",
-					message.content,
-					"\n\n--- Attachments ---\n\n{}".format("\n".join([x.url for x in message.attachments])) if message.attachments else ""
+					"\n"+message.content if message.content else "",
+					"\n--- Attachments ---\n{}".format("\n".join([x.url for x in message.attachments])) if message.attachments else ""
 				)
 		if missing_ids:
 			msg += "--- Message IDs Not Found In Cache ---\n\n"+"\n".join(missing_ids)
