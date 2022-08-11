@@ -409,7 +409,7 @@ class Debugging(commands.Cog):
 				"#"+channel.name if channel else payload.channel_id
 			)
 			msg = "[ Message ID {} Not Found In Cache ]".format(payload.message_id)
-			pfpurl = Utils.get_default_avatar()
+			pfpurl = Utils.get_guild_icon(guild)
 		else:
 			message = payload.cached_message
 			if message.author.bot:
@@ -425,7 +425,7 @@ class Debugging(commands.Cog):
 				msg += "\n\n--- Attachments ---\n\n"
 				for a in message.attachments:
 					msg += a.url + "\n"
-			pfpurl = Utils.get_guild_icon(guild)
+			pfpurl = Utils.get_avatar(message.author)
 		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl)
 
 	@commands.Cog.listener()
