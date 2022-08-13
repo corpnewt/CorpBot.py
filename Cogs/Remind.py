@@ -205,8 +205,8 @@ class Remind(commands.Cog):
 			"value":("[Link:]({})\n".format(x["Link"]) if "Link" in x else "")+x["Message"]
 		} for i,x in enumerate(sorted(reminders,key=lambda y:int(y["End"])),start=1)]
 		title = "{}'{} Remaining {}Reminders ({:,} total)".format(
-			ctx.author.name,
-			"" if ctx.author.name.lower()[-1]=="s" else "s",
+			DisplayName.name(member),
+			"" if DisplayName.name(member).lower()[-1]=="s" else "s",
 			"" if ctx.guild else "Private ",
 			len(reminders)
 		)
