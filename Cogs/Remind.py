@@ -94,16 +94,12 @@ class Remind(commands.Cog):
 			# We have a positive countdown - let's wait
 			await asyncio.sleep(countDown)
 
-		guild_reminders = self.settings.getUserStat(member,getattr(member,"guild",None),"Reminders",[])
-		global_reminders = self.settings.getGlobalUserStat(member,"Reminders",[])
+		guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
 
 		# Verify reminder is still valid
 		if not any((reminder in x for x in (guild_reminders,global_reminders))):
 			return
-
-		# Gather some info - then send an embed with the reminder
-		is_global = reminder in global_reminders
-		is_guild  = reminder in guild_reminders
 
 		server  = reminder.get("Server")
 		message = reminder.get("Message","I know it was something, but I forgot...")
@@ -112,16 +108,23 @@ class Remind(commands.Cog):
 		title = "Reminder in {}:".format(server) if server else "Private Reminder:"
 		desc = ("[You asked me to remind you:]({})\n\n".format(link) if link else "")+message
 
+		# Attempt to send the reminder to the user
 		try: await Message.Embed(title=title,description=desc,color=member).send(member)
 		except: pass # No perms :(
 
-		if is_global:
-			global_reminders.remove(reminder)
-			self.settings.setGlobalUserStat(member,"Reminders",global_reminders)
-		if is_guild:
-			guild_reminders.remove(reminder)
-			self.settings.setUserStat(member,member.guild,"Reminders",guild_reminders)
+		# Recheck reminders after sending the message
+		guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
 
+		# Remove the reminder from either list if it exists - and save the updated lists
+		if reminder in global_reminders:
+			global_reminders.remove(reminder)
+			await self.bot.loop.run_in_executor(None,self.settings.setGlobalUserStat,member,"Reminders",global_reminders)
+		if reminder in guild_reminders:
+			guild_reminders.remove(reminder)
+			await self.bot.loop.run_in_executor(None,self.settings.setUserStat,member,getattr(member,"guild",None),"Reminders",guild_reminders)
+		
+		# Remove the task from the loop list
 		if task in self.loop_list: self.loop_list.remove(task)
 
 	@commands.command(pass_context=True)
