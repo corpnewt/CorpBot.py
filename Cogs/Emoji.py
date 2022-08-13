@@ -29,7 +29,7 @@ class Emoji(commands.Cog):
     def _get_emoji_mention(self, emoji):
         return "<{}:{}:{}>".format("a" if emoji.animated else "",emoji.name,emoji.id)
 
-    @commands.command()
+    @commands.command(aliases=["addemote"])
     async def addemoji(self, ctx, *, emoji = None, name = None):
         '''Adds the passed emoji, url, or attachment as a custom emoji with the passed name (bot-admin only, max of 10).'''
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -103,7 +103,7 @@ class Emoji(commands.Cog):
             msg += "\n".join(emoji_text)
         await message.edit(content=msg)
 
-    @commands.command()
+    @commands.command(aliases=["emote"])
     async def emoji(self, ctx, emoji = None):
         '''Outputs the passed emoji... but bigger!'''
         if emoji is None:
