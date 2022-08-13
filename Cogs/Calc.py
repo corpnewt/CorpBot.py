@@ -125,7 +125,7 @@ class Calc(commands.Cog):
         global Utils
         Utils = self.bot.get_cog("Utils")
 
-    @commands.command(pass_context=True)
+    @commands.command(aliases=["calculate","math"])
     async def calc(self, ctx, *, formula = None):
         """Do some math."""
 
