@@ -455,7 +455,7 @@ class Debugging(commands.Cog):
 					"\n--- Attachments ---\n{}".format("\n".join([x.url for x in message.attachments])) if message.attachments else ""
 				)
 		if missing_ids:
-			msg += "--- Message IDs Not Found In Cache ---\n\n"+"\n".join(missing_ids)
+			msg += "--- Message IDs Not Found In Cache ---\n\n"+"\n".join([str(x) for x in missing_ids])
 		# Log the event
 		title = '❌ Bulk Message Deletion in {}:'.format(
 			"#"+channel.name if channel else payload.channel_id
