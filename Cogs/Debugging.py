@@ -542,12 +542,15 @@ class Debugging(commands.Cog):
 			if self.wrap:
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
+			# Save our current and UTC time for the logged event
+			now = int(time.mktime(datetime.now().timetuple()))
+			utc = int(time.mktime(datetime.now(timezone.utc).timetuple()))
 			message = await Message.Embed(
 				title=title,
 				description=log_message,
 				color=color,
 				thumbnail=thumbnail,
-				d_header="<t:{}>\n```\n".format(int(time.mktime(datetime.now().timetuple()))),
+				d_header="<t:{}:d><t:{}:t> | <t:{}:d><t:{}:t> UTC\n```\n".format(now,now,utc,utc),
 				d_footer="\n```",
 				footer=footer
 			).send(logChan)
