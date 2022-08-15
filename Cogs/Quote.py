@@ -32,6 +32,7 @@ class Quote(commands.Cog):
 		r = self.settings.getServerStat(member.guild, "QuoteReaction")
 		if not r or str(payload.emoji) != r: return # Not setup, or wrong reaction
 		r_admin = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
+		r_qv = 1 if r_admin else self.settings.getServerStat(member.guild,"QuoteVotes",1)
 		# Get the original message
 		channel = guild.get_channel(payload.channel_id)
 		try: message = await channel.fetch_message(payload.message_id)
@@ -40,32 +41,20 @@ class Quote(commands.Cog):
 		if not reaction: return # Broken for no reason?
 		# Gather the context and evaluate
 		ctx = await self.bot.get_context(message)
-		if reaction.count > 1:
-			# Our reaction is already here
-			if not r_admin:
-				# We're not worried about admin stuffs
-				# and someone already quoted
-				return
-			# Check for admin/bot-admin
-			if not Utils.is_bot_admin(ctx,member=member):
-				# We ARE worried about admin - and we're not admin... skip
-				return
-			# Iterate through those that reacted and see if any are admin
-			r_users = await reaction.users().flatten()
-			for r_user in r_users:
-				if r_user == member:
-					continue
-				if Utils.is_bot_admin(ctx,member=r_user):
-					# An admin already quoted - skip
-					return
-		else:
-			# This is the first reaction
-			# Check for admin/bot-admin
-			if r_admin and not Utils.is_bot_admin(ctx,member=member):
-				return
-
+		# Let's look at who has already reacted aside from us - and if any are admin.
+		r_users = [x for x in await reaction.users().flatten() if x!=member]
+		if any((Utils.is_bot_admin(ctx,member=x) for x in r_users)):
+			return # Already quoted - as at least one user was bot-admin
+		bot_admin = Utils.is_bot_admin(ctx,member=member)
+		# Check bot-admin stuffs first
+		if r_admin and not bot_admin:
+			return # We're not, and we need to be
+		# Check if we're bot admin - but there were already enough users to quote
+		# or if the reaction count isn't exact.
+		if (bot_admin and len(r_users)>=r_qv) or (not bot_admin and reaction.count!=r_qv): return
+		# If we got here - we've passed.
 		r_channel = member.guild.get_channel(int(r_channel))
-		if r_channel == None:
+		if r_channel is None:
 			# Not a valid channel
 			return
 
@@ -82,13 +71,13 @@ class Quote(commands.Cog):
 			for a in reaction.message.attachments:
 				# Add each attachment by name as a link to its own url
 				attach_text += "[{}]({}), ".format(a.filename, a.url)
-				if image == None and a.filename.lower().endswith((".jpg",".jpeg",".png",".gif")):
+				if image is None and a.filename.lower().endswith((".jpg",".jpeg",".png",".gif")):
 					# We got the first image in the attachment list - set it
 					image = a.url
 			# Remove the last ", "
 			attach_text = attach_text[:-2]
 			msg += "\n\n" + attach_text
-		if len(reaction.message.embeds) and image == None:
+		if len(reaction.message.embeds) and image is None:
 			# We have embeds to look at too, and we haven't set an image yet
 			for e in reaction.message.embeds:
 				d = e.to_dict()
@@ -114,16 +103,36 @@ class Quote(commands.Cog):
 		await Message.EmbedText(**e).send(r_channel)
 
 
-	@commands.command(pass_context=True)
-	async def setquotechannel(self, ctx, channel = None):
-		"""Sets the channel for quoted messages or disables it if no channel sent (admin only)."""
+	@commands.command(aliases=["quotev","qv"])
+	async def quotevote(self, ctx, quote_votes = None):
+		"""Gets or sets the number of votes/reactions needed for non admin/bot-admin users to quote a message (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if channel == None:
+		if quote_votes is None: # We're querying the current value
+			qv = self.settings.getServerStat(ctx.guild,"QuoteVotes",1)
+			if not isinstance(qv,int):
+				qv = 1
+				self.settings.setServerStat(ctx.guild,"QuoteVotes",1)
+			return await ctx.send("Quote votes currently set to {:,}.".format(qv))
+		# We're setting a value - make sure it's an int, and at least 1
+		try:
+			qv = int(quote_votes)
+			assert qv > 0
+		except:
+			return await ctx.send("Quote votes must be an integer of at least 1.")
+		# Set the value.
+		self.settings.setServerStat(ctx.guild,"QuoteVotes",qv)
+		await ctx.send("Quote votes set to {:,}.".format(qv))
+
+	@commands.command(aliases=["sqc","setquotec","setqc"])
+	async def setquotechannel(self, ctx, channel = None):
+		"""Sets the channel for quoted messages or disables it if no channel sent (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if channel is None:
 			self.settings.setServerStat(ctx.guild, "QuoteChannel", None)
 			msg = 'Quote channel *disabled*.'
 			return await ctx.send(msg)
 		channel = DisplayName.channelForName(channel, ctx.guild, "text")
-		if channel == None:
+		if channel is None:
 			return await ctx.send("I couldn't find that channel :(")
 		self.settings.setServerStat(ctx.guild, "QuoteChannel", channel.id)
 		
@@ -131,8 +140,8 @@ class Quote(commands.Cog):
 		await ctx.send(msg)
 	
 
-	@commands.command(pass_context=True)
-	async def quotechannel(self, ctx):
+	@commands.command(aliases=["quotechannel","gqc","qc","getquotec"])
+	async def getquotechannel(self, ctx):
 		"""Prints the current quote channel."""
 		qChan = self.settings.getServerStat(ctx.guild, "QuoteChannel")
 		if not qChan:
@@ -143,15 +152,15 @@ class Quote(commands.Cog):
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(qChan))
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["clearqr","clearquoter","cqr"])
 	async def clearquotereaction(self, ctx):
-		"""Clears the trigger reaction for quoting messages (admin only)."""
+		"""Clears the trigger reaction for quoting messages (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		self.settings.setServerStat(ctx.guild, "QuoteReaction", None)
 		await ctx.send("Quote reaction *cleared*.")
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["sqr","setquoter","setqr"])
 	async def setquotereaction(self, ctx):
 		"""Sets the trigger reaction for quoting messages (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -175,14 +184,14 @@ class Quote(commands.Cog):
 		await message.edit(content="Quote reaction set to {}".format(str(reaction.emoji)))
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["gqr","getquoter","getqr"])
 	async def getquotereaction(self, ctx):
 		"""Displays the quote reaction if there is one."""
 		r = self.settings.getServerStat(ctx.guild, "QuoteReaction")
 		await ctx.send("No quote reaction set." if not r else "Current quote reaction is {}".format(r))
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["qao","quoteao","quoteadmino"])
 	async def quoteadminonly(self, ctx, *, yes_no = None):
 		"""Sets whether only admins/bot-admins can quote or not (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
