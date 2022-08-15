@@ -440,7 +440,12 @@ class Debugging(commands.Cog):
 			for a in payload.data["attachments"]:
 				msg += a.get("url","Unknown URL") + "\n"
 		pfpurl = Utils.get_avatar(author)
-		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl)
+		message_url = "https://discord.com/channels/{}/{}/{}".format(
+				guild.id,
+				channel.id,
+				payload.message_id
+			)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message_url=message_url)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
@@ -518,7 +523,7 @@ class Debugging(commands.Cog):
 		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
 		shutil.rmtree(temp,ignore_errors=True)
 	
-	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None):
+	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None, message_url = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color is None:
@@ -545,12 +550,19 @@ class Debugging(commands.Cog):
 			# Save our current and UTC time for the logged event
 			now = int(time.mktime(datetime.now().timetuple()))
 			utc = int(time.mktime(datetime.now(timezone.utc).timetuple()))
+			# Setup the header - and include the optional message link if passed
+			d_header = "<t:{}> | <t:{}> UTC{}\n```\n".format(
+				now,
+				utc,
+				"\n[Link]({})".format(message_url) if message_url else "",
+			)
+			# Send the embed
 			message = await Message.Embed(
 				title=title,
 				description=log_message,
 				color=color,
 				thumbnail=thumbnail,
-				d_header="<t:{}:d><t:{}:t> | <t:{}:d><t:{}:t> UTC\n```\n".format(now,now,utc,utc),
+				d_header=d_header,
 				d_footer="\n```",
 				footer=footer
 			).send(logChan)
