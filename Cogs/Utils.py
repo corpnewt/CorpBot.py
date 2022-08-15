@@ -52,7 +52,7 @@ class Utils(commands.Cog):
 	async def is_owner_reply(self,ctx,member=None,not_claimed="I have not been claimed, *yet*.",not_owner="You are not the *true* owner of me.  Only the rightful owner can use this command."):
 		# Auto-replies if the user isn't an owner
 		are_we = self.is_owner(ctx,member)
-		if are_we == None: await ctx.send(not_claimed)
+		if are_we is None: await ctx.send(not_claimed)
 		elif are_we == False: await ctx.send(not_owner)
 		return are_we
 
@@ -81,13 +81,13 @@ class Utils(commands.Cog):
 		settings = self.bot.get_cog("Settings")
 		if not settings: return "Something is wrong with my settings module :("
 		current = settings.getGlobalStat(setting_name, default) if is_global else settings.getServerStat(guild, setting_name, default)
-		if yes_no == None:
+		if yes_no is None:
 			# Output what we have
 			return "{} currently *{}*.".format(display_name,"enabled" if current else "disabled")
-		elif yes_no.lower() in [ "yes", "on", "true", "enabled", "enable" ]:
+		elif yes_no.lower() in ( "1", "yes", "on", "true", "enabled", "enable" ):
 			yes_no = True
 			msg = "{} {} *enabled*.".format(display_name,"remains" if current else "is now")
-		elif yes_no.lower() in [ "no", "off", "false", "disabled", "disable" ]:
+		elif yes_no.lower() in ( "0", "no", "off", "false", "disabled", "disable" ):
 			yes_no = False
 			msg = "{} {} *disabled*.".format(display_name,"is now" if current else "remains")
 		else:
