@@ -157,8 +157,9 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.ban,))
 		log_msg = ""
 		if last:
-			log_msg = "{}\n{}".format(
+			log_msg = "- {} -\nBy {}#{} ({})\n\n{}".format(
 				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.user.name,last.user.discriminator,last.user.id,
 				last.reason if last.reason else "No reason provided."
 			)
 		# A member was banned
@@ -173,8 +174,9 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.unban,))
 		log_msg = ""
 		if last:
-			log_msg = "{}\n{}".format(
+			log_msg = "- {} -\nBy {}#{} ({})\n\n{}".format(
 				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.user.name,last.user.discriminator,last.user.id,
 				last.reason if last.reason else "No reason provided."
 			)
 		# A member was unbanned
@@ -264,9 +266,10 @@ class Debugging(commands.Cog):
 		log_msg = ""
 		last = await self.get_latest_log(guild,member,(discord.AuditLogAction.kick,discord.AuditLogAction.ban))
 		if last:
-			log_msg = "--- User was {} ---\n\n{}\n{}\n\n".format(
+			log_msg = "--- User was {} ---\n\n- {} -\nBy {}#{} ({})\n\n{}\n\n".format(
 				"banned" if last.action == discord.AuditLogAction.ban else "kicked",
 				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.user.name,last.user.discriminator,last.user.id,
 				last.reason if last.reason else "No reason provided."
 			)
 		roles = ["{} ({})".format(x.name,x.id) for x in member.roles if x != guild.default_role]
