@@ -531,13 +531,11 @@ class Debugging(commands.Cog):
 		try:
 			# Remove triple backticks and replace any single backticks with single quotes
 			log_back  = log_message.replace("`", "'")
-			if log_back == log_message:
-				# Nothing changed
-				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC"
-			else:
+			footer = None
+			if log_back != log_message:
 				# We nullified some backticks - make a note of it
 				log_message = log_back
-				footer = datetime.utcnow().strftime("%b %d %Y - %I:%M %p") + " UTC - Note: Backticks --> Single Quotes"
+				footer = "Note: Backticks --> Single Quotes"
 			if self.wrap:
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
@@ -546,12 +544,13 @@ class Debugging(commands.Cog):
 				description=log_message,
 				color=color,
 				thumbnail=thumbnail,
-				d_header="```\n",
+				d_header="<t:{}>\n```\n".format(int(time.mktime(datetime.now().timetuple()))),
 				d_footer="\n```",
 				footer=footer
 			).send(logChan)
 			if filename: await message.edit(file=discord.File(filename))
-		except:
+		except Exception as e:
+			print(e)
 			# We don't have perms in this channel or something - silently cry
 			pass
 
