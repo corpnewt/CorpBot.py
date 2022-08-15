@@ -230,7 +230,9 @@ class Debugging(commands.Cog):
 			return
 		# A member left
 		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
+		roles = ["{} ({})".format(x.name,x.id) for x in member.roles if x != guild.default_role]
+		log_msg = "Had Roles:\n\n{}".format("\n".join(roles) if roles else "None")
+		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
 
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
