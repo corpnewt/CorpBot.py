@@ -20,16 +20,17 @@ class Xp(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.is_current = False # Used for stopping loops
+		self.loop_time = 600 # Default is 10 minutes (600 seconds)
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 
-	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
+	async def _can_xp(self, user, server, requiredXP = None, promoArray = None):
 		# Checks whether or not said user has access to the xp system
-		if requiredXP == None:
-			requiredXP = self.settings.getServerStat(server, "RequiredXPRole", None)
-		if promoArray == None:
-			promoArray = self.settings.getServerStat(server, "PromotionArray", [])
+		if requiredXP is None:
+			requiredXP = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"RequiredXPRole",None)
+		if promoArray is None:
+			promoArray = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"PromotionArray",[])
 
 		if not requiredXP:
 			return True
@@ -69,21 +70,28 @@ class Xp(commands.Cog):
 	async def addXP(self):
 		print("Starting XP loop: {}".format(datetime.datetime.now().time().isoformat()))
 		await self.bot.wait_until_ready()
+		last_loop = 0
 		while not self.bot.is_closed():
 			try:
-				await asyncio.sleep(600) # runs only every 10 minutes (600 seconds)
+				# Gather our wait time by taking the (last_loop - self.loop_time)
+				wait_time = max(self.loop_time-last_loop,0) # Fall back on 0 if something goes awry
+				print("Last XP/Role Check loop took {} seconds - waiting for {} seconds...".format(last_loop,wait_time))
+				await asyncio.sleep(wait_time)
 				if not self.is_current:
 					# Bail if we're not the current instance
 					return
-				updates = await self.bot.loop.run_in_executor(None, self.update_xp)
+				# Get the start time
 				t = time.time()
+				updates = await self.update_xp()
 				for update in updates:
 					await CheckRoles.checkroles(update["user"], update["chan"], self.settings, self.bot, **update["kwargs"])
-				# Sleep after for testing
+				# Retain how long the update took
+				last_loop = time.time()-t
 			except Exception as e:
+				last_loop = 0 # Reset the loop time
 				print(str(e))
 
-	def update_xp(self):
+	async def update_xp(self):
 		responses = []
 		t = time.time()
 		print("Adding XP: {}".format(datetime.datetime.now().time().isoformat()))
@@ -97,29 +105,31 @@ class Xp(commands.Cog):
 			server = self.bot.get_guild(int(server_id))
 			if not server:
 				continue
-			# Iterate through the servers and add them
-			xpAmount   = int(self.settings.getServerStat(server, "HourlyXP"))
-			xpAmount   = float(xpAmount/6)
-			xpRAmount  = int(self.settings.getServerStat(server, "HourlyXPReal"))
-			xpRAmount  = float(xpRAmount/6)
 
-			xpLimit    = self.settings.getServerStat(server, "XPLimit")
-			xprLimit   = self.settings.getServerStat(server, "XPReserveLimit")
-			
-			onlyOnline = self.settings.getServerStat(server, "RequireOnline")
-			requiredXP = self.settings.getServerStat(server, "RequiredXPRole")
-			promoArray  = self.settings.getServerStat(server, "PromotionArray")
+			# The getServerStat() calls are run *a lot* - same with getUserStat(), so we prevent them from
+			# blocking by running them in the bot loop's executor
+			xpAmount     = int(await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"HourlyXP"))
+			xpAmount     = float(xpAmount/6)
+			xpRAmount    = int(await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"HourlyXPReal"))
+			xpRAmount    = float(xpRAmount/6)
 
-			xpblock = self.settings.getServerStat(server, "XpBlockArray")
-			targetChanID = self.settings.getServerStat(server, "DefaultChannel")
+			xpLimit      = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPLimit")
+			xprLimit     = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPReserveLimit")
+
+			onlyOnline   = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"RequireOnline")
+			requiredXP   = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"RequiredXPRole")
+			promoArray   = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"PromotionArray")
+
+			xpblock      = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XpBlockArray")
+			targetChanID = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"DefaultChannel")
+
 			kwargs = {
-					"xp_promote":self.settings.getServerStat(server,"XPPromote"),
-					"xp_demote":self.settings.getServerStat(server,"XPDemote"),
-					"suppress_promotions":self.settings.getServerStat(server,"SuppressPromotions"),
-					"suppress_demotions":self.settings.getServerStat(server,"SuppressDemotions"),
-					"only_one_role":self.settings.getServerStat(server,"OnlyOneRole")
+				"xp_promote":await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPPromote"),
+				"xp_demote":await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPDemote"),
+				"suppress_promotions":await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"SuppressPromotions"),
+				"suppress_demotions":await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"SuppressDemotions"),
+				"only_one_role":await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"OnlyOneRole")
 			}
-			
 			for user in server_dict[server_id]:
 
 				# First see if we're current - we want to bail quickly
@@ -127,7 +137,7 @@ class Xp(commands.Cog):
 					print("XP Interrupted, no longer current - took {} seconds.".format(time.time() - t))
 					return responses
 				
-				if not self._can_xp(user, server, requiredXP, promoArray):
+				if not await self._can_xp(user,server,requiredXP,promoArray):
 					continue
 
 				bumpXP = False
@@ -155,26 +165,26 @@ class Xp(commands.Cog):
 						skip = False
 						if not xprLimit == None:
 							# Get the current values
-							newxp = self.settings.getUserStat(user, server, "XPReserve")
+							newxp = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XPReserve")
 							# Make sure it's this xpr boost that's pushing us over
 							# This would only push us up to the max, but not remove
 							# any we've already gotten
 							if newxp + xpAmount > xprLimit:
 								skip = True
 								if newxp < xprLimit:
-									self.settings.setUserStat(user, server, "XPReserve", xprLimit)
+									await self.bot.loop.run_in_executor(None,self.settings.setUserStat,user,server,"XPReserve",xprLimit)
 						if not skip:
-							xpLeftover = self.settings.getUserStat(user, server, "XPLeftover")
+							xpLeftover = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XPLeftover")
 
-							if xpLeftover == None:
+							if xpLeftover is None:
 								xpLeftover = 0
 							else:
 								xpLeftover = float(xpLeftover)
 							gainedXp = xpLeftover+xpAmount
 							gainedXpInt = int(gainedXp) # Strips the decimal point off
 							xpLeftover = float(gainedXp-gainedXpInt) # Gets the < 1 value
-							self.settings.setUserStat(user, server, "XPLeftover", xpLeftover)
-							self.settings.incrementStat(user, server, "XPReserve", gainedXpInt)
+							await self.bot.loop.run_in_executor(None,self.settings.setUserStat,user,server,"XPLeftover",xpLeftover)
+							await self.bot.loop.run_in_executor(None,self.settings.incrementStat,user,server,"XPReserve",gainedXpInt)
 					
 					if xpRAmount > 0:
 						# User is online add hourly xp
@@ -183,16 +193,16 @@ class Xp(commands.Cog):
 						skip = False
 						if not xpLimit == None:
 							# Get the current values
-							newxp = self.settings.getUserStat(user, server, "XP")
+							newxp = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XP")
 							# Make sure it's this xpr boost that's pushing us over
 							# This would only push us up to the max, but not remove
 							# any we've already gotten
 							if newxp + xpRAmount > xpLimit:
 								skip = True
 								if newxp < xpLimit:
-									self.settings.setUserStat(user, server, "XP", xpLimit)
+									await self.bot.loop.run_in_executor(None,self.settings.setUserStat,user,server,"XP")
 						if not skip:
-							xpRLeftover = self.settings.getUserStat(user, server, "XPRealLeftover")
+							xpRLeftover = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XPRealLeftover")
 							if xpRLeftover == None:
 								xpRLeftover = 0
 							else:
@@ -200,8 +210,8 @@ class Xp(commands.Cog):
 							gainedXpR = xpRLeftover+xpRAmount
 							gainedXpRInt = int(gainedXpR) # Strips the decimal point off
 							xpRLeftover = float(gainedXpR-gainedXpRInt) # Gets the < 1 value
-							self.settings.setUserStat(user, server, "XPRealLeftover", xpRLeftover)
-							self.settings.incrementStat(user, server, "XP", gainedXpRInt)
+							await self.bot.loop.run_in_executor(None,self.settings.setUserStat,user,server,"XPRealLeftover",xpRLeftover)
+							await self.bot.loop.run_in_executor(None,self.settings.incrementStat,user,server,"XP",gainedXpRInt)
 
 						# Check our default channels
 						targetChan = None
@@ -293,7 +303,7 @@ class Xp(commands.Cog):
 		admin_override = False
 
 		# RequiredXPRole
-		if not self._can_xp(author, server):
+		if not await self._can_xp(author, server):
 			approve = False
 			msg = 'You don\'t have the permissions to give xp.'
 
@@ -556,7 +566,7 @@ class Xp(commands.Cog):
 			approve = False
 
 		# RequiredXPRole
-		if not self._can_xp(author, server):
+		if not await self._can_xp(author, server):
 			approve = False
 			msg = 'You don\'t have the permissions to gamble.'
 				
