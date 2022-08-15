@@ -1,5 +1,5 @@
 import discord, os, textwrap, time, re, shutil, tempfile
-from   datetime import datetime
+from   datetime import datetime, timezone
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message, ReadableTime
 
@@ -28,6 +28,7 @@ class Debugging(commands.Cog):
 		self.verbose = [ x for x in self.logvars ] # Enable all of them
 		self.cleanChannels = []
 		self.invite_list = {}
+		self.audit_log_threshold = 30 # Try to get logs within 30 seconds of happening
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -120,6 +121,22 @@ class Debugging(commands.Cog):
 		if max_uses:      desc += "\nMax Uses:        {}".format(max_uses)
 		return desc
 
+	async def get_latest_log(self, guild, member, types=None):
+		if not types or not isinstance(types,(list,tuple)): return
+		now = datetime.now(timezone.utc)
+		try:
+			actions = []
+			for t in types:
+				actions.extend([x for x in await guild.audit_logs(limit=1,action=t).flatten() if x.target == member])
+			if not actions: return # Nothing to report
+			# We got something - let's get the latest
+			recent = max(actions,key=lambda x:x.created_at)
+			difference = now-recent.created_at
+			if difference.total_seconds() <= self.audit_log_threshold:
+				# Within the threshold - return it
+				return recent
+		except: pass
+
 	# Catch custom xp event
 	@commands.Cog.listener()
 	async def on_xp(self, to_user, from_user, amount):
@@ -137,19 +154,33 @@ class Debugging(commands.Cog):
 	async def on_member_ban(self, guild, member):
 		if not self.shouldLog('user.ban', guild):
 			return
+		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.ban,))
+		log_msg = ""
+		if last:
+			log_msg = "{}\n{}".format(
+				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.reason if last.reason else "No reason provided."
+			)
 		# A member was banned
 		pfpurl = Utils.get_avatar(member)
 		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.red(),thumbnail=pfpurl)
+		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_member_unban(self, guild, member):
 		if not self.shouldLog('user.unban', guild):
 			return
+		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.unban,))
+		log_msg = ""
+		if last:
+			log_msg = "{}\n{}".format(
+				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.reason if last.reason else "No reason provided."
+			)
 		# A member was unbanned
 		pfpurl = Utils.get_avatar(member)
 		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
+		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_mute(self, member, guild, cooldown, muted_by):
@@ -228,10 +259,18 @@ class Debugging(commands.Cog):
 		pfpurl = Utils.get_avatar(member)
 		if not self.shouldLog('user.leave', guild):
 			return
-		# A member left
+		# A member left - get the last ban/kick audit log entry
 		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, guild.name)
+		log_msg = ""
+		last = await self.get_latest_log(guild,member,(discord.AuditLogAction.kick,discord.AuditLogAction.ban))
+		if last:
+			log_msg = "--- User was {} ---\n\n{}\n{}\n\n".format(
+				"banned" if last.action == discord.AuditLogAction.ban else "kicked",
+				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+				last.reason if last.reason else "No reason provided."
+			)
 		roles = ["{} ({})".format(x.name,x.id) for x in member.roles if x != guild.default_role]
-		log_msg = "Had Roles:\n\n{}".format("\n".join(roles) if roles else "None")
+		log_msg += "--- Had Roles ---\n\n{}".format("\n".join(roles) if roles else "None")
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
 
 	def type_to_string(self, activity_type):
