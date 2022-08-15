@@ -47,11 +47,13 @@ class Quote(commands.Cog):
 			return # Already quoted - as at least one user was bot-admin
 		bot_admin = Utils.is_bot_admin(ctx,member=member)
 		# Check bot-admin stuffs first
-		if r_admin and not bot_admin:
-			return # We're not, and we need to be
-		# Check if we're bot admin - but there were already enough users to quote
-		# or if the reaction count isn't exact.
-		if (bot_admin and len(r_users)>=r_qv) or (not bot_admin and reaction.count!=r_qv): return
+		if r_admin:
+			if not bot_admin: return # We're not, and we need to be
+			# We are - bypass
+		else:
+			# Check if we're bot admin - but there were already enough users to quote
+			# or if the reaction count isn't exact.
+			if (bot_admin and len(r_users)>=r_qv) or (not bot_admin and reaction.count!=r_qv): return
 		# If we got here - we've passed.
 		r_channel = member.guild.get_channel(int(r_channel))
 		if r_channel is None:
