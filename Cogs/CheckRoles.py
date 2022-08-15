@@ -24,21 +24,15 @@ async def checkroles(user, channel, settings, bot, suppress : bool = False, **kw
     
     # Get our preliminary vars
     msg         = None
-    xpPromote   = kwargs.get("xp_promote",settings.getServerStat(server,"XPPromote"))
-    xpDemote    = kwargs.get("xp_demote",settings.getServerStat(server,"XPDemote"))
-    userXP      = int(settings.getUserStat(user, server, "XP"))
-    suppProm    = kwargs.get("suppress_promotions",settings.getServerStat(server,"SuppressPromotions"))
-    suppDem     = kwargs.get("suppress_demotions",settings.getServerStat(server,"SuppressDemotions"))
-    onlyOne     = kwargs.get("only_one_role",settings.getServerStat(server,"OnlyOneRole"))
-
-    # Check if we're suppressing @here and @everyone mentions
-    if settings.getServerStat(server, "SuppressMentions"):
-        suppressed = True
-    else:
-        suppressed = False
+    xpPromote   = kwargs.get("xp_promote",await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"XPPromote"))
+    xpDemote    = kwargs.get("xp_demote",await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"XPDemote"))
+    userXP      = int(await self.bot.loop.run_in_executor(None,settings.getUserStat,user,server,"XP"))
+    suppProm    = kwargs.get("suppress_promotions",await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"SuppressPromotions"))
+    suppDem     = kwargs.get("suppress_demotions",await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"SuppressDemotions"))
+    onlyOne     = kwargs.get("only_one_role",await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"OnlyOneRole"))
 
     changed = False
-    promoArray = settings.getServerStat(server, "PromotionArray")
+    promoArray = await self.bot.loop.run_in_executor(None,settings.getServerStat,server,"PromotionArray")
     promoArray = sorted(promoArray, key=lambda x:int(x['XP']))
 
     addRoles = []
