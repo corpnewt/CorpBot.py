@@ -419,7 +419,6 @@ class Debugging(commands.Cog):
 		if not author or author.bot: return # Author doesn't exist - or is a bot
 		if not self.shouldLog("message.edit",guild): return # We're not logging edits
 		channel = guild.get_channel(payload.channel_id)
-		if not channel: return # Channel doesn't exist
 		title = '✏️ {}#{} ({}), in {}, edited:'.format(
 			author.name,
 			author.discriminator,
@@ -442,8 +441,8 @@ class Debugging(commands.Cog):
 				msg += a.get("url","Unknown URL") + "\n"
 		pfpurl = Utils.get_avatar(author)
 		message_url = "https://discord.com/channels/{}/{}/{}".format(
-				guild.id,
-				channel.id,
+				payload.guild_id,
+				payload.channel_id,
 				payload.message_id
 			)
 		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message_url=message_url)
@@ -455,7 +454,6 @@ class Debugging(commands.Cog):
 		if not self.shouldLog("message.delete",guild): return # Not logging deletes
 		if not payload.cached_message:
 			channel = guild.get_channel(payload.channel_id)
-			if not channel: return # Channel doesn't exist
 			title = '❌ Message in {} deleted.'.format(
 				"#"+channel.name if channel else payload.channel_id
 			)
@@ -487,7 +485,6 @@ class Debugging(commands.Cog):
 		# Generate a timestamp for the delete event
 		name = "Bulk-Delete-{}.txt".format(datetime.utcnow().strftime("%Y-%m-%d %H.%M"))
 		channel = guild.get_channel(payload.channel_id)
-		if not channel: return # Channel doesn't exist
 		cached_ids = [x.id for x in payload.cached_messages] if payload.cached_messages else []
 		missing_ids = [x for x in payload.message_ids if not x in cached_ids]
 		msg = "Bulk Delete in {} -> {}:\n\n".format(
