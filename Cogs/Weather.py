@@ -45,18 +45,25 @@ class Weather(commands.Cog):
 			return "️🌫️ "+w_text
 		return w_text
 
+	def _check_float(self, f, round_to=4):
+		if f == int(f): return int(f)
+		if round_to<=0: return f
+		temp = f*10**round_to
+		if temp-int(temp) >= 0.5: temp += 1
+		return self._check_float(int(temp)/10**round_to,round_to=0)
+
 	def _f_to_c(self, f):
-		return int((int(f)-32)/1.8)
+		return self._check_float((f-32)/1.8,round_to=1)
 	def _c_to_f(self, c):
-		return int((int(c)*1.8)+32)
+		return self._check_float((c*1.8)+32,round_to=1)
 	def _c_to_k(self, c):
-		return int(int(c)+273)
+		return self._check_float(c+273,round_to=1)
 	def _k_to_c(self, k):
-		return int(int(k)-273)
+		return self._check_float(k-273,round_to=1)
 	def _f_to_k(self, f):
-		return self._c_to_k(self._f_to_c(int(f)))
+		return self._c_to_k(self._f_to_c(f))
 	def _k_to_f(self, k):
-		return self._c_to_f(self._k_to_c(int(k)))
+		return self._c_to_f(self._k_to_c(k))
 
 	@commands.command(pass_context=True)
 	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
@@ -77,7 +84,7 @@ class Weather(commands.Cog):
 		try:
 			f = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
 			t = next((x for x in types if x.lower() == args[2].lower() or x.lower()[:1] == args[2][:1].lower()), None)
-			m = int(args[0])
+			m = float(args[0])
 		except:
 			await ctx.send(usage)
 			return
@@ -107,7 +114,7 @@ class Weather(commands.Cog):
 					out_val = self._k_to_c(m)
 				else:
 					out_val = self._k_to_f(m)
-			output = "{:,} {} {} is {:,} {} {}".format(m, "degree" if (m==1 or m==-1) else "degrees", f, out_val, "degree" if (out_val==1 or out_val==-1) else "degrees", t)
+			output = "{:,} {} {} is {:,} {} {}".format(self._check_float(float(m),round_to=2), "degree" if abs(m)==1 else "degrees", f, out_val, "degree" if abs(out_val)==1 else "degrees", t)
 		except:
 			pass
 		await ctx.send(output)
