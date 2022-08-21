@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Beer](#beer), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -116,12 +116,21 @@ A list of cogs, commands, and descriptions:
 	   └─ Searches AMD's site for CPU info.
 
 ## Ascii
-####	Ascii Cog (1 command) - Ascii.py Extension:
+####	Ascii Cog (2 commands) - Ascii.py Extension:
 	  $ascii [text]
-	   └─ Beautify some text (font list at http://artii.herokuapp.com/fonts_list).
+	   └─ Beautify some text.
+	  $asciifonts [search_term] (AKA: font, fonts, fontlist)
+	   └─ Lists the available ascii fonts.
+
+## Beer
+####	Beer Cog (2 commands) - Beer.py Extension:
+	  $abv [original_gravity] [final_gravity]
+	   └─ Calculates the alcohol by volume for the passed original and final gravity.
+	  $vconvert [volume] [from_type] [to_type]
+	   └─ Converts between Ounces, Gallons, Liters, Milliliters, and Beer Barrels.  Fro...
 
 ## Bot
-####	Bot Cog (23 commands) - Bot.py Extension:
+####	Bot Cog (24 commands) - Bot.py Extension:
 	  $adminunlim [yes_no]
 	   └─ Sets whether or not to allow unlimited xp to admins (bot-admin only).
 	  $avatar [filename]
@@ -156,6 +165,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the number of servers I'm connected to!
 	  $setbotparts [parts]
 	   └─ Set the bot's parts - can be a url, formatted text, or nothing to clear.
+	  $setname [name]
+	   └─ Sets the bot's name - may take awhile to reflect (owner only).
 	  $shutdown 
 	   └─ Shuts down the bot (owner only).
 	  $source 
@@ -170,7 +181,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the watching status of the bot (owner-only).
 
 ## BotAdmin
-####	BotAdmin Cog (10 commands) - BotAdmin.py Extension:
+####	BotAdmin Cog (11 commands) - BotAdmin.py Extension:
 	  $ban [members] [reason] (AKA: yote)
 	   └─ Bans the passed members for the specified reason.
 	  $banned [user_id]
@@ -183,6 +194,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Kicks the passed members for the specified reason.
 	  $listen [member]
 	   └─ Removes a member from the bot's "ignore" list (bot-admin only).
+	  $listenall 
+	   └─ Clears the bot's ignore list (bot-admin only).
 	  $rembanmessages [number_of_days]
 	   └─ Gets or sets the default number of days worth of messages to remove when bann...
 	  $removeinvitelinks [yes_no]
@@ -231,7 +244,7 @@ A list of cogs, commands, and descriptions:
 
 ## Calc
 ####	Calc Cog (1 command) - Calc.py Extension:
-	  $calc [formula]
+	  $calc [formula] (AKA: calculate, math)
 	   └─ Do some math.
 
 ## Channel
@@ -330,7 +343,7 @@ A list of cogs, commands, and descriptions:
 	  $logenable [options]
 	   └─ Enables the passed, comma-delimited log vars (bot-admin only).
 	  $logging 
-	   └─ Outputs whether or not we're logging is enabled (bot-admin only).
+	   └─ Outputs whether or not we're logging is enabled, the log channel, and any set...
 	  $logpreset [preset]
 	   └─ Can select one of 4 available presets - off, quiet, normal, verbose (bot-admi...
 	  $setdebug [debug]
@@ -390,9 +403,9 @@ A list of cogs, commands, and descriptions:
 
 ## Emoji
 ####	Emoji Cog (2 commands) - Emoji.py Extension:
-	  $addemoji [emoji] [name]
+	  $addemoji [emoji] [name] (AKA: addemote)
 	   └─ Adds the passed emoji, url, or attachment as a custom emoji with the passed n...
-	  $emoji [emoji]
+	  $emoji [emoji] (AKA: emote)
 	   └─ Outputs the passed emoji... but bigger!
 
 ## Encode
@@ -720,17 +733,17 @@ A list of cogs, commands, and descriptions:
 	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
 
 ## Music
-####	Music Cog (31 commands) - Music.py Extension:
+####	Music Cog (33 commands) - Music.py Extension:
 	  $autodeleteafter [seconds]
 	   └─ Lists or sets the current delay before auto-deleting music related messages (...
 	  $disableplay [yes_no]
 	   └─ Enables/Disables the music commands.  Helpful in case Youtube is rate limitin...
-	  $eqpreset [preset]
+	  $eqpreset [preset] (AKA: eqp)
 	   └─ Sets the current eq to one of the following presets:  Boost, Flat, Metal
-	  $geteq 
+	  $geteq  (AKA: eq)
 	   └─ Prints the current equalizer settings.
-	  $join [channel]
-	   └─ Joins a voice channel.
+	  $join [channel] (AKA: summon)
+	   └─ Joins a passed voice channel, or the author's if none passed.
 	  $leave  (AKA: disconnect)
 	   └─ Stops and disconnects the bot from voice.
 	  $loadpl [url]
@@ -745,11 +758,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the currently playing song if any.
 	  $playingin 
 	   └─ Shows the number of servers the bot is currently playing music in.
-	  $playlist  (AKA: queue)
+	  $playlist  (AKA: queue, q)
 	   └─ Lists the queued songs in the playlist.
+	  $reconnect  (AKA: recon, rec)
+	   └─ Attempts to have the bot save the current playlist to memory, leave the voice...
 	  $repeat [yes_no]
 	   └─ Checks or sets whether to repeat the current playlist.
-	  $reseteq 
+	  $reseteq  (AKA: req)
 	   └─ Resets the current eq to the flat preset.
 	  $resume 
 	   └─ Resumes the song if paused.
@@ -759,25 +774,27 @@ A list of cogs, commands, and descriptions:
 	   └─ Gets or sets whether or not the server will show a list of options when searc...
 	  $seek [position]
 	   └─ Seeks to the passed position in the song if possible.  Position should be in ...
-	  $setband [band_number] [value]
+	  $setband [band_number] [value] (AKA: sb)
 	   └─ Sets the value of the passed eq band (1-15) to the passed value from -5 (sile...
-	  $seteq [bands]
+	  $seteq [bands] (AKA: seq)
 	   └─ Sets the equalizer to the passed 15 space-delimited values from -5 (silent) t...
+	  $setfreq [freq_family] [value] (AKA: freq)
+	   └─ Sets the frequency family to the passed value.  Valid families are bass, mid,...
 	  $shuffle [url]
 	   └─ Shuffles the current queue. If you pass a playlist url or search term, it fir...
 	  $shufflepl [url]
 	   └─ Loads and shuffles the passed playlist json data.  Accepts a url - or picks t...
 	  $skip 
 	   └─ Adds your vote to skip the current song.  50% or more of the non-bot users ne...
+	  $skips [user] (AKA: skipped)
+	   └─ Lists the number of skips for the currently playing song.
 	  $stop 
 	   └─ Stops and empties the current playlist.
 	  $stopall 
 	   └─ Stops and disconnects the bot from all voice channels in all servers (owner-o...
-	  $summon [channel]
-	   └─ Joins the summoner's voice channel.
 	  $unplay [song_number]
 	   └─ Removes the passed song number from the queue.  You must be the requestor, or...
-	  $unqueue 
+	  $unqueue [unqueue_from] (AKA: unq)
 	   └─ Removes all songs you've added from the queue (does not include the currently...
 	  $unskip 
 	   └─ Removes your vote to skip the current song.
@@ -830,11 +847,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
 
 ## Printer
-####	Printer Cog (2 commands) - Printer.py Extension:
+####	Printer Cog (3 commands) - Printer.py Extension:
 	  $print [url]
 	   └─ DOT MATRIX.  Accepts a url - or picks the first attachment.
 	  $printavi [member]
-	   └─ Returns a url to the passed member's avatar.
+	   └─ Returns a the passed member's global avatar - use the printguildavi command f...
+	  $printguildavi [member] (AKA: printgavi, printserveravi, printsavi)
+	   └─ Returns a the passed member's guild avatar if available - use the printavi co...
 
 ## Profile
 ####	Profile Cog (7 commands) - Profile.py Extension:
@@ -865,18 +884,20 @@ A list of cogs, commands, and descriptions:
 	   └─ Auto-adds the required xp to promote the passed user to the passed role (admi...
 
 ## Quote
-####	Quote Cog (6 commands) - Quote.py Extension:
-	  $clearquotereaction 
-	   └─ Clears the trigger reaction for quoting messages (admin only).
-	  $getquotereaction 
-	   └─ Displays the quote reaction if there is one.
-	  $quoteadminonly [yes_no]
-	   └─ Sets whether only admins/bot-admins can quote or not (bot-admin only).
-	  $quotechannel 
+####	Quote Cog (7 commands) - Quote.py Extension:
+	  $clearquotereaction  (AKA: clearqr, clearquoter, cqr)
+	   └─ Clears the trigger reaction for quoting messages (bot-admin only).
+	  $getquotechannel  (AKA: quotechannel, gqc, qc, getquotec)
 	   └─ Prints the current quote channel.
-	  $setquotechannel [channel]
-	   └─ Sets the channel for quoted messages or disables it if no channel sent (admin...
-	  $setquotereaction 
+	  $getquotereaction  (AKA: gqr, getquoter, getqr)
+	   └─ Displays the quote reaction if there is one.
+	  $quoteadminonly [yes_no] (AKA: qao, quoteao, quoteadmino)
+	   └─ Sets whether only admins/bot-admins can quote or not (bot-admin only).
+	  $quotevote [quote_votes] (AKA: quotev, qv)
+	   └─ Gets or sets the number of votes/reactions needed for non admin/bot-admin use...
+	  $setquotechannel [channel] (AKA: sqc, setquotec, setqc)
+	   └─ Sets the channel for quoted messages or disables it if no channel sent (bot-a...
+	  $setquotereaction  (AKA: sqr, setquoter, setqr)
 	   └─ Sets the trigger reaction for quoting messages (bot-admin only).
 
 ## RateLimit
@@ -956,7 +977,7 @@ A list of cogs, commands, and descriptions:
 	  $clearmind [index]
 	   └─ Clear the reminder index passed - or all if none passed.
 	  $reminders [member]
-	   └─ List up to 10 pending reminders - pass a user to see their reminders.
+	   └─ List pending reminders - pass a member to see their reminders in the current ...
 	  $remindme [message] [endtime]
 	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
 
@@ -1028,17 +1049,21 @@ A list of cogs, commands, and descriptions:
 	   └─ Prints the current Secret Santa channel create message (bot-admin only).
 
 ## Server
-####	Server Cog (7 commands) - Server.py Extension:
+####	Server Cog (9 commands) - Server.py Extension:
 	  $autopcpp [setting]
 	   └─ Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). ...
 	  $dumpservers 
 	   └─ Dumps a timpestamped list of servers into the same directory as the bot (owne...
+	  $endpoll [message_url] (AKA: pollend, epoll, endp)
+	   └─ Ends the poll that resides at the passed message url.  Must be either the ori...
 	  $getprefix 
 	   └─ Output's the server's prefix - custom or otherwise.
 	  $info 
 	   └─ Displays the server info if any.
 	  $leaveserver [targetServer]
 	   └─ Leaves a server - can take a name or id (owner only).
+	  $poll [poll_options]
+	   └─ Starts a poll - which can take a custom prompt/question, as well as one or up...
 	  $setinfo [word]
 	   └─ Sets the server info (bot-admin only).
 	  $setprefix [prefix]
@@ -1211,7 +1236,7 @@ A list of cogs, commands, and descriptions:
 ## Time
 ####	Time Cog (6 commands) - Time.py Extension:
 	  $listtz [tz_search]
-	   └─ List all the supported TimeZones in PM.
+	   └─ List all the supported TimeZones.
 	  $offset [member]
 	   └─ See a member's UTC offset.
 	  $setoffset [offset]
@@ -1224,13 +1249,15 @@ A list of cogs, commands, and descriptions:
 	   └─ See a member's TimeZone.
 
 ## Translate
-####	Translate Cog (3 commands) - Translate.py Extension:
+####	Translate Cog (4 commands) - Translate.py Extension:
 	  $detectlang <text>
 	   └─ Reports the detected language and certainty of the passed text.
 	  $langlist 
 	   └─ Lists available languages.
-	  $tr [translate]
-	   └─ Translate some stuff!  Takes a phrase, the from language identifier (optional...
+	  $pronounce [text] (AKA: pr)
+	   └─ Pronunciation for a sentence in the English language.
+	  $translate [translate] (AKA: tr)
+	   └─ Translate some stuff!  Takes a phrase, the from language identifier and the t...
 
 ## Turret
 ####	Turret Cog (1 command) - Turret.py Extension:
