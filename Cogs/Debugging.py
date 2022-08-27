@@ -96,7 +96,19 @@ class Debugging(commands.Cog):
 				return True
 		return False
 
-	def format_invite(self, invite, sent = False):
+	def _t(self,value,ago=False):
+		return "Time Unknown" if value is None else "<t:{}>{}".format(
+			int(value.timestamp())," (<t:{}:R>)".format(int(value.timestamp())) if ago else ""
+		)
+
+	def _f(self,name,value,ts=False,ago=False,wrap=True):
+		if ts: # Create the timestamp
+			value = self._t(value,ago=ago)
+		elif wrap: # Only wrap if not ts, and wrap
+			value = "```\n{}```".format(value)
+		return {"name":"{}".format(name),"value":value}
+
+	def format_invite_fields(self, invite, sent = False):
 		# Gather prelim info
 		guild = invite.guild
 		channel = None if guild is None else invite.channel
@@ -105,21 +117,25 @@ class Debugging(commands.Cog):
 		max_uses = None if invite.max_uses is None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
 		uses = None if invite.uses is None else "{:,}".format(invite.uses)
 		created_by = None if invite.inviter is None else "{}#{} ({})".format(invite.inviter.name, invite.inviter.discriminator, invite.inviter.id)
-		created_at = None if invite.created_at is None else invite.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC"
-		temp = None if invite.temporary is None else invite.temporary
+		temp = False if invite.temporary is None else invite.temporary
+		# Setup the fields
+		fields = []
+		if invite.created_at:
+			fields.append(self._f("Invite Created",invite.created_at,ts=True,ago=True))
 		# Build the description
 		desc = "Invite URL:      {}".format(url)
 		if sent == True:
 			if guild:	  desc += "\nName:            {}".format(guild.name)
-			if invite.approximate_member_count:		  desc += "\nUsers:           {}/{}".format(invite.approximate_presence_count,invite.approximate_member_count)
+			if invite.approximate_member_count:		  desc += "\nMembers:         {}/{}".format(invite.approximate_presence_count,invite.approximate_member_count)
 		if created_by:    desc += "\nCreated By:      {}".format(created_by)
-		if created_at:    desc += "\nCreated At:      {}".format(created_at)
+		# if created_at:    desc += "\nCreated At:      {}".format(created_at)
 		if channel:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
 		if expires_after: desc += "\nExpires:         {}".format(expires_after)
 		if temp:          desc += "\nTemporary:       {}".format(temp)
 		if uses:          desc += "\nUses:            {}".format(uses)
 		if max_uses:      desc += "\nMax Uses:        {}".format(max_uses)
-		return desc
+		fields.append(self._f("Invite Information",desc))
+		return fields
 
 	async def get_latest_log(self, guild, member, types=None):
 		if not types or not isinstance(types,(list,tuple)): return
@@ -157,8 +173,7 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.ban,))
 		log_msg = ""
 		if last:
-			log_msg = "- {} -\nBy {}#{} ({})\n\n{}".format(
-				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+			log_msg = "By:  {}#{} ({})\nFor: {}".format(
 				last.user.name,last.user.discriminator,last.user.id,
 				last.reason if last.reason else "No reason provided."
 			)
@@ -174,8 +189,7 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.unban,))
 		log_msg = ""
 		if last:
-			log_msg = "- {} -\nBy {}#{} ({})\n\n{}".format(
-				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
+			log_msg = "By:  {}#{} ({})\nFor: {}".format(
 				last.user.name,last.user.discriminator,last.user.id,
 				last.reason if last.reason else "No reason provided."
 			)
@@ -217,8 +231,8 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('invite.create', invite.guild): return
 		# An invite was created
 		msg = "📥 Invite created."
-		log_msg = self.format_invite(invite)
-		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),log_msg,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
+		fields = self.format_invite_fields(invite)
+		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),"",fields=fields,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_invite_delete(self, invite):
@@ -230,8 +244,8 @@ class Debugging(commands.Cog):
 		self.invite_list[str(guild.id)] = [x for x in self.invite_list.get(str(guild.id),[]) if x.code != invite.code]
 		if not self.shouldLog('invite.delete', guild): return
 		msg = "📤 Invite deleted."
-		log_msg = self.format_invite(invite)
-		await self._logEvent(guild,log_msg,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
+		fields = self.format_invite_fields(invite)
+		await self._logEvent(guild,"",fields=fields,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()	
 	async def on_member_join(self, member):
@@ -251,9 +265,9 @@ class Debugging(commands.Cog):
 			return
 		# A new member joined
 		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		log_msg = "Account Created: {}".format("Unknown" if member.created_at is None else member.created_at.strftime("%b %d %Y - %I:%M %p") + " UTC")
-		if invite: log_msg += "\n"+self.format_invite(invite)
-		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
+		fields = [self._f("Account Created",member.created_at,ts=True,ago=True)]
+		if invite: fields.extend(self.format_invite_fields(invite))
+		await self._logEvent(guild, "", fields=fields, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
 		
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
@@ -263,18 +277,20 @@ class Debugging(commands.Cog):
 			return
 		# A member left - get the last ban/kick audit log entry
 		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, guild.name)
-		log_msg = ""
+		fields = [self._f("Joined",member.joined_at,ts=True,ago=True)]
 		last = await self.get_latest_log(guild,member,(discord.AuditLogAction.kick,discord.AuditLogAction.ban))
 		if last:
-			log_msg = "--- User was {} ---\n\n- {} -\nBy {}#{} ({})\n\n{}\n\n".format(
-				"banned" if last.action == discord.AuditLogAction.ban else "kicked",
-				last.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
-				last.user.name,last.user.discriminator,last.user.id,
-				last.reason if last.reason else "No reason provided."
-			)
+			fields.append({
+				"name":"Member was **{}**".format("banned" if last.action==discord.AuditLogAction.ban else "kicked"),
+				"value":"{}\n```\nBy:  {}#{} ({})\nFor: {}```".format(
+					self._t(last.created_at,ago=True),
+					last.user.name,last.user.discriminator,last.user.id,
+					last.reason or "No reason provided."
+				)
+			})
 		roles = ["{} ({})".format(x.name,x.id) for x in member.roles if x != guild.default_role]
-		log_msg += "--- Had Roles ---\n\n{}".format("\n".join(roles) if roles else "None")
-		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
+		log_msg = "{}".format("\n".join(roles) if roles else "None")
+		await self._logEvent(guild, log_msg, header="**Had Roles**",fields=fields, title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
 
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
@@ -382,6 +398,11 @@ class Debugging(commands.Cog):
 	async def on_message(self, message):
 		if not message.guild or message.author.bot:
 			return
+		message_url = "https://discord.com/channels/{}/{}/{}".format(
+			message.guild.id,
+			message.channel.id,
+			message.id
+		)
 		if self.shouldLog('message.send', message.guild):
 			# A message was sent
 			title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
@@ -391,7 +412,7 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
+			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl, message_url=message_url)
 		if self.shouldLog('invite.send', message.guild):
 			# A message was sent
 			matches = re.finditer(r"(?i)((discord\.gg|discordapp\.com\/invite)\/\S+)",message.content)
@@ -401,11 +422,11 @@ class Debugging(commands.Cog):
 				if not invite in invites: invites.append(invite)
 			if invites:
 				title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
-				msg = ""
+				fields = []
 				for invite in invites:
-					msg += self.format_invite(await self.bot.fetch_invite(invite, with_counts=True), True) + "\n\n"
+					fields.extend(self.format_invite_fields(await self.bot.fetch_invite(invite,with_counts=True),sent=True))
 				pfpurl = Utils.get_avatar(message.author)
-				await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl)
+				await self._logEvent(message.guild, "", fields=fields, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl, message_url=message_url)
 
 	@commands.Cog.listener()
 	async def on_raw_message_edit(self, payload):
@@ -523,7 +544,7 @@ class Debugging(commands.Cog):
 		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
 		shutil.rmtree(temp,ignore_errors=True)
 	
-	async def _logEvent(self, server, log_message, *, filename = None, color = None, title = None, thumbnail = None, message_url = None):
+	async def _logEvent(self, server, log_message, *, header = None, fields = None, filename = None, color = None, title = None, thumbnail = None, message_url = None):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color is None:
@@ -548,14 +569,16 @@ class Debugging(commands.Cog):
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
 			# Save our current and UTC time for the logged event
-			now = int(time.mktime(datetime.now().timetuple()))
-			utc = int(time.mktime(datetime.now(timezone.utc).timetuple()))
-			# Setup the header - and include the optional message link if passed
-			d_header = "<t:{}> | <t:{}> UTC{}\n```\n".format(
-				now,
-				utc,
-				"\n[Link]({})".format(message_url) if message_url else "",
+			d_header = "`Event Logged:` <t:{}>{}\n{}```\n".format(
+				int(datetime.now().timestamp()),
+				"\n[Message Link]({})".format(message_url) if message_url else "",
+				"\n"+header+"\n" if header else ""
 			)
+			d_footer = "\n```"
+			# Make sure we timestamp - even if there's no description
+			if not log_message:
+				log_message = d_header[:-4] if d_header.endswith("```\n") else d_header
+				d_header = d_footer = ""
 			# Send the embed
 			message = await Message.Embed(
 				title=title,
@@ -563,8 +586,9 @@ class Debugging(commands.Cog):
 				color=color,
 				thumbnail=thumbnail,
 				d_header=d_header,
-				d_footer="\n```",
-				footer=footer
+				d_footer=d_footer,
+				footer=footer,
+				fields=fields
 			).send(logChan)
 			if filename: await message.edit(file=discord.File(filename))
 		except Exception as e:
