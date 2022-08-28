@@ -126,7 +126,7 @@ class Debugging(commands.Cog):
 		desc = "Invite URL:      {}".format(url)
 		if sent == True:
 			if guild:	  desc += "\nName:            {}".format(guild.name)
-			if invite.approximate_member_count:		  desc += "\nMembers:         {}/{}".format(invite.approximate_presence_count,invite.approximate_member_count)
+			if invite.approximate_member_count:		  desc += "\nMembers:         {:,}/{:,}".format(invite.approximate_presence_count,invite.approximate_member_count)
 		if created_by:    desc += "\nCreated By:      {}".format(created_by)
 		# if created_at:    desc += "\nCreated At:      {}".format(created_at)
 		if channel:       desc += "\nFor Channel:     #{} ({})".format(channel.name, channel.id)
