@@ -42,7 +42,7 @@ class Ascii(commands.Cog):
 			color=ctx.author
 		).send(ctx)
 
-	@commands.command(pass_context=True, no_pm=True)
+	@commands.command()
 	async def ascii(self, ctx, *, text : str = None):
 		"""Beautify some text."""
 
@@ -55,6 +55,6 @@ class Ascii(commands.Cog):
 			# We got a font!
 			font = parts[0]
 			text = " ".join(parts[1:])
-		output = pyfiglet.figlet_format(text,font=font if font else pyfiglet.DEFAULT_FONT)[:1993] # Limit to 2000 chars
+		output = pyfiglet.figlet_format(text,font=font or pyfiglet.DEFAULT_FONT)[:1993] # Limit to 2000 chars
 		if not output: return await ctx.send("I couldn't beautify that text :(")
 		await ctx.send("```\n{}```".format(output))
