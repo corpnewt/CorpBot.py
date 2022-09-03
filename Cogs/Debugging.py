@@ -163,7 +163,7 @@ class Debugging(commands.Cog):
 				except: return None
 			try:
 				g = self.bot.get_guild(g_id)
-				c = g.get_channel(c_id)
+				c = getattr(g,"get_channel_or_thread",guild.get_channel)(c_id)
 				message = await c.fetch_message(m_id)
 			except: return None
 		return message
@@ -475,7 +475,7 @@ class Debugging(commands.Cog):
 			except: author = None
 		if not author or author.bot: return # Author doesn't exist - or is a bot
 		if not self.shouldLog("message.edit",guild): return # We're not logging edits
-		channel = guild.get_channel(payload.channel_id)
+		channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
 		title = '✏️ {}#{} ({}), in {}, edited:'.format(
 			author.name,
 			author.discriminator,
@@ -498,9 +498,13 @@ class Debugging(commands.Cog):
 				msg += a.get("url","Unknown URL") + "\n"
 		pfpurl = Utils.get_avatar(author)
 		message_url = self._message_url(payload)
-		fetched = await channel.fetch_message(payload.message_id)
-		reference_url = self._message_url(fetched.reference)
-		reference_mention = await self._reference_mention(fetched)
+		fetched = reference_url = reference_mention = None
+		if channel: # Attempt to resolve the message and info
+			try:
+				fetched = await channel.fetch_message(payload.message_id)
+				reference_url = self._message_url(fetched.reference)
+				reference_mention = await self._reference_mention(fetched)
+			except: pass
 		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message_url=message_url, reference_url=reference_url, reference_mention=reference_mention)
 
 	@commands.Cog.listener()
@@ -510,7 +514,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog("message.delete",guild): return # Not logging deletes
 		reference_url = None # Initialize an empty reference
 		if not payload.cached_message:
-			channel = guild.get_channel(payload.channel_id)
+			channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
 			title = '❌ Message in {} deleted.'.format(
 				"#"+channel.name if channel else payload.channel_id
 			)
@@ -543,7 +547,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog("message.delete",guild): return # Not logging deletes
 		# Generate a timestamp for the delete event
 		name = "Bulk-Delete-{}.txt".format(datetime.utcnow().strftime("%Y-%m-%d %H.%M"))
-		channel = guild.get_channel(payload.channel_id)
+		channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
 		cached_ids = [x.id for x in payload.cached_messages] if payload.cached_messages else []
 		missing_ids = [x for x in payload.message_ids if not x in cached_ids]
 		msg = "Bulk Delete in {} -> {}:\n\n".format(
