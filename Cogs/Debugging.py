@@ -171,9 +171,7 @@ class Debugging(commands.Cog):
 	async def _reference_mention(self, message):
 		message = await self._get_message(message) # Ensure we have a retrieved message
 		if not message or not message.mentions: return False # No message or mentions at all
-		# Get a list of orphaned mentions that are in message.mentions, but not message.raw_mentions
-		if [x for x in message.mentions if not x.id in message.raw_mentions]: return True
-		return False
+		return len(message.mentions) != len(message.raw_mentions)
 
 	async def get_latest_log(self, guild, member, types=None):
 		if not types or not isinstance(types,(list,tuple)): return
