@@ -150,28 +150,33 @@ class Debugging(commands.Cog):
 		return "https://discord.com/channels/{}/{}/{}".format(g_id,c_id,m_id)
 
 	async def _get_message(self, message):
-		if not isinstance(message,discord.Message):
-			# Try to resolve to a message
+		if isinstance(message,discord.Message) or message is None:
+			return message # Already a message, or no way to resolve
+		elif isinstance(getattr(message,"cached_message",None),discord.Message):
+			return message.cached_message
+		elif isinstance(getattr(message,"resolved",None),discord.Message):
+			return message.resolved
+		else: # Not none, and no immediate way to resolve - might be string/payload/reference
 			if isinstance(message,str): # Assume it's a url - split it up
 				try: g_id,c_id,m_id = map(int,message.split("/")[-3:])
 				except: return None
-			else: # Assume it's a payload
+			else: # Assume it's a payload or reference
 				try:
 					g_id = getattr(message,"guild_id")
 					c_id = getattr(message,"channel_id")
 					m_id = getattr(message,"message_id")
 				except: return None
+			# Hope we have enough info - try to get the message
 			try:
 				g = self.bot.get_guild(g_id)
 				c = getattr(g,"get_channel_or_thread",guild.get_channel)(c_id)
-				message = await c.fetch_message(m_id)
+				return await c.fetch_message(m_id)
 			except: return None
-		return message
 
 	async def _reference_mention(self, message):
 		message = await self._get_message(message) # Ensure we have a retrieved message
-		if not message or not message.mentions: return False # No message or mentions at all
-		return len(message.mentions) != len(message.raw_mentions)
+		if not message or not message.mentions: return [] # No message or mentions at all
+		return [x for x in message.mentions if not x.id in message.raw_mentions]
 
 	async def get_latest_log(self, guild, member, types=None):
 		if not types or not isinstance(types,(list,tuple)): return
@@ -434,9 +439,7 @@ class Debugging(commands.Cog):
 	async def on_message(self, message):
 		if not message.guild or message.author.bot:
 			return
-		message_url = self._message_url(message)
-		reference_url = self._message_url(message.reference)
-		reference_mention = await self._reference_mention(message)
+		reference = message.reference
 		if self.shouldLog('message.send', message.guild):
 			# A message was sent
 			title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
@@ -446,7 +449,7 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl, message_url=message_url, reference_url=reference_url, reference_mention=reference_mention)
+			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, reference=reference)
 		if self.shouldLog('invite.send', message.guild):
 			# A message was sent
 			matches = re.finditer(r"(?i)((discord\.gg|discordapp\.com\/invite)\/\S+)",message.content)
@@ -462,7 +465,7 @@ class Debugging(commands.Cog):
 				if fields: # Got at least one valid invite
 					title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
 					pfpurl = Utils.get_avatar(message.author)
-					await self._logEvent(message.guild, "", fields=fields, title=title, color=discord.Color.dark_grey(), thumbnail = pfpurl, message_url=message_url, reference_url=reference_url, reference_mention=reference_mention)
+					await self._logEvent(message.guild, "", fields=fields, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, reference=reference)
 
 	@commands.Cog.listener()
 	async def on_raw_message_edit(self, payload):
@@ -497,22 +500,20 @@ class Debugging(commands.Cog):
 			for a in payload.data["attachments"]:
 				msg += a.get("url","Unknown URL") + "\n"
 		pfpurl = Utils.get_avatar(author)
-		message_url = self._message_url(payload)
-		fetched = reference_url = reference_mention = None
+		fetched = reference = None
 		if channel: # Attempt to resolve the message and info
 			try:
 				fetched = await channel.fetch_message(payload.message_id)
-				reference_url = self._message_url(fetched.reference)
-				reference_mention = await self._reference_mention(fetched)
+				reference = fetched.reference
 			except: pass
-		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message_url=message_url, reference_url=reference_url, reference_mention=reference_mention)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message=payload, reference=reference)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
 		guild = self.bot.get_guild(payload.guild_id)
 		if not guild: return # Not in a guild
 		if not self.shouldLog("message.delete",guild): return # Not logging deletes
-		reference_url = None # Initialize an empty reference
+		reference = None # Initialize an empty reference
 		if not payload.cached_message:
 			channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
 			title = '❌ Message in {} deleted.'.format(
@@ -524,8 +525,7 @@ class Debugging(commands.Cog):
 			message = payload.cached_message
 			if message.author.bot:
 				return # Don't log bots
-			reference_url = self._message_url(message.reference)
-			reference_mention = await self._reference_mention(message)
+			reference = message.reference
 			title = '❌ {}#{} ({}), in #{}, deleted:'.format(
 				message.author.name,
 				message.author.discriminator,
@@ -538,7 +538,7 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl, reference_url=reference_url, reference_mention=reference_mention)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl, message=payload, link_message=False, reference=reference)
 
 	@commands.Cog.listener()
 	async def on_raw_bulk_message_delete(self, payload):
@@ -552,19 +552,29 @@ class Debugging(commands.Cog):
 		missing_ids = [x for x in payload.message_ids if not x in cached_ids]
 		msg = "Bulk Delete in {} -> {}:\n\n".format(
 			guild.name,
-			"#"+channel.name if channel else payload.channel_id
+			"#{} ({})".format(channel.name,channel.id) if channel else payload.channel_id
 		)
 		if cached_ids:
 			msg += "--- Cached Messages ---\n\n"
 			for message in payload.cached_messages:
-				msg += "Sent By: {}#{} ({}) at {}{}:{}{}{}\n\n".format(
+				resolved = await self._get_message(message.reference)
+				msg += "{} - Sent By: {}#{} ({}) at {}{}:{}{}{}\n\n".format(
+					message.id,
 					message.author.name,
 					message.author.discriminator,
 					message.author.id,
 					message.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
-					"(edited at {} UTC)".format(message.edited_at.strftime("%b %d %Y - %I:%M %p")) if message.edited_at else "",
+					" (edited at {} UTC)".format(message.edited_at.strftime("%b %d %Y - %I:%M %p")) if message.edited_at else "",
 					"\n"+message.content if message.content else "",
-					"\n--- Reply To{} ---\n{}".format(" (Pinged)" if await self._reference_mention(message) else "",self._message_url(message)) if message.reference else "",
+					"\n--- {}Reply To{} ---\n{}".format(
+						"(Pinged) " if await self._reference_mention(message) else "",
+						" {}#{} ({})".format(
+							resolved.author.name,
+							resolved.author.discriminator,
+							resolved.author.id
+						) if resolved else "",
+						self._message_url(message)
+					) if message.reference else "",
 					"\n--- Attachments ---\n{}".format("\n".join([x.url for x in message.attachments])) if message.attachments else ""
 				)
 		if missing_ids:
@@ -587,7 +597,7 @@ class Debugging(commands.Cog):
 		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
 		shutil.rmtree(temp,ignore_errors=True)
 	
-	async def _logEvent(self, server, log_message, *, header=None, fields=None, filename=None, color=None, title=None, thumbnail=None, message_url=None, reference_url=None, reference_mention=False):
+	async def _logEvent(self, server, log_message, *, header=None, fields=None, filename=None, color=None, title=None, thumbnail=None, message=None, link_message=True, reference=None, link_reference=True):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color is None:
@@ -612,11 +622,19 @@ class Debugging(commands.Cog):
 				# Wraps the message to lines no longer than 70 chars
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
 			urls = ""
-			if message_url: urls += "[Message Link]({})".format(message_url)
-			if reference_url:
-				if urls: urls += " - "
-				urls += "[Reply Link{}]({})".format(
-					" (Pinged)" if reference_mention else "",
+			# Resolve message
+			message = await self._get_message(message)
+			if message and link_message:
+				urls += "- [Message Link]({})".format(self._message_url(message))
+			if reference and link_reference:
+				if urls: urls += "\n" # Add a formatting separator as needed
+				# Let's get the reference_url, reference_mention, and resolve the reference message/author
+				resolved = await self._get_message(reference)
+				reference_url = self._message_url(reference)
+				reference_mention = await self._reference_mention(message)
+				urls += "- [{}Reply{}]({})".format(
+					"Ping " if reference_mention else "",
+					" to {}#{} ({})".format(resolved.author.name,resolved.author.discriminator,resolved.author.id) if resolved else " Link",
 					reference_url
 				)
 			# Save our current and UTC time for the logged event
