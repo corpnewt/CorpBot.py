@@ -4,7 +4,7 @@ import datetime
 import time
 import random
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, Nullify, CheckRoles, UserTime, Message, PickList
+from   Cogs import Settings, DisplayName, Nullify, CheckRoles, Message, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -903,15 +903,13 @@ class Xp(commands.Cog):
 			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
 			stat_embed.author = '{}'.format(member.name)
-		# Get localized user time
-		if member.joined_at != None:
-			local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
-			j_time_str = "{} {}".format(local_time['time'], local_time['zone'])
-		
-			# Add Joined
-			stat_embed.add_field(name="Joined", value=j_time_str, inline=True)
-		else:
-			stat_embed.add_field(name="Joined", value="Unknown", inline=True)
+
+		# Get Joined timestamp
+		joined = "Unknown"
+		if member.joined_at:
+			ts = int(member.joined_at.timestamp())
+			joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
+		stat_embed.add_field(name="Joined", value=joined, inline=True)
 
 		# Get user's current role
 		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
@@ -960,23 +958,20 @@ class Xp(commands.Cog):
 			msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, next_role_text)
 			# Add Next Rank
 			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(next_role_text, int(nextRole['XP'])-newStat), inline=True)
-			
 		# Add status
-		status_text = ":green_heart:"
-		if member.status == discord.Status.offline:
-			status_text = ":black_heart:"
-		elif member.status == discord.Status.dnd:
-			status_text = ":heart:"
-		elif member.status == discord.Status.idle:
-			status_text = ":yellow_heart:"
+		status_text = {
+			discord.Status.offline: ":black_heart: Offline",
+			discord.Status.dnd: ":heart: Do Not Disturb",
+			discord.Status.idle: ":yellow_heart: Idle",
+		}.get(member.status,":green_heart: Online")
 		stat_embed.add_field(name="Status", value=status_text, inline=True)
-
+		# Get User Name and ID
 		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
 		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
 		if member.premium_since:
-			local_time = UserTime.getUserTime(ctx.author, self.settings, member.premium_since, clock=True)
-			c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
-			stat_embed.add_field(name="Boosting Since",value=c_time_str)
+			ts = int(member.premium_since.timestamp())
+			boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
+			stat_embed.add_field(name="Boosting Since",value=boosted)
 		
 		if member.activity and member.activity.name:
 			# Playing a game!
@@ -993,6 +988,7 @@ class Xp(commands.Cog):
 			if member.activity.type == discord.ActivityType.streaming:
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
+
 		# Add joinpos
 		joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in ctx.guild.members], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 
@@ -1006,13 +1002,13 @@ class Xp(commands.Cog):
 				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 		else:
 			stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
-		
-		# Get localized user time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, member.created_at, clock=False)
-		c_time_str = "{} {}".format(local_time['time'], local_time['zone'])
-		# add created_at footer
-		created = "Created at " + c_time_str
-		stat_embed.footer = created
+
+		# Get Created timestamp
+		created = "Unknown"
+		if member.created_at:
+			ts = int(member.created_at.timestamp())
+			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
+		stat_embed.description = "Created {}".format(created)
 
 		await stat_embed.send(ctx)
 		
