@@ -1,6 +1,6 @@
 import asyncio, discord
 from   discord.ext import commands
-from   Cogs        import Nullify, DisplayName, UserTime, Message, PickList
+from   Cogs        import Nullify, DisplayName, Message, PickList
 
 def setup(bot):
     # Add the bot and deps
@@ -89,10 +89,11 @@ class ServerStats(commands.Cog):
         server_embed.title = guild.name
         
         # Get localized user time
-        local_time = UserTime.getUserTime(ctx.author, self.settings, guild.created_at)
-        time_str = "{} {}".format(local_time['time'], local_time['zone'])
-        
-        server_embed.description = "Created at {}".format(time_str)
+        created = "Unknown"
+        if guild.created_at:
+            ts = int(guild.created_at.timestamp())
+            created = "<t:{}> (<t:{}:R>)".format(ts,ts)
+        server_embed.description = "Created: {}".format(created)
         online_members = 0
         bot_member     = 0
         bot_online     = 0
@@ -125,7 +126,7 @@ class ServerStats(commands.Cog):
         server_embed.add_field(name="Default Role", value=guild.default_role, inline=True)
         server_embed.add_field(name="Owner", value=guild.owner.name + "#" + guild.owner.discriminator, inline=True)
         server_embed.add_field(name="AFK Channel", value=guild.afk_channel, inline=True)
-        server_embed.add_field(name="Verification", value=guild.verification_level, inline=True)
+        server_embed.add_field(name="Verification", value=str(guild.verification_level).capitalize(), inline=True)
         # server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
         server_embed.add_field(name="Considered Large", value=guild.large, inline=True)
         server_embed.add_field(name="Shard ID", value="{}/{}".format(guild.shard_id+1, self.bot.shard_count), inline=True)
@@ -379,10 +380,17 @@ class ServerStats(commands.Cog):
         our_list = []
         # offset = self.settings.getGlobalUserStat(ctx.author,"TimeZone",self.settings.getGlobalUserStat(ctx.author,"UTCOffset",None))
         for member in ctx.guild.members:
+            join = "Unknown"
+            if member.joined_at:
+                ts = int(member.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
+            name = "{}#{}".format(member.name,member.discriminator)
+            if member.nick:
+                name = "{} ({})".format(member.nick,name)
             our_list.append(
                 {
-                    "name":"{}#{}".format(member.name,member.discriminator," (AKA: {})".format(member.nick) if member.nick else ""),
-                    "value":"{} UTC ({})".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown",member.id),
+                    "name":name,
+                    "value":join,
                     "date":member.joined_at
                 }
             )
@@ -394,10 +402,17 @@ class ServerStats(commands.Cog):
         """Lists the most recent users to join."""
         our_list = []
         for member in ctx.guild.members:
+            join = "Unknown"
+            if member.joined_at:
+                ts = int(member.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
+            name = "{}#{}".format(member.name,member.discriminator)
+            if member.nick:
+                name = "{} ({})".format(member.nick,name)
             our_list.append(
                 {
-                    "name":"{}#{}".format(member.name,member.discriminator," (AKA: {})".format(member.nick) if member.nick else ""),
-                    "value":"{} UTC ({})".format(member.joined_at.strftime("%Y-%m-%d %I:%M %p") if member.joined_at != None else "Unknown",member.id),
+                    "name":name,
+                    "value":join,
                     "date":member.joined_at
                 }
             )
@@ -411,10 +426,14 @@ class ServerStats(commands.Cog):
         # offset = self.settings.getGlobalUserStat(ctx.author, "TimeZone",self.settings.getGlobalUserStat(ctx.author,"UTCOffset",None))
         for guild in self.bot.guilds:
             bot = guild.me
+            join = "Unknown"
+            if bot.joined_at:
+                ts = int(bot.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
             our_list.append(
                 {
                     "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
-                    "value":"{} UTC ({})".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown",guild.id),
+                    "value":"`{}`\n".format(guild.id)+join,
                     "date":bot.joined_at
                 }
             )
@@ -427,11 +446,15 @@ class ServerStats(commands.Cog):
         our_list = []
         # offset = self.settings.getGlobalUserStat(ctx.author,"TimeZone",self.settings.getGlobalUserStat(ctx.author,"UTCOffset",None))
         for guild in self.bot.guilds:
-            bot = DisplayName.memberForID(self.bot.user.id, guild)
+            bot = guild.me
+            join = "Unknown"
+            if bot.joined_at:
+                ts = int(bot.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
             our_list.append(
                 {
                     "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
-                    "value":"{} UTC ({})".format(bot.joined_at.strftime("%Y-%m-%d %I:%M %p") if bot.joined_at != None else "Unknown",guild.id),
+                    "value":"`{}`\n".format(guild.id)+join,
                     "date":bot.joined_at
                 }
             )
