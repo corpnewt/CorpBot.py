@@ -198,11 +198,11 @@ class Reddit(commands.Cog):
 			"url" : "https://www.reddit.com/user/" + theJSON["data"]["name"],
 			"color" : ctx.author, 
 			"fields" : [] }
-		created_s = time.gmtime(theJSON["data"]["created_utc"])
-		created_dt = datetime(*created_s[:6])
-		# Get the actual user time of creation
-		created = UserTime.getUserTime(ctx.author, self.settings, created_dt)
-		created_string = "{} {}".format(created['time'], created['zone'])
+
+		# Get the unix timestamp for the account creation
+		ts = int(theJSON["data"]["created_utc"])
+		created_string = "<t:{}> (<t:{}:R>)".format(ts,ts)
+
 		e["fields"].append({ "name" : "Created", "value" : created_string, "inline" : True })
 		e["fields"].append({ "name" : "Link Karma", "value" : "{:,}".format(theJSON["data"]["link_karma"]), "inline" : True })
 		e["fields"].append({ "name" : "Comment Karma", "value" : "{:,}".format(theJSON["data"]["comment_karma"]), "inline" : True })
