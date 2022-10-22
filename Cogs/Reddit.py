@@ -177,8 +177,7 @@ class Reddit(commands.Cog):
 	@commands.command(pass_context=True)
 	async def ruser(self, ctx, *, user_name = None):
 		"""Gets some info on the passed username - attempts to use your username if none provided."""
-		if user_name == None:
-			user_name = ctx.author.nick if ctx.author.nick else ctx.author.name
+		user_name = user_name or ctx.author.display_name
 		# Get the info
 		url = "https://www.reddit.com/user/{}/about.json?raw_json=1".format(quote(user_name))
 		# Giving a 200 response for some things that aren't found
