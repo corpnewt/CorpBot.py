@@ -77,7 +77,7 @@ class Profile(commands.Cog):
 			if mem_from_name:
 				# We got a member - let's check for a profile
 				itemList = self.settings.getUserStat(mem_from_name, ctx.guild, "Profiles", [])
-				item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+				item = next((x for x in itemList if x["Name"].lower() == profile_str.lower()),None)
 				if item: return (mem_from_name,item)
 		# Check if there is no member specified
 		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles", [])
