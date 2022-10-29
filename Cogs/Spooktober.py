@@ -13,6 +13,8 @@ class Spooktober(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.spoop_re = re.compile(r"sp[o0]{2,}(k|p)")
+		global Utils
+		Utils = self.bot.get_cog("Utils")
 
 	async def message(self, message):
 		if datetime.today().month == 10 and datetime.today().day == 31:
