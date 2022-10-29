@@ -27,7 +27,9 @@ class Music(commands.Cog):
 		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol")] # Attributes to strip on start
 		# Ratio to equalize volume - can be useful to account for changes in the Wavelink module
 		# which used to use 0 -> 100, and now uses 0.0 -> 1.0 for 0 to 100% volume
-		self.vol_ratio = 0.0075
+		# Has now been changed to 0 -> 1000 where 1000 is 100%, so I guess it's x 10?
+		# They really need to get their shit together with this...
+		self.vol_ratio = 0.75
 		self.reconnect_wait = 0.5 # Number of seconds to wait before reconnecting
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
