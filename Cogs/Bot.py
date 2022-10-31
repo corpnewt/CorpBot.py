@@ -137,13 +137,15 @@ class Bot(commands.Cog):
 		command_count = "{:,}".format(len(visible))
 		
 		# Get localized created time
-		local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.created_at)
-		created_at = "{} {}".format(local_time['time'], local_time['zone'])
+		created_at = joined_at = "Unknown"
+		if bot_member.created_at:
+			ts = int(bot_member.created_at.timestamp())
+			created_at = "<t:{}> (<t:{}:R>)".format(ts,ts)
 		
 		# Get localized joined time if in a server
-		if isinstance(bot_member,discord.Member):
-			local_time = UserTime.getUserTime(ctx.author, self.settings, bot_member.joined_at)
-			joined_at = "{} {}".format(local_time['time'], local_time['zone'])
+		if isinstance(bot_member,discord.Member) and bot_member.joined_at:
+			ts = int(bot_member.joined_at.timestamp())
+			joined_at = "<t:{}> (<t:{}:R>)".format(ts,ts)
 		
 		# Get the current prefix
 		prefix = await self.bot.command_prefix(self.bot, ctx.message)
