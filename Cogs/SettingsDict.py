@@ -90,13 +90,14 @@ class SettingsDict(commands.Cog):
             await Message.Embed(
                 title=("Get" if command=="get" else "Remove")+"Settings Dict Key",
                 fields=fields,
-                color=ctx.author
+                color=ctx.author,
+                footer="Settings changes may require Cog or Bot reload to take effect." if command=="rem" else None
             ).send(ctx)
             # Check if we were removing - and remove it
             if command == "rem":
                 self.bot.settings_dict.pop(key,None)
                 # Write the new settings dict
-                json.dump(settings_dict,open("settings_dict.json","w"),indent=4)
+                json.dump(self.bot.settings_dict,open("settings_dict.json","w"),indent=4)
         else: # We're setting something!
             if not args: # We're missing arguments
                 return await ctx.send("Missing arguments!\n"+usage)
@@ -147,7 +148,8 @@ class SettingsDict(commands.Cog):
             await Message.Embed(
                 title="Set Settings Dict Key",
                 fields=fields,
-                color=ctx.author
+                color=ctx.author,
+                footer="Settings changes may require Cog or Bot reloads to take effect."
             ).send(ctx)
             # Actually set it - and save it
             self.bot.settings_dict[key] = value
