@@ -289,7 +289,7 @@ class Help(commands.Cog):
 			list=result["fields"],
 			ctx=ctx,
 			description=result.get("com_desc",desc),
-			max=12,
+			max=12 if result["fields"] else 100, # 12 fields or 100 lines of desc text
 			d_header=result.get("com_name","")+"```\n",
 			d_footer="```",
 			footer=result.get("footer","" if len(result["fields"]) else desc.replace("```\n","").split("\n")[0])
