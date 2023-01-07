@@ -311,7 +311,7 @@ class Lists(commands.Cog):
 		if not isinstance(items,list):
 			return await message.edit(content="Malformed json data :(")
 		if not all(("Name" in x and l_key in x for x in items)):
-			return await message.edit(content="Invalid [[name]] data :(".format(l_name.lowe()))
+			return await message.edit(content="Invalid {} data :(".format(l_name.lower()))
 		# At this point - we should have a valid json file with our data - let's add it.
 		currentTime = int(time.time())
 		added = 0
@@ -345,6 +345,14 @@ class Lists(commands.Cog):
 		else:
 			msg = "Updated {:,} existing {}{}!".format(updated,l_name.lower(),"" if updated == 1 else "s")
 		await message.edit(content=msg)
+
+	async def _clear_items(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
+		if not itemList:
+			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
+			return await ctx.send(msg)
+		self.settings.setServerStat(ctx.guild, l_list, [])
+		return await ctx.send("Cleared {:,} {}{}!".format(len(itemList),l_name.lower(),"" if len(itemList)==1 else "s"))
 
 	###                    ###
 	## Link-related Methods ##
@@ -395,10 +403,15 @@ class Lists(commands.Cog):
 		"""Saves the link list to a json file and uploads."""
 		await self._save_items(ctx,**self.presets["Link"])
 
-	@commands.command()
+	@commands.command(aliases=["addlinks"])
 	async def loadlinks(self, ctx, *, url=None):
-		"""Loads the passed json attachment or URL into the links list."""
+		"""Loads the passed json attachment or URL into the link list."""
 		await self._load_items(ctx,url,**self.presets["Link"])
+
+	@commands.command(aliases=["clrlinks"])
+	async def clearlinks(self, ctx):
+		"""Clears all entries from the link list."""
+		await self._clear_items(ctx,**self.presets["Link"])
 
 	###                    ###
 	## Hack-related Methods ##
@@ -449,10 +462,15 @@ class Lists(commands.Cog):
 		"""Saves the hack list to a json file and uploads."""
 		await self._save_items(ctx,**self.presets["Hack"])
 
-	@commands.command()
+	@commands.command(aliases=["addhacks"])
 	async def loadhacks(self, ctx, *, url=None):
-		"""Loads the passed json attachment or URL into the hacks list."""
+		"""Loads the passed json attachment or URL into the hack list."""
 		await self._load_items(ctx,url,**self.presets["Hack"])
+
+	@commands.command(aliases=["clrhacks"])
+	async def clearhacks(self, ctx):
+		"""Clears all entries from the hack list."""
+		await self._clear_items(ctx,**self.presets["Hack"])
 
 	###                   ###
 	## Tag-related Methods ##
@@ -503,10 +521,15 @@ class Lists(commands.Cog):
 		"""Saves the tag list to a json file and uploads."""
 		await self._save_items(ctx,**self.presets["Tag"])
 
-	@commands.command()
+	@commands.command(aliases=["addtags"])
 	async def loadtags(self, ctx, *, url=None):
-		"""Loads the passed json attachment or URL into the tags list."""
+		"""Loads the passed json attachment or URL into the tag list."""
 		await self._load_items(ctx,url,**self.presets["Tag"])
+
+	@commands.command(aliases=["clrtags"])
+	async def clearlinks(self, ctx):
+		"""Clears all entries from the tag list."""
+		await self._clear_items(ctx,**self.presets["Tag"])
 		
 	###                     ###
 	## Parts-related Methods ##
