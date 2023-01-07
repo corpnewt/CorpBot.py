@@ -272,7 +272,6 @@ class Lists(commands.Cog):
 	
 	async def _save_items(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		# Helper method to dump the passed command contents to a json file and upload
-		if not self._has_privs(ctx,l_role): return await ctx.send("You do not have sufficient privileges to access this command.")
 		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		if not itemList:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
