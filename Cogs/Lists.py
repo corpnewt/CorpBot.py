@@ -1,6 +1,6 @@
-import asyncio, discord, time
+import asyncio, discord, time, tempfile, json, os, shutil
 from   discord.ext import commands
-from   Cogs import Utils, ReadableTime, DisplayName, FuzzySearch, Message, PickList, Nullify
+from   Cogs import Utils, ReadableTime, DisplayName, FuzzySearch, Message, PickList, Nullify, DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -98,7 +98,7 @@ class Lists(commands.Cog):
 		if not name:
 			msg = 'Usage: `{}{}[[name]] "[[[name]] name]"`'.format(ctx.prefix,"raw" if raw else "").replace("[[name]]",l_name.lower())
 			return await ctx.send(msg)
-		itemList = self.settings.getServerStat(ctx.guild, l_list)
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		# Check other lists
 		other_commands = []
 		other_names    = []
@@ -182,7 +182,7 @@ class Lists(commands.Cog):
 		if name == None or value == None:
 			msg = 'Usage: `{}add[[name]] "[[[name]] name]" [[[key]]]`'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
-		itemList = self.settings.getServerStat(ctx.guild, l_list)
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		if not itemList:
 			itemList = []
 		currentTime = int(time.time())
@@ -204,7 +204,7 @@ class Lists(commands.Cog):
 		if name == None:
 			msg = 'Usage: `{}remove{} "[{} name]"`'.format(ctx.prefix,l_name.lower(),l_name.lower())
 			return await ctx.send(msg)
-		itemList = self.settings.getServerStat(ctx.guild, l_list)
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
@@ -219,7 +219,7 @@ class Lists(commands.Cog):
 		if name == None:
 			msg = 'Usage: `{}info{} "[{} name]"`'.format(ctx.prefix,l_name.lower(),l_name.lower())
 			return await ctx.send(msg)
-		itemList = self.settings.getServerStat(ctx.guild, l_list)
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
@@ -251,7 +251,7 @@ class Lists(commands.Cog):
 			# We have a random attempt at a passed variable - Thanks Sydney!
 			# Invoke this command again with the right name
 			return await ctx.invoke(command, name=extra)
-		itemList = self.settings.getServerStat(ctx.guild, l_list)
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		if not itemList or itemList == []:
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
@@ -269,144 +269,250 @@ class Lists(commands.Cog):
 		if not listrole:
 			return await ctx.send('There is no role that matches id: `{}` - consider updating this setting.'.format(role))
 		return await ctx.send(Utils.suppressed(ctx,"You need to be a{} **{}** to add and remove {}s.").format("n" if listrole.name.lower()[0] in "aeiou" else "",Nullify.escape_all(listrole.name),l_name.lower()))
-		
+	
+	async def _save_items(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
+		# Helper method to dump the passed command contents to a json file and upload
+		if not self._has_privs(ctx,l_role): return await ctx.send("You do not have sufficient privileges to access this command.")
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
+		if not itemList:
+			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
+			return await ctx.send(msg)
+		message = await ctx.send("Saving {}s and uploading...".format(l_name.lower()))
+		temp = tempfile.mkdtemp()
+		temp_json = os.path.join(temp,"{}s.json".format(l_name))
+		try:
+			json.dump(itemList,open(temp_json,"w"),indent=2)
+			await ctx.send(file=discord.File(temp_json))
+		except Exception as e:
+			print(e)
+			return await message.edit(content="Could not save or upload {}s :(".format(l_name.lower()))
+		finally:
+			shutil.rmtree(temp,ignore_errors=True)
+		pass
+		await message.edit(content="Uploaded {}s.json!".format(l_name))
+
+	async def _load_items(self,ctx,url,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
+		# Helper method to load a passed json URL or attachment and add the contents to the list
+		if not self._has_privs(ctx,l_role): return await ctx.send("You do not have sufficient privileges to access this command.")
+		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
+		if not isinstance(itemList,list): # Malformed - let's start it anew
+			itemList = []
+		if url is None and len(ctx.message.attachments) == 0:
+			return await ctx.send("Usage: `{}load{} [url or attachment]`".format(ctx.prefix,l_name.lower()))
+		if url is None:
+			url = ctx.message.attachments[0].url
+		message = await ctx.send("Downloading and parsing...")
+		try:
+			items = await DL.async_json(url.strip("<>"))
+		except Exception as e:
+			return await message.edit(content="Could not serialize data :(")
+		if not items:
+			return await message.edit(content="Json data is empty :(")
+		if not isinstance(items,list):
+			return await message.edit(content="Malformed json data :(")
+		if not all(("Name" in x and l_key in x for x in items)):
+			return await message.edit(content="Invalid [[name]] data :(".format(l_name.lowe()))
+		# At this point - we should have a valid json file with our data - let's add it.
+		currentTime = int(time.time())
+		added = 0
+		updated = 0
+		for i in items:
+			name,value = i["Name"],i[l_key]
+			item = next((x for x in itemList if x["Name"].lower() == i["Name"].lower()),None)
+			if item:
+				updated += 1
+				msg = '{} updated!'.format(Nullify.escape_all(item["Name"]))
+				item[l_key]       = i[l_key]
+				item['UpdatedBy'] = DisplayName.name(ctx.author)
+				item['UpdatedID'] = ctx.author.id
+				item['Updated']   = currentTime
+			else:
+				added += 1
+				itemList.append({
+					"Name":     i["Name"],
+					l_key:      i[l_key],
+					"CreatedBy":DisplayName.name(ctx.author),
+					"CreatedID":ctx.author.id,
+					"Created":  currentTime
+				})
+		self.settings.setServerStat(ctx.guild, l_list, itemList)
+		if added and updated:
+			msg = "Added {:,} new and updated {:,} existing {}{}!".format(
+				added,updated,l_name.lower(),"" if updated == 1 else "s"
+			)
+		elif added:
+			msg = "Added {:,} new {}{}!".format(added,l_name.lower(),"" if added == 1 else "s")
+		else:
+			msg = "Updated {:,} existing {}{}!".format(updated,l_name.lower(),"" if updated == 1 else "s")
+		await message.edit(content=msg)
+
 	###                    ###
 	## Link-related Methods ##
 	###                    ###
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addlink(self, ctx, name : str = None, *, link : str = None):
 		"""Add a link to the link list."""
 		await self._add_item(ctx,name,link,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["remlink","deletelink","dellink"])
 	async def removelink(self, ctx, *, name : str = None):
 		"""Remove a link from the link list."""
 		await self._remove_item(ctx,name,**self.presets["Link"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def link(self, ctx, *, name : str = None):
 		"""Retrieve a link from the link list."""
 		await self._get_item(ctx,name,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawlink(self, ctx, *, name : str = None):
 		"""Retrieve a link's raw markdown from the link list."""
 		await self._get_item(ctx,name,**self.presets["Link"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def linkinfo(self, ctx, *, name : str = None):
 		"""Displays info about a link from the link list."""
 		await self._item_info(ctx,name,**self.presets["Link"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def links(self, ctx):
 		"""List all links in the link list."""
 		await self._list_items(ctx,self.link,**self.presets["Link"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawlinks(self, ctx):
 		"""List raw markdown of all links in the link list."""
 		await self._list_items(ctx,self.link,**self.presets["Link"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def linkrole(self, ctx):
 		"""Lists the required role to add links."""
 		await self._get_role(ctx,**self.presets["Link"])
+		
+	@commands.command()
+	async def savelinks(self, ctx):
+		"""Saves the link list to a json file and uploads."""
+		await self._save_items(ctx,**self.presets["Link"])
+
+	@commands.command()
+	async def loadlinks(self, ctx, *, url=None):
+		"""Loads the passed json attachment or URL into the links list."""
+		await self._load_items(ctx,url,**self.presets["Link"])
 
 	###                    ###
 	## Hack-related Methods ##
 	###                    ###
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addhack(self, ctx, name : str = None, *, hack : str = None):
 		"""Add a hack to the hack list."""
 		await self._add_item(ctx,name,hack,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["remhack","deletehack","delhack"])
 	async def removehack(self, ctx, *, name : str = None):
 		"""Remove a hack from the hack list."""
 		await self._remove_item(ctx,name,**self.presets["Hack"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hack(self, ctx, *, name : str = None):
 		"""Retrieve a hack from the hack list."""
 		await self._get_item(ctx,name,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawhack(self, ctx, *, name : str = None):
 		"""Retrieve a hack's raw markdown from the hack list."""
 		await self._get_item(ctx,name,**self.presets["Hack"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hackinfo(self, ctx, *, name : str = None):
 		"""Displays info about a hack from the hack list."""
 		await self._item_info(ctx,name,**self.presets["Hack"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hacks(self, ctx):
 		"""List all hack in the hack list."""
 		await self._list_items(ctx,self.hack,**self.presets["Hack"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawhacks(self, ctx):
 		"""List raw markdown of all hacks in the hack list."""
 		await self._list_items(ctx,self.hack,**self.presets["Hack"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hackrole(self, ctx):
 		"""Lists the required role to add hacks."""
 		await self._get_role(ctx,**self.presets["Hack"])
+
+	@commands.command()
+	async def savehacks(self, ctx):
+		"""Saves the hack list to a json file and uploads."""
+		await self._save_items(ctx,**self.presets["Hack"])
+
+	@commands.command()
+	async def loadhacks(self, ctx, *, url=None):
+		"""Loads the passed json attachment or URL into the hacks list."""
+		await self._load_items(ctx,url,**self.presets["Hack"])
 
 	###                   ###
 	## Tag-related Methods ##
 	###                   ###
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addtag(self, ctx, name : str = None, *, tag : str = None):
 		"""Add a tag to the tag list."""
 		await self._add_item(ctx,name,tag,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["remtag","deletetag","deltag"])
 	async def removetag(self, ctx, *, name : str = None):
 		"""Remove a tag from the tag list."""
 		await self._remove_item(ctx,name,**self.presets["Tag"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tag(self, ctx, *, name : str = None):
 		"""Retrieve a tag from the tag list."""
 		await self._get_item(ctx,name,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawtag(self, ctx, *, name : str = None):
 		"""Retrieve a tag's raw markdown from the tag list."""
 		await self._get_item(ctx,name,**self.presets["Tag"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def taginfo(self, ctx, *, name : str = None):
 		"""Displays info about a tag from the tag list."""
 		await self._item_info(ctx,name,**self.presets["Tag"])
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tags(self, ctx):
 		"""List all tag in the tag list."""
 		await self._list_items(ctx,self.tag,**self.presets["Tag"])
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawtags(self, ctx):
 		"""List raw markdown of all tags in the tag list."""
 		await self._list_items(ctx,self.tag,**self.presets["Tag"],raw=True)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def tagrole(self, ctx):
 		"""Lists the required role to add tags."""
 		await self._get_role(ctx,**self.presets["Tag"])
+
+	@commands.command()
+	async def savetags(self, ctx):
+		"""Saves the tag list to a json file and uploads."""
+		await self._save_items(ctx,**self.presets["Tag"])
+
+	@commands.command()
+	async def loadtags(self, ctx, *, url=None):
+		"""Loads the passed json attachment or URL into the tags list."""
+		await self._load_items(ctx,url,**self.presets["Tag"])
 		
 	###                     ###
 	## Parts-related Methods ##
 	###                     ###
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def parts(self, ctx, *, member = None):
 		"""Retrieve a member's parts list. DEPRECATED - Use hw instead."""
 		if member is None:
@@ -425,7 +531,7 @@ class Lists(commands.Cog):
 		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rawparts(self, ctx, *, member = None):
 		"""Retrieve the raw markdown for a member's parts list. DEPRECATED - Use rawhw instead."""
 		if member is None:
@@ -444,22 +550,25 @@ class Lists(commands.Cog):
 		msg = '***{}\'s*** **Parts (DEPRECATED - Use {}hw instead):**\n\n{}'.format(DisplayName.name(member), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setparts(self, ctx, *, parts : str = None):
 		"""Set your own parts - can be a url, formatted text, or nothing to clear. DEPRECATED - Use newhw instead."""
 		if not parts:
 			parts = ""
-		self.settings.setGlobalUserStat(author, "Parts", parts)
-		msg = '*{}\'s* parts have been set to (DEPRECATED - Use {}newhw instead):\n{}'.format(DisplayName.name(ctx.author), ctx.prefix, parts)
+		self.settings.setGlobalUserStat(ctx.author, "Parts", parts)
+		if not parts:
+			msg = "*{}'s* parts have been cleared (DEPRECATED - use {}newhw instaed)".format(DisplayName.name(ctx.author),ctx.prefix)
+		else:
+			msg = '*{}\'s* parts have been set to (DEPRECATED - Use {}newhw instead):\n{}'.format(DisplayName.name(ctx.author), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
 		msg = '\{}setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'.format(ctx.prefix)	
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def online(self, ctx):
 		"""Lists the number of users online."""
 		members = membersOnline = bots = botsOnline = 0
@@ -482,7 +591,7 @@ class Lists(commands.Cog):
 			],
 			color=ctx.author).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def lastonline(self, ctx, *, member = None):
 		"""Lists the last time a user was online if known."""
 		if not member:
