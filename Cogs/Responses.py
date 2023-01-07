@@ -1,7 +1,7 @@
-import discord, time
+import discord, time, tempfile, os, shutil, json
 import regex as re
 from discord.ext import commands
-from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message
+from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message, DL
 
 def setup(bot):
 	# Add the bot and deps
@@ -379,6 +379,70 @@ class Responses(commands.Cog):
 		return await ctx.send("Response trigger removed!")
 
 	@commands.command()
+	async def saveresponses(self, ctx):
+		"""Saves the responses list to a json file and uploads."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
+		message = await ctx.send("Saving responses and uploading...")
+		temp = tempfile.mkdtemp()
+		temp_json = os.path.join(temp,"Responses.json")
+		try:
+			json.dump(message_responses,open(temp_json,"w"),indent=2)
+			await ctx.send(file=discord.File(temp_json))
+		except:
+			return await message.edit(content="Could not save or upload responses :(")
+		finally:
+			shutil.rmtree(temp,ignore_errors=True)
+		await message.edit(content="Uploaded Responses.json!")
+
+	@commands.command()
+	async def loadresponses(self, ctx, url=None):
+		"""Loads the passed json attachment or URL into the responses list."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if not isinstance(message_responses,dict):
+			message_responses = {} # Clear it out if it's malformed
+		if url is None and len(ctx.message.attachments) == 0:
+			return await ctx.send("Usage: `{}loadresponses [url or attachment]`".format(ctx.prefix))
+		if url is None:
+			url = ctx.message.attachments[0].url
+		message = await ctx.send("Downloading and parsing...")
+		try:
+			items = await DL.async_json(url.strip("<>"))
+		except:
+			return await message.edit(content="Could not serialize data :(")
+		if not items:
+			return await message.edit(content="Json data is empty :(")
+		if not isinstance(items,dict):
+			return await message.edit(content="Malformed json data :(")
+		# At this point - we should have a valid json file with our data - let's add it.
+		added = 0
+		updated = 0
+		for i in items:
+			# Make sure it's valid regex
+			try: re.compile(i)
+			except: continue # Skip it
+			if i in message_responses:
+				updated += 1
+			else:
+				added += 1
+			message_responses[i] = items[i]
+		# Save the results
+		self.settings.setServerStat(ctx.guild, "MessageResponses", message_responses)
+		if added and updated:
+			msg = "Added {:,} new and updated {:,} existing response{} out of {:,} passed!".format(
+				added,updated,"" if updated == 1 else "s",len(items)
+			)
+		elif added:
+			msg = "Added {:,} new response{} out of {:,} passed!".format(added,"" if added == 1 else "s",len(items))
+		else:
+			msg = "Updated {:,} existing response{} out of {:,} passed!".format(updated,"" if updated == 1 else "s",len(items))
+		await message.edit(content=msg)
+
+	@commands.command()
 	async def clearresponses(self, ctx):
 		"""Removes all response triggers (bot-admin only)."""
 
@@ -466,7 +530,7 @@ class Responses(commands.Cog):
 			entries.append({"name":"Catastrophically Backtracked ({:,} total):".format(len(response["catastrophies"])),"value":catastrophies})
 		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms (total checks took {:,} ms)".format(response["match_time_ms"],response["total_time_ms"])).pick()
 
-	@commands.command()
+	@commands.command(aliases=["getresponse"])
 	async def viewresponse(self, ctx, response_index = None):
 		"""Displays the response in full which corresponds to the target index (bot-admin only)."""
 
@@ -486,7 +550,7 @@ class Responses(commands.Cog):
 			color=ctx.author
 		).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["gettrigger"])
 	async def viewtrigger(self, ctx, response_index = None):
 		"""Displays the regex trigger in full which corresponds to the target index (bot-admin only)."""
 
