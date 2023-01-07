@@ -349,7 +349,7 @@ class Responses(commands.Cog):
 		self.settings.setServerStat(ctx.guild,"MessageResponses",message_responses)
 		return await ctx.send("Updated response at index {:,}!".format(response_index))
 
-	@commands.command()
+	@commands.command(aliases=["listresponses"])
 	async def responses(self, ctx):
 		"""Lists the response triggers and their responses (bot-admin only)."""
 		
@@ -359,7 +359,7 @@ class Responses(commands.Cog):
 		entries = [{"name":"{}. ".format(i)+Nullify.escape_all(x),"value":Nullify.escape_all(message_responses[x])} for i,x in enumerate(message_responses,start=1)]
 		return await PickList.PagePicker(title="Current Responses",list=entries,ctx=ctx).pick()
 
-	@commands.command()
+	@commands.command(aliases=["removeresponse","deleteresponse","delresponse"])
 	async def remresponse(self, ctx, *, regex_trigger_number = None):
 		"""Removes the passed response trigger (bot-admin only)."""
 		
@@ -397,7 +397,7 @@ class Responses(commands.Cog):
 			shutil.rmtree(temp,ignore_errors=True)
 		await message.edit(content="Uploaded Responses.json!")
 
-	@commands.command()
+	@commands.command(aliases=["addresponses"])
 	async def loadresponses(self, ctx, url=None):
 		"""Loads the passed json attachment or URL into the responses list."""
 
@@ -442,7 +442,7 @@ class Responses(commands.Cog):
 			msg = "Updated {:,} existing response{} out of {:,} passed!".format(updated,"" if updated == 1 else "s",len(items))
 		await message.edit(content=msg)
 
-	@commands.command()
+	@commands.command(aliases=["clrresponses"])
 	async def clearresponses(self, ctx):
 		"""Removes all response triggers (bot-admin only)."""
 
@@ -450,7 +450,7 @@ class Responses(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "MessageResponses", {})
 		return await ctx.send("All response triggers removed!")
 
-	@commands.command()
+	@commands.command(aliases=["moveresponse"])
 	async def mvresponse(self, ctx, response_index = None, target_index = None):
 		"""Moves the passed response index to the target index (bot-admin only)."""
 
@@ -475,7 +475,7 @@ class Responses(commands.Cog):
 		self.settings.setServerStat(ctx.guild,"MessageResponses",ordered_responses)
 		return await ctx.send("Moved response from {:,} to {:,}!".format(response_index,target_index))
 
-	@commands.command()
+	@commands.command(aliases=["checkresponse"])
 	async def chkresponse(self, ctx, *, check_string = None):
 		"""Reports a breakdown of the first match (if any) in the responses for the passed check string (bot-admin only)."""
 
