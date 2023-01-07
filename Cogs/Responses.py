@@ -380,7 +380,7 @@ class Responses(commands.Cog):
 
 	@commands.command()
 	async def saveresponses(self, ctx):
-		"""Saves the responses list to a json file and uploads."""
+		"""Saves the responses dictionary to a json file and uploads."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
@@ -399,7 +399,7 @@ class Responses(commands.Cog):
 
 	@commands.command(aliases=["addresponses"])
 	async def loadresponses(self, ctx, url=None):
-		"""Loads the passed json attachment or URL into the responses list."""
+		"""Loads the passed json attachment or URL into the responses dictionary."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
