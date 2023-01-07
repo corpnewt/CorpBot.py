@@ -191,7 +191,7 @@ class Server(commands.Cog):
 		If 2-10 options are present, the poll will use numbered reactions for each.
 
 		You can add a time limit to the poll with t=WwDdHhMmSs where:
-		    w = Weeks
+			w = Weeks
 			d = Days
 			h = Hours
 			m = Minutes
