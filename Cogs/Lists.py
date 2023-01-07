@@ -283,8 +283,7 @@ class Lists(commands.Cog):
 		try:
 			json.dump(itemList,open(temp_json,"w"),indent=2)
 			await ctx.send(file=discord.File(temp_json))
-		except Exception as e:
-			print(e)
+		except:
 			return await message.edit(content="Could not save or upload {}s :(".format(l_name.lower()))
 		finally:
 			shutil.rmtree(temp,ignore_errors=True)
@@ -303,7 +302,7 @@ class Lists(commands.Cog):
 		message = await ctx.send("Downloading and parsing...")
 		try:
 			items = await DL.async_json(url.strip("<>"))
-		except Exception as e:
+		except:
 			return await message.edit(content="Could not serialize data :(")
 		if not items:
 			return await message.edit(content="Json data is empty :(")
