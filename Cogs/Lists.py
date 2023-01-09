@@ -286,7 +286,7 @@ class Lists(commands.Cog):
 			return await message.edit(content="Could not save or upload {}s :(".format(l_name.lower()))
 		finally:
 			shutil.rmtree(temp,ignore_errors=True)
-		await message.edit(content="Uploaded {}s.json!".format(l_name))
+		await message.edit(content="Uploaded {}s.json! ({:,})".format(l_name,len(itemList)))
 
 	async def _load_items(self,ctx,url,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
 		# Helper method to load a passed json URL or attachment and add the contents to the list
