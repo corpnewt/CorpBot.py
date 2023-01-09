@@ -1,5 +1,5 @@
 import functools, string, googletrans
-from Cogs import DisplayName, Message, PickList
+from Cogs import DisplayName, Message, PickList, FuzzySearch
 from discord.ext import commands
 
 def setup(bot):
@@ -21,9 +21,39 @@ class Translate(commands.Cog):
         self.langcodes = googletrans.LANGCODES
         self.languages = googletrans.LANGUAGES
 
-    @commands.command(pass_context=True)
-    async def langlist(self, ctx):
-        """Lists available languages."""
+    @commands.command(aliases=["listlang"])
+    async def langlist(self, ctx, search=None):
+        """Lists available languages - can optionally take a search term and will list the 3 closest results."""
+        if search:
+            code_search = FuzzySearch.search(search.lower(), googletrans.LANGCODES)
+            lang_search = FuzzySearch.search(search.lower(), googletrans.LANGUAGES)
+            full_match  = next((x["Item"] for x in code_search+lang_search if x.get("Ratio") == 1),None)
+            if full_match: # Got an exact match - build an embed
+                if full_match in googletrans.LANGCODES:
+                    name,code,t = string.capwords(full_match),googletrans.LANGCODES[full_match],"Language Name"
+                else:
+                    name,code,t = string.capwords(googletrans.LANGUAGES[full_match]),full_match,"Language Code"
+                return await Message.Embed(
+                    title="Search Results For \"{}\"".format(search),
+                    description="Exact {} Match:\n\n**{}** - {}".format(t,name,code),
+                    color=ctx.author,
+                    ).send(ctx)
+            # Got close matches
+            desc = "No exact language matches for \"{}\"".format(search)
+            fields = []
+            if len(code_search):
+                lang_mess = "\n".join(["└─ **{}** - {}".format(
+                    string.capwords(x["Item"]),
+                    googletrans.LANGCODES[x["Item"]]
+                ) for x in code_search])
+                fields.append({"name":"Close Language Name Matches:","value":lang_mess})
+            if len(lang_search):
+                lang_mess = "\n".join(["└─ **{}** - {}".format(
+                    string.capwords(googletrans.LANGUAGES[x["Item"]]),
+                    x["Item"]
+                ) for x in lang_search])
+                fields.append({"name":"Close Language Code Matches:","value":lang_mess})
+            return await Message.Embed(title="Search Results For \"{}\"".format(search),description=desc,fields=fields).send(ctx)
         description = ""
         for lang in googletrans.LANGCODES:
             description += "**{}** - {}\n".format(string.capwords(lang), googletrans.LANGCODES[lang])
@@ -34,7 +64,7 @@ class Translate(commands.Cog):
             ctx=ctx
         ).pick()
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def detectlang(self, ctx, *, text):
         """Reports the detected language and certainty of the passed text."""
         if text is None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
@@ -57,7 +87,7 @@ class Translate(commands.Cog):
             if value: value = value[0]
         return value
 
-    @commands.command(name="translate", aliases=["tr"], pass_context=True)
+    @commands.command(name="translate", aliases=["tr"], )
     async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
@@ -200,7 +230,7 @@ class Translate(commands.Cog):
             ).send(ctx)
 
         embed = Message.Embed(title="{}, your pronunciation is:".format(ctx.author.display_name),
-                              color=ctx.author.color)
+                            color=ctx.author.color)
         embed.description = pronunciation_result.pronunciation
         embed.add_field(name="Source Text", value=pronunciation_result.text, inline=False)
         embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
