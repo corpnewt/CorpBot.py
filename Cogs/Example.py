@@ -1,6 +1,6 @@
 import asyncio, discord, random
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName, UserTime, PickList
+from   Cogs import Utils, DisplayName, PickList
 
 def setup(bot):
     # Add the bot and deps
@@ -38,7 +38,6 @@ class Example(commands.Cog):
             if not member:
                 msg = 'I couldn\'t find *{}*...'.format(memberName)
                 return await Utils.suppressed(ctx,msg)
-        # Get localized user time
-        local_time = UserTime.getUserTime(ctx.author, self.settings, member.joined_at)
-        time_str = "{} {}".format(local_time['time'], local_time['zone'])
-        await ctx.send('*{}* joined *{}*'.format(DisplayName.name(member), time_str))
+        ts = int(member.joined_at.timestamp())
+        joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
+        await ctx.send("*{}* joined {}".format(DisplayName.name(member),joined))
