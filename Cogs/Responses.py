@@ -395,7 +395,7 @@ class Responses(commands.Cog):
 			return await message.edit(content="Could not save or upload responses :(")
 		finally:
 			shutil.rmtree(temp,ignore_errors=True)
-		await message.edit(content="Uploaded Responses.json!")
+		await message.edit(content="Uploaded Responses.json! ({:,})".format(len(message_responses)))
 
 	@commands.command(aliases=["addresponses"])
 	async def loadresponses(self, ctx, url=None):
