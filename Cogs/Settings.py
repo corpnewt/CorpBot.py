@@ -563,19 +563,29 @@ class Settings(commands.Cog):
 		self.setUserStat(user, server, stat, out+incrementAmount)
 		return out+incrementAmount
 
+	@commands.command(aliases=["recheckdefaultroles"])
+	async def verifydefaultroles(self, ctx):
+		"""Forces a recheck of all members to ensure they have the default role applied in each server (owner-only)."""
+		# Only allow owner
+		isOwner = self.isOwner(ctx.author)
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
+		elif isOwner == False:
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
+		t = time.time()
+		message = await ctx.send("Verifying default roles...")
+		await self.bot.loop.run_in_executor(None, self.check_all)
+		await message.edit(content="Verified default roles in {} seconds.".format(time.time()-t))
+
 	@commands.command(pass_context=True)
 	async def ownerlock(self, ctx):
 		"""Locks/unlocks the bot to only respond to the owner (owner-only... ofc)."""
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 		# We have an owner - and the owner is talking to us
 		# Let's try and get the OwnerLock setting and toggle it
 		ol = self.getGlobalStat("OwnerLock",[])
@@ -702,16 +712,11 @@ class Settings(commands.Cog):
 	@commands.command(pass_context=True)
 	async def disown(self, ctx):
 		"""Revokes all ownership of the bot."""
-		owned = self.isOwner(ctx.author)
-		if owned == False:
-			msg = "Only an existing owner can revoke ownership."
-			await ctx.send(msg)
-			return
-		elif owned == None:
-			# No owners
-			msg = 'I have already been disowned...'
-			await ctx.send(msg)
-			return
+		isOwner = self.isOwner(ctx.author)
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
+		elif isOwner == False:
+			return await ctx.send("I have already been disowned...")
 		self.setGlobalStat("Owner",[])
 		msg = 'I have been disowned!'
 		await ctx.send(msg)
@@ -781,14 +786,10 @@ class Settings(commands.Cog):
 		"""Flush the bot settings to disk (admin only)."""
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 		# Flush settings
 		message = await ctx.send("Flushing settings to disk...")
 		# Actually flush settings
@@ -822,14 +823,10 @@ class Settings(commands.Cog):
 		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.send(msg)
-			return
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.send(msg)
-			return
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 		message = await ctx.send("Pruning local settings...")
 		settingsWord = "settings"
 		removedSettings = self._prune_settings(ctx.guild)
@@ -878,14 +875,10 @@ class Settings(commands.Cog):
 		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 
 		settingsWord = "settings"
 
@@ -914,14 +907,10 @@ class Settings(commands.Cog):
 
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
-		if isOwner == None:
-			msg = 'I have not been claimed, *yet*.'
-			await ctx.channel.send(msg)
-			return
+		if isOwner is None:
+			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
-			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 
 		message = await ctx.send("Pruning orphaned servers...")
 		l = asyncio.get_event_loop()
