@@ -230,7 +230,7 @@ class Xp(commands.Cog):
 		"""Gift xp to other members."""
 
 		author  = ctx.message.author
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -288,7 +288,7 @@ class Xp(commands.Cog):
 
 		# Get our user/server stats
 		isAdmin         = Utils.is_admin(ctx)
-		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
 		# Check for bot admin
 		isBotAdmin      = Utils.is_bot_admin_only(ctx)
 
@@ -494,19 +494,19 @@ class Xp(commands.Cog):
 		"""Lists the default role that new users are assigned."""
 
 		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
+		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
 			suppress = True
 		else:
 			suppress = False
 
-		role = self.settings.getServerStat(ctx.message.guild, "DefaultRole")
+		role = self.settings.getServerStat(ctx.guild, "DefaultRole")
 		if role == None or role == "":
 			msg = 'New users are not assigned a role on joining this server.'
 			await ctx.channel.send(msg)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.guild.roles:
+			for arole in ctx.guild.roles:
 				if str(arole.id) == str(role):
 					found = True
 					msg = 'New users will be assigned to **{}**.'.format(Nullify.escape_all(arole.name))
@@ -519,7 +519,7 @@ class Xp(commands.Cog):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
 		author  = ctx.message.author
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 		
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
@@ -534,7 +534,7 @@ class Xp(commands.Cog):
 			return
 
 		isAdmin    = Utils.is_admin(ctx)
-		checkAdmin = self.settings.getServerStat(ctx.message.guild, "AdminArray")
+		checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
 		# Check for bot admin
 		isBotAdmin = Utils.is_bot_admin_only(ctx)
 		botAdminAsAdmin = self.settings.getServerStat(server, "BotAdminAsAdmin")
@@ -648,7 +648,7 @@ class Xp(commands.Cog):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 
 		isAdmin = Utils.is_admin(ctx)
@@ -694,7 +694,7 @@ class Xp(commands.Cog):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
 		author  = ctx.message.author
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 
 		isAdmin = Utils.is_admin(ctx)
@@ -719,7 +719,7 @@ class Xp(commands.Cog):
 	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 		
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
@@ -751,13 +751,13 @@ class Xp(commands.Cog):
 					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']), arole['XP'])
 
 		# Get the required role for using the xp system
-		role = self.settings.getServerStat(ctx.message.guild, "RequiredXPRole")
+		role = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
 		if role == None or role == "":
 			roleText = '{}\n**Everyone** can give xp, gamble, and feed the bot.'.format(roleText)
 		else:
 			# Role is set - let's get its name
 			found = False
-			for arole in ctx.message.guild.roles:
+			for arole in ctx.guild.roles:
 				if str(arole.id) == str(role):
 					found = True
 					vowels = "aeiou"
@@ -781,7 +781,7 @@ class Xp(commands.Cog):
 			
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
 				await ctx.message.channel.send(msg)
@@ -790,7 +790,7 @@ class Xp(commands.Cog):
 		# Create blank embed
 		stat_embed = discord.Embed(color=member.color)
 			
-		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
+		promoArray = self.settings.getServerStat(ctx.guild, "PromotionArray")
 		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
@@ -874,26 +874,20 @@ class Xp(commands.Cog):
 			
 		if type(member) is str:
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			member = DisplayName.memberForName(memberName, ctx.guild)
+			if not member:
+				try: member = await self.bot.fetch_user(int(memberName))
+				except: pass
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
-				await ctx.message.channel.send(msg)
-				return
+				return await ctx.send(msg)
 
 		url = Utils.get_avatar(member)
 
 		# Create blank embed
 		stat_embed = Message.Embed(color=member.color,thumbnail=url,pm_after_fields=20)
 
-		# Get user's xp
-		newStat = int(self.settings.getUserStat(member, ctx.message.guild, "XP"))
-		newState = int(self.settings.getUserStat(member, ctx.message.guild, "XPReserve"))
-		
-		# Add XP and XP Reserve
-		stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
-		stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
-
-		if member.nick:
+		if getattr(member,"nick",None):
 			# We have a nickname
 			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
 			
@@ -904,76 +898,86 @@ class Xp(commands.Cog):
 			# Add to embed
 			stat_embed.author = '{}'.format(member.name)
 
-		# Get Joined timestamp
-		joined = "Unknown"
-		if member.joined_at:
-			ts = int(member.joined_at.timestamp())
-			joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
-		stat_embed.add_field(name="Joined", value=joined, inline=True)
+		if ctx.guild:
+			# Get user's xp
+			newStat = int(self.settings.getUserStat(member, ctx.guild, "XP"))
+			newState = int(self.settings.getUserStat(member, ctx.guild, "XPReserve"))
+			
+			# Add XP and XP Reserve
+			stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
+			stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
+			
+			# Get Joined timestamp
+			joined = "Unknown"
+			if getattr(member,"joined_at",None):
+				ts = int(member.joined_at.timestamp())
+				joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
+			stat_embed.add_field(name="Joined", value=joined, inline=True)
 
-		# Get user's current role
-		promoArray = self.settings.getServerStat(ctx.message.guild, "PromotionArray")
-		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
-		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
-		
-		highestRole = None
-		if len(promoSorted):
-			nextRole = promoSorted[0]
-		else:
-			nextRole = None
-
-		for role in promoSorted:
-			if int(nextRole['XP']) < newStat:
-				nextRole = role
-			# We *can* have this role, let's see if we already do
-			currentRole = None
-			for aRole in member.roles:
-				# Get the role that corresponds to the id
-				if str(aRole.id) == str(role['ID']):
-					# We found it
-					highestRole = aRole.name
-					if len(promoSorted) > (promoSorted.index(role)+1):
-						# There's more roles above this
-						nRoleIndex = promoSorted.index(role)+1
-						nextRole = promoSorted[nRoleIndex]
-
-		if highestRole:
-			msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
-			# Add Rank
-			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
-		else:
+			# Get user's current role
+			promoArray = self.settings.getServerStat(ctx.guild, "PromotionArray")
+			# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
+			promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+			
+			highestRole = None
 			if len(promoSorted):
-				# Need to have ranks to acquire one
-				msg = '{}They have not acquired a rank yet.\n'.format(msg)
-				# Add Rank
-				stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
-		
-		if nextRole and (newStat < int(nextRole['XP'])):
-			# Get role
-			next_role = DisplayName.roleForID(int(nextRole["ID"]), ctx.guild)
-			if not next_role:
-				next_role_text = "Role ID: {} (Removed from server)".format(nextRole["ID"])
+				nextRole = promoSorted[0]
 			else:
-				next_role_text = next_role.name
-			msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, next_role_text)
-			# Add Next Rank
-			stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(next_role_text, int(nextRole['XP'])-newStat), inline=True)
+				nextRole = None
+
+			for role in promoSorted:
+				if int(nextRole['XP']) < newStat:
+					nextRole = role
+				# We *can* have this role, let's see if we already do
+				currentRole = None
+				for aRole in member.roles:
+					# Get the role that corresponds to the id
+					if str(aRole.id) == str(role['ID']):
+						# We found it
+						highestRole = aRole.name
+						if len(promoSorted) > (promoSorted.index(role)+1):
+							# There's more roles above this
+							nRoleIndex = promoSorted.index(role)+1
+							nextRole = promoSorted[nRoleIndex]
+
+			if highestRole:
+				msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
+				# Add Rank
+				stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
+			else:
+				if len(promoSorted):
+					# Need to have ranks to acquire one
+					msg = '{}They have not acquired a rank yet.\n'.format(msg)
+					# Add Rank
+					stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
+			
+			if nextRole and (newStat < int(nextRole['XP'])):
+				# Get role
+				next_role = DisplayName.roleForID(int(nextRole["ID"]), ctx.guild)
+				if not next_role:
+					next_role_text = "Role ID: {} (Removed from server)".format(nextRole["ID"])
+				else:
+					next_role_text = next_role.name
+				msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, next_role_text)
+				# Add Next Rank
+				stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(next_role_text, int(nextRole['XP'])-newStat), inline=True)
 		# Add status
-		status_text = {
-			discord.Status.offline: ":black_heart: Offline",
-			discord.Status.dnd: ":heart: Do Not Disturb",
-			discord.Status.idle: ":yellow_heart: Idle",
-		}.get(member.status,":green_heart: Online")
-		stat_embed.add_field(name="Status", value=status_text, inline=True)
+		if getattr(member,"status",None):
+			status_text = {
+				discord.Status.offline: ":black_heart: Offline",
+				discord.Status.dnd: ":heart: Do Not Disturb",
+				discord.Status.idle: ":yellow_heart: Idle",
+			}.get(member.status,":green_heart: Online")
+			stat_embed.add_field(name="Status", value=status_text, inline=True)
 		# Get User Name and ID
 		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
 		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
-		if member.premium_since:
+		if getattr(member,"premium_since",None) != None:
 			ts = int(member.premium_since.timestamp())
 			boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
 			stat_embed.add_field(name="Boosting Since",value=boosted)
 		
-		if member.activity and member.activity.name:
+		if getattr(member,"activity",None) and member.activity.name:
 			# Playing a game!
 			play_dict = {
 				discord.ActivityType.playing:"Playing",
@@ -989,23 +993,24 @@ class Xp(commands.Cog):
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
 
-		# Add joinpos
-		joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in ctx.guild.members], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
+		if ctx.guild:
+			# Add joinpos
+			joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(ctx.guild,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 
-		if member.joined_at != None:
-			try:
-				check_item = { "ID" : member.id, "Joined" : member.joined_at }
-				total = len(joinedList)
-				position = joinedList.index(check_item) + 1
-				stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
-			except:
+			if getattr(member,"joined_at",None) != None:
+				try:
+					check_item = { "ID" : member.id, "Joined" : member.joined_at }
+					total = len(joinedList)
+					position = joinedList.index(check_item) + 1
+					stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
+				except:
+					stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
+			else:
 				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
-		else:
-			stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 
 		# Get Created timestamp
 		created = "Unknown"
-		if member.created_at:
+		if getattr(member,"created_at",None) != None:
 			ts = int(member.created_at.timestamp())
 			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
 		stat_embed.description = "Created {}".format(created)
@@ -1023,7 +1028,7 @@ class Xp(commands.Cog):
 	async def xpinfo(self, ctx):
 		"""Gives a quick rundown of the xp system."""
 
-		server  = ctx.message.guild
+		server  = ctx.guild
 		channel = ctx.message.channel
 
 		# Check if we're suppressing @here and @everyone mentions
