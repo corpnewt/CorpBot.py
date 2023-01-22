@@ -1040,13 +1040,10 @@ class Xp(commands.Cog):
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=False)
 
 		# Check if server owner
-		ownership = []
 		if server and server.owner.id == member.id:
-			ownership.append("👑 {}".format(Nullify.escape_all(server.name))) # Server owner
+			stat_embed.add_field(name="Server Owner", value="👑", inline=True)
 		if Utils.is_owner(ctx,member):
-			ownership.append("🤖 {}".format(self.bot.user.mention))
-		if ownership:
-			stat_embed.add_field(name="Owner Of", value="\n".join(ownership), inline=True)
+			stat_embed.add_field(name="Bot Owner", value="🤖", inline=True)
 
 		await stat_embed.send(ctx)
 		
