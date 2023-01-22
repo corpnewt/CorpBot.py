@@ -869,18 +869,47 @@ class Xp(commands.Cog):
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
 		
-		if member is None:
-			member = ctx.message.author
-			
-		if type(member) is str:
-			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.guild)
-			if not member:
-				try: member = await self.bot.fetch_user(int(memberName))
-				except: pass
-			if not member:
-				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
-				return await ctx.send(msg)
+		member = member or ctx.author
+		server = ctx.guild
+
+		if isinstance(member,str):
+			# Walk the components split by spaces and see if we can find a member + server
+			parts = member.split(" ")
+			server_test = member_test = None
+			for i in range(len(parts)+1):
+				m = " ".join(parts[:len(parts)-i])
+				s = " ".join([] if i==0 else parts[-i:])
+				server_test = member_test = None # Initialize
+				# Check for a server first
+				if s:
+					for server in self.bot.guilds:
+						if server.name.lower() == s.lower() or str(server.id) == s:
+							server_test = server
+							break
+					# Didn't find one - don't allow trailing nonsense
+					if not server_test: continue
+					# Got a server - let's see if we have a member to check - or default
+					# to the command author
+					if not m: member_test = server_test.get_member(ctx.author.id)
+				# Check if we got a member
+				if m:
+					# Check if we have a server (either detected or ctx.guild)
+					if server_test or ctx.guild:
+						member_test = DisplayName.memberForName(m,server_test or ctx.guild)
+					else:
+						# No server at all - try to get a user
+						try: member_test = await self.bot.fetch_user(int(m))
+						except: pass
+				# Only bail if we have a member
+				if member_test:
+					member = member_test
+					server = server_test or ctx.guild
+					break
+
+		if not member or isinstance(member,str):
+			return await ctx.send("I couldn't find {}...".format(
+				Nullify.escape_all(member or "that member")
+			))
 
 		url = Utils.get_avatar(member)
 
@@ -898,10 +927,10 @@ class Xp(commands.Cog):
 			# Add to embed
 			stat_embed.author = '{}'.format(member.name)
 
-		if ctx.guild:
+		if server:
 			# Get user's xp
-			newStat = int(self.settings.getUserStat(member, ctx.guild, "XP"))
-			newState = int(self.settings.getUserStat(member, ctx.guild, "XPReserve"))
+			newStat = int(self.settings.getUserStat(member, server, "XP"))
+			newState = int(self.settings.getUserStat(member, server, "XPReserve"))
 			
 			# Add XP and XP Reserve
 			stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
@@ -915,7 +944,7 @@ class Xp(commands.Cog):
 			stat_embed.add_field(name="Joined", value=joined, inline=True)
 
 			# Get user's current role
-			promoArray = self.settings.getServerStat(ctx.guild, "PromotionArray")
+			promoArray = self.settings.getServerStat(server, "PromotionArray")
 			# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
 			promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 			
@@ -953,7 +982,7 @@ class Xp(commands.Cog):
 			
 			if nextRole and (newStat < int(nextRole['XP'])):
 				# Get role
-				next_role = DisplayName.roleForID(int(nextRole["ID"]), ctx.guild)
+				next_role = DisplayName.roleForID(int(nextRole["ID"]), server)
 				if not next_role:
 					next_role_text = "Role ID: {} (Removed from server)".format(nextRole["ID"])
 				else:
@@ -993,9 +1022,9 @@ class Xp(commands.Cog):
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
 
-		if ctx.guild:
+		if server:
 			# Add joinpos
-			joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(ctx.guild,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
+			joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(server,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 
 			if getattr(member,"joined_at",None) != None:
 				try:
@@ -1007,6 +1036,10 @@ class Xp(commands.Cog):
 					stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
 			else:
 				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
+
+		if server != ctx.guild: # Add server info if outside the command context
+			stat_embed.add_field(name="Server Name", value=server.name, inline=True)
+			stat_embed.add_field(name="Server ID", value=server.id, inline=True)
 
 		# Get Created timestamp
 		created = "Unknown"
