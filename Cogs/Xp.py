@@ -883,7 +883,10 @@ class Xp(commands.Cog):
 				# Check for a server first
 				if s:
 					for server in self.bot.guilds:
-						if server.name.lower() == s.lower() or str(server.id) == s:
+						if (server.name.lower() == s.lower() or str(server.id) == s):
+							# Make sure the author is in that server
+							if not server.get_member(ctx.author.id): continue
+							# We got a valid server, and are in it
 							server_test = server
 							break
 					# Didn't find one - don't allow trailing nonsense
