@@ -885,10 +885,10 @@ class Xp(commands.Cog):
 					for server in self.bot.guilds:
 						if (server.name.lower() == s.lower() or str(server.id) == s):
 							# Make sure the author is in that server
-							if not server.get_member(ctx.author.id): continue
-							# We got a valid server, and are in it
-							server_test = server
-							break
+							if Utils.is_owner(ctx,ctx.author) or server.get_member(ctx.author.id):
+								# We got a valid server, and are in it
+								server_test = server
+								break
 					# Didn't find one - don't allow trailing nonsense
 					if not server_test: continue
 					# Got a server - let's see if we have a member to check - or default
@@ -919,14 +919,17 @@ class Xp(commands.Cog):
 		# Create blank embed
 		stat_embed = Message.Embed(color=member.color,thumbnail=url,pm_after_fields=20)
 
+		# Get Created timestamp
+		created = "Unknown"
+		if getattr(member,"created_at",None) != None:
+			ts = int(member.created_at.timestamp())
+			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
+		stat_embed.description = "Created {}".format(created)
+
 		if getattr(member,"nick",None):
 			# We have a nickname
-			msg = "__***{},*** **who currently goes by** ***{}:***__\n\n".format(member.name, member.nick)
-			
-			# Add to embed
 			stat_embed.author = '{}, who currently goes by {}'.format(member.name, member.nick)
 		else:
-			msg = "__***{}:***__\n\n".format(member.name)
 			# Add to embed
 			stat_embed.author = '{}'.format(member.name)
 
@@ -938,13 +941,6 @@ class Xp(commands.Cog):
 			# Add XP and XP Reserve
 			stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
 			stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
-			
-			# Get Joined timestamp
-			joined = "Unknown"
-			if getattr(member,"joined_at",None):
-				ts = int(member.joined_at.timestamp())
-				joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
-			stat_embed.add_field(name="Joined", value=joined, inline=True)
 
 			# Get user's current role
 			promoArray = self.settings.getServerStat(server, "PromotionArray")
@@ -973,15 +969,11 @@ class Xp(commands.Cog):
 							nextRole = promoSorted[nRoleIndex]
 
 			if highestRole:
-				msg = '{}**Current Rank:** *{}*\n'.format(msg, highestRole)
 				# Add Rank
 				stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
-			else:
-				if len(promoSorted):
-					# Need to have ranks to acquire one
-					msg = '{}They have not acquired a rank yet.\n'.format(msg)
-					# Add Rank
-					stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
+			elif len(promoSorted):
+				# Need to have ranks to acquire one
+				stat_embed.add_field(name="Current Rank", value='None acquired yet', inline=True)
 			
 			if nextRole and (newStat < int(nextRole['XP'])):
 				# Get role
@@ -990,9 +982,38 @@ class Xp(commands.Cog):
 					next_role_text = "Role ID: {} (Removed from server)".format(nextRole["ID"])
 				else:
 					next_role_text = next_role.name
-				msg = '{}\n*{:,}* more *xp* required to advance to **{}**'.format(msg, int(nextRole['XP']) - newStat, next_role_text)
 				# Add Next Rank
 				stat_embed.add_field(name="Next Rank", value='{} ({:,} more xp required)'.format(next_role_text, int(nextRole['XP'])-newStat), inline=True)
+			
+			# Get Joined timestamp
+			joined = join_pos = "Unknown"
+			if getattr(member,"joined_at",None):
+				ts = int(member.joined_at.timestamp())
+				joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
+				joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(server,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
+				try:
+					check_item = { "ID" : member.id, "Joined" : member.joined_at }
+					total = len(joinedList)
+					position = joinedList.index(check_item) + 1
+					join_pos = "{:,} of {:,}".format(position, total)
+				except:
+					pass
+			stat_embed.add_field(name="Joined", value=joined, inline=False)
+			stat_embed.add_field(name="Join Position", value=join_pos, inline=server!=ctx.guild)
+
+			# Add server info if outside the command context
+			if server != ctx.guild:
+				stat_embed.add_field(name="Server Name", value=server.name, inline=True)
+				stat_embed.add_field(name="Server ID", value=server.id, inline=True)
+
+			if getattr(member,"premium_since",None) != None:
+				ts = int(member.premium_since.timestamp())
+				boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
+				stat_embed.add_field(name="Boosting Since",value=boosted,inline=False)
+
+		# Get User Name and ID
+		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
+		stat_embed.add_field(name="User ID", value=str(member.id), inline=True)
 		# Add status
 		if getattr(member,"status",None):
 			status_text = {
@@ -1001,13 +1022,6 @@ class Xp(commands.Cog):
 				discord.Status.idle: ":yellow_heart: Idle",
 			}.get(member.status,":green_heart: Online")
 			stat_embed.add_field(name="Status", value=status_text, inline=True)
-		# Get User Name and ID
-		stat_embed.add_field(name="ID", value=str(member.id), inline=True)
-		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
-		if getattr(member,"premium_since",None) != None:
-			ts = int(member.premium_since.timestamp())
-			boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
-			stat_embed.add_field(name="Boosting Since",value=boosted)
 		
 		if getattr(member,"activity",None) and member.activity.name:
 			# Playing a game!
@@ -1016,40 +1030,23 @@ class Xp(commands.Cog):
 				discord.ActivityType.streaming:"Streaming",
 				discord.ActivityType.listening:"Listening to",
 				discord.ActivityType.watching:"Watching",
-				discord.ActivityType.custom:"Currently",
+				discord.ActivityType.custom:"Custom Status",
 				discord.ActivityType.competing:"Competing in"
 			}
 			play_string = play_dict.get(member.activity.type,"Playing")
-			stat_embed.add_field(name=play_string, value=str(member.activity.name), inline=True)
+			stat_embed.add_field(name=play_string, value=str(member.activity.name), inline=False)
 			if member.activity.type == discord.ActivityType.streaming:
 				# Add the URL too
-				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=True)
+				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=False)
 
-		if server:
-			# Add joinpos
-			joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(server,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
-
-			if getattr(member,"joined_at",None) != None:
-				try:
-					check_item = { "ID" : member.id, "Joined" : member.joined_at }
-					total = len(joinedList)
-					position = joinedList.index(check_item) + 1
-					stat_embed.add_field(name="Join Position", value="{:,} of {:,}".format(position, total), inline=True)
-				except:
-					stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
-			else:
-				stat_embed.add_field(name="Join Position", value="Unknown", inline=True)
-
-		if server != ctx.guild: # Add server info if outside the command context
-			stat_embed.add_field(name="Server Name", value=server.name, inline=True)
-			stat_embed.add_field(name="Server ID", value=server.id, inline=True)
-
-		# Get Created timestamp
-		created = "Unknown"
-		if getattr(member,"created_at",None) != None:
-			ts = int(member.created_at.timestamp())
-			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
-		stat_embed.description = "Created {}".format(created)
+		# Check if server owner
+		ownership = []
+		if server and server.owner.id == member.id:
+			ownership.append("👑 {}".format(Nullify.escape_all(server.name))) # Server owner
+		if Utils.is_owner(ctx,member):
+			ownership.append("🤖 {}".format(self.bot.user.mention))
+		if ownership:
+			stat_embed.add_field(name="Owner Of", value="\n".join(ownership), inline=True)
 
 		await stat_embed.send(ctx)
 		
