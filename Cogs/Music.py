@@ -222,16 +222,23 @@ class Music(commands.Cog):
 				try: delattr(player,x)
 				except: pass
 
+	def _check_mc(self, ctx):
+		mcArray = self.settings.getServerStat(ctx.guild, "MCArray", [])
+		for role in mcArray:
+			if ctx.guild.get_role(int(role["ID"])) in ctx.author.roles:
+				return True
+		return False
+
 	async def _check_role(self, ctx):
 		# Checks if we have the required credentials to use the music player.
-		if Utils.is_bot_admin(ctx):
+		if Utils.is_bot_admin(ctx) or self._check_mc(ctx):
 			return True
-		promoArray = self.settings.getServerStat(ctx.guild, "DJArray", [])
+		djArray = self.settings.getServerStat(ctx.guild, "DJArray", [])
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		if not len(promoArray):
+		if not len(djArray):
 			await Message.Embed(title="♫ There are no DJ roles set yet.  Use `{}adddj [role]` to add some.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 			return None
-		for role in promoArray:
+		for role in djArray:
 			if ctx.guild.get_role(int(role["ID"])) in ctx.author.roles:
 				return True
 		await Message.Embed(title="♫ You need a DJ role to do that!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1289,7 +1296,7 @@ class Music(commands.Cog):
 			await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Not connected to a voice channel.")
 		# Let's make sure the caller is connected to voice and the same channel as the bot - or a bot-admin
-		if Utils.is_bot_admin(ctx): return # We good - have enough perms to override whatever
+		if Utils.is_bot_admin(ctx) or self._check_mc(ctx): return # We good - have enough perms to override whatever
 		if not ctx.author.voice or not player or not ctx.author.voice.channel == player.channel:
 			await Message.Embed(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 			raise commands.CommandError("Music Cog: Author not connected to the bot's voice channel.")
