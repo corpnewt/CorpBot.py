@@ -434,7 +434,7 @@ class Music(commands.Cog):
 		total    = self.apply_scale(player,track.duration)
 		return "{} -- {}".format(self.format_duration(progress),self.format_duration(total,track))
 
-	def progress_bar(self,player,track,bar_width=37,show_percent=True,include_time=False):
+	def progress_bar(self,player,track,bar_width=31,show_percent=True,include_time=False):
 		# Returns a [#####-----] XX.x% style progress bar
 		progress = player.position # self.apply_scale(player,player.position)
 		total    = self.apply_scale(player,track.duration) if not hasattr(track,"is_stream") or not track.is_stream() else 0
