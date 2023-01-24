@@ -448,7 +448,7 @@ class Music(commands.Cog):
 		else:
 			# Calculate the progress vs total
 			p = int(round((progress/total*bar_width)))
-			bar = "[{}{}]".format("■"*p,"□"*(bar_width-p))
+			bar = "[`{}{}`]".format("■"*p,"-"*(bar_width-p))
 		if show_percent:
 			bar += " --%" if total == 0 else " {}%".format(int(round(progress/total*100)))
 		if include_time:
