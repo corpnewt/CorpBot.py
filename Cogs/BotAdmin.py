@@ -190,6 +190,27 @@ class BotAdmin(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not members_and_reason:
 			return await ctx.send('Usage: `{}{} [space delimited member mention/id] [reason]`'.format(ctx.prefix, command_name))
+		is_admin = Utils.is_admin(ctx)
+		is_server_owner = False if not ctx.guild else ctx.guild.owner.id == ctx.author.id
+		def member_exception(m):
+			# Helper to check if this member cannot be banned/kicked
+			if not isinstance(m,discord.Member):
+				# Only check members - discord.User isn't in the server,
+				# so they have no reason to be excluded
+				return False
+			if m.id == self.bot.user.id or m.id == ctx.author.id:
+				# Can't ban/kick the bot or ourselves
+				return True
+			if is_server_owner:
+				# The server owner should be able to ban/kick anyone - no exception
+				return False
+			if is_admin and not Utils.is_admin(ctx,m):
+				# Admins can ban anyone who isn't admin
+				return False
+			if Utils.is_bot_admin(ctx,m):
+				# Can't ban other bot-admins
+				return True
+			return False
 		# Force a mention - we don't want any ambiguity
 		args = members_and_reason.split()
 		# Get our list of targets
@@ -217,7 +238,7 @@ class BotAdmin(commands.Cog):
 					continue
 				# Let's check if we have a valid member and make sure it's not:
 				# 1. The bot, 2. The command caller, 3. Another bot-admin/admin
-				if isinstance(member, discord.Member) and (member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member)):
+				if member_exception(member):
 					unable.append(member.mention)
 					continue
 				if not member in targets: targets.append(member) # Only add them if we don't already have them
@@ -231,7 +252,7 @@ class BotAdmin(commands.Cog):
 						for member in ctx.guild.members:
 							if member.joined_at and t-member.joined_at.timestamp() <= seconds:
 								# Check if we *can* kick/ban them first
-								if member.id == self.bot.user.id or member.id == ctx.author.id or Utils.is_bot_admin(ctx,member):
+								if member_exception(member):
 									unable.append(member.name+"#"+member.discriminator)
 									continue
 								# Check our counter
