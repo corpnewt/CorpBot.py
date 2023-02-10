@@ -122,8 +122,7 @@ class Beer(commands.Cog):
 			g_val,g_suf = self._parse_value(original_gravity,("standard","plato"))
 			assert g_val > 0
 			g_suf = g_suf or "plato" if g_val > 1.2 else "standard"
-			if g_suf == "plato":
-				g_val = self._sg_from_plato(g_val)
+			g_sg  = self._sg_from_plato(g_val) if g_suf == "plato" else g_val
 		except:
 			return await ctx.send("Incorrect value for `original_gravity`\n{}".format(usage))
 		try:
@@ -146,9 +145,9 @@ class Beer(commands.Cog):
 		# We should have proper values here - let's gooooooooo
 		hop_val = 1 if use_whole_leaf else 1.15
 		# Do some hefty math
-		t = 1.65 * (0.000125 ** (g_val-1)) * ((1 - math.e ** (-0.04 * bt)) / 4.15) * ((aa / 100 * h_kg * 1000000) / b_l) * hop_val
+		t = 1.65 * (0.000125 ** (g_sg-1)) * ((1 - math.e ** (-0.04 * bt)) / 4.15) * ((aa / 100 * h_kg * 1000000) / b_l) * hop_val
 		u = 18.11 + 13.86 * self._tanh((bt - 31.32) / 18.27)
-		d = max((g_val - 1.050)/0.2, 0)
+		d = max((g_sg - 1.050)/0.2, 0)
 		r = h_kg * 100 * u * hop_val * aa / (b_l * (1 + d))
 		# Let's build the embed with our output
 		fields = [
