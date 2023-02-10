@@ -53,6 +53,9 @@ class Beer(commands.Cog):
 		except: return # Just bail
 		suf = suf or default
 		if not suf: return (num,None) # No suffix, and no default - return as-is
+		# Let's check for pluralization of the suffix - and strip the trailing "s"
+		if len(suf) > 1 and suf[-1].lower() == "s":
+			suf = suf[:-1]
 		# Try to get the suffix in the valid values
 		suf = next((x for x in valid if x.lower().startswith(suf.lower())),None)
 		if suf is None: return # Wasn't found
