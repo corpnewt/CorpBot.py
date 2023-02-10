@@ -136,7 +136,7 @@ class Beer(commands.Cog):
 			aa = float(alpha_acid_percent.replace(",","").replace("%",""))
 			assert 0 < aa <= 100
 		except:
-			return await ctx.send("Incorrect value for `alpha_acit_percent`\n{}".format(usage))
+			return await ctx.send("Incorrect value for `alpha_acid_percent`\n{}".format(usage))
 		try:
 			bt = float(boil_time_minutes)
 			assert bt > 0
