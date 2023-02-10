@@ -169,7 +169,7 @@ class Debugging(commands.Cog):
 			# Hope we have enough info - try to get the message
 			try:
 				g = self.bot.get_guild(g_id)
-				c = getattr(g,"get_channel_or_thread",guild.get_channel)(c_id)
+				c = getattr(g,"get_channel_or_thread",g.get_channel)(c_id)
 				return await c.fetch_message(m_id)
 			except: return None
 
