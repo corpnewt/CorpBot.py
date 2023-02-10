@@ -1,4 +1,4 @@
-import discord
+import discord, math
 from discord.ext import commands
 from Cogs import Message
 
@@ -11,13 +11,23 @@ class Beer(commands.Cog):
 	# Init with the bot reference
 	def __init__(self, bot):
 		self.bot = bot
-		self.ounces = {
+		self.volume_oz = {
 			"ounce":1,
 			"gallon":128,
 			"liter":33.814023,
 		}
-		self.ounces["milliliter"] = self.ounces["liter"]/1000
-		self.ounces["bbl"] = self.ounces["gallon"]*31
+		self.volume_oz["milliliter"] = self.volume_oz["liter"]/1000
+		self.volume_oz["hectoliter"] = self.volume_oz["liter"]*100
+		self.volume_oz["bbl"] = self.volume_oz["gallon"]*31
+		self.volume_oz["oz"] = self.volume_oz["ounce"]
+		self.weight_oz = {
+			"ounce":1,
+			"gram":0.035274,
+			"lb":16
+		}
+		self.weight_oz["pound"] = self.weight_oz["lb"]
+		self.weight_oz["kilogram"] = self.weight_oz["gram"]*1000
+		self.weight_oz["oz"] = self.weight_oz["ounce"]
 
 	def _check_float(self, f, round_to=4):
 		if f == int(f): return int(f)
@@ -26,12 +36,166 @@ class Beer(commands.Cog):
 		if temp-int(temp) >= 0.5: temp += 1
 		return self._check_float(int(temp)/10**round_to,round_to=0)
 
+	def _parse_value(self, value, valid, default=None):
+		# Let's walk the value getting any 0-9, or . chars first
+		# then look for a suffix
+		num = suf = ""
+		value = "".join(value.split()) # Remove any whitespace
+		nums = True
+		for i,x in enumerate(value.replace(",","")):
+			if nums and x in "0123456789.": # got a number
+				num += x
+			else: # non-number
+				nums = False
+				suf += x
+		# Try to cast our number properly
+		try: num = float(num)
+		except: return # Just bail
+		suf = suf or default
+		if not suf: return (num,None) # No suffix, and no default - return as-is
+		# Try to get the suffix in the valid values
+		suf = next((x for x in valid if x.lower().startswith(suf.lower())),None)
+		if suf is None: return # Wasn't found
+		# We got a valid value - return it
+		return (num,suf)
+
+	def _tanh(self, value):
+		return (math.exp(value) - math.exp(-value)) / (math.exp(value) + math.exp(-value))
+
+	@commands.command(aliases=["bitternes","bitter"])
+	async def ibu(self, ctx, *, batch_size = None, original_gravity = None, hops_amount = None, alpha_acid_percent = None, boil_time_minutes = None):
+		"""Calculates the IBU (International Bitterness Units) for the given values.  The output is listed in both Rager and Tinseth.
+
+		Required Arguments:
+			batch_size - accepts Ounces, Gallons, Liters, Hectoliters, Milliliters, or Bbl (default is Bbl)
+				eg. 19.75bbl
+			original_gravity - accepts Plato or Standard (default is Plato if > 1.2 otherwise Standard)
+				eg. 11.0p
+			hops_amount - accepts Ounces, Pounds, Grams, or Kilograms (default is lb, assumes hop pellets)
+				eg. 5.5lb
+			alpha_acid_percent - accepts a percent range from 0-100
+				eg. 11.5%
+			boil_time_minutes - accepts a > 0 minute value for boil time
+				eg. 60
+		Optional Arguments:
+			leaf - change the hop amount from pellets to whole leaf
+
+		Replying to a previous ibu command's output message will append the IBU values in a running total.
+		"""
+		usage = "Usage: `{}ibu [batch_size] [original_gravity] [hops_amount] [alpha_acid_percent] [boil_time_minutes]`".format(ctx.prefix)
+		if not batch_size: return await ctx.send(usage)
+		args = batch_size.split()
+		use_whole_leaf = next((x for x in args if x.lower() in ("whole","wholeleaf","leaf","whole_leaf")),None)
+		if use_whole_leaf: # Strip the arg
+			args = [x for x in args if not x == use_whole_leaf]
+		if not len(args) == 5: return await ctx.send(usage)
+		# Let's see if we're responding to a prior message
+		prev_r = prev_t = prev_e = None
+		try:
+			if ctx.message.reference: # Resolve the replied to reference to a message object
+				channel = self.bot.get_channel(ctx.message.reference.channel_id)
+				reply = await channel.fetch_message(ctx.message.reference.message_id)
+				if reply.embeds: # Get the first embed - if any
+					prev_e = reply.embeds[0]
+		except: pass
+		# If we have an embed in the reply - check for IBU Total (Rager) and IBU Total (Tinseth)
+		# or IBU (Rager) and IBU (Tinseth)
+		if prev_e:
+			embed_dict = prev_e.to_dict()
+			def get_vals_from_embed(ibu_vals):
+				r,t = ibu_vals.split("\n")
+				return (float(r.split()[0]),float(t.split()[0]))
+			for field in embed_dict.get("fields",[]):
+				if field.get("name") == "IBU Results (Total)" or (field.get("name") == "IBU Results" and prev_r is None and prev_t is None):
+					try: prev_r,prev_t = get_vals_from_embed(field.get("value"))
+					except: pass
+		# Should have enough args - let's start sanitizing them
+		batch_size,original_gravity,hops_amount,alpha_acid_percent,boil_time_minutes = args
+		try:
+			b_val,b_suf = self._parse_value(batch_size,self.volume_oz,default="bbl")
+			assert b_val > 0
+			b_oz = self.volume_oz[b_suf]*b_val
+			b_l  = b_oz/self.volume_oz["liter"] # Get batch size in liters
+		except:
+			return await ctx.send("Incorrect value for `batch_size`\n{}".format(usage))
+		try:
+			g_val,g_suf = self._parse_value(original_gravity,("standard","plato"))
+			assert g_val > 0
+			g_suf = g_suf or "plato" if g_val > 1.2 else "standard"
+			if g_suf == "plato":
+				g_val = self._sg_from_plato(g_val)
+		except:
+			return await ctx.send("Incorrect value for `original_gravity`\n{}".format(usage))
+		try:
+			h_val,h_suf = self._parse_value(hops_amount,self.weight_oz,default="lb")
+			assert h_val > 0
+			h_oz = self.weight_oz[h_suf]*h_val
+			h_kg = h_oz/self.weight_oz["kilogram"] # Get in kg
+		except:
+			return await ctx.send("Incorrect value for `hops_amount`\n{}".format(usage))
+		try:
+			aa = float(alpha_acid_percent.replace(",","").replace("%",""))
+			assert 0 < aa <= 100
+		except:
+			return await ctx.send("Incorrect value for `alpha_acit_percent`\n{}".format(usage))
+		try:
+			bt = float(boil_time_minutes)
+			assert bt > 0
+		except:
+			return await ctx.send("Incorrect value for `boil_time_minutes`\n{}".format(usage))
+		# We should have proper values here - let's gooooooooo
+		hop_val = 1 if use_whole_leaf else 1.15
+		# Do some hefty math
+		t = 1.65 * (0.000125 ** (g_val-1)) * ((1 - math.e ** (-0.04 * bt)) / 4.15) * ((aa / 100 * h_kg * 1000000) / b_l) * hop_val
+		u = 18.11 + 13.86 * self._tanh((bt - 31.32) / 18.27)
+		d = max((g_val - 1.050)/0.2, 0)
+		r = h_kg * 100 * u * hop_val * aa / (b_l * (1 + d))
+		# Let's build the embed with our output
+		fields = [
+			{"inline":False,"name":"Batch Size","value":"{:,} {}{}".format(
+				self._check_float(b_val),b_suf,"" if b_val==1 else "s"
+			)},
+			{"inline":False,"name":"Original Target Gravity","value":"{:,} {}".format(
+				self._check_float(g_val),"standard gravity" if g_suf!="plato" else g_suf
+			)},
+			{"inline":False,"name":"Hops Amount ({})".format("Whole Leaf" if use_whole_leaf else "Pellets"),"value":"{:,} {}{}".format(
+				self._check_float(h_val),h_suf,"" if h_val==1 else "s"
+			)},
+			{"inline":False,"name":"Alpha Acid Percent","value":"{:,}%".format(
+				self._check_float(aa,round_to=2)
+			)},
+			{"inline":False,"name":"Boil Time","value":"{:,} minute{}".format(
+				self._check_float(bt),"" if bt==1 else "s"
+			)},
+			{"inline":False,"name":"IBU Results","value":"{:,} (Rager)\n{:,} (Tinseth)".format(
+				self._check_float(r,round_to=2),
+				self._check_float(t,round_to=2)
+			)}
+		]
+		if prev_r is not None and prev_t is not None:
+			# Insert the previous values
+			fields.insert(-1,{"inline":False,"name":"IBU Results (Previous)","value":"{:,} (Rager)\n{:,} (Tinseth)".format(
+				self._check_float(prev_r,round_to=2),
+				self._check_float(prev_t,round_to=2)
+			)})
+			# Add the totals to the end
+			fields.append({"inline":False,"name":"IBU Results (Total)","value":"{:,} (Rager)\n{:,} (Tinseth)".format(
+				self._check_float(prev_r+r,round_to=2),
+				self._check_float(prev_t+t,round_to=2)
+			)})
+		await Message.Embed(
+			title="Bitterness Calculation (IBU)",
+			fields=fields,
+			color=ctx.author
+		).send(ctx)
+
 	@commands.command()
 	async def vconvert(self, ctx, *, volume = None, from_type = None, to_type = None):
 		"""Converts between Ounces, Gallons, Liters, Milliliters, and Beer Barrels.  From/To types can be:
 		(O)unces
 		(G)allons
 		(L)iters
+		(H)ectoliters
 		(M)illiliters
 		(B)eer Barrels"""
 		usage = "Usage: `{}vconvert [volume] [from_type] [to_type]`".format(ctx.prefix)
@@ -39,8 +203,8 @@ class Beer(commands.Cog):
 		args = volume.split()
 		if not len(args) == 3: return await ctx.send(usage)
 		try:
-			f = next((x for x in self.ounces if x[0].lower().startswith(args[1][0].lower())),None)
-			t = next((x for x in self.ounces if x[0].lower().startswith(args[2][0].lower())),None)
+			f = next((x for x in self.volume_oz if x[0].lower().startswith(args[1][0].lower())),None)
+			t = next((x for x in self.volume_oz if x[0].lower().startswith(args[2][0].lower())),None)
 			m = self._check_float(float(args[0]))
 		except:
 			return await ctx.send(usage)
@@ -52,8 +216,8 @@ class Beer(commands.Cog):
 			return await ctx.send("No change when converting {} ---> {}.".format(f, t))
 		output = "I guess I couldn't make that conversion..."
 		try:
-			out_val = self._check_float(m*self.ounces[f]/self.ounces[t])
-			output = "{:,} {} == {:,} {}".format(
+			out_val = self._check_float(m*self.volume_oz[f]/self.volume_oz[t])
+			output = "{:,} {} is {:,} {}".format(
 				m,
 				f+("" if abs(m)==1 else "s"),
 				out_val,
