@@ -220,16 +220,16 @@ class BotAdmin(commands.Cog):
 		skipped = []
 		last = []
 		reason = ""
-		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name == "ban" else None
+		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name.lower() in ("ban","klean") else None
 		try: days = int(days)
 		except: days = None
-		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name == "ban" else None
+		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name.lower() in ("ban","klean") else None
 		for index,item in enumerate(args):
 			if self.mention_re.search(item): # Check if it's a mention
 				# Resolve the member
 				mem_id = int(re.sub(r'\W+', '', item))
 				member = ctx.guild.get_member(mem_id)
-				if member is None and command_name in ("ban","unban"): # Didn't get a valid member, let's allow a pre-ban/unban if we can resolve them
+				if member is None and command_name.lower() in ("ban","unban","klean"): # Didn't get a valid member, let's allow a pre-ban/unban if we can resolve them
 					try: member = await self.bot.fetch_user(mem_id)
 					except: pass
 				# If we have an invalid mention, save it to report later
@@ -264,7 +264,7 @@ class BotAdmin(commands.Cog):
 					continue
 				# Check if we're banning - and if so, check the rest of the args for `-r=#`
 				# then apply that override and remove from the reason
-				if command_name == "ban":
+				if command_name.lower() in ("ban","klean"):
 					for i,x in enumerate(args[index:]):
 						if self.removal.match(x):
 							try:
@@ -314,18 +314,34 @@ class BotAdmin(commands.Cog):
 		# Verify the confirmation
 		if getattr(confirmation_user,"content",None) != confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
 		# We got the authorization!
-		message = await Message.EmbedText(title="{}ing...".format("Bann" if command_name == "ban" else "Unbann" if command_name == "unban" else "Kick"),color=ctx.author,footer=footer).send(ctx)
+		message = await Message.EmbedText(
+			title="{}ing...".format(
+				"Bann" if command_name.lower() == "ban" else "Unbann" if command_name.lower() == "unban" else command_name.capitalize()
+			),color=ctx.author,footer=footer
+		).send(ctx)
 		canned = []
 		cant = []
-		command = {"ban":ctx.guild.ban,"kick":ctx.guild.kick,"unban":ctx.guild.unban}.get(command_name.lower(),ctx.guild.kick)
-		for target in targets:
-			try:
-				args = {"reason":"{}#{}: {}".format(ctx.author.name,ctx.author.discriminator,reason)}
-				if days is not None: args["delete_message_days"] = days
-				await command(target,**args)
-				canned.append(target)
-			except:
-				cant.append(target)
+		command = {
+			"ban":(ctx.guild.ban,),
+			"kick":(ctx.guild.kick,),
+			"unban":(ctx.guild.unban,),
+			"klean":(ctx.guild.ban,ctx.guild.unban)
+		}.get(command_name.lower(),ctx.guild.kick)
+		for c in command:
+			for target in targets:
+				try:
+					args = {"reason":"{}{}#{}: {}".format(
+						"(Klean) " if command_name.lower() == "klean" else "",
+						ctx.author.name,
+						ctx.author.discriminator,
+						reason
+					)}
+					if days is not None and c == ctx.guild.ban: args["delete_message_days"] = days
+					await c(target,**args)
+					canned.append(target)
+				except Exception as e:
+					print(e)
+					cant.append(target)
 		msg = ""
 		if len(canned):
 			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
@@ -364,6 +380,24 @@ class BotAdmin(commands.Cog):
 
 		eg:  $ban last=10m30s raid"""
 		await self.kick_ban(ctx,members,"ban")
+
+	@commands.command(aliases=["scam"])
+	async def klean(self, ctx, *, members = None, reason = None):
+		"""Bans the passed members for the specified reason, then unbans them in order to remove messages without permanently banning the account.
+		All klean targets must be mentions or ids to avoid ambiguity (bot-admin only).
+		
+		eg:  $klean @user1#1234 @user2#5678 @user3#9012 for spamming
+		
+		Accepts r=#, rem=#, remove=# or removal=# (optionally prefixed with -) within the reason to specify the number of days worth of the kleaned users' messages to remove.
+		This is limited to 0-7 days, and will override the value set by the rembanmessages command.
+
+		eg:  $klean @user1#1234 @user2#5678 @user3#9012 for spamming -rem=5
+
+		Accepts last=[time] to kick all valid members that joined in that time (up to 50).
+		The [time] format allows for w=Weeks, d=Days, h=Hours, m=Minutes, s=Seconds.
+
+		eg:  $klean last=10m30s raid"""
+		await self.kick_ban(ctx,members,"klean")
 
 	@commands.command()
 	async def unban(self, ctx, *, members = None, reason = None):
