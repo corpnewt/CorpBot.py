@@ -198,8 +198,7 @@ class Beer(commands.Cog):
         prev_r = prev_t = prev_e = None
         try:
             if ctx.message.reference: # Resolve the replied to reference to a message object
-                channel = self.bot.get_channel(ctx.message.reference.channel_id)
-                reply = await channel.fetch_message(ctx.message.reference.message_id)
+                reply = await ctx.channel.fetch_message(ctx.message.reference.message_id)
                 if reply.embeds: # Get the first embed - if any
                     prev_e = reply.embeds[0]
         except: pass
