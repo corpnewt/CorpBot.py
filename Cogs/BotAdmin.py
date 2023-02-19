@@ -338,10 +338,14 @@ class BotAdmin(commands.Cog):
 					)}
 					if days is not None and c == ctx.guild.ban: args["delete_message_days"] = days
 					await c(target,**args)
-					canned.append(target)
+					if not target in canned: # Avoid double adding
+						canned.append(target)
 				except Exception as e:
 					print(e)
-					cant.append(target)
+					if not target in cant:
+						cant.append(target)
+		# Make sure any that showed up in cant override those in canned
+		canned = [x for x in canned if not x in cant]
 		msg = ""
 		if len(canned):
 			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
