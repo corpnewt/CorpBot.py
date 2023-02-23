@@ -697,13 +697,7 @@ class Music(commands.Cog):
 		await channel.connect(cls=wavelink.Player)
 		await Message.Embed(title="♫ Ready to play music in {}!".format(channel),color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(hidden=True)
-	async def okbye(self, ctx):
-		"""Do you wanna build a snowman?"""
-
-		await ctx.invoke(self.leave)
-
-	@commands.command(aliases=["disconnect"])
+	@commands.command(aliases=["disconnect","okbye"])
 	async def leave(self, ctx):
 		"""Stops and disconnects the bot from voice."""
 
@@ -714,7 +708,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["p"])
 	async def play(self, ctx, *, url = None):
 		"""Plays from a url (almost anything youtube_dl supports) or resumes a currently paused song."""
 
@@ -741,7 +735,7 @@ class Music(commands.Cog):
 		await self.state_added(ctx,songs,message,shuffled=False)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
-	@commands.command()
+	@commands.command(aliases=["unp"])
 	async def unplay(self, ctx, *, song_number = None):
 		"""Removes the passed song number from the queue.  You must be the requestor, or an admin to remove it.  Does not include the currently playing song."""
 		
@@ -753,17 +747,65 @@ class Music(commands.Cog):
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 		try:
-			song_number = int(song_number)-1
+			song_strings = song_number.replace(" ","").split(",")
+			song_numbers = []
+			for num in song_strings:
+				if "-" in num: # Got a range
+					l,b = map(int,num.split("-"))
+					assert l > 0 and b > 0
+					song_numbers.extend(list(range(min(l,b)-1,max(l,b))))
+				else: # Assume it's just a number
+					song_numbers.append(int(num)-1)
+			song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
+			assert song_numbers # Make sure we have *something*
 		except:
 			return await Message.Embed(title="♫ Not a valid song number!",color=ctx.author,delete_after=delay).send(ctx)
-		if song_number < 0 or song_number > len(player.queue):
-			return await Message.Embed(title="♫ Out of bounds!  Song number must be between 2 and {}.".format(len(queue)),color=ctx.author,delete_after=delay).send(ctx)
-		# Get the song at the index
-		track = player.queue[song_number]
-		if track.ctx.author == ctx.author or Utils.is_bot_admin(ctx):
-			del player.queue[song_number]
-			return await Message.Embed(title="♫ Removed {} at position {}!".format(track.title,song_number+1),color=ctx.author,delete_after=delay).send(ctx)
-		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only {} or an admin can remove that song!".format(track.ctx.author.mention),color=ctx.author,delete_after=delay).send(ctx)
+		if any((x < 0 or x >= len(player.queue) for x in song_numbers)):
+			return await Message.Embed(title="♫ Out of bounds!  Song number must be between 1 and {}.".format(len(player.queue)),color=ctx.author,delete_after=delay).send(ctx)
+		# Get the tracks outlined
+		tracks = [(i,player.queue[i]) for i in song_numbers]
+		# Get any that don't belong to us (if we're not bot-admin)
+		not_ours = [] if Utils.is_bot_admin(ctx) else [track for track in tracks if track[1].ctx.author != ctx.author]
+		# Find out which we can remove - and get their indices separately
+		can_rem = [track for track in tracks if not track in not_ours]
+		if can_rem:
+			# We have at least one we can unplay - get the tracks that don't match the indices
+			can_rem_nums = [x[0] for x in can_rem]
+			new_tracks = [t for i,t in enumerate(player.queue) if i not in can_rem_nums]
+			# Clear the player's queue and reload
+			player.queue.clear()
+			await self.add_to_queue(player,new_tracks)
+			if len(can_rem)==1:
+				i,t=can_rem[0]
+				fields = [{
+					"name":"{}. {}".format(i+1,t.title),
+					"value":"{}{} - Requested by {} - [Link]({})".format(
+						self.format_duration(t.seek,t)+" -> " if hasattr(t,"seek") else "",
+						self.format_duration(t.duration,t),
+						t.ctx.author.mention,
+						t.uri
+					),
+					"inline":False
+				}]
+				await Message.Embed(
+					title="♫ Unplayed the following track!".format("" if len(can_rem)==1 else "s"),
+					fields=fields,
+					delete_after=delay,
+					color=ctx.author
+				).send(ctx)
+			else:
+				await Message.Embed(
+					title="♫ Unplayed {:,} tracks!".format(len(can_rem)),
+					delete_after=delay,
+					color=ctx.author
+				).send(ctx)
+		if not_ours:
+			await Message.Embed(
+				title="♫ Could not unplay {:,} track{}!".format(len(not_ours),"" if len(not_ours)==1 else "s"),
+				description="Tracks can only be unplayed by the user that requested them or an admin.",
+				delete_after=delay,
+				color=ctx.author
+			).send(ctx)
 
 	@commands.command(aliases=["unq"])
 	async def unqueue(self, ctx, *, unqueue_from = None):
