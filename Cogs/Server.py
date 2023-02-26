@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, time
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import Utils, Message, PCPP
+from   Cogs import Utils, Message, PCPP, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -38,6 +38,15 @@ class Server(commands.Cog):
 		# See if we were loaded
 		if not self._is_submodule(ext.__name__, self.__module__): return
 		self.bot.loop.create_task(self.start_loading())
+
+	@commands.Cog.listener()	
+	async def on_member_join(self, member):
+		join_id = self.settings.getServerStat(member.guild,"JoinRole",None)
+		if not join_id: return # Nothing to do
+		join_role = DisplayName.roleForName(join_id,member.guild)
+		if not join_role: return # Again, nothing to do
+		# We have a role to apply - let's attempt to do that
+		self.settings.role.add_roles(member,[join_role])
 
 	async def start_loading(self):
 		await self.bot.wait_until_ready()
@@ -181,7 +190,7 @@ class Server(commands.Cog):
 		ret = await PCPP.getMarkdown(pcpplink, autopcpp)
 		return { "Ignore" : False, "Delete" : False, "Respond" : ret }
 
-	@commands.command()
+	@commands.command(aliases=["vote"])
 	async def poll(self, ctx, *, poll_options = None):
 		"""Starts a poll - which can take a custom prompt/question, as well as one or up to 10 options.
 
@@ -341,7 +350,7 @@ class Server(commands.Cog):
 		for r in reactions:
 			await message.add_reaction(r)
 
-	@commands.command(aliases=["pollend","epoll","endp"])
+	@commands.command(aliases=["pollend","epoll","endp","endvote","endv"])
 	async def endpoll(self, ctx, *, message_url = None):
 		"""Ends the poll that resides at the passed message url.  Must be either the original poll author, or a bot-admin."""
 		if not message_url: return await ctx.send("Usage: `{}endpoll [message_url]`".format(ctx.prefix))
@@ -365,6 +374,34 @@ class Server(commands.Cog):
 		# Add our adjusted poll to the task list
 		self.loop_list.append(self.bot.loop.create_task(self.check_poll(ctx.guild, poll)))
 		await ctx.send("Poll has ended.")
+
+	@commands.command()
+	async def setjoinrole(self, ctx, *, role = None):
+		"""Sets the role to apply to each new user that joins (admin only)."""
+		if not await Utils.is_admin_reply(ctx): return
+		if role is None:
+			self.settings.setServerStat(ctx.guild, "JoinRole", None)
+			return await ctx.send("New users will **not** be given a join role.")
+		roleName = role
+		role = DisplayName.roleForName(roleName, ctx.guild)
+		if not role:
+			return await ctx.send("I couldn't find *{}*...".format(Nullify.escape_all(roleName)))
+		self.settings.setServerStat(ctx.guild, "JoinRole", role.id)
+		await ctx.send("New users will be given **{}** when joining.".format(Nullify.escape_all(role.name)))
+
+	@commands.command(aliases=["joinrole"])
+	async def getjoinrole(self, ctx):
+		"""Gets the role applied to each new user that joins (admin only)."""
+		if not await Utils.is_admin_reply(ctx): return
+		join_id = self.settings.getServerStat(ctx.guild, "JoinRole", None)
+		if join_id is None:
+			# No join setup
+			return await ctx.send("There is **no** join role set.")
+		join_role = DisplayName.roleForName(join_id, ctx.guild)
+		if join_role is None:
+			# Not a role anymore
+			return await ctx.send("The join role with id {} no longer exists.".format(join_id))
+		await ctx.send("New users will be given **{}** when joining.".format(Nullify.escape_all(join_role.name)))
 		
 	@commands.command(pass_context=True)
 	async def setprefix(self, ctx, *, prefix : str = None):

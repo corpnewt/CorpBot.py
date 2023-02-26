@@ -261,13 +261,6 @@ class Responses(commands.Cog):
 		if not response.get("matched"): return
 		# See if we're admin/bot-admin - and bail if suppressed
 		if Utils.is_bot_admin(ctx) and response.get("suppress"): return
-		# Check for role changes
-		roles_added = response.get("user_roles_added",[])+response.get("roles_added",[])
-		roles_removed = response.get("user_roles_removed",[])+response.get("roles_removed",[])
-		if roles_added:
-			self.settings.role.add_roles(ctx.author, roles_added)
-		if roles_removed:
-			self.settings.role.rem_roles(ctx.author, roles_removed)
 		# Walk punishments in order of severity (ban -> kick -> mute)
 		if response.get("action") in ("ban","kick"):
 			action = ctx.guild.ban if response["action"] == "ban" else ctx.guild.kick
@@ -285,6 +278,13 @@ class Responses(commands.Cog):
 				# Try to send the response to all defined outputs
 				try: await output.send(response["message"],allowed_mentions=discord.AllowedMentions.all())
 				except: continue
+		# Check for role changes
+		roles_added = response.get("user_roles_added",[])+response.get("roles_added",[])
+		roles_removed = response.get("user_roles_removed",[])+response.get("roles_removed",[])
+		if roles_added:
+			self.settings.role.add_roles(ctx.author, roles_added)
+		if roles_removed:
+			self.settings.role.rem_roles(ctx.author, roles_removed)
 		reactions = response.get("user_roles_react",[])+response.get("roles_react",[])
 		if reactions and not response.get("delete"): # Only react if we're not deleting the message
 			for reaction in reactions:
