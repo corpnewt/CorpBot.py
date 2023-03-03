@@ -108,7 +108,7 @@ class Beer(commands.Cog):
         except:
             return await ctx.send("Incorrect value for `batch_size`\n{}".format(usage))
         try:
-            g_val,g_suf = self._parse_value(original_gravity,("standard","plato"))
+            g_val,g_suf = self._parse_value(original_gravity,("standard","sg","plato"))
             assert g_val > 0
             g_suf = g_suf or "plato" if g_val > 1.2 else "standard"
             g_sg  = self._sg_from_plato(g_val) if g_suf == "plato" else g_val
@@ -223,7 +223,7 @@ class Beer(commands.Cog):
         except:
             return await ctx.send("Incorrect value for `batch_size`\n{}".format(usage))
         try:
-            g_val,g_suf = self._parse_value(original_gravity,("standard","plato"))
+            g_val,g_suf = self._parse_value(original_gravity,("standard","sg","plato"))
             assert g_val > 0
             g_suf = g_suf or "plato" if g_val > 1.2 else "standard"
             g_sg  = self._sg_from_plato(g_val) if g_suf == "plato" else g_val
