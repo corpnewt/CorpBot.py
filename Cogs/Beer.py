@@ -11,6 +11,18 @@ class Beer(commands.Cog):
     # Init with the bot reference
     def __init__(self, bot):
         self.bot = bot
+        self.no_plural = (
+            "oz",
+            "hl",
+            "ml",
+            "l",
+            "kg"
+        )
+        self.unit_display = {
+            "ml": "mL",
+            "hl": "hL",
+            "l" : "L"
+        }
         self.volume_oz = {
             "ounce":1,
             "gallon":128,
@@ -19,14 +31,17 @@ class Beer(commands.Cog):
         self.volume_oz["milliliter"] = self.volume_oz["liter"]/1000
         self.volume_oz["hectoliter"] = self.volume_oz["liter"]*100
         self.volume_oz["bbl"] = self.volume_oz["gallon"]*31
+        self.volume_oz["hl"] = self.volume_oz["hectoliter"]
+        self.volume_oz["ml"] = self.volume_oz["milliliter"]
         self.volume_oz["oz"] = self.volume_oz["ounce"]
         self.weight_oz = {
             "ounce":1,
             "gram":0.035274,
-            "lb":16
+            "pound":16
         }
-        self.weight_oz["pound"] = self.weight_oz["lb"]
         self.weight_oz["kilogram"] = self.weight_oz["gram"]*1000
+        self.weight_oz["lb"] = self.weight_oz["pound"]
+        self.weight_oz["kg"] = self.weight_oz["kilogram"]
         self.weight_oz["oz"] = self.weight_oz["ounce"]
 
     def _check_float(self, f, round_to=4):
@@ -143,7 +158,7 @@ class Beer(commands.Cog):
         # Let's build the embed with our output
         fields = [
             {"inline":False,"name":"Batch Size","value":"{:,} {}{}".format(
-                self._check_float(b_val),b_suf,"" if b_val=="oz" or b_val==1 else "s"
+                self._check_float(b_val),self.unit_display.get(b_suf,b_suf),"" if b_suf in self.no_plural or b_val==1 else "s"
             )},
             {"inline":False,"name":"Original Target Gravity","value":"{:,} {}".format(
                 self._check_float(g_val),"SG" if g_suf=="standard" else g_suf.capitalize()
@@ -158,7 +173,7 @@ class Beer(commands.Cog):
                 self._check_float(bt),"" if bt==1 else "s"
             )},
             {"inline":False,"name":"Hop Amount Needed ({})".format("Whole Leaf" if use_whole_leaf else "Pellets"),"value":"{:,} {}{}".format(
-                self._check_float(h_final,round_to=2),output_unit,"" if output_unit=="oz" or h==1 else "s"
+                self._check_float(h_final,round_to=2),self.unit_display.get(output_unit,output_unit),"" if output_unit in self.no_plural or h==1 else "s"
             )}
         ]
         await Message.Embed(
@@ -256,13 +271,13 @@ class Beer(commands.Cog):
         # Let's build the embed with our output
         fields = [
             {"inline":False,"name":"Batch Size","value":"{:,} {}{}".format(
-                self._check_float(b_val),b_suf,"" if b_val=="oz" or b_val==1 else "s"
+                self._check_float(b_val),self.unit_display.get(b_suf,b_suf),"" if b_suf in self.no_plural or b_val==1 else "s"
             )},
             {"inline":False,"name":"Original Target Gravity","value":"{:,} {}".format(
                 self._check_float(g_val),"SG" if g_suf=="standard" else g_suf.capitalize()
             )},
             {"inline":False,"name":"Hops Amount ({})".format("Whole Leaf" if use_whole_leaf else "Pellets"),"value":"{:,} {}{}".format(
-                self._check_float(h_val),h_suf,"" if h_suf=="oz" or h_val==1 else "s"
+                self._check_float(h_val),self.unit_display.get(h_suf,h_suf),"" if h_suf in self.no_plural or h_val==1 else "s"
             )},
             {"inline":False,"name":"Alpha Acid Percent","value":"{:,}%".format(
                 self._check_float(aa,round_to=2)
@@ -322,9 +337,9 @@ class Beer(commands.Cog):
             out_val = self._check_float(m*self.volume_oz[f]/self.volume_oz[t])
             output = "{:,} {} is {:,} {}".format(
                 m,
-                f+("" if abs(m)==1 else "s"),
+                self.unit_display.get(f,f)+("" if f in self.no_plural or abs(m)==1 else "s"),
                 out_val,
-                t+("" if abs(out_val)==1 else "s")
+                self.unit_display.get(t,t)+("" if t in self.no_plural or abs(out_val)==1 else "s")
             )
         except:
             pass
