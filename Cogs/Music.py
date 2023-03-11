@@ -497,12 +497,20 @@ class Music(commands.Cog):
 			added += 1
 		return added
 
-	async def state_added(self,ctx,songs,message=None,shuffled=False):
+	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None):
 		# Helper to state songs added, whether or not they were shuffled - and to
 		# edit a passed message (if any).
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not "tracks" in songs: return None # Missing info
+		desc = "Requested by {}".format(ctx.author.mention)
 		if isinstance(songs["tracks"],list): # Added a playlist
+			# Get the track positions in the queue
+			if not shuffled and queue:
+				desc = "At positions {} through {} in the playlist\n{}".format(
+					len(queue)-len(songs["tracks"])+1,
+					len(queue),
+					desc
+				)
 			embed = Message.Embed(
 				title="♫ Added {}{} song{} from {}".format(
 					len(songs["tracks"]),
@@ -510,19 +518,25 @@ class Music(commands.Cog):
 					"" if len(songs["tracks"])==1 else "s",
 					songs.get("playlist","Unknown Playlist")
 				),
-				description="Requested by {}".format(ctx.author.mention),
+				description=desc,
 				url=songs.get("search"),
 				delete_after=delay,
 				color=ctx.author
 			)
 		elif isinstance(songs["tracks"],wavelink.abc.Playable): # Only added one track
+			# Get the track position in the queue
+			if not shuffled and queue:
+				desc = "{} in the playlist\n{}".format(
+					"Next" if len(queue)==1 else "At position {}".format(len(queue)),
+					desc
+				)
 			track = songs["tracks"]
 			fields = [{"name":"Duration","value":self.format_duration(track.duration,track),"inline":False}]
 			if getattr(track,"seek",None):
 				fields.append({"name":"Starting At","value":self.format_duration(track.seek),"inline":False})
 			embed = Message.Embed(
 				title="♫ Enqueued: {}".format(track.title),
-				description="Requested by {}".format(ctx.author.mention),
+				description=desc,
 				fields=fields,
 				color=ctx.author,
 				thumbnail=getattr(track,"thumb",None),
@@ -732,7 +746,7 @@ class Music(commands.Cog):
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=False)
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
 	@commands.command(aliases=["unp"])
@@ -747,7 +761,7 @@ class Music(commands.Cog):
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 		try:
-			song_strings = song_number.replace(" ","").split(",")
+			song_strings = song_number.split()
 			song_numbers = []
 			for num in song_strings:
 				if "-" in num: # Got a range
@@ -877,7 +891,7 @@ class Music(commands.Cog):
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=True)
+		await self.state_added(ctx,songs,message,shuffled=True,queue=player.queue)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
 	@commands.command()
