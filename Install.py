@@ -152,23 +152,25 @@ class Run:
 if __name__ == '__main__':
     r = Run()
     modules = [
-        {"name":"pycord", "item":"py-cord[voice]"},
+        {"name":"pomice"},
+        # Remove the updated discord.py that pomice overwrites, and
+        # remove py-cord so we can reinstall it with the proper version
+        {"name":"discord.py","uninstall":True},
+        {"name":"pycord","item":"py-cord[voice]","uninstall":True},
+        {"name":"pycord","item":"py-cord[voice]"},
         {"name":"certifi"},
         {"name":"pillow"},
-        # {"name":"youtube-dl"},
-        {"name":"Wavelink"},
         {"name":"Requests"},
         {"name":"parsedatetime"},
         {"name":"psutil"},
         {"name":"pyparsing"},
         {"name":"pyquery"},
-        {"name":"pyaiml", "item":"git+https://github.com/paulovn/python-aiml"},
+        {"name":"pyaiml","item":"git+https://github.com/paulovn/python-aiml"},
         {"name":"speedtest-cli"},
         {"name":"pytz"},
         {"name":"wikipedia"},
-        #{"name":"googletrans"},
         {"name":"googletrans (direct api branch)","item":"git+https://github.com/ssut/py-googletrans@feature/enhance-use-of-direct-api"},
-        {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
+        {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
         {"name":"igdb_api_python"},
@@ -179,8 +181,11 @@ if __name__ == '__main__':
     item = 0
     for module in modules:
         item+=1
-        print("\n\nUpdating {} - {} of {}\n\n".format(module["name"], item, len(modules)))
-        r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
+        print("\n\n{} {} - {} of {}\n\n".format("Removing" if module.get("uninstall") else "Updating",module["name"], item, len(modules)))
+        if module.get("uninstall"):
+            r.run({"args":[sys.executable, "-m", "pip", "uninstall","-y", module.get("item", module["name"])], "stream":True})
+        else:
+            r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
     # Prompt for the users to press enter to exit
     prompt = "Done.\n\nPress [enter] to leave the script..."
     if sys.version_info >= (3, 0):
