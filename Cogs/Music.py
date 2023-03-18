@@ -387,10 +387,9 @@ class Music(commands.Cog):
 			if not pomice.enums.URLRegex.YOUTUBE_URL.match(url):
 				return None
 			# Got a youtube link - check it for a video
-			url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
-			if not url:
-				return None
-			url = url.group("video") # Get the video identifier
+			pl_url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
+			if pl_url:
+				url = pl_url.group("video") # Get the video identifier
 		node = await self.get_node()
 		# Here we either have a video identifier - or a search term
 		starting_track = await node.get_tracks(query=url,ctx=ctx)
