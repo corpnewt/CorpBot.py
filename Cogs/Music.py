@@ -1382,7 +1382,7 @@ class Music(commands.Cog):
 		server_list = []
 		nodes = list(self.NodePool.nodes.values())
 		for node in nodes:
-			for p in node.players:
+			for p in node.players.values():
 				if p.is_playing and not p.is_paused:
 					server_list.append({
 						"name":"{} ({}){}".format(
