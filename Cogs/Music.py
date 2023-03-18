@@ -67,6 +67,7 @@ class Music(commands.Cog):
 		self.ll_pass = bot.settings_dict.get("lavalink_password","youshallnotpass")
 		# Monkey patch out some regex - maybe find a way to include it via setting later
 		pomice.URLRegex.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"a^",)
+		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
 		# Setup pomice defaults
 		self.NodePool = pomice.NodePool()
 		# Setup player specifics to remember
@@ -378,7 +379,31 @@ class Music(commands.Cog):
 		if ctx: track.ctx = ctx # Append our ctx-based data if provided
 		return track
 
-	async def resolve_search(self, ctx, url, message = None, shuffle = False):
+	async def get_recommendations(self, ctx, url):
+		# Gather youtube recommendations based on the passed video URL or search term
+		urls = Utils.get_urls(url)
+		if urls:
+			url = urls[0]
+			if not pomice.enums.URLRegex.YOUTUBE_URL.match(url):
+				return None
+			# Got a youtube link - check it for a video
+			url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
+			if not url:
+				return None
+			url = url.group("video") # Get the video identifier
+		node = await self.get_node()
+		# Here we either have a video identifier - or a search term
+		starting_track = await node.get_tracks(query=url,ctx=ctx)
+		if not isinstance(starting_track,list):
+			return None # Something went wrong loading this
+		starting_track = starting_track[0]
+		# Load the recommendations
+		return await node.get_tracks(
+			query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
+			ctx=ctx
+		)
+
+	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -388,7 +413,10 @@ class Music(commands.Cog):
 		try:
 			if urls: # Need to load via node get_tracks/get_playlist
 				url = urls[0] # Get the first URL
-				tracks = await node.get_tracks(query=url,ctx=ctx)
+				if recommend:
+					tracks = await self.get_recommendations(ctx,url)
+				else:
+					tracks = await node.get_tracks(query=url,ctx=ctx)
 				# Get the first hit if it's not a playlist
 				if isinstance(tracks,list):
 					tracks = tracks[0]
@@ -443,11 +471,13 @@ class Music(commands.Cog):
 						elif index == -2: await message.edit(content="Times up!  We can search for music another time.",delete_after=delay)
 						else: await message.edit(content="Aborting!  We can search for music another time.",delete_after=delay)
 						return False
-					# Got the index of the track to add
 					tracks = tracks[index]
 				else:
 					# We only want the first entry
 					tracks = tracks[0]
+				# Check if we're gathering recommendations
+				if recommend:
+					tracks = await self.get_recommendations(ctx,tracks.identifier)
 		except Exception as e:
 			tracks = None # Clear it out as something went wrong
 			print("Error resolving search:\n{}".format(repr(e)))
@@ -460,7 +490,7 @@ class Music(commands.Cog):
 				"data":tracks.playlist_info,
 				"tracks":tracks.tracks,
 				"playlist":tracks.name,
-				"search":url
+				"search":tracks.uri
 			}
 		elif isinstance(tracks,pomice.objects.Track):
 			# Rewrap the track as a CorpTrack to allow custom attributes
@@ -790,7 +820,7 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=["p"])
 	async def play(self, ctx, *, url = None):
-		"""Plays from a url (almost anything youtube_dl supports) or resumes a currently paused song."""
+		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -811,6 +841,29 @@ class Music(commands.Cog):
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
+		await self.add_to_queue(player,songs["tracks"])
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
+		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
+
+	@commands.command(aliases=["suggest","r","radio"])
+	async def recommend(self, ctx, *, url = None):
+		"""Queues up recommendations for the passed search term or YouTube link."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = await self.get_player(ctx.guild)
+		if not player or not player.is_connected:
+			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if url is None:
+			return await Message.Embed(title="♫ You need to pass a search term or YouTube link!",color=ctx.author,delete_after=delay).send(ctx)
+		message = await Message.Embed(
+			title="♫ Gathering Recommendations For: {}".format(url.strip("<>")),
+			color=ctx.author
+			).send(ctx)
+		# Add our url to the queue
+		songs = await self.resolve_search(ctx,url,message=message,recommend=True)
+		# Take the songs we got back - if any - and add them to the queue
+		if not songs or not "tracks" in songs: # Got nothing :(
+			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
 		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
@@ -1418,7 +1471,7 @@ class Music(commands.Cog):
 		# If we're just using the join command - we don't need extra checks - they're done in the command itself
 		if ctx.command.name in ("join",): return
 		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
-		if ctx.command.name in ("play","shuffle","loadpl","shufflepl") and ctx.author.voice:
+		if ctx.command.name in ("play","recommend","shuffle","loadpl","shufflepl") and ctx.author.voice:
 			if not player or not player.is_connected:
 				return await ctx.author.voice.channel.connect(cls=CorpPlayer)
 		# Let's ensure the bot is connected to voice
