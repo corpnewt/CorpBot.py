@@ -826,6 +826,8 @@ class Music(commands.Cog):
 		player = await self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if url is None and ctx.message.attachments: # Get the first attachment as the URL
+			url = ctx.message.attachments[0].url
 		if player.is_paused and url is None:
 			# We're trying to resume
 			await player.set_pause(False)
