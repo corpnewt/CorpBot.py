@@ -172,6 +172,8 @@ class Music(commands.Cog):
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+		# Make sure volume is setup properly - equalized per the volume ratio
+		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)
 		if ctx: # Got context, can send the resulting message
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			fields = [{"name":"Duration","value":self.format_duration(track.length,track),"inline":False}]
@@ -180,15 +182,13 @@ class Music(commands.Cog):
 			await Message.Embed(
 				title="♫ Now Playing: {}".format(track.title),
 				fields=fields,
-				description="Requested by {}".format(ctx.author.mention),
+				description="Requested by {}\n-- Volume at {}%".format(ctx.author.mention,int(volume/self.vol_ratio)),
 				color=ctx.author,
 				url=track.uri,
 				thumbnail=getattr(track,"thumb",None),
 				delete_after=delay
 			).send(ctx)
 		# Regardless of whether we can post - go to the next song.
-		# Make sure volume is setup properly - equalized per the volume ratio
-		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild, "MusicVolume", 100)*self.vol_ratio)
 		await player.set_volume(volume)
 		player.vol = player.volume # Retain the setting
 		await player.play(track,start=int(getattr(player,"track_seek",0)))
@@ -1151,12 +1151,16 @@ class Music(commands.Cog):
 				color=ctx.author,
 				delete_after=delay
 			).send(ctx)
-		fields = [{"name":"{}".format(track.title),"value":"Currently {} - at {} - Requested by {} - [Link]({})".format(
+		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
+		desc = "**{}**\nCurrently {} - at {} - Requested by {} - [Link]({})\n-- Volume at {}%".format(
+			track.title,
 			play_text,
 			self.format_elapsed(player,track),
 			track_ctx.author.mention,
-			track.uri),"inline":False},
-		]
+			track.uri,
+			cv
+		)
+		fields = []
 		if not player.queue.is_empty:
 			total_time = 0
 			total_streams = 0
@@ -1171,7 +1175,8 @@ class Music(commands.Cog):
 				# Got at least one stream
 				time_string += "{:,} Stream{} -- ".format(total_streams, "" if total_streams == 1 else "s")
 			q_text = "-- {:,} Song{} in Queue -- {}".format(len(player.queue), "" if len(player.queue) == 1 else "s", time_string)
-			fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
+			desc += "\n\n**♫ Up Next**\n{}".format(q_text)
+			# fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
 		for x,y in enumerate(player.queue,start=1):
 			t_ctx = getattr(y,"ctx",None)
 			fields.append({
@@ -1183,11 +1188,11 @@ class Music(commands.Cog):
 					y.uri
 				),
 				"inline":False})
-		
 		pl_string = " - Repeat Enabled" if getattr(player,"repeat",False) else ""
 		if len(fields) <= 11:
 			await Message.Embed(
 				title="♫ Current Playlist{}".format(pl_string),
+				description=desc,
 				color=ctx.author,
 				fields=fields,
 				delete_after=delay,
@@ -1197,7 +1202,9 @@ class Music(commands.Cog):
 		else:
 			page,message = await PickList.PagePicker(
 				title="♫ Current Playlist{}".format(pl_string),
+				description=desc,
 				list=fields,
+				max=8,
 				timeout=60 if not delay else delay,
 				ctx=ctx,
 				thumbnail=thumb
@@ -1333,8 +1340,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if volume is None:
 			# We're listing the current volume
-			volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild, "MusicVolume", 100)*self.vol_ratio)
-			cv = int(volume/self.vol_ratio)
+			cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
 			return await Message.Embed(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
 		try: # Round volume up or down as needed
 			volume = float(volume)
