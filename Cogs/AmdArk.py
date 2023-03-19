@@ -93,22 +93,52 @@ class AmdArk(commands.Cog):
         """
         Pipes a search term into amd.com/en/search and attempts to scrape the output
         """
-        URL = "https://www.amd.com/en/search?keyword={}".format(urllib.parse.quote(search_term))
+        # URL = "https://www.amd.com/en/search?keyword={}".format(urllib.parse.quote(search_term))
+        URL = "https://www.amd.com/en/search/site-search.html#q={}".format(urllib.parse.quote(search_term))
         try:
             contents = await DL.async_text(URL,headers=self.h)
         except:
             return []
+        # We should have the basic html here - let's scrape for the authorization and run the coveo search
+        try:
+            token = contents.split('data-access-token="')[1].split('"')[0]
+            org_id = contents.split('data-org-id="')[1].split('"')[0]
+        except:
+            return []
+        # Build a simple query - ensure the results are in english
+        post_data = {
+            "q":search_term,
+            "context":'{"amd_lang":"en"}'
+        }
+        # Build a new set of headers with the access token
+        search_headers = {}
+        for x in self.h:
+            # Shallow copy our current headers
+            search_headers[x] = self.h[x]
+        # Add the authorization
+        search_headers["Authorization"] = "Bearer {}".format(token)
+        # Run the actual coveo search
+        search_data = await DL.async_post_json(
+            "https://platform.cloud.coveo.com/rest/search/v2?organizationId={}".format(org_id),
+            post_data,
+            search_headers
+        )
+        if not search_data or not search_data.get("results"):
+            return []
+        # Let's iterate the results
+        search_list = (
+            "/en/products/apu/",
+            "/en/products/cpu/",
+            "/en/products/graphics/",
+            "/en/products/professional-graphics/"
+        )
         results = []
-        search_list = ('<a href="/en/products/apu/','<a href="/en/products/cpu/','<a href="/en/products/graphics/', '<a href="/en/products/professional-graphics/')
-        for line in contents.split("\n"):
-            if not any((x in line for x in search_list)):
-                continue
-            try:
-                name = line.split("</a>")[0].split(">")[-1]
-                url  = "https://www.amd.com"+line.split('<a href="')[1].split('"')[0]
-                results.append({"name":name,"url":url})
-            except:
-                continue
+        for result in search_data["results"]:
+            if any(s in result.get("uri","") for s in search_list):
+                results.append({
+                    "name":result.get("title",result["uri"].split("/")[-1]),
+                    "url":result["uri"]
+                })
         return results
 
     async def get_match_data(self, match):
