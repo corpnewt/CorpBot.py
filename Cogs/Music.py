@@ -72,7 +72,7 @@ class Music(commands.Cog):
 		self.NodePool = pomice.NodePool()
 		# Setup player specifics to remember
 		self.player_attrs = ("skips","ctx","track_ctx","track_seek","repeat","vol","eq")
-		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol")] # Attributes to strip on start
+		self.player_clear = [x for x in self.player_attrs if not x in ("ctx","repeat","vol","eq")] # Attributes to strip on start
 		# Ratio to equalize volume - can be useful to account for changes in the pomice module
 		# which used to use 0 -> 100, and now uses 0.0 -> 1.0 for 0 to 100% volume
 		# Has now been changed to 0 -> 1000 where 1000 is 100%, so I guess it's x 10?
@@ -1176,7 +1176,6 @@ class Music(commands.Cog):
 				time_string += "{:,} Stream{} -- ".format(total_streams, "" if total_streams == 1 else "s")
 			q_text = "-- {:,} Song{} in Queue -- {}".format(len(player.queue), "" if len(player.queue) == 1 else "s", time_string)
 			desc += "\n\n**♫ Up Next**\n{}".format(q_text)
-			# fields.append({"name":"♫ Up Next","value":q_text,"inline":False})
 		for x,y in enumerate(player.queue,start=1):
 			t_ctx = getattr(y,"ctx",None)
 			fields.append({
@@ -1323,7 +1322,7 @@ class Music(commands.Cog):
 		if player:
 			if player.is_playing or player.is_paused:
 				# Clear context to prevent end of playlist spam
-				self._clear_player(player,[x for x in self.player_attrs if x != "repeat"]) # Clear everything but repeat
+				self._clear_player(player,[x for x in self.player_clear+["ctx"]])
 				await self._stop(player,clear_attrs=False,clear_queue=True,disconnect=False)
 				return await Message.Embed(title="♫ Music stopped and playlist cleared!",color=ctx.author,delete_after=delay).send(ctx)
 			else:
