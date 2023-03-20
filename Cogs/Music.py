@@ -882,7 +882,7 @@ class Music(commands.Cog):
 		arg_list = []
 		num = self.settings.getServerStat(ctx.guild,"RecommendCountDefault",25)
 		for arg in url.split():
-			if arg.lower() in ("-t","t"):
+			if arg.lower() == "-t":
 				primed = True
 			elif arg.lower().startswith(("-t=","t=")) or primed:
 				# Split and check
