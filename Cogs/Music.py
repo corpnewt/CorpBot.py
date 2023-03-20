@@ -879,11 +879,14 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ You need to pass a search term or YouTube link!",color=ctx.author,delete_after=delay).send(ctx)
 		# Let's scrape the input for "-t #" or "t=#"
 		primed = False
+		pre_prime = None
 		arg_list = []
 		num = self.settings.getServerStat(ctx.guild,"RecommendCountDefault",25)
 		for arg in url.split():
 			if arg.lower() == "-t":
+				pre_prime = arg
 				primed = True
+				continue
 			elif arg.lower().startswith(("-t=","t=")) or primed:
 				# Split and check
 				try:
@@ -892,6 +895,9 @@ class Music(commands.Cog):
 					num = test_num
 					continue
 				except: pass
+				if pre_prime: # We have a placeholder to add
+					arg_list.append(pre_prime)
+					pre_prime = None
 			arg_list.append(arg)
 		url = " ".join(arg_list)
 		message = await Message.Embed(
