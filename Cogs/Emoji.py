@@ -31,47 +31,41 @@ class Emoji(commands.Cog):
 
     @commands.command(aliases=["addemote"])
     async def addemoji(self, ctx, *, emoji = None, name = None):
-        '''Adds the passed emoji, url, or attachment as a custom emoji with the passed name (bot-admin only, max of 10).'''
+        '''Adds the passed emoji, url, or attachment as a custom emoji with the passed name.  Names can only contain alphanumeric and underscore chars (bot-admin only, max of 10).'''
+        usage = "Usage: `{}addemoji [emoji, url, attachment] [name]`".format(ctx.prefix)
         if not await Utils.is_bot_admin_reply(ctx): return
-        if not len(ctx.message.attachments) and emoji == name == None:
-            return await ctx.send("Usage: `{}addemoji [emoji, url, attachment] [name]`".format(ctx.prefix))
+        if not ctx.message.attachments and emoji is name is None:
+            return await ctx.send(usage)
         # Let's find out if we have an attachment, emoji, or a url
         # Check attachments first - as they'll have priority
-        if len(ctx.message.attachments):
+        if ctx.message.attachments:
             name = emoji
             emoji = " ".join([x.url for x in ctx.message.attachments])
             if name: # Add the name separated by a space
                 emoji += " "+name
         # Now we split the emoji string, and walk it, looking for urls, emojis, and names
-        emojis_to_add = []
-        last_name = []
+        emoji_urls  = []
+        emoji_names = []
         for x in emoji.split():
-            # Check for a url
+            # Let's see if we have an emoji or a name
             urls = Utils.get_urls(x)
-            if len(urls):
-                url = (urls[0], os.path.basename(urls[0]).split(".")[0])
+            url = urls[0] if urls else self._get_emoji_url(x)
+            if url: # Got an emoji URL
+                emoji_urls.append(url)
+            else: # Not a URL, must be a name
+                emoji_names.append(x)
+        # Let's walk our URLs - and map them to names if possible, or rip the name from the URL itself
+        emojis_to_add = []
+        for i,url in enumerate(emoji_urls):
+            if i<len(emoji_names):
+                name = "".join([z for z in emoji_names[i] if z.isalnum() or z=="_"])
             else:
-                # Check for an emoji
-                url = self._get_emoji_url(x)
-                if not url:
-                    # Gotta be a part of the name - add it
-                    last_name.append(x)
-                    continue
-            if len(emojis_to_add) and last_name:
-                # Update the previous name if need be
-                emojis_to_add[-1][1] = "".join([z for z in "_".join(last_name) if z.isalnum() or z == "_"])
-            # We have a valid url or emoji here - let's make sure it's unique
-            if not url[0] in [x[0] for x in emojis_to_add]:
-                emojis_to_add.append([url[0],url[1]])
-            # Reset last_name
-            last_name = []
-        if len(emojis_to_add) and last_name:
-            # Update the final name if need be
-            emojis_to_add[-1][1] = "".join([z for z in "_".join(last_name) if z.isalnum() or z == "_"])
-        if not emojis_to_add: return await ctx.send("Usage: `{}addemoji [emoji, url, attachment] [name]`".format(ctx.prefix))
+                name = os.path.basename(url).split(".")[0]
+            emojis_to_add.append((url,name))
+        if not emojis_to_add: return await ctx.send("Usage: `{}addemoji [list of names and emojis/urls/attachments]`".format(ctx.prefix))
         # Now we have a list of emojis and names
         added_emojis = []
-        allowed = len(emojis_to_add) if len(emojis_to_add)<=self.max_emojis else self.max_emojis
+        allowed = min(len(emojis_to_add),self.max_emojis)
         omitted = " ({} omitted, beyond the limit of {})".format(len(emojis_to_add)-self.max_emojis,self.max_emojis) if len(emojis_to_add)>self.max_emojis else ""
         message = await ctx.send("Adding {} emoji{}{}...".format(
             allowed,
@@ -87,6 +81,7 @@ class Emoji(commands.Cog):
                 image = e.read()
             # Clean up
             GetImage.remove(f)
+            # Ensure the name isn't *just* underscores
             if not e_name.replace("_",""): continue
             # Create the emoji and save it
             try: new_emoji = await ctx.guild.create_custom_emoji(name=e_name,image=image,roles=None,reason="Added by {}#{}".format(ctx.author.name,ctx.author.discriminator))
@@ -107,8 +102,7 @@ class Emoji(commands.Cog):
     async def emoji(self, ctx, emoji = None):
         '''Outputs the passed emoji... but bigger!'''
         if emoji is None:
-            await ctx.send("Usage: `{}emoji [emoji]`".format(ctx.prefix))
-            return
+            return await ctx.send("Usage: `{}emoji [emoji]`".format(ctx.prefix))
         # Get the emoji
         emoji_url = self._get_emoji_url(emoji)
         if not emoji_url: return await ctx.send("Usage: `{}emoji [emoji]`".format(ctx.prefix))
