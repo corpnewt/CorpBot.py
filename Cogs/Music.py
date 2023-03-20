@@ -379,7 +379,7 @@ class Music(commands.Cog):
 		if ctx: track.ctx = ctx # Append our ctx-based data if provided
 		return track
 
-	async def get_recommendations(self, ctx, url):
+	async def get_recommendations(self, ctx, url, recommend_count):
 		# Gather youtube recommendations based on the passed video URL or search term
 		urls = Utils.get_urls(url)
 		if urls:
@@ -397,12 +397,15 @@ class Music(commands.Cog):
 			return None # Something went wrong loading this
 		starting_track = starting_track[0]
 		# Load the recommendations
-		return await node.get_tracks(
+		tracks = await node.get_tracks(
 			query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
 			ctx=ctx
 		)
+		if isinstance(tracks,pomice.objects.Playlist): # Ensure we only take between 2 and 25
+			tracks.tracks = tracks.tracks[:min(max(2,recommend_count),25)]
+		return tracks
 
-	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False):
+	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -413,7 +416,7 @@ class Music(commands.Cog):
 			if urls: # Need to load via node get_tracks/get_playlist
 				url = urls[0] # Get the first URL
 				if recommend:
-					tracks = await self.get_recommendations(ctx,url)
+					tracks = await self.get_recommendations(ctx,url,recommend_count)
 				else:
 					tracks = await node.get_tracks(query=url,ctx=ctx)
 				# Get the first hit if it's not a playlist
@@ -476,7 +479,7 @@ class Music(commands.Cog):
 					tracks = tracks[0]
 				# Check if we're gathering recommendations
 				if recommend:
-					tracks = await self.get_recommendations(ctx,tracks.identifier)
+					tracks = await self.get_recommendations(ctx,tracks.identifier,recommend_count)
 		except Exception as e:
 			tracks = None # Clear it out as something went wrong
 			print("Error resolving search:\n{}".format(repr(e)))
@@ -846,6 +849,24 @@ class Music(commands.Cog):
 		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
+	@commands.command(aliases=["suggestcount","rcount","radiocount"])
+	async def recommendcount(self, ctx, *, count = None):
+		"""Gets or sets the default number of recommended songs returned from 2 to 25 (bot-admin only)."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		if count is None or not await Utils.is_bot_admin_reply(ctx):
+			# Just report the current value
+			count = self.settings.getServerStat(ctx.guild,"RecommendCountDefault",25)
+			return await Message.Embed(title="♫ Recommended playlists currently include {} song{}.".format(count,"" if count==1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+		# Should be bot-admin with a value
+		try:
+			count = int(count)
+		except:
+			return await Message.Embed(title="♫ Count must be an integer between 2 and 25!",color=ctx.author,delete_after=delay).send(ctx)
+		count = min(max(2,count),25)
+		self.settings.setServerStat(ctx.guild,"RecommendCountDefault",count)
+		return await Message.Embed(title="♫ Recommended playlists will include {} song{}.".format(count,"" if count==1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+
 	@commands.command(aliases=["suggest","r","radio"])
 	async def recommend(self, ctx, *, url = None):
 		"""Queues up recommendations for the passed search term or YouTube link."""
@@ -856,12 +877,29 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if url is None:
 			return await Message.Embed(title="♫ You need to pass a search term or YouTube link!",color=ctx.author,delete_after=delay).send(ctx)
+		# Let's scrape the input for "-t #" or "t=#"
+		primed = False
+		arg_list = []
+		num = self.settings.getServerStat(ctx.guild,"RecommendCountDefault",25)
+		for arg in url.split():
+			if arg.lower() in ("-t","t"):
+				primed = True
+			elif arg.lower().startswith(("-t=","t=")) or primed:
+				# Split and check
+				try:
+					test_num = int(arg.split("=")[-1])
+					assert 1 < test_num < 26 # Restrict to 1-25
+					num = test_num
+					continue
+				except: pass
+			arg_list.append(arg)
+		url = " ".join(arg_list)
 		message = await Message.Embed(
 			title="♫ Gathering Recommendations For: {}".format(url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,recommend=True)
+		songs = await self.resolve_search(ctx,url,message=message,recommend=True,recommend_count=num)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1461,7 +1499,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","playing","playlist"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","playing","playlist","recommendcount"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = await self.get_player(ctx.guild)
