@@ -888,7 +888,7 @@ class Music(commands.Cog):
 				# Split and check
 				try:
 					test_num = int(arg.split("=")[-1])
-					assert 1 < test_num < 26 # Restrict to 1-25
+					assert 1 < test_num < 26 # Restrict to 2-25
 					num = test_num
 					continue
 				except: pass
