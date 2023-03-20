@@ -57,10 +57,14 @@ class Emoji(commands.Cog):
         # Let's walk our URLs - and map them to names if possible, or rip the name from the URL itself
         emojis_to_add = []
         for i,url in enumerate(emoji_urls):
+            name = None
+            if isinstance(url,(tuple,list)):
+                url,name = url
             if i<len(emoji_names):
                 name = "".join([z for z in emoji_names[i] if z.isalnum() or z=="_"])
             else:
-                name = os.path.basename(url).split(".")[0]
+                if not name:
+                    name = os.path.basename(url).split(".")[0]
             emojis_to_add.append((url,name))
         if not emojis_to_add: return await ctx.send("Usage: `{}addemoji [list of names and emojis/urls/attachments]`".format(ctx.prefix))
         # Now we have a list of emojis and names
