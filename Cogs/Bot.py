@@ -192,11 +192,15 @@ class Bot(commands.Cog):
 			fields.append({"name":"Status","value":status_text,"inline":True})
 
 			if bot_member.activity and bot_member.activity.name:
-				play_list = [ "Playing", "Streaming", "Listening to", "Watching" ]
-				try:
-					play_string = play_list[bot_member.activity.type]
-				except:
-					play_string = "Playing"
+				play_dict = {
+					discord.ActivityType.playing:"Playing",
+					discord.ActivityType.streaming:"Streaming",
+					discord.ActivityType.listening:"Listening to",
+					discord.ActivityType.watching:"Watching",
+					discord.ActivityType.custom:"Custom Status",
+					discord.ActivityType.competing:"Competing in"
+				}
+				play_string = play_dict.get(bot_member.activity.type,"Playing")
 				fields.append({"name":play_string,"value":str(bot_member.activity.name),"inline":True})
 				if bot_member.activity.type == 1:
 					# Add the URL too
