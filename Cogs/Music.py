@@ -860,9 +860,9 @@ class Music(commands.Cog):
 		# Should be bot-admin with a value
 		try:
 			count = int(count)
+			assert 1 < count < 26
 		except:
 			return await Message.Embed(title="♫ Count must be an integer between 2 and 25!",color=ctx.author,delete_after=delay).send(ctx)
-		count = min(max(2,count),25)
 		self.settings.setServerStat(ctx.guild,"RecommendCountDefault",count)
 		return await Message.Embed(title="♫ Recommended playlists will include {} song{}.".format(count,"" if count==1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 
