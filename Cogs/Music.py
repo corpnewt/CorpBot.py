@@ -157,10 +157,15 @@ class Music(commands.Cog):
 		# Should be connected, and not already playing, let's strip any unwanted attributes
 		# from our player
 		self._clear_player(player)
-		# Check for the "eq" attr - and if we don't have it, ensure we have a flat
-		# eq setup.
+		# Check for the "eq" attr - and if we don't have it, check if we're preserving EQ
+		# and apply as needed - or reset to flat
 		if not hasattr(player,"eq"):
-			await self.reset_eq(player)
+			if self.settings.getServerStat(player.guild,"PreserveLastEQ"): # We are looking to apply the last settings
+				eq = self.settings.getServerStat(player.guild,"LastEQ",self.flat_eq())
+				player.eq = eq
+			else:
+				eq = self.flat_eq()
+			await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		if hasattr(player,"timescale"):
 			# We just remove it as Lavalink doesn't retain it on new songs
 			delattr(player,"timescale")
@@ -776,12 +781,6 @@ class Music(commands.Cog):
 		finally:
 			shutil.rmtree(temp,ignore_errors=True)
 		return await Message.Embed(title="♫ Uploaded playlist!",color=ctx.author).edit(ctx,message)
-
-	@commands.command(pass_context=True)
-	async def searchlist(self, ctx, yes_no = None):
-		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
-		if not await Utils.is_admin_reply(ctx): return
-		await ctx.send(Utils.yes_no_setting(ctx,"Music player search list","YTMultiple",yes_no))
 
 	@commands.command(aliases=["summon"])
 	async def join(self,ctx,*,channel=None):
@@ -1490,11 +1489,19 @@ class Music(commands.Cog):
 		self.settings.setServerStat(ctx.guild, "MusicDeleteDelay", real)
 		return await Message.Embed(title="♫ Music related messages will be auto-deleted after {} second{}!".format(real, "" if real == 1 else "s"),color=ctx.author,delete_after=real).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def searchlist(self, ctx, yes_no = None):
 		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
+		
 		if not await Utils.is_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Music player search list","YTMultiple",yes_no))
+
+	@commands.command()
+	async def lasteq(self, ctx, yes_no = None):
+		"""Gets or sets whether the current EQ settings are preserved between music sessions (bot-admin only)."""
+		
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(ctx,"Preserving EQ settings between sessions","PreserveLastEQ",yes_no))
 
 	@commands.command()
 	async def disableplay(self, ctx, *, yes_no = None):
@@ -1505,7 +1512,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","playing","playlist","recommendcount"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","lasteq","playing","playlist","recommendcount"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = await self.get_player(ctx.guild)
@@ -1540,24 +1547,26 @@ class Music(commands.Cog):
 	### Hidden below everything else because cursed, ofc.
 	###
 
-	async def apply_filters(self,player,filter_json,name=None,fast_apply=False):
+	async def apply_filters(self,player,filter_data,name=None,fast_apply=False,setting_name=None):
 		# Helper to apply filters to the passed player
 		# Here, we basically just rip the functionality directly from pomice's
 		# player class - whenever it sends info to the websocked.  We just imitate
 		# that, but using our own filter data.
 		if not player._node._session_id: # The node was not properly initialized?
 			return
-		if not filter_json: # Got... nothing
+		if setting_name and player.guild: # We're saving it as a server stat
+			self.settings.setServerStat(player.guild,setting_name,filter_data)
+		if not filter_data: # Got... nothing
 			return
 		if name: # Wrap it in a dict
-			filter_json = {name:filter_json}
+			filter_data = {name:filter_data}
 
 		# Send the payload to the websocket and pray
 		await player._node.send(
 			method="PATCH",
 			path=player._player_endpoint_uri,
 			guild_id=player._guild.id,
-			data={"filters":filter_json},
+			data={"filters":filter_data},
 		)
 		# Apply the filter instantly by seeking to the same location - only if player is playing
 		if fast_apply and player.is_playing: await player.seek(player.position)
@@ -1675,12 +1684,6 @@ class Music(commands.Cog):
 			{"band": 13, "gain": -0.025}
 		]
 
-	async def reset_eq(self, player):
-		# Remove the attribute and set a flat eq
-		if hasattr(player,"eq"):
-			delattr(player,"eq")
-		await self.apply_filters(player,self.flat_eq(),name="equalizer")
-
 	def default_timescale(self):
 		return {
 			"speed":1.0,
@@ -1773,9 +1776,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Invalid eq values passed!",description="15 numbers separated by a space from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
 		if not len(band_ints) == 15: return await Message.Embed(title="♫ Incorrect number of eq values! ({:,} - need 15)".format(len(band_ints)),description="15 numbers separated by a space from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
 		eq = [{"band":x,"gain":float(0.25 if y/20 > 0.25 else -0.25 if y/20 < -0.25 else y/20)} for x,y in enumerate(band_ints)]
-		await self.apply_filters(player,eq,name="equalizer")
+		await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		player.eq = eq # Set the player's eq value to the list
-		# self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
 		return await Message.Embed(
 			title="♫ Set equalizer to Custom preset!",
 			description=self.print_eq(eq),
@@ -1806,9 +1808,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Invalid eq value passed!",description="Bands can be between 1 and 15, and eq values from -5 (silent) to 5 (double volume)",color=ctx.author,delete_after=delay).send(ctx)
 		eq = getattr(player,"eq",self.flat_eq())
 		eq[band_number-1]["gain"] = float(value/20)
-		await self.apply_filters(player,eq,name="equalizer")
+		await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		player.eq = eq
-		# self.settings.setServerStat(ctx.guild, "MusicEqualizer", player.eq.raw)
 		return await Message.Embed(
 			title="♫ Set band {} to {}!".format(band_number,value),
 			description=self.print_eq(eq),
@@ -1827,7 +1828,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		
 		eq = self.flat_eq()
-		await self.apply_filters(player,eq,name="equalizer")
+		await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		player.eq = eq
 		return await Message.Embed(
 			title="♫ Reset equalizer!",
@@ -1849,7 +1850,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Please specify a valid eq preset!",description="Options are:  Boost, Flat, Metal, Piano",color=ctx.author,delete_after=delay).send(ctx)
 		preset = preset.lower()
 		eq = self.flat_eq() if preset=="flat" else self.boost_eq() if preset=="boost" else self.metal_eq() if preset=="metal" else self.piano_eq()
-		await self.apply_filters(player,eq,name="equalizer")
+		await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		player.eq = eq
 		return await Message.Embed(
 			title="♫ Set equalizer to {} preset!".format(preset.capitalize()),
@@ -1888,7 +1889,7 @@ class Music(commands.Cog):
 			elif merge_values[0]-entry["band"]==1 or entry["band"]-merge_values[1]==1:
 				# Next nearest - go half
 				entry["gain"] = (entry["gain"]+float(value/20))/2
-		await self.apply_filters(player,eq,name="equalizer")
+		await self.apply_filters(player,eq,name="equalizer",setting_name="LastEQ")
 		player.eq = eq
 		f_name = {"b":"Bass","m":"Mid Range","t":"Treble"}
 		return await Message.Embed(
