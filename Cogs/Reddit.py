@@ -4,7 +4,7 @@ from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
-from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL, Nullify
+from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL, Nullify, PickList
 from   pyquery import PyQuery as pq
 try:
 	from urllib.parse import urlparse
@@ -106,7 +106,12 @@ class Reddit(commands.Cog):
 			randnum = random.randint(0,self.posts)
 			try:
 				theJSON = r["data"]["children"][randnum]["data"]
-				returnDict = { 'title': self.unescape(theJSON['title']), 'content': self.strip_tags(theJSON['selftext_html']), 'over_18': theJSON.get('over_18',False) }
+				returnDict = {
+					"title": self.unescape(theJSON["title"]),
+					"content": self.strip_tags(theJSON["selftext_html"] or ""),
+					"over_18": theJSON.get("over_18",False),
+					"url": theJSON["url"]
+				}
 				break
 			except IndexError:
 				continue
@@ -216,9 +221,13 @@ class Reddit(commands.Cog):
 		"""I hope you're not tired..."""
 		msg = await self.getText('https://www.reddit.com/r/nosleep/top.json?sort=top&t=week&limit=100')
 		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
-		mess = '__**{}**__\n\n'.format(msg['title'])
-		mess += msg['content']
-		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
+		return await PickList.PagePicker(
+			url=msg["url"],
+			title=msg["title"],
+			description=msg["content"],
+			timeout=600, # Allow 10 minutes before we stop watching the picker
+			ctx=ctx
+		).pick()
 
 	@commands.command(pass_context=True)
 	async def joke(self, ctx):
@@ -229,9 +238,13 @@ class Reddit(commands.Cog):
 		if msg['over_18']:
 			# NSFW - check admin
 			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
-		mess = '*{}*\n\n'.format(msg['title'])
-		mess += msg['content']
-		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
+		return await PickList.PagePicker(
+			url=msg["url"],
+			title=msg["title"],
+			description=msg["content"],
+			timeout=600, # Allow 10 minutes before we stop watching the picker
+			ctx=ctx
+		).pick()
 
 	@commands.command(pass_context=True)
 	async def dirtyjoke(self, ctx):
@@ -240,9 +253,13 @@ class Reddit(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
 		msg = await self.getText('https://www.reddit.com/r/DirtyJokes/top.json?sort=top&t=week&limit=100')
 		if not msg: return await ctx.send("Whoops! I couldn't find a working link.")
-		mess = '*{}*\n\n'.format(msg['title'])
-		mess += msg['content']
-		await Message.Message(message=Nullify.escape_all(mess,markdown=False)).send(ctx)
+		return await PickList.PagePicker(
+			url=msg["url"],
+			title=msg["title"],
+			description=msg["content"],
+			timeout=600, # Allow 10 minutes before we stop watching the picker
+			ctx=ctx
+		).pick()
 	
 	@commands.command(pass_context=True)
 	async def lpt(self, ctx):
