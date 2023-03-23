@@ -20,7 +20,7 @@ class CorpPlayer(pomice.Player):
 
 class CorpTrack(pomice.objects.Track):
 	# Create a shell subclass to keep horrible practices going
-	def __init__(self,track):
+	def __init__(self,track,radio=False):
 		if isinstance(track,pomice.objects.Track):
 			track = {
 				"track_id":track.track_id,
@@ -35,6 +35,7 @@ class CorpTrack(pomice.objects.Track):
 		if "encoded" in track or "id" in track and not "track_id" in track:
 			track["track_id"] = track.get("encoded",track.get("id"))
 		self.seek = track.get("position",0)
+		self.radio = radio
 		try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
 		except: self.thumb = None
 		# Set up the track_type if it's not already a pomice TrackType
@@ -187,7 +188,11 @@ class Music(commands.Cog):
 			await Message.Embed(
 				title="♫ Now Playing: {}".format(track.title),
 				fields=fields,
-				description="Requested by {}\n-- Volume at {}%".format(ctx.author.mention,int(volume/self.vol_ratio)),
+				description="Requested by {}{}\n-- Volume at {}%".format(
+					ctx.author.mention,
+					" (via radio)" if track.radio else "",
+					int(volume/self.vol_ratio)
+				),
 				color=ctx.author,
 				url=track.uri,
 				thumbnail=getattr(track,"thumb",None),
@@ -402,12 +407,26 @@ class Music(commands.Cog):
 			return None # Something went wrong loading this
 		starting_track = starting_track[0]
 		# Load the recommendations
-		tracks = await node.get_tracks(
-			query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
-			ctx=ctx
-		)
-		if isinstance(tracks,pomice.objects.Playlist): # Ensure we only take between 2 and 25
-			tracks.tracks = tracks.tracks[:min(max(2,recommend_count),25)]
+		tracks = None
+		last_count = -1
+		while True:
+			playlist = await node.get_tracks(
+				query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
+				ctx=ctx
+			)
+			if not isinstance(playlist,pomice.objects.Playlist): # Got something unexpected
+				return playlist # Return as-is
+			if not tracks: # Set up our playlist
+				tracks = playlist
+			else: # We already have a playlist started - just add to it
+				tracks.tracks.extend(playlist.tracks[1:])
+			if len(tracks.tracks) >= recommend_count or len(tracks.tracks) == last_count:
+				break # We got enough or no new tracks were added
+			last_count = len(tracks.tracks) # Update the running count to avoid dead loops
+			# Reset our starting track to load the next set
+			starting_track = playlist.tracks[-1]
+		if isinstance(tracks,pomice.objects.Playlist): # Ensure we only take between 2 and 100
+			tracks.tracks = tracks.tracks[:min(max(2,recommend_count),100)]
 		return tracks
 
 	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25):
@@ -491,7 +510,7 @@ class Music(commands.Cog):
 		# We need to figure out if we've loaded a playlist
 		if isinstance(tracks,pomice.objects.Playlist):
 			# Rewrap the tracks as CorpTracks to allow custom attributes
-			tracks.tracks = [CorpTrack(track) for track in tracks.tracks]
+			tracks.tracks = [CorpTrack(track,radio=False if i==0 else recommend) for i,track in enumerate(tracks.tracks)]
 			if seek_pos > 0: setattr(tracks.tracks[0],"seek",seek_pos)
 			return {
 				"data":tracks.playlist_info,
@@ -501,7 +520,7 @@ class Music(commands.Cog):
 			}
 		elif isinstance(tracks,pomice.objects.Track):
 			# Rewrap the track as a CorpTrack to allow custom attributes
-			track = CorpTrack(tracks)
+			track = CorpTrack(tracks,radio=recommend)
 			if seek_pos > 0: track.seek = seek_pos
 			return {"tracks":track,"search":url}
 
@@ -598,12 +617,15 @@ class Music(commands.Cog):
 			added += 1
 		return added
 
-	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None):
+	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None,recommend=False):
 		# Helper to state songs added, whether or not they were shuffled - and to
 		# edit a passed message (if any).
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not "tracks" in songs: return None # Missing info
-		desc = "Requested by {}".format(ctx.author.mention)
+		desc = "Requested by {}{}".format(
+			ctx.author.mention,
+			" (via radio)" if recommend else ""
+		)
 		if isinstance(songs["tracks"],list): # Added a playlist
 			# Get the track positions in the queue
 			if not shuffled and queue:
@@ -845,11 +867,11 @@ class Music(commands.Cog):
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=False)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
-	@commands.command(aliases=["suggestcount","rcount","radiocount"])
-	async def recommendcount(self, ctx, *, count = None):
+	@commands.command(aliases=["suggestcount","recommendcount","rcount"])
+	async def radiocount(self, ctx, *, count = None):
 		"""Gets or sets the default number of recommended songs returned from 2 to 25 (bot-admin only)."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -866,8 +888,8 @@ class Music(commands.Cog):
 		self.settings.setServerStat(ctx.guild,"RecommendCountDefault",count)
 		return await Message.Embed(title="♫ Recommended playlists will include {} song{}.".format(count,"" if count==1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(aliases=["suggest","r","radio"])
-	async def recommend(self, ctx, *, url = None):
+	@commands.command(aliases=["suggest","r","recommend"])
+	async def radio(self, ctx, *, url = None):
 		"""Queues up recommendations for the passed search term or YouTube link."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -890,7 +912,7 @@ class Music(commands.Cog):
 				# Split and check
 				try:
 					test_num = int(arg.split("=")[-1])
-					assert 1 < test_num < 26 # Restrict to 2-25
+					assert 1 < test_num < 101 # Allow an override of up to 100 songs
 					num = test_num
 					continue
 				except: pass
@@ -909,7 +931,7 @@ class Music(commands.Cog):
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue)
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=True)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
 	@commands.command(aliases=["unp"])
@@ -956,10 +978,11 @@ class Music(commands.Cog):
 				i,t=can_rem[0]
 				fields = [{
 					"name":"{}. {}".format(i+1,t.title),
-					"value":"{}{} - Requested by {} - [Link]({})".format(
+					"value":"{}{} - Requested by {}{} - [Link]({})".format(
 						self.format_duration(t.seek,t)+" -> " if hasattr(t,"seek") else "",
 						self.format_duration(t.length,t),
 						t.ctx.author.mention,
+						" (via radio)" if t.radio else "",
 						t.uri
 					),
 					"inline":False
@@ -1054,7 +1077,7 @@ class Music(commands.Cog):
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
 		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=True,queue=player.queue)
+		await self.state_added(ctx,songs,message,shuffled=True,queue=player.queue,recommend=False)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
 
 	@commands.command()
@@ -1155,8 +1178,9 @@ class Music(commands.Cog):
 			).send(ctx)
 		await Message.Embed(
 			title="♫ Currently {}: {}".format(play_text,track.title),
-			description="Requested by {}\n -- Volume at {}%{}".format(
+			description="Requested by {}{}\n -- Volume at {}%{}".format(
 				track_ctx.author.mention,
+				" (via radio)" if track.radio else "",
 				cv,
 				self.format_scale(player,prefix="\n -- Speed at ")
 			),
@@ -1195,11 +1219,12 @@ class Music(commands.Cog):
 				delete_after=delay
 			).send(ctx)
 		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
-		desc = "**{}**\nCurrently {} - at {} - Requested by {} - [Link]({})\n-- Volume at {}%".format(
+		desc = "**{}**\nCurrently {} - at {} - Requested by {}{} - [Link]({})\n-- Volume at {}%".format(
 			track.title,
 			play_text,
 			self.format_elapsed(player,track),
 			track_ctx.author.mention,
+			" (via radio)" if track.radio else "",
 			track.uri,
 			cv
 		)
@@ -1223,10 +1248,11 @@ class Music(commands.Cog):
 			t_ctx = getattr(y,"ctx",None)
 			fields.append({
 				"name":"{}. {}".format(x,y.title),
-				"value":"{}{} - Requested by {} - [Link]({})".format(
+				"value":"{}{} - Requested by {}{} - [Link]({})".format(
 					self.format_duration(y.seek,y)+" -> " if hasattr(y,"seek") else "",
 					self.format_duration(y.length,y),
 					t_ctx.author.mention if t_ctx else "Unknown",
+					" (via radio)" if y.radio else "",
 					y.uri
 				),
 				"inline":False})
@@ -1439,10 +1465,11 @@ class Music(commands.Cog):
 							" ({:,} more in queue)".format(len(p.queue)
 							) if len(p.queue) else ""
 						),
-						"value":"{} - at {} - Requested by {} - [Link]({})".format(
+						"value":"{} - at {} - Requested by {}{} - [Link]({})".format(
 							p.track.title,
 							self.format_elapsed(p,p.track),
 							p.track.ctx.author.mention,
+							" (via radio)" if p.track.radio else "",
 							p.track.uri),
 						"inline":False
 					})
