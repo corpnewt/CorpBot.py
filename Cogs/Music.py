@@ -1298,9 +1298,6 @@ class Music(commands.Cog):
 		elif hasattr(player,"track_ctx") and player.track_ctx.author == ctx.author:
 			await Message.Embed(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=delay).send(ctx)
 			to_skip = True
-		# At this point, we're not admin, and not the requestor, let's make sure we're in the same vc
-		elif not ctx.author.voice or not ctx.author.voice.channel == player.channel:
-			return await Message.Embed(title="♫ You have to be in the same voice channel as me to use that!",color=ctx.author,delete_after=delay).send(ctx)
 		else:
 			# Do the checking here to validate we can use this and etc.
 			skips = getattr(player,"skips",[]) # Get the existing skips - or an empty list if none
