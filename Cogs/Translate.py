@@ -21,7 +21,7 @@ class Translate(commands.Cog):
         self.langcodes = googletrans.LANGCODES
         self.languages = googletrans.LANGUAGES
 
-    @commands.command(aliases=["listlang"])
+    @commands.command(aliases=["listlang","llist","listl"])
     async def langlist(self, ctx, search=None):
         """Lists available languages - can optionally take a search term and will list the 3 closest results."""
         if search:
@@ -35,28 +35,28 @@ class Translate(commands.Cog):
                     name,code,t = string.capwords(googletrans.LANGUAGES[full_match]),full_match,"Language Code"
                 return await Message.Embed(
                     title="Search Results For \"{}\"".format(search),
-                    description="Exact {} Match:\n\n**{}** - {}".format(t,name,code),
+                    description="Exact {} Match:\n\n`{}` - {}".format(t,code,name),
                     color=ctx.author,
                     ).send(ctx)
             # Got close matches
             desc = "No exact language matches for \"{}\"".format(search)
             fields = []
             if len(code_search):
-                lang_mess = "\n".join(["└─ **{}** - {}".format(
-                    string.capwords(x["Item"]),
-                    googletrans.LANGCODES[x["Item"]]
+                lang_mess = "\n".join(["└─ `{}` - {}".format(
+                    googletrans.LANGCODES[x["Item"]],
+                    string.capwords(x["Item"])
                 ) for x in code_search])
                 fields.append({"name":"Close Language Name Matches:","value":lang_mess})
             if len(lang_search):
-                lang_mess = "\n".join(["└─ **{}** - {}".format(
-                    string.capwords(googletrans.LANGUAGES[x["Item"]]),
-                    x["Item"]
+                lang_mess = "\n".join(["└─ `{}` - {}".format(
+                    x["Item"],
+                    string.capwords(googletrans.LANGUAGES[x["Item"]])
                 ) for x in lang_search])
                 fields.append({"name":"Close Language Code Matches:","value":lang_mess})
             return await Message.Embed(title="Search Results For \"{}\"".format(search),description=desc,fields=fields).send(ctx)
         description = ""
         for lang in googletrans.LANGCODES:
-            description += "**{}** - {}\n".format(string.capwords(lang), googletrans.LANGCODES[lang])
+            description += "`{}` - {}\n".format(googletrans.LANGCODES[lang],string.capwords(lang))
         await PickList.PagePicker(
             title="Language List",
             description=description,

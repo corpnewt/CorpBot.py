@@ -1,7 +1,7 @@
-import asyncio, discord, json, os
+import asyncio, discord, json, os, string
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList
+from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList, FuzzySearch
 
 def setup(bot):
 	# Add the bot and deps
@@ -35,99 +35,91 @@ class Search(commands.Cog):
 			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		return msg
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def google(self, ctx, *, query = None):
 		"""Get some searching done."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to Google.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query)
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def bing(self, ctx, *, query = None):
 		"""Get some uh... more searching done."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to Bing.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query,"b")
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def duck(self, ctx, *, query = None):
 		"""Duck Duck... GOOSE."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to DuckDuckGo.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query,"d")
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def yahoo(self, ctx, *, query = None):
 		"""Let Yahoo! answer your questions."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to Yahoo.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query,"y")
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def aol(self, ctx, *, query = None):
 		"""The OG search engine."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to AOL.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query,"a")
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ask(self, ctx, *, query = None):
 		"""Jeeves, please answer these questions."""
 
-		if query == None:
+		if query is None:
 			msg = 'You need a topic for me to Ask Jeeves.'
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		msg = await self.get_search(ctx, query,"k")
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	'''@commands.command()
 	async def searchsite(self, ctx, category_name = None, *, query = None):
 		"""Search corpnewt.com forums."""
 
 		auth = self.site_auth
 
-		if auth == None:
-			await ctx.channel.send("Sorry this feature is not supported!")
-			return
+		if auth is None:
+			return await ctx.send("Sorry this feature is not supported!")
 
-		if query == None or category_name == None:
+		if query is None or category_name is None:
 			msg = "Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix)
-			await ctx.channel.send(msg)
-			return
+			return await ctx.send(msg)
 
 		categories_url = "https://corpnewt.com/api/categories"
 		categories_json = await DL.async_json(categories_url, headers={'Authorization': auth})
@@ -135,9 +127,8 @@ class Search(commands.Cog):
 
 		category = await self.find_category(categories, category_name)
 
-		if category == None:
-			await ctx.channel.send("Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix))
-			return
+		if category is None:
+			return await ctx.send("Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix))
 
 		search_url = "https://corpnewt.com/api/search?term={}&in=titlesposts&categories[]={}&searchChildren=true&showAs=posts".format(query, category["cid"])
 		search_json = await DL.async_json(search_url, headers={'Authorization': auth})
@@ -153,7 +144,23 @@ class Search(commands.Cog):
 				ctr = ctr + 1
 				result_string += '__{}__\n<https://corpnewt.com/topic/{}>\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
 			
-		await ctx.channel.send(result_string)
+		await ctx.send(result_string)
+
+
+	async def find_category(self, categories, category_to_search):
+		"""recurse through the categories and sub categories to find the correct category"""
+		result_category = None
+		
+		for category in categories:
+			if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
+					return category
+
+			if len(category["children"]) > 0:
+					result_category = await self.find_category(category["children"], category_to_search)
+					if result_category != None:
+							return result_category
+		
+		return result_category'''
 
 
 	async def _get_api_status(self):
@@ -164,32 +171,80 @@ class Search(commands.Cog):
 			api_status = "UNKNOWN"
 		return api_status
 
-	@commands.command(pass_context=True)
-	async def convert(self, ctx, *, amount = None, frm = None, to = None):
-		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
-		
+	async def _get_currency_list(self):
 		# Get the list of currencies
+		api_status = "UNKNOWN"
+		r = None
 		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
 		except:
 			api_status = await self._get_api_status()
-			return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
-		
-		if amount == None:
-			# Gather our currency list
-			curr_list = []
-			for l in r.get("results",{}):
-				# l is the key - let's format a list
-				curr_list.append("{} - {}".format(r["results"][l]["id"], r["results"][l]["currencyName"]))
-			if len(curr_list):
-				curr_list = sorted(curr_list)
-				return await PickList.PagePicker(
-					title="Currency List",
-					description="\n".join(curr_list),
-					d_header="```\n",
-					d_footer="```",
+		return (r,api_status)
+
+	@commands.command(aliases=["listcurr","lcurr","currl"])
+	async def currlist(self, ctx, *, search = None):
+		"""List currencies for the convert command."""
+		# Get the list of currencies
+		r,api_status = await self._get_currency_list()
+		if not r: return await ctx.send("Something went wrong getting the currency list :(\nThe current status of the API I use is: `{}`".format(api_status))
+		# Gather our currency list
+		name_to_id = {}
+		id_to_name = {}
+		for l in r.get("results",{}):
+			if not all((x in r["results"][l] for x in ("id","currencyName"))): continue # Incomplete
+			name_to_id[r["results"][l]["currencyName"]] = r["results"][l]["id"]
+			id_to_name[r["results"][l]["id"]] = r["results"][l]["currencyName"]
+		if not name_to_id:return await ctx.send("Something went wrong getting the currency list :(")
+		# Check if we're searching
+		if search:
+			# Get our fuzzy matched results
+			id_search   = FuzzySearch.search(search.lower(), id_to_name)
+			name_search = FuzzySearch.search(search.lower(), name_to_id)
+			full_match  = next((x["Item"] for x in id_search+name_search if x.get("Ratio") == 1),None)
+			if full_match: # Got an exact match - build an embed
+				if full_match in id_to_name:
+					name,code,t = string.capwords(id_to_name[full_match]),full_match,"Currency Code"
+				else:
+					name,code,t = string.capwords(full_match),name_to_id[full_match],"Currency Name"
+				return await Message.Embed(
+					title="Search Results For \"{}\"".format(search),
+					description="Exact {} Match:\n\n`{}` - {}".format(t,code,name),
 					color=ctx.author,
-					ctx=ctx
-				).pick()
+					).send(ctx)
+			# Got close matches
+			desc = "No exact currency matches for \"{}\"".format(search)
+			fields = []
+			if len(name_search):
+				curr_mess = "\n".join(["└─ `{}` - {}".format(
+					name_to_id[x["Item"]],
+					string.capwords(x["Item"])
+				) for x in name_search])
+				fields.append({"name":"Close Currency Name Matches:","value":curr_mess})
+			if len(id_search):
+				curr_mess = "\n".join(["└─ `{}` - {}".format(
+					x["Item"],
+					string.capwords(id_to_name[x["Item"]])
+				) for x in id_search])
+				fields.append({"name":"Close Currency Code Matches:","value":curr_mess})
+			return await Message.Embed(title="Search Results For \"{}\"".format(search),description=desc,fields=fields).send(ctx)
+		# We're not searching - list them all
+		curr_list = sorted(["`{}` - {}".format(i,string.capwords(id_to_name[i])) for i in id_to_name])
+		return await PickList.PagePicker(
+			title="Currency List",
+			description="\n".join(curr_list),
+			color=ctx.author,
+			ctx=ctx
+		).pick()
+
+	@commands.command()
+	async def convert(self, ctx, *, amount = None, frm = None, to = None):
+		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
+		
+		if amount is None: # Invoke our currency list
+			return await ctx.invoke(self.currlist,search=amount)
+
+		# Get the list of currencies
+		r,api_status = await self._get_currency_list()
+		if not r: return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
 		
 		# Set up our args
 		num = frm = to = None
@@ -240,19 +295,3 @@ class Search(commands.Cog):
 		inamnt  = "{:,f}".format(num).rstrip("0").rstrip(".")
 		output = "{:,f}".format(num*val).rstrip("0").rstrip(".")
 		await ctx.send("{} {} is {} {}".format(inamnt,frm.upper(), output, to.upper()))
-
-	async def find_category(self, categories, category_to_search):
-		"""recurse through the categories and sub categories to find the correct category"""
-		result_category = None
-		
-		for category in categories:
-			if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
-					return category
-
-			if len(category["children"]) > 0:
-					result_category = await self.find_category(category["children"], category_to_search)
-					if result_category != None:
-							return result_category
-		
-		return result_category
-
