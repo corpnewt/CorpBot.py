@@ -126,7 +126,7 @@ class Server(commands.Cog):
 		# The title is at index 0
 		desc_lines[0] = desc_lines[0].replace("New","Finished")
 		# The time limit is at index 2
-		desc_lines[2] = "Ended <t:{}:R>".format(poll["end"])
+		desc_lines[2] = "Ended <t:{}>".format(poll["end"])
 		# At this point - we see if we have 2 or more options - and tally up
 		sort_lines = []
 		if poll["options"] > 1:
@@ -151,6 +151,18 @@ class Server(commands.Cog):
 		# Update the target embed
 		embed_dict["description"] = "\n".join(desc_lines)
 		await Message.Embed(**embed_dict).edit(ctx,message)
+		# Check if we need to ping the original creator
+		if poll.get("ping_reminder"):
+			# Resolve the author
+			try: author = guild.get_member(poll["author_id"])
+			except: return
+			# Send a reminder
+			await channel.send("{} - your timed poll has ended!  You can view the results here:\nhttps://discord.com/channels/{}/{}/{}".format(
+				author.mention,
+				guild.id,
+				channel.id,
+				message.id
+			),allowed_mentions=discord.AllowedMentions.all())
 
 	def get_perc(self, value):
 		# Helper to take a float and round to the nearest decimal if needed,
@@ -208,6 +220,7 @@ class Server(commands.Cog):
 
 		By default, users' votes in polls with time limits only count if they choose a single option.
 		You can allow multiple choices by passing -multi or -multiple to the $poll command as well.
+		Passing -r(emind) to a timed poll will have the bot ping the poll creator in the same channel where the poll was created when it is done.
 
 		Note:  -multi(ple) is only interpreted if a t= time limit is set.
 
@@ -236,7 +249,7 @@ class Server(commands.Cog):
 		    $poll -multiple Fast, Medium, Slow t=2d
 		"""
 
-		if not poll_options: return await ctx.send("Usage: `{}poll (-mutli t=)(prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
+		if not poll_options: return await ctx.send("Usage: `{}poll (-mutli -remind t=)(prompt:)[option 1(, option 2, option 3...)]`".format(ctx.prefix))
 		
 		# Helper to replace escaped characters
 		def replace_escaped(val,esc = ",:/=-"):
@@ -263,11 +276,11 @@ class Server(commands.Cog):
 		poll_options = poll_options.replace("\n"," ")
 		desc = "**__New Poll by {}__**\n\n".format(ctx.author.mention)
 		# Let's get any timestamps or -multi(ple) strings, and strip them out as needed.
-		time_check = re.compile(r"(?i)t=(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
+		time_check = re.compile(r"(?i)-?t=(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
 		try: poll_time_str = time_check.search(poll_options).group(0)
 		except: poll_time_str = ""
 		poll_time = end_time = 0
-		allow_multiple = False
+		allow_multiple = ping_reminder = False
 		if poll_time_str: # We have a time frame - let's strip - and then process it
 			poll_options = re.sub(time_check,"",poll_options,count=1) # Only strip the first occurrence though
 			poll_time = get_seconds(poll_time_str)
@@ -279,6 +292,10 @@ class Server(commands.Cog):
 			if multi: # We got a hit - let's remove the first match
 				allow_multiple = True
 				poll_list.remove(multi)
+			remind = multi = next((x for x in poll_list if x.lower() in ("-r","-remind","-remindme")),None)
+			if remind: # Same as above
+				ping_reminder = True
+				poll_list.remove(remind)
 			poll_options = " ".join(poll_list)
 		# Let's strip by whitespace, and rejoin with single spaces
 		poll_options = " ".join([x for x in poll_options.split() if x])
@@ -339,6 +356,7 @@ class Server(commands.Cog):
 				"message_ids": "{} {}".format(message.channel.id,message.id),
 				"options": len(options),
 				"allow_multiple": allow_multiple,
+				"ping_reminder": ping_reminder,
 				"end": end_time
 			}
 			polls = self.settings.getServerStat(ctx.guild,"Polls",[])
