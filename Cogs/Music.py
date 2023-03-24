@@ -1151,6 +1151,100 @@ class Music(commands.Cog):
 		await player.seek(ms)
 		return await Message.Embed(title="♫ Seeking to {}!".format(self.format_duration(ms)),color=ctx.author,delete_after=delay).send(ctx)
 
+	@commands.command(aliases=["movesong","mvtrack","movetrack"])
+	async def mvsong(self, ctx, song_index = None, target_index = None):
+		"""Moves the song at song_index in the queue to the target_index (bot-admin only)."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = await self.get_player(ctx.guild)
+		if player.queue.is_empty:
+			# No songs in queue
+			return await Message.Embed(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
+		elif len(player.queue) == 1:
+			# Nowehere to move things
+			return await Message.Embed(title="♫ Only one song in queue - order cannot be changed!",color=ctx.author,delete_after=delay).send(ctx)
+		# Let's check our variables
+		try:
+			song_index = int(song_index)
+			target_index = int(target_index)
+			assert 0 < song_index <= len(player.queue)
+			assert 0 < target_index <= len(player.queue)
+		except:
+			return await Message.Embed(title="♫ Invalid index passed!",description="Indices must be between 1 and {:,}".format(len(player.queue)),color=ctx.author,delete_after=delay).send(ctx)
+		# Make sure we're not moving the song to the same spot
+		if song_index == target_index:
+			return await Message.Embed(title="♫ Invalid index passed!",description="Indices cannot be the same",color=ctx.author,delete_after=delay).send(ctx)
+		# Should have 2 valid indices - let's move the song at song_index to the target_index
+		track = player.queue[song_index-1]
+		player.queue._queue.insert(target_index-1,player.queue._queue.pop(song_index-1))
+		# Report that the move was successful
+		return await Message.Embed(
+			title="♫ Track Moved to Position {:,} in the Queue".format(target_index),
+			fields=[{
+				"name":"{}".format(track.title),
+				"value":"{}{} - Requested by {}{} - [Link]({})".format(
+					self.format_duration(track.seek,track)+" -> " if hasattr(track,"seek") else "",
+					self.format_duration(track.length,track),
+					track.ctx.author.mention,
+					" (via radio)" if track.radio else "",
+					track.uri
+				),
+				"inline":False}],
+			color=ctx.author,
+			delete_after=delay
+		).send(ctx)
+
+	@commands.command(aliases=["swapsongs","swaptracks","swtracks"])
+	async def swsongs(self, ctx, song1_index = None, song2_index = None):
+		"""Swaps the songs at song1_index and song2_index in the queue.  You must have requested both songs - or be a bot-admin to swap them."""
+
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = await self.get_player(ctx.guild)
+		if player.queue.is_empty:
+			# No songs in queue
+			return await Message.Embed(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
+		elif len(player.queue) == 1:
+			# Nowehere to move things
+			return await Message.Embed(title="♫ Only one song in queue - order cannot be changed!",color=ctx.author,delete_after=delay).send(ctx)
+		# Let's check our variables
+		try:
+			song1_index = int(song1_index)
+			song2_index = int(song2_index)
+			assert 0 < song1_index <= len(player.queue)
+			assert 0 < song2_index <= len(player.queue)
+		except:
+			return await Message.Embed(title="♫ Invalid index passed!",description="Indices must be between 1 and {:,}".format(len(player.queue)),color=ctx.author,delete_after=delay).send(ctx)
+		# Make sure we're not moving the song to the same spot
+		if song1_index == song2_index:
+			return await Message.Embed(title="♫ Invalid index passed!",description="Indices cannot be the same",color=ctx.author,delete_after=delay).send(ctx)
+		# Should have 2 valid indices - let's verify we're either bot admin, or requested both songs
+		track1 = player.queue[song1_index-1]
+		track2 = player.queue[song2_index-1]
+		if not Utils.is_bot_admin(ctx) and not track1.ctx.author==track2.ctx.author==ctx.author:
+			return await Message.Embed(title="♫ You cannot swap songs you did not request!",color=ctx.author,delete_after=delay).send(ctx)
+		player.queue._queue[song2_index-1],player.queue._queue[song1_index-1] = player.queue._queue[song1_index-1],player.queue._queue[song2_index-1]
+		# Report that the move was successful
+		fields = []
+		for track,index in sorted(((track1,song2_index),(track2,song1_index)),key=lambda x: x[1]):
+			fields.append({
+				"name":"{}. {}".format(index,track.title),
+				"value":"{}{} - Requested by {}{} - [Link]({})".format(
+					self.format_duration(track.seek,track)+" -> " if hasattr(track,"seek") else "",
+					self.format_duration(track.length,track),
+					track.ctx.author.mention,
+					" (via radio)" if track.radio else "",
+					track.uri
+				),
+				"inline":False
+			})
+		return await Message.Embed(
+			title="♫ Tracks {:,} and {:,} swapped!".format(song1_index,song2_index),
+			fields=fields,
+			color=ctx.author,
+			delete_after=delay
+		).send(ctx)
+
 	@commands.command()
 	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
