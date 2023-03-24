@@ -248,7 +248,7 @@ class IntelArk(commands.Cog):
 			" ": "+"
 		}
 
-		capture = re.search(r"((e|i)\d{1}\s\d{3,4}(\w{1}\d{1}?)?)", search_term)
+		capture = re.search(r"(?i)([a-z]\d{1}\s\d{3,4}(\w{1}\d{1}?)?)", search_term)
 
 		if capture:
 			capture = capture.group()
