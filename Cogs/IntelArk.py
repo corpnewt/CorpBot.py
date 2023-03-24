@@ -2,7 +2,7 @@ from   discord.ext import commands
 from   Cogs import Message
 from   Cogs import DL
 from   Cogs import PickList
-import re
+import re, difflib
 
 def setup(bot):
 	# Add the bot
@@ -31,7 +31,13 @@ class IntelArk(commands.Cog):
 		}
 		self.optional_fields = [
 			'PerfCoreCount',
-			'EffCoreCount'
+			'EffCoreCount',
+			'ThreadCount',
+			'ClockSpeedMax',
+			'MaxTDP',
+			'MaxMem',
+			'GraphicsDeviceId',
+			'InstructionSetExtensions'
 		]
 		self.match_threshold = 0.5 # Lower match limit before showing only those that matched
 
@@ -75,6 +81,7 @@ class IntelArk(commands.Cog):
 
 		# Check if we got more than one result (either not exact, or like 4790 vs 4790k)
 		elif len(response) > 1:
+			response = response[:10] # Only accept a max of 10
 			# Allow the user to choose which one they meant.
 			index, message = await PickList.Picker(
 				message=message,
@@ -129,7 +136,12 @@ class IntelArk(commands.Cog):
 		text = await DL.async_text(data["Link"])
 		lines = text.split('\n')
 
-		for line_index in range(len(lines)):
+		for i,line in enumerate(lines):
+			# Check for the specifications and try to rip the title from there if possible
+			if data["ProductName"] == "Intel Ark Search" and '<meta property="og:title" content="' in line and ' Product Specifications"/>' in line:
+				try: data["ProductName"] = line.split('<meta property="og:title" content="')[1].split(' Product Specifications"/>')[0]
+				except: pass
+				continue
 			for key in self.fields:
 				"""
 				Grabs the image URL of the current item, if possible.
@@ -147,7 +159,7 @@ class IntelArk(commands.Cog):
 				From here, we'd want to isolate what's inside of `src="*"`;
 				In order to achieve this, we can simply divide the string into a list.
 				
-					lines[line_index].split('src="')
+					line.split('src="')
 
 				Which will yield something like:
 
@@ -158,7 +170,7 @@ class IntelArk(commands.Cog):
 
 				From here, we can select the second element, as it contains the URL we're looking for, and split by `"`.
 
-					lines[line_index].split('src="')[1].split('"')
+					line.split('src="')[1].split('"')
 
 				Which will yield something like:
 
@@ -177,36 +189,50 @@ class IntelArk(commands.Cog):
 
 				From here, we can simply select the first element, which is the URL.
 				"""
-				if 'ptype="processors"' in lines[line_index].lower():
-					data['BrandBadge'] = lines[line_index].split('src="')[1].split('"')[0]
+				if 'ptype="processors"' in line.lower():
+					data['BrandBadge'] = line.split('src="')[1].split('"')[0]
 
-				if 'data-key="{}"'.format(key.lower()) in lines[line_index].lower():
+				if 'data-key="{}"'.format(key.lower()) in line.lower():
 					if 'codename' in key.lower():
-						data[key] = lines[line_index + 1].strip().split('>')[1].split('<')[0].replace('Products formerly', '').strip()
+						data[key] = lines[i + 1].strip().split('>')[1].split('<')[0].replace('Products formerly', '').strip()
 						continue
-					data[key] = lines[line_index + 1].strip().replace("</span>", "")
+					data[key] = lines[i + 1].strip().replace("</span>", "")
 
 		return data
 
 
 	async def quick_search(self, search_term):
 		try:
-			# Credits to https://github.com/xiongnemo/arksearch (a fork of major/arksearch) for this.
-			url = (
-				"https://ark.intel.com/libs/apps/intel/arksearch/autocomplete?"
-				+ "_charset_=UTF-8"
-				+ "&locale=en_us"
-				+ "&currentPageUrl=https%3A%2F%2Fark.intel.com%2Fcontent%2Fwww%2Fus%2Fen%2Fark.html"
-				+ "&input_query={0}"
-			)
-
-			res = await DL.async_json(url.format(search_term))
-			return res
+			url = "https://ark.intel.com/content/www/us/en/ark/search.html?_charset_=UTF-8&q={}".format(self.simplified_name(search_term))
+			res = await DL.async_text(url)
+			# Walk the resulting HTML looking for href="/content/www/us/en/ark/products/
+			# If we get a <input id="FormRedirectUrl" type="hidden" value="/content/www/us/en/ark/products/ value, we've been redirected
+			# to a destination page - use that instead.
+			results = []
+			for line in res.split("\n"):
+				# Check for the redirect first
+				if '<input id="FormRedirectUrl"' in line and 'value="' in line:
+					try: url = line.split('value="')[1].split('"')[0]
+					except: continue
+					return [{"prodUrl":url,"exactMatch":True}]
+				if 'href="/content/www/us/en/ark/products/' in line and "Processor" in line and not "Family" in line:
+					# Extract the URL and the product name
+					try:
+						url = line.split('href="')[1].split('"')[0]
+						prod = line.split('">')[-1].split("<")[0]
+					except: continue
+					# Make sure the label matches our search term within a certain threshold
+					match_parts = [x.lower() for x in prod.split() if difflib.SequenceMatcher(None,search_term.lower(),x.lower()).quick_ratio() > 0.5]
+					if not match_parts: continue # Nothing was even close, bail
+					# See if our total match of the above parts is > 0.5 - if not, bail
+					if difflib.SequenceMatcher(None,search_term.lower()," ".join(match_parts).lower()).ratio() > 0.5:
+						results.append({"prodUrl":url,"label":prod})
+			return results
 		except Exception as e:
 			return []
 
 	async def iark_search(self, search_term):
-		results = await self.quick_search(self.simplified_name(search_term))
+		results = await self.quick_search(search_term)
 
 		return results
 
