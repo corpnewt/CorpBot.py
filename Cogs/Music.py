@@ -14,6 +14,16 @@ class CorpPlayer(pomice.Player):
 		pomice.Player.__init__(self,*args,**kwargs)
 		self.queue = pomice.Queue()
 
+	async def move_to(self, channel=None):
+		# Needless wrapper for something that should work as-is?
+		if channel is None:
+			await self.disconnect()
+			return
+		# Attempt to move to the passed channel
+		await self.guild.change_voice_state(channel=channel)
+		self.channel = channel
+		self._is_connected = True
+
 	@property
 	def track(self):
 		return self.current
@@ -263,18 +273,24 @@ class Music(commands.Cog):
 			return # Player is borked or not connected - just bail
 		if player.channel and player.channel != before.channel:
 			return # No player to worry about, or someone left a different channel - ignore
-		if user.id == self.bot.user.id and not after.channel:
-			# We were disconnected somehow - try to reconnect and keep playing
-			#
-			##  Dirty workaround for what seems like a bug in pomice  ##
-			#
-			#   If you manually disconnect the from vc via right click and then try to
-			#   have it join a voice channel, it throws an exception stating that it's
-			#   already connected to a voice channel.
-			#   As a workaround - we manually update the voice state and reconnect to
-			#   the prior channel.
-			# return await before.channel.connect(cls=CorpPlayer)
-			pass
+		if user.id == self.bot.user.id:
+			if not after.channel:
+				# We were disconnected somehow - try to reconnect and keep playing
+				#
+				##  Dirty workaround for what seems like a bug in pomice  ##
+				#
+				#   If you manually disconnect the from vc via right click and then try to
+				#   have it join a voice channel, it throws an exception stating that it's
+				#   already connected to a voice channel.
+				#   As a workaround - we manually update the voice state and reconnect to
+				#   the prior channel.
+				# return await before.channel.connect(cls=CorpPlayer)
+				# Allow this to happen as we haven't been randomly disconnecting lately,
+				# using "pass" also allows us to clean up the player via _stop()
+				pass
+			else:
+				# We were moved - allow this
+				return
 		elif len([x for x in before.channel.members if not x.bot]) > 0:
 			return # At least one non-bot user
 		# if we made it here - then we're alone - disconnect and destroy
