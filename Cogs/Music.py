@@ -1489,7 +1489,7 @@ class Music(commands.Cog):
 				return await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["v","vol"])
 	async def volume(self, ctx, volume = None):
 		"""Changes the player's volume (0-150%)."""
 
@@ -1497,9 +1497,9 @@ class Music(commands.Cog):
 		player = await self.get_player(ctx.guild)
 		if player is None or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
 		if volume is None:
-			# We're listing the current volume
-			cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
+			# We're just listing the current volume
 			return await Message.Embed(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
 		try: # Round volume up or down as needed
 			volume = float(volume)
@@ -1512,7 +1512,8 @@ class Music(commands.Cog):
 		player.vol = player.volume
 		# Save it to the server stats with range 10-100
 		self.settings.setServerStat(ctx.guild, "MusicVolume", 10 if volume < 10 else 100 if volume > 100 else volume)
-		await Message.Embed(title="♫ Changed volume to {}%.".format(volume),color=ctx.author,delete_after=delay).send(ctx)
+		title="♫ Changed volume from {}% to {}%.".format(cv,volume) if cv!=volume else "♫ Volume remains {}%.".format(volume)
+		await Message.Embed(title=title,color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def repeat(self, ctx, *, yes_no = None):
@@ -1630,7 +1631,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","lasteq","playing","playlist","recommendcount"): return
+		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = await self.get_player(ctx.guild)
@@ -1646,7 +1647,7 @@ class Music(commands.Cog):
 		# If we're just using the join command - we don't need extra checks - they're done in the command itself
 		if ctx.command.name in ("join",): return
 		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
-		if ctx.command.name in ("play","recommend","shuffle","loadpl","shufflepl") and ctx.author.voice:
+		if ctx.command.name in ("play","radio","shuffle","loadpl","shufflepl") and ctx.author.voice:
 			if not player or not player.is_connected:
 				return await ctx.author.voice.channel.connect(cls=CorpPlayer)
 		# Let's ensure the bot is connected to voice
