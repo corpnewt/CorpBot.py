@@ -150,11 +150,12 @@ class Music(commands.Cog):
 			# Disconnect all players, then disconnect the node
 			for player in list(node.players.values()):
 				await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
-			if node.is_connected:
-				# Seems to cause a "Cannot write to closing transport" error, but it's
-				# the suggested way in the docs... ¯\_(ツ)_/¯
-				pass
-				# await node.disconnect()
+			if not hasattr(node,"_spotify_client"):
+				# More filthy hacks to work around bugs
+				node._spotify_client = None
+			try: await node.disconnect()
+			except: print("Node failed to disconnect: {}".format(node))
+
 
 	@commands.Cog.listener()
 	async def on_check_play(self,player):
