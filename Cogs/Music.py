@@ -113,9 +113,21 @@ class Music(commands.Cog):
 		# Start up the nodes when the bot starts - this prevents issues
 		# with the session ids not resolving early enough.
 		await self.bot.wait_until_ready()
+		max_wait = 10
+		time_sleep = 0.02
+		time_so_far = 0
 		while self.NodePool.nodes:
 			# Wait for nodes to disconnect if we relaunched the Music module
-			await asyncio.sleep(0.02)
+			await asyncio.sleep(time_sleep)
+			# Make sure we don't deadlock
+			time_so_far += time_sleep
+			if time_so_far > max_wait:
+				print("!! Waited too long for nodes to shut down - bailing...")
+				return
+			# Try to shut the nodes down forcefully
+			try: await self.NodePool.disconnect()
+			except: pass
+		# No existing nodes - start fresh
 		await self.NodePool.create_node(
 			bot=self.bot,
 			host=self.ll_host,
