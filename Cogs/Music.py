@@ -167,7 +167,8 @@ class Music(commands.Cog):
 			if not hasattr(node,"_spotify_client"):
 				# More filthy hacks to work around bugs
 				node._spotify_client = None
-		await self.NodePool.disconnect()
+		try: await self.NodePool.disconnect()
+		except: pass
 
 	@commands.Cog.listener()
 	async def on_check_play(self,player):
