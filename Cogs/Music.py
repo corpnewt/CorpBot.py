@@ -113,14 +113,16 @@ class Music(commands.Cog):
 		# Start up the nodes when the bot starts - this prevents issues
 		# with the session ids not resolving early enough.
 		await self.bot.wait_until_ready()
-		if not self.NodePool.nodes:
-			await self.NodePool.create_node(
-				bot=self.bot,
-				host=self.ll_host,
-				port=self.ll_port,
-				identifier=None,
-				password=self.ll_pass,
-			)
+		while self.NodePool.nodes:
+			# Wait for nodes to disconnect if we relaunched the Music module
+			await asyncio.sleep(0.02)
+		await self.NodePool.create_node(
+			bot=self.bot,
+			host=self.ll_host,
+			port=self.ll_port,
+			identifier=None,
+			password=self.ll_pass,
+		)
 
 	async def get_node(self):
 		# Try to get the best node - if any, otherwise create one
@@ -153,9 +155,7 @@ class Music(commands.Cog):
 			if not hasattr(node,"_spotify_client"):
 				# More filthy hacks to work around bugs
 				node._spotify_client = None
-			try: await node.disconnect()
-			except: print("Node failed to disconnect: {}".format(node))
-
+		await self.NodePool.disconnect()
 
 	@commands.Cog.listener()
 	async def on_check_play(self,player):
