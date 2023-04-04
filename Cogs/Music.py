@@ -815,7 +815,7 @@ class Music(commands.Cog):
 		# Get the options
 		timestamp = True
 		for x in options.split():
-			if x.lower() == "ts":
+			if re.fullmatch(r"-?(no?-?)?t(s|imestamp|ime)?(=(no?|off|disabled?|false))?",x):
 				timestamp = False
 		message = await Message.Embed(title="♫ Gathering info...",color=ctx.author).send(ctx)
 		# Let's save the playlist
