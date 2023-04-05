@@ -836,7 +836,7 @@ class Music(commands.Cog):
 			if len(temp_name) > 123:
 				temp_name = temp_name[:123]
 			# Add the extension if we have something to add
-			if temp_name:
+			if temp_name.replace("-","").replace("_",""):
 				filename = temp_name+".json"
 		message = await Message.Embed(title="♫ Gathering info...",color=ctx.author).send(ctx)
 		# Let's save the playlist
