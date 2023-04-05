@@ -114,7 +114,7 @@ class Music(commands.Cog):
 		# with the session ids not resolving early enough.
 		await self.bot.wait_until_ready()
 		max_wait = 10
-		time_sleep = 0.02
+		time_sleep = 0.25
 		time_so_far = 0
 		while self.NodePool.nodes:
 			# Wait for nodes to disconnect if we relaunched the Music module
@@ -807,16 +807,37 @@ class Music(commands.Cog):
 		
 		Available options:
 
-		ts : Exclude the timestamp of the currently playing song."""
+		ts : Exclude the timestamp of the currently playing song.
+		
+		Any other options passed will be used as the file name."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the options
 		timestamp = True
+		remaining = []
 		for x in options.split():
 			if re.fullmatch(r"-?(no?-?)?t(s|imestamp|ime)?(=(no?|off|disabled?|false))?",x):
 				timestamp = False
+			else:
+				remaining.append(x)
+		filename = "playlist.json"
+		if remaining: # Let's sanitize and see what we end up with
+			# Join without spaces - and only allow alphanumeric or _, and - chars
+			temp_name = "".join([x for x in "_".join(remaining) if x.isalnum() or x in "_-."])
+			# Strip duplicate _ and - chars
+			temp_name = re.sub("-{2,}","-",temp_name)
+			temp_name = re.sub("_{2,}","_",temp_name)
+			# Strip the extension
+			if temp_name.lower().endswith(".json"):
+				temp_name = temp_name[:-5]
+			# Ensure our name length
+			if len(temp_name) > 123:
+				temp_name = temp_name[:123]
+			# Add the extension if we have something to add
+			if temp_name:
+				filename = temp_name+".json"
 		message = await Message.Embed(title="♫ Gathering info...",color=ctx.author).send(ctx)
 		# Let's save the playlist
 		queue = await self._get_playlist_data(player,timestamp=timestamp)
@@ -824,7 +845,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ No playlist to save!",color=ctx.author,delete_after=delay).send(ctx,message)
 		await Message.Embed(title="♫ Saving and uploading...",color=ctx.author).edit(ctx,message)
 		temp = tempfile.mkdtemp()
-		temp_json = os.path.join(temp,"playlist.json")
+		temp_json = os.path.join(temp,filename)
 		try:
 			json.dump(queue,open(temp_json,"w"),indent=2)
 			await ctx.send(file=discord.File(temp_json))
