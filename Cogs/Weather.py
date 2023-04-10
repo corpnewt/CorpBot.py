@@ -24,7 +24,6 @@ class Weather(commands.Cog):
 		# Increase the default timeout to 15 seconds
 		geopy.geocoders.options.default_timeout = 15
 		self.user_agent = "CorpBot"
-		# self.geo = Nominatim(user_agent="CorpBot")
 
 	def _get_output(self, w_text):
 		if "tornado" in w_text.lower():
@@ -160,18 +159,24 @@ class Weather(commands.Cog):
 			return await ctx.send("Usage: `{}weather [city_name]`".format(ctx.prefix))
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		# location = self.geo.geocode(city_name)
-		async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
-			location = await geolocator.geocode(city_name)
+		message = await ctx.send("Gathering weather data...")
+		try:
+			async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
+				location = await geolocator.geocode(city_name)
+		except:
+			return await message.edit(content="Something went wrong geolocating...")
 		if location is None:
-			return await ctx.send("I couldn't find that city...")
+			return await message.edit(content="I couldn't find that city...")
 		title = location.address
 		# Just want the current weather
-		r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
-			self.key,
-			location.latitude,
-			location.longitude
-		))
+		try:
+			r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
+				self.key,
+				location.latitude,
+				location.longitude
+			))
+		except:
+			return await message.edit(content="Something went wrong querying openweathermap.org...")
 		desc = self.get_weather_text(r)
 		# Let's post it!
 		await Message.EmbedText(
@@ -179,7 +184,7 @@ class Weather(commands.Cog):
 			description=desc,
 			color=ctx.author,
 			footer="Powered by OpenWeatherMap"
-		).send(ctx)
+		).send(ctx,message)
 
 	@commands.command(pass_context=True)
 	async def forecast(self, ctx, *, city_name = None):
@@ -188,18 +193,24 @@ class Weather(commands.Cog):
 			return await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		# location = self.geo.geocode(city_name)
-		async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
-			location = await geolocator.geocode(city_name)
+		message = await ctx.send("Gathering forecast data...")
+		try:
+			async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
+				location = await geolocator.geocode(city_name)
+		except:
+			return await message.edit(content="Something went wrong geolocating...")
 		if location is None:
-			return await ctx.send("I couldn't find that city...")
+			return await message.edit(content="I couldn't find that city...")
 		title = location.address
 		# We want the 5-day forecast at this point
-		r = await DL.async_json("http://api.openweathermap.org/data/2.5/forecast?appid={}&lat={}&lon={}".format(
-			self.key,
-			location.latitude,
-			location.longitude
-		))
+		try:
+			r = await DL.async_json("http://api.openweathermap.org/data/2.5/forecast?appid={}&lat={}&lon={}".format(
+				self.key,
+				location.latitude,
+				location.longitude
+			))
+		except:
+			return await message.edit(content="Something went wrong querying openweathermap.org...")
 		days = {}
 		for x in r["list"]:
 			# Check if the day exists - if not, we set up a pre-day
@@ -238,4 +249,4 @@ class Weather(commands.Cog):
 			fields=fields,
 			color=ctx.author,
 			footer="Powered by OpenWeatherMap"
-		).send(ctx)
+		).send(ctx,message)
