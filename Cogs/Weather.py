@@ -1,4 +1,6 @@
 import asyncio, discord, datetime, re
+import geopy.geocoders
+from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
 from   discord.ext import commands
 from   Cogs import Message, PickList, DL
@@ -14,7 +16,15 @@ class Weather(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.key = bot.settings_dict.get("weather","")
-		self.geo = Nominatim(user_agent="CorpBot")
+		self.weather_timeout = bot.settings_dict.get("weather_timeout",15)
+		if not isinstance(self.weather_timeout,int):
+			self.weather_timeout = 15
+		# Min of 5 seconds, max of 100
+		self.weather_timeout = min(100,max(self.weather_timeout,5))
+		# Increase the default timeout to 15 seconds
+		geopy.geocoders.options.default_timeout = 15
+		self.user_agent = "CorpBot"
+		# self.geo = Nominatim(user_agent="CorpBot")
 
 	def _get_output(self, w_text):
 		if "tornado" in w_text.lower():
@@ -75,27 +85,22 @@ class Weather(commands.Cog):
 		types = [ "Fahrenheit", "Celsius", "Kelvin" ]
 		usage = "Usage: `{}tconvert [temp] [from_type] [to_type]`".format(ctx.prefix)
 		if not temp:
-			await ctx.send(usage)
-			return
+			return await ctx.send(usage)
 		args = temp.split()
 		if not len(args) == 3:
-			await ctx.send(usage)
-			return
+			return await ctx.send(usage)
 		try:
 			f = next((x for x in types if x.lower() == args[1].lower() or x.lower()[:1] == args[1][:1].lower()), None)
 			t = next((x for x in types if x.lower() == args[2].lower() or x.lower()[:1] == args[2][:1].lower()), None)
 			m = float(args[0])
 		except:
-			await ctx.send(usage)
-			return
+			return await ctx.send(usage)
 		if not(f) or not(t):
 			# No valid types
-			await ctx.send("Current temp types are: {}".format(", ".join(types)))
-			return
+			return await ctx.send("Current temp types are: {}".format(", ".join(types)))
 		if f == t:
 			# Same in as out
-			await ctx.send("No change when converting {} ---> {}.".format(f, t))
-			return
+			return await ctx.send("No change when converting {} ---> {}.".format(f, t))
 		output = "I guess I couldn't make that conversion..."
 		try:
 			out_val = None
@@ -151,15 +156,15 @@ class Weather(commands.Cog):
 	@commands.command(pass_context=True)
 	async def weather(self, ctx, *, city_name = None):
 		"""Gets some weather."""
-		if city_name == None:
-			await ctx.send("Usage: `{}weather [city_name]`".format(ctx.prefix))
-			return
+		if city_name is None:
+			return await ctx.send("Usage: `{}weather [city_name]`".format(ctx.prefix))
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		location = self.geo.geocode(city_name)
-		if location == None:
-			await ctx.send("I couldn't find that city...")
-			return
+		# location = self.geo.geocode(city_name)
+		async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
+			location = await geolocator.geocode(city_name)
+		if location is None:
+			return await ctx.send("I couldn't find that city...")
 		title = location.address
 		# Just want the current weather
 		r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
@@ -179,15 +184,15 @@ class Weather(commands.Cog):
 	@commands.command(pass_context=True)
 	async def forecast(self, ctx, *, city_name = None):
 		"""Gets some weather, for 5 days or whatever."""
-		if city_name == None:
-			await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
-			return
+		if city_name is None:
+			return await ctx.send("Usage: `{}forecast [city_name]`".format(ctx.prefix))
 		# Strip anything that's non alphanumeric or a space
 		city_name = re.sub(r'([^\s\w]|_)+', '', city_name)
-		location = self.geo.geocode(city_name)
-		if location == None:
-			await ctx.send("I couldn't find that city...")
-			return
+		# location = self.geo.geocode(city_name)
+		async with Nominatim(user_agent=self.user_agent,adapter_factory=AioHTTPAdapter) as geolocator:
+			location = await geolocator.geocode(city_name)
+		if location is None:
+			return await ctx.send("I couldn't find that city...")
 		title = location.address
 		# We want the 5-day forecast at this point
 		r = await DL.async_json("http://api.openweathermap.org/data/2.5/forecast?appid={}&lat={}&lon={}".format(
