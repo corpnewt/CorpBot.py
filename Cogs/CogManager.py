@@ -1,12 +1,6 @@
-import discord
-import os
-import dis
-import random
-import math
-import subprocess
-from   discord.ext import commands
-from   Cogs import Settings
-from   Cogs import Message
+import discord, os, dis, subprocess
+from discord.ext import commands
+from Cogs import Settings, Message, PickList
 
 def setup(bot):
 	# Add the bot
@@ -83,7 +77,7 @@ class CogManager(commands.Cog):
 	def _load_extension(self, extension = None):
 		# Loads extensions - if no extension passed, loads all
 		# starts with Settings, then Mute
-		if extension == None:
+		if extension is None:
 			# Load them all!
 			for x in self.preloads:
 				if x in self.bot.extensions:
@@ -157,7 +151,7 @@ class CogManager(commands.Cog):
 			return ( 0, 0 )
 
 	def _unload_extension(self, extension = None):
-		if extension == None:
+		if extension is None:
 			# NEED an extension to unload
 			return ( 0, 1 )
 		for cog in self.bot.cogs:
@@ -167,18 +161,6 @@ class CogManager(commands.Cog):
 				except:
 					return ( 0, 1 )
 		return ( 0, 0 )
-	
-	async def _send_embed(self, ctx, embed, pm = False):
-		# Helper method to send embeds to their proper location
-		if pm == True and not ctx.channel == ctx.author.dm_channel:
-			# More than 2 pages, try to dm
-			try:
-				await ctx.author.send(embed=embed)
-				await ctx.message.add_reaction("📬")
-			except discord.Forbidden:
-				await ctx.send(embed=embed)
-			return
-		await ctx.send(embed=embed)
 		
 	# Proof of concept stuff for reloading cog/extension
 	def _is_submodule(self, parent, child):
@@ -187,7 +169,7 @@ class CogManager(commands.Cog):
 	@commands.command(pass_context=True)
 	async def imports(self, ctx, *, extension = None):
 		"""Outputs the extensions imported by the passed extension."""
-		if extension == None:
+		if extension is None:
 			# run the extensions command
 			await ctx.invoke(self.extensions)
 			return
@@ -206,20 +188,15 @@ class CogManager(commands.Cog):
 		await cxt.send("I couldn't find that extension...")
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["extensions","ext"])
 	async def extension(self, ctx, *, extension = None):
-		"""Outputs the cogs attatched to the passed extension."""
-		if extension == None:
-			# run the extensions command
-			await ctx.invoke(self.extensions)
-			return
+		"""Outputs the cogs and command count for the passed extension - or all extensions and their corresponding cogs if none passed."""
 
-		cog_list = []
+		# Build our extensions dictionary
+		ext_dict = {}
 		for e in self.bot.extensions:
-			if not str(e[5:]).lower() == extension.lower():
-				continue
-			# At this point - we should've found it
-			# Get the extension
+			ext_name = str(e)[5:]
+			cog_list = ext_dict.get(ext_name,[])
 			b_ext = self.bot.extensions.get(e)
 			for cog in self.bot.cogs:
 				# Get the cog
@@ -227,103 +204,65 @@ class CogManager(commands.Cog):
 				if self._is_submodule(b_ext.__name__, b_cog.__module__):
 					# Submodule - add it to the list
 					cog_list.append(str(cog))
-			# build the embed
-			if type(ctx.author) is discord.Member:
-				help_embed = discord.Embed(color=ctx.author.color)
+			# Retain any cogs located for the extension here
+			if cog_list:
+				ext_dict[ext_name] = cog_list
 			else:
-				help_embed = discord.Embed(color=random.choice(self.colors))
-			help_embed.title = str(e[5:]) + " Extension"
-			if len(cog_list):
-				total_commands = 0
-				for cog in cog_list:
-					total_commands += len(self.bot.get_cog(cog).get_commands())
-				if len(cog_list) > 1:
-					comm = "total command"
-				else:
-					comm = "command"
-				if total_commands == 1:
-					comm = "└─ 1 " + comm
-				else:
-					comm = "└─ {:,} {}s".format(total_commands, comm)
-				help_embed.add_field(name=", ".join(cog_list), value=comm, inline=True)
+				cogless = ext_dict.get("Cogless",[])
+				cogless.append(ext_name)
+				ext_dict["Cogless"] = cogless
+		# Check if we got anything
+		if not ext_dict:
+			return await Message.Embed(
+				title="No Extensions Found",
+				color=ctx.author
+			).send(ctx)
+		# Check if we're searching - and retrieve the extension if so
+		fields = []
+		if extension:
+			# Map the key to the first match - case-insensitive
+			ext_name = next((x for x in ext_dict if x.lower() == extension.lower()),None)
+			if not ext_name:
+				return await Message.Embed(
+					title="Extension Not Found",
+					description="Could not find an extension by that name.",
+					color=ctx.author
+				).send(ctx)
+			if ext_name == "Cogless":
+				title = "Extensions Without Cogs ({:,} Total)".format(len(ext_dict[ext_name]))
+				fields.append({
+					"name":"Cogless - Each Has 0 Commands",
+					"value":"\n".join(["`└─ {}`".format(x) for x in ext_dict[ext_name]]),
+					"inline":True
+				})
 			else:
-				help_embed.add_field(name="No Cogs", value="└─ 0 commands", inline=True)
-			await ctx.send(embed=help_embed)
-			return
-		await ctx.send("I couldn't find that extension.")
-
-
-	@commands.command(pass_context=True)
-	async def extensions(self, ctx):
-		"""Lists all extensions and their corresponding cogs."""
-		# Build the embed
-		if type(ctx.author) is discord.Member:
-			help_embed = discord.Embed(color=ctx.author.color)
+				title = "{} Extension ({:,} Total Cog{})".format(ext_name,len(ext_dict[ext_name]),"" if len(ext_dict[ext_name])==1 else "s")
+				# Got the target extension - gather its info
+				for cog in ext_dict[ext_name]:
+					try: comms = len(self.bot.get_cog(cog).get_commands())
+					except: comms = 0 # Zero it out if it's not a cog, or has none
+					fields.append({
+						"name":cog,
+						"value":"`└─ {:,} command{}`".format(comms,"" if comms==1 else "s"),
+						"inline":True
+					})
 		else:
-			help_embed = discord.Embed(color=random.choice(self.colors))
-			
-		# Setup blank dict
-		ext_list = {}
-		cog_less = []
-		for extension in self.bot.extensions:
-			if not str(extension)[5:] in ext_list:
-				ext_list[str(extension)[5:]] = []
-			# Get the extension
-			b_ext = self.bot.extensions.get(extension)
-			for cog in self.bot.cogs:
-				# Get the cog
-				b_cog = self.bot.get_cog(cog)
-				if self._is_submodule(b_ext.__name__, b_cog.__module__):
-					# Submodule - add it to the list
-					ext_list[str(extension)[5:]].append(str(cog))
-			if not len(ext_list[str(extension)[5:]]):
-				ext_list.pop(str(extension)[5:])
-				cog_less.append(str(extension)[5:])
-		
-		if not len(ext_list) and not len(cog_less):
-			# no extensions - somehow... just return
-			return
-		
-		# Get all keys and sort them
-		key_list = list(ext_list.keys())
-		key_list = sorted(key_list)
-		
-		if len(cog_less):
-			ext_list["Cogless"] = cog_less
-			# add the cogless extensions at the end
-			key_list.append("Cogless")
-		
-		to_pm = len(ext_list) > 25
-		page_count = 1
-		page_total = math.ceil(len(ext_list)/25)
-		if page_total > 1:
-			help_embed.title = "Extensions (Page {:,} of {:,})".format(page_count, page_total)
-		else:
-			help_embed.title = "Extensions"
-		for embed in key_list:
-			if len(ext_list[embed]):
-				help_embed.add_field(name=embed, value="└─ " + ", ".join(ext_list[embed]), inline=True)
-			else:
-				help_embed.add_field(name=embed, value="└─ None", inline=True)
-			# 25 field max - send the embed if we get there
-			if len(help_embed.fields) >= 25:
-				if page_total == page_count:
-					if len(ext_list) == 1:
-						help_embed.set_footer(text="1 Extension Total")
-					else:
-						help_embed.set_footer(text="{} Extensions Total".format(len(ext_list)))
-				await self._send_embed(ctx, help_embed, to_pm)
-				help_embed.clear_fields()
-				page_count += 1
-				if page_total > 1:
-					help_embed.title = "Extensions (Page {:,} of {:,})".format(page_count, page_total)
-		
-		if len(help_embed.fields):
-			if len(ext_list) == 1:
-				help_embed.set_footer(text="1 Extension Total")
-			else:
-				help_embed.set_footer(text="{} Extensions Total".format(len(ext_list)))
-			await self._send_embed(ctx, help_embed, to_pm)
+			# We're listing them all
+			title = "All Extensions ({:,} Total)".format(len(ext_dict))
+			ext_list = [x for x in sorted(list(ext_dict),key=lambda x:x.lower()) if not x == "Cogless"]
+			if "Cogless" in ext_dict: ext_list.append("Cogless") # Make sure this comes last
+			for ext_name in ext_list:
+				fields.append({
+					"name":ext_name,
+					"value":"\n".join(["`└─ {}`".format(x) for x in ext_dict[ext_name]]),
+					"inline":True
+				})
+		return await PickList.PagePicker(
+			title=title,
+			list=fields,
+			ctx=ctx,
+			max=24
+		).pick()
 		
 	
 	@commands.command(pass_context=True)
@@ -331,7 +270,7 @@ class CogManager(commands.Cog):
 		"""Reloads the passed extension - or all if none passed."""
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		if isOwner is None:
 			msg = 'I have not been claimed, *yet*.'
 			await ctx.channel.send(msg)
 			return
@@ -340,7 +279,7 @@ class CogManager(commands.Cog):
 			await ctx.channel.send(msg)
 			return
 
-		if extension == None:
+		if extension is None:
 			message = await ctx.send("Reloading all extensions...")
 			result = self._load_extension()
 			res_str = "*{}* of *{}* extensions reloaded successfully!".format(result[0], result[1])
@@ -360,7 +299,7 @@ class CogManager(commands.Cog):
 	async def update(self, ctx, reset=None):
 		"""Updates from git, pass "reset" or "-reset" to this command to first run "git reset --hard" (owner only)."""
 		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None: return await ctx.send("I have not been claimed, *yet*.")
+		if isOwner is None: return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False: return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
 		
 		# Let's find out if we *have* git first
