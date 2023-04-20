@@ -198,12 +198,19 @@ class CogManager(commands.Cog):
 			ext_name = str(e)[5:]
 			cog_list = ext_dict.get(ext_name,[])
 			b_ext = self.bot.extensions.get(e)
+			hidden = False
 			for cog in self.bot.cogs:
 				# Get the cog
 				b_cog = self.bot.get_cog(cog)
-				if self._is_submodule(b_ext.__name__, b_cog.__module__):
-					# Submodule - add it to the list
-					cog_list.append(str(cog))
+				if not self._is_submodule(b_ext.__name__, b_cog.__module__):
+					continue
+				commands = b_cog.get_commands()
+				if commands and all((x.hidden for x in commands)):
+					hidden = True
+					continue # All commands are hidden
+				# Submodule - add it to the list
+				cog_list.append(str(cog))
+			if hidden: continue # Don't save hidden cogs
 			# Retain any cogs located for the extension here
 			if cog_list:
 				ext_dict[ext_name] = cog_list
@@ -239,7 +246,7 @@ class CogManager(commands.Cog):
 				title = "{} Extension ({:,} Total Cog{})".format(ext_name,len(ext_dict[ext_name]),"" if len(ext_dict[ext_name])==1 else "s")
 				# Got the target extension - gather its info
 				for cog in ext_dict[ext_name]:
-					try: comms = len(self.bot.get_cog(cog).get_commands())
+					try: comms = len([x for x in self.bot.get_cog(cog).get_commands() if not x.hidden])
 					except: comms = 0 # Zero it out if it's not a cog, or has none
 					fields.append({
 						"name":cog,
