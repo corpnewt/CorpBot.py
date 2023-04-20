@@ -15,7 +15,7 @@ class Mute(commands.Cog):
         self.bot = bot
         self.settings = settings
         self.loop_list = []
-        self.mute_perms = ("send_messages","add_reactions","speak")
+        self.mute_perms = ("send_messages","send_messages_in_threads","add_reactions","speak")
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
@@ -259,11 +259,12 @@ class Mute(commands.Cog):
                 continue
             overs = channel.overwrites_for(mute_role) # Get any overrides for the role
             # Check if we qualify in this channel to sync/desync
-            if desync: perm_check  = any(x[0] in self.mute_perms and x[1] != None for x in overs)
-            else: perm_check = not all([x==False for x in (overs.send_messages,overs.add_reactions,overs.speak)])
+            if desync: perm_check = any(x[0] in self.mute_perms and x[1] != None for x in overs)
+            else: perm_check = not all([getattr(overs,x,None)==False for x in self.mute_perms])
             if perm_check: # We qualify - set our perms as needed
                 other_perms = any(x[0] not in self.mute_perms and x[1] != None for x in overs)
-                overs.send_messages = overs.add_reactions = overs.speak = None if desync else False
+                for x in self.mute_perms:
+                    setattr(overs,x,None if desync else False)
                 try: await channel.set_permissions(mute_role, overwrite=overs if other_perms or not desync else None)
                 except: pass
 
