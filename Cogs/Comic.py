@@ -82,6 +82,7 @@ class Comic(commands.Cog):
 				"keys": ["year","month","day"],
 				"first_date": "02-13-2008",
 				"comic_url": [
+					{"find":'<img class="post_media_photo image" src="',"index":-1},
 					{"find":'<img src="',"index":-1},
 					{"find":'"',"index":0}
 				]
@@ -285,7 +286,8 @@ class Comic(commands.Cog):
 		"""Displays a random Calvin & Hobbes comic from 11-18-1985 to today."""
 		await self._display_comic(ctx, "calvin", random=True)
 
-	@commands.command()
+	# Commented out as 
+	'''@commands.command()
 	async def cyanide(self, ctx, date=None):
 		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
 		try: date = int(date)
@@ -303,9 +305,9 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "dilbert", date=date)
 
 	@commands.command()
-	async def randilbert(self, ctx, date=None):
+	async def randilbert(self, ctx):
 		"""Displays a random Dilbert comic from 04-16-1989 to today."""
-		await self._display_comic(ctx, "dilbert", random=True)
+		await self._display_comic(ctx, "dilbert", random=True)'''
 
 	@commands.command()
 	async def garfield(self, ctx, date=None):
