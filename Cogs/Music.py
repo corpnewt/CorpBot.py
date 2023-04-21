@@ -1456,6 +1456,9 @@ class Music(commands.Cog):
 			).send(ctx)
 			to_skip = True
 		else:
+			# Override to_remove here - as we cannot remove it if we're not the original
+			# requester or a bot-admin
+			to_remove = False
 			# Do the checking here to validate we can use this and etc.
 			skips = getattr(player,"skips",[]) # Get the existing skips - or an empty list if none
 			# Relsolve the skips
