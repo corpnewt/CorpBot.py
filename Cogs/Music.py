@@ -30,7 +30,7 @@ class CorpPlayer(pomice.Player):
 
 class CorpTrack(pomice.objects.Track):
 	# Create a shell subclass to keep horrible practices going
-	def __init__(self,track,radio=False):
+	def __init__(self,track,radio=False,to_remove=False):
 		if isinstance(track,pomice.objects.Track):
 			track = {
 				"track_id":track.track_id,
@@ -46,6 +46,7 @@ class CorpTrack(pomice.objects.Track):
 			track["track_id"] = track.get("encoded",track.get("id"))
 		self.seek = track.get("position",0)
 		self.radio = radio
+		self.to_remove = to_remove
 		try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
 		except: self.thumb = None
 		# Set up the track_type if it's not already a pomice TrackType
@@ -233,7 +234,7 @@ class Music(commands.Cog):
 		# print("TRACK ENDED",player)
 		# print(track)
 		# print(reason)
-		if getattr(player,"repeat",False):
+		if getattr(player,"repeat",False) and not getattr(track,"to_remove",False):
 			# We're repeating tracks - add it to the end
 			if not hasattr(player,"track_ctx"): return # No context - probably stopped.
 			track = self._track_fill(track, ctx=player.track_ctx)
@@ -1426,8 +1427,10 @@ class Music(commands.Cog):
 				await message.delete()
 
 	@commands.command()
-	async def skip(self, ctx):
-		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requestors and admins can skip without voting."""
+	async def skip(self, ctx, *, remove = None):
+		"""Adds your vote to skip the current song.  50% or more of the non-bot users need to vote to skip a song.  Original requesters and admins can skip without voting.
+		
+		Passing "remove" as an argument to this command if you're the original requester or a bot-admin will remove the song from the queue if repeat is enabled."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -1437,11 +1440,20 @@ class Music(commands.Cog):
 		if not player.is_playing:
 			return await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Check for added by first, then check admin
+		to_remove = remove is not None and remove.lower() in ("r","rem","remove","unplay","unp","unqueue","unq")
 		if Utils.is_bot_admin(ctx):
-			await Message.Embed(title="♫ Admin override activated - skipping!",color=ctx.author,delete_after=delay).send(ctx)
+			await Message.Embed(
+				title="♫ Admin override activated - skipping{}!".format(" and removing" if to_remove else ""),
+				color=ctx.author,
+				delete_after=delay
+			).send(ctx)
 			to_skip = True
 		elif hasattr(player,"track_ctx") and player.track_ctx.author == ctx.author:
-			await Message.Embed(title="♫ Requestor chose to skip - skipping!",color=ctx.author,delete_after=delay).send(ctx)
+			await Message.Embed(
+				title="♫ Requestor chose to skip - skipping{}!".format(" and removing" if to_remove else ""),
+				color=ctx.author,
+				delete_after=delay
+			).send(ctx)
 			to_skip = True
 		else:
 			# Do the checking here to validate we can use this and etc.
@@ -1471,6 +1483,8 @@ class Music(commands.Cog):
 				player.skips = new_skips
 				await Message.Embed(title="♫ Skip threshold not met - {}/{} skip votes entered - need {} more!".format(len(new_skips),needed_skips,needed_skips-len(new_skips)),color=ctx.author,delete_after=delay).send(ctx)
 		if to_skip:
+			if to_remove: # Only remove if we're skipping
+				player.track.to_remove = True
 			player.skips = [] # Reset the skips
 			await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the current song
 
