@@ -173,7 +173,6 @@ if __name__ == '__main__':
         {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
-        {"name":"igdb_api_python"},
         {"name":"geopy"},
         {"name":"pyfiglet"},
         {"name":"regex"}
