@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Beer](#beer), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Beer](#beer), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Minesweeper](#minesweeper), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [SettingsDict](#settingsdict), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -123,9 +123,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the available ascii fonts.
 
 ## Beer
-####	Beer Cog (2 commands) - Beer.py Extension:
+####	Beer Cog (4 commands) - Beer.py Extension:
 	  $abv [original_gravity] [final_gravity]
 	   └─ Calculates the alcohol by volume for the passed original and final gravity.
+	  $hops [batch_size] [original_gravity] [target_ibu] [alpha_acid_percent] [boil_time_minutes] [output_unit] (AKA: hop, hops4ibu, hopsforibu, hibu)
+	   └─ Calculates the amount of hops required to reach the target IBU.
+	  $ibu [batch_size] [original_gravity] [hops_amount] [alpha_acid_percent] [boil_time_minutes] (AKA: bitternes, bitter)
+	   └─ Calculates the IBU (International Bitterness Units) for the given values.  Th...
 	  $vconvert [volume] [from_type] [to_type]
 	   └─ Converts between Ounces, Gallons, Liters, Milliliters, and Beer Barrels.  Fro...
 
@@ -181,7 +185,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the watching status of the bot (owner-only).
 
 ## BotAdmin
-####	BotAdmin Cog (11 commands) - BotAdmin.py Extension:
+####	BotAdmin Cog (12 commands) - BotAdmin.py Extension:
 	  $ban [members] [reason] (AKA: yote)
 	   └─ Bans the passed members for the specified reason.
 	  $banned [user_id]
@@ -192,6 +196,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the users currently being ignored.
 	  $kick [members] [reason] (AKA: yeet)
 	   └─ Kicks the passed members for the specified reason.
+	  $klean [members] [reason] (AKA: scam)
+	   └─ Bans the passed members for the specified reason, then unbans them in order t...
 	  $listen [member]
 	   └─ Removes a member from the bot's "ignore" list (bot-admin only).
 	  $listenall 
@@ -278,11 +284,9 @@ A list of cogs, commands, and descriptions:
 	   └─ I *know* you wanted some help with something - what was it?
 
 ## CogManager
-####	CogManager Cog (5 commands) - CogManager.py Extension:
-	  $extension [extension]
-	   └─ Outputs the cogs attatched to the passed extension.
-	  $extensions 
-	   └─ Lists all extensions and their corresponding cogs.
+####	CogManager Cog (4 commands) - CogManager.py Extension:
+	  $extension [extension] (AKA: extensions, ext)
+	   └─ Outputs the cogs and command count for the passed extension - or all extensio...
 	  $imports [extension]
 	   └─ Outputs the extensions imported by the passed extension.
 	  $reload [extension]
@@ -322,13 +326,19 @@ A list of cogs, commands, and descriptions:
 	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to t...
 
 ## DJRoles
-####	DJRoles Cog (3 commands) - DJRoles.py Extension:
-	  $adddj [role]
+####	DJRoles Cog (6 commands) - DJRoles.py Extension:
+	  $adddj [role] (AKA: newdj)
 	   └─ Adds a new role to the dj list (bot-admin only).
+	  $addmc [role] (AKA: newmc)
+	   └─ Adds a new role to the mc list (bot-admin only).
 	  $listdj 
 	   └─ Lists dj roles and id's.
-	  $removedj [role]
+	  $listmc 
+	   └─ Lists mc roles and id's.
+	  $removedj [role] (AKA: remdj, deletedj, deldj)
 	   └─ Removes a role from the dj list (bot-admin only).
+	  $removemc [role] (AKA: remmc, deletemc, delmc)
+	   └─ Removes a role from the mc list (bot-admin only).
 
 ## Debugging
 ####	Debugging Cog (9 commands) - Debugging.py Extension:
@@ -534,36 +544,36 @@ A list of cogs, commands, and descriptions:
 
 ## Hw
 ####	Hw Cog (13 commands) - Hw.py Extension:
-	  $cancelhw 
+	  $cancelhw  (AKA: hwcancel)
 	   └─ Cancels a current hardware session.
-	  $delhw [build]
+	  $delhw [build] (AKA: hwdel, remhw, hwrem)
 	   └─ Removes a build from your build list.
-	  $edithw [build]
+	  $edithw [build] (AKA: hwedit)
 	   └─ Edits a build from your build list.
-	  $gethw [user] [search]
+	  $gethw [user] [search] (AKA: hwget, searchhw, hwsearch)
 	   └─ Searches the user's hardware for a specific search term.
 	  $hw [user] [build]
 	   └─ Lists the hardware for either the user's default build - or the passed build.
-	  $lhw [user]
+	  $lhw [user] (AKA: hwl)
 	   └─ Lists only the titles of the builds for the specified user - or yourself if n...
-	  $listhw [user]
+	  $listhw [user] (AKA: hwlist)
 	   └─ Lists the builds for the specified user - or yourself if no user passed.
-	  $mainhw [build]
+	  $mainhw [build] (AKA: hwmain)
 	   └─ Sets a new main build from your build list.
-	  $newhw 
+	  $newhw  (AKA: hwnew)
 	   └─ Initiate a new-hardware conversation with the bot.  The hardware added will a...
 	  $pcpp [url] [style] [escape]
 	   └─ Convert a pcpartpicker.com link into markdown parts. Available styles: normal...
-	  $rawhw [user] [build]
+	  $rawhw [user] [build] (AKA: hwraw)
 	   └─ Lists the raw markdown for either the user's default build - or the passed bu...
-	  $renhw [build]
+	  $renhw [build] (AKA: hwren, renamehw, hwrename)
 	   └─ Renames a build from your build list.
 	  $sethwchannel [channel]
 	   └─ Sets the channel for hardware (admin only).
 
 ## IntelArk
 ####	IntelArk Cog (1 command) - IntelArk.py Extension:
-	  $iark [text]
+	  $iark [text] (AKA: intelark)
 	   └─ Search Ark for Intel CPU info.
 
 ## Invite
@@ -623,13 +633,17 @@ A list of cogs, commands, and descriptions:
 	   └─ Removes comma delimited words from the word list (bot-admin only).
 
 ## Lists
-####	Lists Cog (30 commands) - Lists.py Extension:
+####	Lists Cog (38 commands) - Lists.py Extension:
 	  $addhack [name] [hack]
 	   └─ Add a hack to the hack list.
 	  $addlink [name] [link]
 	   └─ Add a link to the link list.
 	  $addtag [name] [tag]
 	   └─ Add a tag to the tag list.
+	  $clearhacks  (AKA: clrhacks)
+	   └─ Clears all entries from the hack list.
+	  $clearlinks  (AKA: clrtags)
+	   └─ Clears all entries from the tag list.
 	  $hack [name]
 	   └─ Retrieve a hack from the hack list.
 	  $hackinfo [name]
@@ -648,6 +662,12 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the required role to add links.
 	  $links 
 	   └─ List all links in the link list.
+	  $loadhacks [url] (AKA: addhacks)
+	   └─ Loads the passed json attachment or URL into the hack list.
+	  $loadlinks [url] (AKA: addlinks)
+	   └─ Loads the passed json attachment or URL into the link list.
+	  $loadtags [url] (AKA: addtags)
+	   └─ Loads the passed json attachment or URL into the tag list.
 	  $online 
 	   └─ Lists the number of users online.
 	  $parts [member]
@@ -668,12 +688,18 @@ A list of cogs, commands, and descriptions:
 	   └─ Retrieve a tag's raw markdown from the tag list.
 	  $rawtags 
 	   └─ List raw markdown of all tags in the tag list.
-	  $removehack [name]
+	  $removehack [name] (AKA: remhack, deletehack, delhack)
 	   └─ Remove a hack from the hack list.
-	  $removelink [name]
+	  $removelink [name] (AKA: remlink, deletelink, dellink)
 	   └─ Remove a link from the link list.
-	  $removetag [name]
+	  $removetag [name] (AKA: remtag, deletetag, deltag)
 	   └─ Remove a tag from the tag list.
+	  $savehacks 
+	   └─ Saves the hack list to a json file and uploads.
+	  $savelinks 
+	   └─ Saves the link list to a json file and uploads.
+	  $savetags 
+	   └─ Saves the tag list to a json file and uploads.
 	  $setparts [parts]
 	   └─ Set your own parts - can be a url, formatted text, or nothing to clear. DEPRE...
 	  $tag [name]
@@ -723,6 +749,11 @@ A list of cogs, commands, and descriptions:
 	  $ml [word]
 	   └─ Used to choose your words when in the middle of a madlibs.
 
+## Minesweeper
+####	Minesweeper Cog (1 command) - Minesweeper.py Extension:
+	  $minesweeper [grid_size=5] (AKA: ms, minesweep, msweep, msweeper)
+	   └─ Generate and post a new minesweeper game - grid size can range from 3x3 to 9x9
+
 ## Morse
 ####	Morse Cog (3 commands) - Morse.py Extension:
 	  $morse [content]
@@ -733,7 +764,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
 
 ## Music
-####	Music Cog (33 commands) - Music.py Extension:
+####	Music Cog (38 commands) - Music.py Extension:
 	  $autodeleteafter [seconds]
 	   └─ Lists or sets the current delay before auto-deleting music related messages (...
 	  $disableplay [yes_no]
@@ -744,22 +775,30 @@ A list of cogs, commands, and descriptions:
 	   └─ Prints the current equalizer settings.
 	  $join [channel] (AKA: summon)
 	   └─ Joins a passed voice channel, or the author's if none passed.
-	  $leave  (AKA: disconnect)
+	  $lasteq [yes_no]
+	   └─ Gets or sets whether the current EQ settings are preserved between music sess...
+	  $leave  (AKA: disconnect, okbye)
 	   └─ Stops and disconnects the bot from voice.
 	  $loadpl [url]
 	   └─ Loads the passed playlist json data.  Accepts a url - or picks the first atta...
+	  $mvsong [song_index] [target_index] (AKA: movesong, mvtrack, movetrack)
+	   └─ Moves the song at song_index in the queue to the target_index (bot-admin only).
 	  $pause 
 	   └─ Pauses the currently playing song.
 	  $paused [moons]
 	   └─ Lists whether or not the player is paused.  Synonym of the playing command.
-	  $play [url]
-	   └─ Plays from a url (almost anything youtube_dl supports) or resumes a currently...
+	  $play [url] (AKA: p)
+	   └─ Plays from a url (almost anything Lavalink supports) or resumes a currently p...
 	  $playing [moons]
 	   └─ Lists the currently playing song if any.
 	  $playingin 
 	   └─ Shows the number of servers the bot is currently playing music in.
 	  $playlist  (AKA: queue, q)
 	   └─ Lists the queued songs in the playlist.
+	  $radio [url] (AKA: suggest, r, recommend)
+	   └─ Queues up recommendations for the passed search term or YouTube link.
+	  $radiocount [count] (AKA: suggestcount, recommendcount, rcount)
+	   └─ Gets or sets the default number of recommended songs returned from 2 to 25 (b...
 	  $reconnect  (AKA: recon, rec)
 	   └─ Attempts to have the bot save the current playlist to memory, leave the voice...
 	  $repeat [yes_no]
@@ -784,7 +823,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Shuffles the current queue. If you pass a playlist url or search term, it fir...
 	  $shufflepl [url]
 	   └─ Loads and shuffles the passed playlist json data.  Accepts a url - or picks t...
-	  $skip 
+	  $skip [remove]
 	   └─ Adds your vote to skip the current song.  50% or more of the non-bot users ne...
 	  $skips [user] (AKA: skipped)
 	   └─ Lists the number of skips for the currently playing song.
@@ -792,13 +831,15 @@ A list of cogs, commands, and descriptions:
 	   └─ Stops and empties the current playlist.
 	  $stopall 
 	   └─ Stops and disconnects the bot from all voice channels in all servers (owner-o...
-	  $unplay [song_number]
-	   └─ Removes the passed song number from the queue.  You must be the requestor, or...
+	  $swsongs [song1_index] [song2_index] (AKA: swapsongs, swaptracks, swtracks)
+	   └─ Swaps the songs at song1_index and song2_index in the queue.  You must have r...
+	  $unplay [song_number] (AKA: unp)
+	   └─ Removes the passed song number from the queue.  You must be the requester, or...
 	  $unqueue [unqueue_from] (AKA: unq)
 	   └─ Removes all songs you've added from the queue (does not include the currently...
 	  $unskip 
 	   └─ Removes your vote to skip the current song.
-	  $volume [volume]
+	  $volume [volume] (AKA: v, vol)
 	   └─ Changes the player's volume (0-150%).
 
 ## Mute
@@ -982,26 +1023,30 @@ A list of cogs, commands, and descriptions:
 	   └─ Set a reminder.  If the message contains spaces, it must be wrapped in quotes.
 
 ## Responses
-####	Responses Cog (10 commands) - Responses.py Extension:
+####	Responses Cog (12 commands) - Responses.py Extension:
 	  $addresponse [regex_trigger] [response]
 	   └─ Adds a new response for the regex trigger - or updates the response if the tr...
-	  $chkresponse [check_string]
+	  $chkresponse [check_string] (AKA: checkresponse)
 	   └─ Reports a breakdown of the first match (if any) in the responses for the pass...
-	  $clearresponses 
+	  $clearresponses  (AKA: clrresponses)
 	   └─ Removes all response triggers (bot-admin only).
 	  $editresponse [response_index] [response]
 	   └─ Edits the response for the passed index.  The response passed here does not r...
 	  $edittrigger [response_index] [regex_trigger]
 	   └─ Edits the regex trigger for the passed index.  The triggers passed here do no...
-	  $mvresponse [response_index] [target_index]
+	  $loadresponses [url] (AKA: addresponses)
+	   └─ Loads the passed json attachment or URL into the responses dictionary.
+	  $mvresponse [response_index] [target_index] (AKA: moveresponse)
 	   └─ Moves the passed response index to the target index (bot-admin only).
-	  $remresponse [regex_trigger_number]
+	  $remresponse [regex_trigger_number] (AKA: removeresponse, deleteresponse, delresponse)
 	   └─ Removes the passed response trigger (bot-admin only).
-	  $responses 
+	  $responses  (AKA: listresponses)
 	   └─ Lists the response triggers and their responses (bot-admin only).
-	  $viewresponse [response_index]
+	  $saveresponses 
+	   └─ Saves the responses dictionary to a json file and uploads.
+	  $viewresponse [response_index] (AKA: getresponse)
 	   └─ Displays the response in full which corresponds to the target index (bot-admi...
-	  $viewtrigger [response_index]
+	  $viewtrigger [response_index] (AKA: gettrigger)
 	   └─ Displays the regex trigger in full which corresponds to the target index (bot...
 
 ## Search
@@ -1014,12 +1059,12 @@ A list of cogs, commands, and descriptions:
 	   └─ Get some uh... more searching done.
 	  $convert [amount] [frm] [to]
 	   └─ Convert currencies.  If run with no values, the script will print a list of a...
+	  $currlist [search] (AKA: listcurr, lcurr, currl)
+	   └─ List currencies for the convert command.
 	  $duck [query]
 	   └─ Duck Duck... GOOSE.
 	  $google [query]
 	   └─ Get some searching done.
-	  $searchsite [category_name] [query]
-	   └─ Search corpnewt.com forums.
 	  $yahoo [query]
 	   └─ Let Yahoo! answer your questions.
 
@@ -1049,23 +1094,27 @@ A list of cogs, commands, and descriptions:
 	   └─ Prints the current Secret Santa channel create message (bot-admin only).
 
 ## Server
-####	Server Cog (9 commands) - Server.py Extension:
+####	Server Cog (11 commands) - Server.py Extension:
 	  $autopcpp [setting]
 	   └─ Sets the bot's auto-pcpartpicker markdown if found in messages (admin-only). ...
 	  $dumpservers 
 	   └─ Dumps a timpestamped list of servers into the same directory as the bot (owne...
-	  $endpoll [message_url] (AKA: pollend, epoll, endp)
+	  $endpoll [message_url] (AKA: pollend, epoll, endp, endvote, endv)
 	   └─ Ends the poll that resides at the passed message url.  Must be either the ori...
+	  $getjoinrole  (AKA: joinrole)
+	   └─ Gets the role applied to each new user that joins (admin only).
 	  $getprefix 
 	   └─ Output's the server's prefix - custom or otherwise.
 	  $info 
 	   └─ Displays the server info if any.
 	  $leaveserver [targetServer]
 	   └─ Leaves a server - can take a name or id (owner only).
-	  $poll [poll_options]
+	  $poll [poll_options] (AKA: vote)
 	   └─ Starts a poll - which can take a custom prompt/question, as well as one or up...
 	  $setinfo [word]
 	   └─ Sets the server info (bot-admin only).
+	  $setjoinrole [role]
+	   └─ Sets the role to apply to each new user that joins (admin only).
 	  $setprefix [prefix]
 	   └─ Sets the bot's prefix (bot-admin only).
 
@@ -1103,7 +1152,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the total number of users on all servers I'm connected to.
 
 ## Settings
-####	Settings Cog (13 commands) - Settings.py Extension:
+####	Settings Cog (14 commands) - Settings.py Extension:
 	  $addowner [member]
 	   └─ Adds an owner to the owner list.  Can only be done by a current owner.
 	  $claim 
@@ -1130,6 +1179,13 @@ A list of cogs, commands, and descriptions:
 	   └─ Removes an owner from the owner list.  Can only be done by a current owner.
 	  $setsstat [stat] [value]
 	   └─ Sets a server stat (admin only).
+	  $verifydefaultroles  (AKA: recheckdefaultroles)
+	   └─ Forces a recheck of all members to ensure they have the default role applied ...
+
+## SettingsDict
+####	SettingsDict Cog (1 command) - SettingsDict.py Extension:
+	  $sdict [command] [key] [args]
+	   └─ Allows the bot's owners to interface with the settings_dict.json.
 
 ## Setup
 ####	Setup Cog (1 command) - Setup.py Extension:
@@ -1252,8 +1308,8 @@ A list of cogs, commands, and descriptions:
 ####	Translate Cog (4 commands) - Translate.py Extension:
 	  $detectlang <text>
 	   └─ Reports the detected language and certainty of the passed text.
-	  $langlist 
-	   └─ Lists available languages.
+	  $langlist [search] (AKA: listlang, llist, listl)
+	   └─ Lists available languages - can optionally take a search term and will list t...
 	  $pronounce [text] (AKA: pr)
 	   └─ Pronunciation for a sentence in the English language.
 	  $translate [translate] (AKA: tr)
