@@ -1,6 +1,6 @@
 import discord, time
 from   discord.ext import commands
-from   Cogs import Settings, Message, UserTime, DL
+from   Cogs import Settings, Message, UserTime, DL, FuzzySearch
 
 def setup(bot):
     # Do some simple setup
@@ -48,7 +48,7 @@ class GameLookup(commands.Cog):
                 return await ctx.send("I couldn't update my access token :(  Make sure the `igdbclientid` and `igdbsecret` are correct in my settings_dict.json!")
         # Let's build our search query
         search_url = "https://api.igdb.com/v4/games"
-        data = 'search "{}"; fields name,url,summary,first_release_date,platforms.*,cover.*; limit 1;'.format(game_name.replace('"',"").replace("\\",""))
+        data = 'search "{}"; fields name,url,summary,first_release_date,platforms.*,cover.*; limit 10;'.format(game_name.replace('"',"").replace("\\",""))
         headers = {"Client-ID":self.clientid,"Authorization":"Bearer {}".format(self.access_token)}
         try:
             search_data = await DL.async_post_json(search_url,data=data,headers=headers)
@@ -70,7 +70,8 @@ class GameLookup(commands.Cog):
                 description="{}: {}".format(search_data[0]["title"],search_data[0]["cause"]),
                 color=ctx.author
             ).send(ctx)
-        game = search_data[0]
+        # Organize the search data by the closest match
+        game = FuzzySearch.search(game_name,search_data,"name",1)[0]["Item"]
         # Print the results!
         await Message.Embed(
             title=game["name"],
