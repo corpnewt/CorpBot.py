@@ -1,220 +1,85 @@
-import asyncio, discord, time, parsedatetime, os, json
-from   datetime import datetime
-from   operator import itemgetter
+import discord, time
 from   discord.ext import commands
-from   Cogs import Settings, Message, UserTime
-
-try:
-    from igdb_api_python.igdb import igdb
-    LOADED = True
-except:
-    # Missing the api
-    LOADED = False
-
-Platform_Lookup ={3:'Linux',
-        4:'Nintendo 64',
-        5:'Wii',
-        6:'PC (Microsoft Windows)',
-        7:'PlayStation',
-        8:'PlayStation 2',
-        9:'PlayStation 3',
-        11:'Xbox',
-        12:'Xbox 360',
-        13:'PC DOS',
-        14:'Mac',
-        15:'Commodore C64/128',
-        16:'Amiga',
-        18:'Nintendo Entertainment System (NES)',
-        19:'Super Nintendo (SNES)',
-        20:'Nintendo DS',
-        21:'Nintendo GameCube',
-        22:'Game Boy Color',
-        23:'Dreamcast',
-        24:'Game Boy Advance',
-        25:'Amstrad CPC',
-        26:'ZX Spectrum',
-        27:'MSX',
-        29:'Sega Mega Drive/Genesis',
-        30:'Sega 32X',
-        32:'Sega Saturn',
-        33:'Game Boy',
-        34:'Android',
-        35:'Sega Game Gear',
-        36:'Xbox Live Arcade',
-        37:'Nintendo 3DS',
-        38:'PlayStation Portable',
-        39:'iOS',
-        41:'Wii U',
-        42:'N-Gage',
-        44:'Tapwave Zodiac',
-        45:'PlayStation Network',
-        46:'PlayStation Vita',
-        47:'Virtual Console (Nintendo)',
-        48:'PlayStation 4',
-        49:'Xbox One',
-        50:'3DO Interactive Multiplayer',
-        51:'Family Computer Disk System',
-        52:'Arcade',
-        53:'MSX2',
-        55:'Mobile',
-        56:'WiiWare',
-        57:'WonderSwan',
-        58:'Super Famicom',
-        59:'Atari 2600',
-        60:'Atari 7800',
-        61:'Atari Lynx',
-        62:'Atari Jaguar',
-        63:'Atari ST/STE',
-        64:'Sega Master System',
-        65:'Atari 8-bit',
-        66:'Atari 5200',
-        67:'Intellivision',
-        68:'ColecoVision',
-        68:'ColecoVision',
-        70:'Vectrex',
-        71:'Commodore VIC-20',
-        72:'Ouya',
-        73:'BlaclkBerry OS',
-        74:'Windows Phone',
-        75:'Apple II',
-        77:'Sharp X1',
-        78:'Sega CD',
-        79:'Neo Geo MVS',
-        80:'Neo Geo AES',
-        82:'Web browser',
-        84:'SG-1000',
-        85:'Donner Model 30',
-        86:'TurboGrafx-16/PC Engine',
-        87:'Virtual Boy',
-        88:'Odyssey',
-        89:'Microvision',
-        90:'Commodore PET',
-        91:'Bally Astrocade',
-        92:'SteamOS',
-        93:'Commodore 16',
-        94:'Commodore Plus/4',
-        95:'PDP-1',
-        96:'PDP-10',
-        97:'PDP-8',
-        98:'DEC GT40',
-        99:'Family Computer (FAMICOM)',
-        100:'Analogue electronics',
-        101:'Ferranti Nimrod Computer',
-        102:'EDSAC',
-        103:'PDP-7',
-        104:'HP 2100',
-        105:'HP 3000',
-        106:'SDS Sigma 7',
-        107:'Call-A-Computer time-shared mainframe computer system',
-        108:'PDP-11',
-        109:'CDC Cyber 70',
-        110:'PLATO',
-        111:'Imlac PDS-1',
-        112:'Microcomputer',
-        113:'OnLive Game System',
-        114:'Amiga CD32',
-        115:'Apple IIGS',
-        116:'Acorn Archimedes',
-        117:'Philips CD-i',
-        118:'FM Towns',
-        119:'Neo Geo Pocket',
-        120:'Neo Geo Pocket Color',
-        121:'Sharp X68000',
-        122:'Nuon',
-        123:'WonderSwan Color',
-        124:'SwanCrystal',
-        125:'PC-8801',
-        126:'TRS-80',
-        127:'Fairchild Channel F',
-        128:'PC Engine SuperGrafx',
-        129:'Texas Instruments TI-99',
-        130:'Nintendo Switch',
-        131:'Nintendo PlayStation',
-        132:'Amazon Fire TV',
-        133:'Philips Videopac G7000',
-        134:'Acorn Electron',
-        135:'Hyper Neo Geo 64',
-        136:'Neo Geo CD',
-        137:'New Nintendo 3DS',
-        138:'VC 4000',
-        139:'1292 Advanced Programmable Video System',
-        140:'AY-3-8500',
-        141:'AY-3-8610',
-        142:'PC-50X Family',
-        143:'AY-3-8760',
-        144:'AY-3-8710',
-        145:'AY-3-8603',
-        146:'AY-3-8605',
-        147:'AY-3-8606',
-        148:'AY-3-8607',
-        149:'PC-98',
-        150:'Turbografx-16/PC Engine CD',
-        151:'TRS-80 Color Computer',
-        152:'FM-7',
-        153:'Dragon 32/64',
-        154:'Amstrad PCW',
-        155:'Tatung Einstein',
-        156:'Thomson MO5',
-        157:'NEC PC-6000 Series',
-        158:'Commodore CDTV',
-        159:'Nintendo DSi',
-        160:'Nintendo eShop',
-        161:'Windows Mixed Reality',
-        162:'Oculus VR',
-        163:'SteamVR',
-        164:'Daydream',
-        164:'Daydream',
-        165:'PlayStation VR'}
+from   Cogs import Settings, Message, UserTime, DL
 
 def setup(bot):
-    if not LOADED:
-        print("Missing IGDB API - skipping")
-        return
     # Do some simple setup
-    if not bot.settings_dict.get("igdbkey",None):
-        print("Missing idgbkey - skipping.")
+    if not bot.settings_dict.get("igdbclientid",None) or not bot.settings_dict.get("igdbsecret",None):
+        print("Missing igdbclientid or igdbsecret - skipping.")
         return
-    key = bot.settings_dict["igdbkey"]
     # Add the bot and deps
     settings = bot.get_cog("Settings")
-    bot.add_cog(GameLookup(bot, settings, key))
+    bot.add_cog(GameLookup(bot, settings, bot.settings_dict["igdbclientid"], bot.settings_dict["igdbsecret"]))
 
 class GameLookup(commands.Cog):
-    def __init__(self, bot, settings, key):
+    def __init__(self, bot, settings, clientid, secret):
         self.bot = bot
         self.settings = settings
-        self.key = key
+        self.clientid = clientid
+        self.secret = secret
+        self.access_token = None
+        self.expire_time = 0
 
-    @commands.command()
-    async def gamelookup(self, ctx, *,game: str):
-        igdb1 = igdb(self.key)
-        result = igdb1.games({
-            'search': "{}".format(game),
-            'fields': ['name','game',
-                'first_release_date','summary',
-                'cover','platforms','url']
-            })
-        result = result.body
-        GameInfo=result[0]
-        cover = GameInfo['cover']
-        platformconvert = GameInfo['platforms']
-        gameurl = GameInfo['url']
-        platformconvert.sort()
-        plat = "\n".join([Platform_Lookup[x] for x in platformconvert])
-        gt_dict = UserTime.getUserTime(
-                        ctx.author,
-                        self.settings,
-                        datetime.fromtimestamp(time.mktime(time.localtime(GameInfo["first_release_date"]/1000.)))
-                    )
-        game_time = "{} {}".format(gt_dict['time'], gt_dict['zone'])
+    async def _update_token(self):
+        # First reset our values
+        self.access_token = None
+        self.expire_time  = 0
+        # Attempt to update the access token
+        if not self.clientid or not self.secret:
+            return False # Missing info - bail
+        # Build our URL
+        access_url = "https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}&grant_type=client_credentials".format(self.clientid,self.secret)
+        try: output = await DL.async_post_json(access_url)
+        except: output = None
+        if not output:
+            return False # Something went wrong - bail
+        # Get the token and expiration - set them and return success
+        self.access_token = output.get("access_token")
+        self.expire_time  = int(output.get("expires_in",0) + time.time())
+        return True
+
+    @commands.command(aliases=["glu","glup","gamel","gamelu","glookup"])
+    async def gamelookup(self, ctx, *, game_name = None):
+        """Leverage IGDB's API to search for game information."""
+
+        if not game_name: return await ctx.send("Usage: `{}gamelookup [game_name]`".format(ctx.prefix))
+        if not self.access_token or time.time() >= self.expire_time:
+            if not await self._update_token():
+                return await ctx.send("I couldn't update my access token :(  Make sure the `igdbclientid` and `igdbsecret` are correct in my settings_dict.json!")
+        # Let's build our search query
+        search_url = "https://api.igdb.com/v4/games"
+        data = 'search "{}"; fields name,url,summary,first_release_date,platforms.*,cover.*; limit 1;'.format(game_name.replace('"',"").replace("\\",""))
+        headers = {"Client-ID":self.clientid,"Authorization":"Bearer {}".format(self.access_token)}
+        try:
+            search_data = await DL.async_post_json(search_url,data=data,headers=headers)
+        except:
+            return await Message.Embed(
+                title="Something went wrong searching for that game :(",
+                color=ctx.author
+            ).send(ctx)
+        if not search_data:
+            # Nothing was returned - bail.
+            return await Message.Embed(
+                title="Nothing was returned for that search!",
+                color=ctx.author
+            ).send(ctx)
+        if len(search_data)==1 and all((x in search_data[0] for x in ("title","status","cause"))):
+            # Got an error - print it and bail
+            return await Message.Embed(
+                title="Something went wrong searching :(",
+                description="{}: {}".format(search_data[0]["title"],search_data[0]["cause"]),
+                color=ctx.author
+            ).send(ctx)
+        game = search_data[0]
+        # Print the results!
         await Message.Embed(
-            title=GameInfo["name"],
-            thumbnail="http:{}".format(cover["url"]),
-            url=gameurl,
+            title=game["name"],
+            thumbnail="http:{}".format(game["cover"]["url"].replace("/t_thumb/","/t_cover_big/")),
+            url=game["url"],
             color=ctx.author,
+            description=game["summary"],
             fields=[
-                {"name":"Summary", "value":GameInfo['summary'] if len(GameInfo['summary']) <= 1024 else GameInfo['summary'][:1021]+'...'},
-                {"name":"Release Date", "value":game_time},
-                {"name":"Platforms", "value":plat}
+                {"name":"Release Date", "value": "<t:{}:D>".format(game["first_release_date"])},
+                {"name":"Platforms", "value":"\n".join(sorted([x["name"] for x in game["platforms"]]))}
             ]
         ).send(ctx)
