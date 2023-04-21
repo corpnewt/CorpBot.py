@@ -988,7 +988,7 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=["unp"])
 	async def unplay(self, ctx, *, song_number = None):
-		"""Removes the passed song number from the queue.  You must be the requestor, or an admin to remove it.  Does not include the currently playing song."""
+		"""Removes the passed song number from the queue.  You must be the requester, or an admin to remove it.  Does not include the currently playing song."""
 		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
@@ -1450,7 +1450,7 @@ class Music(commands.Cog):
 			to_skip = True
 		elif hasattr(player,"track_ctx") and player.track_ctx.author == ctx.author:
 			await Message.Embed(
-				title="♫ Requestor chose to skip - skipping{}!".format(" and removing" if to_remove else ""),
+				title="♫ Requester chose to skip - skipping{}!".format(" and removing" if to_remove else ""),
 				color=ctx.author,
 				delete_after=delay
 			).send(ctx)
