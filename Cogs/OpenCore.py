@@ -7,13 +7,13 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(OpenCore(bot, settings))
 
-
 class OpenCore(commands.Cog):
 
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
 		self.tex = None
+		self.tex_version = "?.?.?"
 		self.is_current = False # Used for stopping loops
 		self.wait_time = 21600 # Default of 6 hours (21600 seconds)
 		global Utils
@@ -58,6 +58,9 @@ class OpenCore(commands.Cog):
 			with open("Configuration.tex","r") as f:
 				self.tex = f.read()
 		except: return False
+		# Retain the version
+		try: self.tex_version = self.tex.split("Reference Manual (")[1].split(")")[0]
+		except: self.tex_version = "?.?.?"
 		return True
 
 	async def _dl_tex(self):
@@ -66,6 +69,9 @@ class OpenCore(commands.Cog):
 		# Save to a local file
 		with open("Configuration.tex","w") as f:
 			f.write(self.tex)
+		# Retain the version
+		try: self.tex_version = self.tex.split("Reference Manual (")[1].split(")")[0]
+		except: self.tex_version = "?.?.?"
 		return True
 
 	@commands.command(aliases=["updatetex"])
@@ -99,12 +105,13 @@ class OpenCore(commands.Cog):
 
 		search_results = self.tex_search(self.tex, search_parts)
 		if not search_results: return await ctx.send("Nothing was found for that search :(  Remember that all keys are case-sensitive.")
-		
+
 		# We got something to show - let's build a page-picker
 		return await PickList.PagePicker(
-			title=" -> ".join(search_parts) + " Search Results",
+			title="Results For: "+" -> ".join(search_parts),
 			description=search_results,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
+			footer="From Configuration.tex for OpenCore v{}".format(self.tex_version),
 			ctx=ctx
 		).pick()
 
@@ -136,7 +143,8 @@ class OpenCore(commands.Cog):
 				"mono": ("`","`"),
 				"underline": ("__","__"),
 				"reverse": ("",""),
-				"url": ("","")
+				"url": ("",""),
+				"italic": ("*","*")
 			}
 			header,footer = style_parser.get(style,("",""))
 			return header+output+footer
@@ -199,6 +207,10 @@ class OpenCore(commands.Cog):
 			out += c
 		if out:
 			fixed_string +=  dump_out(out, style)
+		# Strip more than one backtick in a row, or orphaned
+		# back ticks surrounded by newlines
+		fixed_string = re.sub("`{2,}","`",fixed_string)
+		fixed_string = re.sub("\\n`\\n","",fixed_string)
 		# Return the built string
 		return fixed_string
 
@@ -318,8 +330,6 @@ class OpenCore(commands.Cog):
 			if "\\begin{lstlisting}" in line:
 				in_listing = True
 				result.append("\n\x1b[11m")
-				result.append("-"*width)
-				result.append("\n")
 				continue
 			if "\\begin{" in line: # ignore other begins
 				continue
@@ -341,7 +351,6 @@ class OpenCore(commands.Cog):
 				continue
 			if "\\end{lstlisting}" in line:
 				in_listing = False
-				result.append("-"*width)
 				result.append("\x1b[10m\n")
 				continue
 			if "\\end{" in line: # ignore other ends
