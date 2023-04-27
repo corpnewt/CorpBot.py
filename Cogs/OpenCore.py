@@ -1,4 +1,4 @@
-import discord, asyncio, re, io, os
+import discord, asyncio, re, io, os, datetime
 from   discord.ext import commands
 from   Cogs import Settings, DL, PickList
 
@@ -14,20 +14,42 @@ class OpenCore(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.tex = None
+		self.is_current = False # Used for stopping loops
+		self.wait_time = 21600 # Default of 6 hours (21600 seconds)
 		global Utils
 		Utils = self.bot.get_cog("Utils")
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		self.is_current = False
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		self.is_current = True
 		self.bot.loop.create_task(self.update_tex())
 
 	async def update_tex(self):
-		print("Starting Configuration.tex update loop...")
+		print("Starting Configuration.tex update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
+			if not self.is_current:
+				# Bail if we're not the current instance
+				return
+			print("Updating Configuration.tex: {}".format(datetime.datetime.now().time().isoformat()))
 			if not await self._dl_tex():
 				print("Could not download Configuration.tex!")
 				if self._load_local():
 					print(" - Falling back on local copy!")
-			# Wait for 6 hours before trying again (60*60*6)
-			await asyncio.sleep(21600)
+			await asyncio.sleep(self.wait_time)
 
 	def _load_local(self):
 		if not os.path.exists("Configuration.tex"): return False
