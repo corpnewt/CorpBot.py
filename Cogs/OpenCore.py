@@ -105,6 +105,7 @@ class OpenCore(commands.Cog):
 		out = ""
 		
 		def dump_out(output,style):
+			if not output: return output
 			# Helper to bridge styles to markdown
 			style_parser = {
 				"bold": ("**","**"),
