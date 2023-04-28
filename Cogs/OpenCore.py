@@ -1,4 +1,4 @@
-import discord, asyncio, re, io, os, datetime
+import discord, asyncio, re, io, os, datetime, plistlib
 from   discord.ext import commands
 from   Cogs import Settings, DL, PickList
 
@@ -12,6 +12,8 @@ class OpenCore(commands.Cog):
 	def __init__(self, bot, settings):
 		self.bot = bot
 		self.settings = settings
+		self.sample = None
+		self.sample_paths = []
 		self.tex = None
 		self.tex_version = "?.?.?"
 		self.is_current = False # Used for stopping loops
@@ -38,16 +40,20 @@ class OpenCore(commands.Cog):
 		self.bot.loop.create_task(self.update_tex())
 
 	async def update_tex(self):
-		print("Starting Configuration.tex update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
+		print("Starting Configuration.tex|Sample.plist update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed():
 			if not self.is_current:
 				# Bail if we're not the current instance
 				return
-			print("Updating Configuration.tex: {}".format(datetime.datetime.now().time().isoformat()))
+			print("Updating Configuration.tex|Sample.plist: {}".format(datetime.datetime.now().time().isoformat()))
 			if not await self._dl_tex():
 				print("Could not download Configuration.tex!")
 				if self._load_local():
+					print(" - Falling back on local copy!")
+			if not await self._dl_sample():
+				print("Could not download Sample.plist!")
+				if self._load_local_sample():
 					print(" - Falling back on local copy!")
 			await asyncio.sleep(self.wait_time)
 
@@ -63,6 +69,17 @@ class OpenCore(commands.Cog):
 		except: self.tex_version = "?.?.?"
 		return True
 
+	def _load_local_sample(self):
+		if not os.path.exists("Sample.plist"): return False
+		# Try to load it
+		try:
+			with open("Sample.plist","rb") as f:
+				self.sample = plistlib.load(f)
+			# Gather all paths
+			self.sample_paths = self._parse_sample()
+		except: return False
+		return True
+
 	async def _dl_tex(self):
 		try: self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
 		except: return False
@@ -74,25 +91,54 @@ class OpenCore(commands.Cog):
 		except: self.tex_version = "?.?.?"
 		return True
 
+	async def _dl_sample(self):
+		try: self.sample = plistlib.loads(await DL.async_dl("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Sample.plist"))
+		except: return False
+		# Save to a local file
+		plistlib.dump(self.sample,open("Sample.plist","wb"))
+		# Gather all paths
+		self.sample_paths = self._parse_sample()
+		return True
+
+	def _parse_sample(self):
+		# Helper function to get a list of all paths within the Sample.plist
+		if not self.sample: return [] # Nothing to parse
+		paths = self._sample_walk(self.sample,[])
+		# Let's condense them all to strings separated by /
+		string_paths = ["/".join(x) for x in paths]
+		lower_paths  = [x.lower() for x in string_paths]
+		return (string_paths,lower_paths,paths)
+
+	def _sample_walk(self,current_dict,parent_path):
+		paths = []
+		for key in current_dict:
+			key_path = parent_path+[key]
+			paths.append(key_path)
+			if isinstance(current_dict[key],dict):
+				paths.extend(self._sample_walk(current_dict[key],key_path))
+			elif isinstance(current_dict[key],list) and len(current_dict[key]) and isinstance(current_dict[key][0],dict):
+				paths.extend(self._sample_walk(current_dict[key][0],key_path))
+		return paths
+
 	@commands.command(aliases=["updatetex"])
 	async def gettex(self, ctx):
 		"""Forces an update of the in-memory Configuration.tex file (owner only)."""
 
 		if not await Utils.is_owner_reply(ctx): return
-		message = await ctx.send("Downloading Configuration.tex...")
-		if await self._dl_tex():
-			return await message.edit(content="Successfully updated Configuration.tex in memory.")
-		return await message.edit(content="Failed to update Configuration.tex{}!".format(
-			" - falling back on local copy" if self._load_local() else ""
-		))
+		message = await ctx.send("Downloading Configuration.tex and Sample.plist...")
+		tex_text = "Successfully updated Configuration.tex"
+		sample_text = "Successfully updated Sample.plist"
+		if not await self._dl_tex():
+			tex_text = "Failed to update Configuration.tex{}!".format(" - falling back on local copy" if self._load_local() else "")
+		if not await self._dl_sample():
+			sample_text = "Failed to update Sample.plist{}!".format(" - falling back on local copy" if self._load_local_sample() else "")
+		await message.edit(content="{}\n{}".format(tex_text,sample_text))
 
-	@commands.command(aliases=["occonfig","configtex","ocsearch","configsearch","seachtex","tex"])
+	@commands.command(aliases=["occonfig","configtex","ocsearch","configsearch","seachtex","tex","occ"])
 	async def octex(self, ctx, *, search_path = None):
-		"""Searches the Configuration.tex file in memory for the passed path.  Must include the full path separated by spaces.
+		"""Searches the Configuration.tex file in memory for the passed path.  Must include the full path separated by spaces, /, >, or -.
 
-		eg.  $occ Kernel Quirks DisableIoMapper
-		
-		All keys are case-sensitive."""
+		eg.  $octex Kernel Quirks DisableIoMapper"""
 
 		usage = "Usage: `{}occ [search_path]`".format(ctx.prefix)
 		if not self.tex: return await ctx.send("It looks like I was unable to get the Configuration.tex :(")
@@ -103,17 +149,35 @@ class OpenCore(commands.Cog):
 		search_parts = search_path.split()
 		if not search_parts: return await ctx.send(usage)
 
-		search_results = self.tex_search(self.tex, search_parts)
-		if not search_results: return await ctx.send("Nothing was found for that search :(  Remember that all keys are case-sensitive.")
+		# Search for matches in our Sample
+		matches = self.search_sample(search_parts)
+		if not matches: return await ctx.send("Nothing was found for that search :(")
+		# Just use the first match for now - maybe expand it to fuzzy match later
+		matches = matches[0]
+		search_results = self.tex_search(self.tex, matches)
+		if not search_results: return await ctx.send("Nothing was found for that search :(")
 
 		# We got something to show - let's build a page-picker
 		return await PickList.PagePicker(
-			title="Results For: "+" -> ".join(search_parts),
+			title="Results For: "+" -> ".join(matches),
 			description=search_results,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			footer="From Configuration.tex for OpenCore v{}".format(self.tex_version),
 			ctx=ctx
 		).pick()
+
+	### Search method for the Sample.plist pathing ###
+
+	def search_sample(self, search_list):
+		if not self.sample_paths: return [] # Nothing to search, bail
+		search_string = "/".join(search_list).lower()
+		matches = []
+		# Try searching for any elements that end without search string
+		for i,x in enumerate(self.sample_paths[1]):
+			if x == search_string: return [self.sample_paths[-1][i]]
+			if x.endswith(search_string):
+				matches.append(self.sample_paths[-1][i])
+		return matches
 
 	### Helper methods adjusted from rusty_bits' config_tex_info.py from ProperTree's repo to search the Configuration.tex ###
 
