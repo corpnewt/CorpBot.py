@@ -187,7 +187,7 @@ class OpenCore(commands.Cog):
 		if not self.sample_paths: return [] # Nothing to search, bail
 		search_string = "/".join(search_list).lower()
 		matches = []
-		# Try searching for any elements that end without search string
+		# Try searching for any elements that equal, or end with our search string
 		for i,x in enumerate(self.sample_paths[1]):
 			if x == search_string: return [self.sample_paths[-1][i]]
 			if x.endswith(search_string):
