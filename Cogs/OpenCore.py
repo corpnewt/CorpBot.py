@@ -151,9 +151,23 @@ class OpenCore(commands.Cog):
 
 		# Search for matches in our Sample
 		matches = self.search_sample(search_parts)
-		if not matches: return await ctx.send("Nothing was found for that search :(")
-		# Just use the first match for now - maybe expand it to fuzzy match later
-		matches = matches[0]
+		message = None
+		if matches:
+			if len(matches)>1: # Multiple matches - show a list
+				index, message = await PickList.Picker(
+					title="There were multiple results for that search, please pick from the following list:",
+					list=[" -> ".join(x) for x in matches[:5]],
+					ctx=ctx
+				).pick()
+				if index < 0:
+					return await message.edit(content="Search cancelled.")
+				matches = matches[index]
+			else:
+				matches = matches[0]
+		else:
+			# Fall back on the original search in case we don't have a Sample.plist,
+			# or there's a version mismatch - or similar.
+			matches = search_parts
 		search_results = self.tex_search(self.tex, matches)
 		if not search_results: return await ctx.send("Nothing was found for that search :(")
 
@@ -163,7 +177,8 @@ class OpenCore(commands.Cog):
 			description=search_results,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			footer="From Configuration.tex for OpenCore v{}".format(self.tex_version),
-			ctx=ctx
+			ctx=ctx,
+			message=message
 		).pick()
 
 	### Search method for the Sample.plist pathing ###
