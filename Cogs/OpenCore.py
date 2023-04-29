@@ -108,6 +108,7 @@ class OpenCore(commands.Cog):
 	def _sample_walk(self,current_dict,parent_path):
 		paths = []
 		for key in current_dict:
+			if " " in key or key.startswith("#"): continue # Skip comments
 			key_path = parent_path+[key]
 			paths.append(key_path)
 			if isinstance(current_dict[key],dict):
