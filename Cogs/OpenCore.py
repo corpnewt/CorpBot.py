@@ -154,10 +154,12 @@ class OpenCore(commands.Cog):
 		message = None
 		if matches:
 			fuzzy,matches = matches # Expand the vars
-			if len(matches)>1: # Multiple matches - show a list
+			if len(matches)>1 or fuzzy: # Multiple matches - show a list
 				if fuzzy:
 					limit = 3
-					title = "There were no exact matches for that search, perhaps you meant one of the following:"
+					title = "There were no exact matches for that search, perhaps you meant {}the following:".format(
+						"one of " if len(matches)>1 else ""
+					)
 				else:
 					limit = 5
 					leftover = len(matches)-5 if len(matches)>5 else 0
@@ -197,34 +199,27 @@ class OpenCore(commands.Cog):
 		if not self.sample_paths: return None # Nothing to search, bail
 		search_lower  = [x.lower() for x in search_list]
 		search_string = "/".join(search_list).lower()
-		matches = []
 		fuzzy = False
 		ratio_min = 0.65
-		# Try searching for any elements that equal, or end with our search string
-		for i,x in enumerate(self.sample_paths[1]):
-			if x == search_string: return (fuzzy,[self.sample_paths[-1][i]])
-			if self.sample_paths[1][i].split("/")[-len(search_list):] == search_lower:
-				matches.append(self.sample_paths[-1][i])
-		if not matches:
-			fuzzy = True
-			# Let's try to build a list of close matches based on sequence matching the latter elements
-			# of the parts lists
-			match_list = []
-			for i,path in enumerate(self.sample_paths[-1]):
-				if len(path)<len(search_list): continue # Not going to match, our search is longer
-				# Get a fuzzy match ratio for each component counting back from the end
-				check_ratios = [
-					difflib.SequenceMatcher(None,search_lower[j],x.lower()).quick_ratio() for j,x in enumerate(path[-len(search_lower):])
-				]
-				if any((x < ratio_min for x in check_ratios)): continue # Skip any individually low ratios
-				# Get the average of all of those matches
-				avg_ratio = sum(check_ratios)/len(check_ratios)
-				if avg_ratio < ratio_min: continue # Not close enough
-				match_list.append((i,avg_ratio))
-			if not match_list: return None # No match was close
-			match_list = sorted(match_list,key=lambda x:x[1],reverse=True)
-			matches = [self.sample_paths[-1][x[0]] for x in match_list]
-		return (fuzzy,matches)
+		# Let's try to build a list of close matches based on sequence matching the latter elements
+		# of the parts lists
+		match_list = []
+		for i,path in enumerate(self.sample_paths[-1]):
+			if len(path)<len(search_list): continue # Not going to match, our search is longer
+			# Get a fuzzy match ratio for each component counting back from the end
+			check_ratios = [
+				difflib.SequenceMatcher(None,search_lower[j],x.lower()).quick_ratio() for j,x in enumerate(path[-len(search_lower):])
+			]
+			# Make sure we have a worthwhile ratio
+			if any((x < ratio_min for x in check_ratios)): continue # Skip any individually low ratios
+			# Get the average of all of those matches
+			avg_ratio = sum(check_ratios)/len(check_ratios)
+			if avg_ratio < ratio_min: continue # Not close enough
+			match_list.append((i,avg_ratio))
+		if not match_list: return None # No match was close
+		match_list = sorted(match_list,key=lambda x:x[1],reverse=True)
+		exact_list = [x for x in match_list if x[1] == 1]
+		return (not exact_list,[self.sample_paths[-1][x[0]] for x in exact_list or match_list])
 
 	### Helper methods adjusted from rusty_bits' config_tex_info.py from ProperTree's repo to search the Configuration.tex ###
 
