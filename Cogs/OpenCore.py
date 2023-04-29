@@ -103,11 +103,7 @@ class OpenCore(commands.Cog):
 	def _parse_sample(self):
 		# Helper function to get a list of all paths within the Sample.plist
 		if not self.sample: return [] # Nothing to parse
-		paths = self._sample_walk(self.sample,[])
-		# Let's condense them all to strings separated by /
-		string_paths = ["/".join(x) for x in paths]
-		lower_paths  = [x.lower() for x in string_paths]
-		return (string_paths,lower_paths,paths)
+		return self._sample_walk(self.sample,[])
 
 	def _sample_walk(self,current_dict,parent_path):
 		paths = []
@@ -197,18 +193,15 @@ class OpenCore(commands.Cog):
 
 	def search_sample(self, search_list):
 		if not self.sample_paths: return None # Nothing to search, bail
-		search_lower  = [x.lower() for x in search_list]
-		search_string = "/".join(search_list).lower()
-		fuzzy = False
 		ratio_min = 0.65
 		# Let's try to build a list of close matches based on sequence matching the latter elements
 		# of the parts lists
 		match_list = []
-		for i,path in enumerate(self.sample_paths[-1]):
+		for i,path in enumerate(self.sample_paths):
 			if len(path)<len(search_list): continue # Not going to match, our search is longer
 			# Get a fuzzy match ratio for each component counting back from the end
 			check_ratios = [
-				difflib.SequenceMatcher(None,search_lower[j],x.lower()).quick_ratio() for j,x in enumerate(path[-len(search_lower):])
+				difflib.SequenceMatcher(None,search_list[j].lower(),x.lower()).quick_ratio() for j,x in enumerate(path[-len(search_list):])
 			]
 			# Make sure we have a worthwhile ratio
 			if any((x < ratio_min for x in check_ratios)): continue # Skip any individually low ratios
@@ -219,7 +212,7 @@ class OpenCore(commands.Cog):
 		if not match_list: return None # No match was close
 		match_list = sorted(match_list,key=lambda x:x[1],reverse=True)
 		exact_list = [x for x in match_list if x[1] == 1]
-		return (not exact_list,[self.sample_paths[-1][x[0]] for x in exact_list or match_list])
+		return (not exact_list,[self.sample_paths[x[0]] for x in exact_list or match_list])
 
 	### Helper methods adjusted from rusty_bits' config_tex_info.py from ProperTree's repo to search the Configuration.tex ###
 
