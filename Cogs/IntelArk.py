@@ -27,7 +27,8 @@ class IntelArk(commands.Cog):
 			'ProcessorGraphicsModelId': 'iGPU',
 			'GraphicsDeviceId': 'iGPU Device ID',
 			'InstructionSet': 'Instruction Set',
-			'InstructionSetExtensions': 'Extensions'
+			'InstructionSetExtensions': 'Extensions',
+			'BornOnDate': 'Launch Date'
 		}
 		self.optional_fields = [
 			'PerfCoreCount',
@@ -37,7 +38,8 @@ class IntelArk(commands.Cog):
 			'MaxTDP',
 			'MaxMem',
 			'GraphicsDeviceId',
-			'InstructionSetExtensions'
+			'InstructionSetExtensions',
+			'BornOnDate'
 		]
 		self.match_threshold = 0.5 # Lower match limit before showing only those that matched
 
