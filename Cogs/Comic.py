@@ -257,6 +257,9 @@ class Comic(commands.Cog):
 			description="Feeling around in the dark trying to find a {} comic...".format(self.comic_data[comic]["name"]),
 			color=ctx.author
 		).send(ctx)
+		if date and isinstance(date,str):
+			date = date.replace("/","-").replace(".","-").replace(" ","-").replace(" ","-")
+			date= "-".join([x.rjust(2,"0") for x in date.split("-") if x][:3])
 		if random:
 			desc = "a random {} comic".format(self.comic_data[comic]["name"])
 			try: comic_out = await self._get_random_comic(self.comic_data[comic])
@@ -265,7 +268,6 @@ class Comic(commands.Cog):
 			desc = "{} comic {}".format(self.comic_data[comic]["name"],date if isinstance(date,int) else "for today" if date==None else "for "+date)
 			try: comic_out = await self._get_comic(self.comic_data[comic],date)
 			except Exception as e:
-				print(e)
 				comic_out = None
 		if not comic_out:
 			return await Message.EmbedText(
@@ -277,7 +279,7 @@ class Comic(commands.Cog):
 		return await Message.EmbedText(**comic_out).edit(ctx,message)
 
 	@commands.command()
-	async def calvin(self, ctx, date=None):
+	async def calvin(self, ctx, *, date=None):
 		"""Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) from 11-18-1985 to today if found."""
 		await self._display_comic(ctx, "calvin", date=date)
 
@@ -288,7 +290,7 @@ class Comic(commands.Cog):
 
 	# Commented out as 
 	'''@commands.command()
-	async def cyanide(self, ctx, date=None):
+	async def cyanide(self, ctx, *, date=None):
 		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
 		try: date = int(date)
 		except: pass
@@ -300,7 +302,7 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "cyanide", random=True)
 
 	@commands.command()
-	async def dilbert(self, ctx, date=None):
+	async def dilbert(self, ctx, *, date=None):
 		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 to today if found."""
 		await self._display_comic(ctx, "dilbert", date=date)
 
@@ -310,7 +312,7 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "dilbert", random=True)'''
 
 	@commands.command()
-	async def garfield(self, ctx, date=None):
+	async def garfield(self, ctx, *, date=None):
 		"""Displays the Garfield comic for the passed date (MM-DD-YYYY) from 06-19-1978 to today if found."""
 		await self._display_comic(ctx, "garfield", date=date)
 
@@ -320,7 +322,7 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "garfield", random=True)
 
 	@commands.command()
-	async def gmg(self, ctx, date=None):
+	async def gmg(self, ctx, *, date=None):
 		"""Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) from 02-13-2008 to today if found."""
 		await self._display_comic(ctx, "gmg", date=date)
 
@@ -330,7 +332,7 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "gmg", random=True)
 
 	@commands.command()
-	async def peanuts(self, ctx, date=None):
+	async def peanuts(self, ctx, *, date=None):
 		"""Displays the Peanuts comic for the passed date (MM-DD-YYYY) from 10-02-1950 to today if found."""
 		await self._display_comic(ctx, "peanuts", date=date)
 
@@ -340,7 +342,7 @@ class Comic(commands.Cog):
 		await self._display_comic(ctx, "peanuts", random=True)
 
 	@commands.command()
-	async def xkcd(self, ctx, date=None):
+	async def xkcd(self, ctx, *, date=None):
 		"""Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to today or comic number if found."""
 		try: date = int(date)
 		except: pass
