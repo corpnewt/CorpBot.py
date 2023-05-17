@@ -47,7 +47,7 @@ class RoleManager:
 			self.q.task_done()
 
 	async def check_member_role(self, r):
-		if r.guild == None or r.member == None:
+		if r.guild is None or r.member is None:
 			# Not applicable
 			return
 		if not r.guild.me.guild_permissions.manage_roles:
@@ -123,7 +123,7 @@ class Settings(commands.Cog):
 	"""The Doorway To The Server Settings"""
 	# Let's initialize with a file location
 	def __init__(self, bot, prefix = "$", file : str = None):
-		if file == None:
+		if file is None:
 			# We weren't given a file, default to ./Settings.json
 			file = "Settings.json"
 		
@@ -447,7 +447,7 @@ class Settings(commands.Cog):
 		# This method converts prior, string-only ownership to a list,
 		# then searches the list for the passed member
 		ownerList = self.getGlobalStat("Owner",[])
-		ownerList = [] if ownerList == None else ownerList
+		ownerList = [] if ownerList is None else ownerList
 		if not len(ownerList):
 			return []
 		if not type(ownerList) is list:
@@ -577,7 +577,7 @@ class Settings(commands.Cog):
 		await self.bot.loop.run_in_executor(None, self.check_all)
 		await message.edit(content="Verified default roles in {} seconds.".format(time.time()-t))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ownerlock(self, ctx):
 		"""Locks/unlocks the bot to only respond to the owner (owner-only... ofc)."""
 		# Only allow owner
@@ -606,7 +606,7 @@ class Settings(commands.Cog):
 			))
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def owners(self, ctx):
 		"""Lists the bot's current owners."""
 		# Check to force the owner list update
@@ -628,9 +628,8 @@ class Settings(commands.Cog):
 				userList.append(userString)
 			msg += ', '.join(userList)
 		await ctx.send(msg)
-
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def claim(self, ctx):
 		"""Claims the bot if disowned - once set, can only be changed by the current owner."""
 		owned = self.isOwner(ctx.author)
@@ -646,15 +645,14 @@ class Settings(commands.Cog):
 			msg = 'I have been claimed by *{}!*'.format(DisplayName.name(ctx.author))
 		await ctx.send(msg)
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def addowner(self, ctx, *, member : str = None):
 		"""Adds an owner to the owner list.  Can only be done by a current owner."""
 		owned = self.isOwner(ctx.author)
 		if owned == False:
 			msg = "Only an existing owner can add more owners."
-			await ctx.send(msg)
-			return
-		if member == None:
+			return await ctx.send(msg)
+		if member is None:
 			member = ctx.author
 		if type(member) is str:
 			memberCheck = DisplayName.memberForName(member, ctx.guild)
@@ -662,12 +660,10 @@ class Settings(commands.Cog):
 				member = memberCheck
 			else:
 				msg = 'I couldn\'t find that user...'
-				await ctx.send(msg)
-				return
+				return await ctx.send(msg)
 		if member.bot:
 			msg = "I can't be owned by other bots.  I don't roll that way."
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 		owners = self.getGlobalStat("Owner",[])
 		if member.id in owners:
 			# Already an owner
@@ -678,15 +674,14 @@ class Settings(commands.Cog):
 			msg = '*{}* has been added to my owner list!'.format(DisplayName.name(member))
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def remowner(self, ctx, *, member : str = None):
 		"""Removes an owner from the owner list.  Can only be done by a current owner."""
 		owned = self.isOwner(ctx.author)
 		if owned == False:
 			msg = "Only an existing owner can remove owners."
-			await ctx.send(msg)
-			return
-		if member == None:
+			return await ctx.send(msg)
+		if member is None:
 			member = ctx.author
 		if type(member) is str:
 			memberCheck = DisplayName.memberForName(member, ctx.guild)
@@ -694,8 +689,7 @@ class Settings(commands.Cog):
 				member = memberCheck
 			else:
 				msg = 'I couldn\'t find that user...'
-				await ctx.channel.send(msg)
-				return
+				return await ctx.channel.send(msg)
 		owners = self.getGlobalStat("Owner",[])
 		if member.id in owners:
 			# Found an owner!
@@ -709,7 +703,7 @@ class Settings(commands.Cog):
 			msg += " I have been disowned!"
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def disown(self, ctx):
 		"""Revokes all ownership of the bot."""
 		isOwner = self.isOwner(ctx.author)
@@ -721,67 +715,56 @@ class Settings(commands.Cog):
 		msg = 'I have been disowned!'
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getstat(self, ctx, stat : str = None, member : discord.Member = None):
 		"""Gets the value for a specific stat for the listed member (case-sensitive)."""
-		if member == None:
+		usage = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
+		if stat is None:
+			return await ctx.send(usage)
+		if member is None or (not Utils.is_bot_admin(ctx) and member):
 			member = ctx.author
-		if str == None:
-			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
 		if type(member) is str:
 			try:
 				member = discord.utils.get(ctx.guild.members, name=member)
 			except:
-				print("That member does not exist")
-				return
+				return await ctx.send("That member does not exist")
 		if member is None:
-			msg = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			return await ctx.send(usage)
 		try:
 			newStat = self.getUserStat(member, ctx.guild, stat)
 		except KeyError:
-			msg = '"{}" is not a valid stat for *{}*'.format(stat, DisplayName.name(member))
-			await ctx.send(msg)
-			return
-		msg = '**{}** for *{}* is *{}!*'.format(stat, DisplayName.name(member), newStat)
-		await ctx.send(msg)
+			return await ctx.send('"{}" is not a valid stat for *{}*'.format(
+				Nullify.escape_all(stat), DisplayName.name(member)
+			))
+		await ctx.send('**{}** for *{}* is *{}!*'.format(
+			Nullify.escape_all(stat), DisplayName.name(member), Nullify.escape_all(str(newStat))
+		))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setsstat(self, ctx, stat : str = None, value : str = None):
 		"""Sets a server stat (admin only)."""
-		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
-		if stat == None or value == None:
+		if not await Utils.is_admin_reply(ctx): return
+		if stat is None or value is None:
 			msg = 'Usage: `{}setsstat Stat Value`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 		self.setServerStat(ctx.guild, stat, value)
 		msg = '**{}** set to *{}!*'.format(stat, value)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getsstat(self, ctx, stat : str = None):
 		"""Gets a server stat (admin only)."""
-		isAdmin = Utils.is_admin(ctx)
 		# Only allow admins to change server stats
-		if not isAdmin:
-			await ctx.send('You do not have sufficient privileges to access this command.')
-			return
-		if stat == None:
+		if not await Utils.is_admin_reply(ctx): return
+		if stat is None:
 			msg = 'Usage: `{}getsstat [stat]`'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 		value = self.getServerStat(ctx.guild, stat)
 		msg = '**{}** is currently *{}!*'.format(stat, value)
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def flush(self, ctx):
 		"""Flush the bot settings to disk (admin only)."""
 		# Only allow owner
@@ -818,7 +801,7 @@ class Settings(commands.Cog):
 		except:
 			print("Failed to save - likely already saving.")
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prunelocalsettings(self, ctx):
 		"""Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
 		# Only allow owner
@@ -870,7 +853,7 @@ class Settings(commands.Cog):
 					removed += 1
 		return removed
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prunesettings(self, ctx):
 		"""Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
 		# Only allow owner
@@ -879,39 +862,27 @@ class Settings(commands.Cog):
 			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
 			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
-
 		settingsWord = "settings"
-
 		message = await ctx.send("Pruning settings...")
-
 		removedSettings = await self.bot.loop.run_in_executor(None, self._prune_settings)
-
 		if removedSettings == 1:
 			settingsWord = "setting"
-
 		await message.edit(content="Flushing settings to disk...")
 		# Actually flush settings
 		self.flushSettings()
-		
 		msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
 		await message.edit(content=msg)
 
-
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def prune(self, ctx):
 		"""Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
 		
-		author  = ctx.message.author
-		server  = ctx.message.guild
-		channel = ctx.message.channel
-
 		# Only allow owner
 		isOwner = self.isOwner(ctx.author)
 		if isOwner is None:
 			return await ctx.send("I have not been claimed, *yet*.")
 		elif isOwner == False:
 			return await ctx.send("You are not the *true* owner of me.  Only the rightful owner can use this command.")
-
 		message = await ctx.send("Pruning orphaned servers...")
 		l = asyncio.get_event_loop()
 		ser = await self.bot.loop.run_in_executor(None, self._prune_servers)
@@ -921,12 +892,10 @@ class Settings(commands.Cog):
 		mem = await self.bot.loop.run_in_executor(None, self._prune_users)
 		await message.edit(content="Pruning orphaned global users...")
 		glo = await self.bot.loop.run_in_executor(None, self.checkGlobalUsers)
-
 		ser_str = "servers"
 		sst_str = "settings"
 		mem_str = "members"
 		glo_str = "global users"
-
 		if ser == 1:
 			ser_str = "server"
 		if sst == 1:
@@ -935,10 +904,8 @@ class Settings(commands.Cog):
 			mem_str = "member"
 		if glo == 1:
 			glo_str = "global user"
-
 		await message.edit(content="Flushing settings to disk...")
 		# Actually flush settings
 		self.flushSettings()
-		
 		msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
 		await message.edit(content=msg)
