@@ -336,7 +336,7 @@ class BotAdmin(commands.Cog):
 						ctx.author.discriminator,
 						reason
 					)}
-					if days is not None and c == ctx.guild.ban: args["delete_message_days"] = days
+					if days is not None and c == ctx.guild.ban: args["delete_message_seconds"] = days * 86400 # Get the number of seconds per the day count
 					await c(target,**args)
 					if not target in canned: # Avoid double adding
 						canned.append(target)
