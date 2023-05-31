@@ -716,8 +716,8 @@ class Settings(commands.Cog):
 		await ctx.send(msg)
 
 	@commands.command()
-	async def getstat(self, ctx, stat : str = None, member : discord.Member = None):
-		"""Gets the value for a specific stat for the listed member (case-sensitive)."""
+	async def getstat(self, ctx, stat = None, member = None):
+		"""Gets the value for a specific stat (case-sensitive).  If the stat has spaces, it must be wrapped in quotes.  Admins and bot-admins can query stats for other members."""
 		usage = 'Usage: `{}getstat [stat] [member]`'.format(ctx.prefix)
 		if stat is None:
 			return await ctx.send(usage)
