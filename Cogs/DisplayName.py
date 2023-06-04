@@ -27,15 +27,22 @@ class DisplayName(commands.Cog):
     def memberForName(self, name, server):
         mems = server.members if server else self.bot.users
         # Check nick first - then name
-        name = str(name)
+        name = str(name).lower()
         for member in mems:
-            if not hasattr(member,"nick"):
-                # No nick property - must be a user, bail
+            if isinstance(member, discord.User):
+                # Users don't have nicknames, only members
                 break
-            if member.nick and member.nick.lower() == name.lower():
+            if member.nick and member.nick.lower() == name:
                 return member
         for member in mems:
-            if member.name.lower() == name.lower():
+            if member.name.lower() == name:
+                return member
+            # Check if we have the new global_name
+            if isinstance(member, discord.User):
+                global_name = getattr(member,"global_name",None)
+            else:
+                global_name = getattr(getattr(member,"_user",None),"global_name",None)
+            if global_name and global_name.lower() == name:
                 return member
         mem_parts = name.split("#")
         if len(mem_parts) == 2:
@@ -47,8 +54,9 @@ class DisplayName(commands.Cog):
                 mem_name = mem_disc = None
             if mem_name:
                 for member in mems:
-                    if member.name.lower() == mem_name.lower() and int(member.discriminator) == mem_disc:
+                    if member.name.lower() == mem_name and int(member.discriminator) == mem_disc:
                         return member
+        # Fall back to checking for an id
         mem_id = re.sub(r'\W+', '', name)
         new_mem = self.memberForID(mem_id, server)
         if new_mem:
