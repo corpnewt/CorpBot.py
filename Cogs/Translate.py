@@ -102,6 +102,20 @@ class Translate(commands.Cog):
         If you do not specify the to language, it will default to English."""
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
+
+        # Find out if we're replying to another message
+        reply = None
+        if ctx.message.reference:
+            # Resolve the replied to reference to a message object
+            try:
+                message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+                reply = message.content
+            except:
+                pass
+        if reply: # Prepend our replied-to text, if any
+            translate = reply if not translate else " ".join((reply,translate))
+        
+        # Check if we ended up with anything
         if translate is None: return await ctx.send(usage)
 
         word_list = translate.split(" ")
