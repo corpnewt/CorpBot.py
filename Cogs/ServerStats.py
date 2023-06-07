@@ -56,7 +56,7 @@ class ServerStats(commands.Cog):
             await Message.EmbedText(title=guild.name, description="This server has no bots.", color=ctx.author).send(ctx)
         else:
             # Got some bots!
-            fields = [{"name":"{:,}. {}#{} ({})".format(i,x.name,x.discriminator,x.id),"value":x.mention,"inline":False} for i,x in enumerate(bot_list,1)]
+            fields = [{"name":"{:,}. {} ({})".format(i,x,x.id),"value":x.mention,"inline":False} for i,x in enumerate(bot_list,1)]
             header = "__**Showing {:,} bot{}:**__".format(len(bot_list), "" if len(bot_list) == 1 else "s")
             return await PickList.PagePicker(
                 title="Bots in {} ({:,} total)".format(guild.name,len(bot_list)),
@@ -124,7 +124,7 @@ class ServerStats(commands.Cog):
         chandesc = "{:,} text, {:,} voice".format(len(guild.text_channels), len(guild.voice_channels))
         server_embed.add_field(name="Channels", value=chandesc, inline=True)
         server_embed.add_field(name="Default Role", value=guild.default_role, inline=True)
-        server_embed.add_field(name="Owner", value=guild.owner.name + "#" + guild.owner.discriminator, inline=True)
+        server_embed.add_field(name="Owner", value=str(guild.owner), inline=True)
         server_embed.add_field(name="AFK Channel", value=guild.afk_channel, inline=True)
         server_embed.add_field(name="Verification", value=str(guild.verification_level).capitalize(), inline=True)
         # server_embed.add_field(name="Voice Region", value=guild.region, inline=True)
@@ -384,7 +384,7 @@ class ServerStats(commands.Cog):
             if member.joined_at:
                 ts = int(member.joined_at.timestamp())
                 join = "<t:{}> (<t:{}:R>)".format(ts,ts)
-            name = "{}#{}".format(member.name,member.discriminator)
+            name = str(member)
             if member.nick:
                 name = "{} ({})".format(member.nick,name)
             our_list.append(
@@ -406,7 +406,7 @@ class ServerStats(commands.Cog):
             if member.joined_at:
                 ts = int(member.joined_at.timestamp())
                 join = "<t:{}> (<t:{}:R>)".format(ts,ts)
-            name = "{}#{}".format(member.name,member.discriminator)
+            name = str(member)
             if member.nick:
                 name = "{} ({})".format(member.nick,name)
             our_list.append(

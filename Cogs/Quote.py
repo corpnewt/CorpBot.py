@@ -100,7 +100,7 @@ class Quote(commands.Cog):
 				"<t:{}>".format(int(datetime.timestamp(reaction.message.created_at.replace(tzinfo=timezone.utc)))) #reaction.message.created_at.strftime("%I:%M %p")
 			),
 			"color" : reaction.message.author,
-			"footer" : "Quoted by {}#{} ({})".format(member.name, member.discriminator, member.id)
+			"footer" : "Quoted by {} ({})".format(member, member.id)
 		}
 		await Message.EmbedText(**e).send(r_channel)
 

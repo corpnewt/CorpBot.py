@@ -88,7 +88,7 @@ class Emoji(commands.Cog):
             # Ensure the name isn't *just* underscores
             if not e_name.replace("_",""): continue
             # Create the emoji and save it
-            try: new_emoji = await ctx.guild.create_custom_emoji(name=e_name,image=image,roles=None,reason="Added by {}#{}".format(ctx.author.name,ctx.author.discriminator))
+            try: new_emoji = await ctx.guild.create_custom_emoji(name=e_name,image=image,roles=None,reason="Added by {}".format(ctx.author))
             except: continue
             added_emojis.append(new_emoji)
         msg = "Created {} of {} emoji{}{}.".format(

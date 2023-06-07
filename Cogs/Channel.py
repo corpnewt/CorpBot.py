@@ -138,7 +138,7 @@ class Channel(commands.Cog):
 		async for message in chan.history(limit=messages):
 			counter += 1
 			msg += message.content + "\n"
-			msg += '----Sent-By: ' + message.author.name + '#' + message.author.discriminator + "\n"
+			msg += '----Sent-By: ' + str(message.author) + "\n"
 			msg += '---------At: ' + message.created_at.strftime("%Y-%m-%d %H.%M") + "\n"
 			if message.edited_at:
 				msg += '--Edited-At: ' + message.edited_at.strftime("%Y-%m-%d %H.%M") + "\n"

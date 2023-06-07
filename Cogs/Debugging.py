@@ -116,7 +116,7 @@ class Debugging(commands.Cog):
 		expires_after = None if invite.max_age is None else "Never" if invite.max_age == 0 else "In "+ReadableTime.getReadableTimeBetween(0, invite.max_age)
 		max_uses = None if invite.max_uses is None else "Unlimited" if invite.max_uses == 0 else "{:,}".format(invite.max_uses)
 		uses = None if invite.uses is None else "{:,}".format(invite.uses)
-		created_by = None if invite.inviter is None else "{}#{} ({})".format(invite.inviter.name, invite.inviter.discriminator, invite.inviter.id)
+		created_by = None if invite.inviter is None else "{} ({})".format(invite.inviter, invite.inviter.id)
 		temp = False if invite.temporary is None else invite.temporary
 		# Setup the fields
 		fields = []
@@ -202,9 +202,9 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('xp', guild):
 			return
 		if type(to_user) is discord.Role:
-			msg = "🌟 {}#{} ({}) gave {} xp to the {} role.".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name)
+			msg = "🌟 {} ({}) gave {} xp to the {} role.".format(from_user, from_user.id, amount, to_user.name)
 		else:
-			msg = "🌟 {}#{} ({}) gave {} xp to {}#{} ({}).".format(from_user.name, from_user.discriminator, from_user.id, amount, to_user.name, to_user.discriminator, to_user.id)
+			msg = "🌟 {} ({}) gave {} xp to {} ({}).".format(from_user, from_user.id, amount, to_user, to_user.id)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.blue(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -214,13 +214,13 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.ban,))
 		log_msg = ""
 		if last:
-			log_msg = "By:  {}#{} ({})\nFor: {}".format(
-				last.user.name,last.user.discriminator,last.user.id,
-				last.reason if last.reason else "No reason provided."
+			log_msg = "By:  {} ({})\nFor: {}".format(
+				last.user,last.user.id,
+				last.reason or "No reason provided."
 			)
 		# A member was banned
 		pfpurl = Utils.get_avatar(member)
-		msg = '🚫 {}#{} ({}) was banned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
+		msg = '🚫 {} ({}) was banned from {}.'.format(member, member.id, guild.name)
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -230,13 +230,13 @@ class Debugging(commands.Cog):
 		last = await self.get_latest_log(guild, member, (discord.AuditLogAction.unban,))
 		log_msg = ""
 		if last:
-			log_msg = "By:  {}#{} ({})\nFor: {}".format(
-				last.user.name,last.user.discriminator,last.user.id,
-				last.reason if last.reason else "No reason provided."
+			log_msg = "By:  {} ({})\nFor: {}".format(
+				last.user,last.user.id,
+				last.reason or "No reason provided."
 			)
 		# A member was unbanned
 		pfpurl = Utils.get_avatar(member)
-		msg = '🔵 {}#{} ({}) was unbanned from {}.'.format(member.name, member.discriminator, member.id, guild.name)
+		msg = '🔵 {} ({}) was unbanned from {}.'.format(member, member.id, guild.name)
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -244,9 +244,9 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.mute', guild): return
 		# A memeber was muted
 		pfpurl = Utils.get_avatar(member)
-		msg = "🔇 {}#{} ({}) was muted.".format(member.name, member.discriminator, member.id)
+		msg = "🔇 {} ({}) was muted.".format(member, member.id)
 		message = "Muted by {}.\nMuted {}.".format(
-			"Auto-Muted" if not muted_by else "{}#{} ({})".format(muted_by.name, muted_by.discriminator, muted_by.id),
+			"Auto-Muted" if not muted_by else "{} ({})".format(muted_by, muted_by.id),
 			"for "+ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "until further notice"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
@@ -256,7 +256,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.unmute', guild): return
 		# A memeber was muted
 		pfpurl = Utils.get_avatar(member)
-		msg = "🔊 {}#{} ({}) was unmuted.".format(member.name, member.discriminator, member.id)
+		msg = "🔊 {} ({}) was unmuted.".format(member, member.id)
 		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
@@ -305,7 +305,7 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.join', guild):
 			return
 		# A new member joined
-		msg = '👐 {}#{} ({}) joined {}.'.format(member.name, member.discriminator, member.id, guild.name)
+		msg = '👐 {} ({}) joined {}.'.format(member, member.id, guild.name)
 		fields = [self._f("Account Created",member.created_at,ts=True,ago=True)]
 		if invite: fields.extend(self.format_invite_fields(invite))
 		await self._logEvent(guild, "", fields=fields, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
@@ -317,15 +317,15 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('user.leave', guild):
 			return
 		# A member left - get the last ban/kick audit log entry
-		msg = '👋 {}#{} ({}) left {}.'.format(member.name, member.discriminator, member.id, guild.name)
+		msg = '👋 {} ({}) left {}.'.format(member, member.id, guild.name)
 		fields = [self._f("Joined",member.joined_at,ts=True,ago=True)]
 		last = await self.get_latest_log(guild,member,(discord.AuditLogAction.kick,discord.AuditLogAction.ban))
 		if last:
 			fields.append({
 				"name":"Member was **{}**".format("banned" if last.action==discord.AuditLogAction.ban else "kicked"),
-				"value":"{}\n```\nBy:  {}#{} ({})\nFor: {}```".format(
+				"value":"{}\n```\nBy:  {} ({})\nFor: {}```".format(
 					self._t(last.created_at,ago=True),
-					last.user.name,last.user.discriminator,last.user.id,
+					last.user,last.user.id,
 					last.reason or "No reason provided."
 				)
 			})
@@ -375,7 +375,7 @@ class Debugging(commands.Cog):
 		pfpurl = Utils.get_avatar(before)
 		if before.status != after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		# Sanitize activities - fixes an issue where the "start" and "end" keys may not be visible
 		before.activities = [self.sanitize_activity(x) for x in before.activities]
 		after.activities = [self.sanitize_activity(x) for x in after.activities]
@@ -421,19 +421,19 @@ class Debugging(commands.Cog):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-					await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+					await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if Utils.get_avatar(before) != Utils.get_avatar(after) and self.shouldLog('user.avatar', server):
 			# Avatar changed
 			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(Utils.get_avatar(before), Utils.get_avatar(after))
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if before.nick != after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
 			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		if before.name != after.name and self.shouldLog('user.name', server):
 			# Name changed
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
-			await self._logEvent(server, msg, title="👤 {}#{} ({}) Updated.".format(before.name, before.discriminator, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -442,7 +442,7 @@ class Debugging(commands.Cog):
 		reference = message.reference
 		if self.shouldLog('message.send', message.guild):
 			# A message was sent
-			title = '📧 {}#{} ({}), in #{}, sent:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+			title = '📧 {} ({}), in #{}, sent:'.format(message.author, message.author.id, message.channel.name)
 			msg = message.content
 			if len(message.attachments):
 				msg += "\n\n--- Attachments ---\n\n"
@@ -463,7 +463,7 @@ class Debugging(commands.Cog):
 					try: fields.extend(self.format_invite_fields(await self.bot.fetch_invite(invite,with_counts=True),sent=True))
 					except: pass # Not a real invite
 				if fields: # Got at least one valid invite
-					title = '🎫 {}#{} ({}), in #{}, sent invite:'.format(message.author.name, message.author.discriminator, message.author.id, message.channel.name)
+					title = '🎫 {} ({}), in #{}, sent invite:'.format(message.author, message.author.id, message.channel.name)
 					pfpurl = Utils.get_avatar(message.author)
 					await self._logEvent(message.guild, "", fields=fields, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, reference=reference)
 
@@ -479,9 +479,8 @@ class Debugging(commands.Cog):
 		if not author or author.bot: return # Author doesn't exist - or is a bot
 		if not self.shouldLog("message.edit",guild): return # We're not logging edits
 		channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
-		title = '✏️ {}#{} ({}), in {}, edited:'.format(
-			author.name,
-			author.discriminator,
+		title = '✏️ {} ({}), in {}, edited:'.format(
+			author,
 			author.id,
 			"#"+channel.name if channel else payload.channel_id
 		)
@@ -526,9 +525,8 @@ class Debugging(commands.Cog):
 			if message.author.bot:
 				return # Don't log bots
 			reference = message.reference
-			title = '❌ {}#{} ({}), in #{}, deleted:'.format(
-				message.author.name,
-				message.author.discriminator,
+			title = '❌ {} ({}), in #{}, deleted:'.format(
+				message.author,
 				message.author.id,
 				message.channel.name
 			)
@@ -558,19 +556,17 @@ class Debugging(commands.Cog):
 			msg += "--- Cached Messages ---\n\n"
 			for message in payload.cached_messages:
 				resolved = await self._get_message(message.reference)
-				msg += "{} - Sent By: {}#{} ({}) at {}{}:{}{}{}\n\n".format(
+				msg += "{} - Sent By: {} ({}) at {}{}:{}{}{}\n\n".format(
 					message.id,
-					message.author.name,
-					message.author.discriminator,
+					message.author,
 					message.author.id,
 					message.created_at.strftime("%b %d %Y - %I:%M %p")+" UTC",
 					" (edited at {} UTC)".format(message.edited_at.strftime("%b %d %Y - %I:%M %p")) if message.edited_at else "",
 					"\n"+message.content if message.content else "",
 					"\n--- {}Reply To{} ---\n{}".format(
 						"(Pinged) " if await self._reference_mention(message) else "",
-						" {}#{} ({})".format(
-							resolved.author.name,
-							resolved.author.discriminator,
+						" {} ({})".format(
+							resolved.author,
 							resolved.author.id
 						) if resolved else "",
 						self._message_url(message)
@@ -634,7 +630,7 @@ class Debugging(commands.Cog):
 				reference_mention = await self._reference_mention(message)
 				urls += "- [{}Reply{}]({})".format(
 					"Ping " if reference_mention else "",
-					" to {}#{} ({})".format(resolved.author.name,resolved.author.discriminator,resolved.author.id) if resolved else " Link",
+					" to {} ({})".format(resolved.author,resolved.author.id) if resolved else " Link",
 					reference_url
 				)
 			# Save our current and UTC time for the logged event
@@ -715,7 +711,7 @@ class Debugging(commands.Cog):
 			try:
 				async for message in chan.history(limit=tempNum):
 					# Save to a text file
-					new_msg = '{}#{}:\n    {}\n'.format(message.author.name, message.author.discriminator, message.content)
+					new_msg = '{}:\n    {}\n'.format(message.author, message.content)
 					if len(message.attachments):
 						new_msg += "\n    --- Attachments ---\n\n"
 						for a in message.attachments:
@@ -735,7 +731,7 @@ class Debugging(commands.Cog):
 		# Remove channel from list
 		self.cleanChannels.remove(chan)
 
-		msg = 'Messages cleaned by {}#{} in {} - #{}\n\n'.format(ctx.message.author.name, ctx.message.author.discriminator, ctx.guild.name, ctx.channel.name) + msg
+		msg = 'Messages cleaned by {} in {} - #{}\n\n'.format(ctx.author, ctx.guild.name, ctx.channel.name) + msg
 
 		# Timestamp and save to file
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
@@ -754,7 +750,7 @@ class Debugging(commands.Cog):
 			pass
 		if self.shouldLog('message.delete', ctx.guild):
 			# We're logging
-			logmess = '{}#{} cleaned in #{}'.format(ctx.author.name, ctx.author.discriminator, chan.name)
+			logmess = '{} cleaned in #{}'.format(ctx.author, chan.name)
 			pfpurl = Utils.get_avatar(ctx.author)
 			await self._logEvent(ctx.guild, "{:,} message{} removed.".format(counter, "" if counter == 1 else "s"), title=logmess, filename=filename, thumbnail=pfpurl)
 		# Delete the remaining file

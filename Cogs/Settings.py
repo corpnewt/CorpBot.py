@@ -624,7 +624,7 @@ class Settings(commands.Cog):
 				if not user:
 					userString = "*Unknown User ({})*".format(owner)
 				else:
-					userString = "*{}#{}*".format(user.name, user.discriminator)
+					userString = "*{}*".format(user)
 				userList.append(userString)
 			msg += ', '.join(userList)
 		await ctx.send(msg)

@@ -188,13 +188,8 @@ class XpStack(commands.Cog):
 		num = self.settings.getServerStat(server, "XP Count")
 		if num == None:
 			num = self.xp_save_count
-		'''if type(to_user) is discord.Role:
-			#to_name = to_user.name + " role"
-		else:
-			to_name = "{}#{}".format(to_user.name, to_user.discriminator)'''
 		to_name = to_user.id
 		f_name = from_user.id
-		#f_name = "{}#{}".format(from_user.name, from_user.discriminator)
 		# Add new xp transaction
 		xp_transaction = { "To": to_name, "From": f_name, "Time": datetime.today().strftime("%Y-%m-%d %H.%M"), "Amount": amount }
 		xp_array = self.settings.getServerStat(server, "XP Array")

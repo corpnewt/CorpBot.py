@@ -158,7 +158,7 @@ class BotAdmin(commands.Cog):
 		ignoreList = [ctx.guild.get_member(int(x)) for x in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])]
 		ignoreList = sorted([x for x in ignoreList if x],key=lambda x:x.name.lower()) # Skip all None values
 		if not ignoreList: return await ctx.send("I'm not currently ignoring anyone.")
-		desc = "\n".join(["{}. {}#{} ({})".format(i,Utils.suppressed(ctx,x.name),x.discriminator,x.id) for i,x in enumerate(ignoreList,start=1)])
+		desc = "\n".join(["{}. {} ({})".format(i,Utils.suppressed(ctx,str(x)),x.id) for i,x in enumerate(ignoreList,start=1)])
 		return await PickList.PagePicker(
 			title="Ignored Users ({:,} total)".format(len(ignoreList)),
 			description=desc,
@@ -253,7 +253,7 @@ class BotAdmin(commands.Cog):
 							if member.joined_at and t-member.joined_at.timestamp() <= seconds:
 								# Check if we *can* kick/ban them first
 								if member_exception(member):
-									unable.append(member.name+"#"+member.discriminator)
+									unable.append(str(member))
 									continue
 								# Check our counter
 								if len(last) >= self.max_last:
@@ -297,7 +297,7 @@ class BotAdmin(commands.Cog):
 		msg = "**To {} the following {}:**\n\n{}\n\n**With reason:**\n\n\"{}\"\n\n**Please type:**\n\n`{}`{}{}{}".format(
 			command_name,
 			"member" if len(targets) == 1 else "{:,} members".format(len(targets)),
-			"\n".join([x.name+"#"+x.discriminator for x in targets]),
+			"\n".join([str(x) for x in targets]),
 			reason if len(reason) else "None",
 			confirmation_code,
 			"" if not len(missed) else "\n\n**Unmatched ID{}:**\n\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
@@ -330,10 +330,9 @@ class BotAdmin(commands.Cog):
 		for c in command:
 			for target in targets:
 				try:
-					args = {"reason":"{}{}#{}: {}".format(
+					args = {"reason":"{}{}: {}".format(
 						"(Klean) " if command_name.lower() == "klean" else "",
-						ctx.author.name,
-						ctx.author.discriminator,
+						ctx.author,
 						reason
 					)}
 					if days is not None and c == ctx.guild.ban: args["delete_message_seconds"] = days * 86400 # Get the number of seconds per the day count
@@ -348,9 +347,9 @@ class BotAdmin(commands.Cog):
 		canned = [x for x in canned if not x in cant]
 		msg = ""
 		if len(canned):
-			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in canned]))
+			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([str(x) for x in canned]))
 		if len(cant):
-			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([x.name+"#"+x.discriminator for x in cant]))
+			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([str(x) for x in cant]))
 		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg,footer=footer).edit(ctx,message)
 
 	@commands.command(aliases=["yeet"])
@@ -430,7 +429,7 @@ class BotAdmin(commands.Cog):
 
 		entries = []
 		for i,ban in enumerate(all_bans,start=1):
-			entries.append({"name":"{}. {}#{} ({})".format(i,ban.user.name,ban.user.discriminator,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
+			entries.append({"name":"{}. {} ({})".format(i,ban.user,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
 			if user_id != None and user_id == ban.user.id:
 				# Got a match - display it
 				return await Message.Embed(

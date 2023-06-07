@@ -317,7 +317,7 @@ class Mute(commands.Cog):
             return await ctx.send("The mute role has been set to the __existing__ **{}** role!".format(Utils.suppressed(ctx,mute_role.name)))
         # Create a role with the proper overrides
         message = await ctx.send("Creating **{}** role...".format(Utils.suppressed(ctx,role_name)))
-        try: mute_role = await ctx.guild.create_role(name=role_name,reason="Mute role created by {}#{}".format(ctx.author.name,ctx.author.discriminator))
+        try: mute_role = await ctx.guild.create_role(name=role_name,reason="Mute role created by {}".format(ctx.author))
         except Exception as e: return await message.edit(content="Role create failed with error:\n```\n{}\n```".format(e))
         # Walk the channels and set the perms for the role
         await message.edit(content="Updating permissions for **{}**...".format(Utils.suppressed(ctx,role_name)))
