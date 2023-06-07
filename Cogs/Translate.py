@@ -199,6 +199,18 @@ class Translate(commands.Cog):
         """Pronunciation for a sentence in the English language.\n
         $pronounce こんにちは --> returns \"Kon'nichiwa\""""
 
+        # Find out if we're replying to another message
+        reply = None
+        if ctx.message.reference:
+            # Resolve the replied to reference to a message object
+            try:
+                message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+                reply = message.content
+            except:
+                pass
+        if reply: # Prepend our replied-to text, if any
+            text = reply if not text else " ".join((reply,text))
+
         if text is None: return await ctx.send("Usage: `{}pronounce [text to identify]`".format(ctx.prefix))
 
         if text.split()[-1] in self.langcodes.values():
@@ -226,6 +238,8 @@ class Translate(commands.Cog):
         else:
             lang_confidence = 1  # When the user specifies a source language, we assume they know what they're doing
 
+        source_lang_name = self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown'
+        
         pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
         # We don't need to translate to another language, we just get the pronunciation
         if not pronunciation_result.pronunciation or pronunciation_result.pronunciation == pronunciation_result.src:
@@ -235,7 +249,6 @@ class Translate(commands.Cog):
                 color=ctx.author
             ).send(ctx) # We don't want a pronunciation that's the same as the text
 
-        english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
         if not self.languages.get(source_lang):
             return await Message.EmbedText(
                 title="Something went wrong...",
@@ -247,15 +260,18 @@ class Translate(commands.Cog):
                             color=ctx.author.color)
         embed.description = pronunciation_result.pronunciation
         embed.add_field(name="Source Text", value=pronunciation_result.text, inline=False)
-        embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
+
+        if source_lang_name.lower() != "english": # Only translate to English if we're not already using it
+            english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
+            embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
         if int(lang_confidence) != 1:
             embed.footer = {
                 "text": "Language: {} (Confidence: {}%)".format(
-                    self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown',
+                    source_lang_name,
                     round(lang_confidence * 100, 2))
             }
         else:
             embed.footer = {
-                "text": "Language: {}".format(self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown')
+                "text": "Language: {}".format(source_lang_name)
             }
         await embed.send(ctx)
