@@ -160,11 +160,10 @@ class Invite(commands.Cog):
 			await ctx.invoke(self.invite,invite_url)
 			return await ctx.send("Valid for {}.".format(ReadableTime.getReadableTimeBetween(time.time(),temp[1])))
 		# Build a request to dm to up to the first 10 owners
-		msg = "{} ({} - {}#{} - {})\nhas requested the bot for: {} ({})\nvia the following invite: {}".format(
+		msg = "{} ({} - {} - {})\nhas requested the bot for: {} ({})\nvia the following invite: {}".format(
 			DisplayName.name(ctx.author),
 			ctx.author.mention,
-			ctx.author.name,
-			ctx.author.discriminator,
+			ctx.author,
 			ctx.author.id,
 			invite.guild.name,
 			invite.guild.id,

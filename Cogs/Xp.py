@@ -718,59 +718,59 @@ class Xp(commands.Cog):
 	@commands.command(pass_context=True)
 	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
-		
-		server  = ctx.guild
-		channel = ctx.message.channel
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-		
 		# Get the array
-		promoArray = self.settings.getServerStat(server, "PromotionArray")
+		promoArray = self.settings.getServerStat(ctx.guild, "PromotionArray", [])
 
 		# Sort by XP first, then by name
-		# promoSorted = sorted(promoArray, key=itemgetter('XP', 'Name'))
-		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
+		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']), reverse=True)
 		
 		if not len(promoSorted):
-			roleText = "There are no roles in the xp role list.  You can add some with the `{}addxprole [role] [xpamount]` command!\n".format(ctx.prefix)
+			desc = None
 		else:
-			roleText = "**__Current Roles:__**\n\n"
+			title = "Current XP Roles ({:,} total)".format(len(promoSorted))
+			desc = ""
 			for arole in promoSorted:
 				# Get current role name based on id
 				foundRole = False
-				for role in server.roles:
+				for role in ctx.guild.roles:
 					if str(role.id) == str(arole['ID']):
 						# We found it
 						foundRole = True
-						roleText = '{}**{}** : *{:,} XP*\n'.format(roleText, Nullify.escape_all(role.name), arole['XP'])
+						desc += '{} : *{:,} XP*\n'.format(role.mention,arole['XP'])
 				if not foundRole:
-					roleText = '{}**{}** : *{:,} XP* (removed from server)\n'.format(roleText, Nullify.escape_all(arole['Name']), arole['XP'])
+					desc += '**{}** ({}) : *{:,} XP* (removed from server)\n'.format(Nullify.escape_all(arole['Name']),arole["ID"],arole['XP'])
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
-		if role == None or role == "":
-			roleText = '{}\n**Everyone** can give xp, gamble, and feed the bot.'.format(roleText)
+		required = ""
+		if role is None or role == "":
+			required = "**Everyone** can give xp, gamble, and feed the bot."
 		else:
 			# Role is set - let's get its name
 			found = False
 			for arole in ctx.guild.roles:
 				if str(arole.id) == str(role):
 					found = True
-					vowels = "aeiou"
-					if arole.name[:1].lower() in vowels:
-						roleText = '{}\nYou need to be an **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
-					else:
-						roleText = '{}\nYou need to be a **{}** to *give xp*, *gamble*, or *feed* the bot.'.format(roleText, Nullify.escape_all(arole.name))
-					# roleText = '{}\nYou need to be a/an **{}** to give xp, gamble, or feed the bot.'.format(roleText, arole.name)
+					required = "You need to be a{} {} to *give xp*, *gamble*, or *feed* the bot.".format(
+						"n" if arole.name[:1].lower() in "aeiou" else "",
+						arole.mention
+					)
+					break
 			if not found:
-				roleText = '{}\nThere is no role that matches id: `{}` for using the xp system - consider updating that setting.'.format(roleText, role)
+				required = "There is no role that matches id: `{}` for using the xp system - consider updating that setting.".format(role)
 
-		await channel.send(roleText)
-		
+		if desc is None:
+			return await ctx.send(
+				"There are no roles in the xp role list.  You can add some with the `{}addxprole [role] [xpamount]` command!\n{}".format(ctx.prefix,required)
+			)
+		# Update the description and send the message
+		desc = "{}\n\n{}".format(required,desc)
+		return await PickList.PagePicker(
+			title=title,
+			description=desc,
+			color=ctx.author,
+			ctx=ctx
+		).pick()		
 		
 	@commands.command(pass_context=True)
 	async def rank(self, ctx, *, member = None):
@@ -841,7 +841,7 @@ class Xp(commands.Cog):
 		sorted_array = sorted([(int(await self.bot.loop.run_in_executor(None, self.settings.getUserStat,x,ctx.guild,"XP",0)),x) for x in ctx.guild.members],key=lambda x:(x[0],x[1].id),reverse=reverse)
 		# Update the array with the user's place in the list
 		xp_array = [{
-			"name":"{}. {} ({}#{} {})".format(i,x[1].display_name,x[1].name,x[1].discriminator,x[1].id),
+			"name":"{}. {} ({} {})".format(i,x[1].display_name,x[1],x[1].id),
 			"value":"{:,} XP".format(x[0])
 			} for i,x in enumerate(sorted_array,start=1)]
 		return await PickList.PagePicker(
@@ -1012,7 +1012,7 @@ class Xp(commands.Cog):
 				stat_embed.add_field(name="Boosting Since",value=boosted,inline=False)
 
 		# Get User Name and ID
-		stat_embed.add_field(name="User Name", value="{}#{}".format(member.name, member.discriminator), inline=True)
+		stat_embed.add_field(name="User Name", value=str(member), inline=True)
 		stat_embed.add_field(name="User ID", value=str(member.id), inline=True)
 		# Add status
 		if getattr(member,"status",None):

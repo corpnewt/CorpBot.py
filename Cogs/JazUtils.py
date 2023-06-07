@@ -188,7 +188,7 @@ class JazUtils(commands.Cog):
 			sorted_list = sorted_list[:MAX_USERS] ## truncate to the limit
 			truncated = True
 		if mode == 2: # add full username
-			page = '\n'.join('{} {} ({}#{})'.format(STATUSMAP2.get(member.status, ':black_circle:'), member.mention, member.name, member.discriminator) for member in sorted_list) # not bothering with multiple pages cause 30 members is way shorter than one embed
+			page = '\n'.join('{} {} ({})'.format(STATUSMAP2.get(member.status, ':black_circle:'), member.mention, member) for member in sorted_list) # not bothering with multiple pages cause 30 members is way shorter than one embed
 		elif mode == 1: # add nickname
 			page = '\n'.join('{} {} ({})'.format(STATUSMAP2.get(member.status, ':black_circle:'), member.mention, member.display_name) for member in sorted_list)
 		else:

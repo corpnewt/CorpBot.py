@@ -614,7 +614,7 @@ class Hw(commands.Cog):
 	async def rawhw(self, ctx, *, user : str = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
 		if not user:
-			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
+			user = str(ctx.author)
 	
 		# Let's check for username and build name
 		parts = user.split()
@@ -738,7 +738,7 @@ class Hw(commands.Cog):
 		"""Lists the builds for the specified user - or yourself if no user passed."""
 		usage = 'Usage: `{}listhw [user]`'.format(ctx.prefix)
 		if not user:
-			user = "{}#{}".format(ctx.author.name, ctx.author.discriminator)
+			user = str(ctx.author)
 		member = DisplayName.memberForName(user, ctx.guild)
 		if not member:
 			return await ctx.send(usage)

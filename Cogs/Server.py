@@ -502,7 +502,7 @@ class Server(commands.Cog):
 		for server in self.bot.guilds:
 			msg += server.name + "\n"
 			msg += str(server.id) + "\n"
-			msg += server.owner.name + "#" + str(server.owner.discriminator) + "\n\n"
+			msg += str(server.owner) + "\n\n"
 			msg += str(len(server.members)) + "\n\n"
 		# Trim the last 2 newlines
 		msg = msg[:-2].encode("utf-8")

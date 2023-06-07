@@ -242,9 +242,9 @@ class SecretSanta(commands.Cog):
 		await m.edit(content="Organizing results...")
 		for x in range(len(participants)):
 			results["swaps"].append({
-				"to_name"   : participants[x].name + "#" + participants[x].discriminator,
+				"to_name"   : str(participants[x]),
 				"to_id"     : participants[x].id,
-				"from_name" : partners[x].name + "#" + partners[x].discriminator,
+				"from_name" : str(partners[x]),
 				"from_id"   : partners[x].id
 			})
 		# results = dict(zip(participants,partners))

@@ -77,8 +77,8 @@ class Bot(commands.Cog):
 					pass
 				return True
 			# Check for owner name and id quick
-			# Name *MUST* be case-sensitive and have the discriminator for safety
-			namecheck = server.owner.name + "#" + str(server.owner.discriminator)
+			# Name *MUST* be case-sensitive and have the discriminator (if not migrated) for safety
+			namecheck = str(server.owner)
 			if serv == namecheck or serverID == server.owner.id:
 				# Got the owner
 				try:
@@ -162,7 +162,7 @@ class Bot(commands.Cog):
 				if not user:
 					userString = "Unknown User ({})".format(owner)
 				else:
-					userString = "{}#{}".format(user.name, user.discriminator)
+					userString = str(user)
 				userList.append(userString)
 			owners = ', '.join(userList)
 			
@@ -231,8 +231,7 @@ class Bot(commands.Cog):
 		if not await Utils.is_admin_reply(ctx): return
 		
 		# Let's get the bot's member in the current server
-		botName = "{}#{}".format(self.bot.user.name, self.bot.user.discriminator)
-		botMember = ctx.message.guild.get_member_named(botName)
+		botMember = ctx.guild.get_member(self.bot.user.id)
 		await botMember.edit(nick=name)
 
 	@commands.command(pass_context=True)

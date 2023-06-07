@@ -91,6 +91,30 @@ class Channel(commands.Cog):
 
 		await ctx.send(Utils.suppressed(ctx,roleText))
 
+	'''@commands.command(pass_context=True)
+	async def rolecall(self, ctx, *, role = None):
+		"""Lists the number of users in a current role."""
+		if role == None:
+			msg = 'Usage: `{}rolecall [role]`'.format(ctx.prefix)
+			return await ctx.send(msg)
+			
+		if type(role) is str:
+			roleName = role
+			role = DisplayName.roleForName(roleName, ctx.guild)
+			if not role:
+				msg = 'I couldn\'t find *{}*...'.format(roleName)
+				return await ctx.send(Utils.suppressed(ctx,msg))
+		
+		# Create blank embed
+		role_embed = discord.Embed(color=role.color)
+		role_embed.set_author(name='{}'.format(role.name))
+		# We have a role
+		members = [x for x in ctx.guild.members if role in x.roles]
+		memberCount = len(members)
+		memberOnline = len([x for x in members if x.status != discord.Status.offline])
+		role_embed.add_field(name="Members", value='{:,} of {:,} online.'.format(memberOnline, memberCount), inline=True)
+		await ctx.send(embed=role_embed)'''
+
 
 	@commands.command(pass_context=True)
 	async def log(self, ctx, messages : int = 25, *, chan : discord.TextChannel = None):
@@ -114,7 +138,7 @@ class Channel(commands.Cog):
 		async for message in chan.history(limit=messages):
 			counter += 1
 			msg += message.content + "\n"
-			msg += '----Sent-By: ' + message.author.name + '#' + message.author.discriminator + "\n"
+			msg += '----Sent-By: ' + str(message.author) + "\n"
 			msg += '---------At: ' + message.created_at.strftime("%Y-%m-%d %H.%M") + "\n"
 			if message.edited_at:
 				msg += '--Edited-At: ' + message.edited_at.strftime("%Y-%m-%d %H.%M") + "\n"
