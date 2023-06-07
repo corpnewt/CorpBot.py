@@ -5,6 +5,11 @@ def setup(bot):
     # Not a cog
     return
 
+try:
+    EMPTY = discord.Embed.Empty
+except:
+    EMPTY = None
+
 class Message:
     def __init__(self, **kwargs):
         # Creates a new message - with an optional setup dictionary
@@ -210,7 +215,7 @@ class Embed:
             tot += len(embed.title)
         if embed.description:
             tot += len(embed.description)
-        if not embed.footer is discord.Embed.Empty:
+        if not embed.footer is EMPTY:
             tot += len(embed.footer)
         for field in embed.fields:
             tot += len(field.name) + len(field.value)
@@ -238,9 +243,9 @@ class Embed:
         em.url = self.url
         # em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
-            em.set_image(url=self.image.get("url",discord.Embed.Empty) if isinstance(self.image,dict) else self.image)
+            em.set_image(url=self.image.get("url",EMPTY) if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
-            em.set_thumbnail(url=self.thumbnail.get("url",discord.Embed.Empty) if isinstance(self.thumbnail,dict) else self.thumbnail)
+            em.set_thumbnail(url=self.thumbnail.get("url",EMPTY) if isinstance(self.thumbnail,dict) else self.thumbnail)
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
@@ -251,9 +256,9 @@ class Embed:
             elif type(self.author) is dict:
                 if any(item in self.author for item in ["name", "url", "icon"]):
                     em.set_author(
-                        name = self._truncate_string(self.author.get("name",     discord.Embed.Empty), self.auth_max),
-                        url = self.author.get("url",      discord.Embed.Empty),
-                        icon_url = self.author.get("icon_url", discord.Embed.Empty)
+                        name = self._truncate_string(self.author.get("name", EMPTY), self.auth_max),
+                        url = self.author.get("url", EMPTY),
+                        icon_url = self.author.get("icon_url", EMPTY)
                     )
                 else:
                     em.set_author(name=self._truncate_string(str(self.author), self.auth_max))
@@ -264,12 +269,12 @@ class Embed:
 
     def _get_footer(self):
         # Get our footer if we have one
-        footer_text = footer_icon = discord.Embed.Empty
+        footer_text = footer_icon = EMPTY
         if type(self.footer) is str:
             footer_text = self.footer
         elif type(self.footer) is dict:
-            footer_text = self.footer.get("text", discord.Embed.Empty)
-            footer_icon = self.footer.get("icon_url", discord.Embed.Empty)
+            footer_text = self.footer.get("text", EMPTY)
+            footer_icon = self.footer.get("icon_url", EMPTY)
         elif self.footer == None:
             # Never setup
             pass
