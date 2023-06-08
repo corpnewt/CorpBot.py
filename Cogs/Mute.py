@@ -475,10 +475,11 @@ class Mute(commands.Cog):
         # that the calling function has already fetched the mute_role to avoid
         # multiple db calls where possible.
         #
-        # Returns a tuple of (muted_bool, cooldown_timestamp, readable_cooldown, muted_role_bool, muted_in_channels)
+        # Returns a tuple of:
+        # (muted_bool, cooldown_timestamp, readable_cooldown, muted_role_bool, muted_in_channels)
         #
         # If not muted, will only return False - any function receiving
-        # this info should check return_value[0] before querying the rest.
+        # this info should check the return value before querying the rest.
         #
         if not ctx or not ctx.guild: # Can't be muted in dm
             return False
@@ -514,6 +515,11 @@ class Mute(commands.Cog):
                     return (True,None,"",False,muted_channels)
                 # We're still muted - but have a cooldown
                 return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),False,muted_channels)
+        # Fall back to see if we're in the MuteList - even if there's no channel perms or mute role
+        if muted_entry:
+            if muted_entry["Cooldown"] is None:
+                return (True,None,"",False,None)
+            return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),False,None)
         return False
 
     @commands.command(aliases=["muted","listmuted"])
