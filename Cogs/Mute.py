@@ -1,7 +1,7 @@
 import asyncio, discord, time, parsedatetime
 from discord.ext import commands
 from datetime import datetime
-from Cogs import Utils, DisplayName, ReadableTime
+from Cogs import Utils, DisplayName, ReadableTime, PickList
 
 def setup(bot):
     # Add the bot and deps
@@ -69,7 +69,7 @@ class Mute(commands.Cog):
                 if member:
                     # We have a user! Check for a cooldown
                     cooldown = entry['Cooldown']
-                    if cooldown == None:
+                    if cooldown is None:
                         continue
                     self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
         # Add a loop to remove expired mutes in the MuteList
@@ -82,7 +82,7 @@ class Mute(commands.Cog):
         entry = next((x for x in muteList if str(x["ID"])==str(member.id)),None)
         if not entry: return # Doesn't exist - skip
         # We had a mute - let's validate it
-        if (entry["Cooldown"] == None and int(time.time())-entry.get("Added",int(time.time()))>3600*24*90) or (entry["Cooldown"] != None and int(entry["Cooldown"])-int(time.time())<=0):
+        if (entry["Cooldown"] is None and int(time.time())-entry.get("Added",int(time.time()))>3600*24*90) or (entry["Cooldown"] != None and int(entry["Cooldown"])-int(time.time())<=0):
             # Was a permamute and 90 days have expired - or was a timed mute, and the time has expired
             # Remove the mute from the mute list - and ignore
             muteList.remove(entry)
@@ -102,7 +102,7 @@ class Mute(commands.Cog):
                     if guild.get_member(int(entry["ID"])):
                         # Still on the server - ignore
                         continue
-                    if entry["Cooldown"] == None:
+                    if entry["Cooldown"] is None:
                         # Perma-muted - let's see if we have a rolloff time
                         if not "Added" in entry:
                             # Old mute - set "Added" to now
@@ -145,7 +145,7 @@ class Mute(commands.Cog):
         # But check if the mute time has changed
         cd = self.settings.getUserStat(member, server, "Cooldown")
         isMute = self.settings.getUserStat(member, server, "Muted", False)
-        if cd == None:
+        if cd is None:
             if isMute:
                 # We're now muted permanently
                 self._remove_task(task)
@@ -187,7 +187,7 @@ class Mute(commands.Cog):
         # Save the results
         self.settings.setServerStat(server, "MuteList", muteList)
         # Set a timer if we have a cooldown
-        if not cooldown == None: self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
+        if not cooldown is None: self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
         # Dispatch and event
         self.bot.dispatch("mute", member, server, cooldown, muted_by)
 
@@ -268,7 +268,7 @@ class Mute(commands.Cog):
                 try: await channel.set_permissions(mute_role, overwrite=overs if other_perms or not desync else None)
                 except: pass
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def setmuterole(self, ctx, *, role = None):
         """Sets the target role to apply when muting.  Passing nothing will disable the mute role and remove send_messages, add_reactions, and speak overrides (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -278,7 +278,7 @@ class Mute(commands.Cog):
         try: mute_role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
         except: mute_role = None
         await ctx.send("Current mute role: **{}**".format(Utils.suppressed(ctx,mute_role.name)) if mute_role else "Currently, there is **no mute role** setup.")
-        if role == None:
+        if role is None:
             if mute_role:
                 await self._ask_perms(ctx,mute_role,desync=True,show_count=True)
             self.settings.setServerStat(ctx.guild,"MuteRole",None)
@@ -294,7 +294,7 @@ class Mute(commands.Cog):
         await self._ask_perms(ctx,target_role,desync=False,show_count=True)
         await ctx.send("The mute role has been set to **{}**!".format(Utils.suppressed(ctx,target_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def muterole(self, ctx):
         """Lists the target role to apply when muting (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -306,7 +306,7 @@ class Mute(commands.Cog):
         if not mute_role: return await ctx.send("The prior mute role (ID: `{}`) no longer exists.  You can set one with `{}setmuterole [role]` - or have me create one with `{}createmuterole [role_name]`".format(role,ctx.prefix,ctx.prefix))
         await ctx.send("Muted users will be given **{}**.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def createmuterole(self, ctx, *, role_name = None):
         """Sets the target role to apply when muting (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -335,7 +335,7 @@ class Mute(commands.Cog):
         self.settings.setServerStat(ctx.guild,"MuteRole",mute_role.id)
         await message.edit(content="Muted users will be given **{}**.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def syncmuterole(self, ctx):
         """Ensures that the mute role has the send_messages, add_reactions, and speak overrides disabled in all channels (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -350,7 +350,7 @@ class Mute(commands.Cog):
         await self._sync_perms(ctx,mute_role)
         await message.edit(content="**{}** has been synced for muting.".format(Utils.suppressed(ctx,mute_role.name)))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def desyncmuterole(self, ctx):
         """Removes send_messages, add_reactions, and speak overrides from the mute role - helpful if you plan to repurpose the existing mute role (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
@@ -371,11 +371,11 @@ class Mute(commands.Cog):
         if not await Utils.is_bot_admin_reply(ctx): return
         await ctx.send(Utils.yes_no_setting(ctx,"Muted user auto-delete","MuteAutoDelete",yes_no=yes_no,default=True))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def mute(self, ctx, *, member = None, cooldown = None):
         """Prevents a member from sending messages in chat or speaking in voice (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
-        if member == None:
+        if member is None:
             msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
             return await ctx.send(msg)
         # Let's search for a name at the beginning - and a time at the end
@@ -404,10 +404,10 @@ class Mute(commands.Cog):
                     endTime = end-currentTime
                 except:
                     pass
-                if not endTime == None:
+                if not endTime is None:
                     # We got a member and a time - break
                     break
-        if memFromName == None:
+        if memFromName is None:
             # We couldn't find one or the other
             msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
             return await ctx.send(msg)
@@ -450,11 +450,11 @@ class Mute(commands.Cog):
             # pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
         await mess.edit(content=Utils.suppressed(ctx,msg))
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def unmute(self, ctx, *, member = None):
         """Allows a muted member to send messages in chat (bot-admin only)."""
         if not await Utils.is_bot_admin_reply(ctx): return
-        if member == None:
+        if member is None:
             msg = 'Usage: `{}unmute [member]`'.format(ctx.prefix)
             return await ctx.send(msg)
         if type(member) is str:
@@ -469,32 +469,33 @@ class Mute(commands.Cog):
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
 
-    @commands.command(pass_context=True)
-    async def ismuted(self, ctx, *, member = None):
-        """Says whether a member is muted in chat."""
-        if member == None:
-            msg = 'Usage: `{}ismuted [member]`'.format(ctx.prefix)
-            return await ctx.send(msg)
-        memberName = member
-        member = DisplayName.memberForName(memberName, ctx.guild)
-        if not member:
-            msg = 'I couldn\'t find *{}*...'.format(memberName)
-            return await ctx.send(Utils.suppressed(ctx,msg))
-        # Check if we have a muted role
-        try: mute_role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
-        except: mute_role = None
-        item = next((x for x in self.settings.getServerStat(ctx.guild,"MuteList",[]) if str(x["ID"])==str(member.id)),None)
+    def _get_mute_status(self, member, ctx, muted_list=None, mute_role=None):
+        # Helper to get the muted status of a passed member based on info passed
+        # This command will get the MuteList if none is passed, but assumes that
+        # that the calling function has already fetched the mute_role to avoid
+        # multiple db calls where possible.
+        #
+        # Returns a tuple of (muted_bool, cooldown_timestamp, readable_cooldown, muted_role_bool, muted_in_channels)
+        #
+        # If not muted, will only return False - any function receiving
+        # this info should check return_value[0] before querying the rest.
+        #
+        if not ctx or not ctx.guild: # Can't be muted in dm
+            return False
+        if muted_list is None: # Resolve the mute list if not passed
+            muted_list = self.settings.getServerStat(server,"MuteList",[])
+        # Get the muted_list entry, if any
+        muted_entry = next((x for x in muted_list if str(x["ID"])==str(member.id)),None)
+        # Check if the member has the muted role
         if mute_role and mute_role in member.roles:
-            # We're muted using the role - let's get the cooldown if any
-            if not item or item["Cooldown"] == None:
+            # Get the cooldown if any
+            if not muted_entry or muted_entry["Cooldown"] is None:
                 # No cooldown - let's just give the bad news...
-                return await ctx.send("*{}* is **muted**.".format(DisplayName.name(member)))
+                return (True,None,"",True,None)
             # We're still muted - but have a cooldown
-            return await ctx.send("*{}* is **muted**.\n*{}* remain.".format(
-                DisplayName.name(member),
-                ReadableTime.getReadableTimeBetween(int(time.time()), item["Cooldown"])
-            ))
-        muted_channels = 0
+            return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),True,None)
+        # Not using a muted role - check if we have any channel overrides
+        muted_channels = []
         # Walk the channels we may be muted in
         for channel in ctx.guild.channels:
             if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
@@ -503,22 +504,54 @@ class Mute(commands.Cog):
             overs = channel.overwrites_for(member) # Get any overrides for the user
             # Check if we match any of the mute overrides - and if we have any others
             if any(x[0] in self.mute_perms and x[1] != None for x in overs):
-                muted_channels += 1
+                muted_channels.append(channel)
         # Tell the user if the target is muted
         if muted_channels:
-            if not item or item["Cooldown"] == None:
+            # Get the cooldown if any
+            if not muted_entry or muted_entry["Cooldown"] is None:
                 # No cooldown - let's just give the bad news...
-                return await ctx.send("*{}* is **muted** in {} channel{}.".format(
-                    DisplayName.name(member),
-                    muted_channels,
-                    "" if muted_channels == 1 else "s"
-                ))
+                return (True,None,"",False,muted_channels)
             # We're still muted - but have a cooldown
-            return await ctx.send("*{}* is **muted** in {} channel{},\n*{}* remain.".format(
-                DisplayName.name(member),
-                muted_channels,    
-                "" if muted_channels == 1 else "s",
-                ReadableTime.getReadableTimeBetween(int(time.time()), item["Cooldown"])
-            ))
-        # Not muted - let em know
-        await ctx.send("*{}* is **unmuted**.".format(DisplayName.name(member)))
+            return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),False,muted_channels)
+        return False
+
+    @commands.command(aliases=["muted","listmuted"])
+    async def ismuted(self, ctx, *, member = None):
+        """Says whether a member is muted in chat - pass no arguments to get a list of all muted members."""
+
+        if member is None:
+            member_list = ctx.guild.members # Check all
+        else:
+            # Try to resolve the passed member
+            member_list = [DisplayName.memberForName(member, ctx.guild)]
+            if not member_list[0]:
+                return await PickList.PagePicker(
+                    title="Mute Results for \"{}\":".format(member),
+                    description="I couldn't find that member...",
+                    color=ctx.author,
+                    ctx=ctx
+                ).pick()
+        # Check if we have a muted role
+        try: mute_role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
+        except: mute_role = None
+        muted_list = self.settings.getServerStat(ctx.guild,"MuteList",[])
+        muted_members = []
+        for m in member_list:
+            mute_stat = self._get_mute_status(m,ctx,muted_list,mute_role)
+            if not mute_stat: continue # Not muted.
+            # Parse the output
+            value = "{} - `{}`\n{}{}".format(
+                m.mention,m.id,
+                "" if not mute_stat[-1] else "In {:,} channel{}\n".format(len(mute_stat[-1]),"" if len(mute_stat[-1])==1 else "s"),
+                "Muted until further notice." if not mute_stat[2] else mute_stat[2] + " remain."
+            )
+            muted_members.append({"name":"{}".format(m),"value":value})
+        title = "Currently Muted Members:" if member is None else "Mute Results for \"{}\":".format(member)
+        desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
+        return await PickList.PagePicker(
+            title=title,
+            description=desc,
+            list=muted_members,
+            color=ctx.author,
+            ctx=ctx
+        ).pick()
