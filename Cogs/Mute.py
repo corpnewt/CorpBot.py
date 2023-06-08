@@ -1,7 +1,7 @@
 import asyncio, discord, time, parsedatetime
 from discord.ext import commands
 from datetime import datetime
-from Cogs import Utils, DisplayName, ReadableTime, PickList
+from Cogs import Utils, DisplayName, ReadableTime, PickList, Nullify
 
 def setup(bot):
     # Add the bot and deps
@@ -518,15 +518,16 @@ class Mute(commands.Cog):
     @commands.command(aliases=["muted","listmuted"])
     async def ismuted(self, ctx, *, member = None):
         """Says whether a member is muted in chat - pass no arguments to get a list of all muted members."""
-
         if member is None:
             member_list = ctx.guild.members # Check all
+            title = "Currently Muted Members:"
         else:
             # Try to resolve the passed member
             member_list = [DisplayName.memberForName(member, ctx.guild)]
+            title = "Mute Results for \"{}\":".format(Nullify.resolve_mentions(member,ctx=ctx))
             if not member_list[0]:
                 return await PickList.PagePicker(
-                    title="Mute Results for \"{}\":".format(member),
+                    title=title,
                     description="I couldn't find that member...",
                     color=ctx.author,
                     ctx=ctx
@@ -546,7 +547,6 @@ class Mute(commands.Cog):
                 "Muted until further notice." if not mute_stat[2] else mute_stat[2] + " remain."
             )
             muted_members.append({"name":"{}".format(m),"value":value})
-        title = "Currently Muted Members:" if member is None else "Mute Results for \"{}\":".format(member)
         desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
         return await PickList.PagePicker(
             title=title,
