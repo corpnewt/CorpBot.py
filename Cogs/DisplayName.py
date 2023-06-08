@@ -29,7 +29,7 @@ class DisplayName(commands.Cog):
         # Check nick first - then name
         name = str(name).lower()
         for member in mems:
-            if isinstance(member, discord.User):
+            if isinstance(member,(discord.User,discord.ClientUser)):
                 # Users don't have nicknames, only members
                 break
             if member.nick and member.nick.lower() == name:
@@ -38,7 +38,7 @@ class DisplayName(commands.Cog):
             if member.name.lower() == name:
                 return member
             # Check if we have the new global_name
-            if isinstance(member, discord.User):
+            if isinstance(member,(discord.User,discord.ClientUser)):
                 global_name = getattr(member,"global_name",None)
             else:
                 global_name = getattr(getattr(member,"_user",None),"global_name",None)
