@@ -469,7 +469,7 @@ class Mute(commands.Cog):
         msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
         await mess.edit(content=msg)
 
-    def _get_mute_status(self, member, ctx, muted_list=None, mute_role=None):
+    def _get_mute_status(self, member, ctx, muted_list=None, mute_role=None, check_channels=False):
         # Helper to get the muted status of a passed member based on info passed
         # This command will get the MuteList if none is passed, but assumes that
         # that the calling function has already fetched the mute_role to avoid
@@ -494,30 +494,31 @@ class Mute(commands.Cog):
                 return (True,None,"",True,None)
             # We're still muted - but have a cooldown
             return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),True,None)
-        # Not using a muted role - check if we have any channel overrides
-        muted_channels = []
-        # Walk the channels we may be muted in
-        for channel in ctx.guild.channels:
-            if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
-            if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
-                if channel.permissions_synced: channel = channel.category # Get the category if we're synced
-            overs = channel.overwrites_for(member) # Get any overrides for the user
-            # Check if we match any of the mute overrides - and if we have any others
-            if any(x[0] in self.mute_perms and x[1] != None for x in overs):
-                muted_channels.append(channel)
-        # Tell the user if the target is muted
-        if muted_channels:
-            # Get the cooldown if any
-            if not muted_entry or muted_entry["Cooldown"] is None:
-                # No cooldown - let's just give the bad news...
-                return (True,None,"",False,muted_channels)
-            # We're still muted - but have a cooldown
-            return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),False,muted_channels)
+        if check_channels:
+            # Not using a muted role - check if we have any channel overrides
+            muted_channels = []
+            # Walk the channels we may be muted in
+            for channel in ctx.guild.channels:
+                if not isinstance(channel,(discord.TextChannel,discord.VoiceChannel)): continue
+                if hasattr(channel,"permissions_synced"): # Implemented in 1.3.0 of discord.py
+                    if channel.permissions_synced: channel = channel.category # Get the category if we're synced
+                overs = channel.overwrites_for(member) # Get any overrides for the user
+                # Check if we match any of the mute overrides - and if we have any others
+                if any(x[0] in self.mute_perms and x[1] != None for x in overs):
+                    muted_channels.append(channel)
+            # Tell the user if the target is muted
+            if muted_channels:
+                # Get the cooldown if any
+                if not muted_entry or muted_entry["Cooldown"] is None:
+                    # No cooldown - let's just give the bad news...
+                    return (True,None,"",False,muted_channels)
+                # We're still muted - but have a cooldown
+                return (True,muted_entry["Cooldown"],ReadableTime.getReadableTimeBetween(int(time.time()),muted_entry["Cooldown"]),False,muted_channels)
         return False
 
     @commands.command(aliases=["muted","listmuted"])
     async def ismuted(self, ctx, *, member = None):
-        """Says whether a member is muted in chat - pass no arguments to get a list of all muted members."""
+        """Says whether a member is muted in chat - pass no arguments to get a list of all muted members.  Channel override mutes are only checked if a member is passed."""
         if ctx.guild is None:
             return await ctx.send("Mutes do not apply in dm.")
         if member is None:
@@ -540,15 +541,21 @@ class Mute(commands.Cog):
         muted_list = self.settings.getServerStat(ctx.guild,"MuteList",[])
         muted_members = []
         for m in member_list:
-            mute_stat = self._get_mute_status(m,ctx,muted_list,mute_role)
+            mute_stat = self._get_mute_status(
+                m,
+                ctx,
+                muted_list=muted_list,
+                mute_role=mute_role,
+                check_channels=member is not None
+            )
             if not mute_stat: continue # Not muted.
             # Parse the output
-            value = "{} - `{}`\n{}{}".format(
-                m.mention,m.id,
-                "" if not mute_stat[-1] else "In {:,} channel{}\n".format(len(mute_stat[-1]),"" if len(mute_stat[-1])==1 else "s"),
+            value = "`       ID:` `{}`\n{}` Cooldown:` {}".format(
+                m.id,
+                "" if not mute_stat[-1] else "`Mute Type:` Permission-based (in {:,} channel{})\n".format(len(mute_stat[-1]),"" if len(mute_stat[-1])==1 else "s"),
                 "Muted until further notice." if not mute_stat[2] else mute_stat[2] + " remain."
             )
-            muted_members.append({"name":"{}".format(m),"value":value})
+            muted_members.append({"name":"{}. {} ({})".format(len(muted_members)+1,DisplayName.name(m),m),"value":value})
         desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
         return await PickList.PagePicker(
             title=title,
