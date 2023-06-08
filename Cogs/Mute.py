@@ -518,6 +518,8 @@ class Mute(commands.Cog):
     @commands.command(aliases=["muted","listmuted"])
     async def ismuted(self, ctx, *, member = None):
         """Says whether a member is muted in chat - pass no arguments to get a list of all muted members."""
+        if ctx.guild is None:
+            return await ctx.send("Mutes do not apply in dm.")
         if member is None:
             member_list = ctx.guild.members # Check all
             title = "Currently Muted Members:"
