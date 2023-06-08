@@ -2,7 +2,7 @@ import asyncio, discord, time, os
 from   discord.ext import commands
 from   datetime import datetime
 from   operator import itemgetter
-from   Cogs import Utils, Settings, ReadableTime, DisplayName
+from   Cogs import Utils, Settings, ReadableTime, DisplayName, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -29,6 +29,10 @@ class Channel(commands.Cog):
 			self.settings.setUserStat(after, after.guild, "LastOnline", currentTime)
 		
 
+	##
+	## Not sure why I decided to put these commands in the Channel cog?  I'll likely move
+	## them to more sane spots eventually...
+	##
 	@commands.command(pass_context=True)
 	async def islocked(self, ctx):
 		"""Says whether the bot only responds to admins."""
@@ -42,28 +46,6 @@ class Channel(commands.Cog):
 		rules = self.settings.getServerStat(ctx.guild, "Rules")
 		msg = "***{}*** **Rules:**\n{}".format(ctx.guild.name, rules)
 		await ctx.send(Utils.suppressed(ctx,msg))
-
-
-	@commands.command(pass_context=True)
-	async def listmuted(self, ctx):
-		"""Lists the names of those that are muted."""
-		muteList = self.settings.getServerStat(ctx.guild, "MuteList")
-		activeMutes = []
-		for entry in muteList:
-			member = DisplayName.memberForID(entry['ID'], ctx.guild)
-			if member:
-				# Found one!
-				activeMutes.append(DisplayName.name(member))
-
-		if not len(activeMutes):
-			await ctx.send("No one is currently muted.")
-			return
-
-		# We have at least one member muted
-		msg = 'Currently muted:\n\n'
-		msg += ', '.join(activeMutes)
-
-		await ctx.send(Utils.suppressed(ctx,msg))
 		
 		
 	@commands.command(pass_context=True)
@@ -74,8 +56,7 @@ class Channel(commands.Cog):
 
 		if not len(promoSorted):
 			roleText = "There are no admin roles set yet.  Use `{}addadmin [role]` to add some.".format(ctx.prefix)
-			await ctx.send(roleText)
-			return
+			return await ctx.send(roleText)
 		
 		roleText = "__**Current Admin Roles:**__\n\n"
 
@@ -115,6 +96,9 @@ class Channel(commands.Cog):
 		role_embed.add_field(name="Members", value='{:,} of {:,} online.'.format(memberOnline, memberCount), inline=True)
 		await ctx.send(embed=role_embed)'''
 
+	##
+	## End of the odd commands
+	##
 
 	@commands.command(pass_context=True)
 	async def log(self, ctx, messages : int = 25, *, chan : discord.TextChannel = None):
