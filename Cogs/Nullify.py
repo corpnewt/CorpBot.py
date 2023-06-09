@@ -27,12 +27,16 @@ def escape_all(string, mentions = True, markdown = True, links = True):
         # This is a bit wonky - let's search the string and retain endpoints for individual
         # matches for a forward slash that isn't preceeded by a backslash
         index = 0
+        pattern = re.compile(r"[^\\](\/)")
         while True:
-            match = re.search(r"[^\\](\/)", string)
+            if index >= len(string): break # Out of bounds
+            match = pattern.search(string, index)
             if not match: break # Leave the loop if we don't have a match
             # Got a match - let's insert a backslash
             start,end = match.span()
             string = string[:start+1]+"\\"+string[start+1:]
+            # Update the index so we're not constantly revisiting the same spots
+            index = end
     return string
 
 def resolve_mentions(string, ctx = None, escape = True, show_mentions = True, channel_mentions = False):
