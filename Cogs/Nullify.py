@@ -20,9 +20,19 @@ def clean(string, deaden_links = False, ctx = None):
             i_adjust += len(match)-len(m.group(0))
     return resolve_mentions(string,ctx=ctx)
 
-def escape_all(string, mentions = True, markdown = True):
+def escape_all(string, mentions = True, markdown = True, links = True):
     if mentions: string = discord.utils.escape_mentions(string)
     if markdown: string = discord.utils.escape_markdown(string)
+    if links:
+        # This is a bit wonky - let's search the string and retain endpoints for individual
+        # matches for a forward slash that isn't preceeded by a backslash
+        index = 0
+        while True:
+            match = re.search(r"[^\\](\/)", string)
+            if not match: break # Leave the loop if we don't have a match
+            # Got a match - let's insert a backslash
+            start,end = match.span()
+            string = string[:start+1]+"\\"+string[start+1:]
     return string
 
 def resolve_mentions(string, ctx = None, escape = True, show_mentions = True, channel_mentions = False):

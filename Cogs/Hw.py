@@ -488,8 +488,7 @@ class Hw(commands.Cog):
 	@commands.command()
 	async def hw(self, ctx, *, user : str = None, build = None):
 		"""Lists the hardware for either the user's default build - or the passed build."""
-		if not user:
-			user = "{}".format(ctx.author.mention)
+		if not user: user = ctx.author.mention
 
 		# Let's check for username and build name
 		parts = user.split()
@@ -613,8 +612,7 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwraw"])
 	async def rawhw(self, ctx, *, user : str = None, build = None):
 		"""Lists the raw markdown for either the user's default build - or the passed build."""
-		if not user:
-			user = str(ctx.author)
+		if not user: user = ctx.author.mention
 	
 		# Let's check for username and build name
 		parts = user.split()
@@ -737,8 +735,7 @@ class Hw(commands.Cog):
 	async def listhw(self, ctx, *, user = None):
 		"""Lists the builds for the specified user - or yourself if no user passed."""
 		usage = 'Usage: `{}listhw [user]`'.format(ctx.prefix)
-		if not user:
-			user = str(ctx.author)
+		if not user: user = ctx.author.mention
 		member = DisplayName.memberForName(user, ctx.guild)
 		if not member:
 			return await ctx.send(usage)
@@ -756,7 +753,7 @@ class Hw(commands.Cog):
 	async def lhw(self, ctx, *, user = None):
 		"""Lists only the titles of the builds for the specified user - or yourself if no user passed."""
 		usage = 'Usage: `{}lhw [user]`'.format(ctx.prefix)
-		if not user: user = ctx.author.id
+		if not user: user = ctx.author.mention
 		member = DisplayName.memberForName(user, ctx.guild)
 		if not member: return await ctx.send(usage)
 		buildList = self.settings.getGlobalUserStat(member, "Hardware", [])
