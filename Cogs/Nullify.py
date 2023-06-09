@@ -39,7 +39,7 @@ def escape_all(string, mentions = True, markdown = True, links = True):
             index = end
     return string
 
-def resolve_mentions(string, ctx = None, escape = True, show_mentions = True, channel_mentions = False):
+def resolve_mentions(string, ctx = None, escape = True, escape_links = False, show_mentions = True, channel_mentions = False):
     guild = ctx if isinstance(ctx,discord.Guild) else ctx.guild if hasattr(ctx,"guild") else None
     if guild:
         # We have a guild - let's try to resolve!
@@ -60,4 +60,4 @@ def resolve_mentions(string, ctx = None, escape = True, show_mentions = True, ch
             if show_mentions: name = ("#" if "#" in m.group(0) else "@")+name
             string = string[0:m.start()+i_adjust] + name + string[i_adjust+m.end():]
             i_adjust += len(name)-len(m.group(0))
-    return escape_all(string,markdown=False) if escape else string # Catch any missing mentions as needed
+    return escape_all(string,markdown=False,links=escape_links) if escape else string # Catch any missing mentions as needed
