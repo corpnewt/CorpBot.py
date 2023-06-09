@@ -110,7 +110,7 @@ class Lists(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append("{}{} {}".format(ctx.prefix,i["command"],Nullify.escape_all(name)))
+				other_names.append("{}{} {}".format(ctx.prefix,i["command"],Nullify.escape_all(name,links=False)))
 				
 		if not itemList or itemList == []:
 			no_items = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
