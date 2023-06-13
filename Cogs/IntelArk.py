@@ -60,8 +60,7 @@ class IntelArk(commands.Cog):
 		# Strip single quotes
 		text = text.replace("'","")
 		if not len(text):
-			await Message.EmbedText(**args).send(ctx)
-			return
+			return await Message.EmbedText(**args).send(ctx)
 
 		args["description"] = "Gathering info..."
 		message = await Message.EmbedText(**args).send(ctx)
@@ -79,7 +78,10 @@ class IntelArk(commands.Cog):
 
 		elif len(response) == 1:
 			# Set it to the first item
-			response = await self.get_match_data(response[0])
+			try:
+				response = await self.get_match_data(response[0])
+			except:
+				response = None
 
 		# Check if we got more than one result (either not exact, or like 4790 vs 4790k)
 		elif len(response) > 1:
@@ -94,8 +96,7 @@ class IntelArk(commands.Cog):
 
 			if index < 0:
 				args["description"] = "Search cancelled."
-				await Message.EmbedText(**args).edit(ctx, message)
-				return
+				return await Message.EmbedText(**args).edit(ctx, message)
 
 			# Got something
 			response = await self.get_match_data(response[index])
