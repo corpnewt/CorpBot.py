@@ -15,7 +15,7 @@ class BotAdmin(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.dregex =  re.compile(r"(?i)(discord(\.gg|app\.com)\/)(?!attachments)([^\s]+)")
-		self.mention_re = re.compile(r"[0-9]{17,21}")
+		self.mention_re = re.compile(r"<?@?!?[0-9]{17,21}>?")
 		self.removal = re.compile(r"(?i)-?r(em(ove|oval)?)?=\d+")
 		self.max_last = 50 # Semi-arbitrary limit for the number of resolved last=[time] members
 		global Utils, DisplayName
@@ -225,7 +225,7 @@ class BotAdmin(commands.Cog):
 		except: days = None
 		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name.lower() in ("ban","klean") else None
 		for index,item in enumerate(args):
-			if self.mention_re.search(item): # Check if it's a mention
+			if self.mention_re.fullmatch(item): # Check if it's a mention
 				# Resolve the member
 				mem_id = int(re.sub(r'\W+', '', item))
 				member = ctx.guild.get_member(mem_id)
