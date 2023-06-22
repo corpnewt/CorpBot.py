@@ -13,6 +13,8 @@ class CorpPlayer(pomice.Player):
 	def __init__(self,*args,**kwargs):
 		pomice.Player.__init__(self,*args,**kwargs)
 		self.queue = pomice.Queue()
+		self.failure_count = 0
+		self.failed_tracks = {}
 
 	async def move_to(self, channel=None):
 		# Needless wrapper for something that should work as-is?
@@ -47,6 +49,7 @@ class CorpTrack(pomice.objects.Track):
 		self.seek = track.get("position",0)
 		self.radio = radio
 		self.to_remove = to_remove
+		self.did_fail = False
 		try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
 		except: self.thumb = None
 		# Set up the track_type if it's not already a pomice TrackType
@@ -91,6 +94,9 @@ class Music(commands.Cog):
 		# They really need to get their shit together with this...
 		self.vol_ratio = 0.75
 		self.reconnect_wait = 0.5 # Number of seconds to wait before reconnecting
+		# Save our failure thresholds
+		self.player_failure_threshold = 5 # >= we stop music
+		self.track_failure_threshold = 2 # >= we clear out that track
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
 		'''	"b"  :"│",  # "║" # Bar outline
@@ -230,6 +236,56 @@ class Music(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_pomice_track_end(self,player,track,reason):
+		player_failed = track_failed = False
+		if getattr(track,"did_fail",False):
+			# Incrememnt our failure counts
+			try:
+				player.failed_tracks[track.track_id] = player.failed_tracks.get(track.track_id,0)+1
+				if player.failed_tracks[track.track_id] >= self.track_failure_threshold:
+					track_failed = True
+				player.failure_count += 1
+				if player.failure_count >= self.player_failure_threshold:
+					player_failed = True
+			except: pass
+		else:
+			# Clear our failure counts
+			try:
+				player.failure_count = 0
+				player.failed_tracks.pop(track.track_id,None)
+			except: pass
+		# Get our context
+		# If attached to the player, it's bound to the starting track - if we only have it on the
+		# track, then we're just replying to the last queued element.
+		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+		color_ctx = getattr(player,"track_ctx",ctx)
+		# Check for failures
+		if player_failed:
+			# Clear attributes to prevent triggering the event again
+			self._clear_player(player,[x for x in self.player_clear+["ctx"]])
+			await self._stop(player,clear_attrs=False,clear_queue=True,disconnect=False)
+			return await Message.Embed(
+				title="♫ Failure Threshold Exceeded!",
+				description="{:,} or more track{} failed to play in a row - cleared queue and stopped playing to prevent spam.".format(
+					self.player_failure_threshold,"" if self.player_failure_threshold==1 else "s"
+				),
+				color=color_ctx.author
+			).send(ctx)
+		if track_failed:
+			# We need to remove all instances of this track from the queue
+			if not player.queue.is_empty:
+				# Strip other instances of the failed track
+				queue = [t for t in player.queue if t.track_id != track.track_id]
+				player.queue.clear()
+				await self.add_to_queue(player,queue)
+			await Message.Embed(
+				title="♫ Track Failure Threshold Exceeded!",
+				description="{} has exceeded the allowed failure threshold - all instances have been removed from the current queue to prevent spam.".format(
+					track.title
+				),
+				url=track.uri,
+				thumbnail=getattr(track,"thumb",None),
+				color=color_ctx.author
+			).send(ctx)
 		await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the player - prevents issues with it thinking it's still playing
 		# print("TRACK ENDED",player)
 		# print(track)
@@ -241,11 +297,6 @@ class Music(commands.Cog):
 			if hasattr(player,"track_seek"): track.seek = player.track_seek # Restore the seek position
 			await self.add_to_queue(player,track)
 		if player.queue.is_empty:
-			# Nothing else to play - let's attempt to get our context.
-			# If attached to the player, it's bound to the starting track - if we only have it on the
-			# track, then we're just replying to the last queued element.
-			ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
-			color_ctx = getattr(player,"track_ctx",ctx)
 			if not ctx: return # Nothing left to play, and nowhere to post our end message.
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			return await Message.Embed(title="♫ End of playlist!",color=color_ctx.author,delete_after=delay).send(ctx)
@@ -256,28 +307,30 @@ class Music(commands.Cog):
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
 		color_ctx = getattr(player,"track_ctx",ctx)
 		if not ctx: return # Nowhere to post our error message.
-		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		return await Message.Embed(
 			title="♫ Track {}!".format(str(issue).capitalize()),
 			description="Something went wrong playing \"{}\".\n\n{}".format(track,error),
-			color=color_ctx.author,
-			delete_after=delay
+			url=track.uri,
+			thumbnail=getattr(track,"thumb",None),
+			color=color_ctx.author
 		).send(ctx)
 
 	@commands.Cog.listener()
 	async def on_pomice_track_exception(self,player,track,error):
-		await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the player - prevents issues with it thinking it's still playing
 		print("TRACK EXCEPTION",player)
 		print(track)
 		print(error)
+		track.did_fail = True
 		await self._print_track_issue("Exception",player,track,error)
+		await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the player - prevents issues with it thinking it's still playing
 
 	@commands.Cog.listener()
 	async def on_pomice_track_stuck(self,player,track):
-		await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the player - prevents issues with it thinking it's still playing
 		print("TRACK STUCK",player)
 		print(track)
+		track.did_fail = True
 		await self._print_track_issue("Stuck",player,track,"The track got stuck - you may need to skip it if the issue persists.")
+		await self._stop(player,clear_attrs=False,clear_queue=False,disconnect=False) # Stop the player - prevents issues with it thinking it's still playing
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, user, before, after):
