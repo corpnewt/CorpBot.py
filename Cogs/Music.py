@@ -829,7 +829,9 @@ class Music(commands.Cog):
 		if message.reference:
 			# Resolve the replied to reference to a message object
 			try:
-				m = await message.channel.fetch_message(message.reference.message_id)
+				m = self.bot.get_message(message.reference.message_id)
+				if not m: # Wasn't cached - try to retrieve it
+					m = await message.channel.fetch_message(message.reference.message_id)
 				if m.content or m.attachments:
 					message = m
 			except:
@@ -843,8 +845,15 @@ class Music(commands.Cog):
 			return message
 		# We got a match - let's try to get the server, channel, and message
 		try:
-			m_id = int(m.group().split("/")[-1])
-			m = self.bot.get_message(m_id)
+			g_id,c_id,m_id = m.group().split("/")[-3:]
+			m = self.bot.get_message(int(m_id))
+			if m:
+				return m # Message was cached
+			if g_id == "@me": # This is a dm - assume the channel is the user
+				c = message.author
+			else: # Resolve the channel
+				c = self.bot.get_channel(int(c_id))
+			m = await c.fetch_message(int(m_id))
 			assert m
 			return m
 		except:
