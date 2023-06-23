@@ -44,6 +44,9 @@ class Beer(commands.Cog):
         self.weight_oz["kg"] = self.weight_oz["kilogram"]
         self.weight_oz["oz"] = self.weight_oz["ounce"]
 
+        global Utils
+        Utils = self.bot.get_cog("Utils")
+
     def _check_float(self, f, round_to=4):
         if f == int(f): return int(f)
         if round_to<=0: return f
@@ -212,10 +215,9 @@ class Beer(commands.Cog):
         # Let's see if we're responding to a prior message
         prev_r = prev_t = prev_e = None
         try:
-            if ctx.message.reference: # Resolve the replied to reference to a message object
-                reply = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                if reply.embeds: # Get the first embed - if any
-                    prev_e = reply.embeds[0]
+            reply = await Utils.get_replied_to(ctx.message,ctx=ctx)
+            if reply.embeds: # Get the first embed - if any
+                prev_e = reply.embeds[0]
         except: pass
         # If we have an embed in the reply - check for IBU Total (Rager) and IBU Total (Tinseth)
         # or IBU (Rager) and IBU (Tinseth)
