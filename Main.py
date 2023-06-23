@@ -69,11 +69,13 @@ async def return_message():
 	stat_check = "{}-ReturnChannel".format(bot.user.id)
 	return_channel = settings.getGlobalStat(stat_check,None)
 	if return_channel:
+		settings.delGlobalStat(stat_check)
 		message_to = bot.get_channel(return_channel)
 		if not message_to:
-			# No channel
-			return
-		settings.delGlobalStat(stat_check)
+			# No channel - try getting a user, possibly rebooted in dm
+			message_to = bot.get_user(return_channel)
+			if not message_to:
+				return
 		return_options = [
 			"I'm back!",
 			"I have returned!",
