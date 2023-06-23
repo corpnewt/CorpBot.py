@@ -65,8 +65,19 @@ class Translate(commands.Cog):
         ).pick()
 
     @commands.command()
-    async def detectlang(self, ctx, *, text):
+    async def detectlang(self, ctx, *, text = None):
         """Reports the detected language and certainty of the passed text."""
+        # Find out if we're replying to another message
+        reply = None
+        if ctx.message.reference:
+            # Resolve the replied to reference to a message object
+            try:
+                message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+                reply = await Utils.get_message_content(message)
+            except:
+                pass
+        if reply: # Use the replied to message content instead
+            text = reply
         if text is None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
         lang_detect = await self.bot.loop.run_in_executor(None, self.translator.detect, text)
         await Message.EmbedText(
@@ -87,7 +98,7 @@ class Translate(commands.Cog):
             if value: value = value[0]
         return value
 
-    @commands.command(name="translate", aliases=["tr"], )
+    @commands.command(name="translate", aliases=["tr"])
     async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
         To see a number of potential language identifiers, use the langlist command.
@@ -108,8 +119,8 @@ class Translate(commands.Cog):
         if ctx.message.reference:
             # Resolve the replied to reference to a message object
             try:
-                message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                reply = message.content
+                message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+                reply = await Utils.get_message_content(message)
             except:
                 pass
         if reply: # Prepend our replied-to text, if any
@@ -196,7 +207,7 @@ class Translate(commands.Cog):
 
     @commands.command(name="pronounce", aliases=["pr"])
     async def pronounce(self, ctx, *, text=None):
-        """Pronunciation for a sentence in the English language.\n
+        """Pronunciation for a sentence in the English language.
         $pronounce こんにちは --> returns \"Kon'nichiwa\""""
 
         # Find out if we're replying to another message
@@ -204,8 +215,8 @@ class Translate(commands.Cog):
         if ctx.message.reference:
             # Resolve the replied to reference to a message object
             try:
-                message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                reply = message.content
+                message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+                reply = await Utils.get_message_content(message)
             except:
                 pass
         if reply: # Prepend our replied-to text, if any

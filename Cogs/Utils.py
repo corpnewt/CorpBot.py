@@ -138,3 +138,52 @@ class Utils(commands.Cog):
 		elif getattr(guild,"icon",None):
 			return guild.icon.url
 		return self.get_default_avatar()
+
+	async def get_message_content(self,message,ctx=None):
+		# Returns the adjusted content of a message - stripping any command
+		# call prefix if needed
+		if not isinstance(message,discord.Message): return ""
+		if not ctx:
+			ctx = await self.bot.get_context(message)
+		if not ctx or not ctx.command:
+			return message.content
+		# We have a command - check names and aliases
+		for check in [ctx.command.name]+list(ctx.command.aliases):
+			check_str = ctx.prefix+check
+			if message.content.startswith(check_str):
+				return message.content[len(check_str):].strip()
+		# If we got here, nothing was found - return the original content
+		return message.content
+
+	async def get_replied_to(self,message,ctx=None):
+		# Returns the replied-to message first by checking the cache, then
+		# by fetching it.
+		if not isinstance(message,discord.Message): return None
+		if not message.reference: return None
+		replied_to = self.bot.get_message(message.reference.message_id)
+		if not replied_to: # Not in the cache, try to retrieve it
+			if not ctx: # First retrieve the context if needed
+				ctx = await self.bot.get_context(message)
+			replied_to = await ctx.channel.fetch_message(message.reference.message_id)
+		return replied_to
+
+	async def get_message_from_url(self,message_url,ctx=None):
+		# Attempts to resolve the passed URL to the message object using the passed
+		# context as needed.
+		try:
+			guild_id,channel_id,message_id = message_url.split("/")[-3:]
+			message = self.bot.get_message(int(message_id))
+			if message: return message
+			# Resolve the originating channel
+			if guild_id == "@me":
+				if not ctx: return None # Need context to resolve to the author
+				channel = ctx.author
+			else:
+				channel = self.bot.get_channel(int(channel_id))
+			message = await channel.fetch_message(int(message_id))
+			assert message # Force a failure if the message wasn't found
+			return message
+		except:
+			pass
+		# Nothing resolved - bail
+		return None

@@ -798,12 +798,7 @@ class Music(commands.Cog):
 	async def _load_playlist_from_url(self, message, ctx, shuffle = False):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
-		m_ctx = await self.bot.get_context(message)
-		if m_ctx.command and message.content: # Strip the command from the contents
-			comm = m_ctx.command.name
-			url = comm.join(message.content.split(comm)[1:]).strip()
-		else: # Just use the original content
-			url = message.content
+		url = await Utils.get_message_content(message)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not url and not message.attachments:
@@ -829,36 +824,21 @@ class Music(commands.Cog):
 		if message.reference:
 			# Resolve the replied to reference to a message object
 			try:
-				m = self.bot.get_message(message.reference.message_id)
-				if not m: # Wasn't cached - try to retrieve it
-					m = await message.channel.fetch_message(message.reference.message_id)
+				m = await Utils.get_replied_to(message)
 				if m.content or m.attachments:
 					message = m
-			except:
-				pass
+			except: pass			
 		# Check if we have any attachments - if so, those take priority
 		if message.content is None and message.attachments:
 			return message
 		# Check if the message contains a discord message URL
-		m = self.message_regex.search(message.content)
-		if not m:
+		m_match = self.message_regex.search(message.content)
+		if not m_match:
 			return message
 		# We got a match - let's try to get the server, channel, and message
-		try:
-			g_id,c_id,m_id = m.group().split("/")[-3:]
-			m = self.bot.get_message(int(m_id))
-			if m:
-				return m # Message was cached
-			if g_id == "@me": # This is a dm - assume the channel is the user
-				c = message.author
-			else: # Resolve the channel
-				c = self.bot.get_channel(int(c_id))
-			m = await c.fetch_message(int(m_id))
-			assert m
-			return m
-		except:
-			pass
-		return message
+		ctx = await self.bot.get_context(message)
+		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
+		return m or message
 
 	@commands.command(aliases=["recon","rec"])
 	async def reconnect(self, ctx):
