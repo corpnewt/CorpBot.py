@@ -515,7 +515,7 @@ class Xp(commands.Cog):
 			await ctx.message.channel.send(msg)
 		
 	@commands.command(pass_context=True)
-	async def gamble(self, ctx, bet : int = None):
+	async def gamble(self, ctx, bet = None):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
 		author  = ctx.message.author
@@ -524,14 +524,11 @@ class Xp(commands.Cog):
 		
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
 		msg = 'Usage: `{}gamble [xp reserve bet] (must be multiple of 10)`'.format(ctx.prefix)
-		
-		if not (bet or type(bet) == int):
-			await channel.send(msg)
-			return
-			
-		if not type(bet) == int:
-			await channel.send(msg)
-			return
+
+		try:
+			bet = int(float(bet))
+		except:
+			return await ctx.send(msg)
 
 		isAdmin    = Utils.is_admin(ctx)
 		checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
