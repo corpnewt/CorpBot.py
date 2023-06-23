@@ -467,7 +467,7 @@ class Bot(commands.Cog):
 		if not await Utils.is_owner_reply(ctx): return
 
 		# Save the return channel and flush settings
-		self.settings.setGlobalStat("ReturnChannel",ctx.channel.id)
+		self.settings.setGlobalStat("{}-ReturnChannel".format(self.bot.user.id),ctx.channel.id)
 		# Flush settings asynchronously here
 		await ctx.invoke(self.settings.flush)
 		await ctx.send("Rebooting...")
