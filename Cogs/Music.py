@@ -97,6 +97,8 @@ class Music(commands.Cog):
 		# Save our failure thresholds
 		self.player_failure_threshold = 5 # >= we stop music
 		self.track_failure_threshold = 2 # >= we clear out that track
+		# Regex fun
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?\w+\.discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
 		'''	"b"  :"│",  # "║" # Bar outline
@@ -793,27 +795,61 @@ class Music(commands.Cog):
 		added_tracks = await self.add_to_queue(player,valid_tracks)
 		return (valid_tracks,added_tracks)
 
-	async def _load_playlist_from_url(self, url, ctx, shuffle = False):
+	async def _load_playlist_from_url(self, message, ctx, shuffle = False):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = await self.get_player(ctx.guild)
+		m_ctx = await self.bot.get_context(message)
+		if m_ctx.command and message.content: # Strip the command from the contents
+			comm = m_ctx.command.name
+			url = comm.join(message.content.split(comm)[1:]).strip()
+		else: # Just use the original content
+			url = message.content
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		if url is None and len(ctx.message.attachments) == 0:
-			return await ctx.send("Usage: `{}loadpl [url or attachment]`".format(ctx.prefix))
-		if url is None:
-			url = ctx.message.attachments[0].url
-		message = await Message.Embed(title="♫ Downloading...",color=ctx.author).send(ctx)
+		if not url and not message.attachments:
+			return await ctx.send("Usage: `{}{} [url or attachment]`".format(ctx.prefix,"shufflepl" if shuffle else "loadpl"))
+		if not url:
+			url = message.attachments[0].url
+		m = await Message.Embed(title="♫ Downloading...",color=ctx.author).send(ctx)
 		try:
 			playlist = await DL.async_json(url.strip("<>"))
 		except Exception as e:
-			return await Message.Embed(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,message)
-		if not len(playlist): return await Message.Embed(title="♫ Playlist is empty!",color=ctx.author).edit(ctx,message)
-		if not isinstance(playlist,list): return await Message.Embed(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,message)
+			return await Message.Embed(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,m)
+		if not len(playlist): return await Message.Embed(title="♫ Playlist is empty!",color=ctx.author).edit(ctx,m)
+		if not isinstance(playlist,list): return await Message.Embed(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,m)
 		if shuffle: random.shuffle(playlist)
 		# Let's walk the items and add them
 		valid_tracks,added_tracks = await self._load_playlist_data(ctx,player,playlist_data=playlist)
-		await Message.Embed(title="♫ Added {:,}/{:,} {}song{} from playlist!".format(added_tracks,len(valid_tracks),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,message)
+		await Message.Embed(title="♫ Added {:,}/{:,} {}song{} from playlist!".format(added_tracks,len(valid_tracks),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,m)
 		self.bot.dispatch("check_play",player)
+
+	async def _resolve_message(self, message):
+		# Helper to check the passed message for a discord message link - or a replied to message.
+		# Will return the target message - if found, otherwise the original
+		if message.reference:
+			# Resolve the replied to reference to a message object
+			try:
+				m = await message.channel.fetch_message(message.reference.message_id)
+				if m.content or m.attachments:
+					message = m
+			except:
+				pass
+		# Check if we have any attachments - if so, those take priority
+		if message.content is None and message.attachments:
+			return message
+		# Check if the message contains a discord message URL
+		m = self.message_regex.search(message.content)
+		if not m:
+			return message
+		# We got a match - let's try to get the server, channel, and message
+		try:
+			c_id,m_id = m.group().split("/")[-2:]
+			channel = self.bot.get_channel(int(c_id))
+			m = await channel.fetch_message(int(m_id))
+			assert m
+			return m
+		except:
+			return message
 
 	@commands.command(aliases=["recon","rec"])
 	async def reconnect(self, ctx):
@@ -842,7 +878,8 @@ class Music(commands.Cog):
 		Note that the structure of this file is very specific and alterations may not work.
 		
 		Only files dumped via the savepl command are supported."""
-		await self._load_playlist_from_url(url, ctx)
+		message = await self._resolve_message(ctx.message)
+		await self._load_playlist_from_url(message, ctx)
 
 	@commands.command()
 	async def shufflepl(self, ctx, *, url = None):
@@ -851,7 +888,8 @@ class Music(commands.Cog):
 		Note that the structure of this file is very specific and alterations may not work.
 		
 		Only files dumped via the savepl command are supported."""
-		await self._load_playlist_from_url(url, ctx, shuffle=True)
+		message = await self._resolve_message(ctx.message)
+		await self._load_playlist_from_url(message, ctx, shuffle=True)
 
 	@commands.command()
 	async def savepl(self, ctx, *, options = ""):
