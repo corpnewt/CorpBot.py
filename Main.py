@@ -66,13 +66,14 @@ async def return_message():
 	settings = bot.get_cog("Settings")
 	if not settings:
 		return
-	return_channel = settings.getGlobalStat("ReturnChannel",None)
-	if not return_channel == None:
+	stat_check = "{}-ReturnChannel".format(bot.user.id)
+	return_channel = settings.getGlobalStat(stat_check,None)
+	if return_channel:
 		message_to = bot.get_channel(return_channel)
-		if message_to == None:
+		if not message_to:
 			# No channel
 			return
-		settings.delGlobalStat("ReturnChannel")
+		settings.delGlobalStat(stat_check)
 		return_options = [
 			"I'm back!",
 			"I have returned!",
