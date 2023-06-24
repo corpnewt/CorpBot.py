@@ -15,6 +15,41 @@ class Encode(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.types = (
+			# Decimal types
+			"decimal",
+			"dec",
+			"d",
+			"integer",
+			"int",
+			"i",
+			# Base64 types
+			"base64",
+			"b64",
+			"b",
+			# Binary types
+			"binary",
+			"bin",
+			"bin8",
+			"bin16",
+			"bin32",
+			"bin64",
+			# Ascii/text types
+			"ascii",
+			"a",
+			"text",
+			"t",
+			"string",
+			"str",
+			"s",
+			# Hex types
+			"hexadecimal",
+			"hex",
+			"h",
+			"bhex",
+			"lhex"
+		)
+		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext","(h)ex")
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -43,7 +78,7 @@ class Encode(commands.Cog):
 		return filePath
 		
 	def remove(self, path):
-		if not path == None and os.path.exists(path):
+		if not path is None and os.path.exists(path):
 			shutil.rmtree(os.path.dirname(path), ignore_errors=True)
 
 	# Helper methods
@@ -62,6 +97,68 @@ class Encode(commands.Cog):
 		hex_string = hex_string.replace("0x", "").replace("0X", "")
 		hex_string = re.sub(r'[^0-9A-Fa-f]+', '', hex_string)
 		return hex_string
+
+	def _convert_value(self, val, from_type, to_type):
+		# Normalize case
+		from_type = from_type.lower()
+		to_type = to_type.lower()
+		# Ensure types are valid
+		if not from_type in self.types or not to_type in self.types:
+			return None
+		# Resolve the value to hex bytes
+		if from_type.startswith(("d","i")):
+			val_hex = "{:x}".format(int(val))
+			val_adj = binascii.unhexlify("0"*(len(val_hex)%2)+val_hex)
+		elif from_type.startswith("bin"):
+			val_hex = "{:x}".format(int("".join([x for x in val if x in "01"]),2))
+			val_adj = binascii.unhexlify("0"*(len(val_hex)%2)+val_hex)
+		elif from_type.startswith("b") and not from_type=="bhex":
+			if len(val)%4: # Pad with =
+				val += "="*(4-len(val)%4)
+			val_adj = base64.b64decode(val.encode())
+		elif from_type.startswith(("a","t","s")):
+			val_adj = binascii.hexlify(val.encode())
+			val_adj = val.encode()
+		elif from_type == "lhex": # Little-endian
+			val = self._check_hex(val)
+			val = "0"*(len(val)%2)+val
+			hex_rev = "".join(["".join(x) for x in [val[i:i + 2] for i in range(0,len(val),2)][::-1]])
+			val_adj = binascii.unhexlify(hex_rev)
+		else: # Assume bhex/hex
+			val = self._check_hex(val)
+			val_adj = binascii.unhexlify("0"*(len(val)%2)+val)
+		# At this point - everything is converted to hex bytes - let's convert
+		out = None
+		if to_type.startswith(("d","i")):
+			out = str(int(binascii.hexlify(val_adj).decode(),16))
+		elif to_type.startswith("bin"):
+			out = "{:b}".format(int(binascii.hexlify(val_adj).decode(),16))
+			# Get our chunk/pad size - use 8 as a fallback
+			try: pad = int(to_type[3:])
+			except: pad = 8
+			# Pad if needed
+			if len(out)%pad:
+				out = "0"*(pad-len(out)%pad)+out
+			# Split into chunks
+			out = "{}".format(" ".join((out[0+i:pad+i] for i in range(0,len(out),pad))))
+		elif to_type.startswith("b") and not to_type=="bhex":
+			out = base64.b64encode(val_adj).decode()
+		elif to_type.startswith(("a","t","s")):
+			out = val_adj.decode()
+		elif to_type == "lhex": # Little-endian
+			out = binascii.hexlify(val_adj).decode().upper() # Get the hex values as a string
+			pad_val = "0"*(len(out)%2)+out
+			out = "".join(["".join(x) for x in [pad_val[i:i + 2] for i in range(0,len(pad_val),2)][::-1]]).upper()
+		else:
+			out = binascii.hexlify(val_adj).decode().upper()
+			if from_type.startswith(("d","i","bin")): # No need to pad to an even length - but prepend 0x
+				out = "0x"+hex(int(out,16))[2:].upper()
+			else:
+				if len(out)%2: # Not from a decimal, and an odd length - prepend 0
+					out = "0"+out
+				# Also split into chunks of 8 for readability
+				out = " ".join((out[0+i:8+i] for i in range(0,len(out),8)))
+		return out
 
 	# To base64 methods
 	def _ascii_to_base64(self, ascii_string):
@@ -154,7 +251,7 @@ class Encode(commands.Cog):
 				try: color_values.append(int(x))
 				except: pass # Bad value - ignore
 		original_type = "hex" if len(color_values) == 1 else "rgb" if len(color_values) == 3 else "cmyk" if len(color_values) == 4 else None
-		if original_type == None: return await ctx.send("Incorrect number of color values!  Hex takes 1, RGB takes 3, CMYK takes 4.")
+		if original_type is None: return await ctx.send("Incorrect number of color values!  Hex takes 1, RGB takes 3, CMYK takes 4.")
 		# Verify values
 		max_val = int("FFFFFF",16) if original_type == "hex" else 255 if original_type == "rgb" else 100
 		if not all((0 <= x <= max_val for x in color_values)):
@@ -250,14 +347,14 @@ class Encode(commands.Cog):
 				except:	continue
 		return available
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def slide(self, ctx, *, input_hex = None):
 		"""Calculates your slide value for Clover based on an input address (in hex)."""
-		if input_hex == None and len(ctx.message.attachments) == 0: # No info passed - bail!
+		if input_hex is None and len(ctx.message.attachments) == 0: # No info passed - bail!
 			return await ctx.send("Usage: `{}slide [hex address]`".format(ctx.prefix))
 		# Check for urls
-		matches = [] if input_hex == None else list(re.finditer(self.regex, input_hex))
-		slide_url = ctx.message.attachments[0].url if input_hex == None else None if not len(matches) else matches[0].group(0)
+		matches = [] if input_hex is None else list(re.finditer(self.regex, input_hex))
+		slide_url = ctx.message.attachments[0].url if input_hex is None else None if not len(matches) else matches[0].group(0)
 		if slide_url:
 			path = await self.download(slide_url)
 			if not path: # It was just an attachment - bail
@@ -290,16 +387,14 @@ class Encode(commands.Cog):
 		pad = max([len(x[0]) for x in slides])
 		await ctx.send("**Applicable Slide Values:**\n```\n{}\n```".format("\n".join(["{}: slide={}".format(x[0].rjust(pad),x[1]) for x in slides])))
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hexswap(self, ctx, *, input_hex = None):
 		"""Byte swaps the passed hex value."""
-		if input_hex == None:
-			await ctx.send("Usage: `{}hexswap [input_hex]`".format(ctx.prefix))
-			return
+		if input_hex is None:
+			return await ctx.send("Usage: `{}hexswap [input_hex]`".format(ctx.prefix))
 		input_hex = self._check_hex(input_hex)
 		if not len(input_hex):
-			await ctx.send("Malformed hex - try again.")
-			return
+			return await ctx.send("Malformed hex - try again.")
 		# Normalize hex into pairs
 		input_hex = list("0"*(len(input_hex)%2)+input_hex)
 		hex_pairs = [input_hex[i:i + 2] for i in range(0, len(input_hex), 2)]
@@ -307,50 +402,44 @@ class Encode(commands.Cog):
 		hex_str = "".join(["".join(x) for x in hex_rev])
 		await ctx.send(hex_str.upper())
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hexdec(self, ctx, *, input_hex = None):
 		"""Converts hex to decimal."""
-		if input_hex == None:
-			await ctx.send("Usage: `{}hexdec [input_hex]`".format(ctx.prefix))
-			return
+		if input_hex is None:
+			return await ctx.send("Usage: `{}hexdec [input_hex]`".format(ctx.prefix))
 		
 		input_hex = self._check_hex(input_hex)
 		if not len(input_hex):
-			await ctx.send("Malformed hex - try again.")
-			return
+			return await ctx.send("Malformed hex - try again.")
 		
 		try:
 			dec = int(input_hex, 16)
 		except Exception:
-			await ctx.send("I couldn't make that conversion!")
-			return	
+			return await ctx.send("I couldn't make that conversion!")
 
 		await ctx.send(dec)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def dechex(self, ctx, *, input_dec = None):
 		"""Converts an int to hex."""
-		if input_dec == None:
-			await ctx.send("Usage: `{}dechex [input_dec]`".format(ctx.prefix))
-			return
+		if input_dec is None:
+			return await ctx.send("Usage: `{}dechex [input_dec]`".format(ctx.prefix))
 
 		try:
 			input_dec = int(input_dec)
 		except Exception:
-			await ctx.send("Input must be an integer.")
-			return
+			return await ctx.send("Input must be an integer.")
 		min_length = 2
 		hex_str = "{:x}".format(input_dec).upper()
 		hex_str = "0"*(len(hex_str)%min_length)+hex_str
 		await ctx.send("0x"+hex_str)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def strbin(self, ctx, *, input_string = None):
 		"""Converts the input string to its binary representation."""
-		if input_string == None:
-			await ctx.send("Usage: `{}strbin [input_string]`".format(ctx.prefix))
-			return
+		if input_string is None:
+			return await ctx.send("Usage: `{}strbin [input_string]`".format(ctx.prefix))
 		msg = ''.join('{:08b}'.format(ord(c)) for c in input_string)
 		# Format into blocks:
 		# - First split into chunks of 8
@@ -360,60 +449,52 @@ class Encode(commands.Cog):
 		msg += " ".join(msg_list)
 		msg += "```"	
 		if len(msg) > 1993:
-			await ctx.send("Well... that was *a lot* of 1s and 0s.  Maybe try a smaller string... Discord won't let me send all that.")
-			return
+			return await ctx.send("Well... that was *a lot* of 1s and 0s.  Maybe try a smaller string... Discord won't let me send all that.")
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def binstr(self, ctx, *, input_binary = None):
 		"""Converts the input binary to its string representation."""
-		if input_binary == None:
-			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
-			return
+		if input_binary is None:
+			return await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
 		# Clean the string
 		new_bin = ""
 		for char in input_binary:
 			if char == "0" or char == "1":
 				new_bin += char
 		if not len(new_bin):
-			await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
-			return
+			return await ctx.send("Usage: `{}binstr [input_binary]`".format(ctx.prefix))
 		msg = ''.join(chr(int(new_bin[i:i+8], 2)) for i in range(0, len(new_bin), 8))
 		await ctx.send(Nullify.escape_all(msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def binint(self, ctx, *, input_binary = None):
 		"""Converts the input binary to its integer representation."""
-		if input_binary == None:
-			await ctx.send("Usage: `{}binint [input_binary]`".format(ctx.prefix))
-			return
+		if input_binary is None:
+			return await ctx.send("Usage: `{}binint [input_binary]`".format(ctx.prefix))
 		try:
 			msg = int(input_binary, 2)
 		except Exception:
 			msg = "I couldn't make that conversion!"
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def intbin(self, ctx, *, input_int = None):
 		"""Converts the input integer to its binary representation."""
-		if input_int == None:
-			await ctx.send("Usage: `{}intbin [input_int]`".format(ctx.prefix))
-			return
+		if input_int is None:
+			return await ctx.send("Usage: `{}intbin [input_int]`".format(ctx.prefix))
 		try:
 			input_int = int(input_int)
 		except Exception:
-			await ctx.send("Input must be an integer.")
-			return
+			return await ctx.send("Input must be an integer.")
 
 		await ctx.send("{:08b}".format(input_int))
 
-	
-
-	@commands.command(pass_context=True)
+	'''@commands.command()
 	async def encode(self, ctx, from_type = None , to_type = None, *, value = None):
 		"""Data converter from ascii <--> hex <--> base64."""
 
-		if value == None or from_type == None or to_type == None:
+		if value is None or from_type is None or to_type is None:
 			msg = 'Usage: `{}encode [from_type] [to_type] [value]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
 			await ctx.send(msg)
 			return
@@ -462,5 +543,27 @@ class Encode(commands.Cog):
 					return
 		except Exception:
 			await ctx.send("I couldn't make that conversion!")
-			return		
+			return	'''	
 	
+	@commands.command()
+	async def encode(self, ctx, from_type = None, to_type = None, *, value = None):
+		"""Data converter that supports hex, decimal, binary, base64, and ascii."""
+
+		if any((x is None for x in (value,from_type,to_type))):
+			return await ctx.send(
+				'Usage: `{}encode [from_type] [to_type] [value]`\nAvailable types are:\n{}'.format(ctx.prefix,", ".join(self.display_types))
+			)
+		
+		if not from_type.lower() in self.types:
+			return await ctx.send("Invalid *from* type!\nAvailable types are:\n{}".format(", ".join(self.display_types)))
+
+		if not to_type.lower() in self.types:
+			return await ctx.send("Invalid *to* type!\nAvailable types are:\n{}".format(", ".join(self.display_types)))
+
+		if from_type.lower() == to_type.lower():
+			return await ctx.send("*Poof!* Your encoding was done before it started!")
+			
+		try:
+			return await ctx.send(Nullify.escape_all(self._convert_value(value,from_type,to_type)))
+		except Exception as e:
+			return await ctx.send(Nullify.escape_all("I couldn't make that conversion:\n{}".format(e)))
