@@ -30,10 +30,6 @@ class Encode(commands.Cog):
 			# Binary types
 			"binary",
 			"bin",
-			"bin8",
-			"bin16",
-			"bin32",
-			"bin64",
 			# Ascii/text types
 			"ascii",
 			"a",
@@ -49,7 +45,7 @@ class Encode(commands.Cog):
 			"bhex",
 			"lhex"
 		)
-		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext","(h)ex")
+		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext/(s)tring","(h)ex/bhex/lhex")
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -103,8 +99,11 @@ class Encode(commands.Cog):
 		from_type = from_type.lower()
 		to_type = to_type.lower()
 		# Ensure types are valid
-		if not from_type in self.types or not to_type in self.types:
-			return None
+		if (not from_type in self.types \
+		and not from_type.startswith("bin")) \
+		or (not to_type in self.types \
+		and not to_type.startswith("bin")):
+			raise Exception("Invalid from or to type")
 		# Resolve the value to hex bytes
 		if from_type.startswith(("d","i")):
 			val_hex = "{:x}".format(int(val))
@@ -134,8 +133,15 @@ class Encode(commands.Cog):
 		elif to_type.startswith("bin"):
 			out = "{:b}".format(int(binascii.hexlify(val_adj).decode(),16))
 			# Get our chunk/pad size - use 8 as a fallback
-			try: pad = int(to_type[3:])
-			except: pad = 8
+			pad = 8
+			if to_type.startswith("binary"):
+				try: pad = abs(int(to_type[6:]))
+				except: pass
+			else:
+				try: pad = abs(int(to_type[3:]))
+				except: pass
+			# Can't have a 0 pad
+			if pad <= 0: pad = 8
 			# Pad if needed
 			if len(out)%pad:
 				out = "0"*(pad-len(out)%pad)+out
@@ -551,14 +557,14 @@ class Encode(commands.Cog):
 
 		if any((x is None for x in (value,from_type,to_type))):
 			return await ctx.send(
-				'Usage: `{}encode [from_type] [to_type] [value]`\nAvailable types are:\n{}'.format(ctx.prefix,", ".join(self.display_types))
+				'Usage: `{}encode [from_type] [to_type] [value]`\nAvailable types include:\n- {}'.format(ctx.prefix,"\n- ".join(self.display_types))
 			)
 		
-		if not from_type.lower() in self.types:
-			return await ctx.send("Invalid *from* type!\nAvailable types are:\n{}".format(", ".join(self.display_types)))
+		if not from_type.lower() in self.types and not from_type.lower().startswith("bin"):
+			return await ctx.send("Invalid *from* type!\nAvailable types include:\n- {}".format("\n- ".join(self.display_types)))
 
-		if not to_type.lower() in self.types:
-			return await ctx.send("Invalid *to* type!\nAvailable types are:\n{}".format(", ".join(self.display_types)))
+		if not to_type.lower() in self.types and not to_type.lower().startswith("bin"):
+			return await ctx.send("Invalid *to* type!\nAvailable types include:\n- {}".format("\n- ".join(self.display_types)))
 
 		if from_type.lower() == to_type.lower():
 			return await ctx.send("*Poof!* Your encoding was done before it started!")
