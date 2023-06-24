@@ -145,7 +145,7 @@ class Comic(commands.Cog):
 	def _date_dict(self,date,padded=True):
 		if isinstance(date,(int,float)):
 			date = self._gregorian_day(date)
-		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(x) for x in date.split("-")]
+		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(int(x)) for x in date.split("-")]
 		return {"month":m,"day":d,"year":y}
 
 	async def _get_last_comic_number(self,comic_data,date=None,month_adjust=0):
