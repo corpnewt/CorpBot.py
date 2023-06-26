@@ -42,8 +42,16 @@ class Encode(commands.Cog):
 			"hexadecimal",
 			"hex",
 			"h",
+			# - Big endian specifics
 			"bhex",
-			"lhex"
+			"hexb",
+			"bh",
+			"hb",
+			# - Little endian specifics
+			"lhex",
+			"hexl",
+			"lh",
+			"hl"
 		)
 		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext/(s)tring","(h)ex/bhex/lhex")
 		global Utils
@@ -111,14 +119,14 @@ class Encode(commands.Cog):
 		elif from_type.startswith("bin"):
 			val_hex = "{:x}".format(int("".join([x for x in val if x in "01"]),2))
 			val_adj = binascii.unhexlify("0"*(len(val_hex)%2)+val_hex)
-		elif from_type.startswith("b") and not from_type=="bhex":
+		elif from_type.startswith("b") and not from_type in ("bhex","bh"):
 			if len(val)%4: # Pad with =
 				val += "="*(4-len(val)%4)
 			val_adj = base64.b64decode(val.encode())
 		elif from_type.startswith(("a","t","s")):
 			val_adj = binascii.hexlify(val.encode())
 			val_adj = val.encode()
-		elif from_type == "lhex": # Little-endian
+		elif from_type in ("lhex","hexl","lh","hl"): # Little-endian
 			val = self._check_hex(val)
 			val = "0"*(len(val)%2)+val
 			hex_rev = "".join(["".join(x) for x in [val[i:i + 2] for i in range(0,len(val),2)][::-1]])
@@ -147,11 +155,11 @@ class Encode(commands.Cog):
 				out = "0"*(pad-len(out)%pad)+out
 			# Split into chunks
 			out = "{}".format(" ".join((out[0+i:pad+i] for i in range(0,len(out),pad))))
-		elif to_type.startswith("b") and not to_type=="bhex":
+		elif to_type.startswith("b") and not to_type in ("bhex","bh"):
 			out = base64.b64encode(val_adj).decode()
 		elif to_type.startswith(("a","t","s")):
 			out = val_adj.decode()
-		elif to_type == "lhex": # Little-endian
+		elif to_type in ("lhex","hexl","lh","hl"): # Little-endian
 			out = binascii.hexlify(val_adj).decode().upper() # Get the hex values as a string
 			pad_val = "0"*(len(out)%2)+out
 			out = "".join(["".join(x) for x in [pad_val[i:i + 2] for i in range(0,len(pad_val),2)][::-1]]).upper()
@@ -495,76 +503,33 @@ class Encode(commands.Cog):
 			return await ctx.send("Input must be an integer.")
 
 		await ctx.send("{:08b}".format(input_int))
-
-	'''@commands.command()
-	async def encode(self, ctx, from_type = None , to_type = None, *, value = None):
-		"""Data converter from ascii <--> hex <--> base64."""
-
-		if value is None or from_type is None or to_type is None:
-			msg = 'Usage: `{}encode [from_type] [to_type] [value]`\nTypes include ascii, hex, and base64.'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
-
-		types = [ "base64", "hex", "ascii" ]
-		
-		# Allow first letters as well
-		from_check = [x for x in types if x[0] == from_type.lower()]
-		from_type = from_type if not len(from_check) else from_check[0]
-		to_check = [x for x in types if x[0] == to_type.lower()]
-		to_type = to_type if not len(to_check) else to_check[0]
-		
-		if not from_type.lower() in types:
-			await ctx.send("Invalid *from* type!")
-			return
-
-		if not to_type.lower() in types:
-			await ctx.send("Invalid *to* type!")
-			return
-
-		if from_type.lower() == to_type.lower():
-			await ctx.send("*Poof!* Your encoding was done before it started!")
-			return
-
-		try:
-			if from_type.lower() == "base64":
-				if to_type.lower() == "hex":
-					await ctx.send(Nullify.escape_all(self._base64_to_hex(value)))
-					return
-				elif to_type.lower() == "ascii":
-					await ctx.send(Nullify.escape_all(self._base64_to_ascii(value)))
-					return
-			elif from_type.lower() == "hex":
-				if to_type.lower() == "ascii":
-					await ctx.send(Nullify.escape_all(self._hex_to_ascii(value)))
-					return
-				elif to_type.lower() == "base64":
-					await ctx.send(Nullify.escape_all(self._hex_to_base64(value)))
-					return
-			elif from_type.lower() == "ascii":
-				if to_type.lower() == "hex":
-					await ctx.send(Nullify.escape_all(self._ascii_to_hex(value)))
-					return
-				elif to_type.lower() == "base64":
-					await ctx.send(Nullify.escape_all(self._ascii_to_base64(value)))
-					return
-		except Exception:
-			await ctx.send("I couldn't make that conversion!")
-			return	'''	
 	
 	@commands.command()
 	async def encode(self, ctx, from_type = None, to_type = None, *, value = None):
 		"""Data converter that supports hex, decimal, binary, base64, and ascii."""
 
-		if any((x is None for x in (value,from_type,to_type))):
-			return await ctx.send(
-				'Usage: `{}encode [from_type] [to_type] [value]`\nAvailable types include:\n- {}'.format(ctx.prefix,"\n- ".join(self.display_types))
-			)
-		
-		if not from_type.lower() in self.types and not from_type.lower().startswith("bin"):
-			return await ctx.send("Invalid *from* type!\nAvailable types include:\n- {}".format("\n- ".join(self.display_types)))
+		usage = 'Usage: `{}encode [from_type] [to_type] [value]`\nAvailable types include:\n- {}'.format(ctx.prefix,"\n- ".join(self.display_types))
+		if from_type is None or to_type is None:
+			return await ctx.send(usage)
 
-		if not to_type.lower() in self.types and not to_type.lower().startswith("bin"):
-			return await ctx.send("Invalid *to* type!\nAvailable types include:\n- {}".format("\n- ".join(self.display_types)))
+		# Find out if we're replying to another message
+		reply = None
+		if ctx.message.reference:
+			# Resolve the replied to reference to a message object
+			try:
+				message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+				reply = await Utils.get_message_content(message)
+			except:
+				pass
+		if reply: # Use the replied to message content instead
+			value = reply
+
+		if not value:
+			return await ctx.send(usage)
+
+		for v,n in ((from_type,"from"),(to_type,"to")):
+			if not v.lower() in self.types and not v.lower().startswith("bin"):
+				return await ctx.send("Invalid *{}* type!\nAvailable types include:\n- {}".format(n,"\n- ".join(self.display_types)))
 
 		if from_type.lower() == to_type.lower():
 			return await ctx.send("*Poof!* Your encoding was done before it started!")
