@@ -366,7 +366,7 @@ class BotAdmin(commands.Cog):
 		await self.kick_ban(ctx,members,"kick")
 		
 		
-	@commands.command(aliases=["yote"])
+	@commands.command(aliases=["yote","bean"])
 	async def ban(self, ctx, *, members = None, reason = None):
 		"""Bans the passed members for the specified reason.
 		All ban targets must be mentions or ids to avoid ambiguity (bot-admin only).
