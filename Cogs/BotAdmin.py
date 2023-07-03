@@ -166,6 +166,71 @@ class BotAdmin(commands.Cog):
 		).pick()
 
 
+	@commands.command(aliases=["dbladd"])
+	async def adddbl(self, ctx, *, member = None):
+		"""Adds the passed member to the default role blacklist - preventing the bot from checking them for default roles at startup (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if member is None:
+			return await ctx.send("Usage: `{}adddbl [member]`".format(ctx.prefix))
+		# Try to resolve the member
+		m = DisplayName.memberForName(member, ctx.guild)
+		if not m:
+			return await ctx.send("I couldn't find that member :(")
+		# Get the current list - if any
+		blacklist = self.settings.getServerStat(ctx.guild, "DefaultRoleBlacklist", [])
+		if m.id in blacklist:
+			return await ctx.send("*{}* is already blacklisted from getting the default role.".format(DisplayName.name(m)))
+		# Add them to the list
+		blacklist.append(m.id)
+		self.settings.setServerStat(ctx.guild, "DefaultRoleBlacklist", blacklist)
+		return await ctx.send("*{}* is now blacklisted from getting the default role.".format(DisplayName.name(m)))
+
+	@commands.command(aliases=["dblrem"])
+	async def remdbl(self, ctx, *, member = None):
+		"""Removes the passed user from the default role blacklist (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if member is None:
+			return await ctx.send("Usage: `{}remdbl [member]`".format(ctx.prefix))
+		# Try to resolve the member
+		m = DisplayName.memberForName(member, ctx.guild)
+		if not m:
+			return await ctx.send("I couldn't find that member :(")
+		# Get the current list - if any
+		blacklist = self.settings.getServerStat(ctx.guild, "DefaultRoleBlacklist", [])
+		if not m.id in blacklist:
+			return await ctx.send("*{}* is not blacklisted from getting the default role.".format(DisplayName.name(m)))
+		# Remove all instances of their id from the list
+		blacklist = [x for x in blacklist if x != m.id]
+		self.settings.setServerStat(ctx.guild, "DefaultRoleBlacklist", blacklist)
+		return await ctx.send("*{}* is no longer blacklisted from getting the default role.".format(DisplayName.name(m)))
+
+	@commands.command(aliases=["dblclear"])
+	async def cleardbl(self, ctx):
+		"""Clears the default role blacklist (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		# Get the current list - if any
+		blacklist = self.settings.getServerStat(ctx.guild, "DefaultRoleBlacklist", [])
+		if not blacklist:
+			return await ctx.send("The default role blacklist is already empty.")
+		# Reset the blacklist
+		self.settings.setServerStat(ctx.guild, "DefaultRoleBlacklist", [])
+		return await ctx.send("*{:,}* member{} are no longer blacklisted from getting the default role.".format(len(blacklist),"" if len(blacklist)==1 else "s"))
+
+	@commands.command(aliases=["dbllist"])
+	async def listdbl(self, ctx):
+		"""Lists the members in the default role blacklist."""
+		blacklist = [ctx.guild.get_member(x) for x in self.settings.getServerStat(ctx.guild,"DefaultRoleBlacklist",[])]
+		blacklist = sorted([x for x in blacklist if x],key=lambda x:x.name.lower()) # Skip all None values
+		if not blacklist:
+			return await ctx.send("The default role blacklist is empty.")
+		desc = "\n".join(["{}. {} ({})".format(i,Utils.suppressed(ctx,str(x)),x.id) for i,x in enumerate(blacklist,start=1)])
+		return await PickList.PagePicker(
+			title="Members Blacklisted from the Default Role ({:,} total)".format(len(blacklist)),
+			description=desc,
+			ctx=ctx
+		).pick()
+
+
 	def get_seconds(self, time_string=None):
 		if not isinstance(time_string,str): return 0
 		allowed = {"w":604800,"d":86400,"h":3600,"m":60,"s":1}
