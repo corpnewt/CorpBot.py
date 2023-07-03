@@ -138,7 +138,7 @@ class Hw(commands.Cog):
 		await ctx.send(msg)
 
 	
-	@commands.command(aliases=["hwdel","remhw","hwrem"])
+	@commands.command(aliases=["hwdel","remhw","hwrem","hwdelete","deletehw","hwremove","removehw"])
 	async def delhw(self, ctx, *, build = None):
 		"""Removes a build from your build list."""
 
@@ -768,7 +768,7 @@ class Hw(commands.Cog):
 			ctx=ctx
 		).pick()
 
-	@commands.command(aliases=["hwnew"])
+	@commands.command(aliases=["hwnew","hwadd","addhw"])
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot.  The hardware added will also be set as the Main Build."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
