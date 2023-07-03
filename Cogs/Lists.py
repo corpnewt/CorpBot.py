@@ -48,6 +48,7 @@ class Lists(commands.Cog):
 				"l_role": "RequiredTagRole",
 			}
 		}
+		self.zws = "​"
 		
 		
 	'''async def onjoin(self, member, server):
@@ -98,6 +99,8 @@ class Lists(commands.Cog):
 		if not name:
 			msg = 'Usage: `{}{}[[name]] "[[[name]] name]"`'.format(ctx.prefix,"raw" if raw else "").replace("[[name]]",l_name.lower())
 			return await ctx.send(msg)
+		# Strip zero width spaces
+		name = name.replace(self.zws,"")
 		itemList = self.settings.getServerStat(ctx.guild, l_list, [])
 		# Check other lists
 		other_commands = []
@@ -110,7 +113,7 @@ class Lists(commands.Cog):
 			if any(x["Name"].lower() == name.lower() for x in check_list):
 				# Add the list
 				other_commands.append(i)
-				other_names.append("{}{} {}".format(ctx.prefix,i["command"],Nullify.escape_all(name,links=False)))
+				other_names.append("{}{} {}".format(ctx.prefix,i["command"],name.replace("`","`{}".format(self.zws))))
 				
 		if not itemList or itemList == []:
 			no_items = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
@@ -127,7 +130,7 @@ class Lists(commands.Cog):
 			if index < 0:
 				return await message.edit(content=no_items)
 			# Got something
-			await message.edit(content="`{}`".format(other_names[index]))
+			await message.edit(content="```\n{}\n```".format(other_names[index].replace("`","`{}".format(self.zws))))
 			# Invoke
 			return await ctx.invoke(self.bot.all_commands.get(other_commands[index]["command"]), name=name)
 
@@ -145,7 +148,7 @@ class Lists(commands.Cog):
 		if len(potentialList):
 			# Setup and display the picker
 			msg = not_found + '\n\nSelect one of the following close matches:'
-			p_list = [x["Item"]["Name"] for x in potentialList]
+			p_list = [x["Item"]["Name"].replace("`","`{}".format(self.zws)) for x in potentialList]
 			p_list.extend(other_names)
 			index, message = await PickList.Picker(
 				title=msg,
@@ -158,7 +161,7 @@ class Lists(commands.Cog):
 			# Check if we have another command
 			if index >= len(potentialList):
 				# We're into our other list
-				await message.edit(content="`{}`".format(Nullify.escape_all(other_names[index - len(potentialList)])))
+				await message.edit(content="```\n{}\n```".format(other_names[index - len(potentialList)].replace("`","`{}".format(self.zws))))
 				# Invoke
 				return await ctx.invoke(self.bot.all_commands.get(other_commands[index - len(potentialList)]["command"]), name=name)
 			# Display the item
@@ -256,7 +259,7 @@ class Lists(commands.Cog):
 			msg = 'No [[name]]s in list!  You can add some with the `{}add[[name]] "[[[name]] name]" [[[key]]]` command!'.format(ctx.prefix).replace("[[name]]",l_name.lower()).replace("[[key]]",l_key.lower())
 			return await ctx.send(msg)
 		# Sort by link name
-		items = [{"name":"{}. {}".format(i,x["Name"]),"value":Utils.truncate_string(x[l_key])} for i,x in enumerate(sorted(itemList, key=lambda x:x["Name"].lower()),start=1)]
+		items = [{"name":"{}. {}".format(i,Nullify.escape_all(x["Name"])),"value":Utils.truncate_string(x[l_key])} for i,x in enumerate(sorted(itemList, key=lambda x:x["Name"].lower()),start=1)]
 		return await PickList.PagePicker(title="Current {}s ({:,} total)".format(l_name,len(itemList)),list=items,ctx=ctx).pick()
 
 	async def _get_role(self,ctx,l_role="RequiredLinkRole",l_list="Links",l_name="Link",l_key="URL"):
