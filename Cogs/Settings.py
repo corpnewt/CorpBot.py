@@ -426,10 +426,12 @@ class Settings(commands.Cog):
 			defRole = self.getServerStat(server, "DefaultRole")
 			defRole = DisplayName.roleForID(defRole, server)
 			if defRole:
+				# Get the default role blacklist - only do this if we have a default role
+				blacklist = self.getServerStat(server, "DefaultRoleBlacklist", [])
 				# We have a default - check for it
 				for member in guilds[server_id]:
-					if member.bot:
-						# skip bots
+					if member.bot or member.id in blacklist:
+						# skip bots and blacklisted members
 						continue
 					if not defRole in member.roles:
 						# We don't have the role - set a timer
