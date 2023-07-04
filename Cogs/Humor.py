@@ -379,10 +379,10 @@ class Humor(commands.Cog):
 			d = ImageDraw.Draw(image)
 			name_text = test_user.display_name
 			name_size = name_max_h # max size for the name to fit
-			t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+			_,_,t_w,t_h = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 			if t_w > name_max_w:
 				name_size = int(t_h*(name_max_w/t_w))
-				t_w,t_h = d.textsize(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+				_,_,t_w,t_h = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 			d.text((210+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
@@ -402,9 +402,10 @@ class Humor(commands.Cog):
 			os.remove('images/Stardewnow.png')
 		except Exception as e:
 			print(e)
-			pass
-		if os.path.exists(path):
-			GetImage.remove(path)
+			return await message.edit(content="I guess I couldn't draw that image :(")
+		finally:
+			if os.path.exists(path):
+				GetImage.remove(path)
 
 	@commands.command()
 	async def slap(self, ctx, *, user = None):

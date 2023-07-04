@@ -23,7 +23,7 @@ class Clippy(commands.Cog):
         # If the width of the text is smaller than image width
         # we don't need to split it, just add it to the lines array
         # and return
-        if font.getsize(text)[0] <= max_width:
+        if font.getbbox(text)[-2] <= max_width:
             lines.append(text)
         else:
             # split the line by spaces to get words
@@ -32,7 +32,7 @@ class Clippy(commands.Cog):
             # append every word to a line while its width is shorter than image width
             while i < len(words):
                 line = ''
-                while i < len(words) and font.getsize(line + words[i])[0] <= max_width:
+                while i < len(words) and font.getbbox(line + words[i])[-2] <= max_width:
                     line = line + words[i] + " "
                     i += 1
                 if not line:
@@ -73,14 +73,14 @@ class Clippy(commands.Cog):
             font = ImageFont.truetype('fonts/comic.ttf', size=xs)
             #340 is the width we want to set the image width to
             lines = self.text_wrap(text, font, 340)
-            line_height = font.getsize('hg')[1]
+            line_height = font.getbbox('hg')[-1]
             (x, y) = (25, 20)
             color = 'rgb(0, 0, 0)' # black color
-            text_size = draw.textsize(text, font=font)
+            text_size = draw.textbbox((0,0),text,font=font)
 
             for line in lines:
-                text_size = draw.textsize(line, font=font)
-                image_x = (image_width /2 ) - (text_size[0]/2)
+                text_size = draw.textbbox((0,0),line,font=font)
+                image_x = (image_width /2 ) - (text_size[2]/2)
                 draw.text((image_x, y), line, fill=color, font=font)
                 y = y + line_height
             if y < 182: # Check if the text overlaps. 182 was found by trial and error.
@@ -88,8 +88,8 @@ class Clippy(commands.Cog):
                 draw = ImageDraw.Draw(image)
                 (x, y) = (25, 20)
                 for line in lines:
-                    text_size = draw.textsize(line, font=font)
-                    image_x = (image_width /2 ) - (text_size[0]/2)
+                    text_size = draw.textbbox((0,0),line,font=font)
+                    image_x = (image_width /2 ) - (text_size[2]/2)
                     draw.text((image_x, y), line, fill=color, font=font)
                     y = y + line_height
                 image.save('images/clippynow.png')
