@@ -27,6 +27,12 @@ class Hw(commands.Cog):
 		# manages to do this twice in < 1 second)
 		return str(time.time())
 
+	def _get_comms(self, ctx, backticks=True):
+		# Returns a formatted string of commands requiring the hardware channel
+		ph = "`{}{}`" if backticks else "{}{}"
+		hw_comms = ("newhw","edithw","renhw")
+		return ", ".join([ph.format(ctx.prefix,x) for x in hw_comms])
+
 	@commands.command(aliases=["hwcancel"])
 	async def cancelhw(self, ctx):
 		"""Cancels a current hardware session."""
@@ -48,20 +54,30 @@ class Hw(commands.Cog):
 
 		if channel is None:
 			self.settings.setServerStat(ctx.guild, "HardwareChannel", "")
-			msg = 'Hardware works *only* in pm now.'
-			return await ctx.send(msg)
+			return await ctx.send("{} commands now work *only* in pm.".format(self._get_comms(ctx)))
 
 		# If we made it this far - then we can add it
 		self.settings.setServerStat(ctx.guild, "HardwareChannel", channel.id)
 
-		msg = 'Hardware channel set to **{}**.'.format(channel.name)
-		await ctx.send(Utils.suppressed(ctx,msg))
+		await ctx.send("{} commands now work in {} - or in pm.".format(self._get_comms(ctx),channel.mention))
 	
 	@sethwchannel.error
 	async def sethwchannel_error(self, error, ctx):
 		# do stuff
 		msg = 'sethwchannel Error: {}'.format(error)
 		await ctx.send(msg)
+
+	@commands.command(aliases=["gethwchannel","listhwchannel"])
+	async def hwchannel(self, ctx):
+		"""Lists the current channel for hardware - if any."""
+
+		channel = None
+		chan_id = self.settings.getServerStat(ctx.guild, "HardwareChannel", None)
+		if chan_id:
+			channel = ctx.guild.get_channel(int(chan_id))
+		if not channel: # Only in dm
+			return await ctx.send("{} commands work *only* in pm.".format(self._get_comms(ctx)))
+		await ctx.send("{} commands work in the {} channel - or in pm.".format(self._get_comms(ctx),channel.mention))
 
 	@commands.command()
 	async def pcpp(self, ctx, url = None, style = None, escape = None):
@@ -183,18 +199,12 @@ class Hw(commands.Cog):
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
-				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-							break
-					return await ctx.send(Utils.suppressed(ctx,msg))
-				else:
-					hwChannel = self.bot.get_channel(hwChannel)
+			hwChannel = self.settings.getServerStat(ctx.guild,"HardwareChannel")
+			if hwChannel:
+				# Resolve the id to the channel itself
+				hwChannel = self.bot.get_channel(int(hwChannel))
+				if hwChannel and hwChannel != ctx.channel:
+					return await ctx.send("This isn't the channel for that.  Please take the hardware talk to {} - or to pm.".format(hwChannel.mention))
 		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -329,18 +339,12 @@ class Hw(commands.Cog):
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
-				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-					await ctx.send(msg)
-					return
-				else:
-					hwChannel = self.bot.get_channel(hwChannel)
+			hwChannel = self.settings.getServerStat(ctx.guild,"HardwareChannel")
+			if hwChannel:
+				# Resolve the id to the channel itself
+				hwChannel = self.bot.get_channel(int(hwChannel))
+				if hwChannel and hwChannel != ctx.channel:
+					return await ctx.send("This isn't the channel for that.  Please take the hardware talk to {} - or to pm.".format(hwChannel.mention))
 		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
@@ -778,17 +782,12 @@ class Hw(commands.Cog):
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
-			hwChannel = self.settings.getServerStat(ctx.guild, "HardwareChannel")
-			if not (not hwChannel or hwChannel == ""):
-				# We need the channel id
-				if not str(hwChannel) == str(ctx.channel.id):
-					msg = 'This isn\'t the channel for that...'
-					for chan in ctx.guild.channels:
-						if str(chan.id) == str(hwChannel):
-							msg = 'This isn\'t the channel for that.  Take the hardware talk to the **{}** channel.'.format(chan.name)
-					return await ctx.send(msg)
-				else:
-					hwChannel = self.bot.get_channel(hwChannel)
+			hwChannel = self.settings.getServerStat(ctx.guild,"HardwareChannel")
+			if hwChannel:
+				# Resolve the id to the channel itself
+				hwChannel = self.bot.get_channel(int(hwChannel))
+				if hwChannel and hwChannel != ctx.channel:
+					return await ctx.send("This isn't the channel for that.  Please take the hardware talk to {} - or to pm.".format(hwChannel.mention))
 		if not hwChannel:
 			# Nothing set - pm
 			hwChannel = ctx.author
