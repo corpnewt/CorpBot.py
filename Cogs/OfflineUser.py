@@ -20,7 +20,7 @@ class OfflineUser(commands.Cog):
 		
 	async def _send_message(self, ctx, msg, pm = False):
 		# Helper method to send messages to their proper location
-		if pm == True and not ctx.channel == ctx.author.dm_channel:
+		if pm == True and not isinstance(ctx.channel,discord.DMChannel):
 			# Try to dm
 			try:
 				await ctx.author.send(msg)

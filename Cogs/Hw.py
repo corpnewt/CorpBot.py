@@ -17,6 +17,7 @@ class Hw(commands.Cog):
 		self.settings = settings
 		self.hwactive = {}
 		self.charset = "0123456789"
+		self.wait_time = 300 # Wait 5 minutes for prompts
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -45,7 +46,7 @@ class Hw(commands.Cog):
 		
 		if not await Utils.is_admin_reply(ctx): return
 
-		if channel == None:
+		if channel is None:
 			self.settings.setServerStat(ctx.guild, "HardwareChannel", "")
 			msg = 'Hardware works *only* in pm now.'
 			return await ctx.send(msg)
@@ -70,9 +71,9 @@ class Hw(commands.Cog):
 			style = 'normal'
 		if not url:
 			return await ctx.send(usage)
-		if escape == None:
+		if escape is None:
 			escape = 'no'
-		escape = escape.lower() in ["yes","true","on","enable","enabled"]
+		escape = escape.lower() in ["yes","true","on","enable","enabled","1"]
 		
 		output = await PCPP.getMarkdown(url, style, escape)
 		if not output:
@@ -92,7 +93,7 @@ class Hw(commands.Cog):
 			return await ctx.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
@@ -146,7 +147,7 @@ class Hw(commands.Cog):
 			return await ctx.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
@@ -203,7 +204,7 @@ class Hw(commands.Cog):
 			return await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		if not len(buildList):
 			# No parts!
@@ -257,7 +258,7 @@ class Hw(commands.Cog):
 				# Must not accept pms
 				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
 			return
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		if hwChannel == ctx.author and not isinstance(ctx.channel,discord.DMChannel):
 			await ctx.message.add_reaction("📬")
 		await hwChannel.send(bparts)
 
@@ -275,7 +276,7 @@ class Hw(commands.Cog):
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
 				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
-				if test == None:
+				if test is None:
 					self._stop_hw(ctx.author)
 					return
 				elif test == True:
@@ -300,7 +301,7 @@ class Hw(commands.Cog):
 						return
 					# Make sure
 					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
+					if conf is None:
 						# Timed out
 						self._stop_hw(ctx.author)
 						return
@@ -350,7 +351,7 @@ class Hw(commands.Cog):
 			return
 
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		if not len(buildList):
 			# No parts!
@@ -393,7 +394,7 @@ class Hw(commands.Cog):
 		self.hwactive[str(ctx.author.id)] = hw_id
 
 		# Post the dm reaction
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		if hwChannel == ctx.author and not isinstance(ctx.channel,discord.DMChannel):
 			await ctx.message.add_reaction("📬")
 
 		# Here, we have a build
@@ -507,7 +508,7 @@ class Hw(commands.Cog):
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
 				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
+				if buildList is None:
 					buildList = []
 				for build in buildList:
 					if build['Name'].lower() == buildStr.lower():
@@ -533,7 +534,7 @@ class Hw(commands.Cog):
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
 					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					if buildList == None:
+					if buildList is None:
 						buildList = []
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
@@ -552,7 +553,7 @@ class Hw(commands.Cog):
 		if not memFromName:
 			# One last shot - check if it's a build for us
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-			if buildList == None:
+			if buildList is None:
 				buildList = []
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 			for build in buildList:
@@ -579,10 +580,10 @@ class Hw(commands.Cog):
 			msg = "I couldn't find that user/build combo..."
 			return await ctx.send(msg)
 
-		if buildParts == None:
+		if buildParts is None:
 			# Check if that user has no builds
 			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-			if buildList == None:
+			if buildList is None:
 				buildList = []
 			if not len(buildList):
 				# No parts!
@@ -631,7 +632,7 @@ class Hw(commands.Cog):
 			memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 			if memFromName:
 				buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-				if buildList == None:
+				if buildList is None:
 					buildList = []
 				for build in buildList:
 					if build['Name'].lower() == buildStr.lower():
@@ -657,7 +658,7 @@ class Hw(commands.Cog):
 				memFromName = DisplayName.memberForName(nameStr, ctx.guild)
 				if memFromName:
 					buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-					if buildList == None:
+					if buildList is None:
 						buildList = []
 					buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 					try:
@@ -676,7 +677,7 @@ class Hw(commands.Cog):
 		if not memFromName:
 			# One last shot - check if it's a build for us
 			buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-			if buildList == None:
+			if buildList is None:
 				buildList = []
 			buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 			for build in buildList:
@@ -703,10 +704,10 @@ class Hw(commands.Cog):
 			msg = "I couldn't find that user/build combo..."
 			return await ctx.send(msg)
 
-		if buildParts == None:
+		if buildParts is None:
 			# Check if that user has no builds
 			buildList = self.settings.getGlobalUserStat(memFromName, "Hardware")
-			if buildList == None:
+			if buildList is None:
 				buildList = []
 			if not len(buildList):
 				# No parts!
@@ -740,7 +741,7 @@ class Hw(commands.Cog):
 		if not member:
 			return await ctx.send(usage)
 		buildList = self.settings.getGlobalUserStat(member, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 		if not len(buildList):
@@ -772,7 +773,7 @@ class Hw(commands.Cog):
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot.  The hardware added will also be set as the Main Build."""
 		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
-		if buildList == None:
+		if buildList is None:
 			buildList = []
 		hwChannel = None
 		if ctx.guild:
@@ -816,7 +817,7 @@ class Hw(commands.Cog):
 				await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
 			return
 
-		if hwChannel == ctx.author and ctx.channel != ctx.author.dm_channel:
+		if hwChannel == ctx.author and not isinstance(ctx.channel,discord.DMChannel):
 			await ctx.message.add_reaction("📬")
 		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
 		
@@ -852,7 +853,7 @@ class Hw(commands.Cog):
 				# Possibly a pc partpicker link?
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
 				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
-				if test == None:
+				if test is None:
 					self._stop_hw(ctx.author)
 					return
 				elif test == True:
@@ -878,7 +879,7 @@ class Hw(commands.Cog):
 						return
 					# Make sure
 					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
-					if conf == None:
+					if conf is None:
 						# Timed out
 						self._stop_hw(ctx.author)
 						return
@@ -906,31 +907,34 @@ class Hw(commands.Cog):
 
 	# New HW helper methods
 	def channelCheck(self, msg, dest = None):
-		if self.stillHardwaring(msg.author) == False:
+		if not self.stillHardwaring(msg.author):
 			# any message is a valid check if we're not editing
 			return True
 		if dest:
 			# We have a target channel
-			if type(dest) is discord.User or type(dest) is discord.Member:
-				dest = dest.dm_channel.id
-			elif type(dest) is discord.TextChannel:
+			if isinstance(dest,(discord.User,discord.Member)):
+				if dest.id == msg.author.id:
+					return True
+				return False # Didn't match
+			elif isinstance(dest,discord.TextChannel):
 				dest = dest.id
-			elif type(dest) is discord.Guild:
-				dest = dest.get_channel(dest.id).id
-			if not dest == msg.channel.id:
+			elif isinstance(discord.Guild):
+				dest = getattr(dest.get_channel(dest.id),"id",None)
+			# If we got here - we're comparing to the channel id
+			if dest != msg.channel.id:
 				return False 
 		else:
 			# Just make sure it's in pm or the hw channel
-			if msg.channel == discord.TextChannel:
+			if isinstance(msg.channel,discord.TextChannel):
 				# Let's check our server stuff
 				hwChannel = self.settings.getServerStat(msg.guild, "HardwareChannel")
-				if not (not hwChannel or hwChannel == ""):
+				if hwChannel:
 					# We need the channel id
 					if not str(hwChannel) == str(ctx.channel.id):
 						return False
 				else:
 					# Nothing set - pm
-					if not type(msg.channel) == discord.DMChannel:
+					if not isinstance(msg.channel,discord.DMChannel):
 						return False
 		return True
 
@@ -994,10 +998,11 @@ class Hw(commands.Cog):
 
 		while True:
 			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.confirmCheck(m, dest) and len(m.content)
+				return ctx.author.id == m.author.id and m.content and self.confirmCheck(m,dest)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
-			except Exception:
+				talk = await self.bot.wait_for('message', check=littleCheck, timeout=self.wait_time)
+			except Exception as e:
+				print(e)
 				talk = None
 
 			# See if we're still in the right context
@@ -1056,10 +1061,10 @@ class Hw(commands.Cog):
 		await dest.send(Utils.suppressed(ctx,message))
 		while True:
 			def littleCheck(m):
-				return ctx.author.id == m.author.id and self.channelCheck(m, dest) and len(m.content)
+				return ctx.author.id == m.author.id and m.content and self.channelCheck(m,dest)
 			try:
-				talk = await self.bot.wait_for('message', check=littleCheck, timeout=300)
-			except Exception:
+				talk = await self.bot.wait_for('message', check=littleCheck, timeout=self.wait_time)
+			except:
 				talk = None
 
 			# See if we're still in the right context
