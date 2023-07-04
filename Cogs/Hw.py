@@ -900,7 +900,12 @@ class Hw(commands.Cog):
 
 		buildList.append(newBuild)
 		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = '*{}*, {} was created successfully!  It has been set as your main build.  To select a different main, you can use `{}mainhw`'.format(DisplayName.name(ctx.author), bname, ctx.prefix)
+		msg = "*{}*, {} was created successfully!  It has been set as your **main build**.  To view your main build, you can use `{}hw` - or to change which is your main, use `{}mainhw [build name or number]`".format(
+			DisplayName.name(ctx.author),
+			bname,
+			ctx.prefix,
+			ctx.prefix
+		)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
 
@@ -912,7 +917,7 @@ class Hw(commands.Cog):
 		if dest:
 			# We have a target channel
 			if isinstance(dest,(discord.User,discord.Member)):
-				if dest.id == msg.author.id:
+				if isinstance(msg.channel,discord.DMChannel) and dest.id == msg.author.id:
 					return True
 				return False # Didn't match
 			elif isinstance(dest,discord.TextChannel):
