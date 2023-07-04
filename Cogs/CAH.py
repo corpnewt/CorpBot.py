@@ -516,7 +516,7 @@ class CAH(commands.Cog):
                 if member['IsBot']:
                     continue
                 # Show that we're typing
-                await member['User'].dm_channel.trigger_typing()
+                await member['User'].trigger_typing()
                 await asyncio.sleep(self.loopsleep)
             await asyncio.sleep(typeTime)
         else:
@@ -524,7 +524,7 @@ class CAH(commands.Cog):
                 if member['IsBot']:
                     continue
                 # Show that we're typing
-                await member['User'].dm_channel.trigger_typing()
+                await member['User'].trigger_typing()
                 await asyncio.sleep(self.loopsleep)
             await asyncio.sleep(waitTime)
 

@@ -30,7 +30,7 @@ class XpStack(commands.Cog):
 		
 	async def _send_embed(self, ctx, embed, pm = False):
 		# Helper method to send embeds to their proper location
-		if pm == True and not ctx.channel == ctx.author.dm_channel:
+		if pm == True and not isinstance(ctx.channel,discord.DMChannel):
 			# More than 2 pages, try to dm
 			try:
 				await ctx.author.send(embed=embed)

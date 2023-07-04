@@ -49,7 +49,7 @@ class Message:
             else:
                 # Setup our file
                 send_file = dfile[0]
-        if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
+        if pm == True and isinstance(ctx,discord.ext.commands.Context) and not isinstance(ctx.channel,discord.DMChannel):
             # More than 2 pages - try to dm
             try:
                 message = await ctx.author.send(message, file=send_file, delete_after=self.delete_after)
@@ -186,7 +186,7 @@ class Embed:
                 # Setup our file
                 send_file = dfile[0]
                 embed.set_image(url="attachment://" + str(dfile[1]))
-        if pm == True and type(ctx) is discord.ext.commands.Context and not ctx.channel == ctx.author.dm_channel:
+        if pm == True and isinstance(ctx,discord.ext.commands.Context) and not isinstance(ctx.channel,discord.DMChannel):
             # More than 2 pages and targeting context - try to dm
             try:
                 message = await ctx.author.send(embed=embed,file=send_file,delete_after=self.delete_after)
@@ -348,7 +348,7 @@ class Embed:
             return original_message
         # We're dming this message - send the new, and edit the original
         message = await self._send_embed(ctx,embed,to_pm,self.file)
-        if message.channel == ctx.author.dm_channel != ctx.channel:
+        if isinstance(message.channel,discord.DMChannel) and message.channel != ctx.channel:
             # We sent a dm - edit the original message to reflect this
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
