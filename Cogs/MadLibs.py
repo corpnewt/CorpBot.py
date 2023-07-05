@@ -1,6 +1,6 @@
 import discord, re, os, random, string
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, Utils, Nullify
+from   Cogs import Settings, DisplayName, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -18,8 +18,7 @@ class MadLibs(commands.Cog):
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
 		self.playing_madlibs = {}
-		global Utils, DisplayName
-		Utils = self.bot.get_cog("Utils")
+		global DisplayName
 		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command()
