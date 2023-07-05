@@ -1,11 +1,6 @@
-import asyncio
-import discord
-import re
-import os
-import random
-import string
+import discord, re, os, random, string
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, Utils
+from   Cogs import Settings, DisplayName, Utils, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -20,7 +15,6 @@ class MadLibs(commands.Cog):
 		self.settings = settings
 		# Setup/compile our regex
 		self.regex = re.compile(r"\[\[[^\[\]]+\]\]")
-		#self.botPrefix = "$"
 		self.prefix = "ml"
 		self.leavePrefix = "mleave"
 		self.playing_madlibs = {}
@@ -33,94 +27,96 @@ class MadLibs(commands.Cog):
 		"""Used to choose your words when in the middle of a madlibs."""
 		pass
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def madlibs(self, ctx):
 		"""Let's play MadLibs!"""
 
-		channel = ctx.message.channel
-		author  = ctx.message.author
-		server  = ctx.message.guild
-
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.message.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		# Check if we have a MadLibs channel - and if so, restrict to that
-		channelID = self.settings.getServerStat(server, "MadLibsChannel")
-		if not (not channelID or channelID == ""):
-			# We need the channel id
-			if not str(channelID) == str(channel.id):
-				msg = 'This isn\'t the channel for that...'
-				for chan in server.channels:
-					if str(chan.id) == str(channelID):
-						msg = 'This isn\'t the channel for that.  Take the MadLibs to the **{}** channel.'.format(chan.name)
-				await channel.send(msg)
-				return
+		channel = self.settings.getServerStat(ctx.guild,"MadLibsChannel")
+		if channel:
+			# Resolve the id to the channel itself
+			channel = self.bot.get_channel(int(channel))
+			if channel and channel != ctx.channel:
+				return await ctx.send("This isn't the channel for that.  Please take the MadLibs to {}.".format(channel.mention))
 
 		# Check if our folder exists
 		if not os.path.isdir("./Cogs/MadLibs"):
-			msg = 'I\'m not configured for MadLibs yet...'
-			await channel.send(msg)
-			return
+			return await ctx.send("I'm not configured for MadLibs yet...")
 
 		# Folder exists - let's see if it has any files
-		choices = [] # Empty array
-		for file in os.listdir("./Cogs/MadLibs"):
-			if file.endswith(".txt"):
-				choices.append(file)
+		choices = [x for x in os.listdir("./Cogs/MadLibs") if x.endswith(".txt")]
 		
-		if len(choices) == 0:
+		if not choices:
 			# No madlibs...
-			msg = 'I\'m not configured for MadLibs yet...'
-			await channel.send(msg)
-			return
+			return await ctx.send("I'm not configured for MadLibs yet...")
 		
 		# Check if we're already in a game
-		if self.playing_madlibs.get(str(server.id),False):
-			msg = 'I\'m already playing MadLibs - use `{}{} [your word]` to submit answers.'.format(ctx.prefix, self.prefix)
-			await channel.send(msg)
-			return
+		if self.playing_madlibs.get(str(ctx.guild.id)):
+			await ctx.send("I'm already playing MadLibs - use `{}{} [your word]` to submit answers.".format(ctx.prefix,self.prefix))
 		
-		self.playing_madlibs[str(server.id)] = True
+		self.playing_madlibs[str(ctx.guild.id)] = True
 
 		# Get a random madlib from those available
-		randnum = random.randint(0, (len(choices)-1))
-		randLib = choices[randnum]
+		randLib = random.choice(choices)
 
 		# Let's load our text and get to work
-		with open("./Cogs/MadLibs/{}".format(randLib), 'rb') as myfile:
-			data = myfile.read().decode("utf-8")
+		with open("./Cogs/MadLibs/{}".format(randLib), 'rb') as f:
+			data = f.read().decode("utf-8")
 
-		# Set up an empty arry
-		words = []
+		# Gather an array of words
+		words = [x.group(0) for x in re.finditer(self.regex,data)]
 
-		# Match
-		matches = re.finditer(self.regex, data)
-
-		# Iterate matches
-		for match in matches:
-			words.append(match.group(0))
-
+		# At this point we need to scrape for words that end with _#
+		reused_words = {}
+		count_adjust = 0
+		for word in words:
+			try: int(word[2:-2].split("_")[-1])
+			except: continue # Not formatted with _#
+			if not word.lower() in reused_words:
+				reused_words[word.lower()] = None
+			else:
+				count_adjust += 1 # Increment the amount we adjust by
+		
 		# Create empty substitution array
 		subs = []
 
 		# Iterate words and ask for input
-		i = 0
-		while i < len(words):
-			# Ask for the next word
+		prompt_adjust = 0
+		for i,word in enumerate(words,start=1):
+			# First check if the word is in our reused_words list - and if
+			# it's already received a value
+			if reused_words.get(word.lower()):
+				prompt_adjust += 1 # Adjust our prompt index
+				# Got a value for it - just use that
+				val = reused_words[word.lower()]
+				# Append and capitalize if needed based on context
+				subs.append(string.capwords(val) if word[2].isupper() else val)
+				# No need to prompt - onto the next
+				continue
+			
+			# Didn't match the reused_words list - or doesn't have an initial value set
+			# Prompt the user for the word
 			vowels = "aeiou"
-			word = words[i][2:-2]
-			if word[:1].lower() in vowels:
-				msg = "I need an **{}** (word *{}/{}*).  `{}{} [your word]`".format(words[i][2:-2], str(i+1), str(len(words)), ctx.prefix, self.prefix)
-			else:
-				msg = "I need a **{}** (word *{}/{}*).  `{}{} [your word]`".format(words[i][2:-2], str(i+1), str(len(words)), ctx.prefix, self.prefix)
-			await channel.send(msg)
+			prompt = word[2:-2] # Strip [[ ]]
+			# Check if it uses a number at the end
+			try:
+				int(prompt.split("_")[-1])
+				# If we get here - it does, strip that from the prompt
+				prompt = "_".join(prompt.split("_")[:-1])
+			except: # It doesn't - leave it as-is
+				pass
+			await ctx.send("I need a{} **{}** (word *{:,}/{:,}*).  `{}{} [your word]`".format(
+				"n" if prompt[0].lower() in vowels else "",
+				prompt,
+				i-prompt_adjust,
+				len(words)-count_adjust,
+				ctx.prefix,
+				self.prefix
+			))
 
 			# Setup the check
 			def check(msg):	
-				return msg.content.startswith("{}{}".format(ctx.prefix, self.prefix)) and msg.channel == channel
+				return msg.content.startswith("{}{}".format(ctx.prefix, self.prefix)) and msg.channel == ctx.channel
 
 			# Wait for a response
 			try:
@@ -130,56 +126,40 @@ class MadLibs(commands.Cog):
 
 			if not talk:
 				# We timed out - leave the loop
-				msg = "*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(author))
-				await channel.send(msg)
-				self.playing_madlibs.pop(str(server.id),None)
-				return
+				self.playing_madlibs.pop(str(ctx.guild.id),None)
+				return await ctx.send("*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(ctx.author)))
 
 			# Check if the message is to leave
 			if talk.content.lower().startswith('{}{}'.format(ctx.prefix, self.leavePrefix.lower())):
-				if talk.author is author:
-					msg = "Alright, *{}*.  We'll play another time.".format(DisplayName.name(author))
-					await channel.send(msg)
-					self.playing_madlibs.pop(str(server.id),None)
-					return
+				if talk.author is ctx.author:
+					self.playing_madlibs.pop(str(ctx.guild.id),None)
+					return await ctx.send("Alright, *{}*.  We'll play another time.".format(DisplayName.name(ctx.author)))
 				else:
 					# Not the originator
-					msg = "Only the originator (*{}*) can leave the MadLibs.".format(DisplayName.name(author))
-					await channel.send(msg)
+					await ctx.send("Only the originator (*{}*) can leave the MadLibs.".format(DisplayName.name(ctx.author)))
 					continue
 
 			# We got a relevant message
-			word = talk.content
+			val = talk.content
 			# Let's remove the $ml prefix (with or without space)
-			if word.startswith('{}{} '.format(ctx.prefix.lower(), self.prefix.lower())):
-				word = word[len(ctx.prefix)+len(self.prefix)+1:]
-			if word.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
-				word = word[len(ctx.prefix)+len(self.prefix):]
-			
-			# Check capitalization
-			if words[i][:3].isupper():
-				# Capitalized
-				word = string.capwords(word)
+			if val.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
+				val = val[len(ctx.prefix)+len(self.prefix):]
+			# Strip any unnecessary whitespace
+			val = val.strip()
 
-			# Add to our list
-			subs.append(word)
-			# Increment our index
-			i += 1
+			# Append and capitalize if needed based on context
+			subs.append(string.capwords(val) if word[2].isupper() else val)
+			
+			# Check if we need to add to our reused_words
+			if word.lower() in reused_words and not reused_words[word.lower()]:
+				reused_words[word.lower()] = val
 
 		# Let's replace
-		for asub in subs:
-			# Only replace the first occurence
-			data = re.sub(self.regex, "**{}**".format(asub), data, 1)
+		for sub in subs:
+			# Only replace the first occurence of each
+			data = re.sub(self.regex, "**{}**".format(Nullify.escape_all(sub)), data, 1)
 
-		self.playing_madlibs.pop(str(server.id),None)
+		self.playing_madlibs.pop(str(ctx.guild.id),None)
 		
-		data = Utils.suppressed(ctx,data)
 		# Message the output
-		await channel.send(data)
-
-	@madlibs.error
-	async def madlibs_error(self, ctx, error):
-		# Reset playing status and display error
-		self.playing_madlibs.pop(str(error.guild.id),None)
-		msg = 'madlibs Error: {}'.format(ctx)
-		await error.send(msg)
+		await ctx.send(data)
