@@ -108,7 +108,7 @@ class Embed(commands.Cog):
 
         ----------------------------------
 
-        Example: $embed -nodm description {"title":"An embed!","description":"This is an embed"}
+        Example: $embed -nodm {"title":"An embed!","description":"This is an embed"}
         """
 
         if embed_json is None and not len(ctx.message.attachments):
@@ -222,32 +222,32 @@ class Embed(commands.Cog):
     @commands.command()
     async def getembed(self, ctx, message_url = None):
         """Gets any embeds for the passed message url and uploads their data as json files."""
-        if message_url is None: return await ctx.send("Usage: `{}getembed [message_url]`".format(ctx.prefix))
-        # We are setting a message - let's split the url and get the last 2 integers - then save them.
-        parts = [x for x in message_url.replace("/"," ").split() if len(x)]
-        try: channel_id,message_id = [int(x) for x in parts[-2:]]
-        except: return await ctx.send("Improperly formatted message url!")
-        # Attempt to get the server from parts as well - but default to this one
-        guild = ctx.guild # Default to the current guild if any
-        if len(parts) > 2:
-            if parts[-3].lower() == "@me": # Assume it's a dm
-                guild = self.bot
-            else: # Hope for an guild id integer
-                try: guild = self.bot.get_guild(int(parts[-3]))
-                except: pass
-        if guild is None: # Get the guild if run in one, or fall back to the bot
-            guild = ctx.guild if ctx.guild else self.bot
-        # Let's actually get the channel+message and ensure it exists
-        channel = guild.get_channel(channel_id)
-        if not channel: return await ctx.send("I couldn't find the channel connected to that id.")
-        try: message = await channel.fetch_message(message_id)
-        except: return await ctx.send("I couldn't find the message connected to that id.")
-        if not len(message.embeds): return await ctx.send("There are not embeds attached to that message.")
+        message = None
+        if ctx.message.reference:
+            # Resolve the replied to reference to a message object
+            try:
+                message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+                if message.embeds:
+                    message_url = None # ignore anything passed
+                else:
+                    # No embeds - use the contents of that message as the URL
+                    message_url = await Utils.get_message_content(message)
+            except:
+                pass
+        if not message_url and not message:
+            return await ctx.send("Usage: `{}getembed [message_url]`".format(ctx.prefix))
+        # Resolve the message pointed at by the URL if need be
+        if message_url:
+            message = await Utils.get_message_from_url(message_url,ctx=ctx)
+        if not message:
+            return await ctx.send("I couldn't find the message connected to that id.")
+        if not message.embeds:
+            return await ctx.send("There are no embeds attached to that message.")
         # At this point - we should have the embeds - let's iterate them, and upload them
         # as json files
         tmp = tempfile.mkdtemp()
         for index,embed in enumerate(message.embeds):
-            name = "{}-{}-{}.json".format(channel_id,message_id,index)
+            name = "{}-{}-{}.json".format(message.channel.id,message.id,index)
             fp = os.path.join(tmp,name)
             m_dict = embed.to_dict()
             try:
