@@ -1,6 +1,6 @@
 import discord, re, os, random, string
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, Nullify
+from   Cogs import Settings, DisplayName, Nullify, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -27,7 +27,27 @@ class MadLibs(commands.Cog):
 		pass
 
 	@commands.command()
-	async def madlibs(self, ctx):
+	async def mleave(self, ctx):
+		"""Used to leave a current MadLibs game."""
+		pass
+
+	@commands.command(aliases=["mlist"])
+	async def listml(self, ctx):
+		"""List the available MadLibs"""
+
+		# Check if our folder exists
+		if not os.path.isdir("./Cogs/MadLibs"):
+			return await ctx.send("I'm not configured for MadLibs yet...")
+		# Folder exists - let's see if it has any files
+		choices = ["{}. {}".format(i,x[:-4]) for i,x in enumerate(os.listdir("./Cogs/MadLibs"),start=1) if x.endswith(".txt")]
+		return await PickList.PagePicker(
+			title="Available MadLibs ({:,} total)".format(len(choices)),
+			description="\n".join(choices),
+			ctx=ctx
+		).pick()
+
+	@commands.command()
+	async def madlibs(self, ctx, *, madlib = None):
 		"""Let's play MadLibs!"""
 
 		# Check if we have a MadLibs channel - and if so, restrict to that
@@ -52,11 +72,24 @@ class MadLibs(commands.Cog):
 		# Check if we're already in a game
 		if self.playing_madlibs.get(str(ctx.guild.id)):
 			await ctx.send("I'm already playing MadLibs - use `{}{} [your word]` to submit answers.".format(ctx.prefix,self.prefix))
+
+		# Check if we're taking a number - or the title of one of the MadLibs
+		if madlib:
+			randLib = None
+			try:
+				madloc = int(madlib)
+				assert 0 < madloc <= len(choices)
+				# Got an index
+				randLib = choices[madloc-1]
+			except:
+				# Got a title
+				randLib = next((x for x in choices if x[:-4].lower() == madlib.lower() or x.lower() == madlib.lower()),None)
+			if not randLib:
+				return await ctx.send("I couldn't find that MadLibs - you can use `{}listml` to see a list of available options.".format(ctx.prefix))
+		else: # Picking one at random
+			randLib = random.choice(choices)
 		
 		self.playing_madlibs[str(ctx.guild.id)] = True
-
-		# Get a random madlib from those available
-		randLib = random.choice(choices)
 
 		# Let's load our text and get to work
 		with open("./Cogs/MadLibs/{}".format(randLib), 'rb') as f:
