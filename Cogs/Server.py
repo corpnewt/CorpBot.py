@@ -431,6 +431,8 @@ class Server(commands.Cog):
 			return await ctx.send("Usage: `[[p]]setprefix [prefix]`\nTo remove prefixes - see `[[p]]remprefix` and `[[p]]clearprefix`".replace("[[p]]",ctx.prefix))
 		elif prefix in ['@everyone','@here']:
 			return await ctx.send("Yeah, that'd get annoying *reaaaal* fast.  Try a different prefix...")
+		elif prefix in ("<@!{}> ".format(self.bot.user.id),"<@{}> ".format(self.bot.user.id)):
+			return await ctx.send("I will always watch for mentions.")
 		else:
 			self.settings.setServerStat(ctx.guild, "Prefix", prefix)
 			await ctx.send("Prefix set!")
@@ -453,7 +455,7 @@ class Server(commands.Cog):
 					prefixes = list(prefixes)
 				else: # Wrap in a list
 					prefixes = [prefixes]
-			if prefix in prefixes:
+			if prefix in prefixes or prefix in ("<@!{}> ".format(self.bot.user.id),"<@{}> ".format(self.bot.user.id)):
 				return await ctx.send("That is already a prefix I'm watching for.")
 			prefixes.append(prefix)
 			self.settings.setServerStat(ctx.guild,"Prefix",prefixes)
@@ -466,6 +468,8 @@ class Server(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not prefix:
 			return await ctx.send("Usage: `{}remprefix [prefix]`".format(ctx.prefix))
+		elif prefix in ("<@!{}> ".format(self.bot.user.id),"<@{}> ".format(self.bot.user.id)):
+			return await ctx.send("I will always watch for mentions.")
 		else:
 			prefixes = self.settings.getServerStat(ctx.guild,"Prefix",[])
 			print(type(prefixes),prefixes)
