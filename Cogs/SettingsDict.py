@@ -16,7 +16,7 @@ class SettingsDict(commands.Cog):
         DisplayName = self.bot.get_cog("DisplayName")
 
     def _type(self, val):
-        for t,n in ((bool,"bool"),(int,"int"),(float,"float"),(str,"str")):
+        for t,n in ((bool,"bool"),(int,"int"),(float,"float"),(str,"str"),(list,"list"),(tuple,"list"),(dict,"dict")):
             if isinstance(val,t):return n
         return type(val)
 
@@ -31,12 +31,15 @@ class SettingsDict(commands.Cog):
             get  - Gets the passed setting key
             set  - Sets the passed setting key with the passed value
             rem  - Removes the passed setting name if found
+            del  - Alias for rem
 
         Type (optional - will take the first cast match by default):
             int
             float
             bool
             str
+
+        JSON data passed with no type will be serialized and used as-is
 
         Examples:
             To print the value and type of a key called "some_value":
@@ -52,7 +55,7 @@ class SettingsDict(commands.Cog):
         if not command: return await ctx.send(usage)
         # Let's see if we got a valid command
         command = command.lower() # Normalize case
-        valid_commands = ("list","get","set","rem")
+        valid_commands = ("list","get","set","rem","del")
         if not command in valid_commands:
             return await ctx.send("Invalid command!\n"+usage)
         if command == "list": # We're just listing the current keys
@@ -94,31 +97,34 @@ class SettingsDict(commands.Cog):
                 footer="Settings changes may require Cog or Bot reload to take effect." if command=="rem" else None
             ).send(ctx)
             # Check if we were removing - and remove it
-            if command == "rem":
+            if command in ("rem","del"):
                 self.bot.settings_dict.pop(key,None)
                 # Write the new settings dict
                 json.dump(self.bot.settings_dict,open("settings_dict.json","w"),indent=4)
         else: # We're setting something!
             if not args: # We're missing arguments
                 return await ctx.send("Missing arguments!\n"+usage)
-            # Setup some cast functions
-            type_func = {"int":int,"float":float,"bool":bool,"str":str}
-            # Try to see if the first arg matches any cast functions
-            cast_name = args.split(" ")[0].lower()
-            cast = type_func.get(cast_name)
-            if cast: # Trim the args to remove the leading type
-                args = " ".join(args.split(" ")[1:])
-            # Get a list to iterate - if none matched, check them all in order
-            check_types = [cast] if cast else list(type_func.values())
-            value = None
-            for t in check_types:
-                if t == bool:
-                    # Special check for true/false
-                    value = True if args.lower() == "true" else False if args.lower() == "false" else value
-                else:
-                    try:value = t(args)
-                    except: pass
-                if value: break # Leave the loop if we got a valid value cast
+            try: # Try json first
+                value = json.loads(args)
+            except:
+                # Setup some cast functions
+                type_func = {"int":int,"float":float,"bool":bool,"str":str}
+                # Try to see if the first arg matches any cast functions
+                cast_name = args.split(" ")[0].lower()
+                cast = type_func.get(cast_name)
+                if cast: # Trim the args to remove the leading type
+                    args = " ".join(args.split(" ")[1:])
+                # Get a list to iterate - if none matched, check them all in order
+                check_types = [cast] if cast else list(type_func.values())
+                value = None
+                for t in check_types:
+                    if t == bool:
+                        # Special check for true/false
+                        value = True if args.lower() == "true" else False if args.lower() == "false" else value
+                    else:
+                        try:value = t(args)
+                        except: pass
+                    if value: break # Leave the loop if we got a valid value cast
             if not value:
                 # We didn't cast properly - let's whine
                 return await Message.Embed(
