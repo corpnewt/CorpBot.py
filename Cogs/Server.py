@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, time
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import Utils, Message, PCPP, Nullify
+from   Cogs import Utils, Message, PCPP, Nullify, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -422,28 +422,81 @@ class Server(commands.Cog):
 		await ctx.send("New users will be given **{}** when joining.".format(Nullify.escape_all(join_role.name)))
 		
 	@commands.command(pass_context=True)
-	async def setprefix(self, ctx, *, prefix : str = None):
-		"""Sets the bot's prefix (bot-admin only)."""
+	async def setprefix(self, ctx, prefix : str = None):
+		"""Sets the bot's server-specific prefix.  This will remove all other server-specific prefixes.
+		If it contains spaces, you will need to wrap it in quotes (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		# We're admin
 		if not prefix:
-			self.settings.setServerStat(ctx.guild, "Prefix", None)
-			msg = 'Custom server prefix *removed*.'
+			return await ctx.send("Usage: `[[p]]setprefix [prefix]`\nTo remove prefixes - see `[[p]]remprefix` and `[[p]]clearprefix`".replace("[[p]]",ctx.prefix))
 		elif prefix in ['@everyone','@here']:
-			return await ctx.send("Yeah, that'd get annoying *reaaaal* fast.  Try another prefix.")
+			return await ctx.send("Yeah, that'd get annoying *reaaaal* fast.  Try a different prefix...")
 		else:
 			self.settings.setServerStat(ctx.guild, "Prefix", prefix)
-			msg = 'Custom server prefix is now: {}'.format(prefix)
-		await ctx.send(msg)
+			await ctx.send("Prefix set!")
+			await ctx.invoke(self.getprefix)
 
-	@commands.command(pass_context=True)
+	@commands.command()
+	async def addprefix(self, ctx, prefix : str = None):
+		"""Adds a server-specific command prefix.  If it contains spaces, you will need to wrap it in quotes (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not prefix:
+			return await ctx.send("Usage: `{}addprefix [prefix]`".format(ctx.prefix))
+		elif prefix in ["@everyone","@here"]:
+			return await ctx.send("Yeah, that'd get annoying *reaaaal* fast.  Try a different prefix...")
+		else:
+			prefixes = self.settings.getServerStat(ctx.guild,"Prefix",[])
+			if not prefixes: # Try to get the original as we're just adding
+				prefixes = self.bot.settings_dict.get("prefix","$")
+			if not isinstance(prefixes,list):
+				if isinstance(prefixes,tuple): # Cast to list
+					prefixes = list(prefixes)
+				else: # Wrap in a list
+					prefixes = [prefixes]
+			if prefix in prefixes:
+				return await ctx.send("That is already a prefix I'm watching for.")
+			prefixes.append(prefix)
+			self.settings.setServerStat(ctx.guild,"Prefix",prefixes)
+			await ctx.send("Prefix added!")
+			await ctx.invoke(self.getprefix)
+
+	@commands.command(aliases=["removeprefix","delprefix","deleteprefix"])
+	async def remprefix(self, ctx, prefix : str = None):
+		"""Removes a server-specific command prefix.  If it contains spaces, you will need to wrap it in quotes (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not prefix:
+			return await ctx.send("Usage: `{}remprefix [prefix]`".format(ctx.prefix))
+		else:
+			prefixes = self.settings.getServerStat(ctx.guild,"Prefix",[])
+			print(type(prefixes),prefixes)
+			if not isinstance(prefixes,list):
+				if isinstance(prefixes,tuple): # Cast to list
+					prefixes = list(prefixes)
+				else: # Wrap in a list
+					prefixes = [prefixes]
+			print(prefixes)
+			if not prefix in prefixes:
+				return await ctx.send("That is not one of the prefixes I'm watching for.")
+			prefixes.remove(prefix)
+			self.settings.setServerStat(ctx.guild,"Prefix",prefixes)
+			await ctx.send("Prefix removed!")
+			await ctx.invoke(self.getprefix)
+
+	@commands.command(aliases=["clearprefixes","clrprefix","clrprefixes"])
+	async def clearprefix(self, ctx):
+		"""Clears any server-specific prefixes (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		self.settings.setServerStat(ctx.guild,"Prefix",[])
+		await ctx.send("All server-specific prefixes have been cleared.")
+		await ctx.invoke(self.getprefix)
+
+	@commands.command(aliases=["getprefixes","prefix","prefixes"])
 	async def getprefix(self, ctx):
-		"""Output's the server's prefix - custom or otherwise."""
+		"""Output's the server's prefixes - custom or otherwise.  Each prefix is wrapped in double quotes to show spaces."""
 		# Get the current prefix
-		prefix = await self.bot.command_prefix(self.bot, ctx.message)
-		prefixlist = ", ".join([x for x in prefix if not x == "<@!{}> ".format(self.bot.user.id)])
-		msg = 'Prefix{}: {}'.format("es are" if len(prefix) > 1 else " is",prefixlist)
-		await ctx.send(msg)
+		prefix = [Nullify.escape_all(x,mentions=False) for x in await self.bot.command_prefix(self.bot, ctx.message) if not x=="<@!{}> ".format(self.bot.user.id)]
+		prefixlist = "\n".join(["{}. {}".format(i,'"'+x+'"') for i,x in enumerate(prefix,start=1)])
+		await PickList.PagePicker(title="Current Prefixes ({:,} total)".format(len(prefix)),description=prefixlist,ctx=ctx).pick()
 	
 	@commands.command(pass_context=True)
 	async def autopcpp(self, ctx, *, setting : str = None):
