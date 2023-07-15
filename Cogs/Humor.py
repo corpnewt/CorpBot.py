@@ -347,8 +347,8 @@ class Humor(commands.Cog):
 		"""Test your luck with another user."""
 
 		# Set some defaults
-		name_max_w = 92
-		name_max_h = 15
+		name_max_w = 88
+		name_max_h = 12
 		if not self.canDisplay(ctx.guild):
 			return
 		# Let's check if the "url" is actually a user
@@ -379,11 +379,16 @@ class Humor(commands.Cog):
 			d = ImageDraw.Draw(image)
 			name_text = test_user.display_name
 			name_size = name_max_h # max size for the name to fit
-			_,_,t_w,t_h = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+			l,t,r,b = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+			t_w,t_h = r-l,b-t
+			# 210 starting x, 88 max w
+			t_w = d.textlength(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 			if t_w > name_max_w:
-				name_size = int(t_h*(name_max_w/t_w))
-				_,_,t_w,t_h = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
-			d.text((210+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
+				name_size = int(t_h*(name_max_w/t_w)+2)
+				l,t,r,b = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+				t_w,t_h = r-l,b-t
+				t_w = d.textlength(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
+			d.text((209+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
 				random.choice(self.stardew_responses),
