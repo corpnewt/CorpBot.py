@@ -78,7 +78,7 @@ class SettingsDict(commands.Cog):
         # Alright - now we should have some stuffs - let's see what we have
         cleaned_key = Nullify.escape_all(key)
         val = self.bot.settings_dict.get(key)
-        if command in ("get","rem"): # We're only retrieving keys
+        if command in ("get","rem","del"): # We're only retrieving keys
             if not val: # The key didn't match anything - throw an error
                 return await Message.Embed(
                     title="Missing Key",
