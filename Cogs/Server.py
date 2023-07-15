@@ -498,7 +498,12 @@ class Server(commands.Cog):
 		# Get the current prefix
 		prefix = [Nullify.escape_all(x,mentions=False) for x in await self.bot.command_prefix(self.bot, ctx.message) if not x=="<@!{}> ".format(self.bot.user.id)]
 		prefixlist = "\n".join(["{}. {}".format(i,'"'+x+'"') for i,x in enumerate(prefix,start=1)])
-		await PickList.PagePicker(title="Current Prefixes ({:,} total)".format(len(prefix)),description=prefixlist,ctx=ctx).pick()
+		await PickList.PagePicker(
+			title="Current Prefixes ({:,} total)".format(len(prefix)),
+			description=prefixlist,
+			ctx=ctx,
+			footer="Prefixes are wrapped in double quotes to show spaces"
+		).pick()
 	
 	@commands.command(pass_context=True)
 	async def autopcpp(self, ctx, *, setting : str = None):
