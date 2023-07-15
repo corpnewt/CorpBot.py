@@ -472,13 +472,11 @@ class Server(commands.Cog):
 			return await ctx.send("I will always watch for mentions.")
 		else:
 			prefixes = self.settings.getServerStat(ctx.guild,"Prefix",[])
-			print(type(prefixes),prefixes)
 			if not isinstance(prefixes,list):
 				if isinstance(prefixes,tuple): # Cast to list
 					prefixes = list(prefixes)
 				else: # Wrap in a list
 					prefixes = [prefixes]
-			print(prefixes)
 			if not prefix in prefixes:
 				return await ctx.send("That is not one of the prefixes I'm watching for.")
 			prefixes.remove(prefix)
