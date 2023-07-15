@@ -486,7 +486,7 @@ class Responses(commands.Cog):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
 		entries = [{"name":"{}. ".format(i)+Nullify.escape_all(x),"value":Nullify.escape_all(message_responses[x])} for i,x in enumerate(message_responses,start=1)]
-		return await PickList.PagePicker(title="Current Responses",list=entries,ctx=ctx).pick()
+		return await PickList.PagePicker(title="Current Responses ({:,} total)".format(len(entries)),list=entries,ctx=ctx).pick()
 
 	@commands.command(aliases=["removeresponse","deleteresponse","delresponse"])
 	async def remresponse(self, ctx, *, regex_trigger_number = None):
