@@ -26,7 +26,7 @@ class Clippy(commands.Cog):
         # Returns the size of all ascii chars in the passed font
         draw = ImageDraw.Draw(Image.open('images/clippy.png'))
         size_dict = {}
-        max_w = max_h = avg_w = 0
+        max_h = avg_w = 0
         for x in range(128):
             char = chr(x)
             l,t,r,b = draw.textbbox((0,0),char,font=font)
@@ -34,28 +34,12 @@ class Clippy(commands.Cog):
             if char != "\n":
                 # Use the textlength instead - but skip newlines
                 w = draw.textlength(char,font=font)
-            size_dict[char] = (w,h)
-            if w > max_w: max_w = w
-            if h > max_h: max_h = h
+            if h > max_h:
+                max_h = h
             avg_w += w
-        size_dict["max_w"] = max_w
         size_dict["max_h"] = max_h
         size_dict["avg_w"] = avg_w/128
-        # Get some kerning info
-        text = "the quick brown fox jumps over the lazy dog"
-        for k,x in (("kern_upper",text.upper()),("kern_lower",text)):
-            l,t,r,b = draw.textbbox((0,0),x,font=font)
-            w,h = r-l,b-t
-            size_dict[k] = w/len(x) # Get the average width with kerning
         return size_dict
-
-    def get_text_size(self,text,size_dict):
-        w = h = 0
-        for x in text:
-            width,height = size_dict.get(x,(0,0))
-            w += width
-            if height > h: h = height
-        return w,h
     
     @commands.command()
     async def clippy(self, ctx, *,text: str = ""):
