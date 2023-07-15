@@ -29,17 +29,23 @@ else:
 
 async def get_prefix(bot, message):
 	# Check commands against some things and do stuff or whatever...
+	prefixes = ["<@!{}> ".format(bot.user.id), "<@{}> ".format(bot.user.id)]
 	try:
 		# Set the settings var up
 		settings = bot.get_cog("Settings")
-		serverPrefix = settings.getServerStat(message.guild, "Prefix")
+		serverPrefix = settings.getServerStat(message.guild,"Prefix")
 	except Exception:
 		serverPrefix = None
-
 	if not serverPrefix:
 		# No custom prefix - use the default
 		serverPrefix = settings_dict.get("prefix","$") # prefix
-	return (serverPrefix, "<@!{}> ".format(bot.user.id), "<@{}> ".format(bot.user.id))
+	if isinstance(serverPrefix,(list,tuple)):
+		prefixes.extend(serverPrefix)
+	else:
+		prefixes.append(serverPrefix)
+	# Ensure all elements are strings
+	prefixes = [x for x in prefixes if isinstance(x,str)]
+	return tuple(prefixes)
 
 # This should be the main soul of the bot - everything should load from here
 # bot = commands.Bot(command_prefix=get_prefix, pm_help=None, description='A bot that does stuff.... probably')
