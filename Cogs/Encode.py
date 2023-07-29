@@ -166,7 +166,7 @@ class Encode(commands.Cog):
 		else:
 			out = binascii.hexlify(val_adj).decode().upper()
 			if from_type.startswith(("d","i","bin")): # No need to pad to an even length - but prepend 0x
-				out = "0x"+hex(int(out,16))[2:].upper()
+				out = "0x"+out
 			else:
 				if len(out)%2: # Not from a decimal, and an odd length - prepend 0
 					out = "0"+out
