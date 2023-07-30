@@ -611,13 +611,16 @@ class Mute(commands.Cog):
                 mute_role=mute_role,
                 check_channels=member is not None
             )
-            if not mute_stat: continue # Not muted.
+            if not mute_stat and not m.timed_out: continue # Not muted.
             # Parse the output
-            value = "`       ID:` `{}`\n{}` Cooldown:` {}".format(
-                m.id,
-                "" if not mute_stat[-1] else "`Mute Type:` Permission-based (in {:,} channel{})\n".format(len(mute_stat[-1]),"" if len(mute_stat[-1])==1 else "s"),
-                "Muted until further notice." if not mute_stat[2] else mute_stat[2] + " remain."
-            )
+            value = "`      ID:` `{}`".format(m.id)
+            if mute_stat:
+                value += "\n{}`Cooldown:` {}".format(
+                    "" if not mute_stat[-1] else "` Mute Type:` Permission-based (in {:,} channel{})\n".format(len(mute_stat[-1]),"" if len(mute_stat[-1])==1 else "s"),
+                    "Muted until further notice." if not mute_stat[2] else mute_stat[2] + " remain."
+                )
+            if m.timed_out:
+                value += "\n` Timeout:` Member is currently timed out"
             muted_members.append({"name":"{}. {} ({})".format(len(muted_members)+1,DisplayName.name(m),m),"value":value})
         desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
         return await PickList.PagePicker(
