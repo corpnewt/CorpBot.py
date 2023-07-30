@@ -1,7 +1,7 @@
-import asyncio, discord, time, parsedatetime
+import asyncio, discord, time, parsedatetime, re
 from discord.ext import commands
-from datetime import datetime
-from Cogs import Utils, DisplayName, ReadableTime, PickList, Nullify
+from datetime import datetime, timedelta
+from Cogs import Utils, DisplayName, ReadableTime, PickList, Nullify, Message
 
 def setup(bot):
     # Add the bot and deps
@@ -14,6 +14,8 @@ class Mute(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        self.mention_re = re.compile(r"<?@?!?[0-9]{17,21}>?")
+        self.time_check = re.compile(r"(?i)(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
         self.loop_list = []
         self.mute_perms = ("send_messages","send_messages_in_threads","add_reactions","speak")
         global Utils, DisplayName
@@ -164,7 +166,7 @@ class Mute(commands.Cog):
             # await member.send(pm)
         self._remove_task(task)
 
-    async def _mute(self, member, server, cooldown = None, muted_by = None):
+    async def _mute(self, member, server, cooldown = None, muted_by = None, reason = None):
         # Mutes the specified user on the specified server
         # Check for a mute role - and verify it
         mute_role = self.settings.getServerStat(server,"MuteRole")
@@ -188,10 +190,10 @@ class Mute(commands.Cog):
         self.settings.setServerStat(server, "MuteList", muteList)
         # Set a timer if we have a cooldown
         if not cooldown is None: self.loop_list.append(self.bot.loop.create_task(self.checkMute(member, server, cooldown)))
-        # Dispatch and event
-        self.bot.dispatch("mute", member, server, cooldown, muted_by)
+        # Dispatch an event
+        self.bot.dispatch("mute", member, server, cooldown, muted_by, reason)
 
-    async def _unmute(self, member, server):
+    async def _unmute(self, member, server, unmuted_by = None, reason = None):
         # Unmutes the specified user on the specified server
         # First we check for the mute role if possible - and then we
         # walk the channels looking for our custom overrides and remove those
@@ -213,7 +215,7 @@ class Mute(commands.Cog):
         # Save the results
         self.settings.setServerStat(server, "MuteList", muteList)
         # Dispatch the event for logging
-        self.bot.dispatch("unmute", member, server)
+        self.bot.dispatch("unmute", member, server, unmuted_by, reason)
 
     async def _ask_perms(self, ctx, mute_role, desync=False, show_count=True):
         # Helper that asks the user if they want to sync/desync the role perms
@@ -371,103 +373,158 @@ class Mute(commands.Cog):
         if not await Utils.is_bot_admin_reply(ctx): return
         await ctx.send(Utils.yes_no_setting(ctx,"Muted user auto-delete","MuteAutoDelete",yes_no=yes_no,default=True))
 
-    @commands.command()
-    async def mute(self, ctx, *, member = None, cooldown = None):
-        """Prevents a member from sending messages in chat or speaking in voice (bot-admin only)."""
+    async def mute_timeout(self, ctx, members_and_reason = None, command_name = "mute"):
+        # Helper method to handle the lifting for mute and timeout
         if not await Utils.is_bot_admin_reply(ctx): return
-        if member is None:
-            msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
-            return await ctx.send(msg)
-        # Let's search for a name at the beginning - and a time at the end
-        parts = member.split()
-        for j in range(len(parts)):
-            # Reverse search direction
-            i = len(parts)-1-j
-            memFromName = None
-            endTime     = None
-            # Name = 0 up to i joined by space
-            nameStr = ' '.join(parts[0:i+1])
-            # Time = end of name -> end of parts joined by space
-            timeStr = ' '.join(parts[i+1:])
-            memFromName = DisplayName.memberForName(nameStr, ctx.guild)
-            if memFromName:
-                # We got a member - let's check for time
-                # Get current time - and end time
-                try:
-                    # Get current time - and end time
-                    currentTime = int(time.time())
-                    cal         = parsedatetime.Calendar()
-                    time_struct, parse_status = cal.parse(timeStr)
-                    start       = datetime(*time_struct[:6])
-                    end         = time.mktime(start.timetuple())
-                    # Get the time from now to end time
-                    endTime = end-currentTime
-                except:
-                    pass
-                if not endTime is None:
-                    # We got a member and a time - break
-                    break
-        if memFromName is None:
-            # We couldn't find one or the other
-            msg = 'Usage: `{}mute [member] [cooldown]`'.format(ctx.prefix)
-            return await ctx.send(msg)
-        cooldown = None if endTime == 0 else endTime
-        member   = memFromName
-        # Check if we're muting ourself
-        if member is ctx.author:
-            msg = 'It would be easier for me if you just *stayed quiet all by yourself...*'
-            return await ctx.send(msg)
-        # Check if we're muting the bot
-        if member.id == self.bot.user.id:
-            msg = 'How about we don\'t, and *pretend* we did...'
-            return await ctx.send(msg)
-        # Check if member is admin or bot admin
-        if await Utils.is_bot_admin_reply(ctx,member=member,message="You can't mute other admins or bot-admins.",message_when=True): return
-        # Set cooldown - or clear it
-        if type(cooldown) is int or type(cooldown) is float:
-            if cooldown < 0:
-                msg = 'Cooldown cannot be a negative number!'
-                return await ctx.send(msg)
-            currentTime = int(time.time())
-            cooldownFinal = currentTime+cooldown
-        else:
-            cooldownFinal = None
-        # Check if we're using the old mute and suggest the quicker version
-        try: role = ctx.guild.get_role(int(self.settings.getServerStat(ctx.guild,"MuteRole")))
-        except: role = None
-        mess = await ctx.send("Muting...{}".format(
-            "" if role else " You can set up a mute role with `{}setmuterole [role]` or `{}createmuterole [role_name]` for a **much faster** muting experience.".format(ctx.prefix,ctx.prefix)
+        if not members_and_reason:
+            return await ctx.send('Usage: `{}{} [space delimited member mention/id] {}[reason]`'.format(
+                ctx.prefix,
+                command_name,
+                "" if command_name.lower() == "unmute" else "[duration] "
             ))
-        # Do the actual muting
-        await self._mute(member, ctx.guild, cooldownFinal, ctx.author)
-        if cooldown:
-            mins = "minutes"
-            checkRead = ReadableTime.getReadableTimeBetween(currentTime, cooldownFinal)
-            msg = '*{}* has been **Muted** for *{}*.'.format(DisplayName.name(member), checkRead)
-            # pm  = 'You have been **Muted** by *{}* for *{}*.\n\nYou will not be able to send messages on *{}* until either that time has passed, or you have been **Unmuted**.'.format(DisplayName.name(ctx.author), checkRead, Utils.suppressed(ctx, ctx.guild.name))
-        else:
-            msg = '*{}* has been **Muted** *until further notice*.'.format(DisplayName.name(member))
-            # pm  = 'You have been **Muted** by *{}* *until further notice*.\n\nYou will not be able to send messages on *{}* until you have been **Unmuted**.'.format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
-        await mess.edit(content=Utils.suppressed(ctx,msg))
+        is_admin = Utils.is_admin(ctx)
+        def member_exception(m):
+            # Helper to check if this member cannot be muted
+            if not isinstance(m,discord.Member):
+                # Only check members - discord.User isn't in the server,
+                # so they have no reason to be excluded
+                return False
+            if m.id in (self.bot.user.id,ctx.author.id):
+                # Can't mute the bot or ourselves
+                return True
+            if Utils.is_bot_admin(ctx,m):
+                # Can't mute other bot-admins
+                return True
+            return False
+        def get_seconds(time):
+            # Helper to convert WwDdHhMmSs type time strings into a
+            # total number of seconds
+            allowed = {"w":604800,"d":86400,"h":3600,"m":60,"s":1}
+            total_seconds = 0
+            last_time = ""
+            for char in time:
+                # Check if we have a number
+                if char.isdigit():
+                    last_time += char
+                    continue
+                # Check if it's a valid suffix and we have a time so far
+                if char.lower() in allowed and last_time:
+                    total_seconds += int(last_time)*allowed[char.lower()]
+                last_time = ""
+            # Check if we have any left - and add it
+            if last_time: total_seconds += int(last_time) # Assume seconds at this point
+            return total_seconds
+        # Split into a list of args
+        args = members_and_reason.split()
+        # Get our list of targets
+        targets = []
+        missed  = []
+        unable  = []
+        skipped = []
+        reason  = ""
+        cooldown_time = None # Default to None for later checks
+        for index,item in enumerate(args):
+            if self.mention_re.fullmatch(item): # Check if it's a mention
+                # Resolve the member
+                mem_id = int(re.sub(r'\W+', '', item))
+                member = ctx.guild.get_member(mem_id)
+                # If we have an invalid mention, save it to report later
+                if member is None:
+                    missed.append(str(mem_id))
+                    continue
+                # Let's check if we have a valid member and make sure it's not:
+                # 1. The bot, 2. The command caller, 3. Another bot-admin/admin
+                if command_name.lower() != "unmute" and member_exception(member):
+                    unable.append(member.mention)
+                    continue
+                if not member in targets:
+                    targets.append(member) # Only add them if we don't already have them
+            else:
+                # Not a member match - we're in the cooldown/reason portion now
+                # Check if the next value is a time value
+                try: mute_time_str = self.time_check.search(args[index]).group(0)
+                except: mute_time_str = ""
+                if mute_time_str:
+                    # Got a mute time - let's get the seconds value
+                    cooldown_time = get_seconds(mute_time_str)
+                reason = " ".join(args[index if cooldown_time is None else index+1:])
+                break
+        reason = reason or "No reason provided."
+        readable_time = "Until further notice" if not cooldown_time else ReadableTime.getReadableTimeBetween(time.time(), time.time()+cooldown_time)
+        if not len(targets):
+            msg = "**With reason:**\n{}{}{}".format(
+                reason,
+                "" if not len(missed) else "\n\n**Unmatched ID{}:**\n{}".format("" if len(missed) == 1 else "s", "\n".join(missed)),
+                "" if not len(unable) else "\n\n**Unable to {}:**\n{}".format(command_name,"\n".join(unable))
+            )
+            return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author).send(ctx)
+        if cooldown_time is not None and cooldown_time < 0:
+            return await Message.EmbedText(title="Cooldown cannot be a negative number!",color=ctx.author).send(ctx)
+        if command_name.lower() == "timeout" and cooldown_time is None:
+            return await Message.EmbedText(title="Timeout requires a cooldown!",color=ctx.author).send(ctx)
+        message = await Message.EmbedText(
+            title="{}...".format(
+                {
+                    "mute":"Muting",
+                    "timeout":"Timing Out",
+                    "unmute":"Unmuting"
+                }.get(command_name.lower(),"Muting")
+            ),color=ctx.author
+        ).send(ctx)
+        canned = []
+        cant   = []
+        for target in targets:
+            try:
+                # Actually run our commands
+                if command_name.lower() == "mute":
+                    await self._mute(target, ctx.guild, None if not cooldown_time else time.time()+cooldown_time, ctx.author, reason)
+                elif command_name.lower() == "timeout":
+                    await target.timeout_for(timedelta(seconds=cooldown_time),reason="{}: {}".format(ctx.author,reason))
+                elif command_name.lower() == "unmute":
+                    if target.timed_out: # Remove the timeout first
+                        await target.timeout(None,reason="{}: {}".format(ctx.author,reason))
+                    await self._unmute(target, ctx.guild, ctx.author, reason)
+                if not target in canned: # Avoid double adding
+                    canned.append(target)
+            except Exception as e:
+                print(e)
+                if not target in cant:
+                    cant.append(target)
+        # Make sure any that showed up in cant override those in canned
+        canned = [x for x in canned if not x in cant]
+        msg = ""
+        if len(canned):
+            msg += "**I was ABLE to {}:**\n{}\n\n".format(command_name,"\n".join([str(x) for x in canned]))
+        if len(cant):
+            msg += "**I was UNABLE to {}:**\n{}\n\n".format(command_name,"\n".join([str(x) for x in cant]))
+        if command_name.lower() != "unmute":
+            msg += "**Duration:**\n{}".format(readable_time)
+        await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg).edit(ctx,message)
 
     @commands.command()
-    async def unmute(self, ctx, *, member = None):
-        """Allows a muted member to send messages in chat (bot-admin only)."""
-        if not await Utils.is_bot_admin_reply(ctx): return
-        if member is None:
-            msg = 'Usage: `{}unmute [member]`'.format(ctx.prefix)
-            return await ctx.send(msg)
-        if type(member) is str:
-            memberName = member
-            member = DisplayName.memberForName(memberName, ctx.guild)
-            if not member:
-                msg = 'I couldn\'t find *{}*...'.format(memberName)
-                return await ctx.send(Utils.suppressed(ctx,msg))
-        mess = await ctx.send("Unmuting...")
-        await self._unmute(member, ctx.guild)
-        # pm = "You have been **Unmuted** by *{}*.\n\nYou can send messages on *{}* again.".format(DisplayName.name(ctx.author), Utils.suppressed(ctx, ctx.guild.name))
-        msg = '*{}* has been **Unmuted**.'.format(DisplayName.name(member))
-        await mess.edit(content=msg)
+    async def mute(self, ctx, *, members = None, cooldown = None, reason = None):
+        """Prevents the passed members from sending messages in chat or speaking in voice (bot-admin only).
+        Cooldown expects WwXdHhMmSs format, where:
+        w = weeks
+        d = days
+        h = hours
+        m = minutes
+        s = seconds
+        Passing no cooldown results in a perma-mute.
+        eg. To mute 3 users for 2 days, 10 hours for spamming, you could do:
+            $mute @user1 @user2 @user3 2d10h spamming
+        """
+        await self.mute_timeout(ctx,members,"mute")
+
+    @commands.command(aliases=["to"])
+    async def timeout(self, ctx, *, members = None, cooldown = None, reason = None):
+        """Alternative to $mute that uses discord's native timeout api (bot-admin only)."""
+        await self.mute_timeout(ctx,members,"timeout")
+
+    @commands.command()
+    async def unmute(self, ctx, *, members = None, reason = None):
+        """Allows the passed members to send messages in chat or speak in voice (bot-admin only)."""
+        await self.mute_timeout(ctx,members,"unmute")
 
     def _get_mute_status(self, member, ctx, muted_list=None, mute_role=None, check_channels=False):
         # Helper to get the muted status of a passed member based on info passed

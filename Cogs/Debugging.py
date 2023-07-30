@@ -240,24 +240,45 @@ class Debugging(commands.Cog):
 		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
-	async def on_mute(self, member, guild, cooldown, muted_by):
+	async def on_timed_out(self, member, guild, cooldown, muted_by, reason):
 		if not self.shouldLog('user.mute', guild): return
-		# A memeber was muted
+		# A member was timed out
 		pfpurl = Utils.get_avatar(member)
-		msg = "🔇 {} ({}) was muted.".format(member, member.id)
-		message = "Muted by {}.\nMuted {}.".format(
-			"Auto-Muted" if not muted_by else "{} ({})".format(muted_by, muted_by.id),
-			"for "+ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "until further notice"
+		msg = "🔇 {} ({}) was timed-out.".format(member, member.id)
+		message = "By:  {}\nFor: {}\nDuration: {}".format(
+			"{} ({})".format(muted_by, muted_by.id),
+			reason or "No reason provided",
+			ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "Until further notice"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
-	async def on_unmute(self, member, guild):
+	async def on_mute(self, member, guild, cooldown, muted_by, reason):
+		if not self.shouldLog('user.mute', guild): return
+		# A memeber was muted
+		pfpurl = Utils.get_avatar(member)
+		msg = "🔇 {} ({}) was muted.".format(member, member.id)
+		message = "By:  {}\nFor: {}\nDuration: {}".format(
+			"Auto-Muted" if not muted_by else "{} ({})".format(muted_by, muted_by.id),
+			reason or ("Auto-Muted" if not muted_by else "No reason provided"),
+			ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "Until further notice"
+		)
+		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
+
+	@commands.Cog.listener()
+	async def on_unmute(self, member, guild, unmuted_by=None, reason=None):
 		if not self.shouldLog('user.unmute', guild): return
 		# A memeber was muted
 		pfpurl = Utils.get_avatar(member)
 		msg = "🔊 {} ({}) was unmuted.".format(member, member.id)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.green(),thumbnail=pfpurl)
+		if unmuted_by:
+			message = "By:  {}\nFor: {}".format(
+				"Auto-Unmuted" if not unmuted_by else "{} ({})".format(unmuted_by, unmuted_by.id),
+				reason or ("Auto-Unmuted" if not unmuted_by else "No reason provided")
+			)
+		else:
+			message = "Auto-Unmuted"
+		await self._logEvent(guild, message, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_invite_create(self, invite):
@@ -370,6 +391,17 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
 		if not before or before.bot: return
+		if before.timed_out != after.timed_out:
+			try:
+				last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
+				if hasattr(last.changes.after,"communication_disabled_until"):
+					timestamp = datetime.strptime(
+						last.changes.after.communication_disabled_until.split(".")[0],
+						"%Y-%m-%dT%H:%M:%S"
+					).replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
+					self.bot.dispatch("timed_out",last.target,after.guild,timestamp,last.user,last.reason)
+			except:
+				pass
 		# A member changed something about their user-profile
 		server = before.guild
 		pfpurl = Utils.get_avatar(before)
