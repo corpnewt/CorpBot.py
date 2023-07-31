@@ -258,9 +258,14 @@ class Debugging(commands.Cog):
 		# A memeber was muted
 		pfpurl = Utils.get_avatar(member)
 		msg = "🔇 {} ({}) was muted.".format(member, member.id)
-		message = "By:  {}\nFor: {}\nDuration: {}".format(
-			"Auto-Muted" if not muted_by else "{} ({})".format(muted_by, muted_by.id),
-			reason or ("Auto-Muted" if not muted_by else "No reason provided"),
+		if muted_by:
+			message = "By:  {}\nFor: {}".format(
+				"Auto-Muted" if not muted_by else "{} ({})".format(muted_by, muted_by.id),
+				reason or ("Auto-Muted" if not muted_by else "No reason provided")
+			)
+		else:
+			message = "Auto-Muted"
+		message += "\nDuration: {}".format(
 			ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "Until further notice"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
