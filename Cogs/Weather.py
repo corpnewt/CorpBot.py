@@ -118,7 +118,14 @@ class Weather(commands.Cog):
 					out_val = self._k_to_c(m)
 				else:
 					out_val = self._k_to_f(m)
-			output = "{:,} {} {} is {:,} {} {}".format(self._check_float(float(m),round_to=2), "degree" if abs(m)==1 else "degrees", f, out_val, "degree" if abs(out_val)==1 else "degrees", t)
+			output = "{:,} {}{} is {:,} {}{}".format(
+				self._check_float(float(m),round_to=2),
+				"" if f == "Kelvin" else "degree " if abs(m)==1 else "degrees ",
+				f,
+				out_val,
+				"" if t == "Kelvin" else "degree " if abs(out_val)==1 else "degrees ",
+				t
+			)
 		except:
 			pass
 		await ctx.send(output)
