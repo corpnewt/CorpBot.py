@@ -2,6 +2,7 @@ import random
 import datetime as dt
 from discord.ext import commands
 from urllib.parse import unquote
+from html.parser import HTMLParser
 try:
 	from html import unescape
 except ImportError:
@@ -11,6 +12,16 @@ from Cogs import DL, Message
 def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Comic(bot, settings))
+
+class MLStripper(HTMLParser):
+	def __init__(self):
+		super().__init__()
+		self.reset()
+		self.fed = []
+	def handle_data(self, d):
+		self.fed.append(d)
+	def get_data(self):
+		return ''.join(self.fed)
 
 class Comic(commands.Cog):
 
@@ -64,6 +75,26 @@ class Comic(commands.Cog):
 					{"find":'data-title="',"index":-1},
 					{"find":'"',"index":0},
 					{"find":"Dilbert Comic for ","index":0}
+				]
+			},
+			"farside": {
+				"name": "The Far Side",
+				"url": "https://www.thefarside.com/{}/{}/{}",
+				"keys": ["year","month","day"],
+				"first_date": "today-2",
+				"comic_url": [
+					{"find":'data-src="',"index":1},
+					{"find":'"',"index":0}
+				],
+				"comic_desc": [
+					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next commic
+					{"find":'class="figure-caption">',"index":1},
+					{"find":"</figcaption","index":0}
+				],
+				"comic_title": [
+					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next commic
+					{"find":'alt="',"index":1},
+					{"find":'"',"index":0}
 				]
 			},
 			"garfield": {
@@ -136,7 +167,7 @@ class Comic(commands.Cog):
 	def _julian_day(self,gregorian_day):
 		# Takes a date string MM-DD-YYYY and returns the Julian day
 		M,D,Y = [int(x) for x in gregorian_day.split("-")]
-		return int(dt.date(Y,M,D).toordinal() + 1721424.5)
+		return dt.date(Y,M,D).toordinal() + 1721424.5
 
 	def _gregorian_day(self,julian_day):
 		# Takes a Julian day and returns MM-DD-YYYY in Gregorian
@@ -154,7 +185,7 @@ class Comic(commands.Cog):
 		if month_adjust: # We need to adjust months
 			today = dt.datetime(today.year-1,12,1) if today.month == 1 else dt.datetime(today.year,today.month-1,1)
 		# Helper to return the highest comic number for a given comic and source html
-		date_dict = self._date_dict(today.strftime("%m-%d-%Y") if date == None else date,padded=comic_data.get("padded",True))
+		date_dict = self._date_dict(today.strftime("%m-%d-%Y") if date is None else date,padded=comic_data.get("padded",True))
 		try: 
 			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
 			archive_html = await DL.async_text(archive_url)
@@ -167,6 +198,20 @@ class Comic(commands.Cog):
 		except: return await self._get_last_comic_number(comic_data,date,month_adjust+1)
 		return (latest_comic,archive_html)
 
+	def _resolve_first_date(self,comic_data):
+		first_date = comic_data.get("first_date")
+		if first_date is None: return # borked
+		if isinstance(first_date,str) and first_date.lower().startswith("today"):
+			# First date is a reference to today - pull an offset if needed
+			try: offset = int(first_date[len("today"):])
+			except: offset = 0
+			# Set it to the actual date +- the offset as needed
+			fd = dt.datetime.today()
+			if offset: fd += dt.timedelta(days=offset)
+			# Get it formatted as MM-DD-YYYY
+			first_date = fd.strftime("%m-%d-%Y")
+		return first_date
+
 	async def _get_random_comic(self,comic_data):
 		# Try to get a random comic between the first_date/last_date, or between custom indexes (XKCD)
 		latest_tuple = None
@@ -174,16 +219,18 @@ class Comic(commands.Cog):
 		if use_number:
 			# We're using numbers - not dates
 			latest_tuple = await self._get_last_comic_number(comic_data)
-			if latest_tuple[0] == None: return None # borken
+			if latest_tuple[0] is None: return None # borken
 			first = comic_data["first_date"]
 			last  = latest_tuple[0]
 		else:
 			# Using dates, organize them into julian days
-			first = self._julian_day(comic_data["first_date"])
+			first_date = self._resolve_first_date(comic_data)
+			if first_date is None: return # Borken
+			first = self._julian_day(first_date)
 			last  = self._julian_day(comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")))
 		for x in range(self.max_tries):
 			# Generate a random date
-			date = random.randint(first,last)
+			date = random.randint(int(first),int(last))+0.5
 			if not use_number: date = self._gregorian_day(date)
 			comic = await self._get_comic(comic_data,date,latest_tuple)
 			if comic: return comic
@@ -200,14 +247,14 @@ class Comic(commands.Cog):
 
 	async def _get_comic(self,comic_data,date=None,latest_tuple=None):
 		# Attempts to retrieve the comic at the passed date
-		first_date = comic_data.get("first_date",None)
-		if first_date == None: return None # Malformed comic data - first date must be defined
+		first_date = self._resolve_first_date(comic_data)
+		if first_date is None: return None # Malformed comic data - first date must be defined
 		if comic_data.get("comic_number",False):
 			# Gather the latest comic number and archive info
 			if latest_tuple: latest,archive_html = latest_tuple
 			else: latest,archive_html = await self._get_last_comic_number(comic_data, date if not isinstance(date,int) else None)
-			if latest == None: return None # Failed to get the info
-			date = latest if date == None else date # Set it to the latest if None
+			if latest is None: return None # Failed to get the info
+			date = latest if date is None else date # Set it to the latest if None
 			if not isinstance(date,int):
 				date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
 				# We have a date to check for
@@ -219,7 +266,7 @@ class Comic(commands.Cog):
 			url = comic_data["url"].format(date)
 		else:
 			# Use today's date if none passed
-			date = dt.datetime.today().strftime("%m-%d-%Y") if date == None else date
+			date = dt.datetime.today().strftime("%m-%d-%Y") if date is None else date
 			# We're using date-oriented urls
 			last_date = comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")) # Last supplied date, or today
 			# Gather our julian days for comparison
@@ -230,6 +277,8 @@ class Comic(commands.Cog):
 			url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
 		try: html = await DL.async_text(url, {'User-Agent': ''})
 		except: return None # Failed to get the HTML, bail
+		with open("comic.html","wb") as f:
+			f.write(html.encode())
 		# Let's locate our comic by walking the search steps
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
 		if not comic_url: return None
@@ -240,14 +289,19 @@ class Comic(commands.Cog):
 		except NameError:
 			h = HTMLParser()
 			u = h.unescape
+		def strip_tags(html): # Helper to remove <i>...</i> type tags
+			html = u(html)
+			s = MLStripper()
+			s.feed(html)
+			return s.get_data()
 		# Check if we need to get title text
 		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
 		if not comic_title: comic_title = comic_data["name"]
 		comic_title += " ({}{})".format("#" if isinstance(date,int) else "", date)
-		comic_title = u(unquote(comic_title))
+		comic_title = strip_tags(unquote(comic_title))
 		# Check if we need to get a description
 		comic_desc = self._walk_replace(html, comic_data["comic_desc"]) if len(comic_data.get("comic_desc",[])) else None
-		comic_desc = u(unquote(comic_desc)) if comic_desc else None
+		comic_desc = strip_tags(unquote(comic_desc)) if comic_desc else None
 		return {"image":comic_url,"url":url,"title":comic_title,"description":comic_desc}
 
 	async def _display_comic(self, ctx, comic, date = None, random = False):
@@ -310,6 +364,16 @@ class Comic(commands.Cog):
 	async def randilbert(self, ctx):
 		"""Displays a random Dilbert comic from 04-16-1989 to today."""
 		await self._display_comic(ctx, "dilbert", random=True)'''
+
+	@commands.command()
+	async def farside(self, ctx, *, date=None):
+		"""Displays the Far Side comic for the passed date (MM-DD-YYYY) from 2 days ago to today if found."""
+		await self._display_comic(ctx, "farside", date=date)
+
+	@commands.command()
+	async def randfarside(self, ctx):
+		"""Displays a random Far Side comic from 2 days ago to today."""
+		await self._display_comic(ctx, "farside", random=True)
 
 	@commands.command()
 	async def garfield(self, ctx, *, date=None):
