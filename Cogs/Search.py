@@ -22,21 +22,26 @@ class Search(commands.Cog):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
 		return quote(query.replace("+","%2B").replace("\t","+").replace("\r","+").replace("\n","+").replace(" ","+"),safe="+")
 
+	async def get_search(self, ctx, query, service=""):
+		# Searches in the passed service
+		service = "s={}&".format(service) if service else ""
+		lmgtfy = "https://lmgtfy2.com/?{}q={}".format(service, self.quote(query))
+		try:
+			lmgtfyT = await TinyURL.tiny_url(lmgtfy, self.bot)
+		except Exception as e:
+			print(e)
+			msg = "It looks like I couldn't search for that... :("
+		else:
+			msg = '*{}*, you can find your answers here:\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		return msg
+
 	@commands.command()
 	async def google(self, ctx, *, query = None):
 		"""Get some searching done."""
 
 		if query is None:
 			return await ctx.send("You need a topic for me to Google.")
-		lmgtfy  = "https://letmegooglethat.com/?q={}".format(self.quote(query))
-		try:
-			msg = "*{}*, you can find your answers here:\n<{}>".format(
-				DisplayName.name(ctx.author),
-				await TinyURL.tiny_url(lmgtfy,self.bot)
-			)
-		except:
-			msg = "It looks like I couldn't search for that... :("
-		await ctx.send(msg)
+		await ctx.send(await self.get_search(ctx,query))
 
 	@commands.command()
 	async def bing(self, ctx, *, query = None):
@@ -44,15 +49,7 @@ class Search(commands.Cog):
 
 		if query is None:
 			return await ctx.send("You need a topic for me to Bing.")
-		lmgtfy  = "https://letmebingthatforyou.com/BingThis/{}".format(quote(query))
-		try:
-			msg = "*{}*, you can find your answers here:\n<{}>".format(
-				DisplayName.name(ctx.author),
-				await TinyURL.tiny_url(lmgtfy,self.bot)
-			)
-		except:
-			msg = "It looks like I couldn't search for that... :("
-		await ctx.send(msg)
+		await ctx.send(await self.get_search(ctx,query,"b"))
 
 	@commands.command()
 	async def duck(self, ctx, *, query = None):
@@ -60,67 +57,34 @@ class Search(commands.Cog):
 
 		if query is None:
 			return await ctx.send("You need a topic for me to DuckDuckGo.")
-		lmgtfy  = "https://lmddgtfy.net/?q={}".format(quote(query))
-		try:
-			msg = "*{}*, you can find your answers here:\n<{}>".format(
-				DisplayName.name(ctx.author),
-				await TinyURL.tiny_url(lmgtfy,self.bot)
-			)
-		except:
-			msg = "It looks like I couldn't search for that... :("
-		await ctx.send(msg)
+		await ctx.send(await self.get_search(ctx,query,"d"))
 
-	'''async def get_search(self, ctx, query, service=""):
-		# Searches in the passed service
-		service = "s={}&".format(service) if service else ""
-		lmgtfy = "http://lmgtfy.com/?{}q={}".format(service, self.quote(query))
-		try:
-			lmgtfyT = await TinyURL.tiny_url(lmgtfy, self.bot)
-		except Exception as e:
-			print(e)
-			msg = "It looks like I couldn't search for that... :("
-		else:
-			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
-		return msg
-		
 	@commands.command()
 	async def yahoo(self, ctx, *, query = None):
 		"""Let Yahoo! answer your questions."""
 
 		if query is None:
-			msg = 'You need a topic for me to Yahoo.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query,"y")
-		# Say message
-		await ctx.send(msg)
+			return await ctx.send("You need a topic for me to Yahoo.")
+		await ctx.send(await self.get_search(ctx,query,"y"))
 
 	@commands.command()
 	async def aol(self, ctx, *, query = None):
 		"""The OG search engine."""
 
 		if query is None:
-			msg = 'You need a topic for me to AOL.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query,"a")
-		# Say message
-		await ctx.send(msg)
+			return await ctx.send("You need a topic for me to AOL.")
+		await ctx.send(await self.get_search(ctx,query,"a"))
 
 	@commands.command()
 	async def ask(self, ctx, *, query = None):
 		"""Jeeves, please answer these questions."""
 
 		if query is None:
-			msg = 'You need a topic for me to Ask Jeeves.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query,"k")
-		# Say message
-		await ctx.send(msg)
+			return await ctx.send("You need a topic for me to Ask Jeeves.")
+		await ctx.send(await self.get_search(ctx,query,"k"))
 
 
-	@commands.command()
+	'''@commands.command()
 	async def searchsite(self, ctx, category_name = None, *, query = None):
 		"""Search corpnewt.com forums."""
 
