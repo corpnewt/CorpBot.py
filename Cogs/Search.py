@@ -22,7 +22,55 @@ class Search(commands.Cog):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
 		return quote(query.replace("+","%2B").replace("\t","+").replace("\r","+").replace("\n","+").replace(" ","+"),safe="+")
 
-	async def get_search(self, ctx, query, service=""):
+	@commands.command()
+	async def google(self, ctx, *, query = None):
+		"""Get some searching done."""
+
+		if query is None:
+			return await ctx.send("You need a topic for me to Google.")
+		lmgtfy  = "https://letmegooglethat.com/?q={}".format(self.quote(query))
+		try:
+			msg = "*{}*, you can find your answers here:\n<{}>".format(
+				DisplayName.name(ctx.author),
+				await TinyURL.tiny_url(lmgtfy,self.bot)
+			)
+		except:
+			msg = "It looks like I couldn't search for that... :("
+		await ctx.send(msg)
+
+	@commands.command()
+	async def bing(self, ctx, *, query = None):
+		"""Get some uh... more searching done."""
+
+		if query is None:
+			return await ctx.send("You need a topic for me to Bing.")
+		lmgtfy  = "https://letmebingthatforyou.com/BingThis/{}".format(quote(query))
+		try:
+			msg = "*{}*, you can find your answers here:\n<{}>".format(
+				DisplayName.name(ctx.author),
+				await TinyURL.tiny_url(lmgtfy,self.bot)
+			)
+		except:
+			msg = "It looks like I couldn't search for that... :("
+		await ctx.send(msg)
+
+	@commands.command()
+	async def duck(self, ctx, *, query = None):
+		"""Duck Duck... GOOSE."""
+
+		if query is None:
+			return await ctx.send("You need a topic for me to DuckDuckGo.")
+		lmgtfy  = "https://lmddgtfy.net/?q={}".format(quote(query))
+		try:
+			msg = "*{}*, you can find your answers here:\n<{}>".format(
+				DisplayName.name(ctx.author),
+				await TinyURL.tiny_url(lmgtfy,self.bot)
+			)
+		except:
+			msg = "It looks like I couldn't search for that... :("
+		await ctx.send(msg)
+
+	'''async def get_search(self, ctx, query, service=""):
 		# Searches in the passed service
 		service = "s={}&".format(service) if service else ""
 		lmgtfy = "http://lmgtfy.com/?{}q={}".format(service, self.quote(query))
@@ -34,43 +82,7 @@ class Search(commands.Cog):
 		else:
 			msg = '*{}*, you can find your answers here:\n\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
 		return msg
-
-	@commands.command()
-	async def google(self, ctx, *, query = None):
-		"""Get some searching done."""
-
-		if query is None:
-			msg = 'You need a topic for me to Google.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query)
-		# Say message
-		await ctx.send(msg)
-
-	@commands.command()
-	async def bing(self, ctx, *, query = None):
-		"""Get some uh... more searching done."""
-
-		if query is None:
-			msg = 'You need a topic for me to Bing.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query,"b")
-		# Say message
-		await ctx.send(msg)
-
-	@commands.command()
-	async def duck(self, ctx, *, query = None):
-		"""Duck Duck... GOOSE."""
-
-		if query is None:
-			msg = 'You need a topic for me to DuckDuckGo.'
-			return await ctx.send(msg)
-
-		msg = await self.get_search(ctx, query,"d")
-		# Say message
-		await ctx.send(msg)
-
+		
 	@commands.command()
 	async def yahoo(self, ctx, *, query = None):
 		"""Let Yahoo! answer your questions."""
@@ -108,7 +120,7 @@ class Search(commands.Cog):
 		await ctx.send(msg)
 
 
-	'''@commands.command()
+	@commands.command()
 	async def searchsite(self, ctx, category_name = None, *, query = None):
 		"""Search corpnewt.com forums."""
 
