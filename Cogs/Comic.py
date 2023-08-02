@@ -277,8 +277,6 @@ class Comic(commands.Cog):
 			url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
 		try: html = await DL.async_text(url, {'User-Agent': ''})
 		except: return None # Failed to get the HTML, bail
-		with open("comic.html","wb") as f:
-			f.write(html.encode())
 		# Let's locate our comic by walking the search steps
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
 		if not comic_url: return None
