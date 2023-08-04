@@ -207,7 +207,7 @@ class OpenCore(commands.Cog):
 		# Try to walk our codec list and see if we get a name match, a decimal match, or a hex match
 		matched = None
 		for codec in self.alc_codecs:
-			if isinstance(search_term,str) and search_term.lower() == codec.lower() or search_term.replace("_"," ").lower() == codec.lower():
+			if isinstance(search_term,str) and (search_term.lower() == codec.lower() or search_term.replace("_"," ").lower() == codec.lower()):
 				matched = codec
 				break
 			elif self.alc_codecs[codec]["CodecID"] == search_term:
