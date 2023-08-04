@@ -1,6 +1,6 @@
-import discord, asyncio, re, io, os, datetime, plistlib, difflib
+import discord, asyncio, re, io, os, datetime, plistlib, difflib, json, time
 from   discord.ext import commands
-from   Cogs import Settings, DL, PickList
+from   Cogs import Settings, DL, PickList, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -18,6 +18,8 @@ class OpenCore(commands.Cog):
 		self.tex_version = "?.?.?"
 		self.is_current = False # Used for stopping loops
 		self.wait_time = 21600 # Default of 6 hours (21600 seconds)
+		self.alc_codecs = None
+		self.alc_wait_time = 86400 # Default of 24 hours (86400 seconds)
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -37,7 +39,13 @@ class OpenCore(commands.Cog):
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
 		self.is_current = True
+		# Load the local files first
+		self._load_local()
+		self._load_local_sample()
+		self._load_local_alc()
+		# Start the update loops
 		self.bot.loop.create_task(self.update_tex())
+		self.bot.loop.create_task(self.update_alc())
 
 	async def update_tex(self):
 		print("Starting Configuration.tex|Sample.plist update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
@@ -56,6 +64,22 @@ class OpenCore(commands.Cog):
 				if self._load_local_sample():
 					print(" - Falling back on local copy!")
 			await asyncio.sleep(self.wait_time)
+
+	async def update_alc(self):
+		print("Starting AppleALC codec loop - repeats every {:,} second{}...".format(self.alc_wait_time,"" if self.alc_wait_time==1 else "s"))
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed():
+			if not self.is_current:
+				# Bail if we're not the current instance
+				return
+			t = time.time()
+			print("Updating AppleALCCodecs.plist: {}".format(datetime.datetime.now().time().isoformat()))
+			if not await self._dl_alc():
+				print("Could not download AppleALCCodecs.plist!")
+				if self._load_local_alc():
+					print(" - Falling back on local copy!")
+			print("AppleALCCodecs - took {:,} seconds.".format(time.time()-t))
+			await asyncio.sleep(self.alc_wait_time)
 
 	def _load_local(self):
 		if not os.path.exists("Configuration.tex"): return False
@@ -80,6 +104,15 @@ class OpenCore(commands.Cog):
 		except: return False
 		return True
 
+	def _load_local_alc(self):
+		if not os.path.exists("AppleALCCodecs.plist"): return False
+		# Try to load it
+		try:
+			with open("AppleALCCodecs.plist","rb") as f:
+				self.alc_codecs = plistlib.load(f)
+		except: return False
+		return True
+
 	async def _dl_tex(self):
 		try: self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
 		except: return False
@@ -100,6 +133,27 @@ class OpenCore(commands.Cog):
 		self.sample_paths = self._parse_sample()
 		return True
 
+	async def _dl_alc(self):
+		try:
+			resources = await DL.async_text("https://github.com/acidanthera/AppleALC/tree/master/Resources")
+			payload_json = json.loads(resources)
+			codec_list = [x["name"] for x in payload_json["payload"]["tree"]["items"] if x["contentType"] == "directory" and not "/" in x["name"]]
+			codecs = {}
+			for codec in codec_list:
+				codec_url = "https://raw.githubusercontent.com/acidanthera/AppleALC/master/Resources/{}/Info.plist".format(codec)
+				codec_plist = plistlib.loads(await DL.async_dl(codec_url))
+				codecs[codec] = {
+					"CodecID":codec_plist["CodecID"],
+					"Layouts":[x["Id"] for x in codec_plist["Files"]["Layouts"]]
+				}
+				if "Revisions" in codec_plist:
+					codecs[codec]["Revisions"] = ["0x"+hex(x)[2:].upper() for x in codec_plist["Revisions"]]
+		except:
+			return False
+		plistlib.dump(codecs,open("AppleALCCodecs.plist","wb"))
+		self.alc_codecs = codecs
+		return True
+
 	def _parse_sample(self):
 		# Helper function to get a list of all paths within the Sample.plist
 		if not self.sample: return [] # Nothing to parse
@@ -116,6 +170,62 @@ class OpenCore(commands.Cog):
 			elif isinstance(current_dict[key],list) and len(current_dict[key]) and isinstance(current_dict[key][0],dict):
 				paths.extend(self._sample_walk(current_dict[key][0],key_path))
 		return paths
+
+	@commands.command(aliases=["updatecodecs"])
+	async def getcodecs(self, ctx):
+		"""Forces an update of the in-memory AppleALCCodecs.plist file (owner only)."""
+
+		if not await Utils.is_owner_reply(ctx): return
+		message = await ctx.send("Updating AppleALCCodecs.plist...")
+		alc_text = "Successfully updated AppleALCCodecs.plist"
+		if not await self._dl_alc():
+			alc_text = "Failed to update AppleALCCodecs.plist{}!".format(" - falling back on local copy" if self._load_local_alc() else "")
+		await message.edit(content=alc_text)
+
+	@commands.command(aliases=["alc"])
+	async def codec(self, ctx, *, search_term = None):
+		"""Searches the AppleALCCodecs.plist file in memory for the passed search term.
+		
+		Will search for the codec name, the hex device-id if prefixed with 0x, or the integer device-id.
+		
+		e.g. $codec ALC662
+		     $codec 2304
+			 $codec 0x0900"""
+
+		usage = "Usage: `{}codec [search_term]`".format(ctx.prefix)
+		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
+		if search_term is None: return await ctx.send(usage)
+
+		# See if it's a hex value first
+		if search_term.lower().startswith("0x"):
+			try: search_term = int(search_term[-4:],16)
+			except: pass
+		# If not - check if it's a decimal
+		else:
+			try: search_term = int(search_term)
+			except: pass
+		# Try to walk our codec list and see if we get a name match, a decimal match, or a hex match
+		matched = None
+		for codec in self.alc_codecs:
+			if isinstance(search_term,str) and search_term.lower() == codec.lower() or search_term.replace("_"," ").lower() == codec.lower():
+				matched = codec
+				break
+			elif self.alc_codecs[codec]["CodecID"] == search_term:
+				matched = codec
+				break
+		if not matched: return await ctx.send("Nothing was found for that search :(")
+		fields = [
+			{"name":"Layout IDs","value":", ".join([str(x) for x in self.alc_codecs[matched]["Layouts"]]),"inline":False}
+		]
+		if "Revisions" in self.alc_codecs[matched]:
+			fields.append({"name":"Revisions","value":", ".join([x for x in self.alc_codecs[matched]["Revisions"]]),"inline":False})
+		# Something was found - let's give the info
+		return await Message.Embed(
+			title="AppleALC Info For {}".format(matched),
+			url="https://github.com/acidanthera/AppleALC/blob/master/Resources/{}/Info.plist".format(matched),
+			fields=fields,
+			color=ctx.author
+		).send(ctx)			
 
 	@commands.command(aliases=["updatetex"])
 	async def gettex(self, ctx):
