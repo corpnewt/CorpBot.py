@@ -1,6 +1,6 @@
 import discord, asyncio, re, io, os, datetime, plistlib, difflib, json, time
 from   discord.ext import commands
-from   Cogs import Settings, DL, PickList, Message
+from   Cogs import Settings, DL, PickList, Message, FuzzySearch
 
 def setup(bot):
 	# Add the bot and deps
@@ -235,21 +235,37 @@ class OpenCore(commands.Cog):
 		).send(ctx)
 
 	@commands.command(aliases=["codecs"])
-	async def listcodecs(self, ctx):
-		"""Lists the codecs in the AppleALCCodecs.plist."""
+	async def listcodecs(self, ctx, *, search_term = None):
+		"""Lists the codecs in the AppleALCCodecs.plist - can optionally take a codec name as a search term and will list the 3 closest results."""
 
 		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
 
-		codec_list = "\n".join([
-			"{}. `{}` ({:,} layout{})".format(
-				i,
-				x,
-				len(self.alc_codecs[x]["Layouts"]),
-				"" if len(self.alc_codecs[x]["Layouts"])==1 else "s"
-			) for i,x in enumerate(self.alc_codecs,start=1)
-		])
+		if search_term:
+			codec_search = FuzzySearch.search(search_term.upper(), list(self.alc_codecs))
+			full_match  = next((x["Item"] for x in codec_search if x.get("Ratio") == 1),None)
+			if full_match: # Got an exact match - just run codec
+				return await ctx.invoke(self.codec, search_term=search_term)
+			title="Search Results For \"{}\"".format(search_term)
+			codec_list = "\n".join([
+				"{}. `{}` ({:,} layout{})".format(
+					i,
+					x["Item"],
+					len(self.alc_codecs[x["Item"]]),
+					"" if len(self.alc_codecs[x["Item"]])==1 else "s"
+				) for i,x in enumerate(codec_search,start=1)
+			])
+		else:
+			title="Currently Supported AppleALC Codecs ({:,} total)".format(len(self.alc_codecs))
+			codec_list = "\n".join([
+				"{}. `{}` ({:,} layout{})".format(
+					i,
+					x,
+					len(self.alc_codecs[x]["Layouts"]),
+					"" if len(self.alc_codecs[x]["Layouts"])==1 else "s"
+				) for i,x in enumerate(self.alc_codecs,start=1)
+			])
 		return await PickList.PagePicker(
-			title="Currently Supported AppleALC Codecs ({:,} total)".format(len(self.alc_codecs)),
+			title=title,
 			description=codec_list,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			ctx=ctx
