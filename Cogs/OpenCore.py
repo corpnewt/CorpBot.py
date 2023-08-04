@@ -214,8 +214,15 @@ class OpenCore(commands.Cog):
 				matched = codec
 				break
 		if not matched: return await ctx.send("Nothing was found for that search :(")
+		dev_id = hex(self.alc_codecs[matched]["CodecID"])[2:].upper()
+		if len(dev_id)%2: # Ensure it's an even number of chars
+			dev_id = "0"+dev_id
 		fields = [
-			{"name":"Layout IDs","value":", ".join([str(x) for x in self.alc_codecs[matched]["Layouts"]]),"inline":False}
+			{"name":"Layout IDs","value":", ".join([str(x) for x in self.alc_codecs[matched]["Layouts"]]),"inline":False},
+			{"name":"Device ID","value":"0x{} ({})".format(
+				dev_id,
+				self.alc_codecs[matched]["CodecID"]
+			)}
 		]
 		if "Revisions" in self.alc_codecs[matched]:
 			fields.append({"name":"Revisions","value":", ".join([x for x in self.alc_codecs[matched]["Revisions"]]),"inline":False})
@@ -225,7 +232,28 @@ class OpenCore(commands.Cog):
 			url="https://github.com/acidanthera/AppleALC/blob/master/Resources/{}/Info.plist".format(matched),
 			fields=fields,
 			color=ctx.author
-		).send(ctx)			
+		).send(ctx)
+
+	@commands.command(aliases=["codecs"])
+	async def listcodecs(self, ctx):
+		"""Lists the codecs in the AppleALCCodecs.plist."""
+
+		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
+
+		codec_list = "\n".join([
+			"{}. `{}` ({:,} layout{})".format(
+				i,
+				x,
+				len(self.alc_codecs[x]["Layouts"]),
+				"" if len(self.alc_codecs[x]["Layouts"])==1 else "s"
+			) for i,x in enumerate(self.alc_codecs,start=1)
+		])
+		return await PickList.PagePicker(
+			title="Currently Supported AppleALC Codecs ({:,} total)".format(len(self.alc_codecs)),
+			description=codec_list,
+			timeout=300, # Allow 5 minutes before we stop watching the picker
+			ctx=ctx
+		).pick()
 
 	@commands.command(aliases=["updatetex"])
 	async def gettex(self, ctx):
