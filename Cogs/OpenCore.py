@@ -161,7 +161,8 @@ class OpenCore(commands.Cog):
 				codec_plist = plistlib.loads(await DL.async_dl(codec_url))
 				codecs[codec] = {
 					"CodecID":codec_plist["CodecID"],
-					"Layouts":[int(x["Id"]) for x in codec_plist["Files"]["Layouts"]]
+					"Layouts":[int(x["Id"]) for x in codec_plist["Files"]["Layouts"]],
+					"Vendor":codec_plist["Vendor"]
 				}
 				if "Revisions" in codec_plist:
 					codecs[codec]["Revisions"] = ["0x"+hex(int(x))[2:].upper() for x in codec_plist["Revisions"]]
@@ -201,6 +202,7 @@ class OpenCore(commands.Cog):
 			matched = next((x for x in self.alc_alternate if codec_name.lower() in self.alc_alternate[x]),None)
 		if matched: # Got a match - build our dict
 			m["name"] = matched
+			m["vendor"] = self.alc_codecs[matched]["Vendor"]
 			m["device_id"] = self._device_id(self.alc_codecs[matched]["CodecID"])
 			m["layouts"] = ", ".join([str(x) for x in sorted(self.alc_codecs[matched]["Layouts"])])
 			m["revisions"] = ", ".join(self.alc_codecs[matched].get("Revisions",[]))
@@ -252,6 +254,7 @@ class OpenCore(commands.Cog):
 		if not matched: return await ctx.send("Nothing was found for that search :(")
 		m = self._get_codec_info(matched)
 		fields = [
+			{"name":"Vendor","value":"`{}`".format(m["vendor"]),"inline":False},
 			{"name":"Layout IDs","value":"`{}`".format(m["layouts"]),"inline":False},
 			{"name":"Device ID","value":"`{}`".format(m["device_id"]),"inline":False}
 		]
@@ -273,6 +276,7 @@ class OpenCore(commands.Cog):
 
 		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
 
+		fields = []
 		if search_term:
 			search_list = list(self.alc_codecs)
 			for codec in self.alc_alternate:
@@ -282,30 +286,32 @@ class OpenCore(commands.Cog):
 			if full_match: # Got an exact match - just run codec
 				return await ctx.invoke(self.codec, search_term=search_term)
 			title="Search Results For \"{}\"".format(search_term)
-			fields = []
 			for i,x in enumerate(codec_search,start=1):
 				m = self._get_codec_info(x["Item"])
 				fields.append({
 					"name":"{}. {}".format(i,x["Item"]),
-					"value":"` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
-					m["layouts"],
-					m["device_id"],
-					"\n` └─ Revisions: {}`".format(m["revisions"]) if m.get("revisions") else "",
-					"\n` └─ Alternate Names: {}`".format(m["alternate"]) if m.get("alternate") else ""
-				),
+					"value":"` └─ Vendor: {}`\n` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
+						m["vendor"],
+						m["layouts"],
+						m["device_id"],
+						"\n` └─ Revisions: {}`".format(m["revisions"]) if m.get("revisions") else "",
+						"\n` └─ Alternate Names: {}`".format(m["alternate"]) if m.get("alternate") else ""
+					),
 				"inline":False})
 		else:
 			title="Currently Supported AppleALC Codecs ({:,} total)".format(len(self.alc_codecs))
-			fields = [{
-				"name":"{}. {}".format(i,x),
-				"value":"` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
-					", ".join([str(l) for l in sorted(self.alc_codecs[x]["Layouts"])]),
-					self._device_id(self.alc_codecs[x]["CodecID"]),
-					"\n` └─ Revisions: {}`".format(", ".join(self.alc_codecs[x]["Revisions"])) if self.alc_codecs[x].get("Revisions") else "",
-					"\n` └─ Alternate Names: {}`".format(", ".join(self.alc_alternate[x])) if x in self.alc_alternate else ""
-				),
-				"inline":False
-			} for i,x in enumerate(self.alc_codecs,start=1)]
+			for i,x in enumerate(self.alc_codecs,start=1):
+				m = self._get_codec_info(x)
+				fields.append({
+					"name":"{}. {}".format(i,x),
+					"value":"` └─ Vendor: {}`\n` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
+						m["vendor"],
+						m["layouts"],
+						m["device_id"],
+						"\n` └─ Revisions: {}`".format(m["revisions"]) if m.get("revisions") else "",
+						"\n` └─ Alternate Names: {}`".format(m["alternate"]) if m.get("alternate") else ""
+					),
+				"inline":False})
 		return await PickList.PagePicker(
 			title=title,
 			list=fields,
