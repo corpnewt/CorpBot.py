@@ -20,6 +20,23 @@ class OpenCore(commands.Cog):
 		self.wait_time = 21600 # Default of 6 hours (21600 seconds)
 		self.alc_codecs = None
 		self.alc_wait_time = 86400 # Default of 24 hours (86400 seconds)
+		self.alc_alternate = { # Alternate codec names pulled from: https://github.com/acidanthera/AppleALC/wiki/Supported-codecs
+			"ALC225":["ALC3253"],
+			"ALC233":["ALC3236"],
+			"ALC255":["ALC3234"],
+			"ALC256":["ALC3246"],
+			"ALC269":["ALC271X"],
+			"ALC290":["ALC3241"],
+			"ALC888":["ALC1200"],
+			"ALC891":["ALC867"],
+			"ALC898":["ALC899"],
+			"CX20751_2":["CX20751","CX20752"],
+			"CX20753_4":["CX20753","CX20754"],
+			"IDT92HD66C3_65":["IDT92HD66C3/65"],
+			"IDT92HD87B1_3":["IDT92HD87B1/3"],
+			"IDT92HD87B2_4":["IDT92HD87B2/4"],
+			"VT2020_2021":["VT2020","VT2021"]
+		}
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -144,10 +161,10 @@ class OpenCore(commands.Cog):
 				codec_plist = plistlib.loads(await DL.async_dl(codec_url))
 				codecs[codec] = {
 					"CodecID":codec_plist["CodecID"],
-					"Layouts":[x["Id"] for x in codec_plist["Files"]["Layouts"]]
+					"Layouts":[int(x["Id"]) for x in codec_plist["Files"]["Layouts"]]
 				}
 				if "Revisions" in codec_plist:
-					codecs[codec]["Revisions"] = ["0x"+hex(x)[2:].upper() for x in codec_plist["Revisions"]]
+					codecs[codec]["Revisions"] = ["0x"+hex(int(x))[2:].upper() for x in codec_plist["Revisions"]]
 		except:
 			return False
 		plistlib.dump(codecs,open("AppleALCCodecs.plist","wb"))
@@ -170,6 +187,25 @@ class OpenCore(commands.Cog):
 			elif isinstance(current_dict[key],list) and len(current_dict[key]) and isinstance(current_dict[key][0],dict):
 				paths.extend(self._sample_walk(current_dict[key][0],key_path))
 		return paths
+
+	def _device_id(self, device_int):
+		dev_id = hex(device_int)[2:].upper()
+		if len(dev_id)%2: # Ensure it's an even number of chars
+			dev_id = "0"+dev_id
+		return "0x{} ({})".format(dev_id,device_int)
+
+	def _get_codec_info(self, codec_name):
+		m = {}
+		matched = next((x for x in self.alc_codecs if x.lower()==codec_name.lower()),None)
+		if not matched: # Check alternate names
+			matched = next((x for x in self.alc_alternate if codec_name.lower() in self.alc_alternate[x]),None)
+		if matched: # Got a match - build our dict
+			m["name"] = matched
+			m["device_id"] = self._device_id(self.alc_codecs[matched]["CodecID"])
+			m["layouts"] = ", ".join([str(x) for x in sorted(self.alc_codecs[matched]["Layouts"])])
+			m["revisions"] = ", ".join(self.alc_codecs[matched].get("Revisions",[]))
+			m["alternate"] = ", ".join(self.alc_alternate.get(matched,[]))
+		return m
 
 	@commands.command(aliases=["updatecodecs"])
 	async def getcodecs(self, ctx):
@@ -207,25 +243,22 @@ class OpenCore(commands.Cog):
 		# Try to walk our codec list and see if we get a name match, a decimal match, or a hex match
 		matched = None
 		for codec in self.alc_codecs:
-			if isinstance(search_term,str) and (search_term.lower() == codec.lower() or search_term.replace("_"," ").lower() == codec.lower()):
+			if isinstance(search_term,str) and (search_term.upper() == codec.upper() or search_term.upper() in self.alc_alternate.get(codec,[])):
 				matched = codec
 				break
 			elif self.alc_codecs[codec]["CodecID"] == search_term:
 				matched = codec
 				break
 		if not matched: return await ctx.send("Nothing was found for that search :(")
-		dev_id = hex(self.alc_codecs[matched]["CodecID"])[2:].upper()
-		if len(dev_id)%2: # Ensure it's an even number of chars
-			dev_id = "0"+dev_id
+		m = self._get_codec_info(matched)
 		fields = [
-			{"name":"Layout IDs","value":", ".join([str(x) for x in self.alc_codecs[matched]["Layouts"]]),"inline":False},
-			{"name":"Device ID","value":"0x{} ({})".format(
-				dev_id,
-				self.alc_codecs[matched]["CodecID"]
-			)}
+			{"name":"Layout IDs","value":"`{}`".format(m["layouts"]),"inline":False},
+			{"name":"Device ID","value":"`{}`".format(m["device_id"]),"inline":False}
 		]
-		if "Revisions" in self.alc_codecs[matched]:
-			fields.append({"name":"Revisions","value":", ".join([x for x in self.alc_codecs[matched]["Revisions"]]),"inline":False})
+		if m.get("alternate"):
+			fields.append({"name":"Alternate Names","value":"`{}`".format(m["alternate"]),"inline":False})
+		if m.get("revisions"):
+			fields.append({"name":"Revisions","value":"`{}`".format(m["revisions"]),"inline":False})
 		# Something was found - let's give the info
 		return await Message.Embed(
 			title="AppleALC Info For {}".format(matched),
@@ -241,32 +274,41 @@ class OpenCore(commands.Cog):
 		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
 
 		if search_term:
-			codec_search = FuzzySearch.search(search_term.upper(), list(self.alc_codecs))
+			search_list = list(self.alc_codecs)
+			for codec in self.alc_alternate:
+				search_list.extend(self.alc_alternate[codec])
+			codec_search = FuzzySearch.search(search_term.upper(), search_list)
 			full_match  = next((x["Item"] for x in codec_search if x.get("Ratio") == 1),None)
 			if full_match: # Got an exact match - just run codec
 				return await ctx.invoke(self.codec, search_term=search_term)
 			title="Search Results For \"{}\"".format(search_term)
-			codec_list = "\n".join([
-				"{}. `{}` ({:,} layout{})".format(
-					i,
-					x["Item"],
-					len(self.alc_codecs[x["Item"]]),
-					"" if len(self.alc_codecs[x["Item"]])==1 else "s"
-				) for i,x in enumerate(codec_search,start=1)
-			])
+			fields = []
+			for i,x in enumerate(codec_search,start=1):
+				m = self._get_codec_info(x["Item"])
+				fields.append({
+					"name":"{}. {}".format(i,x["Item"]),
+					"value":"` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
+					m["layouts"],
+					m["device_id"],
+					"\n` └─ Revisions: {}`".format(m["revisions"]) if m.get("revisions") else "",
+					"\n` └─ Alternate Names: {}`".format(m["alternate"]) if m.get("alternate") else ""
+				),
+				"inline":False})
 		else:
 			title="Currently Supported AppleALC Codecs ({:,} total)".format(len(self.alc_codecs))
-			codec_list = "\n".join([
-				"{}. `{}` ({:,} layout{})".format(
-					i,
-					x,
-					len(self.alc_codecs[x]["Layouts"]),
-					"" if len(self.alc_codecs[x]["Layouts"])==1 else "s"
-				) for i,x in enumerate(self.alc_codecs,start=1)
-			])
+			fields = [{
+				"name":"{}. {}".format(i,x),
+				"value":"` └─ Layout IDs: {}`\n` └─ Device ID: {}`{}{}".format(
+					", ".join([str(l) for l in sorted(self.alc_codecs[x]["Layouts"])]),
+					self._device_id(self.alc_codecs[x]["CodecID"]),
+					"\n` └─ Revisions: {}`".format(", ".join(self.alc_codecs[x]["Revisions"])) if self.alc_codecs[x].get("Revisions") else "",
+					"\n` └─ Alternate Names: {}`".format(", ".join(self.alc_alternate[x])) if x in self.alc_alternate else ""
+				),
+				"inline":False
+			} for i,x in enumerate(self.alc_codecs,start=1)]
 		return await PickList.PagePicker(
 			title=title,
-			description=codec_list,
+			list=fields,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			ctx=ctx
 		).pick()
