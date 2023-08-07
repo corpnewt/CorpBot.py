@@ -316,6 +316,7 @@ class OpenCore(commands.Cog):
 			title=title,
 			list=fields,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
+			max=5,
 			ctx=ctx
 		).pick()
 
