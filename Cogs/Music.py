@@ -525,6 +525,13 @@ class Music(commands.Cog):
 		try:
 			if urls: # Need to load via node get_tracks/get_playlist
 				url = urls[0] # Get the first URL
+				try:
+					# Check if it's using the new youtube.com/live/id URL approach
+					yt_url = pomice.URLRegex.YOUTUBE_URL.match(url)
+					if yt_url and yt_url.group(5).lower() == "live":
+						# Reformat the URL to use the prior approach
+						url = "https://www.youtube.com/watch?v={}".format(yt_url.group(6).lstrip("/"))
+				except: pass
 				if recommend:
 					tracks = await self.get_recommendations(ctx,url,recommend_count)
 				else:
