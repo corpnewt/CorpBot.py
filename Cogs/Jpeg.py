@@ -72,7 +72,7 @@ class Jpeg(commands.Cog):
 			i.save(half_name,"JPEG",quality=1)
 			# Load it again - then resize it up
 			i = Image.open(half_name)
-			i = i.resize((int(w*2),int(h*2)))
+			i = i.resize((int(w),int(h)))
 			# Remove the old, and save it again
 			os.remove(half_name)
 			os.remove(path)
