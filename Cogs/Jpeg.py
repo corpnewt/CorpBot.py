@@ -1,12 +1,7 @@
-import asyncio
-import discord
-import time
-import os
-from   PIL import Image
-from   discord.ext import commands
-from   Cogs import GetImage
-from   Cogs import DisplayName
-from   Cogs import Message
+import discord, time, os
+from PIL import Image
+from discord.ext import commands
+from Cogs import GetImage, DisplayName, Message
 
 def setup(bot):
 	# Add the bot and deps
@@ -35,35 +30,15 @@ class Jpeg(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	def _jpeg(self, image, compression = 1):
-		try:
-			img = Image.open(image)
-			# Get frame 1
-			img = img.convert('RGBA')
-			img = self._remove_transparency(img)
-			img.save(image, 'JPEG', quality=compression)
-		except Exception:
-			return False
-		return True
-
-	def _remove_transparency(self, image, fill_color = 'black'):
-		if image.mode in ('RGBA', 'LA'):
-			background = Image.new(image.mode[:-1], image.size, fill_color)
-			background.paste(image, image.split()[-1])
-			image = background
-		return image
-
-
 	@commands.command(pass_context=True)
 	async def jpeg(self, ctx, *, url = None):
 		"""MOAR JPEG!  Accepts a url - or picks the first attachment."""
 		if not self.canDisplay(ctx.guild):
 			return
-		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}jpeg [url or attachment]`".format(ctx.prefix))
-			return
+		if url is None and not ctx.message.attachments:
+			return await ctx.send("Usage: `{}jpeg [url or attachment]`".format(ctx.prefix))
 
-		if url == None:
+		if url is None:
 			url = ctx.message.attachments[0].url
 			
 		# Let's check if the "url" is actually a user
@@ -76,12 +51,36 @@ class Jpeg(commands.Cog):
 		
 		path = await GetImage.download(url)
 		if not path:
-			await Message.Embed(title="An error occurred!", description="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
-			return
+			return await Message.Embed(title="An error occurred!", description="I guess I couldn't jpeg that one...  Make sure you're passing a valid url or attachment.").edit(ctx, message)
 
 		message = await Message.Embed(description="Jpegifying...").edit(ctx, message)
+		fn = os.path.basename(path)
+		dn = os.path.dirname(path)
 		# JPEEEEEEEEGGGGG
-		if not self._jpeg(path):
+		try:
+			i = Image.open(path)
+			# Get the first frame, and replace transparency with black
+			i = i.convert("RGBA")
+			bg = Image.new(i.mode[:-1],i.size,"black")
+			bg.paste(i,i.split()[-1])
+			i = bg
+			# Resize the image to half - and save it with extreme compression
+			w,h = i.size
+			i = i.resize((int(w/2),int(h/2)))
+			# Save it to a temp image path
+			half_name = os.path.join(dn,"half-"+fn)
+			i.save(half_name,"JPEG",quality=1)
+			# Load it again - then resize it up
+			i = Image.open(half_name)
+			i = i.resize((int(w*2),int(h*2)))
+			# Remove the old, and save it again
+			os.remove(half_name)
+			os.remove(path)
+			# Save it to a path ending in .jpg/.jpeg
+			if not path.lower().endswith((".jpg",".jpeg")):
+				path = os.path.join(dn,fn+".jpg")
+			i.save(path,"JPEG",quality=1)
+		except:
 			await Message.Embed(title="An error occurred!", description="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.").edit(ctx, message)
 			if os.path.exists(path):
 				GetImage.remove(path)
