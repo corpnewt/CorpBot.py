@@ -420,9 +420,9 @@ class Lockdown(commands.Cog):
 
             on_off:           Enables or disables anti-raid detection
             join_number:      The number of members that need to join within the threshold to enable anti-raid (2-100)
-            join_seconds:     The seconds threshold for the number of members specified in join_number to enable anti-raid (2-100)
+            join_seconds:     The seconds threshold for the number of members specified in join_number to enable anti-raid (1-600)
             kick_ban_mute:    The response the bot should take for all members that join during anti-raid (including those in the threshold)
-            cooldown_minutes: The number of minutes with no joins before anti-raid is disabled (2-100)
+            cooldown_minutes: The number of minutes with no joins before anti-raid is disabled (1-100)
         
         Example:
 
@@ -451,8 +451,8 @@ class Lockdown(commands.Cog):
                 join_seconds,
                 kick_ban_mute.lower(),
                 int(cooldown_minutes/60)
-            )) 
-        if on_off.lower() in ("off", "no", "disable", "disabled", "false"):
+            ))
+        if on_off.split()[0].lower() in ("off", "no", "disable", "disabled", "false"):
             self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", False)
             self.settings.setServerStat(ctx.guild, "AntiRaidJoins", [])
             self.settings.setServerStat(ctx.guild, "AntiRaidLastJoin", 0)
@@ -463,16 +463,17 @@ class Lockdown(commands.Cog):
         except:
             return await ctx.send(usage)
         # We should have adequate values here - let's ensure limits though
-        if on_off.lower() in ("off", "no", "disable", "disabled", "false"):
-            self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", False)
-            return await ctx.send("Anti-raid is disabled!")
-        elif not on_off.lower() in ("on", "yes", "enable", "enabled", "true"):
+        if not on_off.lower() in ("on", "yes", "enable", "enabled", "true"):
             return await ctx.send(usage)
         # We're enabling - qualify the rest of the values
-        if any((100 < x or 2 > x for x in (join_number, join_seconds, cooldown_minutes))):
-            return await ctx.send("All numerical values must be between 2-100.")
+        if not 2 <= join_number <= 100:
+            return await ctx.send("`join_number` must be between 2-100.")
+        if not 1 <= join_seconds <= 600:
+            return await ctx.send("`join_seconds` must be between 1-600.")
+        if not 1 <= cooldown_minutes <= 100:
+            return await ctx.send("`cooldown_minutes` must be between 1-100.")
         if not kick_ban_mute.lower() in ("kick","ban","mute"):
-            return await ctx.send("Unknown kick_ban_mute value - can only be kick, ban, or mute.")
+            return await ctx.send("Unknown `kick_ban_mute` value - can only be `kick`, `ban`, or `mute`.")
         # Values should be qualified - let's save them
         self.settings.setServerStat(ctx.guild, "AntiRaidEnabled", True)
         self.settings.setServerStat(ctx.guild, "AntiRaidMax", join_number)
@@ -480,11 +481,13 @@ class Lockdown(commands.Cog):
         self.settings.setServerStat(ctx.guild, "AntiRaidResponse", kick_ban_mute.lower())
         self.settings.setServerStat(ctx.guild, "AntiRaidCooldown", cooldown_minutes*60)
         self.settings.setServerStat(ctx.guild, "AntiRaidActive", False)
-        await ctx.send("Anti-raid protection enabled with the following settings:\n\nIf {:,} members join within {:,} seconds, I will {} all new members until {} minutes have elapsed without joins.".format(
+        await ctx.send("Anti-raid protection enabled with the following settings:\n\nIf {:,} members join within {:,} second{}, I will {} all new members until {} minute{} elapsed without joins.".format(
             join_number,
             join_seconds,
+            "" if join_seconds==1 else "s",
             kick_ban_mute.lower(),
-            cooldown_minutes
+            cooldown_minutes,
+            " has" if cooldown_minutes==1 else "s have"
         )) 
 
     @commands.command()
