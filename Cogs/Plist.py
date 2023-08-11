@@ -45,15 +45,22 @@ class Plist(commands.Cog):
     async def nvweb(self, ctx, os_build = None):
         """Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
         # Get the current manifest
+        link = self.nv_link
         try:
             data = await DL.async_dl(self.nv_link)
             plist_data = plistlib.loads(data)
         except:
-            return await Message.Embed(
-                title="⚠ An error occurred!", 
-                description="I guess I couldn't get the manifest...\n\"{}\" may no longer be valid.".format(self.nv_link),
-                color=ctx.author
-            ).send(ctx)
+            # Load a local file if we have one
+            try:
+                with open("nvweb.plist","rb") as f:
+                    plist_data = plistlib.load(f)
+                link = "local nvweb.plist"
+            except:
+                return await Message.Embed(
+                    title="⚠ An error occurred!", 
+                    description="I guess I couldn't get the manifest...\n{} may no longer be valid.".format(self.nv_link),
+                    color=ctx.author
+                ).send(ctx)
         # We have the plist data
         wd = None
         if os_build is None:
@@ -66,7 +73,10 @@ class Plist(commands.Cog):
             if not len(sorted_list):
                 return await Message.Embed(
                     title="⚠ An error occurred!", 
-                    description="There were no updates found at \"{}\".".format(self.nv_link),
+                    description="There were no updates found {} {}.".format(
+                        "at" if link == self.nv_link else "in",
+                        link
+                    ),
                     color=ctx.author
                 ).send(ctx)
             wd = [{
@@ -116,7 +126,7 @@ class Plist(commands.Cog):
             list=wd,
             color=ctx.author,
             pm_after_fields=25,
-            footer="All links pulled from {}".format(self.nv_link),
+            footer="All links pulled from {}".format(link),
             ctx=ctx
         ).pick()
 
