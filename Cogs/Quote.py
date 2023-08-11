@@ -34,9 +34,12 @@ class Quote(commands.Cog):
 		r_admin = self.settings.getServerStat(member.guild, "QuoteAdminOnly")
 		r_qv = 1 if r_admin else self.settings.getServerStat(member.guild,"QuoteVotes",1)
 		# Get the original message
-		channel = guild.get_channel(payload.channel_id)
+		channel = self.bot.get_channel(payload.channel_id)
 		try: message = await channel.fetch_message(payload.message_id)
 		except: return # Failed to get the message
+		# Check if the message id is already in our QuotedMessages list
+		quoted_messages = self.settings.getServerStat(member.guild, "QuotedMessages", [])
+		if payload.message_id in quoted_messages: return # Already quoted - ignore
 		reaction = next((x for x in message.reactions if str(x) == str(r)),None)
 		if not reaction: return # Broken for no reason?
 		# Gather the context and evaluate
@@ -103,6 +106,9 @@ class Quote(commands.Cog):
 			"footer" : "Quoted by {} ({})".format(member, member.id)
 		}
 		await Message.EmbedText(**e).send(r_channel)
+		# Add it to our quoted messages list
+		quoted_messages.append(payload.message_id)
+		self.settings.setServerStat(member.guild,"QuotedMessages",quoted_messages)
 
 
 	@commands.command(aliases=["quotev","qv"])
@@ -198,3 +204,50 @@ class Quote(commands.Cog):
 		"""Sets whether only admins/bot-admins can quote or not (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Admin-only quotes","QuoteAdminOnly",yes_no))
+
+
+	@commands.command()
+	async def unquote(self, ctx, *, message_id = None):
+		"""Removes the passed message id from the QuotedMessages list if found (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not message_id:
+			return await ctx.send("Usage: `{}unquote [message_id]`".format(ctx.prefix))
+		# Try to resolve the message id from the link
+		try:
+			message_id = int(message_id.split("/")[-1])
+		except:
+			return await ctx.send("Usage: `{}unquote [message_id]`".format(ctx.prefix))
+		quoted_messages = self.settings.getServerStat(ctx.guild,"QuotedMessages",[])
+		if not message_id in quoted_messages:
+			return await ctx.send("That message id isn't in the QuotedMessages list and can be quoted.")
+		quoted_messages = [x for x in quoted_messages if x != message_id]
+		self.settings.setServerStat(ctx.guild,"QuotedMessages",quoted_messages)
+		await ctx.send("Message id `{}` removed from QuotedMessagese list and can be quoted again.".format(message_id))
+
+
+	@commands.command()
+	async def unquoteall(self, ctx):
+		"""Removes all message ids from the QuotedMessages list (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		quoted_messages = self.settings.getServerStat(ctx.guild,"QuotedMessages",[])
+		if not quoted_messages:
+			return await ctx.send("There are no message ids in the QuotedMessages list.")
+		self.settings.setServerStat(ctx.guild,"QuotedMessages",[])
+		await ctx.send("{:,} message ids removed from QuotedMessagese list.".format(len(quoted_messages)))
+
+
+	@commands.command()
+	async def isquoted(self, ctx, *, message_id = None):
+		"""Checks if the passed message id is present in the QuotedMessages list (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if not message_id:
+			return await ctx.send("Usage: `{}unquote [message_id]`".format(ctx.prefix))
+		# Try to resolve the message id from the link
+		try:
+			message_id = int(message_id.split("/")[-1])
+		except:
+			return await ctx.send("Usage: `{}unquote [message_id]`".format(ctx.prefix))
+		quoted_messages = self.settings.getServerStat(ctx.guild,"QuotedMessages",[])
+		if not message_id in quoted_messages:
+			return await ctx.send("That message id **was not** found in the QuotedMessages list.")
+		await ctx.send("That message id **was** found in the QuotedMessages list.")
