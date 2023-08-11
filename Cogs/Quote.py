@@ -126,7 +126,7 @@ class Quote(commands.Cog):
 		# Check if we're admin-only
 		qv = 1
 		if self.settings.getServerStat(ctx.guild,"QuoteAdminOnly"):
-			ao = "Admin Only"
+			ao = "Only Admins and Bot-Admins"
 		else:
 			ao = "Anyone"
 			qv = self.settings.getServerStat(ctx.guild,"QuoteVotes",1)
