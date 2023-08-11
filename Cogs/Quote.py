@@ -111,6 +111,39 @@ class Quote(commands.Cog):
 		self.settings.setServerStat(member.guild,"QuotedMessages",quoted_messages)
 
 
+	@commands.command(aliases=["quote","qinfo","qi"])
+	async def quoteinfo(self, ctx):
+		"""Lists information about the current quote setup."""
+		# Resolve the channel
+		try: qc = ctx.guild.get_channel(int(self.settings.getServerStat(ctx.guild,"QuoteChannel")))
+		except: qc = None
+		if not qc:
+			return await ctx.send("Quoting is currently *disabled*.  There is no quote channel set.\nA bot-admin can set one with `{}setquotechannel [channel]`".format(ctx.prefix))
+		# Resolve the reaction
+		qr = self.settings.getServerStat(ctx.guild,"QuoteReaction")
+		if not qr:
+			return await ctx.send("Quoting is currently *disabled*.  There is no quote reaction set.\nA bot-admin can set one with `{}setquotereaction`".format(ctx.prefix))
+		# Check if we're admin-only
+		qv = 1
+		if self.settings.getServerStat(ctx.guild,"QuoteAdminOnly"):
+			ao = "Admin Only"
+		else:
+			ao = "Anyone"
+			qv = self.settings.getServerStat(ctx.guild,"QuoteVotes",1)
+		fields = [
+			{"name":"Quote Channel","value":qc.mention,"inline":False},
+			{"name":"Quote Reaction","value":qr,"inline":False},
+			{"name":"Who Can Quote","value":ao,"inline":False}
+		]
+		if ao == "Anyone":
+			fields.append({"name":"How Many Reactions To Quote","value":"{:,}".format(qv),"inline":False})
+		await Message.Embed(
+			title="Current Quote Information",
+			fields=fields,
+			color=ctx.author
+		).send(ctx)
+
+
 	@commands.command(aliases=["quotev","qv"])
 	async def quotevote(self, ctx, quote_votes = None):
 		"""Gets or sets the number of votes/reactions needed for non admin/bot-admin users to quote a message (bot-admin only)."""
@@ -130,6 +163,7 @@ class Quote(commands.Cog):
 		# Set the value.
 		self.settings.setServerStat(ctx.guild,"QuoteVotes",qv)
 		await ctx.send("Quote votes set to {:,}.".format(qv))
+
 
 	@commands.command(aliases=["sqc","setquotec","setqc"])
 	async def setquotechannel(self, ctx, channel = None):
