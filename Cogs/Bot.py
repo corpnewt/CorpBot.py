@@ -245,11 +245,9 @@ class Bot(commands.Cog):
 		cpuThred      = os.cpu_count()
 		cpuUsage      = psutil.cpu_percent(interval=1)
 		memStats      = psutil.virtual_memory()
-		memUsed       = memStats.used
-		memTotal      = memStats.total
-		memUsedGB     = "{:.1f}".format(memUsed/1024**3)
-		memTotalGB    = "{:.1f}".format(memTotal/1024**3)
-		memPerc       = (memUsed/1024**3)/(memTotal/1024**3)*100
+		memUsedGB     = round(memStats.used/1024**3,1)
+		memTotalGB    = round(memStats.total/1024**3,1)
+		memPerc       = memUsedGB/memTotalGB*100
 		currentOS     = platform.platform()
 		system        = platform.system()
 		release       = platform.release()
