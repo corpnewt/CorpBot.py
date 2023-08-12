@@ -245,11 +245,11 @@ class Bot(commands.Cog):
 		cpuThred      = os.cpu_count()
 		cpuUsage      = psutil.cpu_percent(interval=1)
 		memStats      = psutil.virtual_memory()
-		memPerc       = memStats.percent
 		memUsed       = memStats.used
 		memTotal      = memStats.total
-		memUsedGB     = "{0:.1f}".format(((memUsed / 1024) / 1024) / 1024)
-		memTotalGB    = "{0:.1f}".format(((memTotal/1024)/1024)/1024)
+		memUsedGB     = "{:.1f}".format(memUsed/1024**3)
+		memTotalGB    = "{:.1f}".format(memTotal/1024**3)
+		memPerc       = (memUsed/1024**3)/(memTotal/1024**3)*100
 		currentOS     = platform.platform()
 		system        = platform.system()
 		release       = platform.release()
@@ -280,7 +280,7 @@ class Bot(commands.Cog):
 		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
 		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
-		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
+		msg += ProgressBar.center('{} ({:.1f}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
 		msg += '{} uptime```'.format(timeString)
 
