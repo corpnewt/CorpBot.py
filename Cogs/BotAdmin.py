@@ -123,7 +123,6 @@ class BotAdmin(commands.Cog):
 		self.settings.setServerStat(ctx.guild,"IgnoredUsers",ignoreList)
 		await ctx.send('*{}* is now being ignored.'.format(DisplayName.name(member)))
 
-
 	@commands.command()
 	async def listen(self, ctx, *, member = None):
 		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
@@ -139,7 +138,6 @@ class BotAdmin(commands.Cog):
 		if not str(member.id) in ignoreList: return await ctx.send("*{}* wasn't being ignored...".format(DisplayName.name(member)))
 		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[x for x in ignoreList if x != str(member.id)])
 		await ctx.send("*{}* is no longer being ignored.".format(DisplayName.name(member)))
-
 
 	@commands.command()
 	async def listenall(self,ctx):
@@ -164,7 +162,6 @@ class BotAdmin(commands.Cog):
 			description=desc,
 			ctx=ctx
 		).pick()
-
 
 	@commands.command(aliases=["dbladd"])
 	async def adddbl(self, ctx, *, member = None):
@@ -252,11 +249,13 @@ class BotAdmin(commands.Cog):
 	
 	async def kick_ban(self, ctx, members_and_reason = None, command_name = "kick"):
 		# Helper method to handle the lifting for kick and ban
-		if not await Utils.is_bot_admin_reply(ctx): return
+		bot_owner_over_admin = self.settings.getServerStat(ctx.guild,"BotOwnerOverAdmin",False)
+		is_bot_owner = False if not bot_owner_over_admin else Utils.is_owner(ctx)
+		if not (bot_owner_over_admin and is_bot_owner) and not await Utils.is_bot_admin_reply(ctx): return
 		if not members_and_reason:
 			return await ctx.send('Usage: `{}{} [space delimited member mention/id] [reason]`'.format(ctx.prefix, command_name))
 		is_admin = Utils.is_admin(ctx)
-		is_server_owner = False if not ctx.guild else ctx.guild.owner.id == ctx.author.id
+		is_server_owner = ctx.author == getattr(ctx.guild,"owner",None)
 		def member_exception(m):
 			# Helper to check if this member cannot be banned/kicked
 			if not isinstance(m,discord.Member):
@@ -268,6 +267,9 @@ class BotAdmin(commands.Cog):
 				return True
 			if is_server_owner:
 				# The server owner should be able to ban/kick anyone - no exception
+				return False
+			if bot_owner_over_admin and is_bot_owner and not m == getattr(ctx.guild,"owner",None):
+				# We're allowing bot owner to kick admins and below - and the target isn't the server owner
 				return False
 			if is_admin and not Utils.is_admin(ctx,m):
 				# Admins can ban anyone who isn't admin
@@ -430,7 +432,6 @@ class BotAdmin(commands.Cog):
 		eg:  $kick last=10m30s raid"""
 		await self.kick_ban(ctx,members,"kick")
 		
-		
 	@commands.command(aliases=["yote","bean"])
 	async def ban(self, ctx, *, members = None, reason = None):
 		"""Bans the passed members for the specified reason.
@@ -524,3 +525,10 @@ class BotAdmin(commands.Cog):
 		# At this point, we should have the default number of days - let's tell the user!
 		self.settings.setServerStat(ctx.guild,"BanMessageRemoveDays",days)
 		return await ctx.send("Banning a user will now remove {:,} day{} worth of messages.".format(days,"" if days==1 else "s"))
+
+	@commands.command()
+	async def botowneroveradmin(self, ctx, *, yes_no = None):
+		"""Gets or sets whether the bot owner(s) can kick/ban/klean admins and under (server owner only)."""
+		if not ctx.author == ctx.guild.owner:
+			return await ctx.send("You do not have sufficient privileges to access this command.")
+		await ctx.send(Utils.yes_no_setting(ctx,"Allow bot owner(s) to kick/ban/klean admins and under","BotOwnerOverAdmin",yes_no))
