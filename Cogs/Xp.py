@@ -869,10 +869,6 @@ class Xp(commands.Cog):
 		member = member or ctx.author
 		server = ctx.guild
 
-		if not server: # No server info - try to resolve the member name to a user as-is
-			m = DisplayName.memberForName(member,server)
-			if m: member = m
-
 		if isinstance(member,str):
 			# Walk the components split by spaces and see if we can find a member + server
 			parts = member.split(" ")
@@ -882,12 +878,12 @@ class Xp(commands.Cog):
 				server_test = member_test = None # Initialize
 				# Check for a server first
 				if s:
-					for server in self.bot.guilds:
-						if (server.name.lower() == s.lower() or str(server.id) == s):
+					for serv in self.bot.guilds:
+						if (serv.name.lower() == s.lower() or str(serv.id) == s):
 							# Make sure the author is in that server
-							if Utils.is_owner(ctx,ctx.author) or server.get_member(ctx.author.id):
+							if Utils.is_owner(ctx,ctx.author) or serv.get_member(ctx.author.id):
 								# We got a valid server, and are in it
-								server_test = server
+								server_test = serv
 								break
 					# Didn't find one - don't allow trailing nonsense
 					if not server_test: continue
@@ -908,6 +904,11 @@ class Xp(commands.Cog):
 					member = member_test
 					server = server_test or ctx.guild
 					break
+
+		if isinstance(member,str) and not server:
+			# Try to resolve the member name to a user as-is
+			m = DisplayName.memberForName(member,server)
+			if m: member = m
 
 		if not member or isinstance(member,str):
 			return await ctx.send("I couldn't find {}...".format(
