@@ -276,7 +276,7 @@ class Hw(commands.Cog):
 		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
 		msg += 'For example: '
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
-		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
+		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic* (type `stop` to cancel)'
 		while True:
 			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
@@ -284,7 +284,7 @@ class Hw(commands.Cog):
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
+				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (`y`/`n`/`stop`)'
 				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
 				if test is None:
 					self._stop_hw(ctx.author)
@@ -317,7 +317,7 @@ class Hw(commands.Cog):
 						return
 					elif conf == False:
 						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						msg = 'Alright, *{}*, what parts does "{}" have now? (Please include *all* parts for this build - you can add new lines with *shift + enter* - type `stop` to cancel)'.format(DisplayName.name(ctx.author), bname)
 						continue
 
 					m = '{} set to:\n{}'.format(bname, output)
@@ -818,7 +818,7 @@ class Hw(commands.Cog):
 
 		if hwChannel == ctx.author and not isinstance(ctx.channel,discord.DMChannel):
 			await ctx.message.add_reaction("📬")
-		msg = '*{}*, tell me what you\'d like to call this build (type stop to cancel):'.format(DisplayName.name(ctx.author))
+		msg = '*{}*, tell me what you\'d like to call this build (type `stop` to cancel):'.format(DisplayName.name(ctx.author))
 		
 		# Get the build name
 		newBuild = { 'Main': True }
@@ -842,7 +842,7 @@ class Hw(commands.Cog):
 		msg += 'You can also pass pcpartpicker links to have them formatted automagically - I can also format them using different styles.\n'
 		msg += 'For example: '
 		msg += '```https://pcpartpicker.com/list/123456 mdblock``` would format with the markdown block style.\n'
-		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic*'
+		msg += 'Markdown styles available are *normal, md, mdblock, bold, bolditalic* (type `stop` to cancel)'
 		while True:
 			parts = await self.prompt(hw_id, ctx, msg, hwChannel, DisplayName.name(ctx.author))
 			if not parts:
@@ -850,7 +850,7 @@ class Hw(commands.Cog):
 				return
 			if 'pcpartpicker.com' in parts.content.lower():
 				# Possibly a pc partpicker link?
-				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (y/n/stop)'
+				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (`y`/`n`/`stop`)'
 				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
 				if test is None:
 					self._stop_hw(ctx.author)
@@ -884,7 +884,7 @@ class Hw(commands.Cog):
 						return
 					elif conf == False:
 						# Didn't get our answer
-						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter*)'.format(DisplayName.name(ctx.author), bname)
+						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter* - type `stop` to cancel)'.format(DisplayName.name(ctx.author), bname)
 						continue
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
@@ -992,7 +992,7 @@ class Hw(commands.Cog):
 				msg2 = Utils.suppressed(ctx,message)
 			else:
 				msg2 = '{}'.format(Utils.suppressed(ctx,message.content))
-			msg3 = 'Is that correct? (y/n/stop)'
+			msg3 = 'Is that correct? (`y`/`n`/`stop`)'
 			await dest.send(msg)
 			await dest.send(msg2)
 			await dest.send(msg3)
