@@ -2,6 +2,7 @@ import discord, time, os
 from PIL import Image
 from discord.ext import commands
 from Cogs import GetImage, DisplayName, Message
+from io import BytesIO
 
 def setup(bot):
 	# Add the bot and deps
@@ -64,28 +65,27 @@ class Jpeg(commands.Cog):
 			bg = Image.new(i.mode[:-1],i.size,"black")
 			bg.paste(i,i.split()[-1])
 			i = bg
-			# Resize the image to half - and save it with extreme compression
+			# Resize the image to 80% - and save it with extreme compression
 			w,h = i.size
-			i = i.resize((int(w/2),int(h/2)))
+			i = i.resize((int(w*0.8),int(h*0.8)),Image.NEAREST)
 			# Save it to a temp image path
-			half_name = os.path.join(dn,"half-"+fn)
-			i.save(half_name,"JPEG",quality=1)
+			half_bytes = BytesIO()
+			i.save(half_bytes,"JPEG",quality=1)
+			# Seek to the start in memory
+			half_bytes.seek(0)
 			# Load it again - then resize it up
-			i = Image.open(half_name)
-			i = i.resize((int(w),int(h)))
-			# Remove the old, and save it again
-			os.remove(half_name)
-			os.remove(path)
-			# Save it to a path ending in .jpg/.jpeg
-			if not path.lower().endswith((".jpg",".jpeg")):
-				path = os.path.join(dn,fn+".jpg")
+			i = Image.open(half_bytes)
+			i = i.resize((int(w),int(h)),Image.NEAREST)
+			# Save it to a path ending in .jpeg
+			if not path.lower().endswith((".jpeg",".jpeg")):
+				# Strip .jpg if needed
+				if path.lower().endswith(".jpg"):
+					path = path[:-4]
+				path = os.path.join(dn,fn+".jpeg")
 			i.save(path,"JPEG",quality=1)
+			# Upload and send
+			message = await Message.Embed(description="Uploading...").edit(ctx, message)
+			await Message.Embed(file=path, title="Moar Jpeg!").edit(ctx, message)
 		except:
 			await Message.Embed(title="An error occurred!", description="I couldn't jpegify that image...  Make sure you're pointing me to a valid image file.").edit(ctx, message)
-			if os.path.exists(path):
-				GetImage.remove(path)
-			return
-
-		message = await Message.Embed(description="Uploading...").edit(ctx, message)
-		message = await Message.Embed(file=path, title="Moar Jpeg!").edit(ctx, message)
 		GetImage.remove(path)
