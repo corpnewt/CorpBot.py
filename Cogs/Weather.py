@@ -74,7 +74,7 @@ class Weather(commands.Cog):
 	def _k_to_f(self, k):
 		return self._c_to_f(self._k_to_c(k))
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["tcon","tconv"])
 	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
 		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 		(F)ahrenheit
