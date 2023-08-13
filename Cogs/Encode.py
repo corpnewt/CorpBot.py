@@ -504,7 +504,7 @@ class Encode(commands.Cog):
 
 		await ctx.send("{:08b}".format(input_int))
 	
-	@commands.command()
+	@commands.command(aliases=["enc"])
 	async def encode(self, ctx, from_type = None, to_type = None, *, value = None):
 		"""Data converter that supports hex, decimal, binary, base64, and ascii."""
 
