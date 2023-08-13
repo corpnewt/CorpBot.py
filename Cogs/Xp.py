@@ -869,10 +869,13 @@ class Xp(commands.Cog):
 		member = member or ctx.author
 		server = ctx.guild
 
+		if not server: # No server info - try to resolve the member name to a user as-is
+			m = DisplayName.memberForName(member,server)
+			if m: member = m
+
 		if isinstance(member,str):
 			# Walk the components split by spaces and see if we can find a member + server
 			parts = member.split(" ")
-			server_test = member_test = None
 			for i in range(len(parts)+1):
 				m = " ".join(parts[:len(parts)-i])
 				s = " ".join([] if i==0 else parts[-i:])
