@@ -925,10 +925,10 @@ class Xp(commands.Cog):
 
 		if getattr(member,"nick",None):
 			# We have a nickname
-			stat_embed.author = '{}, who currently goes by {}'.format(member.name, member.nick)
+			stat_embed.author = '{}, who currently goes by {}'.format(getattr(member,"global_name",member.name), member.nick)
 		else:
 			# Add to embed
-			stat_embed.author = '{}'.format(member.name)
+			stat_embed.author = '{}'.format(getattr(member,"global_name",member.name))
 
 		if server:
 			# Get user's xp
