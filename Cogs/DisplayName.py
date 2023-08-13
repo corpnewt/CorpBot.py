@@ -29,7 +29,7 @@ class DisplayName(commands.Cog):
         # Check nick first - then name
         name = str(name).lower()
         for member in mems:
-            if isinstance(member,(discord.User,discord.ClientUser)):
+            if not isinstance(member,discord.Member):
                 # Users don't have nicknames, only members
                 break
             if member.nick and member.nick.lower() == name:
@@ -38,10 +38,7 @@ class DisplayName(commands.Cog):
             if member.name.lower() == name:
                 return member
             # Check if we have the new global_name
-            if isinstance(member,(discord.User,discord.ClientUser)):
-                global_name = getattr(member,"global_name",None)
-            else:
-                global_name = getattr(getattr(member,"_user",None),"global_name",None)
+            global_name = getattr(member,"global_name",None)
             if global_name and global_name.lower() == name:
                 return member
         mem_parts = name.split("#")
@@ -71,11 +68,11 @@ class DisplayName(commands.Cog):
             return None
         for channel in server.channels:
             if typeCheck:
-                if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+                if typeCheck.lower() == "text" and not isinstance(channel,discord.TextChannel):
                     continue
-                if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+                if typeCheck.lower() == "voice" and not isinstance(channel,discord.VoiceChannel):
                     continue
-                if typeCheck.lower() == "category" and not type(channel) is discord.CategoryChannel:
+                if typeCheck.lower() == "category" and not isinstance(channel,discord.CategoryChannel):
                     continue
             if channel.id == checkid:
                 return channel
@@ -85,11 +82,11 @@ class DisplayName(commands.Cog):
         name = str(name)
         for channel in server.channels:
             if typeCheck:
-                if typeCheck.lower() == "text" and not type(channel) is discord.TextChannel:
+                if typeCheck.lower() == "text" and not isinstance(channel,discord.TextChannel):
                     continue
-                if typeCheck.lower() == "voice" and not type(channel) is discord.VoiceChannel:
+                if typeCheck.lower() == "voice" and not isinstance(channel,discord.VoiceChannel):
                     continue
-                if typeCheck.lower() == "category" and not type(channel) is discord.CategoryChannel:
+                if typeCheck.lower() == "category" and not isinstance(channel,discord.CategoryChannel):
                     continue
             if channel.name.lower() == name.lower():
                 return channel
