@@ -923,12 +923,13 @@ class Xp(commands.Cog):
 			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
 		stat_embed.description = "Created {}".format(created)
 
+		member_name = getattr(member,"global_name",None) or member.name
 		if getattr(member,"nick",None):
 			# We have a nickname
-			stat_embed.author = '{}, who currently goes by {}'.format(getattr(member,"global_name",member.name), member.nick)
+			stat_embed.author = '{}, who currently goes by {}'.format(member_name, member.nick)
 		else:
 			# Add to embed
-			stat_embed.author = '{}'.format(getattr(member,"global_name",member.name))
+			stat_embed.author = member_name
 
 		if server:
 			# Get user's xp
@@ -1008,8 +1009,12 @@ class Xp(commands.Cog):
 				boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
 				stat_embed.add_field(name="Boosting Since",value=boosted,inline=False)
 
-		# Get User Name and ID
-		stat_embed.add_field(name="User Name", value=str(member), inline=True)
+		# Get User Name (and ID if not migrated)
+		if getattr(getattr(member,"_user",None),"is_migrated",False):
+			user_name = member.name
+		else:
+			user_name = str(member)
+		stat_embed.add_field(name="User Name", value=user_name, inline=True)
 		stat_embed.add_field(name="User ID", value=str(member.id), inline=True)
 		# Add status
 		if getattr(member,"status",None):
