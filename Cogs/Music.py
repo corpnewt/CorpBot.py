@@ -80,6 +80,11 @@ class Music(commands.Cog):
 		self.ll_host = bot.settings_dict.get("lavalink_host","127.0.0.1")
 		self.ll_port = bot.settings_dict.get("lavalink_port",2333)
 		self.ll_pass = bot.settings_dict.get("lavalink_password","youshallnotpass")
+		# Get Spotify info as needed
+		self.spotify_client_id = bot.settings_dict.get("spotify_client_id")
+		self.spotify_client_secret = bot.settings_dict.get("spotify_client_secret")
+		# Get whether or not to enable Apple Music
+		self.use_apple_music = bot.settings_dict.get("use_apple_music",False)
 		# Monkey patch out some regex - maybe find a way to include it via setting later
 		pomice.URLRegex.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"a^",)
 		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
@@ -143,6 +148,9 @@ class Music(commands.Cog):
 			port=self.ll_port,
 			identifier=None,
 			password=self.ll_pass,
+			spotify_client_id=self.spotify_client_id,
+			spotify_client_secret=self.spotify_client_secret,
+			apple_music=self.use_apple_music
 		)
 
 	async def get_node(self):
