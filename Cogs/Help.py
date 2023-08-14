@@ -1,7 +1,7 @@
 import discord, os
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import ReadableTime, DisplayName, Message, FuzzySearch, PickList
+from   Cogs import ReadableTime, Message, FuzzySearch, PickList, Nullify
 
 def setup(bot):
 	# Add the cog
@@ -15,16 +15,10 @@ class Help(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-		global DisplayName
-		DisplayName = self.bot.get_cog("DisplayName")
 		
 	def _get_prefix(self, ctx):
 		# Helper method to get the simplified prefix
-		# Setup a clean prefix
-		bot_member = ctx.guild.get_member(self.bot.user.id) if ctx.guild else ctx.bot.user
-		# Replace name and nickname mentions
-		name = "@"+DisplayName.name(bot_member)
-		return ctx.prefix.replace("<@{}>".format(bot_member.id),name).replace("<@!{}>".format(bot_member.id),name)
+		return Nullify.resolve_mentions(ctx.prefix,ctx=ctx,escape=False)
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
