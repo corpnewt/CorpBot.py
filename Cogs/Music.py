@@ -47,30 +47,49 @@ class CorpTrack(pomice.objects.Track):
 		# Resolve the encoded id if possible - should be
 		if "encoded" in track or "id" in track and not "track_id" in track:
 			track["track_id"] = track.get("encoded",track.get("id"))
-		self.seek = track.get("position",0)
-		self.radio = radio
-		self.to_remove = to_remove
-		self.did_fail = False
-		self.thumb = track.get("thumbnail")
-		if not self.thumb: # Try to build our own thumbnail
-			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
-			except: self.thumb = None
-		# Set up the track_type if it's not already a pomice TrackType
+		# Resolve some local vars
+		info       = track.get("info",track)
+		track_id   = track.get("track_id")
+		uri        = info.get("uri","")
 		track_type = track.get("track_type",track.get("sourceName"))
-		if track_type and not isinstance(track_type,pomice.enums.TrackType):
+		# Set up the track_type if it's not already a pomice TrackType
+		if not track_type:
+			# Check if our uri starts with the track_id
+			if uri.endswith(track_id):
+				# Check if the uri matches one of our regexes
+				for r,t in (
+					(pomice.enums.URLRegex.SPOTIFY_URL,pomice.enums.TrackType.SPOTIFY),
+					(pomice.enums.URLRegex.AM_URL,pomice.enums.TrackType.APPLE_MUSIC)
+				):
+					if r.match(uri):
+						# It's a match - retain the type
+						print("Got type: {}".format(t))
+						track_type = t
+						break
+		elif not isinstance(track_type,pomice.enums.TrackType):
 			# Wrap it in one of the enum values - or set it to None if not found
-			track_type = pomice.enums.TrackType(track_type)
+			try: track_type = pomice.enums.TrackType(track_type)
+			except: track_type = None
 		# Build our new object - this is tedious but lets us add custom props
 		pomice.objects.Track.__init__(
 			self,
-			track_id=track.get("track_id"),
-			info=track.get("info",track),
+			track_id=track_id,
+			info=info,
 			ctx=track.get("ctx"),
 			track_type=track_type,
 			filters=track.get("filters"),
 			timestamp=track.get("timestamp"),
 			requester=track.get("requester")
 		)
+		# Setup our custom properties
+		self.seek = track.get("position",0)
+		self.radio = radio
+		self.to_remove = to_remove
+		self.did_fail = False
+		self.thumb = track.get("thumbnail")
+		if not self.thumb and track_type == pomice.enums.TrackType.YOUTUBE: # Try to build our own thumbnail
+			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
+			except: self.thumb = None
 
 class Music(commands.Cog):
 
@@ -222,14 +241,6 @@ class Music(commands.Cog):
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
-		# Make sure we actually have a valid track.  Dumping spotify tracks to a
-		# playlist that are queued, but not playing will often dump incomplete info
-		if track.uri.endswith(track.track_id):
-			old_track = track # Retain for other props
-			track = CorpTrack((await self.get_node().get_tracks(track.uri))[0])
-			for x in ("ctx","seek","radio","to_remove"):
-				# Copy needed properties over from the original
-				setattr(track,x,getattr(old_track,x,None))
 		# Make sure volume is setup properly - equalized per the volume ratio
 		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)
 		if ctx: # Got context, can send the resulting message
@@ -253,7 +264,10 @@ class Music(commands.Cog):
 		# Regardless of whether we can post - go to the next song.
 		await player.set_volume(volume)
 		player.vol = player.volume # Retain the setting
-		await player.play(track,start=int(getattr(player,"track_seek",0)))
+		try:
+			await player.play(track,start=int(getattr(player,"track_seek",0)))
+		except Exception as e:
+			self.bot.dispatch("pomice_track_exception",player,track,e)
 
 	@commands.Cog.listener()
 	async def on_pomice_track_end(self,player,track,reason):
