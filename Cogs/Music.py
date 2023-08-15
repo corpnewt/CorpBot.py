@@ -230,7 +230,7 @@ class Music(commands.Cog):
 			if getattr(player,"track_seek",None) and getattr(track,"is_seekable",False): # Check both if we have the attr, and that it evaluates to true
 				fields.append({"name":"Starting At","value":self.format_duration(player.track_seek),"inline":False})
 			await Message.Embed(
-				title="♫ Now Playing: {}".format(track.title),
+				title="♫ Now Playing: {}".format(self.get_track_title(track)),
 				fields=fields,
 				description="Requested by {}{}\n-- Volume at {}%".format(
 					ctx.author.mention,
@@ -293,7 +293,7 @@ class Music(commands.Cog):
 			await Message.Embed(
 				title="♫ Track Failure Threshold Exceeded!",
 				description="{} has exceeded the allowed failure threshold - all instances have been removed from the current queue to prevent spam.".format(
-					track.title
+					self.get_track_title(track)
 				),
 				url=track.uri,
 				thumbnail=getattr(track,"thumb",None),
@@ -518,7 +518,7 @@ class Music(commands.Cog):
 					return playlist
 				# Create a Playlist object for this - so we can retrieve the tracks later
 				playlist = pomice.objects.Playlist(
-					playlist_info={"name":"Mix - {} - {}".format(starting_track.author,starting_track.title)},
+					playlist_info={"name":"Mix - {}".format(self.get_track_title(starting_track))},
 					playlist_type=pomice.enums.PlaylistType.SPOTIFY,
 					tracks=[starting_track]+playlist # Include the original track in the search
 				)
@@ -633,6 +633,7 @@ class Music(commands.Cog):
 			# Rewrap the tracks as CorpTracks to allow custom attributes
 			tracks.tracks = [CorpTrack(track,radio=False if i==0 else recommend) for i,track in enumerate(tracks.tracks)]
 			if seek_pos > 0: setattr(tracks.tracks[0],"seek",seek_pos)
+			if shuffle: random.shuffle(tracks.tracks)
 			return {
 				"data":tracks.playlist_info,
 				"tracks":tracks.tracks,
@@ -738,6 +739,12 @@ class Music(commands.Cog):
 			added += 1
 		return added
 
+	def get_track_title(self,track):
+		# If we have a Spotify track, format the title as "Artist - Title"
+		if track.track_type == pomice.enums.TrackType.SPOTIFY:
+			return "{} - {}".format(track.author,track.title)
+		return track.title
+
 	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None,recommend=False):
 		# Helper to state songs added, whether or not they were shuffled - and to
 		# edit a passed message (if any).
@@ -779,7 +786,7 @@ class Music(commands.Cog):
 			if getattr(track,"seek",None):
 				fields.append({"name":"Starting At","value":self.format_duration(track.seek),"inline":False})
 			embed = Message.Embed(
-				title="♫ Enqueued: {}".format(track.title),
+				title="♫ Enqueued: {}".format(self.get_track_title(track)),
 				description=desc,
 				fields=fields,
 				color=ctx.author,
@@ -1021,7 +1028,7 @@ class Music(commands.Cog):
 		if player.is_paused and url is None:
 			# We're trying to resume
 			await player.set_pause(False)
-			return await Message.Embed(title="♫ Resumed: {}".format(player.track.title),color=ctx.author,delete_after=delay).send(ctx)
+			return await Message.Embed(title="♫ Resumed: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
 		if url is None:
 			return await Message.Embed(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
 		message = await Message.Embed(
@@ -1144,7 +1151,7 @@ class Music(commands.Cog):
 			if len(can_rem)==1:
 				i,t=can_rem[0]
 				fields = [{
-					"name":"{}. {}".format(i+1,t.title),
+					"name":"{}. {}".format(i+1,self.get_track_title(t)),
 					"value":"{}{} - Requested by {}{} - [Link]({})".format(
 						self.format_duration(t.seek,t)+" -> " if hasattr(t,"seek") else "",
 						self.format_duration(t.length,t),
@@ -1261,7 +1268,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Pause the track
 		await player.set_pause(True)
-		await Message.Embed(title="♫ Paused: {}".format(player.track.title),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.Embed(title="♫ Paused: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def paused(self, ctx, *, moons = None):
@@ -1281,7 +1288,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not currently paused!",color=ctx.author,delete_after=delay).send(ctx)
 		# We're trying to resume
 		await player.set_pause(False)
-		await Message.Embed(title="♫ Resumed: {}".format(player.track.title),color=ctx.author,delete_after=delay).send(ctx)
+		await Message.Embed(title="♫ Resumed: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command()
 	async def seek(self, ctx, position = None):
@@ -1349,7 +1356,7 @@ class Music(commands.Cog):
 		return await Message.Embed(
 			title="♫ Track Moved to Position {:,} in the Queue".format(target_index),
 			fields=[{
-				"name":"{}".format(track.title),
+				"name":"{}".format(self.get_track_title(track)),
 				"value":"{}{} - Requested by {}{} - [Link]({})".format(
 					self.format_duration(track.seek,track)+" -> " if hasattr(track,"seek") else "",
 					self.format_duration(track.length,track),
@@ -1395,7 +1402,7 @@ class Music(commands.Cog):
 		fields = []
 		for track,index in sorted(((track1,song2_index),(track2,song1_index)),key=lambda x: x[1]):
 			fields.append({
-				"name":"{}. {}".format(index,track.title),
+				"name":"{}. {}".format(index,self.get_track_title(track)),
 				"value":"{}{} - Requested by {}{} - [Link]({})".format(
 					self.format_duration(track.seek,track)+" -> " if hasattr(track,"seek") else "",
 					self.format_duration(track.length,track),
@@ -1438,7 +1445,7 @@ class Music(commands.Cog):
 				delete_after=delay
 			).send(ctx)
 		await Message.Embed(
-			title="♫ Currently {}: {}".format(play_text,track.title),
+			title="♫ Currently {}: {}".format(play_text,self.get_track_title(track)),
 			description="Requested by {}{}\n -- Volume at {}%{}".format(
 				track_ctx.author.mention,
 				" (via radio)" if track.radio else "",
@@ -1481,7 +1488,7 @@ class Music(commands.Cog):
 			).send(ctx)
 		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
 		desc = "**{}**\nCurrently {} - at {} - Requested by {}{} - [Link]({})\n-- Volume at {}%".format(
-			track.title,
+			self.get_track_title(track),
 			play_text,
 			self.format_elapsed(player,track),
 			track_ctx.author.mention,
@@ -1508,7 +1515,7 @@ class Music(commands.Cog):
 		for x,y in enumerate(player.queue,start=1):
 			t_ctx = getattr(y,"ctx",None)
 			fields.append({
-				"name":"{}. {}".format(x,y.title),
+				"name":"{}. {}".format(x,self.get_track_title(y)),
 				"value":"{}{} - Requested by {}{} - [Link]({})".format(
 					self.format_duration(y.seek,y)+" -> " if hasattr(y,"seek") else "",
 					self.format_duration(y.length,y),
@@ -1741,7 +1748,7 @@ class Music(commands.Cog):
 							) if len(p.queue) else ""
 						),
 						"value":"{} - at {} - Requested by {}{} - [Link]({})".format(
-							p.track.title,
+							self.get_track_title(p),
 							self.format_elapsed(p,p.track),
 							p.track.ctx.author.mention,
 							" (via radio)" if p.track.radio else "",
