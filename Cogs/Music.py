@@ -63,7 +63,6 @@ class CorpTrack(pomice.objects.Track):
 				):
 					if r.match(uri):
 						# It's a match - retain the type
-						print("Got type: {}".format(t))
 						track_type = t
 						break
 		elif not isinstance(track_type,pomice.enums.TrackType):
