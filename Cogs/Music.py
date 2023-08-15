@@ -225,7 +225,11 @@ class Music(commands.Cog):
 		# Make sure we actually have a valid track.  Dumping spotify tracks to a
 		# playlist that are queued, but not playing will often dump incomplete info
 		if track.uri.endswith(track.track_id):
+			old_track = track # Retain for other props
 			track = CorpTrack((await self.get_node().get_tracks(track.uri))[0])
+			for x in ("ctx","seek","radio","to_remove"):
+				# Copy needed properties over from the original
+				setattr(track,x,getattr(old_track,x,None))
 		# Make sure volume is setup properly - equalized per the volume ratio
 		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)
 		if ctx: # Got context, can send the resulting message
@@ -745,7 +749,7 @@ class Music(commands.Cog):
 
 	def get_track_title(self,track):
 		# If we have a Spotify track, format the title as "Artist - Title"
-		if track.track_type == pomice.enums.TrackType.SPOTIFY:
+		if track.track_type == pomice.enums.TrackType.SPOTIFY or not "sourceName" in track.info:
 			return "{} - {}".format(track.author,track.title)
 		return track.title
 
