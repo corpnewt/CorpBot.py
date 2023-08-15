@@ -1305,7 +1305,7 @@ class Music(commands.Cog):
 		# Try to resolve the position - first in seconds, then with the HH:MM:SS format
 		relative = False
 		positive = True
-		current = player.position # Seconds
+		current = player.position/1000 # Seconds
 		if position.startswith(("-","+")):
 			relative = True
 			positive = position.startswith("+")
