@@ -1752,7 +1752,7 @@ class Music(commands.Cog):
 							) if len(p.queue) else ""
 						),
 						"value":"{} - at {} - Requested by {}{} - [Link]({})".format(
-							self.get_track_title(p),
+							self.get_track_title(p.track),
 							self.format_elapsed(p,p.track),
 							p.track.ctx.author.mention,
 							" (via radio)" if p.track.radio else "",
