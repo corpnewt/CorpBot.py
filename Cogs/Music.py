@@ -156,17 +156,17 @@ class Music(commands.Cog):
 			apple_music=self.use_apple_music
 		)
 
-	async def get_node(self):
+	def get_node(self):
 		# Try to get the best node - if any, otherwise create one
 		try:
 			return self.NodePool.get_best_node(algorithm=pomice.enums.NodeAlgorithm.by_ping)
 		except pomice.exceptions.NoNodesAvailable:
 			return None
 
-	async def get_player(self,guild):
+	def get_player(self,guild):
 		# Get (or create) a node, and return the guild's player (if any).
 		# Returns either the player, or None if none exists.
-		node = await self.get_node()
+		node = self.get_node()
 		if not node: return None
 		return node.get_player(getattr(guild,"id",guild))
 
@@ -222,6 +222,10 @@ class Music(commands.Cog):
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+		# Make sure we actually have a valid track.  Dumping spotify tracks to a
+		# playlist that are queued, but not playing will often dump incomplete info
+		if track.uri.endswith(track.track_id):
+			track = CorpTrack((await self.get_node().get_tracks(track.uri))[0])
 		# Make sure volume is setup properly - equalized per the volume ratio
 		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)
 		if ctx: # Got context, can send the resulting message
@@ -349,7 +353,7 @@ class Music(commands.Cog):
 	async def on_voice_state_update(self, user, before, after):
 		if not user.guild or not before.channel or (user.bot and user.id != self.bot.user.id):
 			return # No guild, someone joined, or the user is a bot that's not us
-		player = await self.get_player(before.channel.guild)
+		player = self.get_player(before.channel.guild)
 		if player is None:
 			return # Player is borked or not connected - just bail
 		if player.channel and player.channel != before.channel:
@@ -501,7 +505,7 @@ class Music(commands.Cog):
 					break # Leave the loop
 			else:
 				return None # Not found
-		node = await self.get_node()
+		node = self.get_node()
 		# Here we either have a video identifier - or a search term
 		starting_track = await node.get_tracks(query=url,ctx=ctx)
 		if not isinstance(starting_track,list):
@@ -549,7 +553,7 @@ class Music(commands.Cog):
 		# Check if url - if not, remove /
 		urls = Utils.get_urls(url)
 		seek_pos = 0
-		node = await self.get_node()
+		node = self.get_node()
 		try:
 			if urls: # Need to load via node get_tracks/get_playlist
 				url = urls[0] # Get the first URL
@@ -803,7 +807,7 @@ class Music(commands.Cog):
 	# TODO: Figure this out later...
 	'''async def _check_player(self, player, ctx, delay=None, check_pause=True, respond=True):
 		# Helper to verify the player
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if delay is None:
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
@@ -839,7 +843,7 @@ class Music(commands.Cog):
 
 	async def _load_playlist_from_url(self, message, ctx, shuffle = False):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		url = await Utils.get_message_content(message)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -887,7 +891,7 @@ class Music(commands.Cog):
 		"""Attempts to have the bot save the current playlist to memory, leave the voice chat, reconnect, and reload the playlist.
 		May help if the bot states it is playing, but makes no sound."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		# We have a connected player - let's save the playlist
@@ -897,7 +901,7 @@ class Music(commands.Cog):
 		await asyncio.sleep(self.reconnect_wait) # Wait to let everything settle
 		await channel.connect(cls=CorpPlayer)
 		# Get a new player
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		# Load the playlist data we had saved from before and dispatch the check_play event
 		await self._load_playlist_data(ctx,player,playlist_data=playlist)
 		self.bot.dispatch("check_play",player)
@@ -934,7 +938,7 @@ class Music(commands.Cog):
 		
 		Any other options passed will be used as the file name."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		# Get the options
@@ -991,7 +995,7 @@ class Music(commands.Cog):
 			channel = DisplayName.channelForName(channel,ctx.guild,"voice")
 		if not channel:
 			return await Message.Embed(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player and player.is_connected:
 			if not (player.is_paused or player.is_playing):
 				if player.channel != channel: # Only move if we need to
@@ -1009,7 +1013,7 @@ class Music(commands.Cog):
 		"""Stops and disconnects the bot from voice."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player and player.is_connected:
 			await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
 			return await Message.Embed(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1020,7 +1024,7 @@ class Music(commands.Cog):
 		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if url is None and ctx.message.attachments: # Get the first attachment as the URL
@@ -1067,7 +1071,7 @@ class Music(commands.Cog):
 		"""Queues up recommendations for the passed search term or YouTube link."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if url is None:
@@ -1113,7 +1117,7 @@ class Music(commands.Cog):
 		"""Removes the passed song number from the queue.  You must be the requester, or an admin to remove it.  Does not include the currently playing song."""
 		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.queue.is_empty:
@@ -1187,7 +1191,7 @@ class Music(commands.Cog):
 		Admins and bot-admins can pass a user to remove all of that user's queued songs, or 'all' to remove all songs from the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.queue.is_empty:
@@ -1223,7 +1227,7 @@ class Music(commands.Cog):
 		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			if url is None: # No need to connect to shuffle nothing
 				return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1259,7 +1263,7 @@ class Music(commands.Cog):
 		"""Pauses the currently playing song."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.is_paused: # Just toggle play
@@ -1281,7 +1285,7 @@ class Music(commands.Cog):
 		"""Resumes the song if paused."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ I am not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_paused:
@@ -1297,7 +1301,7 @@ class Music(commands.Cog):
 		if position is None or position.lower() in ["moon","moons","moonme","moon me"]: # Show the playing status
 			return await ctx.invoke(self.playing,moons=position)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not (player.is_playing or player.is_paused):
@@ -1331,7 +1335,7 @@ class Music(commands.Cog):
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player.queue.is_empty:
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1374,7 +1378,7 @@ class Music(commands.Cog):
 		"""Swaps the songs at song1_index and song2_index in the queue.  You must have requested both songs - or be a bot-admin to swap them."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player.queue.is_empty:
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1424,7 +1428,7 @@ class Music(commands.Cog):
 		"""Lists the currently playing song if any."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected or not (player.is_playing or player.is_paused) or not player.track:
 			# No client - and we're not playing or paused
 			return await Message.Embed(
@@ -1467,7 +1471,7 @@ class Music(commands.Cog):
 		"""Lists the queued songs in the playlist."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected or not (player.is_playing or player.is_paused):
 			return await Message.Embed(
 				title="♫ Current Playlist",
@@ -1555,7 +1559,7 @@ class Music(commands.Cog):
 		Passing "remove" as an argument to this command if you're the original requester or a bot-admin will remove the song from the queue if repeat is enabled."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		to_skip = False
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -1618,7 +1622,7 @@ class Music(commands.Cog):
 		"""Removes your vote to skip the current song."""
 		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
@@ -1643,7 +1647,7 @@ class Music(commands.Cog):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		user = ctx.author if user is None else DisplayName.memberForName(user,ctx.guild)
 		if user is None: return await Message.Embed(title="♫ I couldn't find that user!",color=ctx.author,delete_after=delay).send(ctx)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not player.is_playing:
@@ -1668,7 +1672,7 @@ class Music(commands.Cog):
 		"""Stops and empties the current playlist."""
 		
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player:
 			if player.is_playing or player.is_paused:
 				# Clear context to prevent end of playlist spam
@@ -1684,7 +1688,7 @@ class Music(commands.Cog):
 		"""Changes the player's volume (0-150%)."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if player is None or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
@@ -1710,7 +1714,7 @@ class Music(commands.Cog):
 		"""Checks or sets whether to repeat the current playlist."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		current = getattr(player,"repeat",False)
@@ -1768,7 +1772,7 @@ class Music(commands.Cog):
 		players = 0
 		for guild in self.bot.guilds:
 			# Remove the per-server temp settings
-			player = await self.get_player(guild)
+			player = self.get_player(guild)
 			if player:
 				players += 1
 				await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
@@ -1824,7 +1828,7 @@ class Music(commands.Cog):
 		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild,"MusicDeleteDelay",20)
 		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
 			# Music is off - and we're not an owner - disconnect if connected, then send the bad news :(
@@ -2011,7 +2015,7 @@ class Music(commands.Cog):
 	async def timescale(self, ctx, *, speed = None, pitch = None, rate = None):
 		"""Gets or sets the current player's time scale values.  Speed, pitch, and rate can be any number between 0 and 10 with 1 being default."""
 		# All values just get dumped into speed
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2042,7 +2046,7 @@ class Music(commands.Cog):
 	async def resettimescale(self, ctx):
 		"""Resets the current player's time scale values."""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2061,7 +2065,7 @@ class Music(commands.Cog):
 	async def geteq(self, ctx):
 		"""Prints the current equalizer settings."""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2073,7 +2077,7 @@ class Music(commands.Cog):
 	async def seteq(self, ctx, *, bands = None):
 		"""Sets the equalizer to the passed 15 space-delimited values from -5 (silent) to 5 (double volume)."""
 		
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2099,7 +2103,7 @@ class Music(commands.Cog):
 	async def setband(self, ctx, band_number = None, value = None):
 		"""Sets the value of the passed eq band (1-15) to the passed value from -5 (silent) to 5 (double volume)."""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2131,7 +2135,7 @@ class Music(commands.Cog):
 	async def reseteq(self, ctx):
 		"""Resets the current eq to the flat preset."""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2151,7 +2155,7 @@ class Music(commands.Cog):
 	async def eqpreset(self, ctx, preset = None):
 		"""Sets the current eq to one of the following presets:  Boost, Flat, Metal"""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
@@ -2173,7 +2177,7 @@ class Music(commands.Cog):
 	async def setfreq(self, ctx, freq_family=None, value=None):
 		"""Sets the frequency family to the passed value.  Valid families are bass, mid, treble."""
 
-		player = await self.get_player(ctx.guild)
+		player = self.get_player(ctx.guild)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
