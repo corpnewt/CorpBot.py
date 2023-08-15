@@ -491,12 +491,16 @@ class Music(commands.Cog):
 		urls = Utils.get_urls(url)
 		if urls:
 			url = urls[0]
-			if not pomice.enums.URLRegex.YOUTUBE_URL.match(url):
-				return None
-			# Got a youtube link - check it for a video
-			pl_url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
-			if pl_url:
-				url = pl_url.group("video") # Get the video identifier
+			for r in (pomice.enums.URLRegex.SPOTIFY_URL,pomice.enums.URLRegex.YOUTUBE_URL):
+				if r.match(url):
+					# Got a match - check if it's a YT playlist and extract the video
+					if r == pomice.enums.URLRegex.YOUTUBE_URL:
+						pl_url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
+						if pl_url:
+							url = pl_url.group("video") # Get the video identifier
+					break # Leave the loop
+			else:
+				return None # Not found
 		node = await self.get_node()
 		# Here we either have a video identifier - or a search term
 		starting_track = await node.get_tracks(query=url,ctx=ctx)
@@ -507,12 +511,25 @@ class Music(commands.Cog):
 		tracks = None
 		last_count = -1
 		while True:
-			playlist = await node.get_tracks(
-				query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
-				ctx=ctx
-			)
-			if not isinstance(playlist,pomice.objects.Playlist): # Got something unexpected
-				return playlist # Return as-is
+			# Check for Spotify tracks first
+			if starting_track.track_type == pomice.enums.TrackType.SPOTIFY:
+				playlist = await node.get_recommendations(track=starting_track,ctx=ctx)
+				if not isinstance(playlist,list):
+					return playlist
+				# Create a Playlist object for this - so we can retrieve the tracks later
+				playlist = pomice.objects.Playlist(
+					playlist_info={"name":"Mix - {} - {}".format(starting_track.author,starting_track.title)},
+					playlist_type=pomice.enums.PlaylistType.SPOTIFY,
+					tracks=[starting_track]+playlist # Include the original track in the search
+				)
+			else:
+				# Assume it's a YT track - the recommendations function is broken for those - roll our own
+				playlist = await node.get_tracks(
+					query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
+					ctx=ctx
+				)
+				if not isinstance(playlist,pomice.objects.Playlist): # Not a playlist object
+					return playlist # Return as-is
 			if not tracks: # Set up our playlist
 				tracks = playlist
 			else: # We already have a playlist started - just add to it
