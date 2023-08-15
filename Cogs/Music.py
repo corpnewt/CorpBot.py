@@ -41,7 +41,8 @@ class CorpTrack(pomice.objects.Track):
 				"track_type":track.track_type,
 				"filters":track.filters,
 				"timestamp":track.timestamp,
-				"requester":track.requester
+				"requester":track.requester,
+				"thumbnail":track.thumbnail
 			}
 		# Resolve the encoded id if possible - should be
 		if "encoded" in track or "id" in track and not "track_id" in track:
@@ -50,8 +51,10 @@ class CorpTrack(pomice.objects.Track):
 		self.radio = radio
 		self.to_remove = to_remove
 		self.did_fail = False
-		try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
-		except: self.thumb = None
+		self.thumb = track.get("thumbnail")
+		if not self.thumb: # Try to build our own thumbnail
+			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
+			except: self.thumb = None
 		# Set up the track_type if it's not already a pomice TrackType
 		track_type = track.get("track_type",track.get("sourceName"))
 		if track_type and not isinstance(track_type,pomice.enums.TrackType):
