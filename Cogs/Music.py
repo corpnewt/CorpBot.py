@@ -55,7 +55,7 @@ class CorpTrack(pomice.objects.Track):
 		# Set up the track_type if it's not already a pomice TrackType
 		if not track_type:
 			# Check if our uri starts with the track_id
-			if uri.startsiwth(track_id):
+			if uri.endswith(track_id):
 				# Check if the uri matches one of our regexes
 				for r,t in (
 					(pomice.enums.URLRegex.SPOTIFY_URL,pomice.enums.TrackType.SPOTIFY),
@@ -63,19 +63,13 @@ class CorpTrack(pomice.objects.Track):
 				):
 					if r.match(uri):
 						# It's a match - retain the type
+						print("Got type: {}".format(t))
 						track_type = t
 						break
 		elif not isinstance(track_type,pomice.enums.TrackType):
 			# Wrap it in one of the enum values - or set it to None if not found
-			track_type = pomice.enums.TrackType(track_type)
-		self.seek = track.get("position",0)
-		self.radio = radio
-		self.to_remove = to_remove
-		self.did_fail = False
-		self.thumb = track.get("thumbnail")
-		if not self.thumb and track_type == pomice.enums.TrackType.YOUTUBE: # Try to build our own thumbnail
-			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
-			except: self.thumb = None
+			try: track_type = pomice.enums.TrackType(track_type)
+			except: track_type = None
 		# Build our new object - this is tedious but lets us add custom props
 		pomice.objects.Track.__init__(
 			self,
@@ -87,6 +81,15 @@ class CorpTrack(pomice.objects.Track):
 			timestamp=track.get("timestamp"),
 			requester=track.get("requester")
 		)
+		# Setup our custom properties
+		self.seek = track.get("position",0)
+		self.radio = radio
+		self.to_remove = to_remove
+		self.did_fail = False
+		self.thumb = track.get("thumbnail")
+		if not self.thumb and track_type == pomice.enums.TrackType.YOUTUBE: # Try to build our own thumbnail
+			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
+			except: self.thumb = None
 
 class Music(commands.Cog):
 
