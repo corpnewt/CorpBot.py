@@ -207,4 +207,4 @@ async def getMarkdown( url, style = None, escape = False):
 	else:
 		# No style present
 		return None
-	return Nullify.escape_all(partout,markdown=False)
+	return Nullify.escape_all(partout,markdown=False,links=False)
