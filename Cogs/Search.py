@@ -211,7 +211,7 @@ class Search(commands.Cog):
 			ctx=ctx
 		).pick()
 
-	@commands.command()
+	@commands.command(aliases=["conv","currency","curr"])
 	async def convert(self, ctx, *, amount = None, frm = None, to = None):
 		"""Convert currencies.  If run with no values, the script will print a list of available currencies."""
 		
