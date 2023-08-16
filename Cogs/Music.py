@@ -342,6 +342,10 @@ class Music(commands.Cog):
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
 		color_ctx = getattr(player,"track_ctx",ctx)
 		if not ctx: return # Nowhere to post our error message.
+		# Attempt to format the dict as json if needed
+		if isinstance(error,dict):
+			try: error = "```json\n{}\n```".format(json.dumps(error,indent=2))
+			except: pass
 		return await Message.Embed(
 			title="♫ Track {}!".format(str(issue).capitalize()),
 			description="Something went wrong playing \"{}\".\n\n{}".format(track,error),
@@ -764,8 +768,8 @@ class Music(commands.Cog):
 		return added
 
 	def get_track_title(self,track):
-		# If we have a Spotify track, format the title as "Artist - Title"
-		if track.track_type == pomice.enums.TrackType.SPOTIFY or not "sourceName" in track.info:
+		# If we have a non-YouTube track, format the title as "Artist - Title"
+		if track.track_type != pomice.enums.TrackType.YOUTUBE:
 			return "{} - {}".format(track.author,track.title)
 		return track.title
 
