@@ -99,7 +99,7 @@ class Hw(commands.Cog):
 			msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
 			msg += '\nMaybe see if you can prune up that list a bit and try again?'
 			return await ctx.send(msg)
-		await ctx.send(Utils.suppressed(ctx,output))
+		await ctx.send(ctx,output)
 
 	@commands.command(aliases=["hwmain"])
 	async def mainhw(self, ctx, *, build = None):
