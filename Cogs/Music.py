@@ -250,10 +250,11 @@ class Music(commands.Cog):
 			await Message.Embed(
 				title="♫ Now Playing: {}".format(self.get_track_title(track)),
 				fields=fields,
-				description="Requested by {}{}\n-- Volume at {}%".format(
+				description="Requested by {}{}\n-- Volume at {}%{}".format(
 					ctx.author.mention,
 					" (via radio)" if track.radio else "",
-					int(volume/self.vol_ratio)
+					int(volume/self.vol_ratio),
+					"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 				),
 				color=ctx.author,
 				url=track.uri,
@@ -395,7 +396,9 @@ class Music(commands.Cog):
 				return
 		elif len([x for x in before.channel.members if not x.bot]) > 0:
 			return # At least one non-bot user
-		# if we made it here - then we're alone - disconnect and destroy
+		if not self.settings.getServerStat(user.guild, "LeaveVCWhenAlone", True):
+			return # We're configured to stay in VC, even alone
+		# if we made it here - then we're alone, and not allowed to be - disconnect and destroy
 		await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
 
 	def _clear_player(self, player, attrs=None):
@@ -1471,7 +1474,7 @@ class Music(commands.Cog):
 				track_ctx.author.mention,
 				" (via radio)" if track.radio else "",
 				cv,
-				self.format_scale(player,prefix="\n -- Speed at ")
+				"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 			),
 			color=ctx.author,
 			fields=[
@@ -1508,14 +1511,15 @@ class Music(commands.Cog):
 				delete_after=delay
 			).send(ctx)
 		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
-		desc = "**{}**\nCurrently {} - at {} - Requested by {}{} - [Link]({})\n-- Volume at {}%".format(
+		desc = "**{}**\nCurrently {} - at {} - Requested by {}{} - [Link]({})\n-- Volume at {}%{}".format(
 			self.get_track_title(track),
 			play_text,
 			self.format_elapsed(player,track),
 			track_ctx.author.mention,
 			" (via radio)" if track.radio else "",
 			track.uri,
-			cv
+			cv,
+			"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 		)
 		fields = []
 		if not player.queue.is_empty:
@@ -1820,6 +1824,13 @@ class Music(commands.Cog):
 		return await Message.Embed(title="♫ Music related messages will be auto-deleted after {} second{}!".format(real, "" if real == 1 else "s"),color=ctx.author,delete_after=real).send(ctx)
 
 	@commands.command()
+	async def leavewhenalone(self, ctx, yes_no = None):
+		"""Lists or sets whether the bot leaves the voice channel when the last non-bot disconnects.  Requires bot-admin or admin to set."""
+		
+		if not Utils.is_bot_admin(ctx): yes_no = None
+		await ctx.send(Utils.yes_no_setting(ctx,"Leave VC when alone","LeaveVCWhenAlone",yes_no,default=True))
+		
+	@commands.command()
 	async def searchlist(self, ctx, yes_no = None):
 		"""Gets or sets whether or not the server will show a list of options when searching with the play command - or if it'll just pick the first (admin only)."""
 		
@@ -1842,7 +1853,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount"): return
+		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.get_player(ctx.guild)
