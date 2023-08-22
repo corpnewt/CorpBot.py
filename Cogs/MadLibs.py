@@ -22,9 +22,10 @@ class MadLibs(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 	@commands.command()
-	async def ml(self, ctx, word = None):
+	async def ml(self, ctx, *, word = None):
 		"""Used to choose your words when in the middle of a madlibs."""
-		pass
+		if not self.playing_madlibs.get(str(ctx.guild.id)):
+			await ctx.invoke(self.madlibs,madlib=word)
 
 	@commands.command()
 	async def mleave(self, ctx):
@@ -71,7 +72,7 @@ class MadLibs(commands.Cog):
 		
 		# Check if we're already in a game
 		if self.playing_madlibs.get(str(ctx.guild.id)):
-			await ctx.send("I'm already playing MadLibs - use `{}{} [your word]` to submit answers.".format(ctx.prefix,self.prefix))
+			return await ctx.send("I'm already playing MadLibs - use `{}{} [your word]` to submit answers.".format(Nullify.resolve_mentions(ctx.prefix,ctx=ctx,escape=False),self.prefix))
 
 		# Check if we're taking a number - or the title of one of the MadLibs
 		if madlib:
@@ -85,7 +86,7 @@ class MadLibs(commands.Cog):
 				# Got a title
 				randLib = next((x for x in choices if x[:-4].lower() == madlib.lower() or x.lower() == madlib.lower()),None)
 			if not randLib:
-				return await ctx.send("I couldn't find that MadLibs - you can use `{}listml` to see a list of available options.".format(ctx.prefix))
+				return await ctx.send("I couldn't find that MadLibs - you can use `{}listml` to see a list of available options.".format(Nullify.resolve_mentions(ctx.prefix,ctx=ctx,escape=False)))
 		else: # Picking one at random
 			randLib = random.choice(choices)
 		
@@ -142,18 +143,36 @@ class MadLibs(commands.Cog):
 				prompt,
 				i-prompt_adjust,
 				len(words)-count_adjust,
-				ctx.prefix,
+				Nullify.resolve_mentions(ctx.prefix,ctx=ctx,escape=False),
 				self.prefix
 			))
 
+			# Get the available prefixes
+			prefixes      = await self.bot.get_prefix(ctx.message)
+			allowed_ml    = tuple(["{}{}".format(x,self.prefix).lower() for x in prefixes])
+			allowed_leave = tuple(["{}mleave".format(x,self.prefix).lower() for x in prefixes])
+
 			# Setup the check
-			def check(msg):	
-				return msg.content.startswith("{}{}".format(ctx.prefix, self.prefix)) and msg.channel == ctx.channel
+			def check(msg):
+				# Check the channel
+				if not msg.channel == ctx.channel: return False
+				# Make sure it uses an allowed prefix
+				prefix = next((x for x in allowed_ml if msg.content.lower().startswith(x)),None)
+				if not prefix:
+					# Check if it's a leave prefix
+					prefix = next((x for x in allowed_leave if msg.content.lower().startswith(x)),None)
+					if not prefix:
+						# Didn't get a valid prefix - bail
+						return False
+				# Make sure we have something *after* the prefix as well
+				if not msg.content[len(prefix):].strip(): return False
+				# All checks passed
+				return True
 
 			# Wait for a response
 			try:
 				talk = await self.bot.wait_for('message', check=check, timeout=60)
-			except Exception:
+			except:
 				talk = None
 
 			if not talk:
@@ -162,8 +181,8 @@ class MadLibs(commands.Cog):
 				return await ctx.send("*{}*, I'm done waiting... we'll play another time.".format(DisplayName.name(ctx.author)))
 
 			# Check if the message is to leave
-			if talk.content.lower().startswith('{}{}'.format(ctx.prefix, self.leavePrefix.lower())):
-				if talk.author is ctx.author:
+			if talk.content.lower().startswith(allowed_leave):
+				if talk.author == ctx.author:
 					self.playing_madlibs.pop(str(ctx.guild.id),None)
 					return await ctx.send("Alright, *{}*.  We'll play another time.".format(DisplayName.name(ctx.author)))
 				else:
@@ -174,8 +193,9 @@ class MadLibs(commands.Cog):
 			# We got a relevant message
 			val = talk.content
 			# Let's remove the $ml prefix (with or without space)
-			if val.startswith('{}{}'.format(ctx.prefix.lower(), self.prefix.lower())):
-				val = val[len(ctx.prefix)+len(self.prefix):]
+			matched_prefix = next((x for x in allowed_ml if val.lower().startswith(x.lower())),None)
+			if matched_prefix: # Strip the prefix
+				val = val[len(matched_prefix):]
 			# Strip any unnecessary whitespace
 			val = val.strip()
 
