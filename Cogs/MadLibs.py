@@ -32,7 +32,7 @@ class MadLibs(commands.Cog):
 		"""Used to leave a current MadLibs game."""
 		pass
 
-	@commands.command(aliases=["mlist"])
+	@commands.command(aliases=["mlist","madlibslist","listmadlibs"])
 	async def listml(self, ctx):
 		"""List the available MadLibs"""
 
