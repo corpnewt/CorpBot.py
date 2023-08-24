@@ -11,10 +11,9 @@ import subprocess
 
 try:
 	import pymongo
-except ImportError:
+except:
 	# I mean, it doesn't really matter as it can still revert to JSON
-	print("pymongo not installed, preparing to use JSON")
-	pass
+	print("pymongo not installed, or failed to import, preparing to use JSON")
 
 from   Cogs        import DisplayName
 from   Cogs        import Nullify
