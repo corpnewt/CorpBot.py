@@ -78,7 +78,7 @@ class Server(commands.Cog):
 		self.settings.setServerStat(guild,"Polls",[x for x in polls if x != poll])
 		# Let's make sure the message still exists
 		c,m = poll["message_ids"].split() # Assumes "channel_id message_id" string pair
-		try: channel = guild.get_channel(int(c))
+		try: channel = self.bot.get_channel(int(c))
 		except: channel = None
 		if not channel: return # No channel - likely deleted.
 		try: message = await channel.fetch_message(int(m))
