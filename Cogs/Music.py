@@ -348,7 +348,7 @@ class Music(commands.Cog):
 			except: pass
 		return await Message.Embed(
 			title="♫ Track {}!".format(str(issue).capitalize()),
-			description="Something went wrong playing \"{}\".\n\n{}".format(track,error),
+			description="Something went wrong playing \"{}\".\n\n{}".format(self.get_track_title(track),error),
 			url=track.uri,
 			thumbnail=getattr(track,"thumb",None),
 			color=color_ctx.author
