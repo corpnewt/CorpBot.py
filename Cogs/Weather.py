@@ -26,31 +26,25 @@ class Weather(commands.Cog):
 		self.user_agent = "CorpBot"
 
 	def _get_output(self, w_text):
-		if "tornado" in w_text.lower():
-			return "🌪️ "+w_text
-		if any(x in w_text.lower() for x in ["hurricane", "tropical"]):
-			return "🌀 "+w_text
-		if any(x in w_text.lower() for x in ["snow", "flurries", "hail"]):
-			return "🌨️ "+w_text
-		if "thunder" in w_text.lower():
-			return "⛈️ "+w_text
-		if any(x in w_text.lower() for x in ["rain", "drizzle", "showers", "sleet"]):
-			return "🌧️ "+w_text
-		if "cold" in w_text.lower():
-			return "❄️ "+w_text
-		if any(x in w_text.lower() for x in ["windy", "blustery", "breezy"]):
-			return "🌬️ "+w_text
-		if "mostly cloudy" in w_text.lower():
-			return "⛅ "+w_text
-		if any(x in w_text.lower() for x in ["partly cloudy", "scattered clouds", "few clouds", "broken clouds"]):
-			return "🌤️ "+w_text
-		if any(x in w_text.lower() for x in ["cloudy", "clouds"]):
-			return "☁️ "+w_text
-		if "fair" in w_text.lower():
-			return "🌄 "+w_text
-		if any(x in w_text.lower() for x in ["hot", "sunny", "clear"]):
+		# https://openweathermap.org/weather-conditions
+		w_lower = w_text.lower()
+		if "clear" in w_lower:
 			return "☀️ "+w_text
-		if any(x in w_text.lower() for x in ["dust", "foggy", "haze", "smoky"]):
+		if "thunder" in w_lower:
+			return "⛈️ "+w_text
+		if "tornado" in w_lower:
+			return "🌪️ "+w_text
+		if "broken clouds" in w_lower:
+			return "⛅ "+w_text
+		if any(x in w_lower for x in ["few clouds", "scattered clouds"]):
+			return "🌤️ "+w_text
+		if "clouds" in w_lower:
+			return "☁️ "+w_text
+		if any(x in w_lower for x in ["snow", "freezing rain"]):
+			return "🌨️ "+w_text
+		if any(x in w_lower for x in ["rain", "drizzle", "sleet"]):
+			return "🌧️ "+w_text
+		if any(x in w_lower for x in ["mist", "smoke", "haze", "sand", "fog", "dust", "ash", "squalls"]):
 			return "️🌫️ "+w_text
 		return w_text
 
@@ -141,6 +135,11 @@ class Weather(commands.Cog):
 		minf = self._c_to_f(minc)
 		maxc = self._k_to_c(main["temp_max"])
 		maxf = self._c_to_f(maxc)
+		hum  = main.get("humidity")
+		fl_c = fl_f = None
+		if "feels_like" in main:
+			fl_c = self._k_to_c(main["feels_like"])
+			fl_f = self._c_to_f(fl_c)
 		# Gather the formatted conditions
 		weath_list = []
 		for x,y in enumerate(weath):
@@ -150,8 +149,15 @@ class Weather(commands.Cog):
 			weath_list.append(self._get_output(d))
 		condition = ", ".join(weath_list)
 		# Format the description
-		if show_current: desc = "{} °F ({} °C),\n\n".format(tf,tc)
-		else: desc = ""
+		if show_current:
+			desc = "{} °F ({} °C){}{}\n\n".format(
+				tf,
+				tc,
+				"\n\nFeels like {} °F ({} °C)".format(fl_f,fl_c) if fl_c is not None else "",
+				"\n\n{}% Humidity".format(hum) if hum is not None else ""
+			)
+		else:
+			desc = ""
 		desc += "{}\n\nHigh of {} °F ({} °C) - Low of {} °F ({} °C)\n\n".format(
 			condition,
 			maxf, maxc,
