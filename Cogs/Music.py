@@ -1,4 +1,4 @@
-import asyncio, discord, pomice, re, random, math, tempfile, json, os, shutil
+import asyncio, discord, pomice, re, random, math, tempfile, json, os, shutil, aiohttp
 from discord.ext import commands
 from Cogs import Utils, Message, DisplayName, PickList, DL
 
@@ -109,6 +109,8 @@ class Music(commands.Cog):
 		# Monkey patch out some regex - maybe find a way to include it via setting later
 		pomice.URLRegex.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"a^",)
 		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
+		# Set up regex for the new spotify.link/id URLs
+		self.spotify_link_regex = re.compile(r"(?i)https?:\/\/spotify\.link\/?(?P<id>[a-zA-Z0-9]+)")
 		# Setup pomice defaults
 		self.NodePool = pomice.NodePool()
 		# Setup player specifics to remember
@@ -587,6 +589,13 @@ class Music(commands.Cog):
 					if yt_url and yt_url.group(5).lower() == "live":
 						# Reformat the URL to use the prior approach
 						url = "https://www.youtube.com/watch?v={}".format(yt_url.group(6).lstrip("/"))
+				except: pass
+				try:
+					# Check if we have a spotify.link and attempt to chase the redirects
+					if self.spotify_link_regex.match(url):
+						async with aiohttp.ClientSession() as session:
+							async with session.get(url, allow_redirects=False) as response:
+								url = str(response).split("Location': \'")[1].split("\'")[0]
 				except: pass
 				if recommend:
 					tracks = await self.get_recommendations(ctx,url,recommend_count)
