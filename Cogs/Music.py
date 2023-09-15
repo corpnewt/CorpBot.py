@@ -15,6 +15,34 @@ class CorpPlayer(pomice.Player):
 		self.queue = pomice.Queue()
 		self.failure_count = 0
 		self.failed_tracks = {}
+		self._vol_set = False
+		self._vol = kwargs.get("volume",100)
+		self._vol_real = kwargs.get("real_volume",100)
+		self._vol_ratio = kwargs.get("volume_ratio",0.75)
+
+	async def set_vol(self, volume=100):
+		# Adjusts the volume to a 0-150% scale while applying
+		# the ratio
+		self._vol = volume # Save the raw percent for reporting
+		# Apply the ratio, and round to the nearest whole number
+		adj_volume = volume * self._vol_ratio
+		self._vol_real = int(adj_volume)+(1 if adj_volume-int(adj_volume)>=0.5 else 0)
+		await self.set_volume(self._vol_real)
+		self._vol_set = True
+
+	def get_vol(self, ctx):
+		# Gets the volume in percent based on the last set value
+		if not self._vol_set:
+			# Get the default volume for the passed server
+			settings = ctx.bot.get_cog("Settings")
+			if settings:
+				return settings.getServerStat(ctx.guild,"MusicVolume",100)
+			return None
+		return self._vol
+
+	def get_real_vol(self):
+		# Gets the true volume value
+		return self._vol_real if self._vol_set else None
 
 	async def move_to(self, channel=None):
 		# Needless wrapper for something that should work as-is?
@@ -242,8 +270,9 @@ class Music(commands.Cog):
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
-		# Make sure volume is setup properly - equalized per the volume ratio
-		volume = getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)
+		# Make sure volume is setup properly
+		try: volume = player.get_vol(ctx) or self.settings.getServerStat(ctx.guild,"MusicVolume",100)
+		except: volume = 100 # Fall back on 100 if we don't have anything else
 		if ctx: # Got context, can send the resulting message
 			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 			fields = [{"name":"Duration","value":self.format_duration(track.length,track),"inline":False}]
@@ -255,7 +284,7 @@ class Music(commands.Cog):
 				description="Requested by {}{}\n-- Volume at {}%{}".format(
 					ctx.author.mention,
 					" (via radio)" if track.radio else "",
-					int(volume/self.vol_ratio),
+					player.get_vol(ctx),
 					"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 				),
 				color=ctx.author,
@@ -263,9 +292,8 @@ class Music(commands.Cog):
 				thumbnail=getattr(track,"thumb",None),
 				delete_after=delay
 			).send(ctx)
-		# Regardless of whether we can post - go to the next song.
-		await player.set_volume(volume)
-		player.vol = player.volume # Retain the setting
+		# Regardless of whether we can post, set volume and go to the next song.
+		await player.set_vol(volume)
 		try:
 			await player.play(track,start=int(getattr(player,"track_seek",0)))
 		except Exception as e:
@@ -1473,7 +1501,6 @@ class Music(commands.Cog):
 		play_text = "Playing" if (player.is_playing and not player.is_paused) else "Paused"
 		track = player.track
 		track_ctx = getattr(player,"track_ctx",None)
-		cv = int(player.volume/self.vol_ratio)
 		if not track_ctx:
 			return await Message.Embed(
 				title="Missing information!",
@@ -1486,7 +1513,7 @@ class Music(commands.Cog):
 			description="Requested by {}{}\n -- Volume at {}%{}".format(
 				track_ctx.author.mention,
 				" (via radio)" if track.radio else "",
-				cv,
+				player.get_vol(ctx),
 				"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 			),
 			color=ctx.author,
@@ -1523,7 +1550,6 @@ class Music(commands.Cog):
 				color=ctx.author,
 				delete_after=delay
 			).send(ctx)
-		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
 		desc = "**{}**\nCurrently {} - at {} - Requested by {}{} - [Link]({})\n-- Volume at {}%{}".format(
 			self.get_track_title(track),
 			play_text,
@@ -1531,7 +1557,7 @@ class Music(commands.Cog):
 			track_ctx.author.mention,
 			" (via radio)" if track.radio else "",
 			track.uri,
-			cv,
+			player.get_vol(ctx),
 			"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
 		)
 		fields = []
@@ -1725,7 +1751,7 @@ class Music(commands.Cog):
 		player = self.get_player(ctx.guild)
 		if player is None or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		cv = int(getattr(player,"vol",self.settings.getServerStat(ctx.guild,"MusicVolume",100)*self.vol_ratio)/self.vol_ratio)
+		cv = player.get_vol(ctx)
 		if volume is None:
 			# We're just listing the current volume
 			return await Message.Embed(title="♫ Current volume at {}%.".format(cv),color=ctx.author,delete_after=delay).send(ctx)
@@ -1736,10 +1762,9 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Volume must be an integer between 0-150.",color=ctx.author,delete_after=delay).send(ctx)
 		# Ensure our volume is between 0 and 150
 		volume = max(min(150,volume),0)
-		await player.set_volume(volume*self.vol_ratio)
-		player.vol = player.volume
+		await player.set_vol(volume)
 		# Save it to the server stats with range 10-100
-		self.settings.setServerStat(ctx.guild, "MusicVolume", 10 if volume < 10 else 100 if volume > 100 else volume)
+		self.settings.setServerStat(ctx.guild, "MusicVolume", max(min(100,volume),10))
 		title="♫ Changed volume from {}% to {}%.".format(cv,volume) if cv!=volume else "♫ Volume remains {}%.".format(volume)
 		await Message.Embed(title=title,color=ctx.author,delete_after=delay).send(ctx)
 
