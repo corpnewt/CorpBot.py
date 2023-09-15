@@ -1387,7 +1387,7 @@ class Music(commands.Cog):
 			seconds += current
 			if seconds < 0: seconds = 0
 		ms = seconds*1000
-		await player.seek(ms)
+		await player.seek(int(ms))
 		return await Message.Embed(title="♫ Seeking to {}!".format(self.format_duration(ms)),color=ctx.author,delete_after=delay).send(ctx)
 
 	@commands.command(aliases=["movesong","mvtrack","movetrack"])
@@ -1948,7 +1948,7 @@ class Music(commands.Cog):
 			data={"filters":filter_data},
 		)
 		# Apply the filter instantly by seeking to the same location - only if player is playing
-		if fast_apply and player.is_playing: await player.seek(player.position)
+		if fast_apply and player.is_playing: await player.seek(int(player.position))
 
 	def _draw_band(self, band, max_len=5):
 		v = max(min(float(band),1.),-1.) # Get the value as a float and force -1 to 1 range
