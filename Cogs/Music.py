@@ -1092,8 +1092,7 @@ class Music(commands.Cog):
 			url = ctx.message.attachments[0].url
 		if player.is_paused and url is None:
 			# We're trying to resume
-			await player.set_pause(False)
-			return await Message.Embed(title="♫ Resumed: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
+			return await ctx.invoke(self.resume)
 		if url is None:
 			return await Message.Embed(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
 		message = await Message.Embed(
@@ -1328,12 +1327,32 @@ class Music(commands.Cog):
 		if not player or not player.is_connected:
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if player.is_paused: # Just toggle play
-			return await ctx.invoke(self.play)
+			return await ctx.invoke(self.resume)
 		if not player.is_playing:
 			return await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
 		# Pause the track
 		await player.set_pause(True)
-		await Message.Embed(title="♫ Paused: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
+		track = player.track
+		track_ctx = getattr(player,"track_ctx",None)
+		desc = "-- Volume at {}%{}".format(
+			player.get_vol(ctx),
+			"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
+		)
+		if track_ctx:
+			desc = "Requested by {}{}\n{}".format(
+				track_ctx.author.mention,
+				" (via radio)" if track.radio else "",
+				desc
+			)
+		await Message.Embed(
+			title="♫ Paused: {}".format(self.get_track_title(track)),
+			fields=[{"name":"Elapsed","value":self.format_elapsed(player,track),"inline":False}],
+			description=desc,
+			color=ctx.author,
+			url=track.uri,
+			thumbnail=getattr(track,"thumb",None),
+			delete_after=delay
+		).send(ctx)
 
 	@commands.command()
 	async def paused(self, ctx, *, moons = None):
@@ -1353,7 +1372,27 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not currently paused!",color=ctx.author,delete_after=delay).send(ctx)
 		# We're trying to resume
 		await player.set_pause(False)
-		await Message.Embed(title="♫ Resumed: {}".format(self.get_track_title(player.track)),color=ctx.author,delete_after=delay).send(ctx)
+		track = player.track
+		track_ctx = getattr(player,"track_ctx",None)
+		desc = "-- Volume at {}%{}".format(
+			player.get_vol(ctx),
+			"\n-- Repeat Enabled" if getattr(player,"repeat",False) else ""
+		)
+		if track_ctx:
+			desc = "Requested by {}{}\n{}".format(
+				track_ctx.author.mention,
+				" (via radio)" if track.radio else "",
+				desc
+			)
+		await Message.Embed(
+			title="♫ Resumed: {}".format(self.get_track_title(track)),
+			fields=[{"name":"Elapsed","value":self.format_elapsed(player,track),"inline":False}],
+			description=desc,
+			color=ctx.author,
+			url=track.uri,
+			thumbnail=getattr(track,"thumb",None),
+			delete_after=delay
+		).send(ctx)
 
 	@commands.command()
 	async def seek(self, ctx, position = None):
