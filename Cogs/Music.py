@@ -545,7 +545,7 @@ class Music(commands.Cog):
 		if ctx: track.ctx = ctx # Append our ctx-based data if provided
 		return track
 
-	async def get_recommendations(self, ctx, url, recommend_count):
+	async def get_recommendations(self, ctx, url, recommend_count, search_type = None):
 		# Gather youtube recommendations based on the passed video URL or search term
 		urls = Utils.get_urls(url)
 		if urls:
@@ -562,7 +562,7 @@ class Music(commands.Cog):
 				return None # Not found
 		node = self.get_node()
 		# Here we either have a video identifier - or a search term
-		starting_track = await node.get_tracks(query=url,ctx=ctx)
+		starting_track = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
 		if not isinstance(starting_track,list):
 			return None # Something went wrong loading this
 		starting_track = starting_track[0]
@@ -585,7 +585,8 @@ class Music(commands.Cog):
 				# Assume it's a YT track - the recommendations function is broken for those - roll our own
 				playlist = await node.get_tracks(
 					query="https://www.youtube.com/watch?v=[[id]]&list=RD[[id]]".replace("[[id]]",starting_track.identifier),
-					ctx=ctx
+					ctx=ctx,
+					search_type=search_type or "ytsearch"
 				)
 				if not isinstance(playlist,pomice.objects.Playlist): # Not a playlist object
 					return playlist # Return as-is
@@ -627,9 +628,9 @@ class Music(commands.Cog):
 								url = str(response).split("Location': \'")[1].split("\'")[0]
 				except: pass
 				if recommend:
-					tracks = await self.get_recommendations(ctx,url,recommend_count)
+					tracks = await self.get_recommendations(ctx,url,recommend_count,search_type=search_type)
 				else:
-					tracks = await node.get_tracks(query=url,ctx=ctx)
+					tracks = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
 				# Get the first hit if it's not a playlist
 				if isinstance(tracks,list):
 					tracks = tracks[0]
