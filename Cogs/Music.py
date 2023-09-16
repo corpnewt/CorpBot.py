@@ -60,7 +60,7 @@ class CorpPlayer(pomice.Player):
 
 class CorpTrack(pomice.objects.Track):
 	# Create a shell subclass to keep horrible practices going
-	def __init__(self,track,radio=False,to_remove=False):
+	def __init__(self,track,radio=False,to_remove=False,search_type=None):
 		if isinstance(track,pomice.objects.Track):
 			track = {
 				"track_id":track.track_id,
@@ -114,6 +114,7 @@ class CorpTrack(pomice.objects.Track):
 		self.to_remove = to_remove
 		self.did_fail = False
 		self.thumb = track.get("thumbnail")
+		self.search_type = search_type
 		if not self.thumb and track_type == pomice.enums.TrackType.YOUTUBE: # Try to build our own thumbnail
 			try: self.thumb = "https://img.youtube.com/vi/{}/maxresdefault.jpg".format(track.get("identifier",track["info"].get("identifier")))
 			except: self.thumb = None
@@ -601,7 +602,7 @@ class Music(commands.Cog):
 			tracks.tracks = tracks.tracks[:min(max(2,recommend_count),100)]
 		return tracks
 
-	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25):
+	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25, search_type = None):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -666,7 +667,7 @@ class Music(commands.Cog):
 				except Exception as e:
 					seek_pos = 0
 			else: # Got a search term - let's search
-				tracks = await node.get_tracks(query=url,ctx=ctx)
+				tracks = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
 				if isinstance(tracks,pomice.objects.Playlist): tracks = tracks.tracks
 				if self.settings.getServerStat(ctx.guild, "YTMultiple", False):
 					delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -696,7 +697,7 @@ class Music(commands.Cog):
 		# We need to figure out if we've loaded a playlist
 		if isinstance(tracks,pomice.objects.Playlist):
 			# Rewrap the tracks as CorpTracks to allow custom attributes
-			tracks.tracks = [CorpTrack(track,radio=False if i==0 else recommend) for i,track in enumerate(tracks.tracks)]
+			tracks.tracks = [CorpTrack(track,radio=False if i==0 else recommend,search_type=None if urls else search_type or "ytsearch") for i,track in enumerate(tracks.tracks)]
 			if seek_pos > 0: setattr(tracks.tracks[0],"seek",seek_pos)
 			if shuffle: random.shuffle(tracks.tracks)
 			return {
@@ -707,7 +708,7 @@ class Music(commands.Cog):
 			}
 		elif isinstance(tracks,pomice.objects.Track):
 			# Rewrap the track as a CorpTrack to allow custom attributes
-			track = CorpTrack(tracks,radio=recommend)
+			track = CorpTrack(tracks,radio=recommend,search_type=None if urls else search_type or "ytsearch")
 			if seek_pos > 0: track.seek = seek_pos
 			return {"tracks":track,"search":url}
 
@@ -806,7 +807,7 @@ class Music(commands.Cog):
 
 	def get_track_title(self,track):
 		# If we have a non-YouTube track, format the title as "Artist - Title"
-		if track.track_type != pomice.enums.TrackType.YOUTUBE:
+		if track.track_type != pomice.enums.TrackType.YOUTUBE or track.search_type == "ytmsearch":
 			return "{} - {}".format(track.author,track.title)
 		return track.title
 
@@ -1082,7 +1083,12 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=["p"])
 	async def play(self, ctx, *, url = None):
-		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song."""
+		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song.
+		You can control what search type is used for non-URL queries by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
@@ -1095,12 +1101,30 @@ class Music(commands.Cog):
 			return await ctx.invoke(self.resume)
 		if url is None:
 			return await Message.Embed(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
+		# Check for a specific search type set
+		url_parts = []
+		search_type = None
+		for u in url.split():
+			if u.lower() in ("st=ytsearch","st=ytmsearch","st=scsearch","st=yt","st=ytm","st=sc"):
+				search_type = u.lower().split("=")[-1]
+				if not search_type.endswith("search"):
+					search_type += "search" # Ensure it's set to a valid value
+			else:
+				url_parts.append(u)
+		url = " ".join(url_parts) # Rejoin the parts - skipping any search queries
+		# if we don't have a specified search, let's fall back to the server's setting
+		if not search_type:
+			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
+		# Build our search - and only use it if we don't have a URL
+		search_provider = None
+		if not Utils.get_urls(url.strip('<>')):
+			search_provider = {"ytmsearch":" YouTube Music","scsearch":" Sound Cloud"}.get(search_type," YouTube")
 		message = await Message.Embed(
-			title="♫ Searching For: {}".format(url.strip("<>")),
+			title="♫ Searching{} For: {}".format(search_provider or "",url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message)
+		songs = await self.resolve_search(ctx,url,message=message,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1915,6 +1939,26 @@ class Music(commands.Cog):
 		await ctx.send(Utils.yes_no_setting(ctx,"Music player search list","YTMultiple",yes_no))
 
 	@commands.command()
+	async def searchtype(self, ctx, search_type = None):
+		"""Gets or sets the default search type used.  Can be ytsearch, ytmsearch, or scsearch (default is ytsearch).  Requires bot-admin or admin to set."""
+
+		if not Utils.is_bot_admin(ctx): search_type = None
+		st_provider = {"ytsearch":"YouTube","ytmsearch":"YouTube Music","scsearch":"Sound Cloud"}
+		if search_type is None: # Just getting the default search type
+			st = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
+			return await ctx.send("Current search type is `{}` ({}).".format(st,st_provider.get(st)))
+		# Setting it - make sure the value is in our list
+		search_type = search_type.lower()
+		if not search_type in ("ytsearch","ytmsearch","scsearch","yt","ytm","sc"):
+			return await ctx.send("Invalid search type.  Can only be `ytsearch`, `ytmsearch`, or `scsearch`.")
+		# Ensure it ends with "searcH"
+		if not search_type.endswith("search"):
+			search_type += "search"
+		# Set it
+		self.settings.setServerStat(ctx.guild, "MusicSearchType", search_type)
+		return await ctx.send("Search type set to `{}` ({}).".format(search_type,st_provider.get(search_type)))
+
+	@commands.command()
 	async def lasteq(self, ctx, yes_no = None):
 		"""Gets or sets whether the current EQ settings are preserved between music sessions (bot-admin only)."""
 		
@@ -1930,7 +1974,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount"): return
+		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount","searchtype"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.get_player(ctx.guild)
