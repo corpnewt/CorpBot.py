@@ -949,6 +949,23 @@ class Music(commands.Cog):
 		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
 		return m or message
 
+	def _get_search_type(self, ctx, url):
+		# Check for a specific search type set
+		url_parts = []
+		search_type = None
+		for u in url.split():
+			if u.lower() in ("st=ytsearch","st=ytmsearch","st=scsearch","st=yt","st=ytm","st=sc"):
+				search_type = u.lower().split("=")[-1]
+				if not search_type.endswith("search"):
+					search_type += "search" # Ensure it's set to a valid value
+			else:
+				url_parts.append(u)
+		url = " ".join(url_parts) # Rejoin the parts - skipping any search queries
+		# if we don't have a specified search, let's fall back to the server's setting
+		if not search_type:
+			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
+		return (url,search_type)
+
 	@commands.command(aliases=["recon","rec"])
 	async def reconnect(self, ctx):
 		"""Attempts to have the bot save the current playlist to memory, leave the voice chat, reconnect, and reload the playlist.
@@ -1085,7 +1102,7 @@ class Music(commands.Cog):
 	@commands.command(aliases=["p"])
 	async def play(self, ctx, *, url = None):
 		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song.
-		You can control what search type is used for non-URL queries by passing one of the following as an arg:
+		You can control what search type is used by passing one of the following as an arg:
 		
 		st=ytsearch (searches YouTube)
 		st=ytmsearch (searches YouTube Music)
@@ -1102,20 +1119,8 @@ class Music(commands.Cog):
 			return await ctx.invoke(self.resume)
 		if url is None:
 			return await Message.Embed(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
-		# Check for a specific search type set
-		url_parts = []
-		search_type = None
-		for u in url.split():
-			if u.lower() in ("st=ytsearch","st=ytmsearch","st=scsearch","st=yt","st=ytm","st=sc"):
-				search_type = u.lower().split("=")[-1]
-				if not search_type.endswith("search"):
-					search_type += "search" # Ensure it's set to a valid value
-			else:
-				url_parts.append(u)
-		url = " ".join(url_parts) # Rejoin the parts - skipping any search queries
-		# if we don't have a specified search, let's fall back to the server's setting
-		if not search_type:
-			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
+		# Gather the search type
+		url,search_type = self._get_search_type(ctx,url)
 		# Build our search - and only use it if we don't have a URL
 		search_provider = None
 		if not Utils.get_urls(url.strip('<>')):
@@ -1153,7 +1158,7 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=["suggest","r","recommend"])
 	async def radio(self, ctx, *, url = None):
-		"""Queues up recommendations for the passed search term or YouTube link."""
+		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL."""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
@@ -1184,12 +1189,14 @@ class Music(commands.Cog):
 					pre_prime = None
 			arg_list.append(arg)
 		url = " ".join(arg_list)
+		# Gather the search type
+		url,search_type = self._get_search_type(ctx,url)
 		message = await Message.Embed(
 			title="♫ Gathering Recommendations For: {}".format(url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,recommend=True,recommend_count=num)
+		songs = await self.resolve_search(ctx,url,message=message,recommend=True,recommend_count=num,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1309,7 +1316,12 @@ class Music(commands.Cog):
 
 	@commands.command()
 	async def shuffle(self, ctx, *, url = None):
-		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue."""
+		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue.
+		You can control what search type is used by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
 
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
@@ -1329,13 +1341,19 @@ class Music(commands.Cog):
 			player.queue.clear()
 			await self.add_to_queue(player,queue)
 			return await Message.Embed(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
+		# Gather the search type
+		url,search_type = self._get_search_type(ctx,url)
+		# Build our search - and only use it if we don't have a URL
+		search_provider = None
+		if not Utils.get_urls(url.strip('<>')):
+			search_provider = {"ytmsearch":" YouTube Music","scsearch":" Sound Cloud"}.get(search_type," YouTube")
 		# We're adding a new song/playlist/search shuffled to the queue
 		message = await Message.Embed(
-			title="♫ Searching For: {}".format(url.strip("<>")),
+			title="♫ Searching{} For: {}".format(search_provider or "",url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,shuffle=True)
+		songs = await self.resolve_search(ctx,url,message=message,shuffle=True,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
