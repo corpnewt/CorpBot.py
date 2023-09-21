@@ -276,7 +276,7 @@ class Server(commands.Cog):
 		poll_options = poll_options.replace("\n"," ")
 		desc = "**__New Poll by {}__**\n\n".format(ctx.author.mention)
 		# Let's get any timestamps or -multi(ple) strings, and strip them out as needed.
-		time_check = re.compile(r"(?i)-?t=(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
+		time_check = re.compile(r"(?i)-?t=(\d+w(k|eek)?s?|\d+d(ay)?s?|\d+h(r|our)?s?|\d+m(inute|in)?s?|\d+s(econd|ec)?s?)+")
 		try: poll_time_str = time_check.search(poll_options).group(0)
 		except: poll_time_str = ""
 		poll_time = end_time = 0
