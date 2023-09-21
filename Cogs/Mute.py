@@ -15,7 +15,7 @@ class Mute(commands.Cog):
         self.bot = bot
         self.settings = settings
         self.mention_re = re.compile(r"<?@?!?[0-9]{17,21}>?")
-        self.time_check = re.compile(r"(?i)(\d+w|\d+d|\d+h|\d+m|\d+s?)+")
+        self.time_check = re.compile(r"(?i)(\d+w(k|eek)?s?|\d+d(ay)?s?|\d+h(r|our)?s?|\d+m(inute|in)?s?|\d+s(econd|ec)?s?)+")
         self.loop_list = []
         self.mute_perms = ("send_messages","send_messages_in_threads","add_reactions","speak")
         global Utils, DisplayName
@@ -442,9 +442,10 @@ class Mute(commands.Cog):
             else:
                 # Not a member match - we're in the cooldown/reason portion now
                 # Check if the next value is a time value
-                try: mute_time_str = self.time_check.search(args[index]).group(0)
+                try: mute_time_str = self.time_check.match(args[index]).group(0)
                 except: mute_time_str = ""
                 if mute_time_str:
+                    print(self.time_check.match(args[index]))
                     # Got a mute time - let's get the seconds value
                     cooldown_time = get_seconds(mute_time_str)
                 reason = " ".join(args[index if cooldown_time is None else index+1:])
