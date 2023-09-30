@@ -63,9 +63,7 @@ class PandorasDB:
         self.db.bgsave()
 
     def get_id(self, value):
-        if isinstance(value, (discord.User, discord.Member, discord.Guild)):
-            return value.id
-        return str(value)
+        return getattr(value,"id",str(value))
 
     def load(self, value, type_override = None):
         # Attempts to quickly load a value with the override applied if needed
