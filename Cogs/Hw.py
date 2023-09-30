@@ -104,11 +104,21 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwmain"])
 	async def mainhw(self, ctx, *, build = None):
 		"""Sets a new main build from your build list."""
+		await self._mainhw(ctx, build=build)
 
+	@commands.command(aliases=["hwbotmain"])
+	async def mainbothw(self, ctx, *, build = None):
+		"""Sets a new main build from the bot's build list (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._mainhw(ctx, user=self.bot.user, build=build)
+
+	async def _mainhw(self, ctx, user = None, build = None):
+		user = user or ctx.author
+		bot = "" if user==ctx.author else "bot"
 		if not build:
-			return await ctx.send("Usage: `{}mainhw [build name or number]`".format(ctx.prefix))
+			return await ctx.send("Usage: `{}main{}hw [build name or number]`".format(ctx.prefix,bot))
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = self.settings.getGlobalUserStat(user, "Hardware")
 		if buildList is None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
@@ -129,7 +139,7 @@ class Hw(commands.Cog):
 					b['Main'] = True
 				else:
 					b['Main'] = False
-			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+			self.settings.setGlobalUserStat(user, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
 			return await ctx.send(Utils.suppressed(ctx,msg))
 				
@@ -147,7 +157,7 @@ class Hw(commands.Cog):
 					b['Main'] = True
 				else:
 					b['Main'] = False
-			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+			self.settings.setGlobalUserStat(user, "Hardware", buildList)
 			msg = "{} set as main!".format(mainBuild['Name'])
 			return await ctx.send(Utils.suppressed(ctx,msg))
 
@@ -158,11 +168,21 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwdel","remhw","hwrem","hwdelete","deletehw","hwremove","removehw"])
 	async def delhw(self, ctx, *, build = None):
 		"""Removes a build from your build list."""
+		await self._delhw(ctx, build=build)
 
+	@commands.command(aliases=["hwbotdel","rembothw","hwbotrem"])
+	async def delbothw(self, ctx, *, build = None):
+		"""Removes a build from the bot's build list (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._delhw(ctx, user=self.bot.user, build=build)
+
+	async def _delhw(self, ctx, user = None, build = None):
+		user = user or ctx.author
+		bot = "" if user==ctx.author else "bot"
 		if not build:
-			return await ctx.send("Usage: `{}delhw [build name or number]`".format(ctx.prefix))
+			return await ctx.send("Usage: `{}del{}hw [build name or number]`".format(ctx.prefix,bot))
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = self.settings.getGlobalUserStat(user, "Hardware")
 		if buildList is None:
 			buildList = []
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
@@ -174,7 +194,7 @@ class Hw(commands.Cog):
 				buildList.remove(b)
 				if b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				self.settings.setGlobalUserStat(user, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
 				return await ctx.send(Utils.suppressed(ctx,msg))
 		try:
@@ -183,7 +203,7 @@ class Hw(commands.Cog):
 				b = buildList.pop(build)
 				if b['Main'] and len(buildList):
 					buildList[0]['Main'] = True
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				self.settings.setGlobalUserStat(user, "Hardware", buildList)
 				msg = "{} removed!".format(b['Name'])
 				return await ctx.send(Utils.suppressed(ctx,msg))
 		except:
@@ -196,6 +216,17 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwedit"])
 	async def edithw(self, ctx, *, build = None):
 		"""Edits a build from your build list."""
+		await self._edithw(ctx, build=build)
+
+	@commands.command()
+	async def editbothw(self, ctx, *, build = None):
+		"""Edits a build from the bot's build list (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._edithw(ctx, user=self.bot.user, build=build)
+
+	async def _edithw(self, ctx, user = None, build = None):
+		user = user or ctx.author
+		you_i,you_i_lower,your_my,bot = ("You","you","your","") if user==ctx.author else ("I","I","my","bot")
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
@@ -213,12 +244,12 @@ class Hw(commands.Cog):
 		if str(ctx.author.id) in self.hwactive:
 			return await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = self.settings.getGlobalUserStat(user, "Hardware")
 		if buildList is None:
 			buildList = []
 		if not len(buildList):
 			# No parts!
-			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
+			msg = '{} have no builds on file!  You can add some with the `{}new{}hw` command.'.format(you_i,ctx.prefix,bot)
 			return await ctx.send(msg)
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
@@ -323,10 +354,10 @@ class Hw(commands.Cog):
 					m = '{} set to:\n{}'.format(bname, output)
 					await hwChannel.send(m)
 					mainBuild['Hardware'] = output
-					self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+					self.settings.setGlobalUserStat(user, "Hardware", buildList)
 					break
 			mainBuild['Hardware'] = parts.content
-			self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+			self.settings.setGlobalUserStat(user, "Hardware", buildList)
 			break
 		msg = '*{}*, {} was edited successfully!'.format(DisplayName.name(ctx.author), bname)
 		self._stop_hw(ctx.author)
@@ -336,6 +367,17 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwren","renamehw","hwrename"])
 	async def renhw(self, ctx, *, build = None):
 		"""Renames a build from your build list."""
+		await self._renhw(ctx, build=build)
+
+	@commands.command(aliases=["hwbotren"])
+	async def renbothw(self, ctx, *, build = None):
+		"""Renames a build from the bot's build list (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._renhw(ctx, user=self.bot.user, build=build)
+
+	async def _renhw(self, ctx, user = None, build = None):
+		user = user or ctx.author
+		you_i,you_i_lower,your_my,bot = ("You","you","your","") if user==ctx.author else ("I","I","my","bot")
 		hwChannel = None
 		if ctx.guild:
 			# Not a pm
@@ -351,17 +393,19 @@ class Hw(commands.Cog):
 
 		# Make sure we're not already in a parts transaction
 		if str(ctx.author.id) in self.hwactive:
-			await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
-			return
+			return await ctx.send("You're already in a hardware session!  You can leave with `{}cancelhw`".format(ctx.prefix))
 
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		buildList = self.settings.getGlobalUserStat(user, "Hardware")
 		if buildList is None:
 			buildList = []
 		if not len(buildList):
 			# No parts!
-			msg = 'You have no builds on file!  You can add some with the `{}newhw` command.'.format(ctx.prefix)
-			await ctx.send(msg)
-			return
+			msg = '{} have no builds on file!  You can add some with the `{}new{}hw` command.'.format(
+				you_i,
+				ctx.prefix,
+				bot
+			)
+			return await ctx.send(msg)
 		buildList = sorted(buildList, key=lambda x:x['Name'].lower())
 
 		mainBuild = None
@@ -390,8 +434,7 @@ class Hw(commands.Cog):
 
 		if not mainBuild:
 			msg = "I couldn't find that build or number."
-			await ctx.send(msg)
-			return
+			return await ctx.send(msg)
 
 		# Set our HWActive flag
 		hw_id = self.gen_id()
@@ -416,19 +459,18 @@ class Hw(commands.Cog):
 					await ctx.send("It looks like you don't accept pms.  Please enable them and try again.")
 				return
 			if not buildName:
-				self._stop_hw(ctx.author)
-				return
+				return self._stop_hw(ctx.author)
 			buildExists = False
 			for build in buildList:
 				if build['Name'].lower() == buildName.content.lower():
-					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.format(DisplayName.name(ctx.author))
+					mesg = 'It looks like {} already have a build by that name, *{}*.  Try again.'.format(you_i_lower,DisplayName.name(ctx.author))
 					await hwChannel.send(mesg)
 					buildExists = True
 					break
 			if not buildExists:
 				mainBuild['Name'] = buildName.content
 				# Flush settings to all servers
-				self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
+				self.settings.setGlobalUserStat(user, "Hardware", buildList)
 				break
 		bname2 = Utils.suppressed(ctx,buildName.content)
 		msg = '*{}*, {} was renamed to {} successfully!'.format(DisplayName.name(ctx.author), bname, bname2)
@@ -776,7 +818,18 @@ class Hw(commands.Cog):
 	@commands.command(aliases=["hwnew","hwadd","addhw"])
 	async def newhw(self, ctx):
 		"""Initiate a new-hardware conversation with the bot.  The hardware added will also be set as the Main Build."""
-		buildList = self.settings.getGlobalUserStat(ctx.author, "Hardware")
+		await self._newhw(ctx)
+
+	@commands.command(aliases=["addbothw"])
+	async def newbothw(self, ctx):
+		"""Initiates a new-hardware conversation for the bot's hardware.  The hardware added will also be set as the bot's Main Build (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._newhw(ctx, self.bot.user)
+
+	async def _newhw(self, ctx, user=None):
+		user = user or ctx.author
+		you_i,you_i_lower,your_my,bot = ("You","you","your","") if user==ctx.author else ("I","I","my","bot")
+		buildList = self.settings.getGlobalUserStat(user, "Hardware")
 		if buildList is None:
 			buildList = []
 		hwChannel = None
@@ -800,11 +853,11 @@ class Hw(commands.Cog):
 		hw_id = self.gen_id()
 		self.hwactive[str(ctx.author.id)] = hw_id
 
-		msg = 'Alright, *{}*, let\'s add a new build.\n\n'.format(DisplayName.name(ctx.author))
+		msg = 'Alright, *{}*, let\'s add a new {}build.\n\n'.format(DisplayName.name(ctx.author),"" if ctx.author==user else "bot ")
 		if len(buildList) == 1:
-			msg += 'You currently have *1 build* on file.\n\n'
+			msg += '{} currently have *1 build* on file.\n\n'.format(you_i)
 		else:
-			msg += 'You currently have *{} builds* on file.\n\nLet\'s get started!'.format(len(buildList))
+			msg += '{} currently have *{} builds* on file.\n\nLet\'s get started!'.format(you_i, len(buildList))
 
 		try:
 			await hwChannel.send(msg)
@@ -830,7 +883,7 @@ class Hw(commands.Cog):
 			buildExists = False
 			for build in buildList:
 				if build['Name'].lower() == buildName.content.lower():
-					mesg = 'It looks like you already have a build by that name, *{}*.  Try again.'.format(DisplayName.name(ctx.author))
+					mesg = 'It looks like {} already have a build by that name, *{}*.  Try again.'.format(you_i_lower,DisplayName.name(ctx.author))
 					await hwChannel.send(mesg)
 					buildExists = True
 					break
@@ -853,8 +906,7 @@ class Hw(commands.Cog):
 				msg = 'It looks like you sent a pc part picker link - did you want me to try and format that? (`y`/`n`/`stop`)'
 				test = await self.confirm(hw_id, ctx, parts, hwChannel, msg)
 				if test is None:
-					self._stop_hw(ctx.author)
-					return
+					return self._stop_hw(ctx.author)
 				elif test == True:
 					partList = parts.content.split()
 					if len(partList) == 1:
@@ -868,20 +920,17 @@ class Hw(commands.Cog):
 					if not output:
 						msg = 'Something went wrong!  Make sure you use a valid pcpartpicker link.'
 						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
+						return self._stop_hw(ctx.author)
 					if len(output) > 2000:
 						msg = "That's an *impressive* list of parts - but the max length allowed for messages in Discord is 2000 characters, and you're at *{}*.".format(len(output))
 						msg += '\nMaybe see if you can prune up that list a bit and try again?'
 						await hwChannel.send(msg)
-						self._stop_hw(ctx.author)
-						return
+						return self._stop_hw(ctx.author)
 					# Make sure
 					conf = await self.confirm(hw_id, ctx, output, hwChannel, None, ctx.author)
 					if conf is None:
 						# Timed out
-						self._stop_hw(ctx.author)
-						return
+						return self._stop_hw(ctx.author)
 					elif conf == False:
 						# Didn't get our answer
 						msg = 'Alright, *{}*, what parts does "{}" have? (Please include *all* parts for this build - you can add new lines with *shift + enter* - type `stop` to cancel)'.format(DisplayName.name(ctx.author), bname)
@@ -899,12 +948,13 @@ class Hw(commands.Cog):
 				build['Main'] = False
 
 		buildList.append(newBuild)
-		self.settings.setGlobalUserStat(ctx.author, "Hardware", buildList)
-		msg = "*{}*, {} was created successfully!  It has been set as your **main build**.  To view your main build, you can use `{}hw` - or to change which is your main, use `{}mainhw [build name or number]`".format(
+		self.settings.setGlobalUserStat(user, "Hardware", buildList)
+		msg = "*{0}*, {1} was created successfully!  It has been set as {2} **main build**.  To view {2} main build, you can use `{3}hw` - or to change which is {2} main, use `{3}main{4}hw [build name or number]`".format(
 			DisplayName.name(ctx.author),
 			bname,
+			your_my,
 			ctx.prefix,
-			ctx.prefix
+			bot
 		)
 		self._stop_hw(ctx.author)
 		await hwChannel.send(msg)
