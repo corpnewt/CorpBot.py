@@ -580,7 +580,7 @@ class Lists(commands.Cog):
 			parts = ""
 		self.settings.setGlobalUserStat(ctx.author, "Parts", parts)
 		if not parts:
-			msg = "*{}'s* parts have been cleared (DEPRECATED - use {}newhw instaed)".format(DisplayName.name(ctx.author),ctx.prefix)
+			msg = "*{}'s* parts have been cleared (DEPRECATED - use {}newhw instead)".format(DisplayName.name(ctx.author),ctx.prefix)
 		else:
 			msg = '*{}\'s* parts have been set to (DEPRECATED - Use {}newhw instead):\n{}'.format(DisplayName.name(ctx.author), ctx.prefix, parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
