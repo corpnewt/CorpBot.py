@@ -486,7 +486,7 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, reference=reference)
+			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, message_id=True, reference=reference)
 		if self.shouldLog('invite.send', message.guild):
 			# A message was sent
 			matches = re.finditer(r"(?i)((discord\.gg|discordapp\.com\/invite)\/\S+)",message.content)
@@ -542,7 +542,7 @@ class Debugging(commands.Cog):
 				fetched = await channel.fetch_message(payload.message_id)
 				reference = fetched.reference
 			except: pass
-		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message=payload, reference=reference)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message=payload, message_id=True, reference=reference)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
@@ -573,7 +573,7 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl, message=payload, link_message=False, reference=reference)
+		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl, message=payload, message_id=True, link_message=False, reference=reference)
 
 	@commands.Cog.listener()
 	async def on_raw_bulk_message_delete(self, payload):
@@ -630,7 +630,7 @@ class Debugging(commands.Cog):
 		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
 		shutil.rmtree(temp,ignore_errors=True)
 	
-	async def _logEvent(self, server, log_message, *, header=None, fields=None, filename=None, color=None, title=None, thumbnail=None, message=None, link_message=True, reference=None, link_reference=True):
+	async def _logEvent(self, server, log_message, *, header=None, fields=None, filename=None, color=None, title=None, thumbnail=None, message=None, message_id=False, link_message=True, reference=None, link_reference=True):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color is None:
@@ -656,10 +656,14 @@ class Debugging(commands.Cog):
 				log_message = textwrap.fill(log_message, replace_whitespace=False)
 			urls = ""
 			# Resolve message
-			message = await self._get_message(message)
-			if message and link_message:
+			if link_message or link_reference or message_id:
+				message = await self._get_message(message)
+			if message_id and message:
+				urls += "`  Message ID: {}`".format(message.id)
+			if link_message and message:
+				if urls: urls += "\n" # Add formatting separator as needed
 				urls += "- [Message Link]({})".format(self._message_url(message))
-			if reference and link_reference:
+			if link_reference and reference:
 				if urls: urls += "\n" # Add a formatting separator as needed
 				# Let's get the reference_url, reference_mention, and resolve the reference message/author
 				resolved = await self._get_message(reference)
