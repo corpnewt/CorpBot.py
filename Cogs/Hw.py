@@ -1001,11 +1001,7 @@ class Hw(commands.Cog):
 		if not self.channelCheck(msg, dest):
 			return False
 		msgStr = msg.content.lower()
-		if msgStr.startswith('y'):
-			return True
-		if msgStr.startswith('n'):
-			return True
-		elif msgStr.startswith('stop'):
+		if msgStr.startswith(('y','n','stop','cancel')):
 			return True
 		return False
 
@@ -1078,7 +1074,7 @@ class Hw(commands.Cog):
 				# We got something
 				if talk.content.lower().startswith('y'):
 					return True
-				elif talk.content.lower().startswith('stop'):
+				elif talk.content.lower().startswith(('stop','cancel')):
 					if authorName:
 						msg = "No problem, *{}!*  See you later!".format(authorName)
 					else:
@@ -1135,7 +1131,7 @@ class Hw(commands.Cog):
 				return None
 			else:
 				# Check for a stop
-				if talk.content.lower() == 'stop':
+				if talk.content.lower().startswith(('stop','cancel')):
 					msg = "No problem, *{}!*  See you later!".format(authorName, ctx.prefix)
 					await dest.send(msg)
 					return None
