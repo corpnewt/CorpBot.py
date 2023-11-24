@@ -244,10 +244,14 @@ class ServerStats(commands.Cog):
         """Lists the top servers I'm connected to ordered by population."""
         our_list = []
         for guild in self.bot.guilds:
+            join = "Unknown"
+            if guild.me.joined_at:
+                ts = int(guild.me.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
             our_list.append(
                 {
-                    "name":"{}".format(guild.name),
-                    "value":"{:,} member{} ({})".format(len(guild.members),"" if len(guild.members)==1 else "s",guild.id),
+                    "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "value":"`{}`\n".format(guild.id)+join,
                     "users":len(guild.members)
                 }
             )
@@ -259,10 +263,14 @@ class ServerStats(commands.Cog):
         """Lists the bottom servers I'm connected to ordered by population."""
         our_list = []
         for guild in self.bot.guilds:
+            join = "Unknown"
+            if guild.me.joined_at:
+                ts = int(guild.me.joined_at.timestamp())
+                join = "<t:{}> (<t:{}:R>)".format(ts,ts)
             our_list.append(
                 {
-                    "name":"{}".format(guild.name),
-                    "value":"{:,} member{} ({})".format(len(guild.members),"" if len(guild.members)==1 else "s",guild.id),
+                    "name":"{} ({:,} member{})".format(guild.name,len(guild.members),"" if len(guild.members)==1 else "s"),
+                    "value":"`{}`\n".format(guild.id)+join,
                     "users":len(guild.members)
                 }
             )
