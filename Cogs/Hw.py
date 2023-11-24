@@ -1000,8 +1000,7 @@ class Hw(commands.Cog):
 	def confirmCheck(self, msg, dest = None):
 		if not self.channelCheck(msg, dest):
 			return False
-		msgStr = msg.content.lower()
-		if msgStr.startswith(('y','n','stop','cancel')):
+		if msg.content.lower().startswith(('y','n','stop','cancel')):
 			return True
 		return False
 
