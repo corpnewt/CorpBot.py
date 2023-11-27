@@ -14,6 +14,7 @@ def setup(bot):
 class NvidiaArk(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.h = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
     @commands.command(no_pm=True, aliases=("nark", "nvark"))
     async def nvidiaark(self, ctx, *, text: str = None):
@@ -157,7 +158,7 @@ class NvidiaArk(commands.Cog):
 
     async def get_match_data(self, match):
         BASE_URL = "https://www.techpowerup.com"
-        contents = await DL.async_text(match["url"])
+        contents = await DL.async_text(match["url"],headers=self.h)
         lines = contents.split("\n")
         blacklist = {
             "Relative Performance",
