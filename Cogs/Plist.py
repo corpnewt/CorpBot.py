@@ -49,6 +49,12 @@ class Plist(commands.Cog):
         try:
             data = await DL.async_dl(self.nv_link)
             plist_data = plistlib.loads(data)
+            # Ensure the data is loaded, and contains the 
+            # updates key with at least one child, then save
+            # a local copy
+            assert len(plist_data["updates"])
+            with open("nvweb.plist","wb") as f:
+                plistlib.dump(plist_data, f)
         except:
             # Load a local file if we have one
             try:
