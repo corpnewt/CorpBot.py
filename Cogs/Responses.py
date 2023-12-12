@@ -41,6 +41,8 @@ class Responses(commands.Cog):
 		self.react_r       = re.compile(r"\[\[react_r:.*\]\]",   re.IGNORECASE)
 		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",    re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
+		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
+		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
 		self.match_time    = 0.025
 
 	async def _get_response(self, ctx, message, check_chan=True):
@@ -81,15 +83,24 @@ class Responses(commands.Cog):
 						check_channel = self.bot.get_channel(int(x))
 						if check_channel and not check_channel in output_channels:
 							output_channels.append(check_channel)
-					elif x.lower().startswith("o") and not ctx.channel in output_channels: # Got the original channel
-						output_channels.append(ctx.channel)
+					elif x.lower().startswith("o"):
+						if not ctx.channel in output_channels: # Got the original channel
+							output_channels.append(ctx.channel)
 					elif not ctx.author in output_channels: # dm/pm/etc
 						output_channels.append(ctx.author)
 			except:
 				pass
 			if not output_channels: output_channels = [ctx.channel] # Ensure the original if none resolved
 			response["outputs"] = output_channels
-			if self.regexDelete.search(m): response["delete"] = True
+			if self.regexDelete.search(m):
+				response["delete"] = True
+			else:
+				# Don't reply if we intend to delete
+				if self.reply.search(m):
+					response["reply_to"] = ctx.message
+				if self.preply.search(m):
+					response["reply_to"] = ctx.message
+					response["ping_reply"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
 			action = "ban" if self.regexBan.search(m) else "kick" if self.regexKick.search(m) else "mute" if self.regexMute.search(m) else None
 			if action:
@@ -240,7 +251,9 @@ class Responses(commands.Cog):
 				self.rem_r,
 				self.react_r,
 				self.in_chan,
-				self.out_chan
+				self.out_chan,
+				self.reply,
+				self.preply
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
@@ -274,9 +287,28 @@ class Responses(commands.Cog):
 			try: await message.delete()
 			except: pass # RIP - couldn't delete that one, I guess
 		if response.get("message","").strip(): # Don't send an empty message, or one with just whitespace
+			reply_to = response.get("reply_to")
+			ping_reply = response.get("ping_reply",False)
 			for output in response.get("outputs",[]):
 				# Try to send the response to all defined outputs
-				try: await output.send(response["message"],allowed_mentions=discord.AllowedMentions.all())
+				message = response["message"]
+				r = reply_to
+				if r and r.channel.id != output.id:
+					# We're trying to reply, but in a different channel.
+					# Append a link to the original message URL to our
+					# message instead.
+					r = None
+					message += " ({}{})".format(
+						"By {}: ".format(reply_to.author.mention) if ping_reply else "",
+						reply_to.jump_url
+					)
+				try:
+					await output.send(
+						message,
+						allowed_mentions=discord.AllowedMentions.all(),
+						reference=r,
+						mention_author=response.get("ping_reply",False)
+					)
 				except: continue
 		# Check for role changes
 		roles_added = response.get("user_roles_added",[])+response.get("roles_added",[])
@@ -328,6 +360,13 @@ class Responses(commands.Cog):
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
 		[[everyone]]  = @everyone ping
+
+		Reply options:
+
+		[[reply]]     = replies to the message that triggered the response
+		                - if set to output in a different channel, will append
+						  a link to the original message
+	    [[pingreply]] = same as [[reply]], but pings the author
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
@@ -422,6 +461,14 @@ class Responses(commands.Cog):
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
 		[[everyone]]  = @everyone ping
+
+		Reply options:
+
+		[[reply]]     = replies to the message that triggered the response
+		                - if set to output in a different channel, will append
+						  a link to the original message
+	    [[pingreply]] = same as [[reply]], but pings the author
+
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
@@ -660,6 +707,8 @@ class Responses(commands.Cog):
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
+		if response.get("message","").strip():
+			entries.append({"name":"Reply To Message:","value":"No" if not response.get("reply_to") else "Yes (Pings Author)" if response.get("ping_reply") else "Yes"})
 		if response.get("user_roles_added"):
 			entries.append({"name":"UserRoles Added:","value":"\n".join([x.mention for x in response["user_roles_added"]])})
 		if response.get("user_roles_removed"):
