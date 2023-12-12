@@ -53,6 +53,18 @@ class Encode(commands.Cog):
 			"lh",
 			"hl"
 		)
+		self.padded_prefixes = (
+			"bin",
+			"hexadecimal",
+			"hex",
+			"h",
+			"bh",
+			"hb",
+			"hexb",
+			"lh",
+			"hl",
+			"hexl"
+		)
 		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext/(s)tring","(h)ex/bhex/lhex")
 		global Utils
 		Utils = self.bot.get_cog("Utils")
@@ -108,9 +120,9 @@ class Encode(commands.Cog):
 		to_type = to_type.lower()
 		# Ensure types are valid
 		if (not from_type in self.types \
-		and not from_type.startswith("bin")) \
+		and not from_type.startswith(self.padded_prefixes)) \
 		or (not to_type in self.types \
-		and not to_type.startswith("bin")):
+		and not to_type.startswith(self.padded_prefixes)):
 			raise Exception("Invalid from or to type")
 		# Resolve the value to hex bytes
 		if from_type.startswith(("d","i")):
@@ -119,14 +131,14 @@ class Encode(commands.Cog):
 		elif from_type.startswith("bin"):
 			val_hex = "{:x}".format(int("".join([x for x in val if x in "01"]),2))
 			val_adj = binascii.unhexlify("0"*(len(val_hex)%2)+val_hex)
-		elif from_type.startswith("b") and not from_type in ("bhex","bh"):
+		elif from_type.startswith("b") and not from_type.startswith(self.padded_prefixes):
 			if len(val)%4: # Pad with =
 				val += "="*(4-len(val)%4)
 			val_adj = base64.b64decode(val.encode())
 		elif from_type.startswith(("a","t","s")):
 			val_adj = binascii.hexlify(val.encode())
 			val_adj = val.encode()
-		elif from_type in ("lhex","hexl","lh","hl"): # Little-endian
+		elif from_type.startswith(("lh","hl","hexl")): # Little-endian
 			val = self._check_hex(val)
 			val = "0"*(len(val)%2)+val
 			hex_rev = "".join(["".join(x) for x in [val[i:i + 2] for i in range(0,len(val),2)][::-1]])
@@ -141,13 +153,7 @@ class Encode(commands.Cog):
 		elif to_type.startswith("bin"):
 			out = "{:b}".format(int(binascii.hexlify(val_adj).decode(),16))
 			# Get our chunk/pad size - use 8 as a fallback
-			pad = 8
-			if to_type.startswith("binary"):
-				try: pad = abs(int(to_type[6:]))
-				except: pass
-			else:
-				try: pad = abs(int(to_type[3:]))
-				except: pass
+			pad = self._get_pad(to_type, default_pad=8)
 			# Can't have a 0 pad
 			if pad <= 0: pad = 8
 			# Pad if needed
@@ -155,24 +161,48 @@ class Encode(commands.Cog):
 				out = "0"*(pad-len(out)%pad)+out
 			# Split into chunks
 			out = "{}".format(" ".join((out[0+i:pad+i] for i in range(0,len(out),pad))))
-		elif to_type.startswith("b") and not to_type in ("bhex","bh"):
+		elif to_type.startswith("b") and not to_type.startswith(self.padded_prefixes):
 			out = base64.b64encode(val_adj).decode()
 		elif to_type.startswith(("a","t","s")):
 			out = val_adj.decode()
-		elif to_type in ("lhex","hexl","lh","hl"): # Little-endian
+		elif to_type.startswith(("lh","hl","hexl")): # Little-endian
+			pad = self._get_pad(to_type, default_pad=8)
+			# Ensure we have pads in 8-bit increments
+			pad = int((8-pad%8+pad if pad%8 else pad)/4)
 			out = binascii.hexlify(val_adj).decode().upper() # Get the hex values as a string
+			if len(out) < pad:
+				# Make sure we pad to the correct amount
+				out = "0"*(pad-len(out))+out
+			# Ensure it's an even number of elements as well
 			pad_val = "0"*(len(out)%2)+out
 			out = "".join(["".join(x) for x in [pad_val[i:i + 2] for i in range(0,len(pad_val),2)][::-1]]).upper()
+			# Also split into chunks of 8 for readability
+			out = "0x"+" ".join((out[0+i:8+i] for i in range(0,len(out),8)))
 		else:
+			pad = self._get_pad(to_type, default_pad=0)
+			# Ensure we have pads in 8-bit increments
+			pad = int((8-pad%8+pad if pad%8 else pad)/4)
 			out = binascii.hexlify(val_adj).decode().upper()
-			if from_type.startswith(("d","i","bin")): # No need to pad to an even length - but prepend 0x
+			if from_type.startswith(("d","i","bin")) and pad == 0: # No need to pad to an even length - but prepend 0x
 				out = "0x"+out
 			else:
-				if len(out)%2: # Not from a decimal, and an odd length - prepend 0
-					out = "0"+out
+				out = binascii.hexlify(val_adj).decode().upper() # Get the hex values as a string
+				if len(out) < pad:
+					# Make sure we pad to the correct amount
+					out = "0"*(pad-len(out))+out
+				# Ensure it's an even number of elements as well
+				pad_val = "0"*(len(out)%2)+out
 				# Also split into chunks of 8 for readability
-				out = " ".join((out[0+i:8+i] for i in range(0,len(out),8)))
+				out = "0x"+" ".join((out[0+i:8+i] for i in range(0,len(out),8)))
 		return out
+
+	def _get_pad(self, type_string, default_pad = 0):
+		pad = default_pad
+		m = re.search(r"\d",type_string)
+		if m:
+			try: pad = abs(int(type_string[m.start():]))
+			except: pass
+		return pad
 
 	# To base64 methods
 	def _ascii_to_base64(self, ascii_string):
@@ -528,7 +558,7 @@ class Encode(commands.Cog):
 			return await ctx.send(usage)
 
 		for v,n in ((from_type,"from"),(to_type,"to")):
-			if not v.lower() in self.types and not v.lower().startswith("bin"):
+			if not v.lower() in self.types and not v.lower().startswith(self.padded_prefixes):
 				return await ctx.send("Invalid *{}* type!\nAvailable types include:\n- {}".format(n,"\n- ".join(self.display_types)))
 
 		if from_type.lower() == to_type.lower():
