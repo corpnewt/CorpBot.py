@@ -307,12 +307,19 @@ class Responses(commands.Cog):
 			mute_time = None if not response.get("mute_time") else int(time.time())+response["mute_time"]
 			if mute: await mute._mute(ctx.author,ctx.guild,cooldown=mute_time)
 		# Check if we need to delete the message
+		did_delete = False
 		if response.get("delete"):
-			try: await message.delete()
-			except: pass # RIP - couldn't delete that one, I guess
+			try:
+				await message.delete()
+				did_delete = True
+			except:
+				pass # RIP - couldn't delete that one, I guess
 		if response.get("message","").strip(): # Don't send an empty message, or one with just whitespace
-			reply_to = response.get("reply_to")
-			ping_reply = response.get("ping_reply",False)
+			reply_to = ping_reply = None # Initialize as None
+			if not did_delete:
+				# We can't reply if we deleted the message
+				reply_to = response.get("reply_to")
+				ping_reply = response.get("ping_reply",False)
 			for output in response.get("outputs",[]):
 				# Try to send the response to all defined outputs
 				message = response["message"]
@@ -342,7 +349,7 @@ class Responses(commands.Cog):
 		if roles_removed:
 			self.settings.role.rem_roles(ctx.author, roles_removed)
 		reactions = set(response.get("user_roles_react",[])+response.get("roles_react",[])+response.get("react",[]))
-		if reactions and not response.get("delete"): # Only react if we're not deleting the message
+		if reactions and not did_delete: # Only react if we're not deleting the message
 			for reaction in reactions:
 				try: await message.add_reaction(reaction)
 				except: pass
