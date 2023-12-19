@@ -30,6 +30,7 @@ class Responses(commands.Cog):
 		self.regexKick     = re.compile(r"\[\[kick\]\]",         re.IGNORECASE)
 		self.regexBan      = re.compile(r"\[\[ban\]\]",          re.IGNORECASE)
 		self.regexSuppress = re.compile(r"\[\[suppress\]\]",     re.IGNORECASE)
+		self.react         = re.compile(r"\[\[react:.*\]\]",     re.IGNORECASE)
 		self.toggle_ur     = re.compile(r"\[\[t_ur:[\d,]+\]\]",  re.IGNORECASE)
 		self.add_ur        = re.compile(r"\[\[add_ur:[\d,]+\]\]",re.IGNORECASE)
 		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",   re.IGNORECASE)
@@ -172,7 +173,7 @@ class Responses(commands.Cog):
 							user_role_rem = [x for x in map(ctx.guild.get_role,ur_list) if x and x in ctx.author.roles and x.id!=role.id]
 							user_role_add = [] if role in ctx.author.roles else [role]
 			# Set up helper function for resolving emojis
-			def check_emojis(e_search,m,add_list,rem_list):
+			def check_emojis(e_search,m,role_related=True,add_list=None,rem_list=None):
 				emojis_resolved = []
 				try:
 					emoji_string = ":".join(e_search.search(m).group(0).replace("]]","").split(":")[1:])
@@ -189,6 +190,9 @@ class Responses(commands.Cog):
 							except: emoji = None
 						emojis_resolved.append(emoji)
 				except: pass
+				# Not considering role related info - just return all resolved emojis
+				if not role_related:
+					return emojis_resolved
 				# See what we need to add
 				reactions = []
 				if add_list and emojis_resolved and emojis_resolved[0]:
@@ -198,12 +202,25 @@ class Responses(commands.Cog):
 				if not add_list and not rem_list and len(emojis_resolved)>2 and emojis_resolved[2]:
 					reactions.append(emojis_resolved[2])
 				return reactions
+			# Set our reactions
+			react = check_emojis(
+				self.react,
+				m,
+				role_related=False
+			)
+			if react: response["react"] = list(set(react))
 			# Set our user role reactions
-			user_role_react = [] #check_emojis(self.react_ur,m,user_role_add,user_role_rem)
+			user_role_react = check_emojis(
+				self.react_ur,
+				m,
+				role_related=True,
+				add_list=user_role_add,
+				rem_list=user_role_rem
+			)
 			# Retain the added and removed user roles
 			if user_role_add: response["user_roles_added"] = user_role_add
 			if user_role_rem: response["user_roles_removed"] = user_role_rem
-			if user_role_react: response["user_roles_react"] = user_role_react
+			if user_role_react: response["user_roles_react"] = list(set(user_role_react))
 			# Let's go through the regular non-UserRole roles
 			role_add = []
 			role_rem = []
@@ -229,11 +246,17 @@ class Responses(commands.Cog):
 					elif local == self.rem_r and role in ctx.author.roles and not any((role in x for x in (role_rem,user_role_rem))): # Remove it
 						role_rem.append(role)
 			# Set our role reactions
-			role_react = check_emojis(self.react_r,m,role_add,role_rem)
+			role_react = check_emojis(
+				self.react_r,
+				m,
+				role_related=True,
+				add_list=role_add,
+				rem_list=role_rem
+			)
 			# Retain the added and removed roles
 			if role_add: response["roles_added"] = role_add
 			if role_rem: response["roles_removed"] = role_rem
-			if role_react: response["roles_react"] = role_react
+			if role_react: response["roles_react"] = list(set(role_react))
 			# Strip out leftovers from delete, ban, kick, mute, suppress, and the user role options
 			for sub in (
 				self.regexDelete,
@@ -245,6 +268,7 @@ class Responses(commands.Cog):
 				self.add_ur,
 				self.set_ur,
 				self.rem_ur,
+				self.react,
 				self.react_ur,
 				self.toggle_r,
 				self.add_r,
@@ -317,7 +341,7 @@ class Responses(commands.Cog):
 			self.settings.role.add_roles(ctx.author, roles_added)
 		if roles_removed:
 			self.settings.role.rem_roles(ctx.author, roles_removed)
-		reactions = response.get("user_roles_react",[])+response.get("roles_react",[])
+		reactions = set(response.get("user_roles_react",[])+response.get("roles_react",[])+response.get("react",[]))
 		if reactions and not response.get("delete"): # Only react if we're not deleting the message
 			for reaction in reactions:
 				try: await message.add_reaction(reaction)
@@ -360,6 +384,10 @@ class Responses(commands.Cog):
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
 		[[everyone]]  = @everyone ping
+
+		Reaction options:
+
+		[[react:react1,react2]] = reactions to apply to the author's message
 
 		Reply options:
 
@@ -461,6 +489,10 @@ class Responses(commands.Cog):
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
 		[[everyone]]  = @everyone ping
+
+		Reaction options:
+
+		[[react:react1,react2]] = reactions to apply to the author's message
 
 		Reply options:
 
@@ -719,8 +751,10 @@ class Responses(commands.Cog):
 			entries.append({"name":"Roles Removed:","value":"\n".join([x.mention for x in response["roles_removed"]])})
 		if response.get("user_roles_react"):
 			entries.append({"name":"UserRole Reactions","value":"".join([str(x) for x in response["user_roles_react"]])})
-		if response.get("user_roles_react"):
+		if response.get("roles_react"):
 			entries.append({"name":"Role Reactions","value":"".join([str(x) for x in response["roles_react"]])})
+		if response.get("react"):
+			entries.append({"name":"Reactions","value":"".join([str(x) for x in response["react"]])})
 		if response.get("outputs",[]):
 			entries.append({"name":"Output Targets:","value":"\n".join([x.mention for x in response["outputs"]])})
 		if catastrophies:
