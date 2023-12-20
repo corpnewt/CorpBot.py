@@ -140,6 +140,8 @@ class Music(commands.Cog):
 		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
 		# Set up regex for the new spotify.link/id URLs
 		self.spotify_link_regex = re.compile(r"(?i)https?:\/\/spotify\.link\/?(?P<id>[a-zA-Z0-9]+)")
+		# Retain a list of *next command names
+		self.next_commands = ["playnext","radionext","shufflenext","loadplnext","shuffleplnext"]
 		# Setup pomice defaults
 		self.NodePool = pomice.NodePool()
 		# Setup player specifics to remember
@@ -793,17 +795,21 @@ class Music(commands.Cog):
 			bar = time_prefix + bar
 		return bar
 
-	async def add_to_queue(self, player, song_list):
+	async def add_to_queue(self, player, song_list, position=-1):
 		# Add songs as long as they're applicable - returns number added
 		added = 0
-		if isinstance(song_list,list):
-			for song in song_list:
-				if isinstance(song,pomice.objects.Track):
+		if not isinstance(song_list,(list,tuple)):
+			# Ensure it's in a list or tuple
+			song_list = [song_list]
+		for song in (song_list[::-1] if position >= 0 else song_list):
+			if isinstance(song,pomice.objects.Track):
+				if position >= 0:
+					# If we're adding it to a specific position, use _insert()
+					player.queue._insert(position,song)
+				else:
+					# We're just adding it to the end - use put()
 					player.queue.put(song)
-					added += 1
-		elif isinstance(song_list,pomice.objects.Track):
-			player.queue.put(song_list)
-			added += 1
+				added += 1
 		return added
 
 	def get_track_title(self,track):
@@ -812,7 +818,7 @@ class Music(commands.Cog):
 			return "{} - {}".format(track.author,track.title)
 		return track.title
 
-	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None,recommend=False):
+	async def state_added(self,ctx,songs,message=None,shuffled=False,queue=None,recommend=False,position=-1):
 		# Helper to state songs added, whether or not they were shuffled - and to
 		# edit a passed message (if any).
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -823,10 +829,12 @@ class Music(commands.Cog):
 		)
 		if isinstance(songs["tracks"],list): # Added a playlist
 			# Get the track positions in the queue
-			if not shuffled and queue:
+			if queue:
+				start_pos = len(queue)-len(songs["tracks"])+1 if position < 0 else position+1
+				end_pos   = start_pos + len(songs["tracks"])-1
 				desc = "At positions {} through {} in the playlist\n{}".format(
-					len(queue)-len(songs["tracks"])+1,
-					len(queue),
+					start_pos,
+					end_pos,
 					desc
 				)
 			embed = Message.Embed(
@@ -845,7 +853,7 @@ class Music(commands.Cog):
 			# Get the track position in the queue
 			if not shuffled and queue:
 				desc = "{} in the playlist\n{}".format(
-					"Next" if len(queue)==1 else "At position {}".format(len(queue)),
+					"Next" if position==0 or len(queue)==1 else "At position {}".format(len(queue) if position < 0 else position+1),
 					desc
 				)
 			track = songs["tracks"]
@@ -898,13 +906,13 @@ class Music(commands.Cog):
 			queue.insert(0,current)
 		return queue
 
-	async def _load_playlist_data(self,ctx,player,playlist_data=[]):
+	async def _load_playlist_data(self,ctx,player,playlist_data=[],position=-1):
 		# Helper method to apply loaded json data to the passed player
 		valid_tracks = self.get_tracks_from_data({"tracks":playlist_data},check_start=False,check_seek=True,ctx=ctx)
-		added_tracks = await self.add_to_queue(player,valid_tracks)
+		added_tracks = await self.add_to_queue(player,valid_tracks,position=position)
 		return (valid_tracks,added_tracks)
 
-	async def _load_playlist_from_url(self, message, ctx, shuffle = False):
+	async def _load_playlist_from_url(self, message, ctx, shuffle = False, position = -1):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
 		url = await Utils.get_message_content(message)
@@ -923,7 +931,7 @@ class Music(commands.Cog):
 		if not isinstance(playlist,list): return await Message.Embed(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,m)
 		if shuffle: random.shuffle(playlist)
 		# Let's walk the items and add them
-		valid_tracks,added_tracks = await self._load_playlist_data(ctx,player,playlist_data=playlist)
+		valid_tracks,added_tracks = await self._load_playlist_data(ctx,player,playlist_data=playlist,position=position)
 		await Message.Embed(title="♫ Added {:,}/{:,} {}song{} from playlist!".format(added_tracks,len(valid_tracks),"shuffled " if shuffle else "", "" if len(playlist) == 1 else "s"),color=ctx.author,delete_after=delay).edit(ctx,m)
 		self.bot.dispatch("check_play",player)
 
@@ -996,6 +1004,17 @@ class Music(commands.Cog):
 		message = await self._resolve_message(ctx.message)
 		await self._load_playlist_from_url(message, ctx)
 
+	@commands.command(aliases=["loadpln"])
+	async def loadplnext(self, ctx, *, url = None):
+		"""Loads the passed playlist json data.  Accepts a url - or picks the first attachment.
+		Adds songs to the beginning of the queue if enabled by the allowplaynext command.
+		
+		Note that the structure of this file is very specific and alterations may not work.
+		
+		Only files dumped via the savepl command are supported."""
+		message = await self._resolve_message(ctx.message)
+		await self._load_playlist_from_url(message, ctx, position=0)
+
 	@commands.command()
 	async def shufflepl(self, ctx, *, url = None):
 		"""Loads and shuffles the passed playlist json data.  Accepts a url - or picks the first attachment.
@@ -1005,6 +1024,17 @@ class Music(commands.Cog):
 		Only files dumped via the savepl command are supported."""
 		message = await self._resolve_message(ctx.message)
 		await self._load_playlist_from_url(message, ctx, shuffle=True)
+
+	@commands.command(aliases=["shufflepln"])
+	async def shuffleplnext(self, ctx, *, url = None):
+		"""Loads and shuffles the passed playlist json data.  Accepts a url - or picks the first attachment.
+		Adds songs to the beginning of the queue if enabled by the allowplaynext command.
+		
+		Note that the structure of this file is very specific and alterations may not work.
+		
+		Only files dumped via the savepl command are supported."""
+		message = await self._resolve_message(ctx.message)
+		await self._load_playlist_from_url(message, ctx, shuffle=True, position=0)
 
 	@commands.command()
 	async def savepl(self, ctx, *, options = ""):
@@ -1099,15 +1129,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ I've left the voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(aliases=["p"])
-	async def play(self, ctx, *, url = None):
-		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song.
-		You can control what search type is used by passing one of the following as an arg:
-		
-		st=ytsearch (searches YouTube)
-		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
-
+	async def _play(self, ctx, url, position=-1):
+		# Helper to search for and queue up songs as the passed position
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
@@ -1134,9 +1157,33 @@ class Music(commands.Cog):
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
-		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=False)
+		await self.add_to_queue(player,songs["tracks"],position=position)
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=False,position=position)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
+
+	@commands.command(aliases=["p"])
+	async def play(self, ctx, *, url = None):
+		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song.
+		Adds songs to the end of the queue.
+		You can control what search type is used by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
+
+		await self._play(ctx, url)
+
+	@commands.command(aliases=["pn","pnext","playn"])
+	async def playnext(self, ctx, *, url = None):
+		"""Plays from a url (almost anything Lavalink supports) or resumes a currently paused song.
+		Adds songs to the beginning of the queue if enabled by the allowplaynext command.
+		You can control what search type is used by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
+
+		await self._play(ctx, url, position=0)
 
 	@commands.command(aliases=["suggestcount","recommendcount","rcount"])
 	async def radiocount(self, ctx, *, count = None):
@@ -1156,10 +1203,7 @@ class Music(commands.Cog):
 		self.settings.setServerStat(ctx.guild,"RecommendCountDefault",count)
 		return await Message.Embed(title="♫ Recommended playlists will include {} song{}.".format(count,"" if count==1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(aliases=["suggest","r","recommend"])
-	async def radio(self, ctx, *, url = None):
-		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL."""
-
+	async def _radio(self, ctx, url, position=-1):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
@@ -1200,9 +1244,22 @@ class Music(commands.Cog):
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
-		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=True)
+		await self.add_to_queue(player,songs["tracks"],position=position)
+		await self.state_added(ctx,songs,message,shuffled=False,queue=player.queue,recommend=True,position=position)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
+
+	@commands.command(aliases=["suggest","r","recommend"])
+	async def radio(self, ctx, *, url = None):
+		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL."""
+
+		await self._radio(ctx, url)
+
+	@commands.command(aliases=["suggestnext","rn","recommendnext"])
+	async def radionext(self, ctx, *, url = None):
+		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL.
+		Adds songs to the beginning of the queue if enabled by the allowplaynext command."""
+
+		await self._radio(ctx, url, position=0)
 
 	@commands.command(aliases=["unp"])
 	async def unplay(self, ctx, *, song_number = None):
@@ -1314,15 +1371,7 @@ class Music(commands.Cog):
 			).send(ctx)
 		await Message.Embed(title="♫ You can only remove songs you requested!", description="Only an admin or bot-admin can remove all queued songs or those requested by other users!",color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command()
-	async def shuffle(self, ctx, *, url = None):
-		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue.
-		You can control what search type is used by passing one of the following as an arg:
-		
-		st=ytsearch (searches YouTube)
-		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
-
+	async def _shuffle(self, ctx, url, position=-1):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected:
@@ -1357,9 +1406,31 @@ class Music(commands.Cog):
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
-		await self.add_to_queue(player,songs["tracks"])
-		await self.state_added(ctx,songs,message,shuffled=True,queue=player.queue,recommend=False)
+		await self.add_to_queue(player,songs["tracks"],position=position)
+		await self.state_added(ctx,songs,message,shuffled=True,queue=player.queue,recommend=False,position=position)
 		self.bot.dispatch("check_play",player) # Dispatch the event to check if we should start playing
+
+	@commands.command()
+	async def shuffle(self, ctx, *, url = None):
+		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the end of the queue.
+		You can control what search type is used by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
+
+		await self._shuffle(ctx, url)
+
+	@commands.command(aliases=["shufflen"])
+	async def shufflenext(self, ctx, *, url = None):
+		"""Shuffles the current queue. If you pass a playlist url or search term, it first shuffles that, then adds it to the beginning of the queue if enabled by the allowplaynext command.
+		You can control what search type is used by passing one of the following as an arg:
+		
+		st=ytsearch (searches YouTube)
+		st=ytmsearch (searches YouTube Music)
+		st=scsearch (searches SoundCloud)"""
+
+		await self._shuffle(ctx, url, position=0)
 
 	@commands.command()
 	async def pause(self, ctx):
@@ -1985,6 +2056,15 @@ class Music(commands.Cog):
 		await ctx.send(Utils.yes_no_setting(ctx,"Preserving EQ settings between sessions","PreserveLastEQ",yes_no))
 
 	@commands.command()
+	async def allowplaynext(self, ctx, yes_no = None):
+		"""Gets or sets whether playnext, shufflenext, radionext, loadplnext, and shuffleplnext can queue songs at the beginning of the current playlist."""
+
+		if not Utils.is_bot_admin(ctx):
+			yes_no = None
+		comm_format = ", ".join(["`{}{}`".format(ctx.prefix,x) for x in self.next_commands])
+		await ctx.send(Utils.yes_no_setting(ctx,"Queuing songs at the beginning of the playlist with {} commands".format(comm_format),"AllowPlayNext",yes_no))
+
+	@commands.command()
 	async def disableplay(self, ctx, *, yes_no = None):
 		"""Enables/Disables the music commands.  Helpful in case Youtube is rate limiting to avoid extra api calls and allow things to calm down.  Owners can still access music commands (owner only)."""
 		
@@ -1993,7 +2073,7 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount","searchtype"): return
+		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount","searchtype","allowplaynext"): return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.get_player(ctx.guild)
@@ -2008,8 +2088,12 @@ class Music(commands.Cog):
 			raise commands.CommandError("Music Cog: Missing DJ roles.")
 		# If we're just using the join command - we don't need extra checks - they're done in the command itself
 		if ctx.command.name in ("join",): return
+		# Let's make sure we're running an allowed command
+		if ctx.command.name in self.next_commands and not Utils.is_bot_admin(ctx) and not self.settings.getServerStat(ctx.guild,"AllowPlayNext"):
+			await ctx.send("`{0}{1}` is not currently enabled.  An admin or bot-admin can enable it with `{0}allowplaynext True`".format(ctx.prefix,ctx.command.name))
+			raise commands.CommandError("Music Cog: AllowPlayNext not enabled.")
 		# We've got the role - let's join the author's channel if we're playing/shuffling and not connected
-		if ctx.command.name in ("play","radio","shuffle","loadpl","shufflepl") and ctx.author.voice:
+		if ctx.command.name in ["play","radio","shuffle","loadpl","shufflepl"]+self.next_commands and ctx.author.voice:
 			if not player or not player.is_connected:
 				return await ctx.author.voice.channel.connect(cls=CorpPlayer)
 		# Let's ensure the bot is connected to voice
