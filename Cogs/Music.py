@@ -720,7 +720,6 @@ class Music(commands.Cog):
 							# Bandcamp gives us some JSON data that has plenty of useful info
 							if '<script type="application/ld+json">' in line:
 								json_data = json.loads(html_lines[i+1].strip().replace("\r","").replace("\n",""))
-								json.dump(json_data,open("bc.json",'w'),indent=2)
 								artist = json_data["byArtist"]["name"]
 								image  = json_data["image"]
 								if "track" in json_data:
