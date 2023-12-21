@@ -140,6 +140,8 @@ class Music(commands.Cog):
 		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
 		# Set up regex for the new spotify.link/id URLs
 		self.spotify_link_regex = re.compile(r"(?i)https?:\/\/spotify\.link\/?(?P<id>[a-zA-Z0-9]+)")
+		# Set up bandcamp regex
+		self.bandcamp_regex = re.compile(r"(?i)https:\/\/[^\s]+\.bandcamp\.com\/(album|track)\/[^\s]+")
 		# Retain a list of *next command names
 		self.next_commands = ["playnext","radionext","shufflenext","loadplnext","shuffleplnext"]
 		# Setup pomice defaults
@@ -273,6 +275,23 @@ class Music(commands.Cog):
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+		# Lazy load if needed
+		if not track.track_id and (track.uri or track.info.get("lazy_load_url")):
+			info = track.info
+			node = self.get_node()
+			try:
+				track = await node.get_tracks(query=track.info.get("lazy_load_url",track.uri),ctx=ctx,search_type=None)
+			except Exception as e:
+				self.bot.dispatch("pomice_track_exception",player,track,e)
+			if isinstance(track,list):
+				track = track[0]
+			# Wrap it into a new CorpTrack
+			track = CorpTrack(track)
+			# Update local info - both in the info dict, and attributes
+			for key in info:
+				track.info[key] = info[key]
+				try: setattr(track,key,info[key])
+				except: pass
 		# Make sure volume is setup properly
 		try: volume = player.get_vol(ctx) or self.settings.getServerStat(ctx.guild,"MusicVolume",100)
 		except: volume = 100 # Fall back on 100 if we don't have anything else
@@ -605,6 +624,27 @@ class Music(commands.Cog):
 			tracks.tracks = tracks.tracks[:min(max(2,recommend_count),100)]
 		return tracks
 
+	def get_seek(self, url):
+		try:
+			adj_dict = {"h":3600,"m":60,"s":1}
+			seek_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("t=")),"0").lower()
+			values = [x for x in re.split("(\\d+)",seek_str) if x]
+			# We should have a list of numbers and non-numbers.  Let's total the values
+			total_time = 0
+			last_type = "s" # Assume seconds in case no value is given
+			for x in values[::-1]:
+				if not x.isdigit():
+					# Save the type
+					last_type = x
+					continue
+				# We have a digit, let's calculate and add our time
+				# Only factor hours, minutes, seconds - anything else is ignored
+				total_time += int(x)*adj_dict.get(last_type,0) # Default to 0 if not a valid type
+			seek_pos = total_time*1000
+		except:
+			seek_pos = 0
+		return seek_pos
+
 	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25, search_type = None):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
@@ -629,6 +669,91 @@ class Music(commands.Cog):
 							async with session.get(url, allow_redirects=False) as response:
 								url = str(response).split("Location': \'")[1].split("\'")[0]
 				except: pass
+				try:
+					# Check for a bandcamp URL and try to rip info
+					if self.bandcamp_regex.match(url):
+
+						def process_duration(duration):
+							# Helper to convert ISO8601 date string to ms
+							total = 0
+							check = {"h":3600,"m":60,"s":1}
+							current = ""
+							for char in duration.lower():
+								if char.isdigit():
+									current += char
+								else:
+									# Check for valid chars
+									if char in check: # Got it
+										if current:
+											try: current = int(current)
+											except: current = 0
+										if current != 0:
+											total += check[char]*current
+									current = ""
+							total *= 1000
+							return total
+
+						def get_track_dict(ctx,data,artist,image):
+							dur = process_duration(data.get("item",{}).get("duration",data.get("duration","0")))
+							return {
+								"author":artist,
+								"image":image,
+								"thumb":image,
+								"thumbnail":image,
+								"title":data.get("item",{}).get("name",data.get("name","Unknown Title")),
+								"length":dur,
+								"timestamp":dur,
+								"sourceName":"http",
+								"track_type":"http",
+								"uri":data.get("item",{}).get("@id",data.get("@id")),
+								"ctx":ctx
+							}
+
+						seek_pos = self.get_seek(url)
+						bandcamp_html = await DL.async_text(url)
+						# Walk the html looking for a particular string
+						track_urls = []
+						track_dicts = []
+						artist = album = image = None
+						html_lines = bandcamp_html.split("\n")
+						for i,line in enumerate(html_lines):
+							# Bandcamp gives us some JSON data that has plenty of useful info
+							if '<script type="application/ld+json">' in line:
+								json_data = json.loads(html_lines[i+1].strip().replace("\r","").replace("\n",""))
+								json.dump(json_data,open("bc.json",'w'),indent=2)
+								artist = json_data["byArtist"]["name"]
+								image  = json_data["image"]
+								if "track" in json_data:
+									# It's an album
+									for x in json_data["track"]["itemListElement"]:
+										track_dicts.append(get_track_dict(ctx,x,artist,image))
+									album = json_data["name"]
+								else:
+									# It's an individual song
+									track_dicts.append(get_track_dict(ctx,json_data,artist,image))
+									# album = json_data["inAlbum"]["name"]
+								continue
+							# Let's search for our mp3 streams
+							if "&quot;https://t4.bcbits.com/stream/" in line:
+								parts = line.split("&quot;https://t4.bcbits.com/stream/")[1:]
+								for part in parts:
+									# Get the important URL info and strip unneeded stuff
+									t_url = "https://t4.bcbits.com/stream/{}".format(part.split("&quot;}")[0])
+									track_urls.append(t_url)
+								continue
+							if track_urls and track_dicts:
+								# Leave if we have both fields already
+								break
+						assert len(track_urls) == len(track_dicts) # Make sure we got the right number of tracks
+						tracks = []
+						for i,td in enumerate(track_dicts):
+							td["lazy_load_url"] = track_urls[i]
+							tracks.append(CorpTrack(td))
+						# Rewrap the tracks as CorpTracks to allow custom attributes
+						if seek_pos > 0: setattr(tracks[0],"seek",seek_pos)
+						if shuffle: random.shuffle(tracks)
+						return {"tracks":tracks, "playlist":album, "search":url.split("?")[0]} if album else {"tracks":tracks[0]}
+				except: pass
 				if recommend:
 					tracks = await self.get_recommendations(ctx,url,recommend_count,search_type=search_type)
 				else:
@@ -651,24 +776,7 @@ class Music(commands.Cog):
 						elif matches: # Let's just start at the first match
 							tracks.tracks = tracks.tracks[matches[0]:]
 				# Let's also get the seek position if needed
-				try:
-					adj_dict = {"h":3600,"m":60,"s":1}
-					seek_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("t=")),"0").lower()
-					values = [x for x in re.split("(\\d+)",seek_str) if x]
-					# We should have a list of numbers and non-numbers.  Let's total the values
-					total_time = 0
-					last_type = "s" # Assume seconds in case no value is given
-					for x in values[::-1]:
-						if not x.isdigit():
-							# Save the type
-							last_type = x
-							continue
-						# We have a digit, let's calculate and add our time
-						# Only factor hours, minutes, seconds - anything else is ignored
-						total_time += int(x)*adj_dict.get(last_type,0) # Default to 0 if not a valid type
-					seek_pos = total_time*1000
-				except Exception as e:
-					seek_pos = 0
+				seek_pos = self.get_seek(url)
 			else: # Got a search term - let's search
 				tracks = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
 				if isinstance(tracks,pomice.objects.Playlist): tracks = tracks.tracks
