@@ -1,5 +1,5 @@
 import discord, time, os
-from PIL import Image
+from PIL import Image, ImageFilter, ImageEnhance
 from discord.ext import commands
 from Cogs import GetImage, DisplayName, Message
 from io import BytesIO
@@ -65,6 +65,21 @@ class Jpeg(commands.Cog):
 			bg = Image.new(i.mode[:-1],i.size,"black")
 			bg.paste(i,i.split()[-1])
 			i = bg
+			# Enhance the edges
+			i = i.filter(ImageFilter.EDGE_ENHANCE)
+			# Blur the image to offset the edges - use a box blur with a radius
+			# of the image's largest edge/200 and rounded to the nearest int (min of 1)
+			blur_amount = max(i.size)/200
+			blur_amount = int(blur_amount) + (1 if blur_amount-int(blur_amount)>=0.5 else 0)
+			blur_amount = max(blur_amount,1) # Minimum of 1 px blur amount
+			i = i.filter(ImageFilter.BoxBlur(blur_amount))
+			# Enhance the saturation to ensure colors don't get drowned out by the
+			# jpeg compression
+			converter = ImageEnhance.Color(i)
+			i = converter.enhance(1.2)
+			# Offset the blur by sharpening the image again
+			converter = ImageEnhance.Sharpness(i)
+			i = converter.enhance(2.5)
 			# Resize the image to 80% - and save it with extreme compression
 			w,h = i.size
 			i = i.resize((int(w*0.8),int(h*0.8)),Image.NEAREST)
