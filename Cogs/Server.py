@@ -227,7 +227,7 @@ class Server(commands.Cog):
 		If you need to use commas, =, -, or a colon in your prompt or options, you can use a backslash to escape them.
 
 		Note:  A colon followed by / (for example, in a URL) will also not be interpreted as a prompt.
-		       You can escape the first forward slash after your colon to have it interpreted (eg. some_prompt:\//option1,option2...)
+		       You can escape the first forward slash after your colon to have it interpreted (eg. some_prompt:\\//option1,option2...)
 			   For the sake of preserving emojis - the format <a:name:01234> is also reserved.
 		
 		Examples:
@@ -240,9 +240,9 @@ class Server(commands.Cog):
 		- Multi-option poll with a prompt:
 		    $poll Favorite day of the weekend?: Saturday, Sunday
 		- Thumbs up/down poll using escaped comma:
-		    $poll April\, May\, and June are the best months
+		    $poll April\\, May\\, and June are the best months
 		- Multi-option poll with prompt with escaped colon:
-		    $poll Escaped\: Rest of Prompt: option 1, option 2, option 3
+		    $poll Escaped\\: Rest of Prompt: option 1, option 2, option 3
 		- Multi-option poll with a 2 week, 15 hour, 30 second time limit:
 		    $poll t=2w15h30s Blue, Purple, Yellow
 		- Multi-option, 2 day poll that allows users to react multiple times:

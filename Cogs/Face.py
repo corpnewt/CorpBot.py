@@ -59,7 +59,7 @@ class Face(commands.Cog):
 		# Log the user
 		self.settings.setServerStat(ctx.message.guild, "LastShrug", ctx.message.author.id)
 
-		msg = "¯\_(ツ)_/¯"
+		msg = "¯\\_(ツ)_/¯"
 		if message:
 			msg += "\n{}".format(message)
 		# Check for suppress

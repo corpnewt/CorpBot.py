@@ -75,7 +75,7 @@ class SenCheck:
     def analyze(self, sentence):
         # Break sentence into words
         # words = sentence.split()
-        words = re.split('\W+', sentence)
+        words = re.split(r'\W+', sentence)
         last_invert = False
         total = 0
         count = {}

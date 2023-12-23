@@ -26,13 +26,13 @@ def normalStyle(types, names, escape = False):
 		if tempLen > padTo:
 			padTo = tempLen
 	if escape:
-		partdown = '\`\`\`\n'
+		partdown = '\\`\\`\\`\n'
 	else:
 		partdown = '```\n'
 	for i in range(0, len(types)):
 		partdown += types[i].rjust(padTo, ' ') + ' : ' + names[i] + '\n'
 	if escape:
-		partdown += '\`\`\`'
+		partdown += '\\`\\`\\`'
 	else:
 		partdown += '```'
 	return partdown
@@ -46,14 +46,14 @@ def mdStyle(types, names, escape = False):
 		if tempLen > padTo:
 			padTo = tempLen
 	if escape:
-		partdown = '\`\`\`md\n'
+		partdown = '\\`\\`\\`md\n'
 	else:
 		partdown = '```md\n'
 	for i in range(0, len(types)):
 		t = "<" + types[i].replace(' ', '-') + ":"
 		partdown += t.ljust(padTo, ' ') + " " + names[i] + '>\n'
 	if escape:
-		partdown += '\`\`\`'
+		partdown += '\\`\\`\\`'
 	else:
 		partdown += '```'
 	return partdown
@@ -67,7 +67,7 @@ def mdBlockStyle(types, names, escape = False):
 		if tempLen > padTo:
 			padTo = tempLen
 	if escape:
-		partdown = '\`\`\`md\n'
+		partdown = '\\`\\`\\`md\n'
 	else:
 		partdown = '```md\n'
 	for i in range(0, len(types)):
@@ -75,7 +75,7 @@ def mdBlockStyle(types, names, escape = False):
 		t = "| " + ty.rjust(padTo, ' ') + "]["
 		partdown += t.rjust(padTo, ' ') + names[i] + ']\n'
 	if escape:
-		partdown += '\`\`\`'
+		partdown += '\\`\\`\\`'
 	else:
 		partdown += '```'
 	return partdown
@@ -84,7 +84,7 @@ def boldStyle(types, names, escape = False):
 	partdown = ''
 	for i in range(0, len(types)):
 		if escape:
-			partdown += "\*\*" + types[i] + ":\*\* " + names[i] + '\n'
+			partdown += "\\*\\*" + types[i] + ":\\*\\* " + names[i] + '\n'
 		else:
 			partdown += "**" + types[i] + ":** " + names[i] + '\n'
 	partdown = partdown[:-1]
@@ -94,7 +94,7 @@ def boldItalicStyle(types, names, escape = False):
 	partdown = ''
 	for i in range(0, len(types)):
 		if escape:
-			partdown += "\*\*\*" + types[i] + ":\*\*\* \*" + names[i] + '\*\n'
+			partdown += "\\*\\*\\*" + types[i] + ":\\*\\*\\* \\*" + names[i] + '\\*\n'
 		else:
 			partdown += "***" + types[i] + ":*** *" + names[i] + '*\n'
 	partdown = partdown[:-1]
