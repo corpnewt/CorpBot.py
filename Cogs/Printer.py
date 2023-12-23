@@ -97,14 +97,14 @@ class Printer(commands.Cog):
 		name += "'{}{} Avatar".format("" if name[-1].lower() == "s" else "s"," Guild" if server else "")
 		await Message.Embed(title=name, image=url, color=ctx.author).send(ctx)
 
-	@commands.command()
-	async def printavi(self, ctx, *, member = None):
-		"""Returns a the passed member's global avatar - use the printguildavi command for their guild avatar if available."""
+	@commands.command(aliases=["printavi","avi","pfp"])
+	async def avatar(self, ctx, *, member = None):
+		"""Returns a the passed member's global avatar - use the guildavatar command for their guild avatar if available."""
 		await self._print_avi(ctx,member,server=False)
 
-	@commands.command(aliases=["printgavi","printserveravi","printsavi"])
-	async def printguildavi(self, ctx, *, member=None):
-		"""Returns a the passed member's guild avatar if available - use the printavi command for their global avatar."""
+	@commands.command(aliases=["printgavi","gavi","gpfp"])
+	async def guildavatar(self, ctx, *, member=None):
+		"""Returns a the passed member's guild avatar if available - use the avatar command for their global avatar."""
 		await self._print_avi(ctx,member,server=True)
 
 	@commands.command()
