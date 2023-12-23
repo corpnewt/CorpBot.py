@@ -1,4 +1,5 @@
 from xml.sax.saxutils import unescape
+from collections import OrderedDict
 from Cogs import DL
 from Cogs import Nullify
 
@@ -193,6 +194,18 @@ async def getMarkdown( url, style = None, escape = False):
 	if not len(types) == len(names):
 		# Only way this would happen that I've seen so far, is with custom entries
 		return None
+	
+	# Let's consolidate duplicate entries and add a x2, x3, etc multiplier
+	ordered = OrderedDict()
+	for i,t in enumerate(types):
+		t = t.strip()
+		n = names[i].strip()
+		# Ensure it's set to the count of the type/name occurrence
+		ordered[(t,n)] = ordered.get((t,n),0)+1
+	# Resolve the values to the types and names lists
+	types = [x[0] for x in ordered]
+	names = ["{}{}".format(x[1]," x{:,}".format(ordered[x]) if ordered[x] > 1 else "") for x in ordered]
+
 	partout = ''
 	if style.lower() == 'md':
 		partout = mdStyle(types, names, escape)
