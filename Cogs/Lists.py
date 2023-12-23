@@ -588,7 +588,7 @@ class Lists(commands.Cog):
 	@commands.command()
 	async def partstemp(self, ctx):
 		"""Gives a copy & paste style template for setting a parts list."""
-		msg = '\{}setparts \`\`\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \`\`\`'.format(ctx.prefix)	
+		msg = '\\{}setparts \\`\\`\\`      CPU : \n   Cooler : \n     MOBO : \n      GPU : \n      RAM : \n      SSD : \n      HDD : \n      PSU : \n     Case : \nWiFi + BT : \n Lighting : \n Keyboard : \n    Mouse : \n  Monitor : \n      DAC : \n Speakers : \\`\\`\\`'.format(ctx.prefix)	
 		await ctx.send(msg)
 		
 	@commands.command()

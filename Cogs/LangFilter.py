@@ -67,7 +67,7 @@ class ProfanitiesFilter(object):
 
 '''if __name__ == '__main__':
 
-	f = ProfanitiesFilter(['bad', 'un\w+'], replacements="-")    
+	f = ProfanitiesFilter(['bad', 'un\\w+'], replacements="-")    
 	example = "I am doing bad ungood badlike things."
 
 	print f.clean(example)
@@ -139,7 +139,7 @@ class LangFilter(commands.Cog):
 		optionList = words.split(',')
 		addedOptions = []
 		for option in optionList:
-			option = option.replace("(", "\(").replace(")", "\)")
+			option = option.replace("(", "\\(").replace(")", "\\)")
 			if not option.lower() in serverOptions:
 				# Only add if not already added
 				addedOptions.append(option.lower())
@@ -175,8 +175,8 @@ class LangFilter(commands.Cog):
 			# Reset them to \(
 			# This should allow either \( or ( to work correctly -
 			# While still allowing \\( or whatever as well
-			option = option.replace("\(", "(").replace("\)", ")")
-			option = option.replace("(", "\(").replace(")", "\)")
+			option = option.replace("\\(", "(").replace("\\)", ")")
+			option = option.replace("(", "\\(").replace(")", "\\)")
 			if option.lower() in serverOptions:
 				# Only add if not already added
 				addedOptions.append(option.lower())

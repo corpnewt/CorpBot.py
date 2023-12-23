@@ -160,7 +160,7 @@ class XpStack(commands.Cog):
 			f_name = (f_name[:253]+"...") if len(f_name) > 256 else f_name
 			
 			# Get the xp amount and time
-			f_value = "\* {} xp\n\* {}".format(i["Amount"], i["Time"])
+			f_value = "\\* {} xp\n\\* {}".format(i["Amount"], i["Time"])
 			# Make sure it's 1024 chars max
 			f_value = (f_value[:1021]+"...") if len(f_value) > 1024 else f_value
 			
