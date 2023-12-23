@@ -88,7 +88,7 @@ class Bot(commands.Cog):
 				return True
 		return False
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def botinfo(self, ctx):
 		"""Lists some general stats about the bot."""
 		bot_member = self.bot.user if not ctx.guild else ctx.guild.get_member(self.bot.user.id)
@@ -214,7 +214,7 @@ class Bot(commands.Cog):
 			thumbnail=avatar
 		).edit(ctx, message)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def ping(self, ctx):
 		"""Feeling lonely?"""
 		before_typing = time.monotonic()
@@ -224,7 +224,7 @@ class Bot(commands.Cog):
 		msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
 		await ctx.send(msg,allowed_mentions=discord.AllowedMentions.all())
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def nickname(self, ctx, *, name : str = None):
 		"""Set the bot's nickname (admin-only)."""
 		
@@ -234,7 +234,7 @@ class Bot(commands.Cog):
 		botMember = ctx.guild.get_member(self.bot.user.id)
 		await botMember.edit(nick=name)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
 
@@ -297,7 +297,7 @@ class Bot(commands.Cog):
 			is_global=True
 		))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def getimage(self, ctx, *, image):
 		"""Tests downloading - owner only"""
 		# Only allow owner to modify the limits
@@ -309,7 +309,7 @@ class Bot(commands.Cog):
 		await Message.EmbedText(title="Image", file=file_path).edit(ctx, mess)
 		GetImage.remove(file_path)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def speedtest(self, ctx):
 		"""Run a network speed test (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
@@ -331,26 +331,26 @@ class Bot(commands.Cog):
 		except Exception as e:
 			await message.edit(content="Speedtest Error: {}".format(str(e)))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def adminunlim(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to allow unlimited xp to admins (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Admin unlimited xp","AdminUnlimited",yes_no))
 	
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def basadmin(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to treat bot-admins as admins with regards to xp (admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Bot-admin as admin","BotAdminAsAdmin",yes_no))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def joinpm(self, ctx, *, yes_no : str = None):
 		"""Sets whether or not to pm the rules to new users when they join (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"New user pm","JoinPM",yes_no))
 
-	@commands.command(pass_context=True)
-	async def avatar(self, ctx, filename = None):
+	@commands.command(aliases=["setavi","setpfp"])
+	async def setavatar(self, ctx, filename = None):
 		"""Sets the bot's avatar (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
 
@@ -459,7 +459,7 @@ class Bot(commands.Cog):
 		return await ctx.send("Username updated - may take some time to show!")
 
 	# Needs rewrite!
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def reboot(self, ctx):
 		"""Reboots the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
@@ -489,7 +489,7 @@ class Bot(commands.Cog):
 		# Kill this process
 		os._exit(2)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def shutdown(self, ctx):
 		"""Shuts down the bot (owner only)."""
 		if not await Utils.is_owner_reply(ctx): return
@@ -516,7 +516,7 @@ class Bot(commands.Cog):
 		# Kill this process
 		os._exit(3)		
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def servers(self, ctx):
 		"""Lists the number of servers I'm connected to!"""
 		await ctx.send("I am a part of *{}* server{}!".format(len(self.bot.guilds),"" if len(self.bot.guilds) == 1 else "s"))
@@ -541,7 +541,7 @@ class Bot(commands.Cog):
 		dgame = discord.Activity(name=game, url=url, type=t) if game else None
 		await self.bot.change_presence(status=s, activity=dgame)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def pres(self, ctx, playing_type="0", status_type="online", game=None, url=None):
 		"""Changes the bot's presence (owner-only).
 	
@@ -632,7 +632,7 @@ class Bot(commands.Cog):
 			]
 		).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def status(self, ctx, status = None):
 		"""Gets or sets the bot's online status (owner-only).
 		Options are:
@@ -697,27 +697,27 @@ class Bot(commands.Cog):
 		await self._update_status()
 		await message.edit(content='{} status set to **{}**{}!'.format(status_name,Utils.suppressed(ctx,status)," at `{}`".format(status_url) if status_url else ""))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def playgame(self, ctx, *, game : str = None):
 		"""Sets the playing status of the bot (owner-only)."""
 		await self.set_status(ctx,game,"Playing",0)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def watchgame(self, ctx, *, game : str = None):
 		"""Sets the watching status of the bot (owner-only)."""
 		await self.set_status(ctx,game,"Watching",3)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listengame(self, ctx, *, game : str = None):
 		"""Sets the listening status of the bot (owner-only)."""
 		await self.set_status(ctx,game,"Listening",2)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def streamgame(self, ctx, url = None, *, game : str = None):
 		"""Sets the streaming status of the bot, requires the url and the game (owner-only)."""
 		await self.set_status(ctx,game,"Streaming",1,url)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def setbotparts(self, ctx, *, parts : str = None):
 		"""Set the bot's parts - can be a url, formatted text, or nothing to clear."""
 		if not await Utils.is_owner_reply(ctx): return
@@ -729,14 +729,14 @@ class Bot(commands.Cog):
 		msg = '*{}\'s* parts have been set to:\n{}'.format(DisplayName.serverNick(self.bot.user, ctx.guild), parts)
 		await ctx.send(Utils.suppressed(ctx,msg))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def source(self, ctx):
 		"""Link the github source."""
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def cloc(self, ctx):
 		"""Outputs the total count of lines of code in the currently installed repo."""
 		# Script pulled and edited from https://github.com/kyco/python-count-lines-of-code/blob/python3/cloc.py
