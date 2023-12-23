@@ -337,9 +337,9 @@ class CogManager(commands.Cog):
 			out, err = u.communicate()
 			msg = "```\n"
 			if len(out.decode("utf-8")):
-				msg += out.decode("utf-8").replace("`", "\`") + "\n"
+				msg += out.decode("utf-8").replace("`", "\\`") + "\n"
 			if len(err.decode("utf-8")):
-				msg += err.decode("utf-8").replace("`", "\`") + "\n"
+				msg += err.decode("utf-8").replace("`", "\\`") + "\n"
 			msg += "```"
 			await Message.EmbedText(title="{}Update Results:".format("Reset and " if reset else ""), description=msg, color=ctx.author).edit(ctx, message)
 		except:
