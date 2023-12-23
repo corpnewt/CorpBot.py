@@ -113,8 +113,22 @@ class Xp(commands.Cog):
 			xpRAmount    = int(await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"HourlyXPReal"))
 			xpRAmount    = float(xpRAmount/6)
 
+			# Make sure we have something to add
+			if not xpAmount and not xpRAmount:
+				continue
+
 			xpLimit      = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPLimit")
 			xprLimit     = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"XPReserveLimit")
+
+			# Cast as int if not None
+			if xpLimit is not None:
+				xpLimit = int(xpLimit)
+			if xprLimit is not None:
+				xprLimit = int(xprLimit)
+
+			# See if we have a limit that prevents adding
+			if xpLimit==0 and xprLimit==0:
+				continue
 
 			onlyOnline   = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"RequireOnline")
 			requiredXP   = await self.bot.loop.run_in_executor(None,self.settings.getServerStat,server,"RequiredXPRole")
