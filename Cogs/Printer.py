@@ -102,7 +102,7 @@ class Printer(commands.Cog):
 		"""Returns a the passed member's global avatar - use the guildavatar command for their guild avatar if available."""
 		await self._print_avi(ctx,member,server=False)
 
-	@commands.command(aliases=["printgavi","gavi","gpfp"])
+	@commands.command(aliases=["printguildavi","printgavi","gavi","gpfp"])
 	async def guildavatar(self, ctx, *, member=None):
 		"""Returns a the passed member's guild avatar if available - use the avatar command for their global avatar."""
 		await self._print_avi(ctx,member,server=True)
