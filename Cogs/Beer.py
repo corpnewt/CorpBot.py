@@ -309,7 +309,7 @@ class Beer(commands.Cog):
             color=ctx.author
         ).send(ctx)
 
-    @commands.command()
+    @commands.command(aliases=["vcon","vconv"])
     async def vconvert(self, ctx, *, volume = None, from_type = None, to_type = None):
         """Converts between Ounces, Gallons, Liters, Milliliters, and Beer Barrels.  From/To types can be:
         (O)unces
