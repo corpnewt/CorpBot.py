@@ -154,6 +154,7 @@ if __name__ == '__main__':
     r = Run()
     modules = [
         # Get the latest commit of pomice to ensure we have Lavalink v4 changes
+        {"name":"pomice","uninstall":True},
         {"name":"pomice","item":"git+https://github.com/cloudwithax/pomice.git"},
         # Remove the updated discord.py that pomice overwrites, and
         # remove py-cord so we can reinstall it with the proper version
