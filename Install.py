@@ -1,3 +1,4 @@
+import os
 import sys
 import subprocess
 import threading
@@ -175,11 +176,17 @@ if __name__ == '__main__':
         {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
-        {"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3"},
         {"name":"geopy"},
         {"name":"pyfiglet"},
         {"name":"regex"}
     ]
+    db_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Cogs","PandorasDB.py")
+    print("\nChecking for {}...".format(db_path))
+    if os.path.exists(db_path):
+        print("Branch has database support - including redis...")
+        modules.append({"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3"})
+    else:
+        print("No database support - omitting redis...")
     item = 0
     for module in modules:
         item+=1
