@@ -18,8 +18,8 @@ def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var
     command = "where" if os.name == "nt" else "which"
     try:
-        p = subprocess.run(command+" "+binary, shell=True, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
-        return p.stdout.decode("utf-8").split("\n")[0].split("\r")[0]
+        p = subprocess.run([command,binary], check=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        return p.stdout.decode("utf-8").replace("\r","").split("\n")[0]
     except:
         return None
     
@@ -56,7 +56,8 @@ def install():
     print(" ")
 
 def main():
-    # Here we have our deps checked - let's go into a loop
+    # Update before we start our loop
+    update()
     while True:
         # Start the bot and wait for it to exit
         bot_process = subprocess.Popen([sys.executable, bot_path])
@@ -74,20 +75,26 @@ def main():
         if bot_process.returncode == 3:
             print("\nShut down.")
             exit(0)
-        elif bot_process.returncode == 2:
+        elif bot_process.returncode in (2,4):
             print("\nRebooting...")
             update()
-        elif bot_process.returncode == 4:
-            print("\nInstalling dependencies and rebooting...")
-            update()
-            install()
+            if bot_process.returncode == 4:
+                print("\nInstalling dependencies...")
+                install()
+        # Wait before we restart
         time.sleep(wait_before_restart)
+        print(bot_process.returncode)
+        if bot_process.returncode not in (2,4):
+            print("Continuing the loop: {}".format(bot_process.returncode))
+            continue # Restart the loop
+        break
+    print("Restarting the local file...")
+    # Restart WatchDog.py anew - this allows for updates to take effect
+    os.execv(sys.executable, [sys.executable, __file__]+sys.argv[1:])
 
 git = get_git()
-if git == None:
+if git is None:
     print("Git is not found in your PATH var!\nUpdates will be disabled!")
 
-# Update first
-update()
 # Enter the loop
 main()
