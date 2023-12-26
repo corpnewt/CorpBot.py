@@ -175,6 +175,7 @@ if __name__ == '__main__':
         {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
+        {"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3"},
         {"name":"geopy"},
         {"name":"pyfiglet"},
         {"name":"regex"}
