@@ -45,7 +45,7 @@ def install():
     if not git:
         return
     print("\n##############################")
-    print("#       INSTALLING DEPS       #")
+    print("#      INSTALLING DEPS       #")
     print("##############################\n")
     print("\nRunning Install.py with --no-interaction")
     try:
@@ -83,7 +83,6 @@ def main():
                 install()
         # Wait before we restart
         time.sleep(wait_before_restart)
-        print(bot_process.returncode)
         if bot_process.returncode not in (2,4):
             print("Continuing the loop: {}".format(bot_process.returncode))
             continue # Restart the loop
