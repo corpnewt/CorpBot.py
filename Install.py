@@ -188,8 +188,10 @@ if __name__ == '__main__':
         else:
             r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
     # Prompt for the users to press enter to exit
-    prompt = "Done.\n\nPress [enter] to leave the script..."
-    if sys.version_info >= (3, 0):
-        input(prompt)
-    else:
-        raw_input(prompt)
+    print("\nDone.")
+    if not "-n" in sys.argv[1:] and not "--no-interaction" in sys.argv[1:]:
+        prompt = "\nPress [enter] to leave the script..."
+        if sys.version_info >= (3, 0):
+            input(prompt)
+        else:
+            raw_input(prompt)
