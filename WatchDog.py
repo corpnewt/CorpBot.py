@@ -7,8 +7,10 @@ import time
 
 # Set defaults
 bot = "Main.py"
+install = "Install.py"
 dir_path = os.path.dirname(os.path.realpath(__file__))
 bot_path = os.path.join(dir_path,bot)
+install_path = os.path.join(dir_path,install)
 restart_on_error = True
 wait_before_restart = 1
 
@@ -39,6 +41,20 @@ def update():
         print("Something went wrong!  Make sure you have git installed and in your path var!")
     print(" ")
 
+def install():
+    if not git:
+        return
+    print("\n##############################")
+    print("#       INSTALLING DEPS       #")
+    print("##############################\n")
+    print("\nRunning Install.py with --no-interaction")
+    try:
+        u = subprocess.Popen([sys.executable, install_path, "--no-interaction"])
+        u.wait()
+    except:
+        print("Something went wrong!  Make sure you have git installed and in your path var!")
+    print(" ")
+
 def main():
     # Here we have our deps checked - let's go into a loop
     while True:
@@ -49,6 +65,7 @@ def main():
         # 1 = Error - restart the bot without updating
         # 2 = Rebooting - update, then restart
         # 3 = Regular exit - ignore, and quit too
+        # 4 = Install deps - update, install, then restart
         # Anything else assumes an issue with the script
         # and will subsequently restart.
 
@@ -60,6 +77,10 @@ def main():
         elif bot_process.returncode == 2:
             print("\nRebooting...")
             update()
+        elif bot_process.returncode == 4:
+            print("\nInstalling dependencies and rebooting...")
+            update()
+            install()
         time.sleep(wait_before_restart)
 
 git = get_git()
