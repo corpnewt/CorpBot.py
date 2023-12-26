@@ -152,12 +152,14 @@ class Run:
 if __name__ == '__main__':
     r = Run()
     modules = [
-        {"name":"pomice"},
+        # Get the latest commit of pomice to ensure we have Lavalink v4 changes
+        {"name":"pomice","item":"git+https://github.com/cloudwithax/pomice.git"},
         # Remove the updated discord.py that pomice overwrites, and
         # remove py-cord so we can reinstall it with the proper version
         {"name":"discord.py","uninstall":True},
         {"name":"pycord","item":"py-cord[voice]","uninstall":True},
-        {"name":"pycord","item":"py-cord[voice]"},
+        # Get the latest commit of py-cord to ensure we have pyhton 3.12 changes
+        {"name":"pycord","item":"git+https://github.com/Pycord-Development/pycord.git#egg=py-cord[voice]"},
         {"name":"certifi"},
         {"name":"pillow"},
         {"name":"Requests"},
