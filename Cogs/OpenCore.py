@@ -26,6 +26,7 @@ class OpenCore(commands.Cog):
 			"ALC255":["ALC3234"],
 			"ALC256":["ALC3246"],
 			"ALC269":["ALC271X"],
+			"ALC282":["ALC3227"],
 			"ALC290":["ALC3241"],
 			"ALC292":["ALC3226","ALC3232"],
 			"ALC888":["ALC1200"],
