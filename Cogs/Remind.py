@@ -64,7 +64,8 @@ class Remind(commands.Cog):
 			)
 			if reminders:
 				for reminder in reminders:
-					self.loop_list.append(self.bot.loop.create_task(self.check_remind(user,reminder)))
+					if reminder.get("bot_id") is None or reminder["bot_id"] == self.bot.user.id:
+						self.loop_list.append(self.bot.loop.create_task(self.check_remind(user,reminder)))
 		for server in self.bot.guilds:
 			for member in server.members:
 				# reminders = self.settings.getUserStat(member, server, "Reminders", [])
