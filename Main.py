@@ -63,7 +63,7 @@ try:
 		command_prefix=get_prefix,
 		pm_help=None,
 		description='A bot that does stuff.... probably',
-		shard_count=4,
+		shard_count=settings_dict.get("shard_count",4),
 		intents=intents,
 		allowed_mentions=allowed_mentions,
 		case_insensitive=settings_dict.get("case_insensitive",True)
@@ -75,12 +75,13 @@ except:
 		command_prefix=get_prefix,
 		pm_help=None,
 		description='A bot that does stuff.... probably',
-		shard_count=4,
+		shard_count=settings_dict.get("shard_count",4),
 		allowed_mentions=allowed_mentions,
 		case_insensitive=settings_dict.get("case_insensitive",True)
 	)
 bot.settings_dict    = settings_dict
 bot.ready_dispatched = False
+bot.local_client     = None
 
 async def return_message():
 	# Set the settings var up
@@ -137,6 +138,13 @@ async def on_all_shards_ready():
 		else:
 			print("Loaded {} of {} cogs.".format(cog_loaded, cog_count))
 	await return_message()
+	if bot.settings_dict.get("local_server_enabled"):
+		# Start the local listening server/client
+		try:
+			import LocalServer
+			asyncio.create_task(LocalServer.start_server(bot))
+		except ImportError:
+			pass
 
 '''@bot.event
 async def on_command_error(context, exception):
@@ -424,6 +432,39 @@ async def on_message_edit(before, message):
 		# We need to delete the message - top priority
 		await message.delete()
 
+async def watchinput():
+	# Get our input asynchronously
+	while True:
+		if hasattr(asyncio,"to_thread"):
+			i = (await asyncio.to_thread(sys.stdin.readline)).rstrip("\n")
+		else:
+			i = (await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)).rstrip("\n")
+		if i.lower() in ("?","-h","--help","/h","/help"):
+			print(" - Console commands:")
+			print("   - 'shutdown', 'exit', or 'quit': shut down and exit the bot (returns 3)")
+			print("   - 'reboot' or 'restart': reboot the bot (returns 2)")
+			print("   - 'install': reboot the bot and install/update dependencies (returns 4)")
+		elif i.lower() in ("shutdown","exit","quit","reboot","restart","install"):
+			try:
+				task_list = asyncio.Task.all_tasks()
+			except AttributeError:
+				task_list = asyncio.all_tasks()
+			for task in task_list:
+				try: task.cancel()
+				except: continue
+			try:
+				await bot.close()
+				bot.loop.stop()
+				bot.loop.close()
+			except:
+				pass
+			# Kill this process
+			os._exit(3 if i.lower() in ("shutdown","exit","quit") else 4 if i.lower() == "install" else 2)
+
 # Run the bot
 print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count == 1 else "s"))
-bot.run(settings_dict.get("token",""))
+bot.loop.create_task(watchinput())
+try:
+	bot.run(settings_dict.get("token",""))
+except RuntimeError as e:
+	print("Dirty shutdown - runtime error minimized:\n - {}".format(e))
