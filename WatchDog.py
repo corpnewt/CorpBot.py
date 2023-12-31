@@ -1,7 +1,4 @@
-import sys
-import os
-import subprocess
-import time
+import sys, os, subprocess, time
 
 # This module will start the script, and reboot it and etc
 
@@ -74,6 +71,8 @@ def main():
 
         if bot_process.returncode == 3:
             print("\nShut down.")
+            if os.name == "nt":
+                print("\nPress [enter] to close this window...")
             exit(0)
         elif bot_process.returncode in (2,4):
             print("\nRebooting...")
@@ -84,7 +83,6 @@ def main():
         # Wait before we restart
         time.sleep(wait_before_restart)
         if bot_process.returncode not in (2,4):
-            print("Continuing the loop: {}".format(bot_process.returncode))
             continue # Restart the loop
         break
     print("Restarting the local file...")
