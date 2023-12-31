@@ -119,13 +119,13 @@ class Telephone(commands.Cog):
 			if caller in call["Members"]:
 				self.switchboard.remove(call)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def teleblocklinks(self, ctx, *, yes_no = None):
 		"""Enables/Disables removing links sent over telephone calls (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 		await ctx.send(Utils.yes_no_setting(ctx,"Block telephone links","TeleBlockLinks",yes_no,default=True))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def phonebook(self, ctx, *, look_up = None):
 		"""Lets you page through the phonebook - or optionally lets you search for a server name or number."""
 		# Build our phone list
@@ -171,7 +171,7 @@ class Telephone(commands.Cog):
 		fields = [m["Item"] for m in matchCheck]
 		return await Message.Embed(title=":telephone: Phonebook - Closest Matches",fields=fields,color=ctx.author).send(ctx)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def telenumber(self, ctx):
 		"""Prints your telephone number."""
 		teleNum = self.settings.getServerStat(ctx.guild, "TeleNumber")
@@ -181,7 +181,7 @@ class Telephone(commands.Cog):
 		teleNumFormat = teleNum[:3] + "-" + teleNum[3:]
 		await ctx.send("Your :telephone: number is: *{}*".format(teleNumFormat))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def callerid(self, ctx):
 		"""Reveals the last number to call regardless of *67 settings (bot-admin only)."""
 
@@ -193,7 +193,7 @@ class Telephone(commands.Cog):
 				target = "UNKNOWN CALLER (bot-admins and admins can reveal this)"
 			await ctx.send(":telephone: Last number recorded: {}".format(target[:3] + "-" + target[3:]))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def settelechannel(self, ctx, *, channel = None):
 		"""Sets the channel for telephone commands - or disables that if nothing is passed (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
@@ -214,7 +214,7 @@ class Telephone(commands.Cog):
 		msg = ':telephone: channel set to {}'.format(channel.mention)
 		await ctx.channel.send(msg)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def telechannel(self, ctx):
 		"""Prints the current channel for telephone commands."""
 		teleChan = self.settings.getServerStat(ctx.guild, "TeleChannel")
@@ -227,7 +227,7 @@ class Telephone(commands.Cog):
 			return
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(teleChan))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def teleblock(self, ctx, *, guild_name = None):
 		"""Blocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -266,7 +266,7 @@ class Telephone(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def teleunblock(self, ctx, *, guild_name = None):
 		"""Unblocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
@@ -308,7 +308,7 @@ class Telephone(commands.Cog):
 		await ctx.send(msg)
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def teleblocks(self, ctx):
 		"""Lists guilds with blocked tele-numbers."""
 
@@ -333,7 +333,7 @@ class Telephone(commands.Cog):
 		).pick()
 
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["dial"])
 	async def call(self, ctx, *, number = None):
 		"""Calls the passed number.  Can use *67 to hide your identity - or *69 to connect to the last incoming call (ignored if another number is present)."""
 		teleChan = self._gettelechannel(ctx.guild)
