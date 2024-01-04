@@ -20,7 +20,8 @@ class Embed(commands.Cog):
         # Helper method to ensure embed_json is valid, and doesn't bypass limits
         # Let's attempt to serialize the json
         try:
-            embed_dict = json.loads(embed_json)
+            # Allow control characters like newlines in the JSON string via strict=False
+            embed_dict = json.loads(embed_json,strict=False)
             # Let's parse the author and color
             if embed_dict.get("color") and not isinstance(embed_dict["color"],list):
                 # We got *something* for the color - let's first check if it's an int between 0 and 16777215
