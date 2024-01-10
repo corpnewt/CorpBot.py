@@ -171,7 +171,7 @@ class IntelArk(commands.Cog):
 				search_term
 			)
 			url = "https://www.intel.com/content/www/us/en/search.html?ws=text#q={}&sort=relevancy".format(
-				urllib.parse.quote(search_term)
+				urllib.parse.quote(search_term.strip())
 			)
 			res = await DL.async_text(url)
 
