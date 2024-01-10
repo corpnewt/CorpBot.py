@@ -160,7 +160,7 @@ class IntelArk(commands.Cog):
 			)
 			# Remove branding like Processor, Core, Ultra, CPU, etc
 			search_term = re.sub(
-				r"(?i)(intel|xeon|core2?|ultra|cpu|processor)[\-\s]",
+				r"(?i)(core2|[^\d\s]{2,})[\-\s]",
 				"",
 				search_term
 			)
