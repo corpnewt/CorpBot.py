@@ -2,89 +2,54 @@ from   discord.ext import commands
 from   Cogs import Message
 from   Cogs import DL
 from   Cogs import PickList
-import re, difflib
+import re, urllib.parse
 
 def setup(bot):
 	# Add the bot
 	bot.add_cog(IntelArk(bot))
 	
 class IntelArk(commands.Cog):
-    
+
 	def __init__(self, bot):
 		self.bot = bot
-		self.fields = {
-			'CodeNameText': 'Codename',
-			'MarketSegment': 'Vertical Segment',
-			'ProcessorNumber': 'Name',
-			'CoreCount': '# of Cores',
-			'PerfCoreCount': '# of Performance-cores',
-			'EffCoreCount': '# of Efficient-cores',
-			'ThreadCount': '# of Threads',
-			'ClockSpeed': 'Base Clock Speed',
-			'ClockSpeedMax': 'Max Clock Speed',
-			'MaxTDP': 'TDP',
-			'MaxMem': 'Max Memory',
-			'ProcessorGraphicsModelId': 'iGPU',
-			'GraphicsDeviceId': 'iGPU Device ID',
-			'InstructionSet': 'Instruction Set',
-			'InstructionSetExtensions': 'Extensions',
-			'BornOnDate': 'Launch Date'
-		}
-		self.optional_fields = [
-			'PerfCoreCount',
-			'EffCoreCount',
-			'ThreadCount',
-			'ClockSpeedMax',
-			'MaxTDP',
-			'MaxMem',
-			'GraphicsDeviceId',
-			'InstructionSetExtensions',
-			'BornOnDate'
-		]
-		self.match_threshold = 0.5 # Lower match limit before showing only those that matched
+		self.h = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
 	@commands.command(aliases=["intelark"])
 	async def iark(self, ctx, *, text : str = None):
-		"""Search Ark for Intel CPU info."""
+		"""Search for Intel CPU info."""
 
 		args = {
-			"title":"Intel Ark Search",
+			"title":"Intel Search",
 			"description":'Usage: `{}iark [cpu model]`'.format(ctx.prefix),
-			"footer":"Powered by http://ark.intel.com",
+			"footer":"Powered by https://www.intel.com",
 			"color":ctx.author
 		}
 
-		if text is None: return await Message.EmbedText(**args).send(ctx)
+		if text is None: return await Message.Embed(**args).send(ctx)
 		original_text = text # Retain the original text sent by the user
 
 		# Strip single quotes
 		text = text.replace("'","")
 		if not len(text):
-			return await Message.EmbedText(**args).send(ctx)
+			return await Message.Embed(**args).send(ctx)
 
 		args["description"] = "Gathering info..."
-		message = await Message.EmbedText(**args).send(ctx)
+		message = await Message.Embed(**args).send(ctx)
 
 		try:
 			# Query the ARK, and try to return a response
-			response = await self.iark_search(text)
+			response = await self.quick_search(text)
 		except:
 			response = []
 
 		# Check if we got nothing
 		if not len(response):
 			args["description"] = "No results returned for `{}`.".format(original_text.replace("`","").replace("\\",""))
-			return await Message.EmbedText(**args).edit(ctx, message)
+			return await Message.Embed(**args).edit(ctx, message)
 
-		elif len(response) == 1:
-			# Set it to the first item
-			try:
-				response = await self.get_match_data(response[0])
-			except:
-				response = None
-
+		index = 0 # Default to the first
 		# Check if we got more than one result (either not exact, or like 4790 vs 4790k)
-		elif len(response) > 1:
+		if len(response) > 1:
 			response = response[:10] # Only accept a max of 10
 			# Allow the user to choose which one they meant.
 			index, message = await PickList.Picker(
@@ -96,195 +61,159 @@ class IntelArk(commands.Cog):
 
 			if index < 0:
 				args["description"] = "Search cancelled."
-				return await Message.EmbedText(**args).edit(ctx, message)
+				return await Message.Embed(**args).edit(ctx, message)
 
-			# Got something
+		# Got something
+		try:
 			response = await self.get_match_data(response[index])
+		except:
+			response = {}
 		
-		if not response or all((response.get(x) is None for x in self.fields)):
+		# Verify if we got something
+		if not response.get("list"):
 			try: # Maybe we got a product line - or something other than a specific CPU?
-				args["title"] = response["ProductName"]
-				args["url"] = response["Link"]
+				args["title"] = response["title"]
+				args["url"] = response["url"]
 				args["description"] = "Could not retrieve specific data for this search.\nPlease follow the title link (or click [here]({})) to open your search results in your browser.".format(response["Link"])
 			except: # Fall back on a generic error
 				args["description"] = "Something went wrong getting search data!"
-			return await Message.EmbedText(**args).edit(ctx, message)
-		# At this point - we should have a single response
-		# Let's format and display.
-		fields = [{"name":self.fields[x], "value":response.get(x), "inline":True} for x in self.fields if not x in self.optional_fields or response.get(x)]
-		matched = [x for x in fields if x["value"]]
-		if len(matched)/len(fields) <= self.match_threshold:
-			# We're under our threshold - but have at least one match, let's only show the matched entries
-			fields = matched
+			return await Message.Embed(**args).edit(ctx, message)
 
-		await Message.Embed(
-			thumbnail=response.get("BrandBadge",None),
-			pm_after_fields=12,
-			title=response.get("ProductName","Intel Ark Search"),
-			fields=fields,
-			url=response.get("Link",None),
-			footer="Powered by http://ark.intel.com",
-			color=ctx.author
-			).edit(ctx, message)
+		# Fill out the rest of the values
+		args["ctx"] = ctx
+		args["max"] = 18
+		args["message"] = message
+		args["description"] = None
+		for key in response:
+			args[key] = response[key]
+		# Display the content
+		await PickList.PagePicker(**args).pick()
 
 	async def get_match_data(self, match):
 		"""Returns the data of a matched entry."""
 
 		if not "prodUrl" in match: return
-		# Force the prodUrl to start with /content/www/us/en/
-		en_prefix = "/content/www/us/en/"
-		if len(match["prodUrl"]) >= len(en_prefix) and not match["prodUrl"].startswith(en_prefix):
-			match["prodUrl"] = en_prefix+match["prodUrl"][len(en_prefix):]
-		data = {"Link":"https://ark.intel.com{}".format(match["prodUrl"]),"ProductName":match.get("label","Intel Ark Search")}
-		text = await DL.async_text(data["Link"])
-		lines = text.split('\n')
-
-		for i,line in enumerate(lines):
-			# Check for the specifications and try to rip the title from there if possible
-			if data["ProductName"] == "Intel Ark Search" and '<meta property="og:title" content="' in line and ' Product Specifications"/>' in line:
-				try: data["ProductName"] = line.split('<meta property="og:title" content="')[1].split(' Product Specifications"/>')[0]
-				except: pass
+		data = {
+			"url":match["prodUrl"],
+			"title":match.get("label","Intel Search")
+		}
+		text = await DL.async_text(data["url"])
+		
+		current_key = None
+		data["list"] = []
+		for line in text.split("<h3>Essentials</h3>")[-1].split("\n"):
+			if '<div class="disclaimer">' in line:
+				break # Got to the end
+			if "<span>" in line and current_key is None:
+				# Got a new key
+				if "t<sub>junction</sub>" in line.lower():
+					# Special handling to avoid dropping "junction"
+					current_key = "Tjunction Max"
+				elif "t<sub>case</sub>" in line.lower():
+					# Special handling to avoid dropping "case"
+					current_key = "Tcase Max"
+				else:
+					current_key = line.split("<span>")[1].split("<")[0].strip()
 				continue
-			for key in self.fields:
-				"""
-				Grabs the image URL of the current item, if possible.
-
-				For example, we might have an element like this:
-
-					<img ptype="processors" alt="Intel® Core™2 Duo Processor P8600 " 
-					src="https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif" 
-					onerror="ValidateImage(this);" 
-					onload="checkImgSize(this);" 
-					width="" 
-					height=""
-					>
-
-				From here, we'd want to isolate what's inside of `src="*"`;
-				In order to achieve this, we can simply divide the string into a list.
-				
-					line.split('src="')
-
-				Which will yield something like:
-
-					->  [  
-							'<img ptype="processors" alt="Intel® Core™2 Duo Processor P8600 "',     
-							'https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif" onerror="ValidateImage(this);" onload="checkImgSize(this);" width="" height="">'
-						]
-
-				From here, we can select the second element, as it contains the URL we're looking for, and split by `"`.
-
-					line.split('src="')[1].split('"')
-
-				Which will yield something like:
-
-					->  [
-							'https://www.intel.com/content/dam/www/global/ark/badges/34530_128.gif/jcr:content/renditions/_64.gif',
-							' onerror=', 
-							'ValidateImage(this);', 
-							' onload=', 
-							'checkImgSize(this);', 
-							' width=', 
-							'', 
-							' height=', 
-							'', 
-							'>'
-						]
-
-				From here, we can simply select the first element, which is the URL.
-				"""
-				if 'ptype="processors"' in line.lower():
-					data['BrandBadge'] = line.split('src="')[1].split('"')[0]
-
-				if 'data-key="{}"'.format(key.lower()) in line.lower():
-					if 'codename' in key.lower():
-						data[key] = lines[i + 1].strip().split('>')[1].split('<')[0].replace('Products formerly', '').strip()
-						continue
-					data[key] = lines[i + 1].strip().replace("</span>", "")
-
+			if current_key is None:
+				# We don't have a key yet - skip until we do
+				continue
+			if "<span>" in line or "</a>" in line:
+				# We have a current key, and what seems to be the results - save them
+				if "</a>" in line and "<a href=" in line:
+					# It's got a link in it - let's rip that out as well
+					url = line.split('<a href="')[1].split('"')[0] # Get the URL referenced
+					if url.startswith("/"):
+						# It's referencing a local value - prepend
+						url = "https://www.intel.com"+url
+					val = "[{}]({})".format(
+						line.split('">')[1].split("<")[0], # Get the name of the value
+						url
+					)
+				else:
+					val = line.split(">")[1].split("<")[0]
+				data["list"].append({
+					"name":current_key,
+					"value":val.strip(),
+					"inline":True
+				})
+				current_key = None # Reset the key
+		# Try to pull the thumbnail as well
+		# Omit this for now - it seems there's some inconsistencies, and trouble loading
+		'''try:
+			data["thumbnail"] = "https://www.intel.com/content/dam/www/central-libraries/"+text.split("/content/dam/www/central-libraries/")[-1].split('"')[0]
+		except:
+			pass'''
 		return data
-
 
 	async def quick_search(self, search_term):
 		try:
-			url = "https://ark.intel.com/content/www/us/en/ark/search.html?_charset_=UTF-8&q={}".format(self.simplified_name(search_term))
+			# Clean up the search terms to prevent some issues with Intel.com
+			# getting a bit confused.  This mostly shows up with Xeons and the
+			# newer Ultra CPUs if some query elements are retained.
+			#
+			# Strip non-ASCII chars
+			search_term = re.sub(
+				r"[^\x00-\x7F]+",
+				"",
+				search_term
+			)
+			# Remove branding like Processor, Core, Ultra, CPU, etc
+			search_term = re.sub(
+				r"(?i)(intel|xeon|core2?|ultra|cpu|processor)[\-\s]",
+				"",
+				search_term
+			)
+			# Ensure we don't have erroneous spaces
+			search_term = re.sub(
+				r"\s+",
+				" ",
+				search_term
+			)
+			url = "https://www.intel.com/content/www/us/en/search.html?ws=text#q={}&sort=relevancy".format(
+				urllib.parse.quote(search_term)
+			)
 			res = await DL.async_text(url)
-			# Walk the resulting HTML looking for href="/content/www/us/en/ark/products/
-			# If we get a <input id="FormRedirectUrl" type="hidden" value="/content/www/us/en/ark/products/ value, we've been redirected
-			# to a destination page - use that instead.
+
+			# Let's split the resulting HTML at ighfToken: ' to get our token
+			token = res.split("ighfToken: '")[1].split("'")[0]
+			# Let's force a coveo search
+			# Build a simple query
+			post_data = {
+				"q":search_term,
+				"aq":"@localecode==en_US"
+			}
+			# Build a new set of headers with the access token
+			search_headers = {}
+			for x in self.h:
+				# Shallow copy our current headers
+				search_headers[x] = self.h[x]
+			# Add the authorization
+			search_headers["Authorization"] = "Bearer {}".format(token)
+			# Run the actual coveo search
+			search_data = await DL.async_post_json(
+				"https://platform.cloud.coveo.com/rest/search/v2",
+				post_data,
+				search_headers
+			)
+
+			if not search_data or not search_data.get("results"):
+				return []
+			# Let's iterate the results
 			results = []
-			for line in res.split("\n"):
-				# Check for the redirect first
-				if '<input id="FormRedirectUrl"' in line and 'value="' in line:
-					try: url = line.split('value="')[1].split('"')[0]
-					except: continue
-					return [{"prodUrl":url,"exactMatch":True}]
-				if 'href="/content/www/us/en/ark/products/' in line and "Processor" in line and not "Family" in line:
-					# Extract the URL and the product name
-					try:
-						url = line.split('href="')[1].split('"')[0]
-						prod = line.split('">')[-1].split("<")[0]
-					except: continue
-					# Make sure the label matches our search term within a certain threshold
-					match_parts = [x.lower() for x in prod.split() if difflib.SequenceMatcher(None,search_term.lower(),x.lower()).quick_ratio() > 0.5]
-					if not match_parts: continue # Nothing was even close, bail
-					# See if our total match of the above parts is > 0.5 - if not, bail
-					if difflib.SequenceMatcher(None,search_term.lower()," ".join(match_parts).lower()).ratio() > 0.5:
-						results.append({"prodUrl":url,"label":prod})
-			return results
+			for result in search_data["results"]:
+				title = result.get("title","").lower()
+				filen = result.get("raw",{}).get("filename","").lower()
+				uri   = result.get("uri","").split("?")[0] # Strip modifiers to the URL
+				if "processor" in title and not "family" in title and "/products/sku/" in uri:
+					if uri.endswith("/ordering.html"):
+						uri = uri[:-len("/ordering.html")]+"/specifications.html"
+					if any(x.get("prodUrl") == uri for x in results):
+						continue # Skip duplicates
+					results.append({
+						"label":result.get("title",uri.split("/")[-1]),
+						"prodUrl":uri
+					})
+			return sorted(results,key=lambda x:x["label"])
 		except Exception as e:
 			return []
-
-	async def iark_search(self, search_term):
-		results = await self.quick_search(search_term)
-
-		return results
-
-	def simplified_name(self, search_term):
-		replace_dict = {
-			"(R)": "®",
-			"(TM)": "™",
-			"(C)": "©",
-			"(P)": "℗",
-			"(G)": "℠",
-			"CPU": "",
-			"@": "",
-			" ": "+"
-		}
-
-		capture = re.search(r"(?i)([a-z]\d{1}\s\d{3,4}(\w{1}\d{1}?)?)", search_term)
-
-		if capture:
-			capture = capture.group()
-			search_term = search_term.replace(capture, capture.replace(" ", "-"))
-
-		for key, val in replace_dict.items():
-			if key in search_term:
-				search_term = search_term.replace(key, val)
-
-		# Make sure if we're searching for an iX-13xxxx or iX-14xxxx CPU that we omit
-		# the iX- prefix
-		capture = re.search(r"(?i)i\d\-1[3-9]\d{3}[^\d\s]*", search_term)
-		if capture:
-			capture = capture.group()
-			search_term = search_term.replace(capture, capture.split("-")[-1])
-
-		return search_term
-		# if not "-" in search_term:
-		# 	sanitised_term = ""
-		# 	sanitised = search_term.split('%20')
-
-		# 	if len(sanitised) == 1:
-		# 		return search_term
-		# 	elif len(sanitised) == 2:
-		# 		return "-".join(sanitised)
-
-		# 	for i in range(len(sanitised)):
-		# 		if i == (len(sanitised) - 2) and not "-" in search_term:
-		# 			sanitised_term += sanitised[i] + '-' + sanitised[i + 1]
-		# 			break
-			
-		# 		sanitised_term += sanitised[i] + '%20' if i != (len(sanitised) - 1) else ''
-
-		# 	return sanitised_term
-		# else:
-		# 	return search_term
