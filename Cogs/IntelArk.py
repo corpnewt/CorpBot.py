@@ -261,6 +261,13 @@ class IntelArk(commands.Cog):
 			if key in search_term:
 				search_term = search_term.replace(key, val)
 
+		# Make sure if we're searching for an iX-13xxxx or iX-14xxxx CPU that we omit
+		# the iX- prefix
+		capture = re.search(r"(?i)i\d\-1[3-9]\d{3}[^\d\s]*", search_term)
+		if capture:
+			capture = capture.group()
+			search_term = search_term.replace(capture, capture.split("-")[-1])
+
 		return search_term
 		# if not "-" in search_term:
 		# 	sanitised_term = ""
