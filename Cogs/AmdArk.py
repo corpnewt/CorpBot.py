@@ -107,7 +107,9 @@ class AmdArk(commands.Cog):
         # Build a simple query - ensure the results are in english
         post_data = {
             "q":search_term,
-            "context":'{"amd_lang":"en"}'
+            "context":'{"amd_lang":"en"}',
+            "cq":"NOT(@amd_result_type==(\"Videos\") OR (@sourcetype==(\"Lithium\") AND @liboardinteractionstyle==(\"forum\", \"tkb\")))",
+            "searchHub":"Site"
         }
         # Build a new set of headers with the access token
         search_headers = {}
