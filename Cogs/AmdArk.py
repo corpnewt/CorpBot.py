@@ -93,7 +93,6 @@ class AmdArk(commands.Cog):
         """
         Pipes a search term into amd.com/en/search and attempts to scrape the output
         """
-        # URL = "https://www.amd.com/en/search?keyword={}".format(urllib.parse.quote(search_term))
         URL = "https://www.amd.com/en/search/site-search.html#q={}".format(urllib.parse.quote(search_term))
         try:
             contents = await DL.async_text(URL,headers=self.h)
@@ -108,7 +107,9 @@ class AmdArk(commands.Cog):
         # Build a simple query - ensure the results are in english
         post_data = {
             "q":search_term,
-            "context":'{"amd_lang":"en"}'
+            "context":'{"amd_lang":"en"}',
+            "cq":"NOT(@amd_result_type==(\"Videos\") OR (@sourcetype==(\"Lithium\") AND @liboardinteractionstyle==(\"forum\", \"tkb\")))",
+            "searchHub":"Site"
         }
         # Build a new set of headers with the access token
         search_headers = {}
