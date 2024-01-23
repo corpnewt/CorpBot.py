@@ -215,7 +215,7 @@ class PagePicker(Picker):
             page = 0 if ind==0 else page-1 if ind==1 else page+1 if ind==2 else pages-1 if ind==3 else page
             if ind == 4:
                 # User selects a page
-                page_instruction = await self.ctx.send("Type the number of that page to go to from {} to {}.".format(1,pages))
+                page_instruction = await self.ctx.send("Type the number of the page to go to from {} to {}.".format(1,pages))
                 def check_page(message):
                     try:
                         int(message.content)
