@@ -20,6 +20,8 @@ class Responses(commands.Cog):
 		# Regex values
 		self.regexUserName = re.compile(r"\[\[user\]\]",         re.IGNORECASE)
 		self.regexUserPing = re.compile(r"\[\[atuser\]\]",       re.IGNORECASE)
+		self.regexMessage  = re.compile(r"\[\[atmessage\]\]",    re.IGNORECASE)
+		self.regexChannel  = re.compile(r"\[\[atchannel\]\]",    re.IGNORECASE)
 		self.regexServer   = re.compile(r"\[\[server\]\]",       re.IGNORECASE)
 		self.regexHere     = re.compile(r"\[\[here\]\]",         re.IGNORECASE)
 		self.regexEveryone = re.compile(r"\[\[everyone\]\]",     re.IGNORECASE)
@@ -110,9 +112,11 @@ class Responses(commands.Cog):
 					# Let's get the mute time - if any
 					try: response["mute_time"] = int(self.regexMute.search(m).group(0).replace("]]","").split(":")[-1])
 					except: pass
-			m = re.sub(self.regexUserName, "{}".format(DisplayName.name(ctx.author)), m)
-			m = re.sub(self.regexUserPing, "{}".format(ctx.author.mention), m)
-			m = re.sub(self.regexServer,   "{}".format(Nullify.escape_all(ctx.guild.name)), m)
+			m = re.sub(self.regexUserName, DisplayName.name(ctx.author), m)
+			m = re.sub(self.regexUserPing, ctx.author.mention, m)
+			m = re.sub(self.regexMessage,  ctx.message.jump_url, m)
+			m = re.sub(self.regexChannel,  ctx.channel.mention, m)
+			m = re.sub(self.regexServer,   Nullify.escape_all(ctx.guild.name), m)
 			m = re.sub(self.regexHere,     "@here", m)
 			m = re.sub(self.regexEveryone, "@everyone", m)
 			d = re.compile("\\d+")
@@ -387,6 +391,8 @@ class Responses(commands.Cog):
 		Mention options:
 
 		[[atuser]]    = sender mention
+		[[atmessage]] = message link
+		[[atchannel]] = channel mention
 		[[m_role:id]] = role mention where id is the role id
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
@@ -492,6 +498,8 @@ class Responses(commands.Cog):
 		Mention options:
 
 		[[atuser]]    = sender mention
+		[[atmessage]] = message link
+		[[atchannel]] = channel mention
 		[[m_role:id]] = role mention where id is the role id
 		[[m_user:id]] = user mention where id is the user id
 		[[here]]      = @here ping
