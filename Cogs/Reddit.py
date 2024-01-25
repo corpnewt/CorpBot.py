@@ -110,7 +110,9 @@ class Reddit(commands.Cog):
 					"title": self.unescape(theJSON["title"]),
 					"content": self.strip_tags(theJSON["selftext_html"] or ""),
 					"over_18": theJSON.get("over_18",False),
-					"url": theJSON["url"]
+					"url": theJSON["url"],
+					'score' : theJSON['score'], 
+					'num_comments' : theJSON['num_comments']
 				}
 				break
 			except IndexError:
@@ -226,7 +228,11 @@ class Reddit(commands.Cog):
 			title=msg["title"],
 			description=msg["content"],
 			timeout=600, # Allow 10 minutes before we stop watching the picker
-			ctx=ctx
+			ctx=ctx,
+			footer="Score: {:,} | Comments: {:,}".format(
+				msg["score"],
+				msg["num_comments"]
+			)
 		).pick()
 
 	@commands.command(pass_context=True)
@@ -243,7 +249,11 @@ class Reddit(commands.Cog):
 			title=msg["title"],
 			description=msg["content"],
 			timeout=600, # Allow 10 minutes before we stop watching the picker
-			ctx=ctx
+			ctx=ctx,
+			footer="Score: {:,} | Comments: {:,}".format(
+				msg["score"],
+				msg["num_comments"]
+			)
 		).pick()
 
 	@commands.command(pass_context=True)
@@ -258,7 +268,11 @@ class Reddit(commands.Cog):
 			title=msg["title"],
 			description=msg["content"],
 			timeout=600, # Allow 10 minutes before we stop watching the picker
-			ctx=ctx
+			ctx=ctx,
+			footer="Score: {:,} | Comments: {:,}".format(
+				msg["score"],
+				msg["num_comments"]
+			)
 		).pick()
 	
 	@commands.command(pass_context=True)
