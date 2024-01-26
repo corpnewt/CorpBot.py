@@ -130,7 +130,7 @@ class Morse(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def unmorse(self, ctx, *, content = None):
-		"""Converts morse code to ascii.  Each letter is comprised of "-" or "." and separated by 1 space.  Each word is separated by 4 spaces."""
+		"""Converts morse code to ascii.  Each letter is comprised of "-" or "." and separated by 1 space.  Each word is separated by 2 or more spaces."""
 
 		if content == None:
 			await ctx.send("Usage `{}unmorse [content]`".format(ctx.prefix))
@@ -138,7 +138,7 @@ class Morse(commands.Cog):
 
 		# Only accept morse symbols
 		content = "".join([x for x in content if x in " .-"])
-		word_list = content.split("    ")
+		word_list = content.split("  ")
 		ascii_list = []
 		for word in word_list:
 			# Split by space for letters
