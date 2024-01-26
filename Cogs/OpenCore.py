@@ -373,7 +373,7 @@ class OpenCore(commands.Cog):
 					)
 				index, message = await PickList.Picker(
 					title=title,
-					list=[" -> ".join(x) for x in matches[:3 if fuzzy else 5]],
+					list=[" -> ".join([y for y in x if y!="*"]) for x in matches[:3 if fuzzy else 5]],
 					ctx=ctx
 				).pick()
 				if index < 0:
