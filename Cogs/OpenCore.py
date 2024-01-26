@@ -188,6 +188,8 @@ class OpenCore(commands.Cog):
 			if isinstance(current_dict[key],dict):
 				paths.extend(self._sample_walk(current_dict[key],key_path))
 			elif isinstance(current_dict[key],list) and len(current_dict[key]) and isinstance(current_dict[key][0],dict):
+				# Append a "*" to imply it's an array
+				key_path.append("*")
 				paths.extend(self._sample_walk(current_dict[key][0],key_path))
 		return paths
 
@@ -338,7 +340,7 @@ class OpenCore(commands.Cog):
 
 	@commands.command(aliases=["occonfig","configtex","ocsearch","configsearch","seachtex","tex","occ"])
 	async def octex(self, ctx, *, search_path = None):
-		"""Searches the Configuration.tex file in memory for the passed path.  Must include the full path separated by spaces, /, >, or -.
+		"""Searches the Configuration.tex file in memory for the passed path.  Must include the full path separated by spaces, /, >, or ->.
 
 		eg.  $octex Kernel Quirks DisableIoMapper"""
 
@@ -346,7 +348,8 @@ class OpenCore(commands.Cog):
 		if not self.tex: return await ctx.send("It looks like I was unable to get the Configuration.tex :(")
 		if search_path is None: return await ctx.send(usage)
 		# Let's split up the search path and ensure we have a qualified path to give to the parser
-		search_path = search_path.replace("-"," ").replace(">"," ").replace("/"," ")
+		# search_path = search_path.replace("->"," ").replace(">"," ").replace("/"," ")
+		search_path = re.sub(r"(?i)(?<!PciRoot\(0x[0-9a-f]\))(?<!Pci\(0x[0-9a-f],0x[0-9a-f]\))(?<!\\)(-?>|\/| )"," ",search_path)
 		search_path = re.sub(" {2,}"," ",search_path)
 		search_parts = search_path.split()
 		if not search_parts: return await ctx.send(usage)
@@ -387,7 +390,7 @@ class OpenCore(commands.Cog):
 
 		# We got something to show - let's build a page-picker
 		return await PickList.PagePicker(
-			title="Results For: "+" -> ".join(matches),
+			title="Results For: "+" -> ".join([x for x in matches if x!="*"]),
 			description=search_results,
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			footer="From Configuration.tex for OpenCore v{}".format(self.tex_version),
@@ -404,6 +407,8 @@ class OpenCore(commands.Cog):
 		# of the parts lists
 		match_list = []
 		for i,path in enumerate(self.sample_paths):
+			# Strip "*" from the path for matching
+			path = [x for x in path if x!="*"]
 			if len(path)<len(search_list): continue # Not going to match, our search is longer
 			# Get a fuzzy match ratio for each component counting back from the end
 			check_ratios = [
