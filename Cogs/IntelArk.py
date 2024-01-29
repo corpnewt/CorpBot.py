@@ -100,11 +100,11 @@ class IntelArk(commands.Cog):
 			"",
 			search_term
 		)
-		if re.search(r"(?i)\b[a-z]\d(\-|\s)[a-z\d]{4,}\b",search_term):
+		if re.search(r"(?i)\b(\w\d(\-|\s))?(\w*\d+\w*){3,}\b",search_term):
 			# Got a model number in there - make sure we strip
 			# the branding like Processor, Core, Ultra, CPU, etc
 			search_term = re.sub(
-				r"(?i)\b(core[\-\s]?2|[^\d\s]{2,})\b",
+				r"(?i)\b(?!(K|M|G|T)Hz)(core[\-\s]?2|[^\d\s]{2,})\b",
 				"",
 				search_term
 			)
@@ -124,6 +124,19 @@ class IntelArk(commands.Cog):
 			" ",
 			search_term
 		)
+		# Check for X.XGHz and convert to X.XX GHz
+		for m in re.finditer(r"(?i)\b(\d+(\.\d)?){1,}\s?((K|M|G|T)?Hz)\b",search_term):
+			m = m.group()
+			try:
+				# Get the numbers and suffix
+				val = m[:-3].strip()
+				suf = m[-3:].strip()
+				# Make sure the number is padded if need be
+				if "." in val and len(val.split(".")[-1]) < 2:
+					val = val+"0" # Pad with a 0
+				search_term = search_term.replace(m,"{} {}Hz".format(val,suf[0].upper()))
+			except:
+				pass
 		return search_term.strip()
 
 	async def get_match_data(self, match):
