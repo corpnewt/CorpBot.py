@@ -89,7 +89,7 @@ class IntelArk(commands.Cog):
 		# Display the content
 		await PickList.PagePicker(**args).pick()
 	
-	def clean_search(self, search_term, strip_prefix=False):
+	def clean_search(self, search_term, xeon_check=False, strip_prefix=False):
 		# Clean up the search terms to prevent some issues with Intel.com
 		# getting a bit confused.  This mostly shows up with Xeons and the
 		# newer Ultra CPUs if some query elements are retained.
@@ -112,6 +112,9 @@ class IntelArk(commands.Cog):
 			" ",
 			search_term
 		)
+		# Make sure we use spaces for Xeon models
+		if xeon_check and re.search(r"(?i)e\d\-[a-z\d]{4,}",search_term):
+			search_term = search_term.replace("-"," ")
 		# Strip out the iX-#### prefix if needed
 		if strip_prefix:
 			search_term = re.sub(
@@ -181,7 +184,7 @@ class IntelArk(commands.Cog):
 	async def quick_search(self, search_term):
 		try:
 			search_term = self.clean_search(search_term)
-			search_term_stripped = self.clean_search(search_term,strip_prefix=True)
+			search_term_stripped = self.clean_search(search_term,xeon_check=True,strip_prefix=True)
 			url = "https://www.intel.com/content/www/us/en/search.html?ws=text#q={}&sort=relevancy".format(
 				urllib.parse.quote(search_term.strip())
 			)
