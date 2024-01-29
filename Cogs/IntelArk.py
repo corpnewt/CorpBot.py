@@ -88,6 +88,38 @@ class IntelArk(commands.Cog):
 			args[key] = response[key]
 		# Display the content
 		await PickList.PagePicker(**args).pick()
+	
+	def clean_search(self, search_term, strip_prefix=False):
+		# Clean up the search terms to prevent some issues with Intel.com
+		# getting a bit confused.  This mostly shows up with Xeons and the
+		# newer Ultra CPUs if some query elements are retained.
+		#
+		# Strip non-ASCII chars
+		search_term = re.sub(
+			r"[^\x00-\x7F]+",
+			"",
+			search_term
+		)
+		# Remove branding like Processor, Core, Ultra, CPU, etc
+		search_term = re.sub(
+			r"(?i)\b(core[\-\s]?2|[^\d\s]{2,})\b",
+			"",
+			search_term
+		)
+		# Ensure we don't have erroneous spaces
+		search_term = re.sub(
+			r"\s+",
+			" ",
+			search_term
+		)
+		# Strip out the iX-#### prefix if needed
+		if strip_prefix:
+			search_term = re.sub(
+				r"(?i)[a-z]\d\-",
+				"",
+				search_term
+			)
+		return search_term.strip()
 
 	async def get_match_data(self, match):
 		"""Returns the data of a matched entry."""
@@ -148,28 +180,8 @@ class IntelArk(commands.Cog):
 
 	async def quick_search(self, search_term):
 		try:
-			# Clean up the search terms to prevent some issues with Intel.com
-			# getting a bit confused.  This mostly shows up with Xeons and the
-			# newer Ultra CPUs if some query elements are retained.
-			#
-			# Strip non-ASCII chars
-			search_term = re.sub(
-				r"[^\x00-\x7F]+",
-				"",
-				search_term
-			)
-			# Remove branding like Processor, Core, Ultra, CPU, etc
-			search_term = re.sub(
-				r"(?i)\b(core[\-\s]?2|[^\d\s]{2,})\b",
-				"",
-				search_term
-			)
-			# Ensure we don't have erroneous spaces
-			search_term = re.sub(
-				r"\s+",
-				" ",
-				search_term
-			)
+			search_term = self.clean_search(search_term)
+			search_term_stripped = self.clean_search(search_term,strip_prefix=True)
 			url = "https://www.intel.com/content/www/us/en/search.html?ws=text#q={}&sort=relevancy".format(
 				urllib.parse.quote(search_term.strip())
 			)
@@ -210,8 +222,12 @@ class IntelArk(commands.Cog):
 						uri = uri[:-len("/ordering.html")]+"/specifications.html"
 					if any(x.get("prodUrl") == uri for x in results):
 						continue # Skip duplicates
+					label = result.get("title",uri.split("/")[-1])
+					# Check if it's exact - and avoid returning multiple results when not needed
+					if self.clean_search(label,strip_prefix=True).lower() == search_term_stripped.lower():
+						return [{"label":label,"prodUrl":uri}]
 					results.append({
-						"label":result.get("title",uri.split("/")[-1]),
+						"label":label,
 						"prodUrl":uri
 					})
 			return sorted(results,key=lambda x:x["label"])
