@@ -100,18 +100,14 @@ class IntelArk(commands.Cog):
 			"",
 			search_term
 		)
-		# Remove branding like Processor, Core, Ultra, CPU, etc
-		search_term = re.sub(
-			r"(?i)\b(core[\-\s]?2|[^\d\s]{2,})\b",
-			"",
-			search_term
-		)
-		# Ensure we don't have erroneous spaces
-		search_term = re.sub(
-			r"\s+",
-			" ",
-			search_term
-		)
+		if re.search(r"(?i)\b[a-z]\d(\-|\s)[a-z\d]{4,}\b",search_term):
+			# Got a model number in there - make sure we strip
+			# the branding like Processor, Core, Ultra, CPU, etc
+			search_term = re.sub(
+				r"(?i)\b(core[\-\s]?2|[^\d\s]{2,})\b",
+				"",
+				search_term
+			)
 		# Make sure we use spaces for Xeon models
 		if xeon_check and re.search(r"(?i)e\d\-[a-z\d]{4,}",search_term):
 			search_term = search_term.replace("-"," ")
@@ -122,6 +118,12 @@ class IntelArk(commands.Cog):
 				"",
 				search_term
 			)
+		# Ensure we don't have erroneous spaces
+		search_term = re.sub(
+			r"\s+",
+			" ",
+			search_term
+		)
 		return search_term.strip()
 
 	async def get_match_data(self, match):
@@ -184,6 +186,8 @@ class IntelArk(commands.Cog):
 	async def quick_search(self, search_term):
 		try:
 			search_term = self.clean_search(search_term)
+			if not search_term:
+				return []
 			search_term_stripped = self.clean_search(search_term,xeon_check=True,strip_prefix=True)
 			url = "https://www.intel.com/content/www/us/en/search.html?ws=text#q={}&sort=relevancy".format(
 				urllib.parse.quote(search_term.strip())
