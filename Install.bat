@@ -7,20 +7,61 @@ REM Setup initial vars
 set "script_name="
 set /a tried=0
 set "toask=yes"
+set "pause_on_error=yes"
 set "py2v="
 set "py2path="
 set "py3v="
 set "py3path="
 set "pypath="
+set "targetpy=3"
 
 REM use_py3:
 REM   TRUE  = Use if found, use py2 otherwise
 REM   FALSE = Use py2
 REM   FORCE = Use py3
-set "use_py3=FORCE"
+set "use_py3=TRUE"
+
+REM We'll parse if the first argument passed is
+REM --install-python and if so, we'll just install
+set "just_installing=FALSE"
 
 REM Get the system32 (or equivalent) path
 call :getsyspath "syspath"
+
+REM Make sure the syspath exists
+if "!syspath!" == "" (
+    if exist "%SYSTEMROOT%\system32\cmd.exe" (
+        if exist "%SYSTEMROOT%\system32\reg.exe" (
+            if exist "%SYSTEMROOT%\system32\where.exe" (
+                REM Fall back on the default path if it exists
+                set "ComSpec=%SYSTEMROOT%\system32\cmd.exe"
+                set "syspath=%SYSTEMROOT%\system32\"
+            )
+        )
+    )
+    if "!syspath!" == "" (
+        cls
+        echo   ###     ###
+        echo  # Warning #
+        echo ###     ###
+        echo.
+        echo Could not locate cmd.exe, reg.exe, or where.exe
+        echo.
+        echo Please ensure your ComSpec environment variable is properly configured and
+        echo points directly to cmd.exe, then try again.
+        echo.
+        echo Current CompSpec Value: "%ComSpec%"
+        echo.
+        echo Press [enter] to quit.
+        pause > nul
+        exit /b 1
+    )
+)
+
+if "%~1" == "--install-python" (
+    set "just_installing=TRUE"
+    goto installpy
+)
 
 goto checkscript
 
@@ -41,84 +82,15 @@ if not exist "!thisDir!\!script_name!" (
     echo.
     echo Press [enter] to quit.
     pause > nul
-    exit /b
+    exit /b 1
 )
 goto checkpy
-
-:getsyspath <variable_name>
-REM Helper method to return the "proper" path to cmd.exe, reg.exe, and where.exe by walking the ComSpec var
-REM Prep the LF variable to use the "line feed" approach
-(SET LF=^
-%=this line is empty=%
-)
-REM Strip double semi-colons
-call :undouble "ComSpec" "%ComSpec%" ";"
-set "testpath=%ComSpec:;=!LF!%"
-REM Let's walk each path and test if cmd.exe, reg.exe, and where.exe exist there
-set /a found=0
-for /f "tokens=* delims=" %%i in ("!testpath!") do (
-    REM Only continue if we haven't found it yet
-    if NOT "%%i" == "" (
-        if !found! lss 1 (
-            set "temppath=%%i"
-            REM Remove "cmd.exe" from the end if it exists
-            if /i "!temppath:~-7!" == "cmd.exe" (
-                set "temppath=!temppath:~0,-7!"
-            )
-            REM Pad the end with a backslash if needed
-            if NOT "!temppath:~-1!" == "\" (
-                set "temppath=!temppath!\"
-            )
-            REM Let's see if cmd, reg, and where exist there - and set it if so
-            if EXIST "!temppath!cmd.exe" (
-                if EXIST "!temppath!reg.exe" (
-                    if EXIST "!temppath!where.exe" (
-                        set /a found=1
-                        set "ComSpec=!temppath!cmd.exe"
-                        set "%~1=!temppath!"
-                    )
-                )
-            )
-        )
-    )
-)
-goto :EOF
-
-:updatepath
-set "spath="
-set "upath="
-for /f "USEBACKQ tokens=2* delims= " %%i in (`!syspath!reg.exe query "HKCU\Environment" /v "Path" 2^> nul`) do ( if not "%%j" == "" set "upath=%%j" )
-for /f "USEBACKQ tokens=2* delims= " %%i in (`!syspath!reg.exe query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" 2^> nul`) do ( if not "%%j" == "" set "spath=%%j" )
-if not "%spath%" == "" (
-    REM We got something in the system path
-    set "PATH=%spath%"
-    if not "!upath!" == "" (
-        REM We also have something in the user path
-        set "PATH=%PATH%;%upath%"
-    )
-) else if not "%upath%" == "" (
-    set "PATH=%upath%"
-)
-REM Remove double semicolons from the adjusted PATH
-call :undouble "PATH" "%PATH%" ";"
-goto :EOF
-
-:undouble <string_name> <string_value> <character>
-REM Helper function to strip doubles of a single character out of a string recursively
-set "string_value=%~2"
-set "check=!string_value:%~3%~3=%~3!"
-if not "!check!" == "!string_value!" (
-    set "%~1=!check!"
-    call :undouble "%~1" "!check!" "%~3"
-)
-goto :EOF
 
 :checkpy
 call :updatepath
 for /f "USEBACKQ tokens=*" %%x in (`!syspath!where.exe python 2^> nul`) do ( call :checkpyversion "%%x" "py2v" "py2path" "py3v" "py3path" )
 for /f "USEBACKQ tokens=*" %%x in (`!syspath!where.exe python3 2^> nul`) do ( call :checkpyversion "%%x" "py2v" "py2path" "py3v" "py3path" )
 for /f "USEBACKQ tokens=*" %%x in (`!syspath!where.exe py 2^> nul`) do ( call :checkpylauncher "%%x" "py2v" "py2path" "py3v" "py3path" )
-set "targetpy=3"
 if /i "!use_py3!" == "FALSE" (
     set "targetpy=2"
     set "pypath=!py2path!"
@@ -156,7 +128,7 @@ if !tried! lss 1 (
     echo.
     echo Press [enter] to quit.
     pause > nul
-    exit /b
+    exit /b 1
 )
 goto runscript
 
@@ -254,7 +226,12 @@ echo.
 echo Gathering info from https://www.python.org/downloads/windows/...
 powershell -command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (new-object System.Net.WebClient).DownloadFile('https://www.python.org/downloads/windows/','%TEMP%\pyurl.txt')"
 if not exist "%TEMP%\pyurl.txt" (
-    goto checkpy
+    if /i "!just_installing!" == "TRUE" (
+        echo Failed to get info
+        exit /b 1
+    ) else (
+        goto checkpy
+    )
 )
 
 echo Parsing for latest...
@@ -263,7 +240,7 @@ pushd "%TEMP%"
 for /f "tokens=9 delims=< " %%x in ('findstr /i /c:"Latest Python !targetpy! Release" pyurl.txt') do ( set "release=%%x" )
 popd
 
-echo Found Python !release! -  Downloading...
+echo Found Python !release! - Downloading...
 REM Let's delete our txt file now - we no longer need it
 del "%TEMP%\pyurl.txt"
 
@@ -279,7 +256,12 @@ REM Now we download it with our slick powershell command
 powershell -command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (new-object System.Net.WebClient).DownloadFile('!url!','%TEMP%\pyinstall.!pytype!')"
 REM If it doesn't exist - we bail
 if not exist "%TEMP%\pyinstall.!pytype!" (
-    goto checkpy
+    if /i "!just_installing!" == "TRUE" (
+        echo Failed to download installer
+        exit /b 1
+    ) else (
+        goto checkpy
+    )
 )
 REM It should exist at this point - let's run it to install silently
 echo Installing...
@@ -300,21 +282,108 @@ REM If it worked, then we should have python in our PATH
 REM this does not get updated right away though - let's try
 REM manually updating the local PATH var
 call :updatepath
-goto checkpy
+if /i "!just_installing!" == "TRUE" (
+    echo.
+    echo Done.
+) else (
+    goto checkpy
+)
 exit /b
 
 :runscript
 REM Python found
 cls
-echo   ###                ###
-echo  # CorpBot - CorpNewt #
-echo ###                ###
-echo.
 set "args=%*"
 set "args=!args:"=!"
 if "!args!"=="" (
     "!pypath!" "!thisDir!!script_name!"
 ) else (
     "!pypath!" "!thisDir!!script_name!" %*
+)
+if /i "!pause_on_error!" == "yes" (
+    if not "%ERRORLEVEL%" == "0" (
+        echo.
+        echo Script exited with error code: %ERRORLEVEL%
+        echo.
+        echo Press [enter] to exit...
+        pause > nul
+    )
+)
+goto :EOF
+
+:undouble <string_name> <string_value> <character>
+REM Helper function to strip doubles of a single character out of a string recursively
+set "string_value=%~2"
+:undouble_continue
+set "check=!string_value:%~3%~3=%~3!"
+if not "!check!" == "!string_value!" (
+    set "string_value=!check!"
+    goto :undouble_continue
+)
+set "%~1=!check!"
+goto :EOF
+
+:updatepath
+set "spath="
+set "upath="
+for /f "USEBACKQ tokens=2* delims= " %%i in (`!syspath!reg.exe query "HKCU\Environment" /v "Path" 2^> nul`) do ( if not "%%j" == "" set "upath=%%j" )
+for /f "USEBACKQ tokens=2* delims= " %%i in (`!syspath!reg.exe query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" 2^> nul`) do ( if not "%%j" == "" set "spath=%%j" )
+if not "%spath%" == "" (
+    REM We got something in the system path
+    set "PATH=%spath%"
+    if not "%upath%" == "" (
+        REM We also have something in the user path
+        set "PATH=%PATH%;%upath%"
+    )
+) else if not "%upath%" == "" (
+    set "PATH=%upath%"
+)
+REM Remove double semicolons from the adjusted PATH
+call :undouble "PATH" "%PATH%" ";"
+goto :EOF
+
+:getsyspath <variable_name>
+REM Helper method to return a valid path to cmd.exe, reg.exe, and where.exe by
+REM walking the ComSpec var - will also repair it in memory if need be
+REM Strip double semi-colons
+call :undouble "temppath" "%ComSpec%" ";"
+
+REM Dirty hack to leverage the "line feed" approach - there are some odd side
+REM effects with this.  Do not use this variable name in comments near this
+REM line - as it seems to behave erradically.
+(set LF=^
+%=this line is empty=%
+)
+REM Replace instances of semi-colons with a line feed and wrap
+REM in parenthesis to work around some strange batch behavior
+set "testpath=%temppath:;=!LF!%"
+
+REM Let's walk each path and test if cmd.exe, reg.exe, and where.exe exist there
+set /a found=0
+for /f "tokens=* delims=" %%i in ("!testpath!") do (
+    REM Only continue if we haven't found it yet
+    if not "%%i" == "" (
+        if !found! lss 1 (
+            set "checkpath=%%i"
+            REM Remove "cmd.exe" from the end if it exists
+            if /i "!checkpath:~-7!" == "cmd.exe" (
+                set "checkpath=!checkpath:~0,-7!"
+            )
+            REM Pad the end with a backslash if needed
+            if not "!checkpath:~-1!" == "\" (
+                set "checkpath=!checkpath!\"
+            )
+            REM Let's see if cmd, reg, and where exist there - and set it if so
+            if EXIST "!checkpath!cmd.exe" (
+                if EXIST "!checkpath!reg.exe" (
+                    if EXIST "!checkpath!where.exe" (
+                        set /a found=1
+                        set "ComSpec=!checkpath!cmd.exe"
+                        set "%~1=!checkpath!"
+                    )
+                )
+            )
+        )
+    )
 )
 goto :EOF
