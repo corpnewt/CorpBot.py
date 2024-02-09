@@ -87,7 +87,9 @@ def main():
         break
     print("Restarting the local file...")
     # Restart WatchDog.py anew - this allows for updates to take effect
-    os.execv(sys.executable, [sys.executable, __file__]+sys.argv[1:])
+    p = subprocess.Popen([sys.executable]+sys.argv)
+    p.communicate()
+    exit(p.returncode)
 
 git = get_git()
 if git is None:
