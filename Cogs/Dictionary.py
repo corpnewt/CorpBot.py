@@ -37,25 +37,29 @@ class Dictionary(commands.Cog):
 		# Walk the phonetics - retain all different entries, and
 		# link audio where applicable
 		if response.get("phonetics"):
-			p_text = ""
-			already_seen = []
+			phonetics = {}
 			for p in response["phonetics"]:
-				if not all((x in p for x in ("text","sourceUrl"))):
-					# Missing values - skip
-					continue
-				if p["text"] in already_seen:
-					continue
-				p_text += "[{}]({}){}\n".format(
-					p["text"],
-					p["sourceUrl"],
-					" ([Listen Here]({}))".format(p["audio"]) if p.get("audio") else ""
-				)
-				already_seen.append(p["text"])
-			if p_text:
-				fields.append({
-					"name":"Phonetics",
-					"value":p_text.strip()
-				})
+				if not "text" in p: continue
+				# Let's prioritize phonetics with audio - and prioritize US audio if
+				# present.
+				if not p["text"] in phonetics:
+					phonetics[p["text"]] = current = ""
+				else:
+					current = phonetics[p["text"]]
+				if p.get("audio"):
+					if not current or p["audio"].split(".")[-2].lower().endswith("-us"):
+						phonetics[p["text"]] = p["audio"]
+			if phonetics:
+				# Format based on our dict
+				p_text = ""
+				for p,v in phonetics.items():
+					if not v: continue # Only include those with audio
+					p_text += "[{}]({})\n".format(p,v)
+				if p_text:
+					fields.append({
+						"name":"Phonetics",
+						"value":p_text.strip()
+					})
 		# Walk the meanings and store them by part of speech
 		if response.get("meanings"):
 			for m in response["meanings"]:
