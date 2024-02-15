@@ -8,7 +8,7 @@ def setup(bot):
 	settings = bot.get_cog("Settings")
 	bot.add_cog(Dictionary(bot, settings))
 
-# This module grabs Urban Dictionary definitions
+# This module grabs Dictionary definitions
 
 class Dictionary(commands.Cog):
 
