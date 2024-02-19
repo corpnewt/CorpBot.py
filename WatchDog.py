@@ -72,7 +72,7 @@ def main():
         if bot_process.returncode == 3:
             print("\nShut down.")
             if os.name == "nt":
-                print("\nPress [enter] to close this window...")
+                input("\nPress [enter] to close this window...")
             exit(0)
         elif bot_process.returncode in (2,4):
             print("\nRebooting...")
