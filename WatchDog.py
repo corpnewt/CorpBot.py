@@ -11,6 +11,9 @@ install_path = os.path.join(dir_path,install)
 restart_on_error = True
 wait_before_restart = 1
 
+# Ensure the current directory is our parent dir
+os.chdir(dir_path)
+
 def get_bin(binary):
     # Returns the location in PATH (if any) of the passed var
     command = "where" if os.name == "nt" else "which"
