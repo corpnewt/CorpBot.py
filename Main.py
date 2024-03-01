@@ -439,12 +439,13 @@ async def watchinput():
 			i = (await asyncio.to_thread(sys.stdin.readline)).rstrip("\n")
 		else:
 			i = (await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)).rstrip("\n")
-		if i.lower() in ("?","-h","--help","/h","/help"):
+		if i.lower() in ("?","-h","--help","/h","/help","help","/?"):
 			print(" - Console commands:")
 			print("   - 'shutdown', 'exit', or 'quit': shut down and exit the bot (returns 3)")
 			print("   - 'reboot' or 'restart': reboot the bot (returns 2)")
-			print("   - 'install': reboot the bot and install/update dependencies (returns 4)")
-		elif i.lower() in ("shutdown","exit","quit","reboot","restart","install"):
+			print("   - 'install': reboot the bot and install dependencies (returns 4)")
+			print("   - 'update': reboot the bot and update dependencies (returns 5)")
+		elif i.lower() in ("shutdown","exit","quit","reboot","restart","install","update"):
 			try:
 				task_list = asyncio.Task.all_tasks()
 			except AttributeError:
@@ -458,8 +459,25 @@ async def watchinput():
 				bot.loop.close()
 			except:
 				pass
+			# Try to flush settings first
+			settings = bot.get_cog("Settings")
+			if settings:
+				print("Flushing settings...")
+				if os.path.isfile(os.path.join("Cogs","PandorasDB.py")):
+					# Flush the redis branch
+					settings.flushSettings()
+				else:
+					# Flush the rewrite branch to file
+					settings.flushSettings(settings.file)
 			# Kill this process
-			os._exit(3 if i.lower() in ("shutdown","exit","quit") else 4 if i.lower() == "install" else 2)
+			returncode = 2
+			if i.lower() in ("shutdown","exit","quit"):
+				returncode = 3
+			elif i.lower() == "install":
+				returncode = 4
+			elif i.lower() == "update":
+				returncode = 5
+			os._exit(returncode)
 
 # Run the bot
 print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count == 1 else "s"))
