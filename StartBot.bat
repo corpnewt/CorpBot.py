@@ -7,6 +7,8 @@ echo ###                   ###
 echo.
 
 set "thisDir=%~dp0"
+set "rd=Redis-x64-3.2.100"
+set "redis=redis-server.exe"
 set "start=Start.bat"
 set "ld=Lavalink"
 set "lava=Lavalink.jar"
@@ -24,12 +26,36 @@ if EXIST "%thisDir%\%ld%\%lava%" (
     echo does not exist!
     echo.
     echo You can get it from:
-    echo   https://github.com/freyacodes/Lavalink/releases/latest
+    echo   https://github.com/lavalink-devs/Lavalink/releases/latest
+    echo.
     pause
     exit /b
 )
 timeout %wait%
 echo.
+REM Only start the Redis server if we're using the redis
+REM branch of CorpBot.py
+if EXIST "%thisDir%\Cogs\PandorasDB.py" (
+    if EXIST "%thisDir%\%rd%\%redis%" (
+        echo Starting database...
+        pushd "%thisDir%\%rd%"
+        start "" "%redis%"
+        popd
+        echo Waiting %wait% seconds...
+        echo.
+    ) else (
+        echo "%thisDir%\%redis%"
+        echo does not exist!
+        echo.
+        echo You can get it from:
+        echo   https://github.com/microsoftarchive/redis/releases/latest
+        echo.
+        pause
+        exit /b
+    )
+    timeout %wait%
+    echo.
+)
 if EXIST "%thisDir%\%start%" (
     echo Starting bot...
     start cmd /c "%thisDir%\%start%"
