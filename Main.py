@@ -489,7 +489,7 @@ except errors.LoginFailure as e:
 	if "token" in str(e).lower():
 		print("You can create/reset your token in the Developer Portal:\n")
 		print("1. Go to https://discord.com/developers/applications")
-		print("2. Select your bot under 'My Application' or click 'New Application' to")
+		print("2. Select your bot under 'My Applications' or click 'New Application' to")
 		print("   create a new bot")
 		print("3. Click 'Bot' in the menu on the left side of the page")
 		print("4. Click 'Reset Token'")
