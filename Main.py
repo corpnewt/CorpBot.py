@@ -484,5 +484,19 @@ print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count =
 bot.loop.create_task(watchinput())
 try:
 	bot.run(settings_dict.get("token",""))
+except errors.LoginFailure as e:
+	print("\nSomething went wrong logging in: {}\n".format(e))
+	if "token" in str(e).lower():
+		print("You can create/reset your token in the Developer Portal:\n")
+		print("1. Go to https://discord.com/developers/applications")
+		print("2. Select your bot under 'My Application' or click 'New Application' to")
+		print("   create a new bot")
+		print("3. Click 'Bot' in the menu on the left side of the page")
+		print("4. Click 'Reset Token'")
+		print("   - DO NOT SHARE THIS TOKEN WITH ANYONE")
+		print("   - YOU CAN ONLY VIEW IT ONCE")
+		print("5. Save the token in settings_dict.json")
+		print("6. Try starting the bot again\n")
+	os._exit(3)
 except RuntimeError as e:
 	print("Dirty shutdown - runtime error minimized:\n - {}".format(e))
