@@ -460,17 +460,25 @@ class Bot(commands.Cog):
 
 	# Needs rewrite!
 	@commands.command()
-	async def reboot(self, ctx, *, install=None):
-		"""Reboots the bot (owner only)."""
+	async def reboot(self, ctx, *, install_or_update=None):
+		"""Reboots the bot (owner only).  Can optionally take install or update as arguments to clear and install dependencies, or update existing as needed."""
 		if not await Utils.is_owner_reply(ctx): return
 
 		# Save the return channel and flush settings
 		self.settings.setGlobalStat("{}-ReturnChannel".format(self.bot.user.id),ctx.channel.id if ctx.guild else ctx.author.id)
 		# Get our return code
-		returncode = 4 if install is not None and "install" in install.lower() else 2
+		returncode = 2
+		suffix = ""
+		if install_or_update:
+			if "install" in install_or_update.lower():
+				returncode = 4
+				suffix = " and installing dependencies"
+			elif "update" in install_or_update.lower():
+				returncode = 5
+				suffix = " and updating dependencies"
 		# Flush settings asynchronously here
 		await ctx.invoke(self.settings.flush)
-		await ctx.send("Rebooting{}...".format(" and updating dependencies" if returncode == 4 else ""))
+		await ctx.send("Rebooting{}...".format(suffix))
 		# Logout, stop the event loop, close the loop, quit
 		try:
 			task_list = asyncio.Task.all_tasks()
