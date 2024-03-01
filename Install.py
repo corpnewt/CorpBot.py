@@ -1,8 +1,4 @@
-import os
-import sys
-import subprocess
-import threading
-import shlex
+import os, sys, subprocess, threading, shlex, venv, argparse, json
 try:
     from Queue import Queue, Empty
 except:
@@ -150,30 +146,78 @@ class Run:
             return output_list[0]
         return output_list
 
+def check_venv(force=False, clear=False, quiet=False):
+    # Check for the virtual env
+    needs_update = True
+    venv_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"venv")
+    if os.name == "nt":
+        py_venv = os.path.join(venv_path,"Scripts","python.exe")
+    else:
+        py_venv = os.path.join(venv_path,"bin","python")
+    if not force:
+        # Only check pathing/versions if we're not forcing an update
+        cfg_path = os.path.join(venv_path,"pyvenv.cfg")
+        if os.path.isfile(cfg_path) and os.path.isfile(py_venv):
+            # Both the pyvenv.cfg and our alias/bin exist,
+            # try to get the path from pyvenv.cfg
+            with open(cfg_path,"r") as f:
+                cfg = f.read()
+            home = exe = None
+            for line in cfg.split("\n"):
+                line = line.rstrip("\r") # Handle CRLF
+                if line.startswith("home = "):
+                    home = "home = ".join(line.split("home = ")[1:])
+                elif line.startswith("executable = "):
+                    exe = "executable = ".join(line.split("executable = ")[1:])
+                if home and exe:
+                    break
+            # Compare to our executable's path
+            c = venv.EnvBuilder().ensure_directories(venv_path)
+            if (exe and exe == c.executable) or (home and home == c.python_dir):
+                # It's a match - no need to update
+                needs_update = False
+    else:
+        # We can't upgrade if we're forcing - so ensure we clear
+        clear = True
+    if needs_update:
+        # Make sure we remove the existing python alias/exe/bin first
+        if os.path.isfile(py_venv):
+            os.remove(py_venv)
+        # We either don't have a venv, or it's a different
+        # version of py - let's create the venv and return
+        if not quiet:
+            print("{} venv...".format("Creating new" if clear else "Upgrading"))
+        venv.EnvBuilder(clear=clear,upgrade=not clear,with_pip=True).create(venv_path)
+    if os.path.isfile(py_venv):
+        return py_venv
+    return None
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog="Install.py", description="Installer for CorpBot.py dependencies.")
+    parser.add_argument("-n", "--no-interaction", help="Don't require user interaction after tasks complete", action="store_true")
+    parser.add_argument("-c", "--clear-venv", help="Clears the venv when accessed with a different python version instead of upgrading", action="store_true")
+    parser.add_argument("-f", "--force-update-venv", help="Clears the venv and creates it anew", action="store_true")
+    parser.add_argument("-l", "--list-dependencies", help="Prints JSON data showing required dependencies, whether they're installed, and their versions (overrides --no-interaction and --install-missing)", action="store_true")
+    parser.add_argument("-m", "--install-missing", help="Only attmepts to install missing dependencies", action="store_true")
+    args = parser.parse_args()
+
     r = Run()
     modules = [
         # Get the latest commit of pomice to ensure we have Lavalink v4 changes
-        {"name":"pomice","uninstall":True},
         {"name":"pomice","item":"git+https://github.com/cloudwithax/pomice.git"},
-        # Remove the updated discord.py that pomice overwrites, and
-        # remove py-cord so we can reinstall it with the proper version
-        {"name":"discord.py","uninstall":True},
-        {"name":"pycord","item":"py-cord[voice]","uninstall":True},
-        # Get the latest commit of py-cord to ensure we have pyhton 3.12 changes
-        {"name":"pycord","item":"git+https://github.com/Pycord-Development/pycord.git#egg=py-cord[voice]"},
-        {"name":"certifi"},
+        # Get the latest commit of py-cord to ensure we have python 3.12 changes
+        {"name":"py-cord","item":"git+https://github.com/Pycord-Development/pycord.git#egg=py-cord[voice]"},
         {"name":"pillow"},
-        {"name":"Requests"},
+        {"name":"requests"},
         {"name":"parsedatetime"},
         {"name":"psutil"},
         {"name":"pyparsing"},
         {"name":"pyquery"},
-        {"name":"pyaiml","item":"git+https://github.com/paulovn/python-aiml"},
+        {"name":"python-aiml","item":"git+https://github.com/paulovn/python-aiml"},
         {"name":"speedtest-cli"},
         {"name":"pytz"},
         {"name":"wikipedia"},
-        {"name":"googletrans (direct api branch)","item":"git+https://github.com/ssut/py-googletrans@feature/enhance-use-of-direct-api"},
+        {"name":"googletrans (direct api branch)","item":"git+https://github.com/ssut/py-googletrans@feature/enhance-use-of-direct-api","pkg_name":"googletrans"},
         {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
@@ -182,25 +226,72 @@ if __name__ == '__main__':
         {"name":"regex"}
     ]
     db_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Cogs","PandorasDB.py")
-    print("\nChecking for {}...".format(db_path))
     if os.path.exists(db_path):
-        print("Branch has database support - including redis...")
-        modules.append({"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3"})
-    else:
-        print("No database support - omitting redis...")
-    item = 0
-    for module in modules:
-        item+=1
-        print("\n\n{} {} - {} of {}\n\n".format("Removing" if module.get("uninstall") else "Updating",module["name"], item, len(modules)))
-        if module.get("uninstall"):
-            r.run({"args":[sys.executable, "-m", "pip", "uninstall","-y", module.get("item", module["name"])], "stream":True})
-        else:
-            r.run({"args":[sys.executable, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
-    # Prompt for the users to press enter to exit
-    print("\nDone.")
-    if not "-n" in sys.argv[1:] and not "--no-interaction" in sys.argv[1:]:
-        prompt = "\nPress [enter] to leave the script..."
-        if sys.version_info >= (3, 0):
-            input(prompt)
-        else:
-            raw_input(prompt)
+        modules.append({"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3","pkg_name":"redis"})
+    
+    # Let's ensure the virtual env
+    py_venv = check_venv(
+        force=args.force_update_venv,
+        clear=args.clear_venv,
+        quiet=args.list_dependencies
+    )
+    if not py_venv:
+        raise FileNotFoundError("Could not locate or create a valid virtual env at {}".format(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)),"venv")
+        ))
+    
+    if args.list_dependencies or args.install_missing:
+        # Gather a list of what deps we have, and which are missing
+        out = r.run({"args":[py_venv,"-m","pip","list"]})
+        if out[2] != 0:
+            exit(out[2])
+        checks = {}
+        for m in modules:
+            if m.get("uninstall"):
+                continue # Skip uninstalls
+            checks[m.get("pkg_name",m["name"]).lower()] = None
+        # Walk the pip list output and scrape for our modules
+        for line in out[0].split("\n"):
+            try:
+                name,vers = line.lower().split()
+            except:
+                continue
+            if name in checks:
+                checks[name]=vers
+        if args.list_dependencies:
+            # Just printing the deps - do that and bail
+            print(json.dumps(checks,indent=2))
+            exit()
+        elif args.install_missing:
+            # Let's replace our modules with the ones that are missing
+            new_modules = []
+            for m in modules:
+                name = m.get("pkg_name",m["name"]).lower()
+                if not checks.get(name):
+                    new_modules.append(m)
+            # Replace the original list
+            modules = new_modules
+    exit_code = 0
+    try:
+        if not modules:
+            print("No modules to install.")
+        for item,module in enumerate(modules,start=1):
+            print("\n\n{} {} - {} of {}\n\n".format("Removing" if module.get("uninstall") else "Updating",module["name"], item, len(modules)))
+            if module.get("uninstall"):
+                o = r.run({"args":[py_venv, "-m", "pip", "uninstall","-y", module.get("item", module["name"])], "stream":True})
+            else:
+                o = r.run({"args":[py_venv, "-m", "pip", "install", "-U", module.get("item", module["name"])], "stream":True})
+            if o[2] != 0:
+                exit_code = o[2]
+        # Prompt for the users to press enter to exit
+        print("\nDone.")
+    except Exception as e:
+        print("Something went wrong: {}".format(e))
+    finally:
+        if not args.no_interaction:
+            prompt = "\nPress [enter] to leave the script..."
+            if sys.version_info >= (3, 0):
+                input(prompt)
+            else:
+                raw_input(prompt)
+        exit(exit_code)
