@@ -5,9 +5,10 @@ from   Cogs import Settings, Message, UserTime, DL, FuzzySearch
 def setup(bot):
     # Do some simple setup
     if not bot.settings_dict.get("igdbclientid") or not bot.settings_dict.get("igdbsecret"):
-        if not bot.settings_dict.get("suppress_requirement_warnings"):
-            print("\n!! IGDB API key is missing ('igdbclientid' & 'igdbsecret' in settings_dict.json)")
-            print(" - You can find instructions for getting them at:")
+        if not bot.settings_dict.get("suppress_disabled_warnings"):
+            print("\n!! GameLookup Cog has been disabled !!")
+            print("* Missing IGDB API keys ('igdbclientid' & 'igdbsecret' in settings_dict.json)")
+            print("* You can find instructions for getting them at:")
             print("   https://api-docs.igdb.com/#getting-started\n")
         return
     # Add the bot and deps

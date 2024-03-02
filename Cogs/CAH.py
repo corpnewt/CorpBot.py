@@ -31,14 +31,15 @@ def setup(bot):
             deck["blackCards"] = deck.pop("black",[])
         assert all((x in deck for x in ("whiteCards","blackCards")))
     except:
-        if not bot.settings_dict.get("suppress_requirement_warnings"):
-            print("\n!! Cards Against Humanity deck.json is {}".format(
+        if not bot.settings_dict.get("suppress_disabled_warnings"):
+            print("\n!! CAH Cog has been disabled !!")
+            print("* Cards Against Humanity deck.json is {}".format(
                 "missing" if not os.path.isfile("deck.json") else "malformed"
             ))
-            print(" - You can get a fresh copy at:")
+            print("* You can get a fresh copy at:")
             print("   http://www.crhallberg.com/cah/json")
-            print(" - Make sure to use the 'compact.json' option when downloading")
-            print("   and save it as 'deck.json' at the root of the bot's main folder\n")
+            print("* Make sure to use the 'compact.json' option when downloading")
+            print("  and save it as 'deck.json' at the root of the bot's main folder\n")
         return
     # Add the bot
     bot.add_cog(CAH(bot,deck))

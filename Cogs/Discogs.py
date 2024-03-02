@@ -6,11 +6,12 @@ from   Cogs import Settings, DisplayName, Message, DL
 def setup(bot):
 	# Make sure we have the needed api key
 	if not bot.settings_dict.get("discogs"):
-		if not bot.settings_dict.get("suppress_requirement_warnings"):
-			print("\n!! Discogs API key is missing ('discogs' in settings_dict.json)")
-			print(" - You can get a free Discogs API key by creating an account at:")
+		if not bot.settings_dict.get("suppress_disabled_warnings"):
+			print("\n!! Discogs Cog has been disabled !!")
+			print("* Discogs API key is missing ('discogs' in settings_dict.json)")
+			print("* You can get a free Discogs API key by creating an account at:")
 			print("   https://www.discogs.com/")
-			print(" - Or if you already have an account, create/copy your API key at:")
+			print("* Or if you already have an account, create/copy your API key at:")
 			print("   https://www.discogs.com/settings/developers\n")
 		return
 	bot.add_cog(Discogs(bot))
