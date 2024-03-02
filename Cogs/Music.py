@@ -210,9 +210,10 @@ class Music(commands.Cog):
 				apple_music=self.use_apple_music
 			)
 		except pomice.exceptions.NodeConnectionFailure as e:
-			if not self.bot.settings_dict.get("suppress_requirement_warnings"):
-				print("\n!! Failed to connect to Lavalink: {}".format(e))
-				print(" - You can get the latest release of Lavalink here:")
+			if not self.bot.settings_dict.get("suppress_disabled_warnings"):
+				print("\n!! Music Cog has been disabled !!")
+				print("* Failed to connect to Lavalink: {}".format(e))
+				print("* You can get the latest release of Lavalink here:")
 				print("   https://github.com/lavalink-devs/Lavalink/releases\n")
 			self.bot.unload_extension("Cogs.Music")
 

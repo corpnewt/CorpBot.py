@@ -27,9 +27,10 @@ class Search(commands.Cog):
 		# Check if we have a currency key - and remove the related commands
 		# if we don't
 		if not self.bot.settings_dict.get("currency"):
-			if not self.bot.settings_dict.get("suppress_requirement_warnings"):
-				print("\n!! Currency Converter API key is missing ('currency' in settings_dict.json)")
-				print(" - You can get a free currency converter API key by signing up at:")
+			if not self.bot.settings_dict.get("suppress_disabled_warnings"):
+				print("\n!! Search Cog's 'convert' and 'currlist' commands have been disabled !!")
+				print("* Currency Converter API key is missing ('currency' in settings_dict.json)")
+				print("* You can get a free currency converter API key by signing up at:")
 				print("   https://free.currencyconverterapi.com/free-api-key\n")
 			self.bot.remove_command("currlist")
 			self.bot.remove_command("convert")

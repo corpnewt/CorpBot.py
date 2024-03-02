@@ -438,6 +438,7 @@ async def watchinput():
 		i = (await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)).rstrip("\n")
 		if i.lower() in ("?","-h","--help","/h","/help","help","/?"):
 			print(" - Console commands:")
+			print("   - 'help': show this help message")
 			print("   - 'shutdown', 'exit', or 'quit': shut down and exit the bot (returns 3)")
 			print("   - 'reboot' or 'restart': reboot the bot (returns 2)")
 			print("   - 'install': reboot the bot and install dependencies (returns 4)")
