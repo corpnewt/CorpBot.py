@@ -197,17 +197,24 @@ class Music(commands.Cog):
 			# Try to shut the nodes down forcefully
 			try: await self.NodePool.disconnect()
 			except: pass
-		# No existing nodes - start fresh
-		await self.NodePool.create_node(
-			bot=self.bot,
-			host=self.ll_host,
-			port=self.ll_port,
-			identifier=None,
-			password=self.ll_pass,
-			spotify_client_id=self.spotify_client_id,
-			spotify_client_secret=self.spotify_client_secret,
-			apple_music=self.use_apple_music
-		)
+		try:
+			# No existing nodes - start fresh
+			await self.NodePool.create_node(
+				bot=self.bot,
+				host=self.ll_host,
+				port=self.ll_port,
+				identifier=None,
+				password=self.ll_pass,
+				spotify_client_id=self.spotify_client_id,
+				spotify_client_secret=self.spotify_client_secret,
+				apple_music=self.use_apple_music
+			)
+		except pomice.exceptions.NodeConnectionFailure as e:
+			if not self.bot.settings_dict.get("suppress_requirement_warnings"):
+				print("\n!! Failed to connect to Lavalink: {}".format(e))
+				print(" - You can get the latest release of Lavalink here:")
+				print("   https://github.com/lavalink-devs/Lavalink/releases\n")
+			self.bot.unload_extension("Cogs.Music")
 
 	def get_node(self):
 		# Try to get the best node - if any, otherwise create one
