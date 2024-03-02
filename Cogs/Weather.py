@@ -6,7 +6,15 @@ from   discord.ext import commands
 from   Cogs import Message, PickList, DL
 
 def setup(bot):
-	# Add the bot
+	# Make sure we have the needed api key
+	if not bot.settings_dict.get("weather"):
+		if not bot.settings_dict.get("suppress_requirement_warnings"):
+			print("\n!! Weather API key is missing ('weather' in settings_dict.json)")
+			print(" - You can get a free openweathermap API key by signing up at:")
+			print("   https://openweathermap.org/home/sign_up")
+			print(" - Or if you already have an account, create/copy your API key at:")
+			print("   https://home.openweathermap.org/api_keys\n")
+		return
 	bot.add_cog(Weather(bot))
 
 # This is the Weather module
@@ -15,7 +23,6 @@ class Weather(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
 		self.bot = bot
-		self.key = bot.settings_dict.get("weather","")
 		self.weather_timeout = bot.settings_dict.get("weather_timeout",15)
 		if not isinstance(self.weather_timeout,int):
 			self.weather_timeout = 15
@@ -184,7 +191,7 @@ class Weather(commands.Cog):
 		# Just want the current weather
 		try:
 			r = await DL.async_json("http://api.openweathermap.org/data/2.5/weather?appid={}&lat={}&lon={}".format(
-				self.key,
+				self.bot.settings_dict.get("weather",""),
 				location.latitude,
 				location.longitude
 			))
@@ -218,7 +225,7 @@ class Weather(commands.Cog):
 		# We want the 5-day forecast at this point
 		try:
 			r = await DL.async_json("http://api.openweathermap.org/data/2.5/forecast?appid={}&lat={}&lon={}".format(
-				self.key,
+				self.bot.settings_dict.get("weather",""),
 				location.latitude,
 				location.longitude
 			))

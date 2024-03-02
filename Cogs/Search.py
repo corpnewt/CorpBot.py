@@ -13,10 +13,26 @@ class Search(commands.Cog):
 	def __init__(self, bot, auth_file: str = None):
 		self.bot       = bot
 		self.site_auth = bot.settings_dict.get("corpsiteauth",None)
-		self.key       = bot.settings_dict.get("currency","")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		# Check if we have a currency key - and remove the related commands
+		# if we don't
+		if not self.bot.settings_dict.get("currency"):
+			if not self.bot.settings_dict.get("suppress_requirement_warnings"):
+				print("\n!! Currency Converter API key is missing ('currency' in settings_dict.json)")
+				print(" - You can get a free currency converter API key by signing up at:")
+				print("   https://free.currencyconverterapi.com/free-api-key\n")
+			self.bot.remove_command("currlist")
+			self.bot.remove_command("convert")
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
@@ -151,7 +167,7 @@ class Search(commands.Cog):
 		# Get the list of currencies
 		api_status = "UNKNOWN"
 		r = None
-		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey="+self.key)
+		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey={}".format(self.bot.settings_dict.get("currency","")))
 		except:
 			api_status = await self._get_api_status()
 		return (r,api_status)
@@ -257,7 +273,12 @@ class Search(commands.Cog):
 			return await ctx.send("Invalid to currency!")
 
 		# At this point, we should be able to convert
-		try: o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(frm.upper(), to.upper(), self.key))
+		try:
+			o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(
+				frm.upper(),
+				to.upper(),
+				self.bot.settings_dict.get("currency","")
+			))
 		except:
 			api_status = await self._get_api_status()
 			return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))

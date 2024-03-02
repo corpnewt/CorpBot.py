@@ -4,15 +4,22 @@ from   discord.ext import commands
 from   Cogs import Settings, DisplayName, Message, DL
 
 def setup(bot):
-	# Add the bot and deps
+	# Make sure we have the needed api key
+	if not bot.settings_dict.get("discogs"):
+		if not bot.settings_dict.get("suppress_requirement_warnings"):
+			print("\n!! Discogs API key is missing ('discogs' in settings_dict.json)")
+			print(" - You can get a free Discogs API key by creating an account at:")
+			print("   https://www.discogs.com/")
+			print(" - Or if you already have an account, create/copy your API key at:")
+			print("   https://www.discogs.com/settings/developers\n")
+		return
 	bot.add_cog(Discogs(bot))
 
 class Discogs(commands.Cog):
 
 	# Init with the bot reference
-	def __init__(self, bot, auth_file: str = None):
+	def __init__(self, bot):
 		self.bot = bot
-		self.key = bot.settings_dict.get("discogs","")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -93,5 +100,5 @@ class Discogs(commands.Cog):
 			if s:
 				search_text += "&{}={}".format(x,self.quote(s))
 		# Get the search results - per_page maxes at 100
-		url = "https://api.discogs.com/database/search?{}&per_page=10&token={}".format(search_text,self.key)
+		url = "https://api.discogs.com/database/search?{}&per_page=10&token={}".format(search_text,self.bot.settings_dict.get("discogs",""))
 		await self.discog(url,ctx)

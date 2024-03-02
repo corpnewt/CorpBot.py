@@ -19,8 +19,29 @@ except ImportError:
     from html.parser import HTMLParser
 
 def setup(bot):
+    # Let's load the deck.json file first
+    # and verify the integrity before adding
+    # the cog.
+    try:
+        deck = json.load(open("deck.json","rb"))
+        # Let's validate our json structure - new versions do not have universal
+        # blackCards and whiteCards keys - so we need to restructure
+        if "white" in deck and "black" in deck:
+            deck["whiteCards"] = deck.pop("white",[])
+            deck["blackCards"] = deck.pop("black",[])
+        assert all((x in deck for x in ("whiteCards","blackCards")))
+    except:
+        if not bot.settings_dict.get("suppress_requirement_warnings"):
+            print("\n!! Cards Against Humanity deck.json is {}".format(
+                "missing" if not os.path.isfile("deck.json") else "malformed"
+            ))
+            print(" - You can get a fresh copy at:")
+            print("   http://www.crhallberg.com/cah/json")
+            print(" - Make sure to use the 'compact.json' option when downloading")
+            print("   and save it as 'deck.json' at the root of the bot's main folder\n")
+        return
     # Add the bot
-    bot.add_cog(CAH(bot))
+    bot.add_cog(CAH(bot,deck))
 
 class SenCheck:
 
@@ -174,8 +195,8 @@ class SenCheck:
 
 class CAH(commands.Cog):
 
-    # Init with the bot reference, and a reference to the deck file
-    def __init__(self, bot, prefix = "$", file_path = None):
+    # Init with the bot reference, and a reference to the deck
+    def __init__(self, bot, deck, prefix = "$"):
         self.prefix = prefix
         self.bot = bot
         self.games = []
@@ -197,20 +218,7 @@ class CAH(commands.Cog):
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
-        file_path = "deck.json" if file_path == None else file_path
-        # Let's load our deck file
-        # Can be found at http://www.crhallberg.com/cah/json
-        # Make sure to use the "compact.json" option when download
-        try: self.deck = json.load(open(file_path,"rb"))
-        except: self.deck = {} # File doesn't exist or isn't valid - create a placeholder
-        # Let's validate our json structure - new versions do not have universal
-        # blackCards and whiteCards keys - so we need to restructure
-        if "white" in self.deck and "black" in self.deck:
-            self.deck["whiteCards"] = self.deck.pop("white",[])
-            self.deck["blackCards"] = self.deck.pop("black",[])
-        # Check if our deck is borked and print an issue if so
-        if not all((x in self.deck for x in ("whiteCards","blackCards"))):
-            print("{} is malformed!  CAH will not work correctly!".format(file_path)) 
+        self.deck = deck
         # Get our bot personalities setup
         words = "cah_words.json"
         try: word_dict = json.load(open(words,"rb"))
