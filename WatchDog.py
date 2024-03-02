@@ -95,10 +95,13 @@ def main():
         # 3 = Regular exit - ignore, and quit too
         # 4 = Install deps - update bot, install, then restart
         # 5 = Update deps - update bot, update deps, ethen restart
+        # 6 = Invalid token - load settings_dict.json and prompt for new token
         # Anything else assumes an issue with the script
         # and will subsequently restart.
 
-        print("Return code:  {}".format(bot_process.returncode))
+        if bot_process.returncode != 6:
+            # Don't print if we need to prompt for a new token
+            print("Return code:  {}".format(bot_process.returncode))
 
         if bot_process.returncode == 3:
             print("\nShut down.")
@@ -114,6 +117,26 @@ def main():
             elif bot_process.returncode == 5:
                 print("\nUpdating dependencies...")
                 update_deps()
+        elif bot_process.returncode == 6:
+            if not os.path.isfile("settings_dict.json"):
+                print("Could not locate settings_dict.json")
+                exit(1)
+            try:
+                settings_dict = json.load(open("settings_dict.json"))
+            except Exception as e:
+                print("Failed to load settings_dict.json: {}".format(e))
+                exit(1)
+            while True:
+                new_token = input("Paste the new token here (or q to quit): ")
+                if not len(new_token):
+                    continue
+                if new_token.lower() == "q":
+                    exit()
+                # Save the token in the settings_dict.json
+                settings_dict["token"] = new_token
+                json.dump(settings_dict,open("settings_dict.json","w"),indent=4)
+                print("\nUpdated token in settings_dict.json - restarting...\n")
+                break
         # Wait before we restart
         time.sleep(wait_before_restart)
         if bot_process.returncode not in (2,4,5):

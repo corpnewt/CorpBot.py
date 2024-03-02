@@ -435,10 +435,7 @@ async def on_message_edit(before, message):
 async def watchinput():
 	# Get our input asynchronously
 	while True:
-		if hasattr(asyncio,"to_thread"):
-			i = (await asyncio.to_thread(sys.stdin.readline)).rstrip("\n")
-		else:
-			i = (await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)).rstrip("\n")
+		i = (await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)).rstrip("\n")
 		if i.lower() in ("?","-h","--help","/h","/help","help","/?"):
 			print(" - Console commands:")
 			print("   - 'shutdown', 'exit', or 'quit': shut down and exit the bot (returns 3)")
@@ -495,8 +492,9 @@ except errors.LoginFailure as e:
 		print("4. Click 'Reset Token'")
 		print("   - DO NOT SHARE THIS TOKEN WITH ANYONE")
 		print("   - YOU CAN ONLY VIEW IT ONCE")
-		print("5. Save the token in settings_dict.json")
-		print("6. Try starting the bot again\n")
+		print("5. Copy the token to the clipboard")
+		print("")
+		os._exit(6)
 	os._exit(3)
 except RuntimeError as e:
 	print("Dirty shutdown - runtime error minimized:\n - {}".format(e))
