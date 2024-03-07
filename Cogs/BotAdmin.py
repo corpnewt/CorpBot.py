@@ -62,7 +62,14 @@ class BotAdmin(commands.Cog):
 			if self.settings.getGlobalStat("OwnerLock",False):
 				ignore = True # Owner locked - ignore everyone else
 			elif not is_admin: # Check if admin locked or ignored
-				ignore = self.settings.getServerStat(ctx.guild,"AdminLock",False) or str(ctx.author.id) in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+				if self.settings.getServerStat(ctx.guild,"AdminLock",False):
+					# Admin locked - no reason to check the roles/ids
+					ignore = True
+				else:
+					# Let's see if the user id or any of their role ids are in the
+					# ignore list
+					ignore_list = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
+					ignore = any((str(x.id) in ignore_list for x in [ctx.author]+ctx.author.roles))
 		return {"Ignore":ignore,"Delete":delete} # Return our ignore and delete status
 
 	@commands.command()
@@ -107,37 +114,58 @@ class BotAdmin(commands.Cog):
 		await ctx.send(msg)
 
 	@commands.command()
-	async def ignore(self, ctx, *, member = None):
-		"""Adds a member to the bot's "ignore" list (bot-admin only)."""
+	async def ignore(self, ctx, *, member_or_role = None):
+		"""Adds a member or role to the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if not member: return await ctx.send("Usage: `{}ignore [member]`".format(ctx.prefix))
+		if not member_or_role: return await ctx.send("Usage: `{}ignore [member_or_role]`".format(ctx.prefix))
 
-		if type(member) is str:
-			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.guild)
-			if not member: return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
-
+		if type(member_or_role) is str:
+			memberName = member_or_role
+			member_or_role = DisplayName.memberForName(memberName, ctx.guild)
+			if not member_or_role:
+				# Try getting it as a role
+				member_or_role = DisplayName.roleForName(memberName, ctx.guild)
+				if not member_or_role:
+					return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
 		ignoreList = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
-		if str(member.id) in ignoreList: return await ctx.send("*{}* is already being ignored.".format(DisplayName.name(member)))
-		ignoreList.append(str(member.id))
+		if str(member_or_role.id) in ignoreList:
+			return await ctx.send("*{}*{} is already being ignored.".format(
+				DisplayName.name(member_or_role),
+				" (role)" if isinstance(member_or_role,discord.Role) else ""
+			))
+		ignoreList.append(str(member_or_role.id))
 		self.settings.setServerStat(ctx.guild,"IgnoredUsers",ignoreList)
-		await ctx.send('*{}* is now being ignored.'.format(DisplayName.name(member)))
+		await ctx.send('*{}*{} is now being ignored.'.format(
+			DisplayName.name(member_or_role),
+			" (role)" if isinstance(member_or_role,discord.Role) else ""
+		))
 
 	@commands.command()
-	async def listen(self, ctx, *, member = None):
-		"""Removes a member from the bot's "ignore" list (bot-admin only)."""
+	async def listen(self, ctx, *, member_or_role = None):
+		"""Removes a member or role from the bot's "ignore" list (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if not member: return await ctx.send("Usage: `{}listen [member]`".format(ctx.prefix))
+		if not member_or_role: return await ctx.send("Usage: `{}listen [member_or_role]`".format(ctx.prefix))
 
-		if type(member) is str:
-			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.guild)
-			if not member: return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
+		if type(member_or_role) is str:
+			memberName = member_or_role
+			member_or_role = DisplayName.memberForName(memberName, ctx.guild)
+			if not member_or_role:
+				# Try getting it as a role
+				member_or_role = DisplayName.roleForName(memberName, ctx.guild)
+				if not member_or_role:
+					return await ctx.send(Utils.suppressed(ctx,"I couldn't find *{}*...".format(memberName)))
 
 		ignoreList = self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])
-		if not str(member.id) in ignoreList: return await ctx.send("*{}* wasn't being ignored...".format(DisplayName.name(member)))
-		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[x for x in ignoreList if x != str(member.id)])
-		await ctx.send("*{}* is no longer being ignored.".format(DisplayName.name(member)))
+		if not str(member_or_role.id) in ignoreList:
+			return await ctx.send("*{}*{} wasn't being ignored...".format(
+				DisplayName.name(member_or_role),
+				" (role)" if isinstance(member_or_role,discord.Role) else ""
+			))
+		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[x for x in ignoreList if x != str(member_or_role.id)])
+		await ctx.send("*{}*{} is no longer being ignored.".format(
+			DisplayName.name(member_or_role),
+			" (role)" if isinstance(member_or_role,discord.Role) else ""
+		))
 
 	@commands.command()
 	async def listenall(self,ctx):
@@ -148,17 +176,28 @@ class BotAdmin(commands.Cog):
 		if not ignore_list: return await ctx.send("I'm not currently ignoring anyone.")
 
 		self.settings.setServerStat(ctx.guild,"IgnoredUsers",[])
-		return await ctx.send("*{:,}* user{} no longer being ignored.".format(len(ignore_list)," is" if len(ignore_list)==1 else "s are"))
+		s, is_are = ("","is") if len(ignore_list)==1 else ("s","are")
+		return await ctx.send("*{0:,}* user{1}/role{1} {2} no longer being ignored.".format(
+			len(ignore_list),
+			s,
+			is_are
+		))
 
 	@commands.command()
 	async def ignored(self, ctx):
-		"""Lists the users currently being ignored."""
-		ignoreList = [ctx.guild.get_member(int(x)) for x in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])]
+		"""Lists the users and roles currently being ignored."""
+		ignoreList = [ctx.guild.get_member(int(x)) or ctx.guild.get_role(int(x)) for x in self.settings.getServerStat(ctx.guild,"IgnoredUsers",[])]
 		ignoreList = sorted([x for x in ignoreList if x],key=lambda x:x.name.lower()) # Skip all None values
-		if not ignoreList: return await ctx.send("I'm not currently ignoring anyone.")
-		desc = "\n".join(["{}. {} ({})".format(i,Utils.suppressed(ctx,str(x)),x.id) for i,x in enumerate(ignoreList,start=1)])
+		if not ignoreList:
+			return await ctx.send("I'm not currently ignoring anyone.")
+		desc = "\n".join(["{}. {} ({}){}".format(
+			i,
+			Utils.suppressed(ctx,str(x)),
+			x.id,
+			" (role)" if isinstance(x,discord.Role) else ""
+		) for i,x in enumerate(ignoreList,start=1)])
 		return await PickList.PagePicker(
-			title="Ignored Users ({:,} total)".format(len(ignoreList)),
+			title="Ignored Users and Roles ({:,} total)".format(len(ignoreList)),
 			description=desc,
 			ctx=ctx
 		).pick()
