@@ -46,16 +46,26 @@ class Responses(commands.Cog):
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
 		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
 		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
+		self.check_comm    = re.compile(r"\[\[(check_)?(in_)?comm{1,2}(and)?s?\]\]",re.IGNORECASE)
 		self.match_time    = 0.025
 
-	async def _get_response(self, ctx, message, check_chan=True):
+	async def _get_response(self, ctx, message, check_chan=True, is_command=False):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
+		if is_command and message_responses:
+			# We have a valid command - let's check only
+			# responses that check in commands
+			new_mr = {}
+			for k,v in message_responses.items():
+				if not self.check_comm.search(v): continue
+				new_mr[k] = v
+			# Replace the original dict with our truncated dict
+			message_responses = new_mr
 		if not message_responses: return {}
 		# Check for matching response triggers here
 		content = message.replace("\n"," ") # Remove newlines for better matching
 		response = {}
 		start_time = time.perf_counter_ns()
-		for trigger in message_responses:
+		for trigger,m in message_responses.items():
 			check_time = time.perf_counter_ns()
 			try:
 				if not re.fullmatch(trigger, content, timeout=self.match_time):
@@ -67,7 +77,6 @@ class Responses(commands.Cog):
 			response["match_time_ms"] = (time.perf_counter_ns()-check_time)/1000000
 			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
 			# Got a full match - build the message, send it and bail
-			m = message_responses[trigger]
 			# Let's check for a channel - and make sure we're searching there
 			try:
 				channel_list = [int(x) for x in self.in_chan.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
@@ -105,6 +114,7 @@ class Responses(commands.Cog):
 					response["reply_to"] = ctx.message
 					response["ping_reply"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
+			if self.check_comm.search(m): response["check_commands"] = True
 			action = "ban" if self.regexBan.search(m) else "kick" if self.regexKick.search(m) else "mute" if self.regexMute.search(m) else None
 			if action:
 				response["action"] = action
@@ -281,7 +291,8 @@ class Responses(commands.Cog):
 				self.in_chan,
 				self.out_chan,
 				self.reply,
-				self.preply
+				self.preply,
+				self.check_comm
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
@@ -296,10 +307,9 @@ class Responses(commands.Cog):
 		if message.author.bot: return
 		if not message.guild: return
 		ctx = await self.bot.get_context(message)
-		if ctx.command: return
 		# Gather the response info - if any
-		response = await self._get_response(ctx,message.content)
-		if not response.get("matched"): return
+		response = await self._get_response(ctx,message.content,is_command=ctx.command)
+		if not response or not response.get("matched"): return
 		# See if we're admin/bot-admin - and bail if suppressed
 		if Utils.is_bot_admin(ctx) and response.get("suppress"): return
 		# Walk punishments in order of severity (ban -> kick -> mute)
@@ -411,15 +421,16 @@ class Responses(commands.Cog):
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
-		[[delete]]    = delete the original message
-		[[ban]]       = bans the message author
-		[[kick]]      = kicks the message author
-		[[mute]]      = mutes the author indefinitely
-		[[mute:#]]    = mutes the message author for # seconds
-		[[in:id]]     = locks the check to the comma-delimited channel ids passed
-		[[out:id]]    = sets the output targets to the comma-delimited channel ids passed
-		                - can also accept "dm" to dm the author, and "original" to send in
-						  the original channel where the response was triggered
+		[[delete]]         = delete the original message
+		[[ban]]            = bans the message author
+		[[kick]]           = kicks the message author
+		[[mute]]           = mutes the author indefinitely
+		[[mute:#]]         = mutes the message author for # seconds
+		[[in:id]]          = locks the check to the comma-delimited channel ids passed
+		[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
+		                     - can also accept "dm" to dm the author, and "original" to send in
+						       the original channel where the response was triggered
+		[[check_commands]] = checks within commands as well
 
 		User role options (roles must be setup per the UserRole cog):
 
@@ -519,15 +530,16 @@ class Responses(commands.Cog):
 
 		Standard user behavioral flags (do not apply to admin/bot-admin):
 
-		[[delete]]    = delete the original message
-		[[ban]]       = bans the message author
-		[[kick]]      = kicks the message author
-		[[mute]]      = mutes the author indefinitely
-		[[mute:#]]    = mutes the message author for # seconds
-		[[in:id]]     = locks the check to the comma-delimited channel ids passed
-		[[out:id]]    = sets the output targets to the comma-delimited channel ids passed
-		                - can also accept "dm" to dm the author, and "original" to send in
-						  the original channel where the response was triggered
+		[[delete]]         = delete the original message
+		[[ban]]            = bans the message author
+		[[kick]]           = kicks the message author
+		[[mute]]           = mutes the author indefinitely
+		[[mute:#]]         = mutes the message author for # seconds
+		[[in:id]]          = locks the check to the comma-delimited channel ids passed
+		[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
+		                     - can also accept "dm" to dm the author, and "original" to send in
+						       the original channel where the response was triggered
+		[[check_commands]] = checks within commands as well
 
 		User role options (roles must be setup per the UserRole cog):
 
@@ -752,6 +764,7 @@ class Responses(commands.Cog):
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
 		else:
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
+		entries.append({"name":"Check In Commands:","value":"Yes" if response.get("check_commands") else "No"})
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
 		if response.get("message","").strip():
