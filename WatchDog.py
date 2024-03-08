@@ -1,4 +1,4 @@
-import sys, os, subprocess, time, venv, json
+import sys, os, subprocess, time, venv, json, getpass
 
 # This module will start the script, and reboot it and etc
 
@@ -127,7 +127,7 @@ def main():
                 print("Failed to load settings_dict.json: {}".format(e))
                 exit(1)
             while True:
-                new_token = input("Paste the new token here (or q to quit): ")
+                new_token = getpass.getpass("Paste the new token here (or q to quit): ")
                 if not len(new_token):
                     continue
                 if new_token.lower() == "q":
