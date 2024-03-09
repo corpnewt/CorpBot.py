@@ -1,4 +1,4 @@
-import discord, asyncio, re, io, os, datetime, plistlib, difflib, json, time
+import discord, asyncio, re, io, os, datetime, plistlib, difflib, json, time, tempfile, shutil, math
 from   discord.ext import commands
 from   Cogs import Settings, DL, PickList, Message, FuzzySearch
 
@@ -39,6 +39,7 @@ class OpenCore(commands.Cog):
 			"IDT92HD87B2_4":["IDT92HD87B2/4"],
 			"VT2020_2021":["VT2020","VT2021"]
 		}
+		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -231,8 +232,8 @@ class OpenCore(commands.Cog):
 		Will search for the codec name, the hex device-id if prefixed with 0x, or the integer device-id.
 		
 		e.g. $codec ALC662
-		     $codec 2304
-			 $codec 0x0900"""
+			$codec 2304
+			$codec 0x0900"""
 
 		usage = "Usage: `{}codec [search_term]`".format(ctx.prefix)
 		if not self.alc_codecs: return await ctx.send("It looks like I was unable to get the AppleALCCodecs.plist :(")
@@ -323,6 +324,121 @@ class OpenCore(commands.Cog):
 			max=5,
 			ctx=ctx
 		).pick()
+
+	async def download(self, url):
+		url = url.strip("<>")
+		# Set up a temp directory
+		dirpath = tempfile.mkdtemp()
+		tempFileName = url.rsplit('/', 1)[-1]
+		# Strip question mark
+		tempFileName = tempFileName.split('?')[0]
+		filePath = dirpath + "/" + tempFileName
+		rImage = None
+		try:
+			rImage = await DL.async_dl(url)
+		except:
+			pass
+		if not rImage:
+			self.remove(dirpath)
+			return None
+		with open(filePath, 'wb') as f:
+			f.write(rImage)
+		# Check if the file exists
+		if not os.path.exists(filePath):
+			self.remove(dirpath)
+			return None
+		return filePath
+		
+	def remove(self, path):
+		if not path is None and os.path.exists(path):
+			shutil.rmtree(os.path.dirname(path), ignore_errors=True)
+
+	def get_slide(self, start_addr = 0):
+		slide = int(math.ceil(( start_addr - 0x100000 ) / 0x200000))
+		return max(0,slide)
+
+	def get_available(self, line_list = []):
+		available = []
+		for line in line_list:
+			line_split = [x for x in line.split(" ") if len(x)]
+			if not len(line_split):
+				continue
+			if len(line_split) == 1:
+				# No spaces - let's make sure it's hex and add it
+				try: available.append({"start":int(line_split[0],16)})
+				except:	continue
+			elif line_split[0].lower() == "available":
+				# If our first item is "available", let's convert the others into ints
+				new_line = []
+				for x in line_split:
+					new_line.extend(x.split("-"))
+				if len(new_line) < 3:
+					# Not enough info
+					continue
+				try:
+					num_bytes = (int(new_line[2],16)-int(new_line[1],16)) if len(new_line) < 4 else int(new_line[3],16)*4096
+					num_mb = round(num_bytes/1024**2,2)
+					available.append({
+						"start":int(new_line[1],16),
+						"end":int(new_line[2],16),
+						"size": num_bytes,
+						"mb": "{} MB @ ".format(num_mb)
+						})
+				except:	continue
+		return available
+
+	@commands.command()
+	async def slide(self, ctx, *, input_hex = None):
+		"""Calculates your slide boot-arg based on an input address (in hex)."""
+		if input_hex is None and len(ctx.message.attachments) == 0: # No info passed - bail!
+			return await ctx.send("Usage: `{}slide [hex address]`".format(ctx.prefix))
+		# Check for urls
+		matches = [] if input_hex is None else list(re.finditer(self.regex, input_hex))
+		slide_url = ctx.message.attachments[0].url if input_hex is None else None if not len(matches) else matches[0].group(0)
+		if slide_url:
+			path = await self.download(slide_url)
+			if not path: # It was just an attachment - bail
+				return await ctx.send("Looks like I couldn't download that link...")
+			# Got something - let's load it as text
+			with open(path,"rb") as f:
+				input_hex = f.read().decode("utf-8","ignore").replace("\x00","").replace("\r","")
+			self.remove(path)
+		# At this point - we might have a url, a table of data, or a single hex address
+		# Let's split by newlines first, then by spaces
+		available = self.get_available(input_hex.replace("`","").split("\n"))
+		if not len(available):
+			return await ctx.send("No available space was found in the passed values.")
+		# Let's sort our available by their size - then walk the list until we find the
+		# first valid slide
+		available = sorted(available, key=lambda x:x.get("size",0),reverse=True)
+		slides = {}
+		for x in available:
+			slide = self.get_slide(x["start"])
+			if slide >= 256 or x["start"] == 0: continue # Out of range
+			# Got a good one - spit it out
+			hex_str = "{:x}".format(x["start"]).upper()
+			hex_str = "0"*(len(hex_str)%2)+hex_str
+			if not slide in slides:
+				slides[slide] = ("0x"+hex_str,x.get("mb",""))
+			# slides.append(("0x"+hex_str,slide))
+			# return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
+		if not len(slides):
+			# If we got here - we have no applicable slides
+			return await ctx.send("No valid slide values were found for the passed info.")
+		# Format the slides
+		pad1 = max([len(x[0]) for x in slides.values()])
+		pad2 = max([len(x[1]) for x in slides.values()])
+		return await PickList.PagePicker(
+			title="Application Slide Values:",
+			description="\n".join(["{}{}: slide={}".format(y[1].rjust(pad2),y[0].rjust(pad1),x) for x,y in slides.items()]),
+			timeout=300, # Allow 5 minutes before we stop watching the picker
+			d_header="```\n",
+			d_footer="```",
+			ctx=ctx
+		).pick()
+		await ctx.send("**Applicable Slide Values:**\n```\n{}\n```".format(
+			"\n".join(["{}{}: slide={}".format(y[1].rjust(pad2),y[0].rjust(pad1),x) for x,y in slides.items()])
+		))
 
 	@commands.command(aliases=["updatetex"])
 	async def gettex(self, ctx):
