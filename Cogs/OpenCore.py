@@ -539,7 +539,14 @@ class OpenCore(commands.Cog):
 		if not match_list: return None # No match was close
 		match_list = sorted(match_list,key=lambda x:x[1],reverse=True)
 		exact_list = [x for x in match_list if x[1] == 1]
-		return (not exact_list,[self.sample_paths[x[0]] for x in exact_list or match_list])
+		# Strip any right-trailing
+		cleaned_list = []
+		for match in exact_list or match_list:
+			p = self.sample_paths[match[0]]
+			while len(p) and p[-1] == "*":
+				p = p[:-1]
+			if p: cleaned_list.append(p)
+		return (not exact_list,cleaned_list)
 
 	### Helper methods adjusted from rusty_bits' config_tex_info.py from ProperTree's repo to search the Configuration.tex ###
 
