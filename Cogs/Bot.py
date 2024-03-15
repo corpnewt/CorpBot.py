@@ -768,13 +768,19 @@ class Bot(commands.Cog):
 		
 		# Get the extensions - include our include list
 		extensions = self.get_extensions(path, list(ext_dict))
-		
+		 
+		# Save a reference to the venv folder to ensure that's
+		# not included
+		venv = os.path.join(path,"venv")
+
 		for run in extensions:
 			extension = "*."+run
 			temp = 0
-			for root, dir, files in os.walk(path):
+			for root, directory, files in os.walk(path):
+				if venv in root:
+					continue # Skip venv-related paths
 				for items in fnmatch.filter(files, extension):
-					value = root + "/" + items
+					value = os.path.join(root,items)
 					temp += sum(+1 for line in open(value, 'rb'))
 			code_count.append(temp)
 		
