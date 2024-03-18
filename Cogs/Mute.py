@@ -445,7 +445,6 @@ class Mute(commands.Cog):
                 try: mute_time_str = self.time_check.match(args[index]).group(0)
                 except: mute_time_str = ""
                 if mute_time_str:
-                    print(self.time_check.match(args[index]))
                     # Got a mute time - let's get the seconds value
                     cooldown_time = get_seconds(mute_time_str)
                 reason = " ".join(args[index if cooldown_time is None else index+1:])
