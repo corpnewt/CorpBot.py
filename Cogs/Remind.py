@@ -96,7 +96,10 @@ class Remind(commands.Cog):
 			# We have a positive countdown - let's wait
 			await asyncio.sleep(countDown)
 
-		guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		if getattr(member,"guild",None):
+			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		else:
+			guild_reminders = []
 		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
 
 		# Verify reminder is still valid
@@ -115,7 +118,10 @@ class Remind(commands.Cog):
 		except: pass # No perms :(
 
 		# Recheck reminders after sending the message
-		guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		if getattr(member,"guild",None):
+			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		else:
+			guild_reminders = []
 		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
 
 		# Remove the reminder from either list if it exists - and save the updated lists
@@ -124,7 +130,7 @@ class Remind(commands.Cog):
 			await self.bot.loop.run_in_executor(None,self.settings.setGlobalUserStat,member,"Reminders",global_reminders)
 		if reminder in guild_reminders:
 			guild_reminders.remove(reminder)
-			await self.bot.loop.run_in_executor(None,self.settings.setUserStat,member,getattr(member,"guild",None),"Reminders",guild_reminders)
+			await self.bot.loop.run_in_executor(None,self.settings.setUserStat,member,member.guild,"Reminders",guild_reminders)
 		
 		# Remove the task from the loop list
 		if task in self.loop_list: self.loop_list.remove(task)
