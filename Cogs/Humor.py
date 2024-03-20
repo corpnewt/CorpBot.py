@@ -284,12 +284,6 @@ class Humor(commands.Cog):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
 			return await ctx.send(msg)
 
-		message = await Message.Embed(
-			title="Preparing to meme...",
-			color=ctx.author,
-			footer="Powered by imgflip.com"
-		).send(ctx)
-
 		if not self.meme_temps:
 			await self._update_memetemps()
 
@@ -314,9 +308,17 @@ class Humor(commands.Cog):
 					# It's either not an int, or we failed to get something - try to search
 					# for it
 					search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(template_id)))
-					closest_meme_template = "https://imgflip.com/memetemplate/{}".format(
-						search_html.split('<h3 class="mt-title">')[1].strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
-					)
+					# Let's break up the html and look for the first non-animated entry
+					found = None
+					for block in search_html.split('<h3 class="mt-title">')[1:]:
+						if "mt-animated-label" in block:
+							continue # Skip animated entries
+						# Got one - scrape the info
+						found = block.strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
+						break
+					# Ensure we actually found something
+					assert found is not None
+					closest_meme_template = "https://imgflip.com/memetemplate/{}".format(found)
 					# Load the template HTML and scrape the info
 					meme_id,meme_name = await self._get_id_name_from_url(closest_meme_template)
 					chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
@@ -327,14 +329,15 @@ class Humor(commands.Cog):
 			chosenTemp = FuzzySearch.search(template_id, self.meme_temps,"name",1)[0]["Item"]
 		# Actually get the meme
 		try: result = await self._get_meme(chosenTemp,box_text)
-		except: return await Message.Embed(title="Something went wrong :(").edit(ctx,message)
+		except: return await Message.Embed(title="Something went wrong :(",color=ctx.author).send(ctx)
 		
 		await Message.Embed(
 			url=result,
 			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
 			image=result,
+			color=ctx.author,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
-		).edit(ctx,message)
+		).send(ctx)
 
 	@commands.command()
 	async def poke(self, ctx, *, url = None):
