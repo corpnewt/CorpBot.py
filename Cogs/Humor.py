@@ -1,5 +1,6 @@
 import discord, random, time, os, PIL, textwrap
 from discord.ext import commands
+from urllib.parse import quote
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
 
@@ -104,10 +105,10 @@ class Humor(commands.Cog):
 			"Sometimes I look for crawdads in the river. Don't tell Aunt Marnie... but I fed one to a cow once."
 		)
 					
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def zalgo(self, ctx, *, message = None):
 		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
-		if message == None: return await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))		
+		if message is None: return await ctx.send("Usage: `{}zalgo [message]`".format(ctx.prefix))		
 		words = message.split()
 		try:
 			iterations = int(words[len(words)-1])
@@ -136,11 +137,11 @@ class Humor(commands.Cog):
 				for i, word in enumerate(words))
 		return zalgo
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def holy(self, ctx, *, subject : str = None):
 		"""Time to backup the Batman!"""
 		
-		if subject == None: return await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
+		if subject is None: return await ctx.send("Usage: `{}holy [subject]`".format(ctx.prefix))
 
 		matchList = [a for a in self.adj if a[0].lower() == subject[0].lower()]
 		word = random.choice(matchList if len(matchList) else self.adj)
@@ -151,13 +152,13 @@ class Humor(commands.Cog):
 		msg = Utils.suppressed(ctx,msg)
 		await ctx.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def fart(self, ctx):
 		"""PrincessZoey :P"""
 		fartList = ["Poot", "Prrrrt", "Thhbbthbbbthhh", "Plllleerrrrffff", "Toot", "Blaaaaahnk", "Squerk"]
 		await ctx.send(random.choice(fartList))
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def french(self, ctx):
 		"""Speaking French... probably..."""
 		fr_list = [ "hon", "fromage", "baguette" ]
@@ -168,7 +169,7 @@ class Humor(commands.Cog):
 		totally_french = " ".join(fr_sentence) + random.choice(punct)
 		await ctx.send(totally_french)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def german(self, ctx):
 		"""Speaking German... probably..."""
 		de_list = [ "BIER", "sauerkraut", "auto", "weißwurst", "KRANKENWAGEN" ]
@@ -194,7 +195,7 @@ class Humor(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def memetemps(self, ctx):
 		"""Get Meme Templates"""
 		url = "https://api.imgflip.com/get_memes"
@@ -214,35 +215,67 @@ class Humor(commands.Cog):
 		result_json = await DL.async_post_json(url, payload)
 		return result_json["data"]["url"]
 
-	@commands.command(pass_context=True)
+	async def _get_id_name_from_url(self,url):
+		html = await DL.async_text(url)
+		meme_id   = html.split("<p>Template ID: ")[1].split("<")[0]
+		meme_name = html.split('<h1 id="mtm-title">')[1].split("<")[0]
+		for x in (" Template"," Meme"):
+			if meme_name.endswith(x):
+				meme_name = meme_name[:-len(x)]
+		return (meme_id,meme_name)
+
+	@commands.command()
 	async def meme(self, ctx, template_id = None, *box_text):
 		"""Generate Memes!  You can get a list of meme templates with the memetemps command.  If any fields have spaces, they must be enclosed in quotes."""
 
 		if not self.canDisplay(ctx.message.guild): return
 
-		if template_id == None or not len(box_text):
+		if template_id is None or not len(box_text):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
 			return await ctx.send(msg)
+
+		message = await Message.Embed(
+			title="Preparing to meme...",
+			color=ctx.author,
+			footer="Powered by imgflip.com"
+		).send(ctx)
 
 		templates = await self.getTemps()
 		# Check if the template_id is a valid int, and try to load that one
 		try:
 			template_id = str(int(template_id))
 			chosenTemp = next((x for x in templates if x["id"] == template_id),{"id":template_id,"name":template_id,"box_count":len(box_text)})
-			result = await self._get_meme(chosenTemp,box_text)
+			if chosenTemp["name"] == chosenTemp["id"]:
+				# Try to resolve the name
+				try:
+					_,chosenTemp["name"] = await self._get_id_name_from_url(
+						"https://imgflip.com/memetemplate/{}".format(chosenTemp["id"])
+					)
+				except:
+					pass
 		except:
-			# Fuzzy match by name
-			chosenTemp = FuzzySearch.search(template_id, templates,"name",1)[0]["Item"]
-			try: result = await self._get_meme(chosenTemp,box_text)
-			except: return await ctx.send("Something went wrong :(")
+			# Try to use imgflip's search
+			try:
+				search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(template_id)))
+				closest_meme_template = "https://imgflip.com/memetemplate/{}".format(
+					search_html.split('<h3 class="mt-title">')[1].strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
+				)
+				# Load the template HTML and scrape the info
+				meme_id,meme_name = await self._get_id_name_from_url(closest_meme_template)
+				chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
+			except:
+				# Fuzzy match by name
+				chosenTemp = FuzzySearch.search(template_id, templates,"name",1)[0]["Item"]
+		# Actually get the meme
+		try: result = await self._get_meme(chosenTemp,box_text)
+		except: return await Message.Embed(title="Something went wrong :(").edit(ctx,message)
 		
 		await Message.Embed(
 			url=result,
 			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
 			image=result,
-			color=ctx.author,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
-		).send(ctx)
+		).edit(ctx,message)
 
 	async def getTemps(self):
 		url = "https://api.imgflip.com/get_memes"
@@ -258,10 +291,9 @@ class Humor(commands.Cog):
 
 		if not self.canDisplay(ctx.guild):
 			return
-		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}poke [url, user, or attachment]`".format(ctx.prefix))
-			return
-		if url == None:
+		if url is None and len(ctx.message.attachments) == 0:
+			return await ctx.send("Usage: `{}poke [url, user, or attachment]`".format(ctx.prefix))
+		if url is None:
 			url = ctx.message.attachments[0].url
 		# Let's check if the "url" is actually a user
 		test_user = DisplayName.memberForName(url, ctx.guild)
@@ -300,9 +332,9 @@ class Humor(commands.Cog):
 		"""Fry up some memes."""
 
 		if not self.canDisplay(ctx.guild): return
-		if url == None and len(ctx.message.attachments) == 0:
+		if url is None and len(ctx.message.attachments) == 0:
 			return await ctx.send("Usage: `{}fry [url, user, or attachment]`".format(ctx.prefix))
-		if url == None: url = ctx.message.attachments[0].url
+		if url is None: url = ctx.message.attachments[0].url
 		# Let's check if the "url" is actually a user
 		test_user = DisplayName.memberForName(url, ctx.guild)
 		if test_user:
