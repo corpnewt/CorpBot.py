@@ -1,6 +1,7 @@
 import discord, random, time, os, PIL, textwrap, datetime, asyncio
 from discord.ext import commands
 from urllib.parse import quote
+from html import unescape
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
 
@@ -267,6 +268,7 @@ class Humor(commands.Cog):
 		html = await DL.async_text(url)
 		meme_id   = html.split("<p>Template ID: ")[1].split("<")[0]
 		meme_name = html.split('<h1 id="mtm-title">')[1].split("<")[0]
+		meme_name = unescape(meme_name)
 		for x in (" Template"," Meme"):
 			if meme_name.endswith(x):
 				meme_name = meme_name[:-len(x)]
