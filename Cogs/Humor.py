@@ -1,4 +1,4 @@
-import discord, random, time, os, PIL, textwrap
+import discord, random, time, os, PIL, textwrap, datetime, asyncio
 from discord.ext import commands
 from urllib.parse import quote
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
@@ -19,6 +19,9 @@ class Humor(commands.Cog):
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
 		self.settings = settings
+		self.is_current = False
+		self.wait_time = 86400 # Default of 24 hours (86400 seconds)
+		self.meme_temps = []
 		# Setup our adjective list
 		self.adj = []
 		marks = map(chr, range(768, 879))
@@ -104,7 +107,47 @@ class Humor(commands.Cog):
 			"Grr... sounds like these raccoons are back again. Filthy varmints...",
 			"Sometimes I look for crawdads in the river. Don't tell Aunt Marnie... but I fed one to a cow once."
 		)
-					
+
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		self.is_current = False
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		self.is_current = True
+		# Start the update loop
+		self.bot.loop.create_task(self.update_memetemps())
+
+	async def update_memetemps(self):
+		print("Starting imgflip.com meme template update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed():
+			if not self.is_current:
+				# Bail if we're not the current instance
+				return
+			await self._update_memetemps()
+			await asyncio.sleep(self.wait_time)
+
+	async def _update_memetemps(self):
+		# Helper to actually do the updating
+		print("Updating meme templates from imageflip.com: {}".format(datetime.datetime.now().time().isoformat()))
+		try:
+			result_json = await DL.async_json("https://api.imgflip.com/get_memes")
+			meme_temps = result_json["data"]["memes"]
+			if meme_temps: self.meme_temps = meme_temps
+		except Exception as e:
+			print("Meme template update failed: {}".format(e))
+		return self.meme_temps
+
 	@commands.command()
 	async def zalgo(self, ctx, *, message = None):
 		"""Ỉ s̰hͨo̹u̳lͪd͆ r͈͍e͓̬a͓͜lͨ̈l̘̇y̡͟ h͚͆a̵͢v͐͑eͦ̓ i͋̍̕n̵̰ͤs͖̟̟t͔ͤ̉ǎ͓͐ḻ̪ͨl̦͒̂ḙ͕͉d͏̖̏ ṡ̢ͬö̹͗m̬͔̌e̵̤͕ a̸̫͓͗n̹ͥ̓͋t̴͍͊̍i̝̿̾̕v̪̈̈͜i̷̞̋̄r̦̅́͡u͓̎̀̿s̖̜̉͌..."""
@@ -197,13 +240,18 @@ class Humor(commands.Cog):
 
 	@commands.command()
 	async def memetemps(self, ctx):
-		"""Get Meme Templates"""
-		url = "https://api.imgflip.com/get_memes"
-		result_json = await DL.async_json(url)
-		templates = result_json["data"]["memes"]		
+		"""Get Meme Templates"""	
 		fields = []
-		for template in templates:
-			fields.append({ "name" : template["name"], "value" : "`{}` [Link]({})".format(template["id"],"https://imgflip.com/memegenerator/{}".format(template["id"])) })
+		if not self.meme_temps:
+			await self._update_memetemps()
+		for template in self.meme_temps:
+			fields.append({
+				"name" : template["name"],
+				"value" : "`{}` [Link]({})".format(
+					template["id"],
+					"https://imgflip.com/memegenerator/{}".format(template["id"])
+				)
+			})
 		await PickList.PagePicker(title="Meme Templates",color=ctx.author,list=fields,ctx=ctx).pick()
 
 	async def _get_meme(self,chosenTemp,box_text):
@@ -240,32 +288,41 @@ class Humor(commands.Cog):
 			footer="Powered by imgflip.com"
 		).send(ctx)
 
-		templates = await self.getTemps()
-		# Check if the template_id is a valid int, and try to load that one
-		try:
-			template_id = str(int(template_id))
-			chosenTemp = next((x for x in templates if x["id"] == template_id),{"id":template_id,"name":template_id,"box_count":len(box_text)})
-			if chosenTemp["name"] == chosenTemp["id"]:
-				# Try to resolve the name
+		if not self.meme_temps:
+			await self._update_memetemps()
+
+		# Check if template_id is in our meme_temps list
+		template_id = str(template_id)
+		chosenTemp = next((x for x in self.meme_temps if template_id.lower() in (x["id"],x["name"].lower())),None)
+
+		if not chosenTemp:
+			# We didn't find it - check if it's an int first - maybe it's a template id
+			try:
+				template_id = str(int(template_id))
+				# If we got here - it's an id, try to load the info
+				meme_id,meme_name = await self._get_id_name_from_url(
+					"https://imgflip.com/memetemplate/{}".format(template_id)
+				)
+				# Force cast the id as an int to make sure it's valid
+				int(meme_id)
+				# We can assume we got *something* here
+				chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
+			except Exception as e:
 				try:
-					_,chosenTemp["name"] = await self._get_id_name_from_url(
-						"https://imgflip.com/memetemplate/{}".format(chosenTemp["id"])
+					# It's either not an int, or we failed to get something - try to search
+					# for it
+					search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(template_id)))
+					closest_meme_template = "https://imgflip.com/memetemplate/{}".format(
+						search_html.split('<h3 class="mt-title">')[1].strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
 					)
+					# Load the template HTML and scrape the info
+					meme_id,meme_name = await self._get_id_name_from_url(closest_meme_template)
+					chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
 				except:
 					pass
-		except:
-			# Try to use imgflip's search
-			try:
-				search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(template_id)))
-				closest_meme_template = "https://imgflip.com/memetemplate/{}".format(
-					search_html.split('<h3 class="mt-title">')[1].strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
-				)
-				# Load the template HTML and scrape the info
-				meme_id,meme_name = await self._get_id_name_from_url(closest_meme_template)
-				chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
-			except:
-				# Fuzzy match by name
-				chosenTemp = FuzzySearch.search(template_id, templates,"name",1)[0]["Item"]
+		if not chosenTemp:
+			# Fuzzy match by name
+			chosenTemp = FuzzySearch.search(template_id, self.meme_temps,"name",1)[0]["Item"]
 		# Actually get the meme
 		try: result = await self._get_meme(chosenTemp,box_text)
 		except: return await Message.Embed(title="Something went wrong :(").edit(ctx,message)
@@ -276,14 +333,6 @@ class Humor(commands.Cog):
 			image=result,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
 		).edit(ctx,message)
-
-	async def getTemps(self):
-		url = "https://api.imgflip.com/get_memes"
-		result_json = await DL.async_json(url)
-		templates = result_json["data"]["memes"]
-		if templates:
-			return templates
-		return None
 
 	@commands.command()
 	async def poke(self, ctx, *, url = None):
