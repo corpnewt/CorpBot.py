@@ -239,32 +239,112 @@ class Humor(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command()
-	async def memetemps(self, ctx):
-		"""Get Meme Templates"""	
-		fields = []
+	@commands.command(aliases=["memetemp","blankmemes","blankmeme"])
+	async def memetemps(self, ctx, *, search_term = None):
+		"""Get Meme Templates"""
+		message = await Message.Embed(
+			title="Searching for \"{}\"...".format(search_term) if search_term else "Gathering meme templates...",
+			color=ctx.author
+		).send(ctx)
+		if search_term is None:
+			# Try to update meme_temps if possible
+			if not self.meme_temps:
+				await self._update_memetemps()
+			if not self.meme_temps:
+				return await Message.Embed(
+					title="No Meme Templates Found",
+					description="It looks like I couldn't get the meme templates from imgur.com :(",
+					color=ctx.author
+				).edit(ctx,message)
+			# Format all the meme_temps
+			fields = []
+			for template in self.meme_temps:
+				fields.append({
+					"name" : template["name"],
+					"value" : "`{}` [Link]({})".format(
+						template["id"],
+						"https://imgflip.com/memegenerator/{}".format(template["id"])
+					)
+				})
+			# Send the results to the user
+			await PickList.PagePicker(
+				title="Meme Templates",
+				color=ctx.author,
+				list=fields,
+				ctx=ctx,
+				message=message,
+				footer="Powered by imgflip.com"
+			).pick()
+		else:
+			# Try to find the meme template passed
+			template = await self._get_meme_from_search(search_term,ensure_blank=True)
+			embed = {
+				"title":"Meme Results For \"{}\"".format(search_term),
+				"color":ctx.author,
+				"description":"Nothing found :(",
+				"footer":"Powered by imgflip.com"
+			}
+			if template:
+				# Update the info
+				embed["description"] = None
+				embed["url"] = "https://imgflip.com/memegenerator/{}".format(template["id"])
+				fields = []
+				for x,y in (("name","Name"),("id","ID"),("format","Format"),("dimensions","Dimensions"),("filesize","File Size")):
+					if template.get(x):
+						fields.append({
+							"name":y,
+							"value":template[x]
+						})
+				if fields:
+					embed["fields"] = fields
+				embed["image"] = template["blank_url"]
+			await Message.Embed(**embed).edit(ctx,message)
+
+	async def _get_meme_from_search(self,search_term,ensure_blank=False):
 		if not self.meme_temps:
 			await self._update_memetemps()
-		for template in self.meme_temps:
-			fields.append({
-				"name" : template["name"],
-				"value" : "`{}` [Link]({})".format(
-					template["id"],
-					"https://imgflip.com/memegenerator/{}".format(template["id"])
-				)
-			})
-		await PickList.PagePicker(title="Meme Templates",color=ctx.author,list=fields,ctx=ctx).pick()
+		# Check if search_term is in our meme_temps list
+		search_term = str(search_term)
+		chosenTemp = next((x for x in self.meme_temps if search_term.lower() in (x["id"],x["name"].lower())),None)
+		if not chosenTemp:
+			# We didn't find it - check if it's an int first - maybe it's a template id
+			meme_url = None
+			try:
+				meme_url = "https://imgflip.com/memetemplate/{}".format(int(search_term))
+			except:
+				try:
+					# It's not an int - try to search for it
+					search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(search_term)))
+					# Get the first non-animated match - ensure next() throws an exception if none are found to escape the try/except
+					meme_url = "https://imgflip.com/memetemplate/{}".format(
+						next(x.strip().split("\n")[0].split('href="/meme/')[1].split('"')[0] for x in search_html.split('<h3 class="mt-title">')[1:] if not "mt-animated-label" in x)
+					)
+				except:
+					pass
+			if meme_url:
+				try:
+					# Load the template HTML and scrape the info
+					chosenTemp = await self._get_meme_info_from_url(meme_url)
+				except:
+					pass
+		if not chosenTemp:
+			# Fuzzy match by name
+			chosenTemp = FuzzySearch.search(search_term,self.meme_temps,"name",1)[0]["Item"]
+		if chosenTemp and ensure_blank and not "blank_url" in chosenTemp:
+			# If we need to get the blank meme URL but didn't already - resolve it
+			chosenTemp = await self._get_meme_info_from_url("https://imgflip.com/memetemplate/{}".format(chosenTemp["id"]))
+		return chosenTemp
 
 	async def _get_meme(self,chosenTemp,box_text):
 		url = "https://api.imgflip.com/caption_image"
 		payload = {'template_id': chosenTemp["id"], 'username':'CorpBot', 'password': 'pooter123'}
 		# Add the text to the payload
-		for i,x in enumerate(box_text[:chosenTemp["box_count"]]):
+		for i,x in enumerate(box_text[:chosenTemp.get("box_count",len(box_text))]):
 			payload["boxes[{}][text]".format(i)] = x.upper()
 		result_json = await DL.async_post_json(url, payload)
 		return result_json["data"]["url"]
 
-	async def _get_id_name_from_url(self,url):
+	async def _get_meme_info_from_url(self,url):
 		html = await DL.async_text(url)
 		meme_id   = html.split("<p>Template ID: ")[1].split("<")[0]
 		meme_name = html.split('<h1 id="mtm-title">')[1].split("<")[0]
@@ -272,7 +352,18 @@ class Humor(commands.Cog):
 		for x in (" Template"," Meme"):
 			if meme_name.endswith(x):
 				meme_name = meme_name[:-len(x)]
-		return (meme_id,meme_name)
+		blank_url = "https://imgflip.com/s/meme/{}".format(html.split('src="/s/meme/')[1].split('"')[0])
+		meme_frmt = html.split("<p>Format: ")[1].split("<")[0]
+		meme_dims = html.split("<p>Dimensions: ")[1].split("<")[0]
+		meme_size = html.split("<p>Filesize: ")[1].split("<")[0]
+		return {
+			"id":meme_id,
+			"name":meme_name,
+			"format":meme_frmt,
+			"dimensions":meme_dims,
+			"filesize":meme_size,
+			"blank_url":blank_url
+		}
 
 	@commands.command()
 	async def meme(self, ctx, template_id = None, *box_text):
@@ -285,52 +376,11 @@ class Humor(commands.Cog):
 			return await ctx.send(msg)
 
 		message = await Message.Embed(title="Calibrating humor...",color=ctx.author).send(ctx)
-
-		if not self.meme_temps:
-			await self._update_memetemps()
-
-		# Check if template_id is in our meme_temps list
-		template_id = str(template_id)
-		chosenTemp = next((x for x in self.meme_temps if template_id.lower() in (x["id"],x["name"].lower())),None)
-
-		if not chosenTemp:
-			# We didn't find it - check if it's an int first - maybe it's a template id
-			try:
-				template_id = str(int(template_id))
-				# If we got here - it's an id, try to load the info
-				meme_id,meme_name = await self._get_id_name_from_url(
-					"https://imgflip.com/memetemplate/{}".format(template_id)
-				)
-				# Force cast the id as an int to make sure it's valid
-				int(meme_id)
-				# We can assume we got *something* here
-				chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
-			except Exception as e:
-				try:
-					# It's either not an int, or we failed to get something - try to search
-					# for it
-					search_html = await DL.async_text("https://imgflip.com/memesearch?q={}".format(quote(template_id)))
-					# Let's break up the html and look for the first non-animated entry
-					found = None
-					for block in search_html.split('<h3 class="mt-title">')[1:]:
-						if "mt-animated-label" in block:
-							continue # Skip animated entries
-						# Got one - scrape the info
-						found = block.strip().split("\n")[0].split('href="/meme/')[1].split('"')[0]
-						break
-					# Ensure we actually found something
-					assert found is not None
-					closest_meme_template = "https://imgflip.com/memetemplate/{}".format(found)
-					# Load the template HTML and scrape the info
-					meme_id,meme_name = await self._get_id_name_from_url(closest_meme_template)
-					chosenTemp = {"id":meme_id,"name":meme_name,"box_count":len(box_text)}
-				except:
-					pass
-		if not chosenTemp:
-			# Fuzzy match by name
-			chosenTemp = FuzzySearch.search(template_id,self.meme_temps,"name",1)[0]["Item"]
+		chosenTemp = await self._get_meme_from_search(template_id)
 		# Actually get the meme
-		try: result = await self._get_meme(chosenTemp,box_text)
+		try:
+			assert chosenTemp is not None
+			result = await self._get_meme(chosenTemp,box_text)
 		except:
 			return await Message.Embed(
 				title="Something went wrong :(",
@@ -339,7 +389,7 @@ class Humor(commands.Cog):
 		# Send the resulting meme
 		await Message.Embed(
 			url=result,
-			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
+			title=" - ".join([x for x in box_text[:chosenTemp.get("box_count",len(box_text))] if x != " "]),
 			image=result,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
 		).edit(ctx,message)
