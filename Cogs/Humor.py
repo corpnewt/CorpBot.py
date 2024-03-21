@@ -284,6 +284,8 @@ class Humor(commands.Cog):
 			msg = "Usage: `{}meme [template_id] [text#1] [text#2]`\n\n Meme Templates can be found using `$memetemps`".format(ctx.prefix)
 			return await ctx.send(msg)
 
+		message = await Message.Embed(title="Calibrating humor...",color=ctx.author).send(ctx)
+
 		if not self.meme_temps:
 			await self._update_memetemps()
 
@@ -326,18 +328,36 @@ class Humor(commands.Cog):
 					pass
 		if not chosenTemp:
 			# Fuzzy match by name
-			chosenTemp = FuzzySearch.search(template_id, self.meme_temps,"name",1)[0]["Item"]
+			chosenTemp = FuzzySearch.search(template_id,self.meme_temps,"name",1)[0]["Item"]
 		# Actually get the meme
 		try: result = await self._get_meme(chosenTemp,box_text)
-		except: return await Message.Embed(title="Something went wrong :(",color=ctx.author).send(ctx)
+		except:
+			return await Message.Embed(
+				title="Something went wrong :(",
+				description="Your meme was too powerful - I couldn't get anything from imgflip"
+			).edit(ctx,message)
+
+		# Download the meme and re-upload it to work around something I've likely
+		# broken with embed previews in dm.  Editing an existing embed to include
+		# an image and url seems to prevent it from showing the image...
+		await Message.Embed(title="Collecting your meme...").edit(ctx,message)
+		path = await GetImage.download(result)
+		if not path:
+			return await Message.Embed(
+				title="Something went wrong :(",
+				description="Your meme was too powerful - I couldn't download the file from imgflip"
+			).edit(ctx,message)
 		
+		# Send the resulting meme
 		await Message.Embed(
 			url=result,
 			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
-			image=result,
-			color=ctx.author,
+			file=path,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
-		).send(ctx)
+		).edit(ctx,message)
+
+		if os.path.exists(path):
+			GetImage.remove(path)
 
 	@commands.command()
 	async def poke(self, ctx, *, url = None):
