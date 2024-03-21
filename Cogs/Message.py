@@ -241,7 +241,6 @@ class Embed:
         em = discord.Embed(color=self.color if isinstance(self.color,discord.Color) else random.choice(self.colors))
         em.title = self._truncate_string(self.title, self.title_max)
         em.url = self.url
-        # em.description = self._truncate_string(self.description, self.desc_max)
         if self.image:
             em.set_image(url=self.image.get("url",EMPTY) if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
@@ -332,17 +331,15 @@ class Embed:
         return (field_pages,desc_pages)
 
     async def edit(self, ctx, message):
-        # Edits the passed message - and sends any remaining pages
-        # check if we can steal the color from the message - but only if using a User color in dm,
-        # or if the color is set to None and the message we're editing has an embed
-        if (self.color is None or isinstance(self.color,discord.User)) and len(message.embeds):
-            self.color = message.embeds[0].color
-        # Pipe to our send() function
+        # Legacy placeholder - just pipe to our send() function
         return await self.send(ctx,original_message=message)
 
     async def _edit_embed(self, ctx, embed, to_pm, original_message):
         # Helper to determine how to edit a message - then actually edit it
-        if not to_pm and not (self.file or self.image):
+        if not to_pm and not (self.file or (self.image and isinstance(original_message.channel,discord.DMChannel))):
+            # Not rerouting the message to dm
+            # Sending a file always requires a new message (for whatever
+            # reason) - editing to include an image only does if it's in dm.
             # Edit in place
             await original_message.edit(content=None,embed=embed,delete_after=self.delete_after)
             return original_message
@@ -351,7 +348,7 @@ class Embed:
         if isinstance(message.channel,discord.DMChannel) and message.channel != ctx.channel:
             # We sent a dm - edit the original message to reflect this
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
-            await message.edit(content=None, embed=em, delete_after=self.delete_after)
+            await original_message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
             # No dm, or our original was already in dms - just delete the original
             await original_message.delete()
@@ -359,6 +356,11 @@ class Embed:
 
     async def send(self, ctx, original_message=None):
         if not ctx: return
+        # Check if we can steal the color from the original_message if possible - but only
+        # if using a User color in dm, or if the color is set to None and the message we're
+        # editing has an embed
+        if getattr(original_message,"embeds",None) and (self.color is None or isinstance(self.color,discord.User)):
+            self.color = original_message.embeds[0].color
         # Create the shell embed with our self properties
         em = self._embed_with_self()
         # Gather our footer - if any
