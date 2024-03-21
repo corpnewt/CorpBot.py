@@ -336,28 +336,13 @@ class Humor(commands.Cog):
 				title="Something went wrong :(",
 				description="Your meme was too powerful - I couldn't get anything from imgflip"
 			).edit(ctx,message)
-
-		# Download the meme and re-upload it to work around something I've likely
-		# broken with embed previews in dm.  Editing an existing embed to include
-		# an image and url seems to prevent it from showing the image...
-		await Message.Embed(title="Collecting your meme...").edit(ctx,message)
-		path = await GetImage.download(result)
-		if not path:
-			return await Message.Embed(
-				title="Something went wrong :(",
-				description="Your meme was too powerful - I couldn't download the file from imgflip"
-			).edit(ctx,message)
-		
 		# Send the resulting meme
 		await Message.Embed(
 			url=result,
 			title=" - ".join([x for x in box_text[:chosenTemp["box_count"]] if x != " "]),
-			file=path,
+			image=result,
 			footer='Powered by imgflip.com - using template id {}{}'.format(chosenTemp["id"],": "+chosenTemp["name"] if chosenTemp["name"]!=chosenTemp["id"] else "")
 		).edit(ctx,message)
-
-		if os.path.exists(path):
-			GetImage.remove(path)
 
 	@commands.command()
 	async def poke(self, ctx, *, url = None):

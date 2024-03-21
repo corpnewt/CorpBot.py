@@ -342,7 +342,7 @@ class Embed:
 
     async def _edit_embed(self, ctx, embed, to_pm, original_message):
         # Helper to determine how to edit a message - then actually edit it
-        if not to_pm and not self.file:
+        if not to_pm and not (self.file or self.image):
             # Edit in place
             await original_message.edit(content=None,embed=embed,delete_after=self.delete_after)
             return original_message
@@ -353,7 +353,7 @@ class Embed:
             em = Embed(title=self.title, description="📬 Check your dm's", color=self.color)._embed_with_self()
             await message.edit(content=None, embed=em, delete_after=self.delete_after)
         else:
-            # No dm - just delete the original
+            # No dm, or our original was already in dms - just delete the original
             await original_message.delete()
         return message
 
