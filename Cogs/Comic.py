@@ -230,8 +230,8 @@ class Comic(commands.Cog):
 			last  = self._julian_day(comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")))
 		for x in range(self.max_tries):
 			# Generate a random date
-			date = random.randint(int(first),int(last))+0.5
-			if not use_number: date = self._gregorian_day(date)
+			date = random.randint(int(first),int(last))
+			if not use_number: date = self._gregorian_day(date+0.5)
 			comic = await self._get_comic(comic_data,date,latest_tuple)
 			if comic: return comic
 		return None
