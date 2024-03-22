@@ -352,7 +352,9 @@ class Humor(commands.Cog):
 		for x in (" Template"," Meme"):
 			if meme_name.endswith(x):
 				meme_name = meme_name[:-len(x)]
-		blank_url = "https://imgflip.com/s/meme/{}".format(html.split('src="/s/meme/')[1].split('"')[0])
+		blank_url = "https://imgflip.com/{}".format(
+			html.split("mtm-img")[1].split('src="')[1].split('"')[0]
+		)
 		meme_frmt = html.split("<p>Format: ")[1].split("<")[0]
 		meme_dims = html.split("<p>Dimensions: ")[1].split("<")[0]
 		meme_size = html.split("<p>Filesize: ")[1].split("<")[0]
