@@ -156,6 +156,9 @@ class OpenCore(commands.Cog):
 	async def _dl_alc(self):
 		try:
 			resources = await DL.async_text("https://github.com/acidanthera/AppleALC/tree/master/Resources")
+			# Attempt to extract the JSON data within
+			try: resources = resources.split('<script type="application/json" data-target="react-app.embeddedData">')[1].split("</script>")[0]
+			except: pass
 			payload_json = json.loads(resources)
 			codec_list = [x["name"] for x in payload_json["payload"]["tree"]["items"] if x["contentType"] == "directory" and not "/" in x["name"]]
 			codecs = {}
