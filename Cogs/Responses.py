@@ -25,6 +25,7 @@ class Responses(commands.Cog):
 		self.regexServer   = re.compile(r"\[\[server\]\]",       re.IGNORECASE)
 		self.regexHere     = re.compile(r"\[\[here\]\]",         re.IGNORECASE)
 		self.regexEveryone = re.compile(r"\[\[everyone\]\]",     re.IGNORECASE)
+		self.regexGroup    = re.compile(r"\[\[group:(.*)\]\]",   re.IGNORECASE)
 		self.regexDelete   = re.compile(r"\[\[delete\]\]",       re.IGNORECASE)
 		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]",    re.IGNORECASE)
 		self.regexRoleMent = re.compile(r"\[\[(m_role|role_m):\d+\]\]",re.IGNORECASE)
@@ -68,8 +69,8 @@ class Responses(commands.Cog):
 		for trigger,m in message_responses.items():
 			check_time = time.perf_counter_ns()
 			try:
-				if not re.fullmatch(trigger, content, timeout=self.match_time):
-					continue
+				full_match = re.fullmatch(trigger, content, timeout=self.match_time)
+				if not full_match: continue
 			except TimeoutError:
 				response["catastrophies"] = response.get("catastrophies",[])+[trigger]
 				continue
@@ -152,6 +153,25 @@ class Responses(commands.Cog):
 					except:
 						continue # Broken, or didn't resolve
 					m = m.replace(mention.group(0),resolved.mention)
+			# Iterate through any capture groups that we're referencing
+			for group in self.regexGroup.finditer(m):
+				try: group_one = group.group(1) # Get the target match group
+				except: continue # Didn't match somehow?
+				# Try to extract that group from our main match.  It can be
+				# either a match group by position (int), or by name if using "(?P<name>)"
+				try:
+					match_group = full_match.group(int(group_one))
+				except:
+					# Was not an int - try to get it as a string
+					try:
+						match_group = full_match.group(group_one)
+					except:
+						continue
+				# If we got here - we got something to replace
+				if match_group is None:
+					match_group = "" # Fall back on an empty string if needed
+				# Make sure we're not mentioning anyone, and deadening links with replacements
+				m = m.replace(group.group(0),Nullify.resolve_mentions(match_group,ctx=ctx,escape_links=True))
 			user_role_add = []
 			user_role_rem = []
 			# Walk the user role options if any - use the following priority: toggle -> add -> rem -> set
@@ -392,68 +412,73 @@ class Responses(commands.Cog):
 	@commands.command()
 	async def addresponse(self, ctx, regex_trigger = None, *, response = None):
 		"""Adds a new response for the regex trigger - or updates the response if the trigger exists already.  If the trigger has spaces, it must be wrapped in quotes (bot-admin only).
-		
-		Value substitutions:
-		
-		[[user]]      = sender's name
-		[[server]]    = server name
 
-		Mention options:
+Value substitutions:
 
-		[[atuser]]    = sender mention
-		[[atmessage]] = message link
-		[[atchannel]] = channel mention
-		[[m_role:id]] = role mention where id is the role id
-		[[m_user:id]] = user mention where id is the user id
-		[[here]]      = @here ping
-		[[everyone]]  = @everyone ping
+[[user]]      = sender's name
+[[server]]    = server name
 
-		Reaction options:
+Mention options:
 
-		[[react:react1,react2]] = reactions to apply to the author's message
+[[atuser]]    = sender mention
+[[atmessage]] = message link
+[[atchannel]] = channel mention
+[[m_role:id]] = role mention where id is the role id
+[[m_user:id]] = user mention where id is the user id
+[[here]]      = @here ping
+[[everyone]]  = @everyone ping
 
-		Reply options:
+Substitution options:
 
-		[[reply]]     = replies to the message that triggered the response
-		                - if set to output in a different channel, will append
-						  a link to the original message
-	    [[pingreply]] = same as [[reply]], but pings the author
+[[group:#]] = is replaced by the named or numbered group in the match (mentions and URLs are deadened)
 
-		Standard user behavioral flags (do not apply to admin/bot-admin):
+Reaction options:
 
-		[[delete]]         = delete the original message
-		[[ban]]            = bans the message author
-		[[kick]]           = kicks the message author
-		[[mute]]           = mutes the author indefinitely
-		[[mute:#]]         = mutes the message author for # seconds
-		[[in:id]]          = locks the check to the comma-delimited channel ids passed
-		[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
-		                     - can also accept "dm" to dm the author, and "original" to send in
-						       the original channel where the response was triggered
-		[[check_commands]] = checks within commands as well
+[[react:react1,react2]] = reactions to apply to the author's message
 
-		User role options (roles must be setup per the UserRole cog):
+Reply options:
 
-		[[t_ur:id]]   = add or remove the user role based on whether the author has it
-		[[add_ur:id]] = add the user role if the author does not have it
-		[[rem_ur:id]] = remove the user role if the author has it
-		[[set_ur:id]] = same as above, but removes any other user roles the author has
-		[[react_ur:add,rem,nochange]] = reactions to apply to the author's message when roles are
-										added, removed, or no change happens (the bot must be on
-										the server the emoji originates from)
+[[reply]]     = replies to the message that triggered the response
+                - if set to output in a different channel, will append
+                  a link to the original message
+[[pingreply]] = same as [[reply]], but pings the author
 
-		(id = the role id)
-		* If multiple role options are passed, they are processed in the order above
-		* t_r, add_r, rem_r, and react_r have the same functionality as above, but without the UserRole requirement
 
-		Admin/bot-admin behavioral flags:
+Standard user behavioral flags (do not apply to admin/bot-admin):
 
-		[[suppress]] = suppresses output for admin/bot-admin author matches
-		
-		Example:  $addresponse "(?i)(hello there|\\btest\\b).*" [[atuser]], this is a test!
-		
-		This would look for a message starting with the whole word "test" or "hello there" (case-insensitive) and respond by pinging the user and saying "this is a test!"
-		"""
+[[delete]]         = delete the original message
+[[ban]]            = bans the message author
+[[kick]]           = kicks the message author
+[[mute]]           = mutes the author indefinitely
+[[mute:#]]         = mutes the message author for # seconds
+[[in:id]]          = locks the check to the comma-delimited channel ids passed
+[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
+                     - can also accept "dm" to dm the author, and "original" to send in
+                       the original channel where the response was triggered
+[[check_commands]] = checks within commands as well
+
+User role options (roles must be setup per the UserRole cog):
+
+[[t_ur:id]]   = add or remove the user role based on whether the author has it
+[[add_ur:id]] = add the user role if the author does not have it
+[[rem_ur:id]] = remove the user role if the author has it
+[[set_ur:id]] = same as above, but removes any other user roles the author has
+[[react_ur:add,rem,nochange]] = reactions to apply to the author's message when roles are
+                                added, removed, or no change happens (the bot must be on
+                                the server the emoji originates from)
+
+(id = the role id)
+* If multiple role options are passed, they are processed in the order above
+* t_r, add_r, rem_r, and react_r have the same functionality as above, but without the UserRole requirement
+
+Admin/bot-admin behavioral flags:
+
+[[suppress]] = suppresses output for admin/bot-admin author matches
+
+Example:  $addresponse "(?i)(hello there|\\btest\\b).*" [[atuser]], this is a test!
+
+This would look for a message starting with the whole word "test" or "hello there" (case-insensitive) and respond by pinging the user and saying "this is a test!"
+"""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not regex_trigger or not response: return await ctx.send("Usage: `{}addresponse regex_trigger response`".format(ctx.prefix))
@@ -500,68 +525,72 @@ class Responses(commands.Cog):
 	@commands.command()
 	async def editresponse(self, ctx, response_index = None, *, response = None):
 		"""Edits the response for the passed index.  The response passed here does not require quotes if there are spaces (bot-admin only).
-		
-		Value substitutions:
-		
-		[[user]]      = sender's name
-		[[server]]    = server name
+	
+Value substitutions:
 
-		Mention options:
+[[user]]      = sender's name
+[[server]]    = server name
 
-		[[atuser]]    = sender mention
-		[[atmessage]] = message link
-		[[atchannel]] = channel mention
-		[[m_role:id]] = role mention where id is the role id
-		[[m_user:id]] = user mention where id is the user id
-		[[here]]      = @here ping
-		[[everyone]]  = @everyone ping
+Mention options:
 
-		Reaction options:
+[[atuser]]    = sender mention
+[[atmessage]] = message link
+[[atchannel]] = channel mention
+[[m_role:id]] = role mention where id is the role id
+[[m_user:id]] = user mention where id is the user id
+[[here]]      = @here ping
+[[everyone]]  = @everyone ping
 
-		[[react:react1,react2]] = reactions to apply to the author's message
+Substitution options:
 
-		Reply options:
+[[group:#]] = is replaced by the named or numbered group in the match (mentions and URLs are deadened)
 
-		[[reply]]     = replies to the message that triggered the response
-		                - if set to output in a different channel, will append
-						  a link to the original message
-	    [[pingreply]] = same as [[reply]], but pings the author
+Reaction options:
+
+[[react:react1,react2]] = reactions to apply to the author's message
+
+Reply options:
+
+[[reply]]     = replies to the message that triggered the response
+                - if set to output in a different channel, will append
+                  a link to the original message
+[[pingreply]] = same as [[reply]], but pings the author
 
 
-		Standard user behavioral flags (do not apply to admin/bot-admin):
+Standard user behavioral flags (do not apply to admin/bot-admin):
 
-		[[delete]]         = delete the original message
-		[[ban]]            = bans the message author
-		[[kick]]           = kicks the message author
-		[[mute]]           = mutes the author indefinitely
-		[[mute:#]]         = mutes the message author for # seconds
-		[[in:id]]          = locks the check to the comma-delimited channel ids passed
-		[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
-		                     - can also accept "dm" to dm the author, and "original" to send in
-						       the original channel where the response was triggered
-		[[check_commands]] = checks within commands as well
+[[delete]]         = delete the original message
+[[ban]]            = bans the message author
+[[kick]]           = kicks the message author
+[[mute]]           = mutes the author indefinitely
+[[mute:#]]         = mutes the message author for # seconds
+[[in:id]]          = locks the check to the comma-delimited channel ids passed
+[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
+                     - can also accept "dm" to dm the author, and "original" to send in
+                       the original channel where the response was triggered
+[[check_commands]] = checks within commands as well
 
-		User role options (roles must be setup per the UserRole cog):
+User role options (roles must be setup per the UserRole cog):
 
-		[[t_ur:id]]   = add or remove the user role based on whether the author has it
-		[[add_ur:id]] = add the user role if the author does not have it
-		[[rem_ur:id]] = remove the user role if the author has it
-		[[set_ur:id]] = same as above, but removes any other user roles the author has
-		[[react_ur:add,rem,nochange]] = reactions to apply to the author's message when roles are
-										added, removed, or no change happens (the bot must be on
-										the server the emoji originates from)
+[[t_ur:id]]   = add or remove the user role based on whether the author has it
+[[add_ur:id]] = add the user role if the author does not have it
+[[rem_ur:id]] = remove the user role if the author has it
+[[set_ur:id]] = same as above, but removes any other user roles the author has
+[[react_ur:add,rem,nochange]] = reactions to apply to the author's message when roles are
+                                added, removed, or no change happens (the bot must be on
+                                the server the emoji originates from)
 
-		(id = the role id)
-		* If multiple role options are passed, they are processed in the order above
-		* t_r, add_r, rem_r, and react_r have the same functionality as above, but without the UserRole requirement
+(id = the role id)
+* If multiple role options are passed, they are processed in the order above
+* t_r, add_r, rem_r, and react_r have the same functionality as above, but without the UserRole requirement
 
-		Admin/bot-admin behavioral flags:
+Admin/bot-admin behavioral flags:
 
-		[[suppress]] = suppresses output for admin/bot-admin author matches
-		
-		Example:  $editresponse 1 [[atuser]], this is a test!
-		
-		This would edit the first response trigger to respond by pinging the user and saying "this is a test!"""
+[[suppress]] = suppresses output for admin/bot-admin author matches
+
+Example:  $editresponse 1 [[atuser]], this is a test!
+
+This would edit the first response trigger to respond by pinging the user and saying "this is a test!"""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not response or not response_index: return await ctx.send("Usage: `{}editresponse response_index response`".format(ctx.prefix))
