@@ -432,16 +432,13 @@ class OpenCore(commands.Cog):
 		pad1 = max([len(x[0]) for x in slides.values()])
 		pad2 = max([len(x[1]) for x in slides.values()])
 		return await PickList.PagePicker(
-			title="Application Slide Values:",
+			title="Applicable Slide Values:",
 			description="\n".join(["{}{}: slide={}".format(y[1].rjust(pad2),y[0].rjust(pad1),x) for x,y in slides.items()]),
 			timeout=300, # Allow 5 minutes before we stop watching the picker
 			d_header="```\n",
 			d_footer="```",
 			ctx=ctx
 		).pick()
-		await ctx.send("**Applicable Slide Values:**\n```\n{}\n```".format(
-			"\n".join(["{}{}: slide={}".format(y[1].rjust(pad2),y[0].rjust(pad1),x) for x,y in slides.items()])
-		))
 
 	@commands.command(aliases=["updatetex"])
 	async def gettex(self, ctx):
