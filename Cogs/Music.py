@@ -406,9 +406,16 @@ class Music(commands.Cog):
 		if isinstance(error,dict):
 			try: error = "```json\n{}\n```".format(json.dumps(error,indent=2))
 			except: pass
+		desc = "Something went wrong playing \"{}\".\n\n{}".format(self.get_track_title(track),error)
+		if len(desc) > 2048:
+			# Truncate
+			if desc.endswith("\n```"):
+				desc = desc[:2048-7]+"...\n```"
+			else:
+				desc = desc[:2048-3]+"..."
 		return await Message.Embed(
 			title="♫ Track {}!".format(str(issue).capitalize()),
-			description="Something went wrong playing \"{}\".\n\n{}".format(self.get_track_title(track),error),
+			description=desc,
 			url=track.uri,
 			thumbnail=getattr(track,"thumb",None),
 			color=color_ctx.author
