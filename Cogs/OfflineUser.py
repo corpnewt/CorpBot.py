@@ -17,40 +17,30 @@ class OfflineUser(commands.Cog):
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
-		
-	async def _send_message(self, ctx, msg, pm = False):
-		# Helper method to send messages to their proper location
-		if pm == True and not isinstance(ctx.channel,discord.DMChannel):
-			# Try to dm
-			try:
-				await ctx.author.send(msg)
-				return await ctx.message.add_reaction("📬")
-			except discord.Forbidden:
-				pass
-		await ctx.send(msg,allowed_mentions=discord.AllowedMentions.all())
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
 		if not message.guild:
 			return
-		if not self.settings.getServerStat(message.guild, "RemindOffline"):
-			return
 		# Valid message
+		if not len(message.mentions):
+			return
+		name_list = [x.mention for x in message.mentions if x.status is discord.Status.offline]
+		if not len(name_list):
+			# No one was offline
+			return
 		ctx = await self.bot.get_context(message)
 		if ctx.command:
 			# Don't check if we're running a command
 			return
-		if not len(message.mentions):
-			return
-		name_list = [DisplayName.name(x) for x in message.mentions if x.status is discord.Status.offline]
-		if not len(name_list):
-			# No one was offline
+		# We got a message in a server, and at least one user was mentioned
+		if not self.settings.getServerStat(message.guild, "RemindOffline"):
 			return
 		if len(name_list) == 1:
-			msg = "{}, it looks like {} is offline - pm them if urgent.".format(ctx.author.mention, name_list[0])
+			msg = "It looks like {} is offline - dm them if urgent.".format(name_list[0])
 		else:
-			msg = "{}, it looks like the following users are offline - pm them if urgent:\n\n{}".format(ctx.author.mention, ", ".join(name_list))
-		await self._send_message(ctx, msg, True)
+			msg = "It looks like the following users are offline - dm them if urgent:\n\n{}".format("\n".join(name_list))
+		await ctx.send(msg,reference=message)
 
 	@commands.command(pass_context=True)
 	async def remindoffline(self, ctx, *, yes_no = None):
