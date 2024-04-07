@@ -30,6 +30,17 @@ class Comic(commands.Cog):
 		self.settings = settings
 		self.max_tries = 10
 		self.comic_data = {
+			"beetle-bailey": {
+				"name": "Beetle Bailey",
+				"url": "https://comicskingdom.com/beetle-bailey-1/{}-{}-{}",
+				"keys": ["year","month","day"],
+				"first_date": "10-05-1953",
+				"comic_url": [
+					{"find":'class="ck-panel',"index":1},
+					{"find":'src="/_next/image?url=',"index":1},
+					{"find":"&amp;w=","index":0}
+				]
+			},
 			"calvin": {
 				"name": "Calvin & Hobbes",
 				"url": "https://www.gocomics.com/calvinandhobbes/{}/{}/{}",
@@ -281,6 +292,7 @@ class Comic(commands.Cog):
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
 		if not comic_url: return None
 		if comic_url.startswith("//"): comic_url = "https:"+comic_url
+		if comic_url.startswith(("http%3A%2F%2F","https%3A%2F%2F")): comic_url = unquote(comic_url)
 		if not comic_url.lower().startswith(("http://","https://")): return None
 		try:
 			u = unescape
@@ -329,6 +341,16 @@ class Comic(commands.Cog):
 			).edit(ctx,message)
 		comic_out["color"] = ctx.author
 		return await Message.EmbedText(**comic_out).edit(ctx,message)
+
+	@commands.command()
+	async def beetle(self, ctx, *, date=None):
+		"""Displays the Beetle Bailey comic for the passed date (MM-DD-YYYY) from 10-05-1953 to today if found."""
+		await self._display_comic(ctx, "beetle-bailey", date=date)
+
+	@commands.command()
+	async def randbeetle(self, ctx):
+		"""Displays a random Beetle Bailey comic from 10-05-1953 to today."""
+		await self._display_comic(ctx, "beetle-bailey", random=True)
 
 	@commands.command()
 	async def calvin(self, ctx, *, date=None):
