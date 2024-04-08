@@ -75,17 +75,29 @@ class Comic(commands.Cog):
 			},
 			"dilbert": {
 				"name": "Dilbert",
-				"url": "https://dilbert.com/strip/{}-{}-{}",
+				"url": "https://dilbert-viewer.herokuapp.com/{}-{}-{}",
 				"keys": ["year","month","day"],
 				"first_date": "04-16-1989",
+				"last_date": "03-12-2023",
 				"comic_url": [
-					{"find":'data-image="',"index":-1},
-					{"find":'"',"index":0}
+					{"find":'src=',"index":2},
+					{"find":" ","index":0},
+					{"find":"_/","index":-1}
 				],
 				"comic_title": [
-					{"find":'data-title="',"index":-1},
-					{"find":'"',"index":0},
-					{"find":"Dilbert Comic for ","index":0}
+					{"find":'"h6 m-1">',"index":-1},
+					{"find":"</h2>","index":0}
+				]
+			},
+			"family-circus": {
+				"name": "Family Circus",
+				"url": "https://comicskingdom.com/family-circus/{}-{}-{}",
+				"keys": ["year","month","day"],
+				"first_date": "01-07-1996",
+				"comic_url": [
+					{"find":'class="ck-panel',"index":1},
+					{"find":'src="/_next/image?url=',"index":1},
+					{"find":"&amp;w=","index":0}
 				]
 			},
 			"farside": {
@@ -362,7 +374,16 @@ class Comic(commands.Cog):
 		"""Displays a random Calvin & Hobbes comic from 11-18-1985 to today."""
 		await self._display_comic(ctx, "calvin", random=True)
 
-	# Commented out as 
+	@commands.command()
+	async def circus(self, ctx, *, date=None):
+		"""Displays the Family Circus comic for the passed date (MM-DD-YYYY) from 01-07-1996 to today if found."""
+		await self._display_comic(ctx, "family-circus", date=date)
+
+	@commands.command()
+	async def randcircus(self, ctx):
+		"""Displays a random Family Circus comic from 01-07-1996 to today."""
+		await self._display_comic(ctx, "family-circus", random=True)
+
 	'''@commands.command()
 	async def cyanide(self, ctx, *, date=None):
 		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
@@ -373,17 +394,17 @@ class Comic(commands.Cog):
 	@commands.command()
 	async def randcyanide(self, ctx):
 		"""Displays a random Cyanide & Happiness comic from 01-26-2005 to today."""
-		await self._display_comic(ctx, "cyanide", random=True)
+		await self._display_comic(ctx, "cyanide", random=True)'''
 
 	@commands.command()
 	async def dilbert(self, ctx, *, date=None):
-		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 to today if found."""
+		"""Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 to 03-12-2023 if found."""
 		await self._display_comic(ctx, "dilbert", date=date)
 
 	@commands.command()
 	async def randilbert(self, ctx):
-		"""Displays a random Dilbert comic from 04-16-1989 to today."""
-		await self._display_comic(ctx, "dilbert", random=True)'''
+		"""Displays a random Dilbert comic from 04-16-1989 to 03-12-2023."""
+		await self._display_comic(ctx, "dilbert", random=True)
 
 	@commands.command()
 	async def farside(self, ctx, *, date=None):
