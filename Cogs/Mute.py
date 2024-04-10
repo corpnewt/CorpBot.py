@@ -479,6 +479,9 @@ class Mute(commands.Cog):
                 if command_name.lower() == "mute":
                     await self._mute(target, ctx.guild, None if not cooldown_time else time.time()+cooldown_time, ctx.author, reason)
                 elif command_name.lower() == "timeout":
+                    if target.timed_out:
+                        # We need to dispatch an event for the sake of logging
+                        self.bot.dispatch("timed_out",target,ctx.guild,round(time.time()+cooldown_time),ctx.author,reason)
                     await target.timeout_for(timedelta(seconds=cooldown_time),reason="{}: {}".format(ctx.author,reason))
                 elif command_name.lower() == "unmute":
                     if target.timed_out: # Remove the timeout first
