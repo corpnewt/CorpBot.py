@@ -1,6 +1,7 @@
 import discord, time, tempfile, os, shutil, json
 import regex as re
 from discord.ext import commands
+from datetime import timedelta
 from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message, DL
 
 def setup(bot):
@@ -27,7 +28,8 @@ class Responses(commands.Cog):
 		self.regexEveryone = re.compile(r"\[\[everyone\]\]",     re.IGNORECASE)
 		self.regexGroup    = re.compile(r"\[\[group:(.*)\]\]",   re.IGNORECASE)
 		self.regexDelete   = re.compile(r"\[\[delete\]\]",       re.IGNORECASE)
-		self.regexMute     = re.compile(r"\[\[mute:?\d*\]\]",    re.IGNORECASE)
+		self.regexMute     = re.compile(r"\[\[mute:?(?P<time>\d*)\]\]",re.IGNORECASE)
+		self.regexTimeout  = re.compile(r"\[\[t(ime)?o(ut)?:(?P<time>\d+)\]\]",re.IGNORECASE)
 		self.regexRoleMent = re.compile(r"\[\[(m_role|role_m):\d+\]\]",re.IGNORECASE)
 		self.regexUserMent = re.compile(r"\[\[(m_user|user_m):\d+\]\]",re.IGNORECASE)
 		self.regexKick     = re.compile(r"\[\[kick\]\]",         re.IGNORECASE)
@@ -116,13 +118,31 @@ class Responses(commands.Cog):
 					response["ping_reply"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
 			if self.check_comm.search(m): response["check_commands"] = True
-			action = "ban" if self.regexBan.search(m) else "kick" if self.regexKick.search(m) else "mute" if self.regexMute.search(m) else None
+			# Set our action with ban -> kick -> mute -> timeout priorty
+			if self.regexBan.search(m):
+				action = "ban"
+			elif self.regexKick.search(m):
+				action = "kick"
+			elif self.regexMute.search(m):
+				action = "mute"
+			elif self.regexTimeout.search(m):
+				action = "timeout"
+			else:
+				action = None
 			if action:
 				response["action"] = action
-				if action == "mute":
-					# Let's get the mute time - if any
-					try: response["mute_time"] = int(self.regexMute.search(m).group(0).replace("]]","").split(":")[-1])
-					except: pass
+				regex_check = {"mute":self.regexMute,"timeout":self.regexTimeout}.get(action)	
+				if regex_check:
+					# Let's get the mute time - if any.  Must be > 0
+					try:
+						mute_time = int(regex_check.search(m).group("time"))
+						assert mute_time > 0
+						response["mute_time"] = mute_time
+					except:
+						# Check if we're timing out - and if so, bail as it *requires* a
+						# valid timeout amount
+						if response["action"] == "timeout":
+							response.pop("action",None)
 			m = re.sub(self.regexUserName, DisplayName.name(ctx.author), m)
 			m = re.sub(self.regexUserPing, ctx.author.mention, m)
 			m = re.sub(self.regexMessage,  ctx.message.jump_url, m)
@@ -297,6 +317,7 @@ class Responses(commands.Cog):
 				self.regexBan,
 				self.regexKick,
 				self.regexMute,
+				self.regexTimeout,
 				self.regexSuppress,
 				self.toggle_ur,
 				self.add_ur,
@@ -336,10 +357,15 @@ class Responses(commands.Cog):
 		if response.get("action") in ("ban","kick"):
 			action = ctx.guild.ban if response["action"] == "ban" else ctx.guild.kick
 			await action(ctx.author,reason="Response trigger matched")
-		elif response.get("action") == "mute":
-			mute = self.bot.get_cog("Mute")
-			mute_time = None if not response.get("mute_time") else int(time.time())+response["mute_time"]
-			if mute: await mute._mute(ctx.author,ctx.guild,cooldown=mute_time)
+		elif response.get("action") in ("mute","timeout"):
+			try: mute_time = int(response["mute_time"])
+			except: mute_time = None
+			if response["action"] == "mute":
+				mute = self.bot.get_cog("Mute")
+				if mute:
+					await mute._mute(ctx.author,ctx.guild,cooldown=int(time.time()+mute_time))
+			elif mute_time:
+				await ctx.author.timeout_for(timedelta(seconds=mute_time),reason="Auto-Timed Out")
 		# Check if we need to delete the message
 		did_delete = False
 		if response.get("delete"):
@@ -451,6 +477,7 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[kick]]           = kicks the message author
 [[mute]]           = mutes the author indefinitely
 [[mute:#]]         = mutes the message author for # seconds
+[[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
@@ -564,6 +591,7 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[kick]]           = kicks the message author
 [[mute]]           = mutes the author indefinitely
 [[mute:#]]         = mutes the message author for # seconds
+[[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
@@ -791,6 +819,9 @@ This would edit the first response trigger to respond by pinging the user and sa
 		if response.get("action") == "mute":
 			mute_time = "indefinitely" if not response.get("mute_time") else "for {:,} second{}".format(response["mute_time"],"" if response["mute_time"]==1 else "s")
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
+		elif response.get("action") == "timeout" and response.get("mute_time"):
+			mute_time = response["mute_time"]
+			entries.append({"name":"Action:","value":"Timeout for {:,} second{}".format(mute_time,"" if mute_time==1 else "s")})
 		else:
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
 		entries.append({"name":"Check In Commands:","value":"Yes" if response.get("check_commands") else "No"})
