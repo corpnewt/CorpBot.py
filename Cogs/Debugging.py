@@ -83,7 +83,7 @@ class Debugging(commands.Cog):
 		except AttributeError:
 			task = asyncio.current_task()
 		# Check if we have a cooldown left - and unmute accordingly
-		timeleft = int(cooldown)-int(time.time())
+		timeleft = round(cooldown)-round(time.time())
 		if timeleft > 0:
 			# Time to wait yet - sleep
 			await asyncio.sleep(timeleft)
@@ -96,9 +96,18 @@ class Debugging(commands.Cog):
 		# Here - we have surpassed our cooldown.  Let's resolve our
 		# member and perform a final check before dispatching the event
 		try:
-			if abs(round(time.time())-round(member.communication_disabled_until.timestamp())) > 5:
+			if round(member.communication_disabled_until.timestamp())-round(time.time()) > 5:
 				# Something is amiss - maybe we missed an event?
-				# Either way - this isn't for us, bail
+				# Let's reset the task, then bail
+				self.set_task(
+					server,
+					member,
+					self.bot.loop.create_task(self.check_timeout(
+						member,
+						server,
+						round(member.communication_disabled_until.timestamp())
+					))
+				)
 				return
 		except:
 			pass
