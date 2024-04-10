@@ -306,19 +306,21 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_timed_out(self, member, guild, cooldown, muted_by, reason):
 		# Create a task to log when the timeout is done
-		self.set_task(
-			guild,
-			member,
-			self.bot.loop.create_task(self.check_timeout(member, guild, int(cooldown)))
-		)
+		try:
+			self.set_task(
+				guild,
+				member,
+				self.bot.loop.create_task(self.check_timeout(member, guild, int(cooldown)))
+			)
+		except: pass
 		if not self.shouldLog('user.mute', guild): return
 		# A member was timed out
 		pfpurl = Utils.get_avatar(member)
 		msg = "🔇 {} ({}) was timed-out.".format(member, member.id)
 		message = "By:  {}\nFor: {}\nDuration: {}".format(
-			"{} ({})".format(muted_by, muted_by.id),
+			"{} ({})".format(muted_by, muted_by.id) if muted_by else "Unknown",
 			reason or "No reason provided",
-			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Until further notice"
+			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Unknown"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
@@ -472,16 +474,29 @@ class Debugging(commands.Cog):
 		# have changed - and dispatch an event as needed
 		if before.timed_out != after.timed_out \
 		or getattr(before,"communication_disabled_until",None) != getattr(after,"communication_disabled_until",None):
-			try:
-				last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
-				if hasattr(last.changes.after,"communication_disabled_until"):
-					timestamp = datetime.strptime(
-						last.changes.after.communication_disabled_until.split(".")[0],
-						"%Y-%m-%dT%H:%M:%S"
-					).replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
-					self.bot.dispatch("timed_out",last.target,after.guild,timestamp,last.user,last.reason)
-			except:
-				pass
+			# Something changed in our timeout values - let's see what happened
+			if after.timed_out:
+				# We were either timed out initially, or again - dispatch the
+				# timed_out event
+				try:
+					last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
+					if hasattr(last.changes.after,"communication_disabled_until"):
+						timestamp = datetime.strptime(
+							last.changes.after.communication_disabled_until.split(".")[0],
+							"%Y-%m-%dT%H:%M:%S"
+						).replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
+						self.bot.dispatch("timed_out",last.target,after.guild,timestamp,last.user,last.reason)
+				except:
+					# Dispatch a generic event
+					self.bot.dispatch("timed_out",after,after.guild,None,None,None)
+			else:
+				# We were likely unmuted - dispatch the unmute event
+				try:
+					last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
+					self.bot.dispatch("unmute",last.target,after.guild,last.user,last.reason)
+				except:
+					# Dispatch a generic event
+					self.bot.dispatch("unmute",after,after.guild)
 		# A member changed something about their user-profile
 		server = before.guild
 		pfpurl = Utils.get_avatar(before)
