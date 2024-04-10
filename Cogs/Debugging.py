@@ -93,10 +93,18 @@ class Debugging(commands.Cog):
 		if task != saved_task:
 			# Nothing found, or not current - bail
 			return
-		# Here - we have surpassed our cooldown
-		# Check if we're logging, and log as needed
-		self.remove_task(server, member)
-		self.bot.dispatch("unmute",member, server)
+		# Here - we have surpassed our cooldown.  Let's resolve our
+		# member and perform a final check before dispatching the event
+		try:
+			if abs(round(time.time())-round(member.communication_disabled_until.timestamp())) > 5:
+				# Something is amiss - maybe we missed an event?
+				# Either way - this isn't for us, bail
+				return
+		except:
+			pass
+		# Dispatch the appropriate event (the event handler will
+		# also remove the event from the task_dict as needed)
+		self.bot.dispatch("unmute",member,server)
 
 	async def oncommand(self, ctx):
 		if self.debug:
@@ -451,7 +459,10 @@ class Debugging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
 		if not before or before.bot: return
-		if before.timed_out != after.timed_out:
+		# Check if the timed_out status, or communication_disabled_until
+		# have changed - and dispatch an event as needed
+		if before.timed_out != after.timed_out \
+		or getattr(before,"communication_disabled_until",None) != getattr(after,"communication_disabled_until",None):
 			try:
 				last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
 				if hasattr(last.changes.after,"communication_disabled_until"):
