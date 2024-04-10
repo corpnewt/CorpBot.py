@@ -1,4 +1,4 @@
-import discord, os, textwrap, time, re, shutil, tempfile
+import discord, os, textwrap, time, re, shutil, tempfile, asyncio
 from   datetime import datetime, timezone
 from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message, ReadableTime
@@ -28,6 +28,7 @@ class Debugging(commands.Cog):
 		self.verbose = [ x for x in self.logvars ] # Enable all of them
 		self.cleanChannels = []
 		self.invite_list = {}
+		self.task_dict = {}
 		self.audit_log_threshold = 30 # Try to get logs within 30 seconds of happening
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
@@ -35,6 +36,16 @@ class Debugging(commands.Cog):
 
 	def _is_submodule(self, parent, child):
 		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_unloaded_extension(self, ext):
+		# Called to shut things down
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		for server in self.task_dict.values():
+			for task in server.values():
+				try: task.cancel()
+				except: pass
 
 	@commands.Cog.listener()
 	async def on_loaded_extension(self, ext):
@@ -50,6 +61,42 @@ class Debugging(commands.Cog):
 			except:
 				pass
 		print("Invites gathered - took {} seconds.".format(time.time() - t))
+
+	def set_task(self, server, member, task):
+		if not server.id in self.task_dict:
+			self.task_dict[server.id] = {}
+		self.task_dict[server.id][member.id] = task
+
+	def remove_task(self, server, member, task=None):
+		if not server.id in self.task_dict: return
+		if not member.id in self.task_dict[server.id]: return
+		# Cancel the existing task first
+		try: self.task_dict[server.id][member.id].cancel()
+		except: pass
+		# Remove the dict
+		self.task_dict[server.id].pop(member.id,None)
+
+	async def check_timeout(self, member, server, cooldown):
+		# Get the current task
+		try:
+			task = asyncio.Task.current_task()
+		except AttributeError:
+			task = asyncio.current_task()
+		# Check if we have a cooldown left - and unmute accordingly
+		timeleft = int(cooldown)-int(time.time())
+		if timeleft > 0:
+			# Time to wait yet - sleep
+			await asyncio.sleep(timeleft)
+		# We've waited our time - let's see if our task is still
+		# current.
+		saved_task = self.task_dict.get(server.id,{}).get(member.id)
+		if task != saved_task:
+			# Nothing found, or not current - bail
+			return
+		# Here - we have surpassed our cooldown
+		# Check if we're logging, and log as needed
+		self.remove_task(server, member)
+		self.bot.dispatch("unmute",member, server)
 
 	async def oncommand(self, ctx):
 		if self.debug:
@@ -241,6 +288,12 @@ class Debugging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_timed_out(self, member, guild, cooldown, muted_by, reason):
+		# Create a task to log when the timeout is done
+		self.set_task(
+			guild,
+			member,
+			self.bot.loop.create_task(self.check_timeout(member, guild, int(cooldown)))
+		)
 		if not self.shouldLog('user.mute', guild): return
 		# A member was timed out
 		pfpurl = Utils.get_avatar(member)
@@ -248,7 +301,7 @@ class Debugging(commands.Cog):
 		message = "By:  {}\nFor: {}\nDuration: {}".format(
 			"{} ({})".format(muted_by, muted_by.id),
 			reason or "No reason provided",
-			ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "Until further notice"
+			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Until further notice"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
@@ -266,12 +319,14 @@ class Debugging(commands.Cog):
 		else:
 			message = "Auto-Muted"
 		message += "\nDuration: {}".format(
-			ReadableTime.getReadableTimeBetween(time.time(), cooldown) if cooldown else "Until further notice"
+			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Until further notice"
 		)
 		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
 
 	@commands.Cog.listener()
 	async def on_unmute(self, member, guild, unmuted_by=None, reason=None):
+		# Remove any pending timeout tasks
+		self.remove_task(guild, member)
 		if not self.shouldLog('user.unmute', guild): return
 		# A memeber was muted
 		pfpurl = Utils.get_avatar(member)
