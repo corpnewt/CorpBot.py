@@ -363,9 +363,11 @@ class Responses(commands.Cog):
 			if response["action"] == "mute":
 				mute = self.bot.get_cog("Mute")
 				if mute:
-					await mute._mute(ctx.author,ctx.guild,cooldown=int(time.time()+mute_time))
+					try: await mute._mute(ctx.author,ctx.guild,cooldown=int(time.time()+mute_time))
+					except: pass
 			elif mute_time:
-				await ctx.author.timeout_for(timedelta(seconds=mute_time),reason="Auto-Timed Out")
+				try: await ctx.author.timeout_for(timedelta(seconds=mute_time),reason="Auto-Timed Out")
+				except: pass
 		# Check if we need to delete the message
 		did_delete = False
 		if response.get("delete"):
