@@ -2,7 +2,7 @@ from discord.ext import commands
 from Cogs import Message
 from Cogs import DL
 from Cogs import PickList
-import urllib.parse
+import urllib.parse, json
 from html import unescape
 
 
@@ -130,6 +130,7 @@ class AmdArk(commands.Cog):
         search_list = (
             "/en/products/apu/",
             "/en/products/cpu/",
+            "/en/products/processors/",
             "/en/products/graphics/",
             "/en/products/professional-graphics/"
         )
@@ -151,28 +152,67 @@ class AmdArk(commands.Cog):
             contents = await DL.async_text(match["url"],headers=self.h)
         except:
             return
-        last_key = None
         info = {"url":match["url"],"name":match["name"]}
         fields = []
-        for line in contents.split("\n"):
-            if line.strip() == "</div>":
-                last_key = None
-            elif 'class="field__label' in line:
-                try:
-                    last_key = unescape(line.split('class="field__label')[1].split("<")[0].split(">")[-1])
-                    assert len(last_key) and not last_key.startswith(self.exclude_key_prefixes)
-                except:
+        if 'data-product-specs="' in contents:
+            # Newer format - this should give us some JSON data to work with
+            try:
+                contents = unescape(contents.split('data-product-specs="')[1].split('" data-tooltips="')[0].strip())
+                json_data = json.loads(contents)
+                for entry in json_data.get("elements",{}).values():
+                    if entry.get("title") and entry.get("formatValue"):
+                        name = unescape(entry["title"])
+                        value = unescape(entry["formatValue"]).replace(" , ",", ")
+                        # Let's see if the value is JSON data
+                        try:
+                            value_json = json.loads(value)
+                            # It is - let's try to format it
+                            def format_val(val):
+                                if isinstance(val,dict) and len(val) == 2:
+                                    first,second = list(val.values())[:2]
+                                    if isinstance(first,list) and first:
+                                        first = first[0]
+                                    if isinstance(second,list) and second:
+                                        second = second[0]
+                                    return "{}: {}".format(first,second)
+                                else:
+                                    return str(val)
+                            if isinstance(value_json,list):
+                                value = "\n".join([format_val(v) for v in value_json])
+                            else:
+                                value = format_val(val)
+                        except:
+                            pass
+                        # Add the entry
+                        fields.append({
+                            "name":name,
+                            "value":value,
+                            "inline":True
+                        })
+            except:
+                return
+        else:
+            # Older format - scrape the HTML directly
+            last_key = None
+            for line in contents.split("\n"):
+                if line.strip() == "</div>":
                     last_key = None
-            elif 'class="field__item">' in line and last_key is not None:
-                try:
-                    val = unescape(line.split('class="field__item">')[1].split("</")[-2].split(">")[-1])
-                    if not len(val): continue
-                    if len(fields) and fields[-1]["name"] == last_key: # Already there, append
-                        fields[-1]["value"] = fields[-1]["value"]+", "+val
-                    else:
-                        fields.append({"name":last_key,"value":val,"inline":True})
-                except:
-                    pass
+                elif 'class="field__label' in line:
+                    try:
+                        last_key = unescape(line.split('class="field__label')[1].split("<")[0].split(">")[-1])
+                        assert len(last_key) and not last_key.startswith(self.exclude_key_prefixes)
+                    except:
+                        last_key = None
+                elif 'class="field__item">' in line and last_key is not None:
+                    try:
+                        val = unescape(line.split('class="field__item">')[1].split("</")[-2].split(">")[-1])
+                        if not len(val): continue
+                        if len(fields) and fields[-1]["name"] == last_key: # Already there, append
+                            fields[-1]["value"] = fields[-1]["value"]+", "+val
+                        else:
+                            fields.append({"name":last_key,"value":val,"inline":True})
+                    except:
+                        pass
         # Ensure we don't duplicate fields (some amd entries have things listed twice for whatever reason)
         unique_fields = []
         for field in fields:
