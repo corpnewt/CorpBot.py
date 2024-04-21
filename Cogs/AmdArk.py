@@ -130,17 +130,15 @@ class AmdArk(commands.Cog):
         search_list = (
             "/en/products/apu/",
             "/en/products/cpu/",
-            "/en/products/processors/",
+            "/en/products/processors/desktops/",
+            "/en/products/processors/laptop/",
             "/en/products/graphics/",
             "/en/products/professional-graphics/"
-        )
-        omit_list = (
-            "/en/products/processors/chipsets/",
         )
         results = []
         suffix = " | AMD"
         for result in search_data["results"]:
-            if any(s in result.get("uri","") for s in search_list) and not any(o in result.get("uri","") for o in omit_list):
+            if any(s in result.get("uri","") for s in search_list):
                 # Strip " | AMD" off the end of the name if present
                 name = result.get("title",result["uri"].split("/")[-1])
                 if name.endswith(suffix) and len(name)>len(suffix):
