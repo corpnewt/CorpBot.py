@@ -134,9 +134,12 @@ class AmdArk(commands.Cog):
             "/en/products/graphics/",
             "/en/products/professional-graphics/"
         )
+        omit_list = (
+            "/en/products/processors/chipsets/",
+        )
         results = []
         for result in search_data["results"]:
-            if any(s in result.get("uri","") for s in search_list):
+            if any(s in result.get("uri","") for s in search_list) and not any(o in result.get("uri","") for o in omit_list):
                 results.append({
                     "name":result.get("title",result["uri"].split("/")[-1]),
                     "url":result["uri"]
