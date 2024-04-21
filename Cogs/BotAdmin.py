@@ -330,6 +330,12 @@ class BotAdmin(commands.Cog):
 		try: days = int(days)
 		except: days = None
 		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name.lower() in ("ban","klean") else None
+		# Let the author know we're resolving members
+		status_message = await Message.Embed(
+			title="Resolving passed members...",
+			color=ctx.author,
+			footer=footer
+		).send(ctx)
 		for index,item in enumerate(args):
 			if self.mention_re.fullmatch(item): # Check if it's a mention
 				# Resolve the member
@@ -395,7 +401,12 @@ class BotAdmin(commands.Cog):
 				"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable)),
 				"" if not len(skipped) else "\n\n{:,} skipped - can only {} {:,} with last keyword".format(len(skipped),command_name,self.max_last)
 			)
-			return await Message.EmbedText(title="No valid members passed!",description=msg,color=ctx.author,footer=footer).send(ctx)
+			return await Message.Embed(
+				title="No valid members passed!",
+				description=msg,
+				color=ctx.author,
+				footer=footer
+			).edit(ctx,status_message)
 		# We should have a list of targets, and the reason - let's list them for confirmation
 		# then generate a 4-digit confirmation code that the original requestor needs to confirm
 		# in order to follow through
@@ -410,17 +421,27 @@ class BotAdmin(commands.Cog):
 			"" if not len(unable) else "\n\n**Unable to {}:**\n\n{}".format(command_name,"\n".join(unable)),
 			"" if not len(skipped) else "\n\n**{:,} skipped** - can only {} {:,} with `last=` keyword".format(len(skipped),command_name,self.max_last)
 			)
-		confirmation_message = await Message.EmbedText(title="{} Confirmation".format(command_name.capitalize()),description=msg,color=ctx.author,footer=footer).send(ctx)
+		await Message.Embed(
+			title="{} Confirmation".format(command_name.capitalize()),
+			description=msg,
+			color=ctx.author,
+			footer=footer
+		).edit(ctx,status_message)
 		def check_confirmation(message):
 			return message.channel == ctx.channel and ctx.author == message.author # Just making sure it's the same user/channel
 		try: confirmation_user = await self.bot.wait_for('message', timeout=60, check=check_confirmation)
 		except: confirmation_user = ""
 		# Delete the confirmation message
-		await confirmation_message.delete()
+		await status_message.delete()
 		# Verify the confirmation
-		if getattr(confirmation_user,"content",None) != confirmation_code: return await ctx.send("{} cancelled!".format(command_name.capitalize()))
+		if getattr(confirmation_user,"content",None) != confirmation_code:
+			return await Message.Embed(
+				title="{} cancelled!".format(command_name.capitalize()),
+				color=ctx.author,
+				footer=footer
+			).send(ctx)
 		# We got the authorization!
-		message = await Message.EmbedText(
+		action_message = await Message.Embed(
 			title="{}ing...".format(
 				"Bann" if command_name.lower() == "ban" else "Unbann" if command_name.lower() == "unban" else command_name.capitalize()
 			),color=ctx.author,footer=footer
@@ -456,7 +477,11 @@ class BotAdmin(commands.Cog):
 			msg += "**I was ABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([str(x) for x in canned]))
 		if len(cant):
 			msg += "**I was UNABLE to {}:**\n\n{}\n\n".format(command_name,"\n".join([str(x) for x in cant]))
-		await Message.EmbedText(title="{} Results".format(command_name.capitalize()),description=msg,footer=footer).edit(ctx,message)
+		await Message.Embed(
+			title="{} Results".format(command_name.capitalize()),
+			description=msg,
+			footer=footer
+		).edit(ctx,action_message)
 
 	@commands.command(aliases=["yeet"])
 	async def kick(self, ctx, *, members = None, reason = None):
