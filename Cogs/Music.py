@@ -2043,13 +2043,12 @@ class Music(commands.Cog):
 		title="♫ Changed volume from {}% to {}%.".format(cv,volume) if cv!=volume else "♫ Volume remains {}%.".format(volume)
 		await Message.Embed(title=title,color=ctx.author,delete_after=delay).send(ctx)
 
-	@commands.command(aliases=["loud"])
-	async def louder(self, ctx, amount = None):
-		"""Increases the volume by the passed amount, or by 10%."""
+	async def _adjust_volume(self, ctx, amount, increment=True):
 		if amount is None:
 			amount = 10
 		else:
-			try: amount = int(amount)
+			try:
+				amount = int(amount)
 			except:
 				return await Message.Embed(
 					title="♫ Amount must be an integer between 1-150.",
@@ -2059,27 +2058,23 @@ class Music(commands.Cog):
 		player = self.get_player(ctx.guild)
 		cv = None
 		if player:
-			cv = player.get_vol(ctx) + amount
+			cv = player.get_vol(ctx)
+			if increment:
+				cv += amount
+			else:
+				cv -= amount
+			cv = max(min(150,cv),1)
 		await ctx.invoke(self.volume,volume=cv)
+
+	@commands.command(aliases=["loud"])
+	async def louder(self, ctx, amount = None):
+		"""Increases the volume by the passed amount, or by 10%."""
+		await self._adjust_volume(ctx,amount)
 
 	@commands.command(aliases=["quiet"])
 	async def quieter(self, ctx, amount = None):
 		"""Decreases the volume by the passed amount, or by 10%."""
-		if amount is None:
-			amount = 10
-		else:
-			try: amount = int(amount)
-			except:
-				return await Message.Embed(
-					title="♫ Amount must be an integer between 1-150.",
-					color=ctx.author,
-					delete_after=delay
-				).send(ctx)
-		player = self.get_player(ctx.guild)
-		cv = None
-		if player:
-			cv = player.get_vol(ctx) - amount
-		await ctx.invoke(self.volume,volume=cv)
+		await self._adjust_volume(ctx,amount,increment=False)
 
 	@commands.command()
 	async def repeat(self, ctx, *, yes_no = None):
