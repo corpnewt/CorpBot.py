@@ -852,7 +852,7 @@ class Music(commands.Cog):
 		return time_value / timescale.get("speed",1.0) / timescale.get("rate",1.0)
 	
 	def format_duration(self, dur, track=None):
-		if isinstance(track,pomice.objects.Track) and hasattr(track,"is_stream") and track.is_stream:
+		if isinstance(track,pomice.objects.Track) and getattr(track,"is_stream",None):
 			# Might be a fleshed out pomice.Track, might not.  We check as much as we can
 			# to determine if it's a stream first.
 			return "[Live Stream]"
@@ -1642,6 +1642,11 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not (player.is_playing or player.is_paused):
 			return await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
+		track = player.track
+		if not track:
+			return await Message.Embed(title="♫ No current track!",color=ctx.author,delete_after=delay).send(ctx)
+		if getattr(track,"is_stream",None):
+			return await Message.Embed(title="♫ Streams cannot seek!",color=ctx.author,delete_after=delay).send(ctx)
 		# Try to resolve the position - first in seconds, then with the HH:MM:SS format
 		relative = False
 		positive = True
@@ -1662,6 +1667,8 @@ class Music(commands.Cog):
 			seconds += current
 			if seconds < 0: seconds = 0
 		ms = seconds*1000
+		# Ensure we seek to somewhere between 0 -> track.length
+		ms = max(0,min(ms,track.length))
 		await player.seek(int(ms))
 		return await Message.Embed(title="♫ Seeking to {}!".format(self.format_duration(ms)),color=ctx.author,delete_after=delay).send(ctx)
 
