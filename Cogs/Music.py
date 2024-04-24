@@ -1081,7 +1081,7 @@ class Music(commands.Cog):
 			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
 		return (url,search_type)
 
-	@commands.command()
+	@commands.command(aliases=["bindplayer","bindmusic"])
 	async def rebind(self, ctx, channel = None):
 		"""Re-binds the music related status messages to the passed channel - or prints the current if no channel is passed."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
@@ -1110,6 +1110,10 @@ class Music(commands.Cog):
 		# Ensure it's a channel where messages can be sent
 		if isinstance(channel,discord.CategoryChannel):
 			return await Message.Embed(title="♫ You can only pass text channels!",color=ctx.author,delete_after=delay).send(ctx)
+		# Make sure the author can send messages in this channel
+		perms = channel.permissions_for(ctx.author)
+		if not (perms.send_messages or perms.send_messages_in_threads):
+			return await Message.Embed(title="♫ You can only bind the player to channels where you can send messages!",color=ctx.author,delete_after=delay).send(ctx)
 		# Bind the player to the new channel
 		player.bound_channel = channel
 		await Message.Embed(
