@@ -282,6 +282,7 @@ class Music(commands.Cog):
 		if hasattr(track,"ctx"): player.track_ctx = track.ctx
 		# We only want to pull the seek value from the current track.
 		if hasattr(track,"seek"): player.track_seek = track.seek
+		bound_channel = getattr(player,"bound_channel",None)
 		ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
 		# Lazy load if needed
 		if not track.track_id and (track.uri or track.info.get("lazy_load_url")):
@@ -321,7 +322,7 @@ class Music(commands.Cog):
 				url=track.uri,
 				thumbnail=getattr(track,"thumb",None),
 				delete_after=delay
-			).send(ctx)
+			).send(bound_channel or ctx)
 		# Regardless of whether we can post, set volume and go to the next song.
 		await player.set_vol(volume)
 		try:
@@ -997,22 +998,6 @@ class Music(commands.Cog):
 		if message: return await embed.edit(ctx,message)
 		return await embed.send(ctx)
 
-	# TODO: Figure this out later...
-	'''async def _check_player(self, player, ctx, delay=None, check_pause=True, respond=True):
-		# Helper to verify the player
-		player = self.get_player(ctx.guild)
-		if delay is None:
-			delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		if not player or not player.is_connected:
-			if respond:
-				await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
-		elif not player.is_playing and not (check_pause and player.is_paused):
-			if respond:
-				await Message.Embed(title="♫ Not playing anything!",color=ctx.author,delete_after=delay).send(ctx)
-		else:
-			return True # Made it through the checks
-		return False # Didn't make it..'''
-
 	async def _get_playlist_data(self,player,timestamp=True):
 		# Helper method to save the passed player's playlist to native objects for json serialization
 		current = player.track.info
@@ -1095,6 +1080,44 @@ class Music(commands.Cog):
 		if not search_type:
 			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
 		return (url,search_type)
+
+	@commands.command()
+	async def rebind(self, ctx, channel = None):
+		"""Re-binds the music related status messages to the passed channel - or prints the current if no channel is passed."""
+		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
+		player = self.get_player(ctx.guild)
+		if not player or not player.is_connected:
+			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
+		if channel is None:
+			# Just print the current channel
+			channel = getattr(player,"bound_channel",None)
+			if not channel:
+				player_ctx = getattr(player,"ctx",getattr(player,"track_ctx",None))
+				if not player_ctx:
+					return await Message.Embed(title="♫ I couldn't get the player's bound channel!",color=ctx.author,delete_after=delay).send(ctx)
+				else:
+					channel = player_ctx.channel
+			return await Message.Embed(
+				title="♫ Player currently bound to:",
+				description=channel.mention,
+				color=ctx.author,
+				delete_after=delay
+			).send(ctx)
+		# Try to resolve it to a channel
+		channel = DisplayName.channelForName(channel,ctx.guild)
+		if not channel:
+			return await Message.Embed(title="♫ I couldn't find that channel!",color=ctx.author,delete_after=delay).send(ctx)
+		# Ensure it's a channel where messages can be sent
+		if isinstance(channel,discord.CategoryChannel):
+			return await Message.Embed(title="♫ You can only pass text channels!",color=ctx.author,delete_after=delay).send(ctx)
+		# Bind the player to the new channel
+		player.bound_channel = channel
+		await Message.Embed(
+			title="♫ Player now bound to:",
+			description=channel.mention,
+			color=ctx.author,
+			delete_after=delay
+		).send(ctx)
 
 	@commands.command(aliases=["recon","rec"])
 	async def reconnect(self, ctx):
