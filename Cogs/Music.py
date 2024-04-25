@@ -1081,7 +1081,7 @@ class Music(commands.Cog):
 			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
 		return (url,search_type)
 
-	@commands.command(aliases=["bindplayer","bindmusic"])
+	@commands.command(aliases=["bindplayer","bindmusic","bindto","boundto"])
 	async def rebind(self, ctx, channel = None):
 		"""Re-binds the music related status messages to the passed channel - or prints the current if no channel is passed."""
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
