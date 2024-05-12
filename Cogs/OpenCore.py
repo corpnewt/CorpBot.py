@@ -244,7 +244,9 @@ class OpenCore(commands.Cog):
 
 		# See if it's a hex value first
 		if search_term.lower().startswith("0x"):
-			try: search_term = int(search_term[-4:],16)
+			# Strip the 0x prefix and then get up to 4 characters
+			# for the device-id
+			try: search_term = int(search_term[2:][-4:],16)
 			except: pass
 		# If not - check if it's a decimal
 		else:
@@ -423,8 +425,6 @@ class OpenCore(commands.Cog):
 			hex_str = "0"*(len(hex_str)%2)+hex_str
 			if not slide in slides:
 				slides[slide] = ("0x"+hex_str,x.get("mb",""))
-			# slides.append(("0x"+hex_str,slide))
-			# return await ctx.send("Slide value for starting address of 0x{}:\n```\nslide={}\n```".format(hex_str.upper(),slide))
 		if not len(slides):
 			# If we got here - we have no applicable slides
 			return await ctx.send("No valid slide values were found for the passed info.")
