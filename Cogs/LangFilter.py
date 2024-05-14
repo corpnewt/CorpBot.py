@@ -66,7 +66,7 @@ class ProfanitiesFilter(object):
 		except:
 			return text
 
-		return r.sub(self.__replacer, text)
+		return r.sub(self.__replacer, text, timeout=0.025)
 
 
 '''if __name__ == '__main__':
