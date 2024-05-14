@@ -1,7 +1,8 @@
-import asyncio, discord, re, random, os
+import asyncio, discord, random, os
+import regex as re
 from   datetime import datetime
 from   discord.ext import commands
-from   Cogs import Utils, DisplayName, Message, Nullify
+from   Cogs import Utils, DisplayName, Message, Nullify, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -60,7 +61,10 @@ class ProfanitiesFilter(object):
 		regexp = (regexp_insidewords[self.inside_words] % 
 				'|'.join(self.badwords))
 
-		r = re.compile(regexp, re.IGNORECASE if self.ignore_case else 0)
+		try:
+			r = re.compile(regexp, re.IGNORECASE if self.ignore_case else 0)
+		except:
+			return text
 
 		return r.sub(self.__replacer, text)
 
@@ -97,8 +101,10 @@ class LangFilter(commands.Cog):
 		# Implemented to bypass having message called twice
 		return { "Ignore" : False, "Delete" : False }
 
+
 	async def message_edit(self, before, message):
 		return await self.message(message)
+
 
 	async def message(self, message):
 		# Check the message and see if we should allow it - always yes.
@@ -126,103 +132,84 @@ class LangFilter(commands.Cog):
 		
 	
 	@commands.command(pass_context=True)
-	async def addfilter(self, ctx, *, words = None):
-		"""Adds comma delimited words to the word list (bot-admin only)."""
+	async def addfilter(self, ctx, *, regex_filter = None):
+		"""Adds the passed regex pattern to the language filter (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 			
-		if words == None:
-			msg = 'Usage: `{}addfilter word1, word2, word3...`'.format(ctx.prefix)
+		if regex_filter is None:
+			msg = 'Usage: `{}addfilter regex_filter`'.format(ctx.prefix)
 			return await ctx.send(msg)
+
+		try:
+			re.compile(regex_filter)
+		except Exception as e:
+			return await ctx.send(Nullify.escape_all(str(e)))
 			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
-		words = "".join(words.split())
-		optionList = words.split(',')
-		addedOptions = []
-		for option in optionList:
-			option = option.replace("(", "\\(").replace(")", "\\)")
-			if not option.lower() in serverOptions:
-				# Only add if not already added
-				addedOptions.append(option.lower())
-		if not len(addedOptions):
-			return await ctx.send('No new words were passed.')
+		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords", [])
+		if regex_filter in serverOptions:
+			return await ctx.send("That regex pattern already exists in language filter!")
 		
-		for option in addedOptions:
-			serverOptions.append(option)
+		serverOptions.append(regex_filter)
 
 		self.settings.setServerStat(ctx.guild, "FilteredWords", serverOptions)
 			
-		if len(addedOptions) == 1:
-			await ctx.send('*1* word added to language filter.')
-		else:
-			await ctx.send('*{}* words added to language filter.'.format(len(addedOptions)))
+		return await ctx.send("Regex pattern added to language filter!")
 			
 			
 	@commands.command(pass_context=True)
-	async def remfilter(self, ctx, *, words = None):
-		"""Removes comma delimited words from the word list (bot-admin only)."""
+	async def remfilter(self, ctx, *, regex_filter_number = None):
+		"""Removes the regex filter at the passed number from the language filter (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-			
-		if words == None:
-			msg = 'Usage: `{}remfilter word1, word2, word3...`'.format(ctx.prefix)
-			return await ctx.send(msg)
-			
-		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
-		words = "".join(words.split())
-		optionList = words.split(',')
-		addedOptions = []
-		for option in optionList:
-			# Clear any instances of \( to (
-			# Reset them to \(
-			# This should allow either \( or ( to work correctly -
-			# While still allowing \\( or whatever as well
-			option = option.replace("\\(", "(").replace("\\)", ")")
-			option = option.replace("(", "\\(").replace(")", "\\)")
-			if option.lower() in serverOptions:
-				# Only add if not already added
-				addedOptions.append(option.lower())
-		if not len(addedOptions):
-			return await ctx.send('No existing words were passed.')
-		
-		for option in addedOptions:
-			serverOptions.remove(option)
 
+		try: regex_filter = int(regex_filter_number)
+		except: regex_filter = None
+		
+		if regex_filter is None:
+			return await ctx.send("Usage: `{}remfilter regex_filter_number`".format(ctx.prefix))
+			
+		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords", [])
+
+		if not 0 < regex_filter <= len(serverOptions):
+			return await ctx.send("Usage: `{}remfilter regex_filter_number`".format(ctx.prefix))
+		
+		serverOptions.pop(regex_filter-1)
 		self.settings.setServerStat(ctx.guild, "FilteredWords", serverOptions)
 			
-		if len(addedOptions) == 1:
-			await ctx.send('*1* word removed from language filter.')
-		else:
-			await ctx.send('*{}* words removed from language filter.'.format(len(addedOptions)))
+		return await ctx.send("Regex pattern removed from language filter!")
 		
 		
 	@commands.command(pass_context=True)
 	async def listfilter(self, ctx):
-		"""Prints out the list of words that will be filtered (bot-admin only)."""
+		"""Lists the regex patterns in the language filter (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
 			return await ctx.send("The filtered words list is empty!")
-		
-		string_list = ", ".join(serverOptions)
-		
-		msg = "__**Filtered Words:**__\n\n" + string_list
-		
-		await Message.Message(message=msg).send(ctx)
+
+		entries = ["{}. {}".format(i,Nullify.escape_all(x)) for i,x in enumerate(serverOptions,start=1)]
+		return await PickList.PagePicker(
+			title="Language Filter ({:,} total)".format(len(entries)),
+			description="\n".join(entries),
+			ctx=ctx
+		).pick()
+
 		
 	@commands.command(pass_context=True)
 	async def clearfilter(self, ctx):
-		"""Empties the list of words that will be filtered (bot-admin only)."""
+		"""Empties the language filter (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 			
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		self.settings.setServerStat(ctx.guild, "FilteredWords", [])
 		
-		if len(serverOptions) == 1:
-			await ctx.send('*1* word removed from language filter.')
-		else:
-			await ctx.send('*{}* words removed from language filter.'.format(len(serverOptions)))
-			
+		await ctx.send('*{:,}* regex pattern{} removed from language filter.'.format(
+			len(serverOptions),
+			"" if len(serverOptions)==1 else "s"
+		))
+
+	
 	@commands.command(pass_context=True)
 	async def dumpfilter(self, ctx):
 		"""Saves the filtered word list to a text file and uploads it to the requestor (bot-admin only)."""
@@ -231,10 +218,10 @@ class LangFilter(commands.Cog):
 		serverOptions = self.settings.getServerStat(ctx.guild, "FilteredWords")
 		
 		if not len(serverOptions):
-			return await ctx.send("The filtered words list is empty!")
+			return await ctx.send("The filter list is empty!")
 			
 		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-		filename = "{}-WordList-{}.txt".format(ctx.guild.id, timeStamp)
+		filename = "{}-Filter-{}.txt".format(ctx.guild.id, timeStamp)
 		msg = "\n".join(serverOptions)
 		
 		msg = msg.encode('utf-8')
@@ -243,18 +230,3 @@ class LangFilter(commands.Cog):
 			
 		await ctx.send(file=discord.File(filename))
 		os.remove(filename)
-		
-	
-	'''@commands.command(pass_context=True)
-	async def setfilter(self, ctx, url = None):
-		"""Sets the word list to a passed text file url, or attachment contents (bot-admin only)."""
-		if not await Utils.is_bot_admin_reply(ctx): return
-			
-		if url == None and len(ctx.message.attachments) == 0:
-			await ctx.send("Usage: `{}setfilter [url or attachment]`".format(ctx.prefix))
-			return
-		
-		if url == None:
-			url = ctx.message.attachments[0].url
-			
-		'''
