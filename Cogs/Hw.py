@@ -101,7 +101,7 @@ class Hw(commands.Cog):
 			return await ctx.send(msg)
 		await ctx.send(output)
 
-	@commands.command(aliases=["hwmain"])
+	@commands.command(aliases=["hwmain","defaulthw","hwdefault"])
 	async def mainhw(self, ctx, *, build = None):
 		"""Sets a new main build from your build list."""
 		await self._mainhw(ctx, build=build)
