@@ -386,7 +386,7 @@ class Music(commands.Cog):
 		# print("TRACK ENDED",player)
 		# print(track)
 		# print(reason)
-		if getattr(player,"repeat",False) and not getattr(track,"to_remove",False):
+		if getattr(player,"repeat",False) and not getattr(track,"to_remove",False) and not track_failed:
 			# We're repeating tracks - add it to the end
 			if not hasattr(player,"track_ctx"): return # No context - probably stopped.
 			track = self._track_fill(track, ctx=player.track_ctx)
