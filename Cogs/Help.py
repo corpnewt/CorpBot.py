@@ -109,118 +109,149 @@ class Help(commands.Cog):
 			})
 		return embed_list
 
-	@commands.command(pass_context=True)
-	async def dumphelp(self, ctx, tab_indent_count = None):
-		"""Dumps a timestamped, formatted list of commands and descriptions into the same directory as the bot."""
-		try:
-			tab_indent_count = int(tab_indent_count)
-			assert tab_indent_count > 0
-		except:
-			tab_indent_count = 1
-
-		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-		serverFile = 'HelpList-{}.txt'.format(timeStamp)
-		message = await ctx.send('Saving help list to *{}*...'.format(serverFile))
-		msg = ''
-		prefix = self._get_prefix(ctx)
-
-		msg = ""
-		# Get and format the help
-		for cog in sorted(self.bot.cogs):
-			# Get the extension
-			the_cog = self.bot.get_cog(cog)
-			cog_commands = [c for c in sorted(the_cog.get_commands(), key=lambda x:x.name) if not c.hidden]
-			if not len(cog_commands): continue
-			cog_count = "{:,} command{}".format(len(cog_commands),"" if len(cog_commands)==1 else "s")
-			cog_string = "{}{} Cog ({})".format(
-				"	"*tab_indent_count,
+	def _dict_add_cog(self, current_dict, cog, prefix, command_named=None, show_hidden=False):
+		the_cog = self.bot.get_cog(cog)
+		if not the_cog:
+			return current_dict # Didn't find it
+		# Resolve the extension
+		extension = "Unknown"
+		for e in self.bot.extensions:
+			b_ext = self.bot.extensions.get(e)
+			if self._is_submodule(b_ext.__name__, the_cog.__module__):
+				# It's a submodule
+				extension = "{}.py".format(e[5:])
+				break
+		commands = sorted(the_cog.get_commands(),key=lambda x:x.name)
+		if not show_hidden:
+			commands = [c for c in commands if not c.hidden]
+		if not commands:
+			return current_dict
+		# Build our info
+		current_dict[cog] = {
+			"command_count":len(commands),
+			"extension":extension,
+			"commands":{},
+			"formatted":"	{} Cog ({:,} command{}){}:".format(
 				cog,
-				cog_count,
-			)
-			for e in self.bot.extensions:
-				b_ext = self.bot.extensions.get(e)
-				if self._is_submodule(b_ext.__name__, the_cog.__module__):
-					# It's a submodule
-					cog_string += " - {}.py Extension".format(e[5:])
-					break
-			cog_string += ":\n"
-			for command in cog_commands:
-				cog_string += "{}  {}{}\n{}  {}└─ {}\n".format(
-					"	"*tab_indent_count,
-					prefix+command.name+" "+command.signature,
-					"" if not len(command.aliases) else " (AKA: {})".format(", ".join(command.aliases)),
-					"	"*tab_indent_count,
+				len(commands),
+				"" if len(commands)==1 else "s",
+				" - {} Extension".format(extension) if extension else ""
+			),
+		}
+		# Add the markdown variant
+		current_dict[cog]["markdown"] = "## {}\n####{}".format(cog,current_dict[cog]["formatted"])
+		# Walk the commands
+		for comm in sorted(commands,key=lambda x:x.name):
+			if command_named and not command_named == comm.name:
+				continue # Skip, as it doesn't match what we're looking for
+			# Add the info
+			current_dict[cog]["commands"][comm.name] = {
+				"signature":comm.signature,
+				"prefix":prefix,
+				"aliases":comm.aliases,
+				"help":self._get_help(comm,80),
+				"formatted":"	  {}{}\n	  {}└─ {}".format(
+					prefix+comm.name+" "+comm.signature,
+					" (AKA: {})".format(", ".join(comm.aliases)) if comm.aliases else "",
 					" "*len(prefix),
-					self._get_help(command, 80)
+					self._get_help(comm,80)
 				)
-			cog_string += "\n"
-			msg += cog_string
-		# Encode to binary
-		# Trim the trailing newlines
-		msg = msg.rstrip().encode("utf-8")
-		with open(serverFile, "wb") as myfile:
-			myfile.write(msg)
-		await message.edit(content='Uploading *{}*...'.format(serverFile))
-		await ctx.send(file=discord.File(serverFile))
-		await message.edit(content='Uploaded *{}!*'.format(serverFile))
-		os.remove(serverFile)
+			}
+		return current_dict
 
-	@commands.command(pass_context=True)
-	async def dumpmarkdown(self, ctx):
-		"""Dumps a timestamped, markdown-formatted list of commands and descriptions into the same directory as the bot."""
-		tab_indent_count = 1
-
-		timeStamp = datetime.today().strftime("%Y-%m-%d %H.%M")
-		serverFile = 'HelpMarkdown-{}.md'.format(timeStamp)
-		message = await ctx.send('Saving help list to *{}*...'.format(serverFile))
+	def _dump_help(self, ctx, file_name=None, cog_or_command=None, markdown=False, show_hidden=False):
+		if file_name is None:
+			file_name = "{}HelpList-{}.txt".format(
+				"" if cog_or_command is None else "{}-".format(cog_or_command),
+				datetime.today().strftime("%Y-%m-%d %H.%M")
+			)
 		prefix = self._get_prefix(ctx)
+		if cog_or_command:
+			cog_dict = self._dict_add_cog({},cog_or_command,prefix,show_hidden=show_hidden)
+			if not cog_dict:
+				# Wasn't found - let's try to locate the command if possible
+				for cog in self.bot.cogs:
+					comm = next((c for c in self.bot.get_cog(cog).get_commands() if cog_or_command in (c.name,*c.aliases)),None)
+					if comm:
+						cog_dict = self._dict_add_cog({},cog,prefix,command_named=comm.name,show_hidden=show_hidden)
+						break
+		else:
+			# Add them all
+			cog_dict = {}
+			for cog in sorted(self.bot.cogs):
+				cog_dict = self._dict_add_cog(cog_dict,cog,prefix,show_hidden=show_hidden)
+		# Walk our list and build the output text if any
+		if not cog_dict:
+			return None
+		output = []
+		for cog in cog_dict:
+			cog_text = cog_dict[cog]["markdown" if markdown else "formatted"]
+			for comm in cog_dict[cog]["commands"]:
+				cog_text += "\n"+cog_dict[cog]["commands"][comm]["formatted"]
+			output.append(cog_text)
+		# Join all the elements with two newlines
+		final_output = "\n\n".join(output)
+		# Check if we need the markdown index
+		if markdown:
+			final_output = "{}\n\n{}".format(
+				", ".join(["[{}](#{})".format(x,x.lower()) for x in cog_dict]),
+				final_output
+			)
+		return final_output
+
+	@commands.command()
+	async def dumphelp(self, ctx, cog_or_command = None):
+		"""Dumps and uploads a timestamped, formatted list of commands and descriptions.  Can optionally take a specific Cog or command name to dump help for."""
+
+		file_name = "{}HelpList-{}.txt".format(
+			"" if cog_or_command is None else "{}-".format(cog_or_command),
+			datetime.today().strftime("%Y-%m-%d %H.%M")
+		)
+		prefix = self._get_prefix(ctx)
+		output = self._dump_help(ctx,file_name,cog_or_command)
+		if not output:
+			return await ctx.send("I couldn't find that Cog or command.  Cog and command names are case-sensitive.")
 		
-		cog_list = []
-		msg = ""
-		# Get and format the help
-		for cog in sorted(self.bot.cogs):
-			# Get the extension
-			the_cog = self.bot.get_cog(cog)
-			cog_commands = [c for c in sorted(the_cog.get_commands(), key=lambda x:x.name) if not c.hidden]
-			if not len(cog_commands): continue
-			cog_list.append(cog)
-			cog_count = "{:,} command{}".format(len(cog_commands),"" if len(cog_commands)==1 else "s")
-			cog_string = "## {}\n####{}{} Cog ({})".format(
-				cog,
-				"	"*tab_indent_count,
-				cog,
-				cog_count,
-			)
-			for e in self.bot.extensions:
-				b_ext = self.bot.extensions.get(e)
-				if self._is_submodule(b_ext.__name__, the_cog.__module__):
-					# It's a submodule
-					cog_string += " - {}.py Extension".format(e[5:])
-					break
-			cog_string += ":\n"
-			for command in cog_commands:
-				cog_string += "{}  {}{}\n{}  {}└─ {}\n".format(
-					"	"*tab_indent_count,
-					prefix+command.name+" "+command.signature,
-					"" if not len(command.aliases) else " (AKA: {})".format(", ".join(command.aliases)),
-					"	"*tab_indent_count,
-					" "*len(prefix),
-					self._get_help(command, 80)
-				)
-			cog_string += "\n"
-			msg += cog_string
-		msg = ", ".join(["[{}](#{})".format(x,x.lower()) for x in sorted(cog_list)])+"\n\n"+msg
+		# Got something!
+		message = await ctx.send('Saving help list to *{}*...'.format(file_name))
 		# Encode to binary
 		# Trim the trailing newlines
-		msg = msg.rstrip().encode("utf-8")
-		with open(serverFile, "wb") as myfile:
-			myfile.write(msg)
-		await message.edit(content='Uploading *{}*...'.format(serverFile))
-		await ctx.send(file=discord.File(serverFile))
-		await message.edit(content='Uploaded *{}!*'.format(serverFile))
-		os.remove(serverFile)
+		output = output.rstrip().encode("utf-8")
+		with open(file_name, "wb") as myfile:
+			myfile.write(output)
+		# Upload the resulting file and clean up
+		await message.edit(content='Uploading *{}*...'.format(file_name))
+		await ctx.send(file=discord.File(file_name))
+		await message.edit(content='Uploaded *{}!*'.format(file_name))
+		os.remove(file_name)
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["dumpmd"])
+	async def dumpmarkdown(self, ctx, cog_or_command = None):
+		"""Dumps and uploads a timestamped, markdown-formatted list of commands and descriptions.  Can optionally take a specific Cog or command name to dump help for."""
+		
+		file_name = "{}HelpMarkdown-{}.md".format(
+			"" if cog_or_command is None else "{}-".format(cog_or_command),
+			datetime.today().strftime("%Y-%m-%d %H.%M")
+		)
+		prefix = self._get_prefix(ctx)
+		output = self._dump_help(ctx,file_name,cog_or_command,markdown=True)
+		if not output:
+			return await ctx.send("I couldn't find that Cog or command.  Cog and command names are case-sensitive.")
+		
+		# Got something!
+		message = await ctx.send('Saving help list to *{}*...'.format(file_name))
+		# Encode to binary
+		# Trim the trailing newlines
+		output = output.rstrip().encode("utf-8")
+		with open(file_name, "wb") as myfile:
+			myfile.write(output)
+		# Upload the resulting file and clean up
+		await message.edit(content='Uploading *{}*...'.format(file_name))
+		await ctx.send(file=discord.File(file_name))
+		await message.edit(content='Uploaded *{}!*'.format(file_name))
+		os.remove(file_name)
+
+	@commands.command()
 	async def help(self, ctx, *, command = None):
 		"""Lists the bot's commands and cogs.
 		You can pass a command or cog to this to get more info (case-sensitive)."""
