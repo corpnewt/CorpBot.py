@@ -368,6 +368,7 @@ class Music(commands.Cog):
 			).send(ctx)
 		if track_failed:
 			# We need to remove all instances of this track from the queue
+			track.to_remove = True
 			if not player.queue.is_empty:
 				# Strip other instances of the failed track
 				queue = [t for t in player.queue if t.track_id != track.track_id]
