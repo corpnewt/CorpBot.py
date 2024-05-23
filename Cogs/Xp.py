@@ -806,16 +806,15 @@ class Xp(commands.Cog):
 		promoSorted = sorted(promoArray, key=lambda x:int(x['XP']))
 		
 		
-		memName = member.name
+		member_name = getattr(member,"global_name",None) or member.name
 		# Get member's avatar url
 		avURL = Utils.get_avatar(member)
-		if member.nick:
-			# We have a nickname
-			# Add to embed
-			stat_embed.set_author(name='{}, who currently goes by {}'.format(member.name, member.nick), icon_url=avURL)
+		if getattr(member,"nick",None) and member.nick != member_name:
+			# We have a nickname - add to embed
+			stat_embed.set_author(name='{}, who currently goes by {}'.format(member_name, member.nick), icon_url=avURL)
 		else:
 			# Add to embed
-			stat_embed.set_author(name='{}'.format(member.name), icon_url=avURL)
+			stat_embed.set_author(name='{}'.format(member_name), icon_url=avURL)
 			
 		
 		highestRole = ""
@@ -942,7 +941,7 @@ class Xp(commands.Cog):
 		stat_embed.description = "Created {}".format(created)
 
 		member_name = getattr(member,"global_name",None) or member.name
-		if getattr(member,"nick",None):
+		if getattr(member,"nick",None) and member.nick != member_name:
 			# We have a nickname
 			stat_embed.author = '{}, who currently goes by {}'.format(member_name, member.nick)
 		else:
