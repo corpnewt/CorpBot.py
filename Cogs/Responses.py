@@ -46,6 +46,7 @@ class Responses(commands.Cog):
 		self.rem_r         = re.compile(r"\[\[rem_r:[\d,]+\]\]", re.IGNORECASE)
 		self.react_r       = re.compile(r"\[\[react_r:.*\]\]",   re.IGNORECASE)
 		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",    re.IGNORECASE)
+		self.not_in_chan   = re.compile(r"\[\[(!|not)in:[\d,]+\]\]",re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
 		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
 		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
@@ -86,6 +87,16 @@ class Responses(commands.Cog):
 				check_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
 			except:
 				check_channels = []
+			try:
+				channel_list = [int(x) for x in self.not_in_chan.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				skip_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
+			except:
+				skip_channels = []
+			if skip_channels:
+				# Ensure we have either our restricted channels, or all of them
+				check_channels = check_channels or ctx.guild.channels
+				# Restrict to only those we don't plan to skip
+				check_channels = [x for x in check_channels if not x in skip_channels]
 			response["channels"] = check_channels
 			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
 				continue
@@ -330,6 +341,7 @@ class Responses(commands.Cog):
 				self.rem_r,
 				self.react_r,
 				self.in_chan,
+				self.not_in_chan,
 				self.out_chan,
 				self.reply,
 				self.preply,
@@ -481,6 +493,7 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[mute:#]]         = mutes the message author for # seconds
 [[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
+[[!in:id]]         = locks the check any but the comma-delimited channel ids passed
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
                        the original channel where the response was triggered
@@ -595,6 +608,7 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[mute:#]]         = mutes the message author for # seconds
 [[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
+[[!in:id]]         = locks the check any but the comma-delimited channel ids passed
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
                        the original channel where the response was triggered
