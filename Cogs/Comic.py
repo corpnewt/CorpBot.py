@@ -153,7 +153,6 @@ class Comic(commands.Cog):
 			},
 			"smbc": {
 				"name": "Saturday Morning Breakfast Cereal",
-				"uses_archive": True,
 				"first_date": "09-05-2002",
 				"archive_url": "https://www.smbc-comics.com/comic/archive",
 				"date_format_windows": "%B %#d, %Y",
@@ -272,7 +271,7 @@ class Comic(commands.Cog):
 
 	async def _get_random_comic(self,comic_data):
 		# Try to get a random comic between the first_date/last_date, or between custom indexes (XKCD)
-		latest_tuple = None
+		latest_tuple = archive_html = None
 		use_number = comic_data.get("comic_number",False)
 		if use_number:
 			# We're using numbers - not dates
@@ -286,11 +285,19 @@ class Comic(commands.Cog):
 			if first_date is None: return # Borken
 			first = self._julian_day(first_date)
 			last  = self._julian_day(comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")))
+			# Make sure we keep the archive if needed
+			if comic_data.get("archive_url"):
+				# We need to load the archive first - then find our target date within
+				try: 
+					archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
+					archive_html = await DL.async_text(archive_url)
+				except:
+					return None
 		for x in range(self.max_tries):
 			# Generate a random date
 			date = random.randint(int(first),int(last))
 			if not use_number: date = self._gregorian_day(date+0.5)
-			comic = await self._get_comic(comic_data,date,latest_tuple)
+			comic = await self._get_comic(comic_data,date,latest_tuple,archive_html=archive_html)
 			if comic: return comic
 		return None
 
@@ -303,7 +310,7 @@ class Comic(commands.Cog):
 			except: return None
 		return text
 
-	async def _get_comic(self,comic_data,date=None,latest_tuple=None):
+	async def _get_comic(self,comic_data,date=None,latest_tuple=None,archive_html=None):
 		# Attempts to retrieve the comic at the passed date
 		first_date = self._resolve_first_date(comic_data)
 		if first_date is None: return None # Malformed comic data - first date must be defined
@@ -332,13 +339,14 @@ class Comic(commands.Cog):
 			if not first_julian <= date_julian <= last_julian: return None # Out of our date range
 			# We have a valid date - let's format the url and gather the html
 			date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
-			if comic_data.get("uses_archive",False):
+			if comic_data.get("archive_url"):
 				# We need to load the archive first - then find our target date within
-				try: 
-					archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
-					archive_html = await DL.async_text(archive_url)
-				except:
-					return None
+				if not archive_html:
+					try: 
+						archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
+						archive_html = await DL.async_text(archive_url)
+					except:
+						return None
 				# Let's walk the archive for the date info
 				date_url = self._walk_replace(archive_html,comic_data["date_url"],date_dict)
 				if not date_url:
