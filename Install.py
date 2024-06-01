@@ -211,7 +211,7 @@ if __name__ == '__main__':
         {"name":"requests"},
         {"name":"parsedatetime"},
         {"name":"psutil"},
-        {"name":"pyparsing"},
+        {"name":"plusminus"},
         {"name":"pyquery"},
         {"name":"python-aiml","item":"git+https://github.com/paulovn/python-aiml"},
         {"name":"speedtest-cli"},
