@@ -151,6 +151,27 @@ class Comic(commands.Cog):
 					{"find":'"',"index":0}
 				]
 			},
+			"smbc": {
+				"name": "Saturday Morning Breakfast Cereal",
+				"uses_archive": True,
+				"first_date": "09-05-2002",
+				"archive_url": "https://www.smbc-comics.com/comic/archive",
+				"date_format_windows": "%B %#d, %Y",
+				"date_format": "%B %-d, %Y",
+				"date_url": [
+					{"find":'">{} {}, {}',"keys":["month_name","day","year"],"index":-2},
+					{"find":'"',"index":-1}
+				],
+				"url": "https://smbc-comics.com/{}",
+				"comic_url": [
+					{"find":'" src="',"index":1},
+					{"find":'"',"index":0}
+				],
+				"comic_desc": [
+					{"find":'<img title="',"index":1},
+					{"find":'" src=',"index":0}
+				]
+			},
 			"xkcd": {
 				"name": "XKCD",
 				"comic_number": True,
@@ -200,7 +221,21 @@ class Comic(commands.Cog):
 		if isinstance(date,(int,float)):
 			date = self._gregorian_day(date)
 		m,d,y = [str(int(x)).rjust(2,"0") if padded else str(int(x)) for x in date.split("-")]
-		return {"month":m,"day":d,"year":y}
+		month_name = {
+			"1":"January",
+			"2":"February",
+			"3":"March",
+			"4":"April",
+			"5":"May",
+			"6":"June",
+			"7":"July",
+			"8":"August",
+			"9":"September",
+			"10":"October",
+			"11":"November",
+			"12":"December"
+		}.get(m.lstrip("0"))
+		return {"month":m,"day":d,"year":y,"month_name":month_name}
 
 	async def _get_last_comic_number(self,comic_data,date=None,month_adjust=0):
 		if month_adjust >= 10: return (None,None) # Adjusted too far :(
@@ -297,7 +332,20 @@ class Comic(commands.Cog):
 			if not first_julian <= date_julian <= last_julian: return None # Out of our date range
 			# We have a valid date - let's format the url and gather the html
 			date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
-			url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
+			if comic_data.get("uses_archive",False):
+				# We need to load the archive first - then find our target date within
+				try: 
+					archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
+					archive_html = await DL.async_text(archive_url)
+				except:
+					return None
+				# Let's walk the archive for the date info
+				date_url = self._walk_replace(archive_html,comic_data["date_url"],date_dict)
+				if not date_url:
+					return None
+				url = comic_data["url"].format(date_url)
+			else:
+				url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
 		try: html = await DL.async_text(url, {'User-Agent': ''})
 		except: return None # Failed to get the HTML, bail
 		# Let's locate our comic by walking the search steps
@@ -445,6 +493,16 @@ class Comic(commands.Cog):
 	async def randpeanuts(self, ctx):
 		"""Displays a random Peanuts comic from 10-02-1950 to today."""
 		await self._display_comic(ctx, "peanuts", random=True)
+
+	@commands.command()
+	async def smbc(self, ctx, date=None):
+		"""Displays the Saturday Morning Breakfast Cereal comic for the passed date (MM-DD-YYYY) from 09-05-2002 to today."""
+		await self._display_comic(ctx, "smbc", date=date)
+
+	@commands.command()
+	async def randsmbc(self, ctx):
+		"""Displays a random Saturday Morning Breakfast Cereal comic from 09-05-2002 to today."""
+		await self._display_comic(ctx, "smbc", random=True)
 
 	@commands.command()
 	async def xkcd(self, ctx, *, date=None):
