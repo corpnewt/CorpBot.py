@@ -619,6 +619,9 @@ class Debugging(commands.Cog):
 				for a in before.attachments:
 					msg += a.url + "\n"
 		else:
+			# Prepend a question mark to denote the message was not found in
+			# the cache
+			title = '❓' + title
 			msg = "[ Message ID {} Not Found In Cache ]".format(payload.message_id)
 		msg += "\n\n--- To ---\n\n{}\n".format(payload.data.get("content",""))
 		if payload.data.get("attachments"):
@@ -642,7 +645,7 @@ class Debugging(commands.Cog):
 		reference = None # Initialize an empty reference
 		if not payload.cached_message:
 			channel = getattr(guild,"get_channel_or_thread",guild.get_channel)(payload.channel_id)
-			title = '❌ Message in {} deleted.'.format(
+			title = '❓❌ Message in {} deleted.'.format(
 				"#"+channel.name if channel else payload.channel_id
 			)
 			msg = "[ Message ID {} Not Found In Cache ]".format(payload.message_id)
