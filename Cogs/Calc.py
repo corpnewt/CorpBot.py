@@ -1,5 +1,6 @@
 from plusminus import ArithmeticParser
 import regex as re
+import math
 from discord.ext import commands
 
 def setup(bot):
@@ -18,6 +19,7 @@ class CustomArithmeticParser(ArithmeticParser):
         self.add_operator("~",1,ArithmeticParser.RIGHT,lambda a:~a)
         self.add_operator("<<",2,ArithmeticParser.LEFT,lambda a,b:a<<b)
         self.add_operator(">>",2,ArithmeticParser.LEFT,lambda a,b:a>>b)
+        self.add_function("sqrt",1,lambda a:math.sqrt(a))
 
 class Calc(commands.Cog):
 
@@ -58,7 +60,8 @@ class Calc(commands.Cog):
             msg += '* `^` for bitwise XOR\n'
             msg += '* `~` for bitwise NOT\n'
             msg += '* `<<` bit shift left\n'
-            msg += '* `>>` bit shift right'
+            msg += '* `>>` bit shift right\n'
+            msg += '* `sqrt()` square root'
             return await ctx.send(msg)
         # Send the results
         over_amount = (len(clean_lines)+len(str(result))+17)-2000
