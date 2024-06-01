@@ -155,8 +155,6 @@ class Comic(commands.Cog):
 				"name": "Saturday Morning Breakfast Cereal",
 				"first_date": "09-05-2002",
 				"archive_url": "https://www.smbc-comics.com/comic/archive",
-				"date_format_windows": "%B %#d, %Y",
-				"date_format": "%B %-d, %Y",
 				"date_url": [
 					{"find":'">{} {}, {}',"keys":["month_name","day","year"],"index":-2},
 					{"find":'"',"index":-1}
