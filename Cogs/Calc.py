@@ -9,6 +9,9 @@ def setup(bot):
 class CustomArithmeticParser(ArithmeticParser):
     
     def customize(self):
+        # Ensure the ArithmeticParser class customizes first
+        super().customize()
+        # Add our customizations
         self.add_operator("&",2,ArithmeticParser.LEFT,lambda a,b:a&b)
         self.add_operator("|",2,ArithmeticParser.LEFT,lambda a,b:a|b)
         self.add_operator("^",2,ArithmeticParser.LEFT,lambda a,b:a^b)
