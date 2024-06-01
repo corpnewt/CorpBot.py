@@ -45,7 +45,7 @@ class Calc(commands.Cog):
                 result = parser.evaluate(line)
         except Exception as e:
             msg  = 'I couldn\'t parse that formula :(\n'
-            msg += "```\n{}\n```\n".format(str(e).replace("`",""))
+            msg += "```\n{}\n```\n".format(str(e).replace("`","back tick"))
             msg += 'Please see [this page](<https://github.com/pyparsing/plusminus/blob/master/doc/arithmetic_parser.md>) for parsing info.\n\n'
             msg += '__Additional syntax supported:__\n'
             msg += '* Newlines or `;` characters separate lines passed to the parser\n'
@@ -58,4 +58,7 @@ class Calc(commands.Cog):
             msg += '* `>>` bit shift right'
             return await ctx.send(msg)
         # Send the results
-        await ctx.send("```\n{}\n```\n=\n```\n{}\n```".format(clean_lines,result))
+        over_amount = (len(clean_lines)+len(str(result))+17)-2000
+        if over_amount > 0:
+            clean_lines = "..."+clean_lines[over_amount+3:]
+        await ctx.send("```\n{}\n```=```\n{}\n```".format(clean_lines,result))
