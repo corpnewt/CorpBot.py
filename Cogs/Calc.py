@@ -33,7 +33,7 @@ class Calc(commands.Cog):
 
         if formula is None:
             return await ctx.send('Usage: `{}calc [formula]`'.format(ctx.prefix))
-        parser_lines = [x.strip() for x in formula.replace(";","\n").split("\n") if x.strip()]
+        parser_lines = [x.strip() for x in formula.replace(";","\n").replace(",","\n").split("\n") if x.strip()]
         if not parser_lines:
             return await ctx.send('Usage: `{}calc [formula]`'.format(ctx.prefix))
         clean_lines = "\n".join(x.replace("`","").replace("\\","") for x in parser_lines)
@@ -53,7 +53,7 @@ class Calc(commands.Cog):
             msg += "```\n{}\n```\n".format(str(e).replace("`","back tick"))
             msg += 'Please see [this page](<https://github.com/pyparsing/plusminus/blob/master/doc/arithmetic_parser.md>) for parsing info.\n\n'
             msg += '__Additional syntax supported:__\n'
-            msg += '* Newlines or `;` characters separate lines passed to the parser\n'
+            msg += '* Newlines, `;`, or `,` characters separate lines passed to the parser\n'
             msg += '* `0x` or `#` prefixes denote hexadecimal values\n'
             msg += '* `&` for bitwise AND\n'
             msg += '* `|` for bitwise OR\n'
