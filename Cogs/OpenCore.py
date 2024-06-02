@@ -381,22 +381,31 @@ class OpenCore(commands.Cog):
 			misc_tools   = [x for x in plist_data.get("Misc",{}).get("Tools",[]) if isinstance(x,dict) and x.get("Enabled")]
 			uefi_drivers = [x for x in plist_data.get("UEFI",{}).get("Drivers",[]) if (isinstance(x,dict) and x.get("Enabled")) or isinstance(x,str)]
 
+			# Get the totals as well
+			aa_total = len(plist_data.get("ACPI",{}).get("Add",[]))
+			ap_total = len(plist_data.get("ACPI",{}).get("Patch",[]))
+			ka_total = len(plist_data.get("Kernel",{}).get("Add",[]))
+			kp_total = len(plist_data.get("Kernel",{}).get("Patch",[]))
+			mt_total = len(plist_data.get("Misc",{}).get("Tools",[]))
+			ud_total = len(plist_data.get("UEFI",{}).get("Drivers",[]))
+
 			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers)):
 				desc += "\nPlist appears to belong to OpenCore"
 				names_data = (
-					("ACPI -> Add",acpi_add,"Path"),
-					("ACPI -> Patch",acpi_patch,"Comment"),
-					("Kernel -> Add",kernel_add,"BundlePath"),
-					("Kernel -> Patch",kernel_patch,"Comment"),
-					("Misc -> Tools",misc_tools,"Path"),
-					("UEFI -> Drivers",uefi_drivers,"Path")
+					("ACPI -> Add",acpi_add,"Path",aa_total),
+					("ACPI -> Patch",acpi_patch,"Comment",ap_total),
+					("Kernel -> Add",kernel_add,"BundlePath",ka_total),
+					("Kernel -> Patch",kernel_patch,"Comment",kp_total),
+					("Misc -> Tools",misc_tools,"Path",mt_total),
+					("UEFI -> Drivers",uefi_drivers,"Path",ud_total)
 				)
 				driver_warning = " - [Using Older OC Schema]" if all(isinstance(x,str) for x in uefi_drivers) \
 							else " - [Using mixed OC Schema!]" if any(isinstance(x,str) for x in uefi_drivers) else ""
-				for n,d,k in names_data:
-					desc += "\n### {} ({:,}){}{}\n".format(
+				for n,d,k,t in names_data:
+					desc += "\n### {} ({:,}/{:,} Enabled){}{}\n".format(
 						n,
 						len(d),
+						t,
 						driver_warning if n=="UEFI -> Drivers" else "",
 						":" if len(d) else ""
 					)
@@ -427,6 +436,7 @@ class OpenCore(commands.Cog):
 			title=title,
 			description=desc,
 			max=20,
+			timeout=300,
 			color=ctx.author,
 			message=message,
 			ctx=ctx
