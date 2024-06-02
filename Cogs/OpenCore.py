@@ -374,64 +374,115 @@ class OpenCore(commands.Cog):
 			).send(ctx, message)
 		else:
 			# Now we walk our entries to list them as needed
-			acpi_add     = [x for x in plist_data.get("ACPI",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
-			acpi_patch   = [x for x in plist_data.get("ACPI",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
-			kernel_add   = [x for x in plist_data.get("Kernel",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
-			kernel_patch = [x for x in plist_data.get("Kernel",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
-			misc_tools   = [x for x in plist_data.get("Misc",{}).get("Tools",[]) if isinstance(x,dict) and x.get("Enabled")]
-			uefi_drivers = [x for x in plist_data.get("UEFI",{}).get("Drivers",[]) if (isinstance(x,dict) and x.get("Enabled")) or isinstance(x,str)]
+			acpi_add = acpi_patch = kernel_add = kernel_patch = misc_tools = uefi_drivers = []
+			booter_q = {}
+			boot_args = boot_args_d = None
+			try: acpi_add     = [x for x in plist_data.get("ACPI",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
+			except: pass
+			try: acpi_patch   = [x for x in plist_data.get("ACPI",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
+			except: pass
+			try: kernel_add   = [x for x in plist_data.get("Kernel",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
+			except: pass
+			try: kernel_patch = [x for x in plist_data.get("Kernel",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
+			except: pass
+			try: misc_tools   = [x for x in plist_data.get("Misc",{}).get("Tools",[]) if isinstance(x,dict) and x.get("Enabled")]
+			except: pass
+			try: uefi_drivers = [x for x in plist_data.get("UEFI",{}).get("Drivers",[]) if (isinstance(x,dict) and x.get("Enabled")) or isinstance(x,str)]
+			except: pass
+			try: booter_q     = plist_data.get("Booter",{}).get("Quirks",{})
+			except: pass
+			try: boot_args    = plist_data.get("NVRAM",{}).get("Add",{}).get("7C436110-AB2A-4BBB-A880-FE41995C9F82",{}).get("boot-args",None)
+			except: pass
+			try: boot_args_d  = "boot-args" in plist_data.get("NVRAM",{}).get("Delete",{}).get("7C436110-AB2A-4BBB-A880-FE41995C9F82",[])
+			except: pass
 
-			# Get the totals as well
-			aa_total = len(plist_data.get("ACPI",{}).get("Add",[]))
-			ap_total = len(plist_data.get("ACPI",{}).get("Patch",[]))
-			ka_total = len(plist_data.get("Kernel",{}).get("Add",[]))
-			kp_total = len(plist_data.get("Kernel",{}).get("Patch",[]))
-			mt_total = len(plist_data.get("Misc",{}).get("Tools",[]))
-			ud_total = len(plist_data.get("UEFI",{}).get("Drivers",[]))
-
-			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers)):
+			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers,booter_q,boot_args,boot_args_d)):
 				desc += "\nPlist appears to belong to OpenCore"
+				# Get the totals as well
+				aa_total = ap_total = ka_total = kp_total = mt_total = ud_total = 0
+				try: aa_total = len(plist_data.get("ACPI",{}).get("Add",[]))
+				except: pass
+				try: ap_total = len(plist_data.get("ACPI",{}).get("Patch",[]))
+				except: pass
+				try: ka_total = len(plist_data.get("Kernel",{}).get("Add",[]))
+				except: pass
+				try: kp_total = len(plist_data.get("Kernel",{}).get("Patch",[]))
+				except: pass
+				try: mt_total = len(plist_data.get("Misc",{}).get("Tools",[]))
+				except: pass
+				try: ud_total = len(plist_data.get("UEFI",{}).get("Drivers",[]))
+				except: pass
+				# We'll parse these in order:
+				# names_data -> booter_q -> names_data2 -> boot_args -> names_data3
 				names_data = (
 					("ACPI -> Add",acpi_add,"Path",aa_total),
 					("ACPI -> Patch",acpi_patch,"Comment",ap_total),
+				)
+				names_data2 = (
 					("Kernel -> Add",kernel_add,"BundlePath",ka_total),
 					("Kernel -> Patch",kernel_patch,"Comment",kp_total),
 					("Misc -> Tools",misc_tools,"Path",mt_total),
-					("UEFI -> Drivers",uefi_drivers,"Path",ud_total)
+				)
+				names_data3 = (
+					("UEFI -> Drivers",uefi_drivers,"Path",ud_total),
 				)
 				driver_warning = " - [Using Older OC Schema]" if all(isinstance(x,str) for x in uefi_drivers) \
 							else " - [Using mixed OC Schema!]" if any(isinstance(x,str) for x in uefi_drivers) else ""
-				for n,d,k,t in names_data:
-					desc += "\n### {} ({:,}/{:,} Enabled){}{}\n".format(
-						n,
-						len(d),
-						t,
-						driver_warning if n=="UEFI -> Drivers" else "",
-						":" if len(d) else ""
-					)
-					for i,v in enumerate(d,start=1):
-						desc += "\n{}. `{}`".format(
-							i,
-							v.get(k,"'{}' key not present!").format(k) if isinstance(v,dict) else v
+				# Set up a helper to parse
+				def parse_tuple(n_d,desc,driver_warning=""):
+					for n,d,k,t in n_d:
+						desc += "\n### {} ({:,}/{:,} Enabled){}{}\n".format(
+							n,
+							len(d),
+							t,
+							driver_warning if n=="UEFI -> Drivers" else "",
+							":" if len(d) else ""
 						)
-						# Check for min/max kernel and add them as needed
-						try:
-							min_kernel = v.get("MinKernel","")
-							max_kernel = v.get("MaxKernel","")
-							match_kernel = v.get("MatchKernel","")
-						except:
-							continue
-						if not any((min_kernel,max_kernel,match_kernel)):
-							continue
-						# We got *something* - check min/max first
-						if min_kernel and max_kernel:
-							desc += " ({} -> {})".format(min_kernel,max_kernel)
-						elif min_kernel:
-							desc += " ({}+)".format(min_kernel)
-						elif max_kernel:
-							desc += " ({}-)".format(max_kernel)
-						elif match_kernel:
-							desc += " (MatchKernel {})".format(match_kernel)
+						for i,v in enumerate(d,start=1):
+							desc += "\n{}. `{}`".format(
+								i,
+								v.get(k,"'{}' key not present!").format(k) if isinstance(v,dict) else v
+							)
+							# Check for min/max kernel and add them as needed
+							try:
+								min_kernel = v.get("MinKernel","")
+								max_kernel = v.get("MaxKernel","")
+								match_kernel = v.get("MatchKernel","")
+							except:
+								continue
+							if not any((min_kernel,max_kernel,match_kernel)):
+								continue
+							# We got *something* - check min/max first
+							if min_kernel and max_kernel:
+								desc += " ({} -> {})".format(min_kernel,max_kernel)
+							elif min_kernel:
+								desc += " ({} and newer)".format(min_kernel)
+							elif max_kernel:
+								desc += " (up to {})".format(max_kernel)
+							elif match_kernel:
+								desc += " (MatchKernel: {})".format(match_kernel)
+					return desc
+				# Parse the data in chunks to keep things more-or-less in order
+				desc = parse_tuple(names_data,desc)
+				# List the Booter -> Quirks, and boot-args as needed
+				if isinstance(booter_q,dict):
+					desc += "\n### Booter -> Quirks ({:,}):\n".format(len(booter_q))
+					# List the elements of the dict and their values
+					for i,v in enumerate(booter_q,start=1):
+						desc += "\n{}. `{}` = `{}`".format(
+							i,
+							v,
+							booter_q[v]
+						)
+				else:
+					desc += "\n### Booter -> Quirks (0)\n"
+				desc = parse_tuple(names_data2,desc)
+				if boot_args:
+					desc += "\n### Boot-args (NVRAM -> Add {}):\n`{}`".format(
+						"only" if not boot_args_d else "and Delete",
+						boot_args
+					)
+				desc = parse_tuple(names_data3,desc,driver_warning=driver_warning)
 		await PickList.PagePicker(
 			title=title,
 			description=desc,
