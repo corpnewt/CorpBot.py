@@ -33,10 +33,10 @@ class Calc(commands.Cog):
 
         if formula is None:
             return await ctx.send('Usage: `{}calc [formula]`'.format(ctx.prefix))
-        parser_lines = [x.strip() for x in formula.replace(";","\n").replace(",","\n").split("\n") if x.strip()]
+        parser_lines = [x.strip() for x in formula.replace(";","\n").split("\n") if x.strip()]
         if not parser_lines:
             return await ctx.send('Usage: `{}calc [formula]`'.format(ctx.prefix))
-        clean_lines = "\n".join(x.replace("`","").replace("\\","") for x in parser_lines)
+        clean_lines = []
         parser = CustomArithmeticParser()
         try:
             for line in parser_lines:
@@ -54,13 +54,14 @@ class Calc(commands.Cog):
                         offset += len(line)-current_len
                     except:
                         pass
-                result = parser.evaluate(line)
+                result = await self.bot.loop.run_in_executor(None,parser.evaluate,line)
+                clean_lines.append("{} = {}".format(line.replace("`","").replace("\\",""),result))
         except Exception as e:
             msg  = 'I couldn\'t parse that formula :(\n'
             msg += "```\n{}\n```\n".format(str(e).replace("`","back tick"))
             msg += 'Please see [this page](<https://github.com/pyparsing/plusminus/blob/master/doc/arithmetic_parser.md>) for parsing info.\n\n'
             msg += '__Additional syntax supported:__\n'
-            msg += '* Newlines, `;`, or `,` characters separate lines passed to the parser\n'
+            msg += '* Newlines or semicolons (`;`) separate lines passed to the parser\n'
             msg += '* `0x` or `#` prefixes denote hexadecimal values\n'
             msg += '* `&` for bitwise AND\n'
             msg += '* `|` for bitwise OR\n'
@@ -70,8 +71,10 @@ class Calc(commands.Cog):
             msg += '* `>>` bit shift right\n'
             msg += '* `sqrt()` square root'
             return await ctx.send(msg)
+        # Save the cleaned lines as a string
+        clean_lines = "\n".join(clean_lines)
         # Send the results
-        over_amount = (len(clean_lines)+len(str(result))+17)-2000
+        over_amount = (len(clean_lines)+len(str(result))+8)-2000
         if over_amount > 0:
             clean_lines = "..."+clean_lines[over_amount+3:]
-        await ctx.send("```\n{}\n```=```\n{}\n```".format(clean_lines,result))
+        await ctx.send("```\n{}\n```".format(clean_lines))
