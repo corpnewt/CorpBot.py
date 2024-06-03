@@ -3,7 +3,7 @@ from discord.ext import commands
 from urllib.parse import quote
 from html import unescape
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList
+from Cogs import Message, FuzzySearch, GetImage, Utils, DL, DisplayName, PickList, Nullify
 
 def setup(bot):
 	# Add the bot and deps
@@ -148,6 +148,26 @@ class Humor(commands.Cog):
 		except Exception as e:
 			print("Meme template update failed: {}".format(e))
 		return self.meme_temps
+
+	@commands.command()
+	async def mock(self, ctx, *, message = None):
+		"""i'M nOt MoCkInG yOu, YoU'rE mOcKiNg Me."""
+		if not message:
+			return await ctx.send("Usage: `{}mock [message]`".format(ctx.prefix))
+		message = Nullify.resolve_mentions(message, ctx=ctx, escape=True, escape_links=True,show_mentions=True)
+		# Walk the chars in the passed message and alternate case
+		upper = False
+		new_message = ""
+		for char in message:
+			if not char.isalpha():
+				new_message += char
+			else:
+				new_message += char.upper() if upper else char.lower()
+				upper = not upper
+		if new_message == message:
+			# Nothing changed - nothing to mock.
+			return await ctx.send("Nothing there to mock...")
+		return await ctx.send(new_message)
 
 	@commands.command()
 	async def zalgo(self, ctx, *, message = None):
