@@ -40,11 +40,18 @@ class Calc(commands.Cog):
         parser = CustomArithmeticParser()
         try:
             for line in parser_lines:
+                offset = 0
                 # Let's regex our way through 0x and # integers
                 for m in re.finditer(self.hex_re,line):
                     try:
-                        hex_int = int(m.group(0).replace("#","0x"),16)
-                        line = line.replace(m.group(0),str(hex_int))
+                        start,end = m.span()
+                        hex_int = str(int(m.group(0).replace("#","0x"),16))
+                        current_len = len(line)
+                        # Specifically replace this *one* instance
+                        line = line[0:start+offset]+str(hex_int)+line[end+offset:]
+                        # Get the offset - i.e. how much our line length
+                        # changed after applying - so we know to adjust
+                        offset += len(line)-current_len
                     except:
                         pass
                 result = parser.evaluate(line)
