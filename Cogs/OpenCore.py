@@ -39,6 +39,7 @@ class OpenCore(commands.Cog):
 			"IDT92HD87B2_4":["IDT92HD87B2/4"],
 			"VT2020_2021":["VT2020","VT2021"]
 		}
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+)?discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.nv_link = "https://gfe.nvidia.com/mac-update"
 		global Utils
@@ -339,12 +340,38 @@ class OpenCore(commands.Cog):
 			ctx=ctx
 		).pick()
 
+	async def _resolve_message(self, message):
+		# Helper to check the passed message for a discord message link - or a replied to message.
+		# Will return the target message - if found, otherwise the original
+		if message.reference:
+			# Resolve the replied to reference to a message object
+			try:
+				m = await Utils.get_replied_to(message)
+				if m.content or m.attachments:
+					message = m
+			except: pass			
+		# Check if we have any attachments - if so, those take priority
+		if message.content is None and message.attachments:
+			return message
+		# Check if the message contains a discord message URL
+		m_match = self.message_regex.search(message.content)
+		if not m_match:
+			return message
+		# We got a match - let's try to get the server, channel, and message
+		ctx = await self.bot.get_context(message)
+		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
+		return m or message
+
 	@commands.command(pass_context=True)
 	async def plist(self, ctx, *, url = None):
 		"""Validates plist file structure.  Accepts a url - or picks the first attachment."""
-		if url is None and not len(ctx.message.attachments):
+		# Resolve the message and URL as needed
+		message = await self._resolve_message(ctx.message)
+		url = await Utils.get_message_content(message)
+		# Check values
+		if url is None and not len(message.attachments):
 			return await ctx.send("Usage: `{}plist [url or attachment]`".format(ctx.prefix))
-		url = url or ctx.message.attachments[0].url
+		url = url or message.attachments[0].url
 		message = await Message.Embed(description="Downloading...",color=ctx.author).send(ctx)
 		try:
 			data = await DL.async_dl(url)
