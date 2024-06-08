@@ -39,7 +39,7 @@ class OpenCore(commands.Cog):
 			"IDT92HD87B2_4":["IDT92HD87B2/4"],
 			"VT2020_2021":["VT2020","VT2021"]
 		}
-		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+)?discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.nv_link = "https://gfe.nvidia.com/mac-update"
 		global Utils
