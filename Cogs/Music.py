@@ -159,7 +159,7 @@ class Music(commands.Cog):
 		self.player_failure_threshold = 5 # >= we stop music
 		self.track_failure_threshold = 2 # >= we clear out that track
 		# Regex fun
-		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+)?discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
 		'''	"b"  :"│",  # "║" # Bar outline
