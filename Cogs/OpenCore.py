@@ -515,6 +515,14 @@ class OpenCore(commands.Cog):
 						boot_args
 					)
 				desc = parse_tuple(names_data3,desc,driver_warning=driver_warning)
+		if not desc:
+			# Use a regular embed - as we're not picking anything
+			return await Message.Embed(
+				title=title,
+				footer=foot,
+				color=ctx.author
+			).send(ctx, message)
+		# Show the page picker results
 		await PickList.PagePicker(
 			title=title,
 			description=desc,
