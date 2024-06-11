@@ -391,12 +391,13 @@ class OpenCore(commands.Cog):
 		# Misc -> Tools, UEFI -> Drivers
 		title = "✅ Plist format OK!"
 		cont  = "'".join(str(type(plist_data)).split("<class '")[1].split("'")[:-1])
-		desc  = "Plist root uses type: `{}`".format(cont)
+		foot  = "Plist root type: {}".format(cont)
+		desc  = ""
 		if not isinstance(plist_data,dict):
 			# Not a dict - nothing really to check
 			return await Message.Embed(
 				title=title,
-				description=desc,
+				footer=foot,
 				color=ctx.author
 			).send(ctx, message)
 		else:
@@ -424,10 +425,10 @@ class OpenCore(commands.Cog):
 			except: pass
 
 			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers,booter_q,boot_args,boot_args_d)):
-				desc += "\n\\- Appears to belong to OpenCore"
+				desc = "\\- Appears to belong to OpenCore"
 				# Regex slightly adjusted from here: https://github.com/ocwebutils/sc_rules
 				if any((re.match(r"^([Vv]\d+\.\d+(\.\d+)?(\s*\|\s*.+)?).*",x["Comment"]) for x in kernel_add if isinstance(x.get("Comment"),str))):
-					desc += "\n\\- May have been edited with a configurator"
+					foot += " | May have been edited with a configurator"
 
 				# Get the totals as well
 				aa_total = ap_total = ka_total = kp_total = mt_total = ud_total = 0
@@ -521,6 +522,7 @@ class OpenCore(commands.Cog):
 			timeout=300,
 			color=ctx.author,
 			message=message,
+			footer=foot,
 			ctx=ctx
 		).pick()
 
