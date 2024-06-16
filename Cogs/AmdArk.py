@@ -3,6 +3,7 @@ from Cogs import Message
 from Cogs import DL
 from Cogs import PickList
 import urllib.parse, json
+import regex as re
 from html import unescape
 
 
@@ -23,6 +24,12 @@ class AmdArk(commands.Cog):
             "Workload Affinity"
         )
         self.h = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        self.url_regex_accept = (
+            re.compile(r"\/en\/products\/(apu|cpu|processors\/(desktops|laptops)|(professional-)?graphics)\/"),
+        )
+        self.url_regex_reject = (
+            re.compile(r"\/en\/products\/graphics\/(technologies|desktops\/radeon.html)"),
+        )
 
     @commands.command(no_pm=True,aliases=("iamd","aark"))
     async def amdark(self, ctx, *, text: str = None):
@@ -73,9 +80,13 @@ class AmdArk(commands.Cog):
 
             # Got something
             response = await self.get_match_data(response[index])
-        
-        if not response:
+                
+        if not response or not isinstance(response,dict):
             args["description"] = "Something went wrong getting search data!"
+            return await Message.EmbedText(**args).edit(ctx, message)
+
+        if not response.get("fields"):
+            args["description"] = "No results returned for `{}`.".format(original_text.replace("`","").replace("\\",""))
             return await Message.EmbedText(**args).edit(ctx, message)
 
         await PickList.PagePicker(
@@ -127,25 +138,18 @@ class AmdArk(commands.Cog):
         if not search_data or not search_data.get("results"):
             return []
         # Let's iterate the results
-        search_list = (
-            "/en/products/apu/",
-            "/en/products/cpu/",
-            "/en/products/processors/desktops/",
-            "/en/products/processors/laptop/",
-            "/en/products/graphics/",
-            "/en/products/professional-graphics/"
-        )
         results = []
         suffix = " | AMD"
         for result in search_data["results"]:
-            if any(s in result.get("uri","") for s in search_list):
+            uri = result.get("uri","")
+            if any(x.search(uri) for x in self.url_regex_accept) and not any(x.search(uri) for x in self.url_regex_reject):
                 # Strip " | AMD" off the end of the name if present
-                name = result.get("title",result["uri"].split("/")[-1])
+                name = result.get("title",uri.split("/")[-1])
                 if name.endswith(suffix) and len(name)>len(suffix):
                     name = name[:-len(suffix)]
                 results.append({
                     "name":name,
-                    "url":result["uri"]
+                    "url":uri
                 })
         return results
 
@@ -156,6 +160,7 @@ class AmdArk(commands.Cog):
         """
         try:
             contents = await DL.async_text(match["url"],headers=self.h)
+            with open("amd.html","wb") as f: f.write(contents.encode())
         except:
             return
         info = {"url":match["url"],"name":match["name"]}
@@ -163,7 +168,7 @@ class AmdArk(commands.Cog):
         if 'data-product-specs="' in contents:
             # Newer format - this should give us some JSON data to work with
             try:
-                contents = unescape(contents.split('data-product-specs="')[1].split('" data-tooltips="')[0].strip())
+                contents = unescape(contents.split('data-product-specs="')[1].split('"')[0].strip())
                 json_data = json.loads(contents)
                 for entry in json_data.get("elements",{}).values():
                     if entry.get("title") and entry.get("formatValue"):
