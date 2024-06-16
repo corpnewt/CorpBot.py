@@ -160,7 +160,6 @@ class AmdArk(commands.Cog):
         """
         try:
             contents = await DL.async_text(match["url"],headers=self.h)
-            with open("amd.html","wb") as f: f.write(contents.encode())
         except:
             return
         info = {"url":match["url"],"name":match["name"]}
