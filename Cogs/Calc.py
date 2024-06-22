@@ -1,6 +1,6 @@
 from plusminus import ArithmeticParser
 import regex as re
-import math
+import math, random
 from discord.ext import commands
 
 def setup(bot):
@@ -20,6 +20,8 @@ class CustomArithmeticParser(ArithmeticParser):
         self.add_operator("<<",2,ArithmeticParser.LEFT,lambda a,b:a<<b)
         self.add_operator(">>",2,ArithmeticParser.LEFT,lambda a,b:a>>b)
         self.add_function("sqrt",1,lambda a:math.sqrt(a))
+        self.add_function("rand",2,lambda a,b:random.randint(a,b))
+        self.add_function("random",2,lambda a,b:random.randint(a,b))
 
 class Calc(commands.Cog):
 
