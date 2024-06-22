@@ -23,27 +23,27 @@ class Telephone(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 	# Proof-of-concept placeholders
-	'''@commands.Cog.listener()
+	@commands.Cog.listener()
 	async def on_message_context(self, ctx, message):
-		return'''
-			
+		kc = await self.killcheck(message)
+		if kc:
+			return
+		# Send our event
+		self.bot.dispatch("telephone_context", ctx, message)
+
 	async def killcheck(self, message):
-		ignore = False
+		if not message:
+			return False
 		for cog in self.bot.cogs:
 			real_cog = self.bot.get_cog(cog)
-			if real_cog == self:
-				# Don't check ourself
-				continue
-			try:
-				check = await real_cog.message(message)
+			if real_cog == self: continue
+			try: check = await real_cog.test_message(message)
 			except AttributeError:
-				continue
-			try:
-				if check['Ignore']:
-					ignore = True
-			except KeyError:
-				pass
-		return ignore
+				try: check = await real_cog.message(message)
+				except AttributeError: continue
+			if not isinstance(check,dict): continue
+			if check.get("Ignore"): return True
+		return False
 
 	async def ontyping(self, channel, user, when):
 		# Check if the channel is typing, and send typing to receiving
@@ -142,7 +142,7 @@ class Telephone(commands.Cog):
 		# Sort alphabetically
 		entries = sorted(entries, key = lambda x: x["name"])
 
-		if look_up == None:
+		if look_up is None:
 			await PickList.PagePicker(title=":telephone: Phonebook",list=entries,ctx=ctx).pick()
 			return
 
@@ -186,7 +186,7 @@ class Telephone(commands.Cog):
 		"""Reveals the last number to call regardless of *67 settings (bot-admin only)."""
 
 		target = self.settings.getServerStat(ctx.guild, "LastCall")
-		if target == None:
+		if target is None:
 			await ctx.send(":telephone: No prior calls recorded.")
 		else:
 			if self.settings.getServerStat(ctx.guild, "LastCallHidden") and not Utils.is_bot_admin(ctx):
@@ -197,14 +197,14 @@ class Telephone(commands.Cog):
 	async def settelechannel(self, ctx, *, channel = None):
 		"""Sets the channel for telephone commands - or disables that if nothing is passed (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
-		if channel == None:
+		if channel is None:
 			self.settings.setServerStat(ctx.message.guild, "TeleChannel", "")
 			self.settings.setServerStat(ctx.guild, "TeleNumber", None)
 			msg = ':telephone: *disabled*.'
 			await ctx.channel.send(msg)
 			return
 		channel = DisplayName.channelForName(channel, ctx.guild, "text")
-		if channel == None:
+		if channel is None:
 			await ctx.send("I couldn't find that channel :(")
 			return
 		self.settings.setServerStat(ctx.message.guild, "TeleChannel", channel.id)
@@ -232,7 +232,7 @@ class Telephone(commands.Cog):
 		"""Blocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		if guild_name == None:
+		if guild_name is None:
 			await ctx.send("Usage: `{}teleblock [guild_name]`".format(ctx.prefix))
 			return
 
@@ -257,7 +257,7 @@ class Telephone(commands.Cog):
 
 		# Here, we should have a guild to block
 		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		if block_list is None:
 			block_list = []
 		block_list.append(target.id)
 		self.settings.setServerStat(ctx.guild, "TeleBlock", block_list)
@@ -271,12 +271,12 @@ class Telephone(commands.Cog):
 		"""Unblocks all tele-numbers associated with the passed guild (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		if guild_name == None:
+		if guild_name is None:
 			await ctx.send("Usage: `{}teleunblock [guild_name]`".format(ctx.prefix))
 			return
 
 		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		if block_list is None:
 			block_list = []
 		
 		if not len(block_list):
@@ -313,7 +313,7 @@ class Telephone(commands.Cog):
 		"""Lists guilds with blocked tele-numbers."""
 
 		block_list = self.settings.getServerStat(ctx.guild, "TeleBlock")
-		if block_list == None:
+		if block_list is None:
 			block_list = []
 		
 		if not len(block_list):
@@ -361,7 +361,7 @@ class Telephone(commands.Cog):
 		hidden = False
 		target = None
 		dial_hide = False
-		if not number == None:
+		if not number is None:
 			if "*67" in number:
 				hidden = True
 			if "*69" in number:
@@ -376,7 +376,7 @@ class Telephone(commands.Cog):
 		await self._dial(ctx.guild, target, hidden, dial_hide)
 
 	async def _dial(self, caller, target, hidden, dial_hide):
-		if target == None:
+		if target is None:
 			# Need a random number
 			numbers = []
 			for guild in self.bot.guilds:
@@ -403,7 +403,7 @@ class Telephone(commands.Cog):
 					break
 			if not found:
 				target = None
-		if target == None:
+		if target is None:
 			# We didn't find a server to connect to
 			caller = self._gettelechannel(caller)
 			if caller:
@@ -412,10 +412,10 @@ class Telephone(commands.Cog):
 
 		# Check for a blocked server
 		block_list = self.settings.getServerStat(caller, "TeleBlock")
-		if block_list == None:
+		if block_list is None:
 			block_list = []
 		tblock_list = self.settings.getServerStat(target, "TeleBlock")
-		if tblock_list == None:
+		if tblock_list is None:
 			block_list = []
 		
 		if target.id in block_list or caller.id in tblock_list:
@@ -426,7 +426,7 @@ class Telephone(commands.Cog):
 			return
 
 		target_channel = self._gettelechannel(target)
-		if target_channel == None:
+		if target_channel is None:
 			# We found a server - but they have no telechannel
 			caller = self._gettelechannel(caller)
 			if caller:
@@ -464,7 +464,7 @@ class Telephone(commands.Cog):
 		receiver_chan = self._gettelechannel(receiver)
 		caller_chan   = self._gettelechannel(caller)
 
-		if receiver_chan == None or caller_chan == None:
+		if receiver_chan is None or caller_chan is None:
 			# No dice
 			return
 
@@ -510,7 +510,6 @@ class Telephone(commands.Cog):
 		# Setup the check
 		def check(ctx, msg):
 			# This now catches the message and the context
-			# print(ctx)
 			if msg.author.bot:
 				return False
 			m_cont = msg.content.lower()
@@ -521,13 +520,11 @@ class Telephone(commands.Cog):
 			return False
 		# Wait for a response
 		try:
-			talk = await self.bot.wait_for('message_context', check=check, timeout=30)
+			ctx,talk = await self.bot.wait_for('telephone_context', check=check, timeout=30)
 		except Exception:
 			talk = None
-		if talk:
-			talk = talk[1]
 
-		if talk == None:
+		if talk is None:
 			# No answer - hangup
 			self._hangup(caller)
 			await caller_chan.send(":telephone: No answer...")
@@ -548,7 +545,7 @@ class Telephone(commands.Cog):
 		# Wait on the call
 		while True:
 			# Setup the check
-			def check_in_call(msg):
+			def check_in_call(ctx,msg):
 				if msg.author.bot:
 					return False
 				if msg.channel == receiver_chan or msg.channel == caller_chan:
@@ -556,10 +553,13 @@ class Telephone(commands.Cog):
 				return False
 			try:
 				# 1 minute timeout
-				talk = await self.bot.wait_for('message', check=check_in_call, timeout=60)
+				ctx,talk = await self.bot.wait_for('telephone_context', check=check_in_call, timeout=60)
 			except Exception:
 				talk = None
-			if talk == None:
+			killcheck = await self.killcheck(talk)
+			if killcheck:
+				continue # User must be ignored or similar
+			if talk is None:
 				# Timed out
 				self._hangup(caller)
 				self._hangup(receiver)
