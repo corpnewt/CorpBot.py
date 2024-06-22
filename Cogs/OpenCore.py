@@ -371,7 +371,7 @@ class OpenCore(commands.Cog):
 		# Check values
 		if url is None and not len(message.attachments):
 			return await ctx.send("Usage: `{}plist [url or attachment]`".format(ctx.prefix))
-		url = url or message.attachments[0].url
+		url = message.attachments[0].url if message.attachments else url
 		message = await Message.Embed(description="Downloading...",color=ctx.author).send(ctx)
 		try:
 			data = await DL.async_dl(url)
