@@ -1028,8 +1028,7 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Not connected to a voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		if not url and not message.attachments:
 			return await ctx.send("Usage: `{}{} [url or attachment]`".format(ctx.prefix,"shufflepl" if shuffle else "loadpl"))
-		if not url:
-			url = message.attachments[0].url
+		url = message.attachments[0].url if message.attachments else url
 		m = await Message.Embed(title="♫ Downloading...",color=ctx.author).send(ctx)
 		try:
 			playlist = await DL.async_json(url.strip("<>"))
