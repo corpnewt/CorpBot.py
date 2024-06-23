@@ -1793,7 +1793,7 @@ class Music(commands.Cog):
 			delete_after=delay
 		).send(ctx)
 
-	@commands.command()
+	@commands.command(aliases=["nowplaying"])
 	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
 
