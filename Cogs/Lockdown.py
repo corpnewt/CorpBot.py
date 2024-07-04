@@ -1,5 +1,6 @@
 import discord, time, re
 from discord.ext import commands
+from datetime import timedelta
 from Cogs import Utils, DisplayName, Message, Nullify, PickList
 
 def setup(bot):
@@ -106,6 +107,264 @@ class Lockdown(commands.Cog):
                 try: await channel.set_permissions(default_role, overwrite=overs if other_perms or not unlock else None)
                 except: pass
         return (categories,channels)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if not message.guild or not message.content or message.author.bot:
+            # We need a guild, some message contents, and for the author to be a person
+            return
+        # Check if we have an admin/bot-admin author and bail - they should be trusted
+        ctx = await self.bot.get_context(message)
+        if Utils.is_bot_admin(ctx):
+            return
+        spam_rules = self.settings.getServerStat(message.guild,"SpamRules",[])
+        if not spam_rules: # Not set up, bail
+            return
+        # Let's ensure they're ordered by severity
+        spam_rules.sort(key=lambda x:x.get("time_out",0),reverse=True)
+        # Figure out the farthest message back we need to be aware of
+        timestamp = time.time()
+        max_time  = max(spam_rules, key=lambda x:x.get("time_frame",-1)).get("time_frame")
+        if max_time is None:
+            return # broken somehow
+        author_messages = self.settings.getUserStat(message.author,message.guild,"MessageHashes",[])
+        valid_messages  = [x for x in author_messages if timestamp-x.get("timestamp",-1) <= max_time]
+        message_check = {"hash":hash(message.content),"timestamp":timestamp,"channel":message.channel.id}
+        # Walk the valid messages and check our rules
+        for rule in spam_rules:
+            # Spam rules are a dict with the following:
+            # "time_frame" : number of seconds old (float) a message can be to consider it
+            # "channels"   : minimum number of channels they have to span
+            # "messages"   : minimum number of messages they have to send
+            # "time_out"   : number of seconds (float) to time the user out for spamming
+            # "same"       : bool that denotes if the messages considered have to be the same
+            # "in_a_row"   : bool that denotes if the messages have to be the same, and sent in a row
+            #
+            # Verify we have what we need and then parse the messages in this rule's context
+            if not (isinstance(rule.get("messages"),int) and rule["messages"] > 1):
+                # Something is not right - we need *at least* the message count
+                continue
+            time_frame = rule.get("time_frame",0)
+            if not isinstance(time_frame,(float,int)) or time_frame <= 0:
+                # Botched time frame - bail on this rule
+                continue
+            time_out = rule.get("time_out",0)
+            if not isinstance(time_out,(float,int)) or time_out <= 0:
+                # Botched time out - bail on this rule
+                continue
+            check_channels = isinstance(rule.get("channels"),int) and rule["channels"] > 0
+            rule_messages = []
+            rule_channels = []
+            # Walk them in reverse - from newest to oldest
+            for m in valid_messages[::-1]:
+                if timestamp-m.get("timestamp",-1) > time_frame:
+                    break # Assume everything this message and after will be older
+                if rule.get("same"):
+                    if rule.get("in_a_row"):
+                        if m.get("hash") != message_check.get("hash",False):
+                            break # Bail on the first non-match
+                        rule_messages.append(m)
+                    elif m.get("hash") == message_check.get("hash",False):
+                        rule_messages.append(m)
+                else:
+                    # They don't have to be the same - just verifying timestamps
+                    rule_messages.append(m)
+                # Add the channel if we haven't seen it before
+                if check_channels and m.get("channel") and not m["channel"] in rule_channels:
+                    rule_channels.append(m["channel"])
+            # Add our message and channel as needed
+            rule_messages.append(message_check)
+            if check_channels and not message.channel.id in rule_channels:
+                rule_channels.append(message.channel.id)
+            # Check the channel count
+            if check_channels and len(rule_channels) < rule.get("channels",0):
+                # Watching channel count - but we didn't exceed it
+                continue
+            # Check the message count
+            if rule.get("messages") and len(rule_messages) < rule["messages"]:
+                # Watching message count - but didn't exceed it
+                continue
+            # At this point - we're spamming per this rule - we should attempt to
+            # time the user out, then delete the message that tripped the filter
+            # Build our reason string
+            reason = "Spam: Sent {:,}{} message{}{}{} within {:,} second{}".format(
+                len(rule_messages),
+                " identical" if rule.get("same") else "",
+                "" if len(rule_messages) == 1 else "s",
+                " in a row" if rule.get("same") and rule.get("in_a_row") else "",
+                "" if not check_channels else " in {:,} channel{}".format(
+                    len(rule_channels),
+                    "" if len(rule_channels) == 1 else "s"
+                ),
+                time_frame,
+                "" if time_frame == 1 else "s"
+            )
+            try: await message.author.timeout_for(timedelta(seconds=time_out),reason=reason)
+            except: pass
+            try: await message.delete()
+            except: pass
+            # Leave the loop - we had a match
+            break
+        # Ensure we update our message hashes
+        self.settings.setUserStat(message.author,message.guild,"MessageHashes",valid_messages+[message_check])
+
+    @commands.command(aliases=["spamlist","spam"])
+    async def listspam(self, ctx):
+        """Lists the spam filter rules (bot-admin only)."""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        spam_rules = self.settings.getServerStat(ctx.guild,"SpamRules",[])
+        if not spam_rules:
+            return await ctx.send("No spam filter rules setup!  You can use the `{}addspam` command to add some.".format(ctx.prefix))
+        entries = []
+        # Walk the entries in order of time_out severity
+        for i,rule in enumerate(sorted(spam_rules,key=lambda x:x.get("time_out",0),reverse=True),start=1):
+            name = "{}. {:,} second time-out:".format(i,rule.get("time_out",0))
+            val  = "**Trigger:** {:,}{} message{} sent{}{} within {:,} second{}\n**Args:** `{}`".format(
+                rule.get("messages",0),
+                " identical" if rule.get("same") else "",
+                "" if rule.get("messages",0) == 1 else "s",
+                " in a row" if rule.get("same") and rule.get("in_a_row") else "",
+                "" if not rule.get("channels",0) else " in {:,} or more channel{}".format(
+                    rule["channels"],
+                    "" if rule["channels"] == 1 else "s"
+                ),
+                rule.get("time_frame",0),
+                "" if rule.get("time_frame",0) == 1 else "s",
+                "-messages {} -channels {} -timeframe {} -timeout {}{}".format(
+                    rule.get("messages",-1),
+                    rule.get("channels",-1),
+                    rule.get("time_frame",-1),
+                    rule.get("time_out",-1),
+                    " -inarow" if rule.get("in_a_row") else " -same" if rule.get("same") else ""
+                )
+            )
+            entries.append({"name":name,"value":val})
+        return await PickList.PagePicker(title="Current Spam Filters ({:,} total)".format(len(entries)),list=entries,ctx=ctx).pick()
+
+    @commands.command(aliases=["spamclear"])
+    async def clearspam(self, ctx):
+        """Clears all spam filter rules (bot-admin only)."""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        self.settings.setServerStat(ctx.guild,"SpamRules",[])
+        await ctx.send("All spam filter rules have been cleared!")
+
+    @commands.command(aliases=["removespam","spamrem","spamremove"])
+    async def remspam(self, ctx, rule_index = None):
+        """Removes the spam filter rule at the passed index (bot-admin only)."""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        spam_rules = self.settings.getServerStat(ctx.guild,"SpamRules",[])
+        if not spam_rules:
+            return await ctx.send("No spam filter rules setup!  You can use the `{}addspam` command to add some.".format(ctx.prefix))
+        try:
+            rule_index = int(rule_index)
+            assert 0 < rule_index <= len(spam_rules)
+        except:
+            return await ctx.send("You need to pass a valid integer from 1 to {:,}.\nYou can get a numbered list with `{}listspam`".format(len(spam_rules),ctx.prefix))
+        # Got our index - let's sort by severity and then remove it
+        spam_rules.sort(key=lambda x:x.get("time_out",0),reverse=True)
+        del spam_rules[rule_index-1]
+        self.settings.setServerStat(ctx.guild,"SpamRules",spam_rules)
+        await ctx.send("Spam filter rule removed!")
+    
+    @commands.command(aliases=["spamadd","newspam","spamnew"])
+    async def addspam(self, ctx, *, rule = None):
+        """Adds a new spam filter rule (bot-admin only).
+        Rules can be a space delimited list of the following:
+
+        -messages #    (# = the number of messages for the rule to consider; 2-50)
+        -channels #    (# = the number of channels for the rule to consider; 1-50)
+        -timeframe #   (# = the number of seconds for the rule to consider; > 0)
+        -timeout #     (# = the number of seconds to time the user out for spamming; > 0)
+        -same          (only consider messages that have the same hash)
+        -inarow        (only consider messages taht have the same hash in a row; implies -same)
+
+        e.g. To create a spam filter rule that watches for a user sending 2 or more idential
+        messages in a row across 2 or more channels within 5 seconds - resulting in them being
+        timed out for 5 minutes, we can use the following:
+
+        $addspam -messages 2 -channels 2 -timeframe 5 -timeout 300 -inarow"""
+
+        if not await Utils.is_bot_admin_reply(ctx): return
+        if rule is None:
+            return await ctx.send("Usage: `{}addspam -messages # -channels # -timeframe # -timeout # -same/-inarow`".format(ctx.prefix))
+        # Set up some regex arg parsing
+        match_dict = {
+            "messages"  : re.compile(r"(?i)-?m(ess(age|ages)?)?"),
+            "channels"  : re.compile(r"(?i)-?(c(h|han|hannels?)?)"),
+            "time_frame": re.compile(r"(?i)-?(tf|time-?f(rame)?)"),
+            "time_out"  : re.compile(r"(?i)-?(to|time-?o(ut)?)"),
+            "same"      : re.compile(r"(?i)-?s(ame)?"),
+            "in_a_row"  : re.compile(r"(?i)-?i(ar|n-?a-?row)?")
+        }
+        # Get the arg order for those that don't *require* the switches
+        arg_order = list(match_dict)[:-2]
+        # Set up placeholders
+        arg_dict = {
+            "messages"  : 0,
+            "channels"  : 1,
+            "time_frame": 0,
+            "time_out"  : 0,
+            "same"      : False,
+            "in_a_row"  : False
+        }
+        # Walk our args
+        last_arg = None
+        for i,arg in enumerate(rule.split(),start=1):
+            if not arg: continue # Skip empty args, if any
+            # Check if it's a float/int
+            arg_float = arg_int = None
+            try:
+                arg_float = float(arg)
+                arg_int = int(arg_float)
+            except:
+                pass
+            # If we got a float/int value, check if we have a last_arg
+            # and if so - use that.  If not - use the next in the order
+            if arg_float is not None:
+                try:
+                    resolved = last_arg or arg_order[0]
+                except IndexError:
+                    # We got something we didn't expect
+                    return await ctx.send("Could not parse '{}' at {}".format(Nullify.escape_all(arg),i))
+            else:
+                # Resolve it to either an arg match - or in-order as needed
+                resolved = next((x for x in match_dict if match_dict[x].fullmatch(arg)),None)
+                if not resolved:
+                    return await ctx.send("Unknown argument '{}' at {}".format(Nullify.escape_all(arg),i))
+            last_arg = None
+            # Make sure we have a valid value for the arg
+            if resolved == "same":
+                arg_dict["same"] = True
+            elif resolved == "in_a_row":
+                arg_dict["same"] = arg_dict["in_a_row"] = True
+            elif arg_float is None:
+                # No value - just the arg - set it and continue
+                last_arg = resolved
+            else:
+                # We got a value - let's set it, clear last_arg, and
+                # remove resolved from our arg_order
+                arg_dict[resolved] = arg_float if resolved == "time_frame" else arg_int
+                try: arg_order.remove(resolved)
+                except: pass
+        if not 2 <= arg_dict["messages"] <= 50:
+            return await ctx.send("`-messages` must be an integer from 2 to 50")
+        if not 1 <= arg_dict["channels"] <= 50:
+            return await ctx.send("`-channels` must be an integer from 1 to 50")
+        if arg_dict["time_frame"] <= 0:
+            return await ctx.send("`-timeframe` must be greater than 0")
+        if arg_dict["time_out"] <= 0:
+            return await ctx.send("`-timeout` must be greater than 0")
+        spam_rules = self.settings.getServerStat(ctx.guild,"SpamRules",[])
+        # Let's see if we have the same requirements in another rule - and just replace it
+        spam_rules_checked = [x for x in spam_rules if not all((x.get(y)==arg_dict[y] for y in ("messages","channels","time_frame","same","in_a_row")))]
+        self.settings.setServerStat(ctx.guild,"SpamRules",spam_rules_checked+[arg_dict])
+        if len(spam_rules) != len(spam_rules_checked):
+            await ctx.send("Spam filter rule updated!")
+        else:
+            await ctx.send("Spam filter rule added!")
 
     @commands.command()
     async def listlock(self, ctx):
