@@ -1422,7 +1422,7 @@ class Music(commands.Cog):
 			# No songs in queue
 			return await Message.Embed(title="♫ No songs in queue!", description="If you want to bypass a currently playing song, use `{}skip` instead.".format(ctx.prefix),color=ctx.author,delete_after=delay).send(ctx)
 		try:
-			song_strings = song_number.split()
+			song_strings = song_number.replace(","," ").split()
 			song_numbers = []
 			for num in song_strings:
 				if "-" in num: # Got a range
