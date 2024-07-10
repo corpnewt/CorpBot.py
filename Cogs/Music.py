@@ -830,7 +830,6 @@ class Music(commands.Cog):
 							tracks.tracks = tracks.tracks[matches[0]:]
 					# Check for r=[x:y:z] or r=a,b,c-f style ranges
 					tracks.tracks = self.get_track_range(url,tracks.tracks)
-					print(tracks.tracks)
 				# Let's also get the seek position if needed
 				seek_pos = self.get_seek(url)
 			else: # Got a search term - let's search
