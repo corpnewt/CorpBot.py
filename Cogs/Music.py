@@ -663,6 +663,7 @@ class Music(commands.Cog):
 		return seek_pos
 
 	def get_track_range(self, url, tracks):
+		new_tracks = None
 		try:
 			range_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("r=")),"0").lower()
 			if ":" in range_str:
@@ -675,11 +676,8 @@ class Music(commands.Cog):
 				except: pass
 				try: step = int(vals[2])
 				except: pass
-				if all(x is None for x in (start,stop,step)):
-					# Nothing to do here
-					return tracks
 				# Let's attempt to apply the settings
-				return tracks[start:stop:step]
+				new_tracks = tracks[start:stop:step]
 			else:
 				# Got A,B,C-F notation
 				song_numbers = []
@@ -693,10 +691,10 @@ class Music(commands.Cog):
 						song_numbers.append(int(num)-1)
 				song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
 				# Let's build our new list of songs
-				return [tracks[x] for x in song_numbers]
+				new_tracks = [tracks[x] for x in song_numbers]
 		except:
 			pass
-		return tracks
+		return new_tracks or tracks
 
 	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25, search_type = None):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
