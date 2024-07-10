@@ -662,6 +662,42 @@ class Music(commands.Cog):
 			seek_pos = 0
 		return seek_pos
 
+	def get_track_range(self, url, tracks):
+		try:
+			range_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("r=")),"0").lower()
+			if ":" in range_str:
+				# Got slice notation
+				start = stop = step = None
+				vals = range_str.split(":")
+				try: start = int(vals[0])
+				except: pass
+				try: stop = int(vals[1])
+				except: pass
+				try: step = int(vals[2])
+				except: pass
+				if all(x is None for x in (start,stop,step)):
+					# Nothing to do here
+					return tracks
+				# Let's attempt to apply the settings
+				return tracks[start:stop:step]
+			else:
+				# Got A,B,C-F notation
+				song_numbers = []
+				song_strings = range_str.replace(","," ").split()
+				for num in song_strings:
+					if "-" in num: # Got a range
+						l,b = map(int,num.split("-"))
+						assert l > 0 and b > 0
+						song_numbers.extend(list(range(min(l,b)-1,max(l,b))))
+					else: # Assume it's just a number
+						song_numbers.append(int(num)-1)
+				song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
+				# Let's build our new list of songs
+				return [tracks[x] for x in song_numbers]
+		except:
+			pass
+		return tracks
+
 	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25, search_type = None):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
@@ -763,9 +799,10 @@ class Music(commands.Cog):
 						assert len(track_urls) == len(track_dicts) # Make sure we got the right number of tracks
 						tracks = []
 						for i,td in enumerate(track_dicts):
+							# Rewrap the tracks as CorpTracks to allow custom attributes
 							td["lazy_load_url"] = track_urls[i]
 							tracks.append(CorpTrack(td))
-						# Rewrap the tracks as CorpTracks to allow custom attributes
+						tracks = self.get_track_range(url,tracks) # Check for r=[x:y:z] or r=a,b,c-f style ranges
 						if seek_pos > 0: setattr(tracks[0],"seek",seek_pos)
 						if shuffle: random.shuffle(tracks)
 						return {"tracks":tracks, "playlist":album, "search":url.split("?")[0]} if album else {"tracks":tracks[0]}
@@ -791,6 +828,9 @@ class Music(commands.Cog):
 							tracks.tracks = tracks.tracks[index:]
 						elif matches: # Let's just start at the first match
 							tracks.tracks = tracks.tracks[matches[0]:]
+					# Check for r=[x:y:z] or r=a,b,c-f style ranges
+					tracks.tracks = self.get_track_range(url,tracks.tracks)
+					print(tracks.tracks)
 				# Let's also get the seek position if needed
 				seek_pos = self.get_seek(url)
 			else: # Got a search term - let's search
