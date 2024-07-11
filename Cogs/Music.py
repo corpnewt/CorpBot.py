@@ -160,6 +160,7 @@ class Music(commands.Cog):
 		self.track_failure_threshold = 2 # >= we clear out that track
 		# Regex fun
 		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
+		self.range_regex = re.compile(r"(?i)(\b|-)r(ange)?=(?P<range>[\[\]:\d,-]+)")
 		# Graphing char set - allows for theming-type overrides
 		self.gc = bot.settings_dict.get("music_graph_chars",{})
 		'''	"b"  :"│",  # "║" # Bar outline
@@ -664,39 +665,43 @@ class Music(commands.Cog):
 
 	def get_track_range(self, url, tracks):
 		new_tracks = None
-		try:
-			range_str = next((x[2:] for x in url.split("?")[1].split("&") if x.lower().startswith("r=")),"0").lower()
-			if ":" in range_str:
-				# Got slice notation
-				start = stop = step = None
-				vals = range_str.split(":")
-				try: start = int(vals[0])
-				except: pass
-				try: stop = int(vals[1])
-				except: pass
-				try: step = int(vals[2])
-				except: pass
-				# Let's attempt to apply the settings
-				new_tracks = tracks[start:stop:step]
-			else:
-				# Got A,B,C-F notation
-				song_numbers = []
-				song_strings = range_str.replace(","," ").split()
-				for num in song_strings:
-					if "-" in num: # Got a range
-						l,b = map(int,num.split("-"))
-						assert l > 0 and b > 0
-						song_numbers.extend(list(range(min(l,b)-1,max(l,b))))
-					else: # Assume it's just a number
-						song_numbers.append(int(num)-1)
-				song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
-				# Let's build our new list of songs
-				new_tracks = [tracks[x] for x in song_numbers]
-		except:
-			pass
+		if url:
+			try:
+				# Extract the last range listed, if any
+				range_str = list(self.range_regex.finditer(url))[-1].group("range")
+				if not range_str:
+					return tracks
+				elif ":" in range_str:
+					# Got slice notation
+					start = stop = step = None
+					vals = range_str.replace("[","").replace("]","").split(":")
+					try: start = int(vals[0])
+					except: pass
+					try: stop = int(vals[1])
+					except: pass
+					try: step = int(vals[2])
+					except: pass
+					# Let's attempt to apply the settings
+					new_tracks = tracks[start:stop:step]
+				else:
+					# Got A,B,C-F notation
+					song_numbers = []
+					song_strings = range_str.replace(","," ").split()
+					for num in song_strings:
+						if "-" in num: # Got a range
+							l,b = map(int,num.split("-"))
+							assert l > 0 and b > 0
+							song_numbers.extend(list(range(min(l,b)-1,max(l,b))))
+						else: # Assume it's just a number
+							song_numbers.append(int(num)-1)
+					song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
+					# Let's build our new list of songs
+					new_tracks = [tracks[x] for x in song_numbers]
+			except:
+				pass
 		return new_tracks or tracks
 
-	async def resolve_search(self, ctx, url, message = None, shuffle = False, recommend = False, recommend_count = 25, search_type = None):
+	async def resolve_search(self, ctx, url, message = None, shuffle = False, range_str = "", recommend = False, recommend_count = 25, search_type = None):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -800,7 +805,8 @@ class Music(commands.Cog):
 							# Rewrap the tracks as CorpTracks to allow custom attributes
 							td["lazy_load_url"] = track_urls[i]
 							tracks.append(CorpTrack(td))
-						tracks = self.get_track_range(url,tracks) # Check for r=[x:y:z] or r=a,b,c-f style ranges
+						# Check for r=[x:y:z] or r=a,b,c-f style ranges
+						tracks = self.get_track_range(range_str,tracks)
 						if seek_pos > 0: setattr(tracks[0],"seek",seek_pos)
 						if shuffle: random.shuffle(tracks)
 						return {"tracks":tracks, "playlist":album, "search":url.split("?")[0]} if album else {"tracks":tracks[0]}
@@ -826,8 +832,6 @@ class Music(commands.Cog):
 							tracks.tracks = tracks.tracks[index:]
 						elif matches: # Let's just start at the first match
 							tracks.tracks = tracks.tracks[matches[0]:]
-					# Check for r=[x:y:z] or r=a,b,c-f style ranges
-					tracks.tracks = self.get_track_range(url,tracks.tracks)
 				# Let's also get the seek position if needed
 				seek_pos = self.get_seek(url)
 			else: # Got a search term - let's search
@@ -860,6 +864,8 @@ class Music(commands.Cog):
 			print("Error resolving search:\n{}".format(repr(e)))
 		# We need to figure out if we've loaded a playlist
 		if isinstance(tracks,pomice.objects.Playlist):
+			# Check for range notation and limit the results as needed
+			tracks.tracks = self.get_track_range(range_str,tracks.tracks)
 			# Rewrap the tracks as CorpTracks to allow custom attributes
 			tracks.tracks = [CorpTrack(track,radio=False if i==0 else recommend,search_type=None if urls else search_type or "ytsearch") for i,track in enumerate(tracks.tracks)]
 			if seek_pos > 0: setattr(tracks.tracks[0],"seek",seek_pos)
@@ -1057,7 +1063,7 @@ class Music(commands.Cog):
 		added_tracks = await self.add_to_queue(player,valid_tracks,position=position)
 		return (valid_tracks,added_tracks)
 
-	async def _load_playlist_from_url(self, message, ctx, shuffle = False, position = -1):
+	async def _load_playlist_from_url(self, message, ctx, shuffle = False, range_str = "", position = -1):
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 		player = self.get_player(ctx.guild)
 		url = await Utils.get_message_content(message)
@@ -1073,6 +1079,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Couldn't serialize playlist!",description=str(e),color=ctx.author,delete_after=delay).edit(ctx,m)
 		if not len(playlist): return await Message.Embed(title="♫ Playlist is empty!",color=ctx.author).edit(ctx,m)
 		if not isinstance(playlist,list): return await Message.Embed(title="♫ Playlist json is incorrectly formatted!",color=ctx.author).edit(ctx,m)
+		# Check for range notation and limit the results as needed
+		playlist = self.get_track_range(range_str,playlist)
 		if shuffle: random.shuffle(playlist)
 		# Let's walk the items and add them
 		valid_tracks,added_tracks = await self._load_playlist_data(ctx,player,playlist_data=playlist,position=position)
@@ -1117,6 +1125,18 @@ class Music(commands.Cog):
 		if not search_type:
 			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
 		return (url,search_type)
+
+	def _get_range_str(self,url):
+		# Check for a range argument
+		range_str = ""
+		if url: # Only process if we got something
+			url_parts = []
+			for u in url.split():
+				m = self.range_regex.match(u)
+				if m: range_str = m.group(0)
+				else: url_parts.append(u)
+			url = " ".join(url_parts)
+		return (url,range_str)
 
 	@commands.command(aliases=["bindplayer","bindmusic","bindto","boundto"])
 	async def rebind(self, ctx, channel = None):
@@ -1186,9 +1206,16 @@ class Music(commands.Cog):
 		
 		Note that the structure of this file is very specific and alterations may not work.
 		
-		Only files dumped via the savepl command are supported."""
+		Only files dumped via the savepl command are supported.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
+		url,range_str = self._get_range_str(url)
 		message = await self._resolve_message(ctx.message)
-		await self._load_playlist_from_url(message, ctx)
+		await self._load_playlist_from_url(message, ctx, range_str=range_str)
 
 	@commands.command(aliases=["loadpln"])
 	async def loadplnext(self, ctx, *, url = None):
@@ -1197,9 +1224,16 @@ class Music(commands.Cog):
 		
 		Note that the structure of this file is very specific and alterations may not work.
 		
-		Only files dumped via the savepl command are supported."""
+		Only files dumped via the savepl command are supported.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
+		url,range_str = self._get_range_str(url)
 		message = await self._resolve_message(ctx.message)
-		await self._load_playlist_from_url(message, ctx, position=0)
+		await self._load_playlist_from_url(message, ctx, range_str=range_str, position=0)
 
 	@commands.command()
 	async def shufflepl(self, ctx, *, url = None):
@@ -1207,9 +1241,16 @@ class Music(commands.Cog):
 		
 		Note that the structure of this file is very specific and alterations may not work.
 		
-		Only files dumped via the savepl command are supported."""
+		Only files dumped via the savepl command are supported.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
+		url,range_str = self._get_range_str(url)
 		message = await self._resolve_message(ctx.message)
-		await self._load_playlist_from_url(message, ctx, shuffle=True)
+		await self._load_playlist_from_url(message, ctx, shuffle=True, range_str=range_str)
 
 	@commands.command(aliases=["shufflepln"])
 	async def shuffleplnext(self, ctx, *, url = None):
@@ -1218,9 +1259,16 @@ class Music(commands.Cog):
 		
 		Note that the structure of this file is very specific and alterations may not work.
 		
-		Only files dumped via the savepl command are supported."""
+		Only files dumped via the savepl command are supported.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
+		url,range_str = self._get_range_str(url)
 		message = await self._resolve_message(ctx.message)
-		await self._load_playlist_from_url(message, ctx, shuffle=True, position=0)
+		await self._load_playlist_from_url(message, ctx, shuffle=True, range_str=range_str, position=0)
 
 	@commands.command()
 	async def savepl(self, ctx, *, options = ""):
@@ -1330,6 +1378,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ You need to pass a url or search term!",color=ctx.author,delete_after=delay).send(ctx)
 		# Gather the search type
 		url,search_type = self._get_search_type(ctx,url)
+		# Process and strip out any range values
+		url,range_str = self._get_range_str(url)
 		# Build our search - and only use it if we don't have a URL
 		search_provider = None
 		if not Utils.get_urls(url.strip('<>')):
@@ -1339,7 +1389,7 @@ class Music(commands.Cog):
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,search_type=search_type)
+		songs = await self.resolve_search(ctx,url,message=message,range_str=range_str,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1355,7 +1405,13 @@ class Music(commands.Cog):
 		
 		st=ytsearch (searches YouTube)
 		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
+		st=scsearch (searches SoundCloud)
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._play(ctx, url)
 
@@ -1367,7 +1423,13 @@ class Music(commands.Cog):
 		
 		st=ytsearch (searches YouTube)
 		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
+		st=scsearch (searches SoundCloud)
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._play(ctx, url, position=0)
 
@@ -1421,12 +1483,14 @@ class Music(commands.Cog):
 		url = " ".join(arg_list)
 		# Gather the search type
 		url,search_type = self._get_search_type(ctx,url)
+		# Process and strip out any range values
+		url,range_str = self._get_range_str(url)
 		message = await Message.Embed(
 			title="♫ Gathering Recommendations For: {}".format(url.strip("<>")),
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,recommend=True,recommend_count=num,search_type=search_type)
+		songs = await self.resolve_search(ctx,url,message=message,range_str=range_str,recommend=True,recommend_count=num,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1578,6 +1642,8 @@ class Music(commands.Cog):
 			return await Message.Embed(title="♫ Shuffled {} song{}!".format(len(queue),"" if len(queue) == 1 else "s"),color=ctx.author,delete_after=delay).send(ctx)
 		# Gather the search type
 		url,search_type = self._get_search_type(ctx,url)
+		# Process and strip out any range values
+		url,range_str = self._get_range_str(url)
 		# Build our search - and only use it if we don't have a URL
 		search_provider = None
 		if not Utils.get_urls(url.strip('<>')):
@@ -1588,7 +1654,7 @@ class Music(commands.Cog):
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,shuffle=True,search_type=search_type)
+		songs = await self.resolve_search(ctx,url,message=message,shuffle=True,range_str=range_str,search_type=search_type)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a url instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1603,7 +1669,13 @@ class Music(commands.Cog):
 		
 		st=ytsearch (searches YouTube)
 		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
+		st=scsearch (searches SoundCloud)
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._shuffle(ctx, url)
 
@@ -1614,7 +1686,13 @@ class Music(commands.Cog):
 		
 		st=ytsearch (searches YouTube)
 		st=ytmsearch (searches YouTube Music)
-		st=scsearch (searches SoundCloud)"""
+		st=scsearch (searches SoundCloud)
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._shuffle(ctx, url, position=0)
 
