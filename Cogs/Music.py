@@ -1500,14 +1500,26 @@ class Music(commands.Cog):
 
 	@commands.command(aliases=["suggest","r","recommend"])
 	async def radio(self, ctx, *, url = None):
-		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL."""
+		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._radio(ctx, url)
 
 	@commands.command(aliases=["suggestnext","rn","recommendnext"])
 	async def radionext(self, ctx, *, url = None):
 		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL.
-		Adds songs to the beginning of the queue if enabled by the allowplaynext command."""
+		Adds songs to the beginning of the queue if enabled by the allowplaynext command.
+		
+		Can take an optional -range=X argument which denotes which tracks to include.
+		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
+		
+		Python's slice notation can also be used for ranges.
+		e.g. To load every other track starting with the 4th through 10 from the end: -range=[3:-10:2]"""
 
 		await self._radio(ctx, url, position=0)
 
