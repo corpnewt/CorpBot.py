@@ -690,10 +690,12 @@ class Music(commands.Cog):
 					for num in song_strings:
 						if "-" in num: # Got a range
 							l,b = map(int,num.split("-"))
-							assert l > 0 and b > 0
+							assert 0 < l <= len(tracks) and 0 < b <= len(tracks)
 							song_numbers.extend(list(range(min(l,b)-1,max(l,b))))
 						else: # Assume it's just a number
-							song_numbers.append(int(num)-1)
+							n = int(num)
+							assert 0 < n <= len(tracks)
+							song_numbers.append(n-1)
 					song_numbers = sorted(list(set(song_numbers))) # Strip dupes, reorder
 					# Let's build our new list of songs
 					new_tracks = [tracks[x] for x in song_numbers]
