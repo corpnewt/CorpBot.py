@@ -24,6 +24,7 @@ class Bot(commands.Cog):
 		self.path = path
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		self.is_current = False
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
@@ -745,6 +746,35 @@ class Bot(commands.Cog):
 		source = "https://github.com/corpnewt/CorpBot.py"
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.send(msg)
+
+	@commands.command(aliases=["deldm","dmdel","dmdelete"])
+	async def deletedm(self, ctx, *, message_link = None):
+		"""Deletes the passed message link if sent from the bot in dms."""
+
+		message = None
+		if message_link:
+			# Try to resolve to a message
+			m_match = self.message_regex.search(message_link)
+			if m_match:
+				message = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
+		elif ctx.message.reference:
+			# Resolve the replied to reference to a message object
+			try: message = await Utils.get_replied_to(ctx.message)
+			except: pass
+		else:
+			# Nothing passed, and not replying to anything
+			return await ctx.send("Usage: `{}deletedm [message_link]`".format(ctx.prefix))
+		if not message:
+			return await ctx.send("I couldn't resolve that message.")
+		if not message.author.id == self.bot.user.id:
+			return await ctx.send("The message resolved wasn't sent by me.")
+		if not isinstance(message.channel,discord.DMChannel):
+			return await ctx.send("That message was not sent in dms.")
+		try:
+			await message.delete()
+			await ctx.message.add_reaction("👍")
+		except:
+			return await ctx.send("I couldn't delete that message :(")
 
 	@commands.command()
 	async def cloc(self, ctx):
