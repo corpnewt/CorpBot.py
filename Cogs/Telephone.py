@@ -41,6 +41,7 @@ class Telephone(commands.Cog):
 			except AttributeError:
 				try: check = await real_cog.message(message)
 				except AttributeError: continue
+				except: pass # Failed the check entirely
 			if not isinstance(check,dict): continue
 			if check.get("Ignore"): return True
 		return False

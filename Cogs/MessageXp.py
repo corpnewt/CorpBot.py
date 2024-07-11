@@ -20,9 +20,9 @@ class MessageXp(commands.Cog):
 
 	def _can_xp(self, user, server, requiredXP = None, promoArray = None):
 		# Checks whether or not said user has access to the xp system
-		if requiredXP == None:
+		if requiredXP is None:
 			requiredXP = self.settings.getServerStat(server, "RequiredXPRole", None)
-		if promoArray == None:
+		if promoArray is None:
 			promoArray = self.settings.getServerStat(server, "PromotionArray", [])
 
 		if not requiredXP:
@@ -48,7 +48,7 @@ class MessageXp(commands.Cog):
 		server = message.guild
 
 		# Check if we're blocked
-		xpblock = self.settings.getServerStat(server, "XpBlockArray")
+		xpblock = self.settings.getServerStat(server, "XpBlockArray", [])
 		if message.author.id in xpblock:
 			# No xp for you
 			return { 'Ignore' : False, 'Delete' : False}
@@ -69,7 +69,7 @@ class MessageXp(commands.Cog):
 		if xpRAmount > 0:
 			# First we check if we'll hit our limit
 			skip = False
-			if not xprLimit == None:
+			if not xprLimit is None:
 				# Get the current values
 				newxp = self.settings.getUserStat(message.author, server, "XPReserve")
 				# Make sure it's this xpr boost that's pushing us over
@@ -86,7 +86,7 @@ class MessageXp(commands.Cog):
 		if xpAmount > 0:
 			# First we check if we'll hit our limit
 			skip = False
-			if not xpLimit == None:
+			if not xpLimit is None:
 				# Get the current values
 				newxp = self.settings.getUserStat(message.author, server, "XP")
 				# Make sure it's this xpr boost that's pushing us over
