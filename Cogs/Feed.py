@@ -28,7 +28,7 @@ class Feed(commands.Cog):
 	def _can_xp(self, user, server):
 		# Checks whether or not said user has access to the xp system
 		requiredXP  = self.settings.getServerStat(server, "RequiredXPRole")
-		promoArray  = self.settings.getServerStat(server, "PromotionArray")
+		promoArray  = self.settings.getServerStat(server, "PromotionArray", [])
 		userXP      = self.settings.getUserStat(user, server, "XP")
 		if not requiredXP:
 			return True
@@ -65,7 +65,7 @@ class Feed(commands.Cog):
 		if current_ignore:
 			return { 'Ignore' : False, 'Delete' : False }
 		ignore = delete = False
-		hunger = int(self.settings.getServerStat(message.guild, "Hunger"))
+		hunger = int(self.settings.getServerStat(message.guild, "Hunger", 0))
 		hungerLock = self.settings.getServerStat(message.guild, "HungerLock")
 		isKill = self.settings.getServerStat(message.guild, "Killed")
 		# Get any commands in the message
@@ -86,7 +86,7 @@ class Feed(commands.Cog):
 				# Iterate through the servers and add them
 				isKill = self.settings.getServerStat(server, "Killed")
 				if not isKill:
-					hunger = int(self.settings.getServerStat(server, "Hunger"))
+					hunger = int(self.settings.getServerStat(server, "Hunger", 0))
 					# Check if hunger is 100% and increase by 1 if not
 					hunger += 1
 					hunger = 100 if hunger > 100 else hunger
@@ -101,7 +101,7 @@ class Feed(commands.Cog):
 	@commands.command(pass_context=True)
 	async def hunger(self, ctx):
 		"""How hungry is the bot?"""
-		hunger = int(self.settings.getServerStat(ctx.guild, "Hunger"))
+		hunger = int(self.settings.getServerStat(ctx.guild, "Hunger", 0))
 		isKill = self.settings.getServerStat(ctx.guild, "Killed")
 		overweight = hunger * -1
 		if hunger <= -1:
@@ -150,8 +150,8 @@ class Feed(commands.Cog):
 		# minRole    = self.settings.getServerStat(ctx.guild, "MinimumXPRole")
 		# requiredXP = self.settings.getServerStat(ctx.guild, "RequiredXPRole")
 		isKill     = self.settings.getServerStat(ctx.guild, "Killed")
-		hunger     = int(self.settings.getServerStat(ctx.guild, "Hunger"))
-		xpblock    = self.settings.getServerStat(ctx.guild, "XpBlockArray")
+		hunger     = int(self.settings.getServerStat(ctx.guild, "Hunger", 0))
+		xpblock    = self.settings.getServerStat(ctx.guild, "XpBlockArray", [])
 
 		approve = True
 		decrement = True
@@ -275,7 +275,7 @@ class Feed(commands.Cog):
 	async def kill(self, ctx):
 		"""Kill the bot... you heartless soul."""
 		# Check for role requirements
-		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
+		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole", "")
 		if requiredRole == "":
 			#admin only
 			if not await Utils.is_admin_reply(ctx): return
@@ -298,7 +298,7 @@ class Feed(commands.Cog):
 	async def resurrect(self, ctx):
 		"""Restore life to the bot.  What magic is this?"""
 		# Check for role requirements
-		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
+		requiredRole = self.settings.getServerStat(ctx.guild, "RequiredKillRole", "")
 		if requiredRole == "":
 			#admin only
 			if not await Utils.is_admin_reply(ctx): return
@@ -334,7 +334,7 @@ class Feed(commands.Cog):
 	async def setkillrole(self, ctx, *, role : discord.Role = None):
 		"""Sets the required role to kill/resurrect the bot (admin only)."""
 		if not await Utils.is_admin_reply(ctx): return
-		if role == None:
+		if role is None:
 			self.settings.setServerStat(ctx.guild, "RequiredKillRole", "")
 			msg = 'Kill/resurrect now *admin-only*.'
 			return await ctx.send(msg)
@@ -359,7 +359,7 @@ class Feed(commands.Cog):
 	async def killrole(self, ctx):
 		"""Lists the required role to kill/resurrect the bot."""
 		role = self.settings.getServerStat(ctx.guild, "RequiredKillRole")
-		if role == None or role == "":
+		if role is None or role == "":
 			msg = '**Only Admins** can kill/ressurect the bot.'
 			return await ctx.send(msg)
 		# Role is set - let's get its name

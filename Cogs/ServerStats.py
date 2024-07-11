@@ -23,8 +23,8 @@ class ServerStats(commands.Cog):
         # Don't count your own, Pooter
         if not message.author.id == self.bot.user.id:
             server = message.guild
-            messages = int(self.settings.getServerStat(server, "TotalMessages"))
-            if messages == None:
+            messages = int(self.settings.getServerStat(server, "TotalMessages", 0))
+            if messages is None:
                 messages = 0
             messages += 1
             self.settings.setServerStat(server, "TotalMessages", messages)
@@ -36,7 +36,7 @@ class ServerStats(commands.Cog):
         """Lists up to the first 20 bots of the current or passed server."""
         # Check if we passed another guild
         guild = None
-        if guild_name == None:
+        if guild_name is None:
             guild = ctx.guild
         else:
             for g in self.bot.guilds:
@@ -46,7 +46,7 @@ class ServerStats(commands.Cog):
                 if str(g.id) == str(guild_name):
                     guild = g
                     break
-        if guild == None:
+        if guild is None:
             # We didn't find it
             await ctx.send("I couldn't find that guild...")
             return
@@ -70,7 +70,7 @@ class ServerStats(commands.Cog):
         
         # Check if we passed another guild
         guild = None
-        if guild_name == None:
+        if guild_name is None:
             guild = ctx.guild
         else:
             for g in self.bot.guilds:
@@ -80,7 +80,7 @@ class ServerStats(commands.Cog):
                 if str(g.id) == str(guild_name):
                     guild = g
                     break
-        if guild == None:
+        if guild is None:
             # We didn't find it
             await ctx.send("I couldn't find that guild...")
             return
@@ -199,7 +199,7 @@ class ServerStats(commands.Cog):
     @commands.command()
     async def sharedservers(self, ctx, *, member = None):
         """Lists how many servers you share with the bot."""
-        if member == None:
+        if member is None:
             member = ctx.author
         
         if type(member) is str:
@@ -318,7 +318,7 @@ class ServerStats(commands.Cog):
     @commands.command()
     async def joinpos(self, ctx, *, member = None):
         """Tells when a user joined compared to other users."""
-        if member == None:
+        if member is None:
             member = ctx.author
         
         if type(member) is str:
@@ -475,7 +475,7 @@ class ServerStats(commands.Cog):
         messages = int(self.settings.getServerStat(ctx.message.guild, "TotalMessages"))
         messages -= 1
         self.settings.setServerStat(ctx.message.guild, "TotalMessages", messages)
-        if messages == None:
+        if messages is None:
             messages = 0
         if messages == 1:
             await ctx.channel.send('So far, I\'ve witnessed *{:,} message!*'.format(messages))
