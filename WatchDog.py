@@ -1,4 +1,8 @@
-import sys, os, subprocess, time, venv, json, getpass
+import sys, os, subprocess, time, venv, json, getpass, socket, datetime
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
 
 # This module will start the script, and reboot it and etc
 
@@ -16,6 +20,59 @@ os.chdir(dir_path)
 
 # Keep a reference to our expected venv python path
 py_path = os.path.join(dir_path,"venv","Scripts","python.exe") if os.name == "nt" else os.path.join(dir_path,"venv","bin","python")
+
+# https://stackoverflow.com/a/33117579 https://stackoverflow.com/a/59312877
+def check_internet(host="8.8.8.8", port=53, timeout=3):
+    """
+    Host: 8.8.8.8 (google-public-dns-a.google.com)
+    OpenPort: 53/tcp
+    Service: domain (DNS/TCP)
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(timeout)
+        s.connect((host, port))
+        return True
+    except socket.error as ex:
+        return False
+
+def grab(prompt, **kwargs):
+    # Takes a prompt, a default, and a timeout and shows it with that timeout
+    # returning the result
+    timeout = kwargs.get("timeout", 0)
+    default = kwargs.get("default", None)
+    # If we don't have a timeout - then skip the timed sections
+    if timeout <= 0:
+        if sys.version_info >= (3,0):
+            return input(prompt)
+        else:
+            return str(raw_input(prompt))
+    # Write our prompt
+    sys.stdout.write(prompt)
+    sys.stdout.flush()
+    if os.name == "nt":
+        start_time = time.time()
+        i = ''
+        while True:
+            if msvcrt.kbhit():
+                c = msvcrt.getche()
+                if ord(c) == 13: # enter_key
+                    break
+                elif ord(c) >= 32: # space_char
+                    i += c.decode() if sys.version_info >= (3,0) and isinstance(c,bytes) else c
+            else:
+                time.sleep(0.02) # Delay for 20ms to prevent CPU workload
+            if len(i) == 0 and (time.time() - start_time) > timeout:
+                break
+    else:
+        i, o, e = select.select( [sys.stdin], [], [], timeout )
+        if i:
+            i = sys.stdin.readline().strip()
+    print('')  # needed to move to next line
+    if len(i) > 0:
+        return i
+    else:
+        return default
 
 def check_venv():
     # Check for the virtual env
@@ -78,6 +135,19 @@ def update_deps():
     print(" ")
 
 def main():
+    # Check in a loop for internet, backing off until we hit 2m waits
+    back_off = 10.
+    back_off_max = 120
+    while not check_internet():
+        back_off_int = int(back_off)
+        grab(
+            "!! {}: No internet connection - trying again in {:,} seconds...".format(
+                datetime.datetime.now().time().isoformat(),
+                back_off_int
+            ),
+            timeout=back_off_int
+        )
+        back_off = min(back_off * 1.5, back_off_max)
     # Update before we start our loop
     update()
     # Ensure our virtual environment is set up as needed
