@@ -20,7 +20,7 @@ You'll want to replace the values with your own.  The `prefix` key can be omitte
 
 # WARNING
 
-This branch of CorpBot requires a Redis database server running to function correctly.  For Windows users, you can download the release [here](https://github.com/MicrosoftArchive/redis/releases) and just run the `redis-server.exe` with the default settings after unzipping the archive for the bot to connect to the db.
+This branch of CorpBot requires a Redis database server running to function correctly.  For Windows users, you can download the 64-bit 5.0.14.1 release [here](https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip) and just run the `redis-server.exe` with the default settings after unzipping the archive for the bot to connect to the db.
 
 ***
 
@@ -34,7 +34,7 @@ As of [this commit](https://github.com/corpnewt/CorpBot.py/commit/c094ca55a2f368
 
 A list of cogs, commands, and descriptions:
 
-[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Beer](#beer), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [Dictionary](#dictionary), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Minesweeper](#minesweeper), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [OpenCore](#opencore), [PciUsb](#pciusb), [Plist](#plist), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RPS](#rps), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [SettingsDict](#settingsdict), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
+[Actions](#actions), [Admin](#admin), [AmdArk](#amdark), [Ascii](#ascii), [Beer](#beer), [Bot](#bot), [BotAdmin](#botadmin), [CAH](#cah), [Calc](#calc), [Channel](#channel), [ChatterBot](#chatterbot), [Claptrap](#claptrap), [Clippy](#clippy), [CogManager](#cogmanager), [Comic](#comic), [DJRoles](#djroles), [Debugging](#debugging), [Dice](#dice), [Dictionary](#dictionary), [DisableCommand](#disablecommand), [Discogs](#discogs), [DrBeer](#drbeer), [EightBall](#eightball), [Embed](#embed), [Emoji](#emoji), [Encode](#encode), [Example](#example), [Face](#face), [Feed](#feed), [Fliptime](#fliptime), [GameLookup](#gamelookup), [Giphy](#giphy), [Groot](#groot), [Help](#help), [Humor](#humor), [Hw](#hw), [IntelArk](#intelark), [Invite](#invite), [JazUtils](#jazutils), [Jpeg](#jpeg), [LangFilter](#langfilter), [Lists](#lists), [Lockdown](#lockdown), [MadLibs](#madlibs), [Minesweeper](#minesweeper), [Morse](#morse), [Music](#music), [Mute](#mute), [NvidiaArk](#nvidiaark), [OfflineUser](#offlineuser), [OpenCore](#opencore), [PciUsb](#pciusb), [Printer](#printer), [Profile](#profile), [Promote](#promote), [Quote](#quote), [RPS](#rps), [RateLimit](#ratelimit), [Reddit](#reddit), [Remind](#remind), [Responses](#responses), [Search](#search), [SecretSanta](#secretsanta), [Server](#server), [ServerStats](#serverstats), [Settings](#settings), [SettingsDict](#settingsdict), [Setup](#setup), [Spooktober](#spooktober), [Stream](#stream), [Strike](#strike), [Telephone](#telephone), [TempRole](#temprole), [Time](#time), [Translate](#translate), [Turret](#turret), [Uptime](#uptime), [UrbanDict](#urbandict), [UserRole](#userrole), [VoteKick](#votekick), [WatchURL](#watchurl), [Weather](#weather), [Welcome](#welcome), [Wiki](#wiki), [Xp](#xp), [XpBlock](#xpblock), [XpStack](#xpstack)
 
 ## Actions
 ####	Actions Cog (6 commands) - Actions.py Extension:
@@ -134,7 +134,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Converts between Ounces, Gallons, Liters, Milliliters, and Beer Barrels.  Fro...
 
 ## Bot
-####	Bot Cog (24 commands) - Bot.py Extension:
+####	Bot Cog (25 commands) - Bot.py Extension:
 	  $adminunlim [yes_no]
 	   └─ Sets whether or not to allow unlimited xp to admins (bot-admin only).
 	  $basadmin [yes_no]
@@ -143,6 +143,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists some general stats about the bot.
 	  $cloc 
 	   └─ Outputs the total count of lines of code in the currently installed repo.
+	  $deletedm [message_link] (AKA: deldm, dmdel, dmdelete)
+	   └─ Deletes the passed message link if sent from the bot in dms.
 	  $getimage <image>
 	   └─ Tests downloading - owner only
 	  $hidehostname [yes_no]
@@ -303,9 +305,15 @@ A list of cogs, commands, and descriptions:
 	   └─ Updates from git, pass "reset" or "-reset" to this command to first run "git ...
 
 ## Comic
-####	Comic Cog (12 commands) - Comic.py Extension:
+####	Comic Cog (20 commands) - Comic.py Extension:
+	  $beetle [date]
+	   └─ Displays the Beetle Bailey comic for the passed date (MM-DD-YYYY) from 10-05-...
 	  $calvin [date]
 	   └─ Displays the Calvin & Hobbes comic for the passed date (MM-DD-YYYY) from 11-1...
+	  $circus [date]
+	   └─ Displays the Family Circus comic for the passed date (MM-DD-YYYY) from 01-07-...
+	  $dilbert [date]
+	   └─ Displays the Dilbert comic for the passed date (MM-DD-YYYY) from 04-16-1989 t...
 	  $farside [date]
 	   └─ Displays the Far Side comic for the passed date (MM-DD-YYYY) from 2 days ago ...
 	  $garfield [date]
@@ -314,18 +322,28 @@ A list of cogs, commands, and descriptions:
 	   └─ Displays the Garfield Minus Garfield comic for the passed date (MM-DD-YYYY) f...
 	  $peanuts [date]
 	   └─ Displays the Peanuts comic for the passed date (MM-DD-YYYY) from 10-02-1950 t...
+	  $randbeetle 
+	   └─ Displays a random Beetle Bailey comic from 10-05-1953 to today.
 	  $randcalvin 
 	   └─ Displays a random Calvin & Hobbes comic from 11-18-1985 to today.
+	  $randcircus 
+	   └─ Displays a random Family Circus comic from 01-07-1996 to today.
 	  $randfarside 
 	   └─ Displays a random Far Side comic from 2 days ago to today.
 	  $randgarfield 
 	   └─ Displays a random Garfield comic from 06-19-1978 to today.
 	  $randgmg 
 	   └─ Displays a random Garfield Minus Garfield comic from 02-13-2008 to today.
+	  $randilbert 
+	   └─ Displays a random Dilbert comic from 04-16-1989 to 03-12-2023.
 	  $randpeanuts 
 	   └─ Displays a random Peanuts comic from 10-02-1950 to today.
+	  $randsmbc 
+	   └─ Displays a random Saturday Morning Breakfast Cereal comic from 09-05-2002 to ...
 	  $randxkcd 
 	   └─ Displays a random XKCD comic from 01-01-2006 to today.
+	  $smbc [date]
+	   └─ Displays the Saturday Morning Breakfast Cereal comic for the passed date (MM-...
 	  $xkcd [date]
 	   └─ Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to t...
 
@@ -517,15 +535,15 @@ A list of cogs, commands, and descriptions:
 
 ## Help
 ####	Help Cog (3 commands) - Help.py Extension:
-	  $dumphelp [tab_indent_count]
-	   └─ Dumps a timestamped, formatted list of commands and descriptions into the sam...
-	  $dumpmarkdown 
-	   └─ Dumps a timestamped, markdown-formatted list of commands and descriptions int...
+	  $dumphelp [cog_or_command]
+	   └─ Dumps and uploads a timestamped, formatted list of commands and descriptions....
+	  $dumpmarkdown [cog_or_command] (AKA: dumpmd)
+	   └─ Dumps and uploads a timestamped, markdown-formatted list of commands and desc...
 	  $help [command]
 	   └─ Lists the bot's commands and cogs.
 
 ## Humor
-####	Humor Cog (11 commands) - Humor.py Extension:
+####	Humor Cog (12 commands) - Humor.py Extension:
 	  $fart 
 	   └─ PrincessZoey :P
 	  $french 
@@ -538,8 +556,10 @@ A list of cogs, commands, and descriptions:
 	   └─ Time to backup the Batman!
 	  $meme [template_id] [box_text...]
 	   └─ Generate Memes!  You can get a list of meme templates with the memetemps comm...
-	  $memetemps 
+	  $memetemps [search_term] (AKA: memetemp, blankmemes, blankmeme)
 	   └─ Get Meme Templates
+	  $mock [message]
+	   └─ i'M nOt MoCkInG yOu, YoU'rE mOcKiNg Me.
 	  $poke [url]
 	   └─ Pokes the passed url/user/uploaded image.
 	  $slap [user]
@@ -573,7 +593,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the builds for the specified user - or yourself if no user passed.
 	  $mainbothw [build] (AKA: hwbotmain)
 	   └─ Sets a new main build from the bot's build list (owner only).
-	  $mainhw [build] (AKA: hwmain)
+	  $mainhw [build] (AKA: hwmain, defaulthw, hwdefault)
 	   └─ Sets a new main build from your build list.
 	  $newbothw  (AKA: addbothw)
 	   └─ Initiates a new-hardware conversation for the bot's hardware.  The hardware a...
@@ -640,16 +660,16 @@ A list of cogs, commands, and descriptions:
 
 ## LangFilter
 ####	LangFilter Cog (5 commands) - LangFilter.py Extension:
-	  $addfilter [words]
-	   └─ Adds comma delimited words to the word list (bot-admin only).
+	  $addfilter [regex_filter]
+	   └─ Adds the passed regex pattern to the language filter (bot-admin only).
 	  $clearfilter 
-	   └─ Empties the list of words that will be filtered (bot-admin only).
+	   └─ Empties the language filter (bot-admin only).
 	  $dumpfilter 
 	   └─ Saves the filtered word list to a text file and uploads it to the requestor (...
 	  $listfilter 
-	   └─ Prints out the list of words that will be filtered (bot-admin only).
-	  $remfilter [words]
-	   └─ Removes comma delimited words from the word list (bot-admin only).
+	   └─ Lists the regex patterns in the language filter (bot-admin only).
+	  $remfilter [regex_filter_number]
+	   └─ Removes the regex filter at the passed number from the language filter (bot-a...
 
 ## Lists
 ####	Lists Cog (38 commands) - Lists.py Extension:
@@ -731,23 +751,29 @@ A list of cogs, commands, and descriptions:
 	   └─ List all tag in the tag list.
 
 ## Lockdown
-####	Lockdown Cog (14 commands) - Lockdown.py Extension:
+####	Lockdown Cog (18 commands) - Lockdown.py Extension:
 	  $addlock [channel_list]
 	   └─ Adds the passed space-delimited list of channels and categories to the lockdo...
 	  $addlockall 
 	   └─ Adds all channels and categories to the lockdown list (bot-admin only).
 	  $addnamefilter [action] [regex]
 	   └─ Adds a new action (kick|ban|mute) and regex name filter (bot-admin only).
+	  $addspam [rule] (AKA: spamadd, newspam, spamnew)
+	   └─ Adds a new spam filter rule (bot-admin only).
 	  $antiraid [on_off] [join_number] [join_seconds] [kick_ban_mute] [cooldown_minutes]
 	   └─ Sets up the anti-raid module (bot-admin only).
 	  $antiraidping [user_or_role] [channel]
 	   └─ Sets up what user or role to ping and in what channel when anti-raid is activ...
 	  $clearnamefilters 
 	   └─ Removes all name filters (bot-admin only).
+	  $clearspam  (AKA: spamclear)
+	   └─ Clears all spam filter rules (bot-admin only).
 	  $listlock 
 	   └─ Lists the channels and categories configured for lockdown (bot-admin only).
 	  $listlockall 
 	   └─ Lists all channels and categories and their lockdown/sync status (bot-admin o...
+	  $listspam  (AKA: spamlist, spam)
+	   └─ Lists the spam filter rules (bot-admin only).
 	  $lockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and revoke the send_message...
 	  $namefilters 
@@ -758,6 +784,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Removes all channels and categories from the lockdown list (bot-admin only).
 	  $remnamefilter [name_filter_number]
 	   └─ Removes the passed name filter (bot-admin only).
+	  $remspam [rule_index] (AKA: removespam, spamrem, spamremove)
+	   └─ Removes the spam filter rule at the passed index (bot-admin only).
 	  $unlockdown [target_channel]
 	   └─ Iterate through the channels in the lockdown list and clear the send_message,...
 
@@ -787,7 +815,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
 
 ## Music
-####	Music Cog (46 commands) - Music.py Extension:
+####	Music Cog (49 commands) - Music.py Extension:
 	  $allowplaynext [yes_no]
 	   └─ Gets or sets whether playnext, shufflenext, radionext, loadplnext, and shuffl...
 	  $autodeleteafter [seconds]
@@ -810,6 +838,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Loads the passed playlist json data.  Accepts a url - or picks the first atta...
 	  $loadplnext [url] (AKA: loadpln)
 	   └─ Loads the passed playlist json data.  Accepts a url - or picks the first atta...
+	  $louder [amount] (AKA: loud)
+	   └─ Increases the volume by the passed amount, or by 10%.
 	  $mvsong [song_index] [target_index] (AKA: movesong, mvtrack, movetrack)
 	   └─ Moves the song at song_index in the queue to the target_index (bot-admin only).
 	  $pause 
@@ -818,7 +848,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists whether or not the player is paused.  Synonym of the playing command.
 	  $play [url] (AKA: p)
 	   └─ Plays from a url (almost anything Lavalink supports) or resumes a currently p...
-	  $playing [moons]
+	  $playing [moons] (AKA: nowplaying)
 	   └─ Lists the currently playing song if any.
 	  $playingin 
 	   └─ Shows the number of servers the bot is currently playing music in.
@@ -826,12 +856,16 @@ A list of cogs, commands, and descriptions:
 	   └─ Lists the queued songs in the playlist.
 	  $playnext [url] (AKA: pn, pnext, playn)
 	   └─ Plays from a url (almost anything Lavalink supports) or resumes a currently p...
+	  $quieter [amount] (AKA: quiet)
+	   └─ Decreases the volume by the passed amount, or by 10%.
 	  $radio [url] (AKA: suggest, r, recommend)
 	   └─ Queues up recommendations for the passed search term, YouTube URL, or Spotify...
 	  $radiocount [count] (AKA: suggestcount, recommendcount, rcount)
 	   └─ Gets or sets the default number of recommended songs returned from 2 to 25 (b...
 	  $radionext [url] (AKA: suggestnext, rn, recommendnext)
 	   └─ Queues up recommendations for the passed search term, YouTube URL, or Spotify...
+	  $rebind [channel] (AKA: bindplayer, bindmusic, bindto, boundto)
+	   └─ Re-binds the music related status messages to the passed channel - or prints ...
 	  $reconnect  (AKA: recon, rec)
 	   └─ Attempts to have the bot save the current playlist to memory, leave the voice...
 	  $repeat [yes_no]
@@ -910,12 +944,14 @@ A list of cogs, commands, and descriptions:
 	   └─ Searches TechPowerUP's site for GPU info.
 
 ## OfflineUser
-####	OfflineUser Cog (1 command) - OfflineUser.py Extension:
+####	OfflineUser Cog (2 commands) - OfflineUser.py Extension:
+	  $afk [yes_no]
+	   └─ Sets whether the bot should reply to pings stating you're offline regardless ...
 	  $remindoffline [yes_no]
 	   └─ Sets whether to inform users that pinged members are offline or not.
 
 ## OpenCore
-####	OpenCore Cog (6 commands) - OpenCore.py Extension:
+####	OpenCore Cog (8 commands) - OpenCore.py Extension:
 	  $codec [search_term] (AKA: alc)
 	   └─ Searches the AppleALCCodecs.plist file in memory for the passed search term.
 	  $getcodecs  (AKA: updatecodecs)
@@ -924,8 +960,12 @@ A list of cogs, commands, and descriptions:
 	   └─ Forces an update of the in-memory Configuration.tex file (owner only).
 	  $listcodecs [search_term] (AKA: codecs)
 	   └─ Lists the codecs in the AppleALCCodecs.plist - can optionally take a codec na...
+	  $nvweb [os_build]
+	   └─ Prints the download url for the passed OS build number (if it exists).  If no...
 	  $octex [search_path] (AKA: occonfig, configtex, ocsearch, configsearch, seachtex, tex, occ)
 	   └─ Searches the Configuration.tex file in memory for the passed path.  Must incl...
+	  $plist [url]
+	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
 	  $slide [input_hex]
 	   └─ Calculates your slide boot-arg based on an input address (in hex).
 
@@ -935,13 +975,6 @@ A list of cogs, commands, and descriptions:
 	   └─ Searches pci-ids.ucw.cz for the passed PCI ven:dev id.
 	  $usb [ven_dev]
 	   └─ Searches usb-ids.gowdy.us for the passed USB ven:dev id.
-
-## Plist
-####	Plist Cog (2 commands) - Plist.py Extension:
-	  $nvweb [os_build]
-	   └─ Prints the download url for the passed OS build number (if it exists).  If no...
-	  $plist [url]
-	   └─ Validates plist file structure.  Accepts a url - or picks the first attachment.
 
 ## Printer
 ####	Printer Cog (3 commands) - Printer.py Extension:
@@ -1016,7 +1049,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the cooldown in seconds between each command (owner only).
 
 ## Reddit
-####	Reddit Cog (32 commands) - Reddit.py Extension:
+####	Reddit Cog (31 commands) - Reddit.py Extension:
 	  $abandoned 
 	   └─ Get something abandoned to look at.
 	  $answer 
@@ -1035,8 +1068,6 @@ A list of cogs, commands, and descriptions:
 	   └─ Marvels of modern engineering.
 	  $dankmeme 
 	   └─ Only the dankest.
-	  $dirtyjoke 
-	   └─ Let's see if reddit can be dir-... oh... uh.. funny... (bot-admin only)
 	  $dragon 
 	   └─ From the past - when great winged beasts soared the skies.
 	  $earthporn 
@@ -1061,7 +1092,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Meow.
 	  $randomdog 
 	   └─ Bark if you know whassup.
-	  $redditimage [subreddit]
+	  $redditimage [subreddit] (AKA: rimage, reddit)
 	   └─ Try to grab an image from an image-based subreddit.
 	  $ruser [user_name]
 	   └─ Gets some info on the passed username - attempts to use your username if none...
