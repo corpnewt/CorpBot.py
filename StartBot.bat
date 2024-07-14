@@ -7,7 +7,7 @@ echo ###                   ###
 echo.
 
 set "thisDir=%~dp0"
-set "rd=Redis-x64-3.2.100"
+set "rd=Redis-x64-5.0.14.1"
 set "redis=redis-server.exe"
 set "start=Start.bat"
 set "ld=Lavalink"
@@ -44,11 +44,11 @@ if EXIST "%thisDir%\Cogs\PandorasDB.py" (
         echo Waiting %wait% seconds...
         echo.
     ) else (
-        echo "%thisDir%\%redis%"
+        echo "%thisDir%\%rd%\%redis%"
         echo does not exist!
         echo.
         echo You can get it from:
-        echo   https://github.com/microsoftarchive/redis/releases/latest
+        echo   https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip
         echo.
         pause
         exit /b
