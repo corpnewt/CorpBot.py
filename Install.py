@@ -227,7 +227,7 @@ if __name__ == '__main__':
     ]
     db_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Cogs","PandorasDB.py")
     if os.path.exists(db_path):
-        modules.append({"name":"redis (locked to 3.5.3 for the time being until v4.x is sorted)","item":"redis==3.5.3","pkg_name":"redis"})
+        modules.append({"name":"redis"})
     
     # Let's ensure the virtual env
     py_venv = check_venv(
