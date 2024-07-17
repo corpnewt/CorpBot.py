@@ -98,6 +98,25 @@ class Translate(commands.Cog):
             if value: value = value[0]
         return value
 
+    def _get_to_from(self, text, just_to=False):
+        if not text or not isinstance(text,str):
+            return (text,None,None)
+        text = text.strip()
+        def get_lang(word_list, text):
+            lang_code = None
+            if word_list:
+                lang_code = next((x for x in self.langcodes.values() if x.lower() == word_list[-1].lower()),None)
+                if lang_code:
+                    # Strip the word from the text and pop it from the list
+                    text = text[:-len(word_list[-1])].strip()
+                    word_list.pop()
+            return (word_list,lang_code,text)
+        word_list,to_code,text   = get_lang(text.split(),text)
+        if not just_to:
+            word_list,from_code,text = get_lang(word_list,text)
+        # Return the remaining text, and any detected language codes
+        return (text,to_code,from_code)
+
     @commands.command(name="translate", aliases=["tr"])
     async def translate(self, ctx, *, translate=None):
         """Translate some stuff!  Takes a phrase, the from language identifier and the to language identifier (optional).
@@ -114,8 +133,9 @@ class Translate(commands.Cog):
 
         usage = "Usage: `{}tr [words] [from code (optional)] [to code (optional)]`".format(ctx.prefix)
 
+        tr,tr_to,tr_from = self._get_to_from(translate)
         # Find out if we're replying to another message
-        reply = None
+        rp = rp_to = rp_from = None
         if ctx.message.reference:
             # Resolve the replied to reference to a message object
             try:
@@ -123,22 +143,15 @@ class Translate(commands.Cog):
                 reply = await Utils.get_message_content(message)
             except:
                 pass
-        if reply: # Prepend our replied-to text, if any
-            translate = reply if not translate else " ".join((reply,translate))
+        # Get our text to translate
+        translate = tr or reply
         
         # Check if we ended up with anything
         if translate is None: return await ctx.send(usage)
 
-        word_list = translate.split(" ")
-        if len(word_list) < 1: return await ctx.send(usage)
-
-        to_lang = word_list[-1].lower() if word_list[-1].lower() in self.langcodes.values() else None  # check for to_lang
-        if to_lang: word_list.pop()  # Remove the last word from the list, i.e. the to_lang
-        else: to_lang = "en"  # Default to english
-
-        # there should be at least 2 words left after we remove the to_lang, in case the user specifies a source language
-        from_lang = word_list[-1].lower() if len(word_list) >= 2 and word_list[-1].lower() in self.langcodes.values() else None
-        if from_lang: word_list.pop()  # remove the last word from the list, i.e. the from_lang (since the to_lang has been removed already)
+        # Get our to/from values
+        to_lang = tr_to or "en"
+        from_lang = tr_from
 
         # Get the from language name from the passed code
         if from_lang: from_lang_name = self.languages.get(from_lang, None)
@@ -155,14 +168,11 @@ class Translate(commands.Cog):
                 color=ctx.author
             ).send(ctx)
 
-        # Get our words joined with spaces
-        to_translate = " ".join(word_list) if word_list else ""
-
         if from_lang_name:
-            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=to_translate, src=from_lang, dest=to_lang))
+            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=translate, src=from_lang, dest=to_lang))
         else:
             # We'll leave Google Translate to figure out the source language if we don't have it
-            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=to_translate, dest=to_lang))
+            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=translate, dest=to_lang))
 
         # Explore the results!
         result.text = self._unpack(result.text)
@@ -173,7 +183,7 @@ class Translate(commands.Cog):
                 color=ctx.author
             ).send(ctx)
 
-        if result.text == to_translate:
+        if result.text == translate:
             # We got back what we put in...
             return await Message.EmbedText(
                 title="Something went wrong...",
@@ -200,7 +210,7 @@ class Translate(commands.Cog):
         if result.pronunciation:
             if isinstance(result.pronunciation,list):
                 result.pronunciation = result.pronunciation[0]
-            if not any(result.pronunciation == x for x in (result.text,to_translate)):
+            if not any(result.pronunciation == x for x in (result.text,translate)):
                 embed.add_field(name="Pronunciation", value=result.pronunciation, inline=False)
 
         await embed.send(ctx)
@@ -210,8 +220,9 @@ class Translate(commands.Cog):
         """Pronunciation for a sentence in the English language.
         $pronounce こんにちは --> returns \"Kon'nichiwa\""""
 
+        tr,source_lang,tr_from = self._get_to_from(text,just_to=True)
         # Find out if we're replying to another message
-        reply = None
+        rp = rp_to = rp_from = None
         if ctx.message.reference:
             # Resolve the replied to reference to a message object
             try:
@@ -219,16 +230,9 @@ class Translate(commands.Cog):
                 reply = await Utils.get_message_content(message)
             except:
                 pass
-        if reply: # Prepend our replied-to text, if any
-            text = reply if not text else " ".join((reply,text))
+        text = tr or reply
 
         if text is None: return await ctx.send("Usage: `{}pronounce [text to identify]`".format(ctx.prefix))
-
-        if text.split()[-1] in self.langcodes.values():
-            source_lang = text.split()[-1]
-            text = " ".join(text.split()[:-1])  # We are removing the last word from the list, since it's the language code
-        else:
-            source_lang = None
 
         if len(text) > 1000:  # We need to keep it under 1024 characters due to field size limits
             return await Message.EmbedText(
