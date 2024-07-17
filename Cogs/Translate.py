@@ -141,10 +141,11 @@ class Translate(commands.Cog):
             try:
                 message = await Utils.get_replied_to(ctx.message,ctx=ctx)
                 reply = await Utils.get_message_content(message)
+                rp,rp_to,rp_from = self._get_to_from(reply)
             except:
                 pass
         # Get our text to translate
-        translate = tr or reply
+        translate = tr or rp
         
         # Check if we ended up with anything
         if translate is None: return await ctx.send(usage)
