@@ -215,7 +215,9 @@ class Music(commands.Cog):
 				print("\n!! Music Cog has been disabled !!")
 				print("* Failed to connect to Lavalink: {}".format(e))
 				print("* You can get the latest release of Lavalink here:")
-				print("   https://github.com/lavalink-devs/Lavalink/releases\n")
+				print("   https://github.com/lavalink-devs/Lavalink/releases")
+				print("* Or the latest Lavalink-Updater here:")
+				print("   https://github.com/corpnewt/Lavalink-Updater\n")
 			self.bot.unload_extension("Cogs.Music")
 
 	def get_node(self):
