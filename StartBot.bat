@@ -12,25 +12,48 @@ set "rdold=Redis-x64-3.2.100"
 set "redis=redis-server.exe"
 set "start=Start.bat"
 set "ld=Lavalink"
-set "lava=Lavalink.jar"
+set "lud=Lavalink-Updater"
+set "lava=Lavalink.bat"
+set "lavajar=Lavalink.jar"
 set /a wait=5
 
-if EXIST "%thisDir%\%ld%\%lava%" (
+if EXIST "%thisDir%\%lud%\%lava%" (
     echo Starting Lavalink server...
-    pushd "%thisDir%\%ld%"
-    start "" java -jar "%lava%"
+    pushd "%thisDir%\%lud%"
+    start "" "%lava%"
     popd
     echo Waiting %wait% seconds...
     echo.
 ) else (
-    echo "%thisDir%\%ld%\%lava%"
-    echo does not exist!
-    echo.
-    echo You can get it from:
-    echo   https://github.com/lavalink-devs/Lavalink/releases/latest
-    echo.
-    pause
-    exit /b
+    if EXIST "%thisDir%\%ld%\%lava%" (
+        echo Starting Lavalink server...
+        pushd "%thisDir%\%ld%"
+        start "" "%lava%"
+        popd
+        echo Waiting %wait% seconds...
+        echo.
+    ) else (
+        if EXIST "%thisDir%\%ld%\%lavajar%" (
+            echo !! WARNING: Located older Lavalink install, consider using Lavalink-Updater:
+            echo   https://github.com/corpnewt/Lavalink-Updater
+            echo.
+            echo Starting Lavalink server...
+            pushd "%thisDir%\%ld%"
+            start "" java -jar "%lavajar%"
+            popd
+            echo Waiting %wait% seconds...
+            echo.
+        ) else (
+            echo "%thisDir%\%lud%\%lava%"
+            echo does not exist!
+            echo.
+            echo You can get it from:
+            echo   https://github.com/corpnewt/Lavalink-Updater
+            echo.
+            pause
+            exit /b
+        )
+    )
 )
 timeout %wait%
 echo.
@@ -46,7 +69,7 @@ if EXIST "%thisDir%\Cogs\PandorasDB.py" (
         echo.
     ) else (
         if EXIST "%thisDir%\%rdold%\%redis%" (
-            echo !! WARNING: Located older redis install, please consider updating via the following link:
+            echo !! WARNING: Located older redis install, consider updating via the following link:
             echo   https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip
             echo.
             echo Starting database...
