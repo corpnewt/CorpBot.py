@@ -112,6 +112,7 @@ class Embed:
         self.image = kwargs.get("image", None)
         self.footer = kwargs.get("footer", None)
         self.thumbnail = kwargs.get("thumbnail", None)
+        self.timestamp = kwargs.get("timestamp", None)
         self.author = kwargs.get("author", None)
         self.fields = kwargs.get("fields", [])
         self.file = kwargs.get("file", None) # Accepts a file path
@@ -245,6 +246,8 @@ class Embed:
             em.set_image(url=self.image.get("url",EMPTY) if isinstance(self.image,dict) else self.image)
         if self.thumbnail:
             em.set_thumbnail(url=self.thumbnail.get("url",EMPTY) if isinstance(self.thumbnail,dict) else self.thumbnail)
+        if self.timestamp:
+            em.timestamp = self.timestamp
         if self.author:
             if type(self.author) is discord.Member or type(self.author) is discord.User:
                 name = self.author.nick if hasattr(self.author, "nick") and self.author.nick else self.author.name
