@@ -9,7 +9,9 @@ echo
 dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
 start="Start.command"
 ld="Lavalink"
-lava="Lavalink.jar"
+lud="Lavalink-Updater"
+lava="Lavalink.command"
+lavajar="Lavalink.jar"
 rd="Redis"
 redis="redis-server"
 wait=5
@@ -85,16 +87,27 @@ fi
 # Retain the window id for future use
 window_id="$(get_window_id)"
 
-if [ -e "$dir/$ld/$lava" ]; then
+if [ -e "$dir/$lud/$lava" ]; then
     echo "Starting Lavalink server..."
-    do_script "cd \"$dir/$ld\" && java -jar \"$lava\"" "$window_id"
+    do_script "cd \"$dir/$lud\" && \"./$lava\"" "$window_id"
+    echo
+elif [ -e "$dir/$ld/$lava" ]; then
+    echo "Starting Lavalink server..."
+    do_script "cd \"$dir/$ld\" && \"./$lava\"" "$window_id"
+    echo
+elif [ -e "$dir/$ld/$lavajar" ]; then
+    echo "!! WARNING: Located older Lavalink install, consider using Lavalink-Updater:"
+    echo "  https://github.com/corpnewt/Lavalink-Updater"
+    echo
+    echo "Starting Lavalink server..."
+    do_script "cd \"$dir/$ld\" && java -jar \"$lavajar\"" "$window_id"
     echo
 else
-    echo "\"$dir/$ld/$lava\""
+    echo "\"$dir/$lud/$lava\""
     echo "does not exist!"
     echo
     echo "You can get it from:"
-    echo "  https://github.com/lavalink-devs/Lavalink/releases/latest"
+    echo "  https://github.com/corpnewt/Lavalink-Updater"
     echo
     exit 1
 fi
