@@ -406,7 +406,14 @@ class Comic(commands.Cog):
 				color=ctx.author
 			).edit(ctx,message)
 		comic_out["color"] = ctx.author
-		return await Message.EmbedText(**comic_out).edit(ctx,message)
+		try:
+			return await Message.EmbedText(**comic_out).edit(ctx,message)
+		except:
+			return await Message.EmbedText(
+				title=self.comic_data[comic]["name"]+" Error",
+				description="Could not get {} :(".format(desc),
+				color=ctx.author
+			).edit(ctx,message)
 
 	@commands.command()
 	async def beetle(self, ctx, *, date=None):
