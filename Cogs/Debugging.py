@@ -787,7 +787,8 @@ class Debugging(commands.Cog):
 				d_header=d_header,
 				d_footer=d_footer,
 				footer=footer,
-				fields=fields
+				fields=fields,
+				timestamp=datetime.now()
 			).send(logChan)
 			if filename: await message.edit(file=discord.File(filename))
 		except Exception as e:
