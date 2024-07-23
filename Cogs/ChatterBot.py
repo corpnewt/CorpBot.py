@@ -78,18 +78,18 @@ class ChatterBot(commands.Cog):
 		msg = message.content
 		chatChannel = self.settings.getServerStat(message.guild, "ChatChannel")
 		the_prefix = await self.bot.command_prefix(self.bot, message)
-		if chatChannel and not message.author.id == self.bot.user.id and not msg.startswith(the_prefix):
-			# We have a channel
-			# Now we check if we're hungry/dead and respond accordingly
-			if await self.killcheck(message):
-				return { "Ignore" : True, "Delete" : False }
-			if str(message.channel.id) == str(chatChannel):
-				# We're in that channel!
-				#ignore = True
-				# Strip prefix
-				msg = message.content
-				ctx = await self.bot.get_context(message)
-				await self._chat(ctx, msg)
+		if not chatChannel or message.author.bot or message.author.id == self.bot.user.id or msg.startswith(the_prefix):
+			return # Ignore messages from bots, ourself, or commands
+		# We qualified the message/channel/author
+		# Now we check if we're hungry/dead and respond accordingly
+		if await self.killcheck(message):
+			return { "Ignore" : True, "Delete" : False }
+		if str(message.channel.id) == str(chatChannel):
+			# We're in that channel!
+			# Strip prefix
+			msg = message.content
+			ctx = await self.bot.get_context(message)
+			await self._chat(ctx, msg)
 		return { 'Ignore' : False, 'Delete' : False}
 
 
