@@ -20,7 +20,7 @@ set /a wait=5
 if EXIST "%thisDir%\%lud%\%lava%" (
     echo Starting Lavalink server...
     pushd "%thisDir%\%lud%"
-    start "" "%lava%"
+    start "" cmd.exe /c "%lava%"
     popd
     echo Waiting %wait% seconds...
     echo.
@@ -28,7 +28,7 @@ if EXIST "%thisDir%\%lud%\%lava%" (
     if EXIST "%thisDir%\%ld%\%lava%" (
         echo Starting Lavalink server...
         pushd "%thisDir%\%ld%"
-        start "" "%lava%"
+        start "" cmd.exe /c "%lava%"
         popd
         echo Waiting %wait% seconds...
         echo.
