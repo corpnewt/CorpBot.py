@@ -1,4 +1,4 @@
-import discord, json, tempfile, shutil, re, os
+import discord, json, tempfile, shutil, re, os, datetime
 from discord.ext import commands
 from Cogs import Message, DL, DisplayName, Utils
 
@@ -39,6 +39,17 @@ class Embed(commands.Cog):
             if embed_dict.get("author") and not isinstance(embed_dict["author"],dict):
                 # Again - got *something* for the author - try to resolve it
                 embed_dict["author"] = DisplayName.memberForName(str(embed_dict["author"]),ctx.guild)
+            if embed_dict.get("timestamp"):
+                if isinstance(embed_dict["timestamp"],str):
+                    # Check for the word "now"
+                    if embed_dict["timestamp"].lower() == "now":
+                        embed_dict["timestamp"] = datetime.datetime.now()
+                    else:
+                        # Check for an ISO formatted time string
+                        embed_dict["timestamp"] = datetime.datetime.fromisoformat(embed_dict["timestamp"])
+                elif isinstance(embed_dict["timestamp"],(int,float)):
+                    # May be a unix timestamp
+                    embed_dict["timestamp"] = datetime.datetime.fromtimestamp(embed_dict["timestamp"])
         except Exception as e:
             return e
         # Only allow owner to modify the limits
@@ -92,6 +103,7 @@ class Embed(commands.Cog):
         thumbnail       (str or dict { url })
         author          (str, dict { name, url, icon_url }, or user/member)
         color           (user/member, rgb int array, int)
+        timestamp       (str "now" or simplified ISO 8601 date string, int/float unix timestamp)
 
         ----------------------------------
 
