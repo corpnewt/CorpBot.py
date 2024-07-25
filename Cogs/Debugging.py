@@ -611,11 +611,15 @@ class Debugging(commands.Cog):
 			author.id,
 			"#"+channel.name if channel else payload.channel_id
 		)
+		message = self.bot.get_message(int(payload.message_id))
+		if not message.edited_at:
+			# If the resulting message is not edited,
+			# bail as this was likely an embed preview
+			return
 		before = payload.cached_message
 		if before:
 			# If we got a prior message - let's compare it to the new
 			# and see if the content or attachments are different
-			message = self.bot.get_message(int(payload.message_id))
 			if message.content == before.content and message.attachments == before.attachments:
 				# If the content and attachments are the same, it was likely
 				# an embed preview that loaded.  In that case, just bail.
