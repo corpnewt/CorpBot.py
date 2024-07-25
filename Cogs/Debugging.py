@@ -613,6 +613,13 @@ class Debugging(commands.Cog):
 		)
 		before = payload.cached_message
 		if before:
+			# If we got a prior message - let's compare it to the new
+			# and see if the content or attachments are different
+			message = self.bot.get_message(int(payload.message_id))
+			if message.content == before.content and message.attachments == before.attachments:
+				# If the content and attachments are the same, it was likely
+				# an embed preview that loaded.  In that case, just bail.
+				return
 			msg = before.content
 			if before.attachments:
 				msg += "\n\n--- Attachments ---\n\n"
