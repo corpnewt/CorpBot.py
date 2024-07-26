@@ -330,14 +330,22 @@ class Server(commands.Cog):
 				# We got the first image in the attachment list - set it
 				image = a.url
 				break
-		if image is None and ctx.message.embeds:
-			# We have embeds to look at too, and we haven't set an image yet
-			for e in ctx.message.embeds:
-				d = e.to_dict()
-				i = d.get("thumbnail",d.get("video",d.get("image",{}))).get("url",None)
-				if not i: continue
-				image = i
-				break
+		status_message = None
+		if image is None:
+			# Let's check for a URL in the message, and if one exists,
+			# delay by 2 seconds to let it embed if needed.
+			if Utils.get_urls(desc):
+				status_message = await Message.Embed(title="Gathering embed info...",color=ctx.author).send(ctx)
+				await asyncio.sleep(0.5)
+			# Check for embeds and iterate as needed
+			if ctx.message.embeds:
+				# We have embeds to look at too, and we haven't set an image yet
+				for e in ctx.message.embeds:
+					d = e.to_dict()
+					i = d.get("thumbnail",d.get("video",d.get("image",{}))).get("url",None)
+					if not i: continue
+					image = i
+					break
 		# Remove the original message first
 		try: await ctx.message.delete()
 		except: pass # Maybe we don't have perms?  Ignore and continue
@@ -347,7 +355,7 @@ class Server(commands.Cog):
 			thumbnail=Utils.get_avatar(ctx.author),
 			image=image,
 			footer=None if not poll_time else "You can vote for multiple items" if allow_multiple else "Your vote only counts if you react once."
-		).send(ctx)
+		).send(ctx,status_message)
 		# Check if we have a timer
 		if poll_time > 0:
 			# Build our task - and add it to the servers Polls list
