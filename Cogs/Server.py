@@ -334,7 +334,7 @@ class Server(commands.Cog):
 		if image is None:
 			# Let's check for a URL in the message, and if one exists,
 			# delay by 2 seconds to let it embed if needed.
-			if Utils.get_urls(desc):
+			if Utils.get_urls(desc) and not ctx.message.embeds:
 				status_message = await Message.Embed(title="Gathering embed info...",color=ctx.author).send(ctx)
 				await asyncio.sleep(0.5)
 			# Check for embeds and iterate as needed
