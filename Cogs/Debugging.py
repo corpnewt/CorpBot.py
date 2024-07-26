@@ -611,16 +611,16 @@ class Debugging(commands.Cog):
 			author.id,
 			"#"+channel.name if channel else payload.channel_id
 		)
-		message = self.bot.get_message(int(payload.message_id))
-		if not message.edited_at:
-			# If the resulting message is not edited,
-			# bail as this was likely an embed preview
+		if not payload.data.get("edited_timestamp"):
+			# Message isn't edited - bail
 			return
 		before = payload.cached_message
 		if before:
 			# If we got a prior message - let's compare it to the new
 			# and see if the content or attachments are different
-			if message.content == before.content and message.attachments == before.attachments:
+			m_attachments = [x["url"] for x in payload.data.get("attachments",[]) if "url" in x]
+			b_attachments = [x.url for x in before.attachments]
+			if payload.data.get("content","") == before.content and m_attachments == b_attachments:
 				# If the content and attachments are the same, it was likely
 				# an embed preview that loaded.  In that case, just bail.
 				return
@@ -643,7 +643,9 @@ class Debugging(commands.Cog):
 		fetched = reference = None
 		if channel: # Attempt to resolve the message and info
 			try:
-				fetched = await channel.fetch_message(payload.message_id)
+				fetched = self.bot.get_message(payload.message_id)
+				if not fetched:
+					fetched = await channel.fetch_message(payload.message_id)
 				reference = fetched.reference
 			except: pass
 		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message=payload, message_id=True, reference=reference)
