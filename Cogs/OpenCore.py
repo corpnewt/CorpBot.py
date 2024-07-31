@@ -147,7 +147,7 @@ class OpenCore(commands.Cog):
 		return True
 
 	async def _dl_sample(self):
-		try: self.sample = plistlib.loads(await DL.async_dl("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Sample.plist"))
+		try: self.sample = plistlib.loads(await DL.async_dl("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/SampleCustom.plist"))
 		except: return False
 		# Save to a local file
 		plistlib.dump(self.sample,open("Sample.plist","wb"))
