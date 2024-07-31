@@ -1924,6 +1924,53 @@ class Music(commands.Cog):
 			delete_after=delay
 		).send(ctx)
 
+	@commands.command()
+	async def lavalink(self, ctx):
+		"""Lists info about the Lavalink version connected to."""
+		node = self.get_node()
+		if not node:
+			return await Message.Embed(
+				title="♫ Missing Information",
+				color=ctx.author,
+				description="No nodes were returned - I may not be connected to Lavalink."
+			).send(ctx)
+		# We have a node we can communicate with - get the versioning info
+		info = await node.send(
+			method="GET",
+			path="info"
+		)
+		if not info:
+			return await Message.Embed(
+				title="♫ Missing Information",
+				color=ctx.author,
+				description="No version information was returned - I may not be connected to Lavalink."
+			).send(ctx)
+		# Let's build our description
+		java_version = info.get("jvm","UNKNOWN")
+		lavalink_version = info.get("version",{}).get("semver","UNKNOWN")
+		lavaplayer_version = info.get("lavaplayer","UNKNOWN")
+		plugins = []
+		for plug in info.get("plugins",[]):
+			plugins.append(" - {}: {}".format(
+				plug.get("name","UNKNOWN PLUGIN"),
+				plug.get("version","UNKNOWN VERSION")
+			))
+		desc = "Java Runtime: {}\nLavalink:     {}\nLavaPlayer:   {}\nPlugins:      {}".format(
+			java_version,
+			lavalink_version,
+			lavaplayer_version,
+			"None" if not plugins else "\n"+"\n".join(plugins)
+		)
+		# Display the results in a codeblock
+		await PickList.PagePicker(
+			title="♫ Current Lavalink Version Info",
+			description=desc,
+			color=ctx.author,
+			d_header="```\n",
+			d_footer="```",
+			ctx=ctx,
+		).pick()
+
 	@commands.command(aliases=["nowplaying"])
 	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
@@ -2393,7 +2440,22 @@ class Music(commands.Cog):
 
 	async def cog_before_invoke(self, ctx):
 		# We don't need to ensure extra for the following commands:
-		if ctx.command.name in ("playingin","autodeleteafter","leavewhenalone","disableplay","stopall","searchlist","lasteq","playing","playlist","radiocount","searchtype","allowplaynext"): return
+		exempt_commands = (
+			"playingin",
+			"autodeleteafter",
+			"leavewhenalone",
+			"disableplay",
+			"stopall",
+			"searchlist",
+			"lasteq",
+			"playing",
+			"playlist",
+			"radiocount",
+			"searchtype",
+			"allowplaynext",
+			"lavalink"
+		)
+		if ctx.command.name in exempt_commands: return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
 		player = self.get_player(ctx.guild)
