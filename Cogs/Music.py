@@ -140,6 +140,9 @@ class Music(commands.Cog):
 		self.YOUTUBE_VID_IN_PLAYLIST = re.compile(r"(?P<video>^.*?v.*?)(?P<list>&list.*)")
 		# Set up regex for the new spotify.link/id URLs
 		self.spotify_link_regex = re.compile(r"(?i)https?:\/\/spotify\.link\/?(?P<id>[a-zA-Z0-9]+)")
+		# Set up the search type and spotify radio regexes
+		self.search_type_regex   = re.compile(r"(?i)st=(?P<value>ytm?|sc)(search)?")
+		self.spotify_radio_regex = re.compile(r"(?i)sp=(?P<value>on|y(es)?|1|true|enabled?|off|no?|0|false|disabled?)")
 		# Set up bandcamp regex
 		self.bandcamp_regex = re.compile(r"(?i)https:\/\/[^\s]+\.bandcamp\.com\/(album|track)\/[^\s]+")
 		# Retain a list of *next command names
@@ -586,7 +589,7 @@ class Music(commands.Cog):
 		if ctx: track.ctx = ctx # Append our ctx-based data if provided
 		return track
 
-	async def get_recommendations(self, ctx, url, recommend_count, search_type = None):
+	async def get_recommendations(self, ctx, url, recommend_count, search_type = None, spotify_recommendations = True):
 		# Gather youtube recommendations based on the passed video URL or search term
 		urls = Utils.get_urls(url)
 		if urls:
@@ -612,8 +615,16 @@ class Music(commands.Cog):
 		last_count = -1
 		while True:
 			# Check for Spotify tracks first
-			if starting_track.track_type == pomice.enums.TrackType.SPOTIFY:
-				playlist = await node.get_recommendations(track=starting_track,ctx=ctx)
+			if spotify_recommendations or starting_track.track_type == pomice.enums.TrackType.SPOTIFY:
+				if not starting_track.track_type == pomice.enums.TrackType.SPOTIFY:
+					# Not a Spotify track - let's search based on the data therein
+					query = " ".join(
+						[getattr(starting_track,x) for x in ("author","title") if getattr(starting_track,x,None)]
+					)
+					playlist = await node.search_spotify_recommendations(query=query,ctx=ctx)
+				else:
+					# Already a Spotify track, just get recommendations as normal
+					playlist = await node.get_recommendations(track=starting_track,ctx=ctx)
 				if not isinstance(playlist,list):
 					return playlist
 				# Create a Playlist object for this - so we can retrieve the tracks later
@@ -705,7 +716,18 @@ class Music(commands.Cog):
 				pass
 		return new_tracks or tracks
 
-	async def resolve_search(self, ctx, url, message = None, shuffle = False, range_str = "", recommend = False, recommend_count = 25, search_type = None):
+	async def resolve_search(
+		self,
+		ctx,
+		url,
+		message = None,
+		shuffle = False,
+		range_str = "",
+		recommend = False,
+		recommend_count = 25,
+		spotify_recommendations = False,
+		search_type = None
+		):
 		# Helper method to search for songs/resolve urls and add the contents to the queue
 		url = url.strip('<>')
 		# Check if url - if not, remove /
@@ -790,7 +812,6 @@ class Music(commands.Cog):
 								else:
 									# It's an individual song
 									track_dicts.append(get_track_dict(ctx,json_data,artist,image))
-									# album = json_data["inAlbum"]["name"]
 								continue
 							# Let's search for our mp3 streams
 							if "&quot;https://t4.bcbits.com/stream/" in line:
@@ -816,7 +837,13 @@ class Music(commands.Cog):
 						return {"tracks":tracks, "playlist":album, "search":url.split("?")[0]} if album else {"tracks":tracks[0]}
 				except: pass
 				if recommend:
-					tracks = await self.get_recommendations(ctx,url,recommend_count,search_type=search_type)
+					tracks = await self.get_recommendations(
+						ctx,
+						url,
+						recommend_count,
+						search_type=search_type,
+						spotify_recommendations=spotify_recommendations
+					)
 				else:
 					tracks = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
 				# Get the first hit if it's not a playlist
@@ -862,7 +889,12 @@ class Music(commands.Cog):
 					tracks = tracks[0]
 				# Check if we're gathering recommendations
 				if recommend:
-					tracks = await self.get_recommendations(ctx,tracks.identifier,recommend_count)
+					tracks = await self.get_recommendations(
+						ctx,
+						tracks.identifier,
+						recommend_count,
+						spotify_recommendations=spotify_recommendations
+					)
 		except Exception as e:
 			tracks = None # Clear it out as something went wrong
 			print("Error resolving search:\n{}".format(repr(e)))
@@ -985,7 +1017,7 @@ class Music(commands.Cog):
 
 	def get_track_title(self,track):
 		# If we have a non-YouTube track, format the title as "Artist - Title"
-		if track.track_type != pomice.enums.TrackType.YOUTUBE or track.search_type == "ytmsearch":
+		if track.track_type != pomice.enums.TrackType.YOUTUBE or getattr(track,"search_type",None) == "ytmsearch":
 			return "{} - {}".format(track.author,track.title)
 		return track.title
 
@@ -1118,8 +1150,9 @@ class Music(commands.Cog):
 		url_parts = []
 		search_type = None
 		for u in url.split():
-			if u.lower() in ("st=ytsearch","st=ytmsearch","st=scsearch","st=yt","st=ytm","st=sc"):
-				search_type = u.lower().split("=")[-1]
+			m = self.search_type_regex.match(u)
+			if m:
+				search_type = m.group("value").lower()
 				if not search_type.endswith("search"):
 					search_type += "search" # Ensure it's set to a valid value
 			else:
@@ -1127,8 +1160,28 @@ class Music(commands.Cog):
 		url = " ".join(url_parts) # Rejoin the parts - skipping any search queries
 		# if we don't have a specified search, let's fall back to the server's setting
 		if not search_type:
-			search_type = self.settings.getServerStat(ctx.guild, "MusicSearchType", "ytsearch")
+			search_type = self.settings.getServerStat(ctx.guild,"MusicSearchType","ytsearch")
 		return (url,search_type)
+
+	def _get_spotify_radio(self, ctx, url):
+		# Check if we should be using Spotify for radio/recommendations or not
+		url_parts = []
+		spotify_radio = None
+		for u in url.split():
+			m = self.spotify_radio_regex.match(u)
+			if m:
+				if m.group("value").lower().startswith(("1","y","on","t","e")):
+					# Enabled
+					spotify_radio = True
+				else:
+					# Disabled
+					spotify_radio = False
+			else:
+				url_parts.append(u)
+		url = " ".join(url_parts)
+		if spotify_radio is None:
+			spotify_radio = self.settings.getServerStat(ctx.guild,"SpotifyForRadio",False)
+		return (url,spotify_radio)
 
 	def _get_range_str(self,url):
 		# Check for a range argument
@@ -1487,6 +1540,8 @@ class Music(commands.Cog):
 		url = " ".join(arg_list)
 		# Gather the search type
 		url,search_type = self._get_search_type(ctx,url)
+		# Find out if we're using spotify or not
+		url,use_spotify = self._get_spotify_radio(ctx,url)
 		# Process and strip out any range values
 		url,range_str = self._get_range_str(url)
 		message = await Message.Embed(
@@ -1494,7 +1549,16 @@ class Music(commands.Cog):
 			color=ctx.author
 			).send(ctx)
 		# Add our url to the queue
-		songs = await self.resolve_search(ctx,url,message=message,range_str=range_str,recommend=True,recommend_count=num,search_type=search_type)
+		songs = await self.resolve_search(
+			ctx,
+			url,
+			message=message,
+			range_str=range_str,
+			recommend=True,
+			recommend_count=num,
+			spotify_recommendations=use_spotify,
+			search_type=search_type
+		)
 		# Take the songs we got back - if any - and add them to the queue
 		if not songs or not "tracks" in songs: # Got nothing :(
 			return await Message.Embed(title="♫ I couldn't find anything for that search!",description="Try using more specific search terms, or pass a YouTube link instead.",color=ctx.author,delete_after=delay).edit(ctx,message)
@@ -1505,6 +1569,11 @@ class Music(commands.Cog):
 	@commands.command(aliases=["suggest","r","recommend"])
 	async def radio(self, ctx, *, url = None):
 		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL.
+		Adds songs to the end of the queue.
+		You can control whether Spotify is used for recommendations by passing one of the following as an arg:
+
+		sp=on  (Spotify is used for all recommendations)
+		sp=off (YouTube is used unless a Spotify URL is passed)
 		
 		Can take an optional -range=X argument which denotes which tracks to include.
 		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
@@ -1518,6 +1587,10 @@ class Music(commands.Cog):
 	async def radionext(self, ctx, *, url = None):
 		"""Queues up recommendations for the passed search term, YouTube URL, or Spotify URL.
 		Adds songs to the beginning of the queue if enabled by the allowplaynext command.
+		You can control whether Spotify is used for recommendations by passing one of the following as an arg:
+
+		sp=on  (Spotify is used for all recommendations)
+		sp=off (YouTube is used unless a Spotify URL is passed)
 		
 		Can take an optional -range=X argument which denotes which tracks to include.
 		e.g. To load the 1st, 3rd, and 5th through 7th tracks: -range=1,3,5-7
@@ -2416,6 +2489,15 @@ class Music(commands.Cog):
 		return await ctx.send("Search type set to `{}` ({}).".format(search_type,st_provider.get(search_type)))
 
 	@commands.command()
+	async def spotifyradio(self, ctx, yes_no = None):
+		"""Gets or sets the whether Spotify is used for radio recommendations.  Requires bot-admin or admin to set.
+		When enabled, Spotify is used for all recommendations.
+		When disabled, YouTube is used unless a Spotify URL is passed."""
+
+		if not Utils.is_bot_admin(ctx): yes_no = None
+		await ctx.send(Utils.yes_no_setting(ctx,"Using Spotify for radio/recommendations","SpotifyForRadio",yes_no))
+
+	@commands.command()
 	async def lasteq(self, ctx, yes_no = None):
 		"""Gets or sets whether the current EQ settings are preserved between music sessions (bot-admin only)."""
 		
@@ -2452,6 +2534,7 @@ class Music(commands.Cog):
 			"playlist",
 			"radiocount",
 			"searchtype",
+			"spotifyradio",
 			"allowplaynext",
 			"lavalink"
 		)
