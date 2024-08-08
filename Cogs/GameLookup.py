@@ -1,6 +1,6 @@
 import discord, time
 from   discord.ext import commands
-from   Cogs import Settings, Message, UserTime, DL, FuzzySearch
+from   Cogs import Settings, Message, DL, FuzzySearch
 
 def setup(bot):
     # Do some simple setup

@@ -4,7 +4,7 @@ from   urllib.parse import quote
 from   html.parser import HTMLParser
 from   os.path import splitext
 from   discord.ext import commands
-from   Cogs import Utils, GetImage, Message, ReadableTime, UserTime, DL, Nullify, PickList
+from   Cogs import Utils, GetImage, Message, ReadableTime, DL, Nullify, PickList
 from   pyquery import PyQuery as pq
 try:
 	from urllib.parse import urlparse
