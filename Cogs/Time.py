@@ -2,14 +2,8 @@ import asyncio
 import discord
 import datetime
 import pytz
-from   discord.ext import commands
-from   Cogs import FuzzySearch
-from   Cogs import Settings
-from   Cogs import DisplayName
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import UserTime
-from   Cogs import PickList
+from discord.ext import commands
+from Cogs import FuzzySearch, Settings, DisplayName, Message, Nullify, PickList
 
 def setup(bot):
 	# Add the bot and deps
@@ -178,28 +172,37 @@ class Time(commands.Cog):
 		await ctx.channel.send(msg)
 
 
-	@commands.command()
-	async def use24(self, ctx, *, yes_no = None):
-		"""Gets or sets whether or not you'd like time results in 24-hour format."""
-
-		current = self.settings.getGlobalUserStat(ctx.author,"Use24HourFormat",False)
+	def _process_12_or_24(self,member,yes_no,reverse=False):
+		current = self.settings.getGlobalUserStat(member,"Use24HourFormat",False)
 		if yes_no is None:
 			# Output what we have
-			return await ctx.send(
-				"You are currently using *{}-hour* time formatting.".format("24" if current else 12)
-			)
+			return "You are currently using *{}-hour* time formatting.".format("24" if current else 12)
 		elif yes_no.lower() in ( "1", "yes", "on", "true", "enabled", "enable" ):
-			yes_no = True
-			msg = "You are set to use *24-hour* time formatting."
+			yes_no = not reverse
+			msg = "You are set to use *{}-hour* time formatting.".format(12 if reverse else 24)
 		elif yes_no.lower() in ( "0", "no", "off", "false", "disabled", "disable" ):
-			yes_no = False
-			msg = "You are set to use *12-hour* time formatting."
+			yes_no = reverse
+			msg = "You are set to use *{}-hour* time formatting.".format(24 if reverse else 12)
 		else:
 			msg = "That's not a valid setting."
 			yes_no = current
 		if yes_no != current:
-			self.settings.setGlobalUserStat(ctx.author,"Use24HourFormat",yes_no)
-		await ctx.send(msg)
+			self.settings.setGlobalUserStat(member,"Use24HourFormat",yes_no)
+		return msg
+
+
+	@commands.command()
+	async def use24(self, ctx, *, yes_no = None):
+		"""Gets or sets whether or not you'd like time results in 24-hour format."""
+
+		await ctx.send(self._process_12_or_24(ctx.author,yes_no))
+
+
+	@commands.command()
+	async def use12(self, ctx, *, yes_no = None):
+		"""Gets or sets whether or not you'd like time results in 12-hour format."""
+
+		await ctx.send(self._process_12_or_24(ctx.author,yes_no,reverse=True))
 
 
 	@commands.command()
@@ -215,8 +218,6 @@ class Time(commands.Cog):
 		use_24 = self.settings.getGlobalUserStat(ctx.author,"Use24HourFormat",False)
 		strftime = "%H:%M" if use_24 else "%I:%M %p"
 
-		print(use_24,strftime)
-
 		if member:
 			# We got one
 			# Check for timezone first
@@ -229,7 +230,7 @@ class Time(commands.Cog):
 				DisplayName.name(member),
 				ctx.prefix,
 				ctx.prefix,
-				UserTime.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
+				self.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
 			return await ctx.channel.send(msg)
 
 		# At this point - we need to determine if we have an offset - or possibly a timezone passed
@@ -239,7 +240,7 @@ class Time(commands.Cog):
 			t = self.getTimeFromOffset(offset,strftime=strftime)
 			if t is None:
 				return await ctx.channel.send("I couldn't find that TimeZone or offset!")
-		t["time"] = UserTime.getClockForTime(t["time"])
+		t["time"] = self.getClockForTime(t["time"])
 		if member:
 			msg = '{}; where *{}* is, it\'s currently *{}*'.format(t["zone"], DisplayName.name(member), t["time"])
 		else:
@@ -247,6 +248,24 @@ class Time(commands.Cog):
 		
 		# Say message
 		await ctx.channel.send(msg)
+
+
+	def getClockForTime(self, time_string):
+		try:
+			t = time_string.split(" ")[0]
+			hour,minute = map(int,t.split(":"))
+			if hour > 12:
+				hour -= 12
+		except:
+			return time_string
+		clock_string = ""
+		if minute > 44:
+			clock_string = str(hour + 1) if hour < 12 else "1"
+		elif minute > 14:
+			clock_string = str(hour) + "30"
+		else:
+			clock_string = str(hour)
+		return time_string +" :clock" + clock_string + ":"
 
 
 	def getTimeFromOffset(self, offset, t = None, strftime = None):
