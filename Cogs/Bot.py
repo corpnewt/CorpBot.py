@@ -1,7 +1,7 @@
 import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct, shutil, tempfile
 from   PIL         import Image
 from   discord.ext import commands
-from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, ProgressBar, UserTime, Message, DL
+from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, ProgressBar, Message, DL
 try:
 	from urllib.parse import urlparse
 except ImportError:

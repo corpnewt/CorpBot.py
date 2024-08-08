@@ -6,17 +6,11 @@ def setup(bot):
     return
 
 def getClockForTime(time_string):
-	# Assumes a HH:MM PP format
 	try:
-		t = time_string.split(" ")
-		if len(t) == 2:
-			t = t[0].split(":")
-		elif len(t) == 3:
-			t = t[1].split(":")
-		else:
-			return time_string
-		hour = int(t[0])
-		minute = int(t[1])
+		t = time_string.split(" ")[0]
+		hour,minute = map(int,t.split(":"))
+		if hour > 12:
+			hour -= 12
 	except:
 		return time_string
 	clock_string = ""
