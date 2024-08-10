@@ -2000,7 +2000,11 @@ class Music(commands.Cog):
 	@commands.command()
 	async def lavalink(self, ctx):
 		"""Lists info about the Lavalink version connected to."""
-		node = self.get_node()
+		node = info = None
+		try:
+			node = self.get_node()
+		except:
+			pass
 		if not node:
 			return await Message.Embed(
 				title="♫ Missing Information",
@@ -2008,10 +2012,13 @@ class Music(commands.Cog):
 				description="No nodes were returned - I may not be connected to Lavalink."
 			).send(ctx)
 		# We have a node we can communicate with - get the versioning info
-		info = await node.send(
-			method="GET",
-			path="info"
-		)
+		try:
+			info = await node.send(
+				method="GET",
+				path="info"
+			)
+		except:
+			pass
 		if not info:
 			return await Message.Embed(
 				title="♫ Missing Information",
@@ -2048,8 +2055,15 @@ class Music(commands.Cog):
 	async def playing(self, ctx, *, moons = None):
 		"""Lists the currently playing song if any."""
 
+		try:
+			player = self.get_player(ctx.guild)
+		except Exception as e:
+			return await Message.Embed(
+				title="♫ Failed To Get Player",
+				color=ctx.author,
+				description="There was an issue getting the player - I may not be connected to Lavalink:\n{}".format(e)
+			).send(ctx)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected or not (player.is_playing or player.is_paused) or not player.track:
 			# No client - and we're not playing or paused
 			return await Message.Embed(
@@ -2090,8 +2104,15 @@ class Music(commands.Cog):
 	async def playlist(self, ctx):
 		"""Lists the queued songs in the playlist."""
 
+		try:
+			player = self.get_player(ctx.guild)
+		except Exception as e:
+			return await Message.Embed(
+				title="♫ Failed To Get Player",
+				color=ctx.author,
+				description="There was an issue getting the player - I may not be connected to Lavalink:\n{}".format(e)
+			).send(ctx)
 		delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
-		player = self.get_player(ctx.guild)
 		if not player or not player.is_connected or not (player.is_playing or player.is_paused):
 			return await Message.Embed(
 				title="♫ Current Playlist",
@@ -2424,7 +2445,10 @@ class Music(commands.Cog):
 		players = 0
 		for guild in self.bot.guilds:
 			# Remove the per-server temp settings
-			player = self.get_player(guild)
+			try:
+				player = self.get_player(guild)
+			except:
+				continue
 			if player:
 				players += 1
 				await self._stop(player,clear_attrs=True,clear_queue=True,disconnect=True)
@@ -2541,7 +2565,15 @@ class Music(commands.Cog):
 		if ctx.command.name in exempt_commands: return
 		# General checks for all music player commands - with specifics filtered per command
 		# If Youtube ratelimits - you can disable music globally so only owners can use it
-		player = self.get_player(ctx.guild)
+		try:
+			player = self.get_player(ctx.guild)
+		except Exception as e:
+			await Message.Embed(
+				title="♫ Failed To Get Player",
+				color=ctx.author,
+				description="There was an issue getting the player - I may not be connected to Lavalink:\n{}".format(e)
+			).send(ctx)
+			raise commands.CommandError("Music Cog: Failed to get player: {}".format(e))
 		delay = self.settings.getServerStat(ctx.guild,"MusicDeleteDelay",20)
 		if self.settings.getGlobalStat("DisableMusic",False) and not Utils.is_owner(ctx):
 			# Music is off - and we're not an owner - disconnect if connected, then send the bad news :(
