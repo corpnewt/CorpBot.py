@@ -798,9 +798,9 @@ class Bot(commands.Cog):
 		ext_match = re.compile(r"(?i)(?s:.*\.(py|bat|sh|command))\Z")
 		# Walk our top-level folder followed by the contents of the Cogs
 		# folder
-		top_level = [os.path.join(path,x) for x in os.listdir(path) if ext_match.match(x)]
+		top_level = [os.path.join(path,x) for x in os.listdir(path) if os.path.isfile(os.path.join(path,x)) and ext_match.match(x)]
 		cog_dir   = os.path.join(path,"Cogs")
-		cog_level = [os.path.join(cog_dir,x) for x in os.listdir(cog_dir) if ext_match.match(x)]
+		cog_level = [os.path.join(cog_dir,x) for x in os.listdir(cog_dir) if os.path.isfile(os.path.join(cog_dir,x)) and ext_match.match(x)]
 
 		# Count the lines for each file - and keep track of
 		# the total line count per extension
