@@ -269,7 +269,13 @@ class Debugging(commands.Cog):
 			msg = "🌟 {} ({}) gave {} xp to the {} role.".format(from_user, from_user.id, amount, to_user.name)
 		else:
 			msg = "🌟 {} ({}) gave {} xp to {} ({}).".format(from_user, from_user.id, amount, to_user, to_user.id)
-		await self._logEvent(guild, "", title=msg, color=discord.Color.blue(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			"",
+			title=msg,
+			color=discord.Color.blue(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_member_ban(self, guild, member):
@@ -285,7 +291,13 @@ class Debugging(commands.Cog):
 		# A member was banned
 		pfpurl = Utils.get_avatar(member)
 		msg = '🚫 {} ({}) was banned from {}.'.format(member, member.id, guild.name)
-		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			log_msg,
+			title=msg,
+			color=discord.Color.red(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_member_unban(self, guild, member):
@@ -301,7 +313,13 @@ class Debugging(commands.Cog):
 		# A member was unbanned
 		pfpurl = Utils.get_avatar(member)
 		msg = '🔵 {} ({}) was unbanned from {}.'.format(member, member.id, guild.name)
-		await self._logEvent(guild, log_msg, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			log_msg,
+			title=msg,
+			color=discord.Color.green(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_timed_out(self, member, guild, cooldown, muted_by, reason):
@@ -322,7 +340,13 @@ class Debugging(commands.Cog):
 			reason or "No reason provided",
 			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Unknown"
 		)
-		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			message,
+			title=msg,
+			color=discord.Color.red(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_mute(self, member, guild, cooldown, muted_by, reason):
@@ -340,7 +364,13 @@ class Debugging(commands.Cog):
 		message += "\nDuration: {}".format(
 			ReadableTime.getReadableTimeBetween(round(time.time()), round(cooldown)) if cooldown else "Until further notice"
 		)
-		await self._logEvent(guild, message, title=msg, color=discord.Color.red(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			message,
+			title=msg,
+			color=discord.Color.red(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_unmute(self, member, guild, unmuted_by=None, reason=None):
@@ -357,7 +387,13 @@ class Debugging(commands.Cog):
 			)
 		else:
 			message = "Auto-Unmuted"
-		await self._logEvent(guild, message, title=msg, color=discord.Color.green(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			message,
+			title=msg,
+			color=discord.Color.green(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_invite_create(self, invite):
@@ -373,7 +409,14 @@ class Debugging(commands.Cog):
 		# An invite was created
 		msg = "📥 Invite created."
 		fields = self.format_invite_fields(invite)
-		await self._logEvent(self.bot.get_guild(int(invite.guild.id)),"",fields=fields,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
+		await self._logEvent(
+			self.bot.get_guild(int(invite.guild.id)),
+			"",
+			fields=fields,
+			title=msg,
+			color=discord.Color.teal(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()
 	async def on_invite_delete(self, invite):
@@ -386,7 +429,14 @@ class Debugging(commands.Cog):
 		if not self.shouldLog('invite.delete', guild): return
 		msg = "📤 Invite deleted."
 		fields = self.format_invite_fields(invite)
-		await self._logEvent(guild,"",fields=fields,title=msg,color=discord.Color.teal(),thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			"",
+			fields=fields,
+			title=msg,
+			color=discord.Color.teal(),
+			thumbnail=pfpurl
+		)
 
 	@commands.Cog.listener()	
 	async def on_member_join(self, member):
@@ -408,7 +458,14 @@ class Debugging(commands.Cog):
 		msg = '👐 {} ({}) joined {}.'.format(member, member.id, guild.name)
 		fields = [self._f("Account Created",member.created_at,ts=True,ago=True)]
 		if invite: fields.extend(self.format_invite_fields(invite))
-		await self._logEvent(guild, "", fields=fields, title=msg, color=discord.Color.teal(), thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			"",
+			fields=fields,
+			title=msg,
+			color=discord.Color.teal(),
+			thumbnail=pfpurl
+		)
 		
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
@@ -431,7 +488,14 @@ class Debugging(commands.Cog):
 			})
 		roles = ["{} ({})".format(x.name,x.id) for x in member.roles if x != guild.default_role]
 		log_msg = "{}".format("\n".join(roles) if roles else "None")
-		await self._logEvent(guild, log_msg, header="**Had Roles**",fields=fields, title=msg, color=discord.Color.light_grey(), thumbnail=pfpurl)
+		await self._logEvent(
+			guild,
+			log_msg,
+			header="**Had Roles**",fields=fields,
+			title=msg,
+			color=discord.Color.light_grey(),
+			thumbnail=pfpurl
+		)
 
 	def type_to_string(self, activity_type):
 		# Returns the string associated with the passed activity type
@@ -502,7 +566,13 @@ class Debugging(commands.Cog):
 		pfpurl = Utils.get_avatar(before)
 		if before.status != after.status and self.shouldLog('user.status', server):
 			msg = 'Changed Status:\n\n{}\n   --->\n{}'.format(str(before.status).lower(), str(after.status).lower())
-			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(
+				server,
+				msg,
+				title="👤 {} ({}) Updated.".format(before,before.id),
+				color=discord.Color.gold(),
+				thumbnail=pfpurl
+			)
 		# Sanitize activities - fixes an issue where the "start" and "end" keys may not be visible
 		before.activities = [self.sanitize_activity(x) for x in before.activities]
 		after.activities = [self.sanitize_activity(x) for x in after.activities]
@@ -548,19 +618,43 @@ class Debugging(commands.Cog):
 				# We saw something tangible change
 				msg = 'Changed Playing Status: \n\n{}'.format(msg)
 				if self.shouldLog('user.game.name', server) or self.shouldLog('user.game.url', server) or self.shouldLog('user.game.type', server):
-					await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+					await self._logEvent(
+						server,
+						msg,
+						title="👤 {} ({}) Updated.".format(before,before.id),
+						color=discord.Color.gold(),
+						thumbnail=pfpurl
+					)
 		if Utils.get_avatar(before) != Utils.get_avatar(after) and self.shouldLog('user.avatar', server):
 			# Avatar changed
-			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(Utils.get_avatar(before), Utils.get_avatar(after))
-			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			msg = 'Changed Avatars: \n\n{}\n   --->\n{}'.format(Utils.get_avatar(before),Utils.get_avatar(after))
+			await self._logEvent(
+				server,
+				msg,
+				title="👤 {} ({}) Updated.".format(before,before.id),
+				color=discord.Color.gold(),
+				thumbnail=pfpurl
+			)
 		if before.nick != after.nick and self.shouldLog('user.nick', server):
 			# Nickname changed
-			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick, after.nick)
-			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			msg = 'Changed Nickname: \n\n{}\n   --->\n{}'.format(before.nick,after.nick)
+			await self._logEvent(
+				server,
+			    msg,
+			    title="👤 {} ({}) Updated.".format(before,before.id),
+			    color=discord.Color.gold(),
+			    thumbnail=pfpurl
+			)
 		if before.name != after.name and self.shouldLog('user.name', server):
 			# Name changed
 			msg = 'Changed Name: \n\n{}\n   --->\n{}'.format(before.name, after.name)
-			await self._logEvent(server, msg, title="👤 {} ({}) Updated.".format(before, before.id), color=discord.Color.gold(), thumbnail=pfpurl)
+			await self._logEvent(
+				server,
+				msg,
+				title="👤 {} ({}) Updated.".format(before,before.id),
+				color=discord.Color.gold(),
+				thumbnail=pfpurl
+			)
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -576,7 +670,16 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-			await self._logEvent(message.guild, msg, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, message_id=True, reference=reference)
+			await self._logEvent(
+				message.guild,
+				msg,
+				title=title,
+				color=discord.Color.dark_grey(),
+				thumbnail=pfpurl,
+				message=message,
+				message_id=True,
+				reference=reference
+			)
 		if self.shouldLog('invite.send', message.guild):
 			# A message was sent
 			matches = re.finditer(r"(?i)((discord\.gg|discordapp\.com\/invite)\/\S+)",message.content)
@@ -592,7 +695,16 @@ class Debugging(commands.Cog):
 				if fields: # Got at least one valid invite
 					title = '🎫 {} ({}), in #{}, sent invite:'.format(message.author, message.author.id, message.channel.name)
 					pfpurl = Utils.get_avatar(message.author)
-					await self._logEvent(message.guild, "", fields=fields, title=title, color=discord.Color.dark_grey(), thumbnail=pfpurl, message=message, reference=reference)
+					await self._logEvent(
+						message.guild,
+						"",
+						fields=fields,
+						title=title,
+						color=discord.Color.dark_grey(),
+						thumbnail=pfpurl,
+						message=message,
+						reference=reference
+					)
 
 	@commands.Cog.listener()
 	async def on_raw_message_edit(self, payload):
@@ -647,8 +759,18 @@ class Debugging(commands.Cog):
 				if not fetched:
 					fetched = await channel.fetch_message(payload.message_id)
 				reference = fetched.reference
-			except: pass
-		await self._logEvent(guild, msg, title=title, color=discord.Color.purple(), thumbnail=pfpurl, message=payload, message_id=True, reference=reference)
+			except Exception as e: print(e); pass
+		await self._logEvent(
+			guild,
+			msg,
+			title=title,
+			color=discord.Color.purple(),
+			thumbnail=pfpurl,
+			message=payload,
+			message_id=True,
+			message_sent=True,
+			reference=reference
+		)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
@@ -679,7 +801,19 @@ class Debugging(commands.Cog):
 				for a in message.attachments:
 					msg += a.url + "\n"
 			pfpurl = Utils.get_avatar(message.author)
-		await self._logEvent(guild, msg, title=title, color=discord.Color.orange(), thumbnail=pfpurl, message=payload, message_id=True, link_message=False, reference=reference)
+		await self._logEvent(
+			guild,
+			msg,
+			title=title,
+			color=discord.Color.orange(),
+			thumbnail=pfpurl,
+			message=payload,
+			message_id=True,
+			message_sent=True,
+			message_edited=True,
+			link_message=False,
+			reference=reference
+		)
 
 	@commands.Cog.listener()
 	async def on_raw_bulk_message_delete(self, payload):
@@ -733,10 +867,34 @@ class Debugging(commands.Cog):
 		temp_file = os.path.join(temp,name)
 		with open(temp_file,"wb") as f:
 			f.write(msg.encode("utf-8"))
-		await self._logEvent(guild,event_msg,filename=temp_file,color=discord.Color.orange(),title=title,thumbnail=Utils.get_guild_icon(guild))
+		await self._logEvent(
+			guild,
+			event_msg,
+			filename=temp_file,
+			color=discord.Color.orange(),
+			title=title,
+			thumbnail=Utils.get_guild_icon(guild)
+		)
 		shutil.rmtree(temp,ignore_errors=True)
 	
-	async def _logEvent(self, server, log_message, *, header=None, fields=None, filename=None, color=None, title=None, thumbnail=None, message=None, message_id=False, link_message=True, reference=None, link_reference=True):
+	async def _logEvent(
+		self,
+		server,
+		log_message,
+		header=None,
+		fields=None,
+		filename=None,
+		color=None,
+		title=None,
+		thumbnail=None,
+		message=None,
+		message_id=False,
+		message_sent=False,
+		message_edited=False,
+		link_message=True,
+		reference=None,
+		link_reference=True
+		):
 		# Here's where we log our info
 		# Check if we're suppressing @here and @everyone mentions
 		if color is None:
@@ -766,6 +924,12 @@ class Debugging(commands.Cog):
 				message = await self._get_message(message)
 			if message_id and message:
 				urls += "`  Message ID: {}`".format(message.id)
+			if message_sent and message and message.created_at:
+				if urls: urls += "\n"
+				urls += "`Message Sent:` <t:{}>".format(int(message.created_at.timestamp()))
+			if message_edited and message and message.edited_at:
+				if urls: urls += "\n"
+				urls += "` Last Edited:` <t:{}>".format(int(message.edited_at.timestamp()))
 			if link_message and message:
 				if urls: urls += "\n" # Add formatting separator as needed
 				urls += "- [Message Link]({})".format(self._message_url(message))
@@ -781,10 +945,10 @@ class Debugging(commands.Cog):
 					reference_url
 				)
 			# Save our current and UTC time for the logged event
-			d_header = "`Event Logged:` <t:{}>{}\n{}```\n".format(
+			d_header = "`Event Logged:` <t:{}>{}{}\n```\n".format(
 				int(datetime.now().timestamp()),
 				"\n"+urls if urls else "",
-				"\n"+header+"\n" if header else ""
+				"\n"+header if header else ""
 			)
 			d_footer = "\n```"
 			# Make sure we timestamp - even if there's no description
@@ -900,7 +1064,13 @@ class Debugging(commands.Cog):
 			# We're logging
 			logmess = '{} cleaned in #{}'.format(ctx.author, chan.name)
 			pfpurl = Utils.get_avatar(ctx.author)
-			await self._logEvent(ctx.guild, "{:,} message{} removed.".format(counter, "" if counter == 1 else "s"), title=logmess, filename=filename, thumbnail=pfpurl)
+			await self._logEvent(
+				ctx.guild,
+				"{:,} message{} removed.".format(counter,"" if counter==1 else "s"),
+				title=logmess,
+				filename=filename,
+				thumbnail=pfpurl
+			)
 		# Delete the remaining file
 		os.remove(filename)
 	
