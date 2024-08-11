@@ -787,50 +787,54 @@ class Bot(commands.Cog):
 		# Get our current working directory - should be the bot's home
 		path = os.getcwd()
 		
-		# Set up some lists
-		extensions = []
-		code_count = []
+		# Set up our extensions dict
 		ext_dict = {
 			"py":"Python (.py)",
 			"bat":"Windows Batch (.bat)",
 			"sh":"Shell Script (.sh)",
 			"command":"Command Script (.command)"}
 		
-		# Get the extensions - include our include list
-		extensions = self.get_extensions(path, list(ext_dict))
-		 
-		# Save a reference to the venv folder to ensure that's
-		# not included
-		venv = os.path.join(path,"venv")
+		# Set up a regex filter to match the above extensions
+		ext_match = re.compile(r"(?i)(?s:.*\.(py|bat|sh|command))\Z")
+		# Walk our top-level folder followed by the contents of the Cogs
+		# folder
+		top_level = [os.path.join(path,x) for x in os.listdir(path) if ext_match.match(x)]
+		cog_dir   = os.path.join(path,"Cogs")
+		cog_level = [os.path.join(cog_dir,x) for x in os.listdir(cog_dir) if ext_match.match(x)]
 
-		for run in extensions:
-			extension = "*."+run
-			temp = 0
-			for root, directory, files in os.walk(path):
-				if venv in root:
-					continue # Skip venv-related paths
-				for items in fnmatch.filter(files, extension):
-					value = os.path.join(root,items)
-					temp += sum(+1 for line in open(value, 'rb'))
-			code_count.append(temp)
+		# Count the lines for each file - and keep track of
+		# the total line count per extension
+		code_count = {}
+		for path in top_level + cog_level:
+			ext = path.split(".")[-1].lower()
+			try:
+				lines = sum(1 for line in open(path,"rb"))
+			except:
+				continue
+			code_count[ext] = code_count.get(ext,0) + lines
+
+		# Let's build our fields
+		fields = []
+		for ext in code_count:
+			if not ext in ext_dict:
+				continue # Shouldn't happen - but to be safe
+			l = code_count[ext]
+			fields.append({
+				"name":ext_dict.get(ext,ext),
+				"value":"{:,} line{}".format(l,"" if l==1 else "s"),
+			})
+
+		# Fallback in case something really weird happened
+		if not fields:
+			fields.append({
+				"name":"Hmmm... something isn't right...",
+				"value":"I didn't find any lines of code to count"
+			})
 		
-		# Set up our output
-		fields = [{"name":ext_dict.get(extensions[x],extensions[x]),"value":"{:,} line{}".format(code_count[x],"" if code_count[x]==1 else "s")} for x in range(len(code_count))]
-		return await Message.Embed(
+		# Report our findings
+		await Message.Embed(
 			title="Counted Lines of Code",
 			description="Some poor soul took the time to sloppily write the following to bring me life...",
 			fields=fields,
 			thumbnail=Utils.get_avatar(bot_member)
 		).edit(ctx,message)
-
-	# Helper function to get extensions
-	def get_extensions(self, path, excl):
-		extensions = []
-		for root, dir, files in os.walk(path):
-			for items in fnmatch.filter(files, "*"):
-				temp_extensions = items.rfind(".")
-				ext = items[temp_extensions+1:]
-				if ext not in extensions:
-					if ext in excl:
-						extensions.append(ext)
-		return extensions
