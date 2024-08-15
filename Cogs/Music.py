@@ -590,26 +590,32 @@ class Music(commands.Cog):
 		return track
 
 	async def get_recommendations(self, ctx, url, recommend_count, search_type = None, spotify_recommendations = True):
-		# Gather youtube recommendations based on the passed video URL or search term
-		urls = Utils.get_urls(url)
-		if urls:
-			url = urls[0]
-			for r in (pomice.enums.URLRegex.SPOTIFY_URL,pomice.enums.URLRegex.YOUTUBE_URL):
-				if r.match(url):
-					# Got a match - check if it's a YT playlist and extract the video
-					if r == pomice.enums.URLRegex.YOUTUBE_URL:
-						pl_url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
-						if pl_url:
-							url = pl_url.group("video") # Get the video identifier
-					break # Leave the loop
-			else:
-				return None # Not found
+		# Gather YouTube or Spotify recommendations based on the passed track, video URL, or search term
 		node = self.get_node()
-		# Here we either have a video identifier - or a search term
-		starting_track = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
-		if not isinstance(starting_track,list):
-			return None # Something went wrong loading this
-		starting_track = starting_track[0]
+		if isinstance(url,pomice.objects.Track):
+			# We were already passed a track - use that as the starting
+			# track.
+			starting_track = url
+		else:
+			# We were passed a string - resolve it as needed
+			urls = Utils.get_urls(url)
+			if urls:
+				url = urls[0]
+				for r in (pomice.enums.URLRegex.SPOTIFY_URL,pomice.enums.URLRegex.YOUTUBE_URL):
+					if r.match(url):
+						# Got a match - check if it's a YT playlist and extract the video
+						if r == pomice.enums.URLRegex.YOUTUBE_URL:
+							pl_url = self.YOUTUBE_VID_IN_PLAYLIST.match(url)
+							if pl_url:
+								url = pl_url.group("video") # Get the video identifier
+						break # Leave the loop
+				else:
+					return None # Not found
+			# Here we either have a video identifier - or a search term
+			starting_track = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
+			if not isinstance(starting_track,list):
+				return None # Something went wrong loading this
+			starting_track = starting_track[0]
 		# Load the recommendations
 		tracks = None
 		last_count = -1
@@ -867,7 +873,8 @@ class Music(commands.Cog):
 				seek_pos = self.get_seek(url)
 			else: # Got a search term - let's search
 				tracks = await node.get_tracks(query=url,ctx=ctx,search_type=search_type or "ytsearch")
-				if isinstance(tracks,pomice.objects.Playlist): tracks = tracks.tracks
+				if isinstance(tracks,pomice.objects.Playlist):
+					tracks = tracks.tracks
 				if self.settings.getServerStat(ctx.guild, "YTMultiple", False):
 					delay = self.settings.getServerStat(ctx.guild, "MusicDeleteDelay", 20)
 					# We want to let the user pick
@@ -891,7 +898,7 @@ class Music(commands.Cog):
 				if recommend:
 					tracks = await self.get_recommendations(
 						ctx,
-						tracks.identifier,
+						tracks,
 						recommend_count,
 						spotify_recommendations=spotify_recommendations
 					)
