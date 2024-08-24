@@ -199,14 +199,22 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--force-update-venv", help="Clears the venv and creates it anew", action="store_true")
     parser.add_argument("-l", "--list-dependencies", help="Prints JSON data showing required dependencies, whether they're installed, and their versions (overrides --no-interaction and --install-missing)", action="store_true")
     parser.add_argument("-m", "--install-missing", help="Only attmepts to install missing dependencies", action="store_true")
+    parser.add_argument("-p", "--skip-pip", help="Skips updating pip in the venv in addition to the other dependencies", action="store_true")
     args = parser.parse_args()
 
     r = Run()
-    modules = [
+
+    # Set up the modules we intend to install
+    modules = []
+    if not args.skip_pip:
+        # Include pip at the start if we're not told to skip it
+        modules.append({"name":"pip"})
+    # Add the rest of the standard modules
+    modules.extend([
         # Get the latest commit of pomice to ensure we have Lavalink v4 changes
         {"name":"pomice","item":"git+https://github.com/cloudwithax/pomice.git"},
         # Get the latest commit of py-cord to ensure we have python 3.12 changes
-        {"name":"py-cord","item":"git+https://github.com/Pycord-Development/pycord.git#egg=py-cord[voice]"},
+        {"name":"py-cord","item":"git+https://github.com/Pycord-Development/pycord"},
         {"name":"pillow"},
         {"name":"requests"},
         {"name":"parsedatetime"},
@@ -224,7 +232,7 @@ if __name__ == '__main__':
         {"name":"geopy"},
         {"name":"pyfiglet"},
         {"name":"regex"}
-    ]
+    ])
     db_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Cogs","PandorasDB.py")
     if os.path.exists(db_path):
         modules.append({"name":"redis"})
