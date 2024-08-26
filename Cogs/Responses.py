@@ -105,12 +105,12 @@ class Responses(commands.Cog):
 			# Now do the same with the roles
 			try:
 				role_list = [int(x) for x in self.role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
-				roles_check = [x for x in map(ctx.guild.get_role,role_list)]
+				roles_check = [x for x in map(ctx.guild.get_role,role_list) if x]
 			except:
 				roles_check = []
 			try:
 				role_list = [int(x) for x in self.not_role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
-				roles_skip = [x for x in map(ctx.guild.get_role,role_list)]
+				roles_skip = [x for x in map(ctx.guild.get_role,role_list) if x]
 			except:
 				roles_skip = []
 			# Make sure we give priority to roles_skip for any duplicates
