@@ -113,6 +113,8 @@ class Responses(commands.Cog):
 				roles_skip = [x for x in map(ctx.guild.get_role,role_list)]
 			except:
 				roles_skip = []
+			# Make sure we give priority to roles_skip for any duplicates
+			roles_check = [x for x in roles_check if not x in roles_skip]
 			if check_roles and (roles_check or roles_skip):
 				# Make sure we have all the required roles, and none of the ignored
 				# roles
