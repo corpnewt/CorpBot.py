@@ -36,24 +36,26 @@ class Responses(commands.Cog):
 		self.regexBan      = re.compile(r"\[\[ban\]\]",          re.IGNORECASE)
 		self.regexSuppress = re.compile(r"\[\[suppress\]\]",     re.IGNORECASE)
 		self.react         = re.compile(r"\[\[react:.*\]\]",     re.IGNORECASE)
-		self.toggle_ur     = re.compile(r"\[\[t_ur:[\d,]+\]\]",  re.IGNORECASE)
-		self.add_ur        = re.compile(r"\[\[add_ur:[\d,]+\]\]",re.IGNORECASE)
-		self.set_ur        = re.compile(r"\[\[set_ur:\d+\]\]",   re.IGNORECASE)
-		self.rem_ur        = re.compile(r"\[\[rem_ur:[\d,]+\]\]",re.IGNORECASE)
-		self.react_ur      = re.compile(r"\[\[react_ur:.*\]\]",  re.IGNORECASE)
-		self.toggle_r      = re.compile(r"\[\[t_r:[\d,]+\]\]",   re.IGNORECASE)
-		self.add_r         = re.compile(r"\[\[add_r:[\d,]+\]\]", re.IGNORECASE)
-		self.rem_r         = re.compile(r"\[\[rem_r:[\d,]+\]\]", re.IGNORECASE)
-		self.react_r       = re.compile(r"\[\[react_r:.*\]\]",   re.IGNORECASE)
-		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",    re.IGNORECASE)
+		self.toggle_ur     = re.compile(r"\[\[t_u(ser)?r(ole)?:[\d,]+\]\]",  re.IGNORECASE)
+		self.add_ur        = re.compile(r"\[\[add_u(ser)?r(ole)?:[\d,]+\]\]",re.IGNORECASE)
+		self.set_ur        = re.compile(r"\[\[set_u(ser)?r(ole)?:\d+\]\]",   re.IGNORECASE)
+		self.rem_ur        = re.compile(r"\[\[rem_u(ser)?r(ole)?:[\d,]+\]\]",re.IGNORECASE)
+		self.react_ur      = re.compile(r"\[\[react_u(ser)?r(ole)?:.*\]\]",  re.IGNORECASE)
+		self.toggle_r      = re.compile(r"\[\[t_r(ole)?:[\d,]+\]\]",   re.IGNORECASE)
+		self.add_r         = re.compile(r"\[\[add_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
+		self.rem_r         = re.compile(r"\[\[rem_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
+		self.react_r       = re.compile(r"\[\[react_r(ole)?:.*\]\]",   re.IGNORECASE)
+		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",       re.IGNORECASE)
 		self.not_in_chan   = re.compile(r"\[\[(!|not)in:[\d,]+\]\]",re.IGNORECASE)
+		self.role          = re.compile(r"\[\[role:[\d,]+\]\]",       re.IGNORECASE)
+		self.not_role      = re.compile(r"\[\[(!|not)role:[\d,]+\]\]",re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
 		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
 		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
 		self.check_comm    = re.compile(r"\[\[(check_)?(in_)?comm{1,2}(and)?s?\]\]",re.IGNORECASE)
 		self.match_time    = 0.025
 
-	async def _get_response(self, ctx, message, check_chan=True, is_command=False):
+	async def _get_response(self, ctx, message, check_chan=True, check_roles=True, is_command=False):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if is_command and message_responses:
 			# We have a valid command - let's check only
@@ -100,6 +102,26 @@ class Responses(commands.Cog):
 			response["channels"] = check_channels
 			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
 				continue
+			# Now do the same with the roles
+			try:
+				role_list = [int(x) for x in self.role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				roles_check = [x for x in map(ctx.guild.get_role,role_list)]
+			except:
+				roles_check = []
+			try:
+				role_list = [int(x) for x in self.not_role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				roles_skip = [x for x in map(ctx.guild.get_role,role_list)]
+			except:
+				roles_skip = []
+			if check_roles and (roles_check or roles_skip):
+				# Make sure we have all the required roles, and none of the ignored
+				# roles
+				if roles_check and not all(x in ctx.author.roles for x in roles_check):
+					continue
+				if roles_skip and any(x in ctx.author.roles for x in roles_skip):
+					continue
+			response["roles"] = roles_check
+			response["roles_skip"] = roles_skip
 			# Let's check for output channels
 			output_channels = []
 			try:
@@ -342,6 +364,8 @@ class Responses(commands.Cog):
 				self.react_r,
 				self.in_chan,
 				self.not_in_chan,
+				self.role,
+				self.not_role,
 				self.out_chan,
 				self.reply,
 				self.preply,
@@ -494,6 +518,10 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
 [[!in:id]]         = locks the check any but the comma-delimited channel ids passed
+[[role:id]]        = comma-delimited list of role ids required for the check
+[[!role:id]]       = comma-delimited list of ignored role ids exempt from the check
+                     - a user having an ignored role takes priority, even if they have
+					   a required role as well
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
                        the original channel where the response was triggered
@@ -609,6 +637,10 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
 [[timeout:#]]      = times the message author out for # seconds
 [[in:id]]          = locks the check to the comma-delimited channel ids passed
 [[!in:id]]         = locks the check any but the comma-delimited channel ids passed
+[[role:id]]        = comma-delimited list of role ids required for the check
+[[!role:id]]       = comma-delimited list of ignored role ids exempt from the check
+                     - a user having an ignored role takes priority, even if they have
+					   a required role as well
 [[out:id]]         = sets the output targets to the comma-delimited channel ids passed
                      - can also accept "dm" to dm the author, and "original" to send in
                        the original channel where the response was triggered
@@ -802,7 +834,7 @@ This would edit the first response trigger to respond by pinging the user and sa
 		if check_string == None: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
-		response = await self._get_response(ctx,check_string,check_chan=False)
+		response = await self._get_response(ctx,check_string,check_chan=False,check_roles=False)
 		catastrophies = None
 		if response.get("catastrophies"):
 			catastrophies = "\n".join(["**{}.** {}".format(i,Nullify.escape_all(x)) for i,x in enumerate(response["catastrophies"],start=1)])
@@ -832,6 +864,10 @@ This would edit the first response trigger to respond by pinging the user and sa
 		entries.append({"name":"Output Suppressed for Admin/Bot-Admin:","value":"Yes" if response.get("suppress") else "No"})
 		if response.get("channels"):
 			entries.append({"name":"Limited To:","value":"\n".join([x.mention for x in response["channels"]])})
+		if response.get("roles"):
+			entries.append({"name":"Required Roles:","value":"\n".join([x.mention for x in response["roles"]])})
+		if response.get("roles_skip"):
+			entries.append({"name":"Ignored Roles:","value":"\n".join([x.mention for x in response["roles_skip"]])})
 		if response.get("action") == "mute":
 			mute_time = "indefinitely" if not response.get("mute_time") else "for {:,} second{}".format(response["mute_time"],"" if response["mute_time"]==1 else "s")
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
