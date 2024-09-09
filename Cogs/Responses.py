@@ -45,10 +45,10 @@ class Responses(commands.Cog):
 		self.add_r         = re.compile(r"\[\[add_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
 		self.rem_r         = re.compile(r"\[\[rem_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
 		self.react_r       = re.compile(r"\[\[react_r(ole)?:.*\]\]",   re.IGNORECASE)
-		self.in_chan       = re.compile(r"\[\[in:[\d,]+\]\]",       re.IGNORECASE)
-		self.not_in_chan   = re.compile(r"\[\[(!|not)in:[\d,]+\]\]",re.IGNORECASE)
-		self.role          = re.compile(r"\[\[role:[\d,]+\]\]",       re.IGNORECASE)
-		self.not_role      = re.compile(r"\[\[(!|not)role:[\d,]+\]\]",re.IGNORECASE)
+		self.in_chan       = re.compile(r"\[\[in:(?P<ids>[\d,]+)\]\]",       re.IGNORECASE)
+		self.not_in_chan   = re.compile(r"\[\[(!|not)in:(?P<ids>[\d,]+)\]\]",re.IGNORECASE)
+		self.role          = re.compile(r"\[\[role:(?P<ids>[\d,]+)(:(?P<any_all>a(ny|ll)))?\]\]",re.IGNORECASE)
+		self.not_role      = re.compile(r"\[\[(!|not)role:(?P<ids>[\d,]+)\]\]",re.IGNORECASE)
 		self.out_chan      = re.compile(r"\[\[out:(\d,?|dm?,?|pm?,?|o(r|rig|rigin|riginal)?,?)+\]\]",re.IGNORECASE)
 		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
 		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
@@ -71,7 +71,7 @@ class Responses(commands.Cog):
 		content = message.replace("\n"," ") # Remove newlines for better matching
 		response = {}
 		start_time = time.perf_counter_ns()
-		for trigger,m in message_responses.items():
+		for i,(trigger,m) in enumerate(message_responses.items(),start=1):
 			check_time = time.perf_counter_ns()
 			try:
 				full_match = re.fullmatch(trigger, content, timeout=self.match_time)
@@ -80,17 +80,18 @@ class Responses(commands.Cog):
 				response["catastrophies"] = response.get("catastrophies",[])+[trigger]
 				continue
 			response["matched"] = trigger
+			response["index"] = i
 			response["match_time_ms"] = (time.perf_counter_ns()-check_time)/1000000
 			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
 			# Got a full match - build the message, send it and bail
 			# Let's check for a channel - and make sure we're searching there
 			try:
-				channel_list = [int(x) for x in self.in_chan.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				channel_list = [int(x) for x in self.in_chan.search(m).group("ids").split(",") if x]
 				check_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
 			except:
 				check_channels = []
 			try:
-				channel_list = [int(x) for x in self.not_in_chan.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				channel_list = [int(x) for x in self.not_in_chan.search(m).group("ids").split(",") if x]
 				skip_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
 			except:
 				skip_channels = []
@@ -103,13 +104,17 @@ class Responses(commands.Cog):
 			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
 				continue
 			# Now do the same with the roles
+			any_roles = False
 			try:
-				role_list = [int(x) for x in self.role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				role_match = self.role.search(m)
+				role_list = [int(x) for x in role_match.group("ids").split(",") if x]
 				roles_check = [x for x in map(ctx.guild.get_role,role_list) if x]
+				if role_match.group("any_all") and role_match.group("any_all").lower() == "any":
+					any_roles = True # We're allowing any roles in the passed list
 			except:
 				roles_check = []
 			try:
-				role_list = [int(x) for x in self.not_role.search(m).group(0).replace("]]","").split(":")[-1].split(",") if x]
+				role_list = [int(x) for x in self.not_role.search(m).group("ids").split(",") if x]
 				roles_skip = [x for x in map(ctx.guild.get_role,role_list) if x]
 			except:
 				roles_skip = []
@@ -118,10 +123,12 @@ class Responses(commands.Cog):
 			if check_roles and (roles_check or roles_skip):
 				# Make sure we have all the required roles, and none of the ignored
 				# roles
-				if roles_check and not all(x in ctx.author.roles for x in roles_check):
+				any_all = any if any_roles else all
+				if roles_check and not any_all(x in ctx.author.roles for x in roles_check):
 					continue
 				if roles_skip and any(x in ctx.author.roles for x in roles_skip):
 					continue
+			response["any_roles"] = any_roles
 			response["roles"] = roles_check
 			response["roles_skip"] = roles_skip
 			# Let's check for output channels
@@ -512,22 +519,24 @@ Reply options:
 
 Standard user behavioral flags (do not apply to admin/bot-admin):
 
-[[delete]]         = delete the original message
-[[ban]]            = bans the message author
-[[kick]]           = kicks the message author
-[[mute]]           = mutes the author indefinitely
-[[mute:#]]         = mutes the message author for # seconds
-[[timeout:#]]      = times the message author out for # seconds
-[[in:id]]          = locks the check to the comma-delimited channel ids passed
-[[!in:id]]         = locks the check any but the comma-delimited channel ids passed
-[[role:id]]        = comma-delimited list of role ids required for the check
-[[!role:id]]       = comma-delimited list of ignored role ids exempt from the check
-                     - a user having an ignored role takes priority, even if they have
-					   a required role as well
-[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
-                     - can also accept "dm" to dm the author, and "original" to send in
-                       the original channel where the response was triggered
-[[check_commands]] = checks within commands as well
+[[delete]]               = delete the original message
+[[ban]]                  = bans the message author
+[[kick]]                 = kicks the message author
+[[mute]]                 = mutes the author indefinitely
+[[mute:#]]               = mutes the message author for # seconds
+[[timeout:#]]            = times the message author out for # seconds
+[[in:id1,id2]]           = locks the check to the comma-delimited channel ids passed
+[[!in:id1,id2]]          = locks the check any but the comma-delimited channel ids passed
+[[role:id1,id2:any/all]] = comma-delimited list of role ids required for the check
+                          - can optionally take :any or :all to denote whether the user
+						    needs any of the roles, or all of them - defaults to :all
+[[!role:id1,id2]]        = comma-delimited list of ignored role ids exempt from the check
+                          - a user having an ignored role takes priority, even if they have
+					        a required role as well
+[[out:id1,id2]]          = sets the output targets to the comma-delimited channel ids passed
+                          - can also accept "dm" to dm the author, and "original" to send in
+                            the original channel where the response was triggered
+[[check_commands]]       = checks within commands as well
 
 User role options (roles must be setup per the UserRole cog):
 
@@ -568,7 +577,10 @@ This would look for a message starting with the whole word "test" or "hello ther
 		context = "Updated" if regex_trigger in message_responses else "Added new"
 		message_responses[regex_trigger] = response
 		self.settings.setServerStat(ctx.guild, "MessageResponses", message_responses)
-		return await ctx.send("{} response trigger!".format(context))
+		return await ctx.send("{} response trigger at position {:,}!".format(
+			context,
+			list(message_responses).index(regex_trigger)+1
+		))
 
 	@commands.command()
 	async def edittrigger(self, ctx, response_index = None, *, regex_trigger = None):
@@ -631,22 +643,24 @@ Reply options:
 
 Standard user behavioral flags (do not apply to admin/bot-admin):
 
-[[delete]]         = delete the original message
-[[ban]]            = bans the message author
-[[kick]]           = kicks the message author
-[[mute]]           = mutes the author indefinitely
-[[mute:#]]         = mutes the message author for # seconds
-[[timeout:#]]      = times the message author out for # seconds
-[[in:id]]          = locks the check to the comma-delimited channel ids passed
-[[!in:id]]         = locks the check any but the comma-delimited channel ids passed
-[[role:id]]        = comma-delimited list of role ids required for the check
-[[!role:id]]       = comma-delimited list of ignored role ids exempt from the check
-                     - a user having an ignored role takes priority, even if they have
-					   a required role as well
-[[out:id]]         = sets the output targets to the comma-delimited channel ids passed
-                     - can also accept "dm" to dm the author, and "original" to send in
-                       the original channel where the response was triggered
-[[check_commands]] = checks within commands as well
+[[delete]]               = delete the original message
+[[ban]]                  = bans the message author
+[[kick]]                 = kicks the message author
+[[mute]]                 = mutes the author indefinitely
+[[mute:#]]               = mutes the message author for # seconds
+[[timeout:#]]            = times the message author out for # seconds
+[[in:id1,id2]]           = locks the check to the comma-delimited channel ids passed
+[[!in:id1,id2]]          = locks the check any but the comma-delimited channel ids passed
+[[role:id1,id2:any/all]] = comma-delimited list of role ids required for the check
+                          - can optionally take :any or :all to denote whether the user
+						    needs any of the roles, or all of them - defaults to :all
+[[!role:id1,id2]]        = comma-delimited list of ignored role ids exempt from the check
+                          - a user having an ignored role takes priority, even if they have
+					        a required role as well
+[[out:id1,id2]]          = sets the output targets to the comma-delimited channel ids passed
+                          - can also accept "dm" to dm the author, and "original" to send in
+                            the original channel where the response was triggered
+[[check_commands]]       = checks within commands as well
 
 User role options (roles must be setup per the UserRole cog):
 
@@ -867,9 +881,9 @@ This would edit the first response trigger to respond by pinging the user and sa
 		if response.get("channels"):
 			entries.append({"name":"Limited To:","value":"\n".join([x.mention for x in response["channels"]])})
 		if response.get("roles"):
-			entries.append({"name":"Required Roles:","value":"\n".join([x.mention for x in response["roles"]])})
+			entries.append({"name":"Requires {} of the Following Roles:".format("Any" if response.get("any_roles") else "All"),"value":"\n".join([x.mention for x in response["roles"]])})
 		if response.get("roles_skip"):
-			entries.append({"name":"Ignored Roles:","value":"\n".join([x.mention for x in response["roles_skip"]])})
+			entries.append({"name":"Cannot Have Any of the Following Roles:","value":"\n".join([x.mention for x in response["roles_skip"]])})
 		if response.get("action") == "mute":
 			mute_time = "indefinitely" if not response.get("mute_time") else "for {:,} second{}".format(response["mute_time"],"" if response["mute_time"]==1 else "s")
 			entries.append({"name":"Action:","value":"Mute {}".format(mute_time)})
@@ -901,7 +915,15 @@ This would edit the first response trigger to respond by pinging the user and sa
 			entries.append({"name":"Output Targets:","value":"\n".join([x.mention for x in response["outputs"]])})
 		if catastrophies:
 			entries.append({"name":"Catastrophically Backtracked ({:,} total):".format(len(response["catastrophies"])),"value":catastrophies})
-		return await PickList.PagePicker(title="Matched Response",description=description,list=entries,ctx=ctx,footer="Matched in {:,} ms (total checks took {:,} ms)".format(response["match_time_ms"],response["total_time_ms"])).pick()
+		return await PickList.PagePicker(
+			title="Matched Response At Index {:,}".format(response["index"]),
+			description=description,
+			list=entries,
+			ctx=ctx,
+			footer="Matched in {:,} ms (total checks took {:,} ms)".format(
+				response["match_time_ms"],
+				response["total_time_ms"]
+			)).pick()
 
 	@commands.command(aliases=["getresponse"])
 	async def viewresponse(self, ctx, response_index = None):
