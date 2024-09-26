@@ -99,6 +99,7 @@ class Translate(commands.Cog):
         return value
 
     def _get_to_from(self, text, just_to=False):
+        to_code = from_code = None
         if not text or not isinstance(text,str):
             return (text,None,None)
         text = text.strip()
@@ -111,7 +112,7 @@ class Translate(commands.Cog):
                     text = text[:-len(word_list[-1])].strip()
                     word_list.pop()
             return (word_list,lang_code,text)
-        word_list,to_code,text   = get_lang(text.split(),text)
+        word_list,to_code,text = get_lang(text.split(),text)
         if not just_to:
             word_list,from_code,text = get_lang(word_list,text)
         # Return the remaining text, and any detected language codes
