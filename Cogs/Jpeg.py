@@ -31,7 +31,7 @@ class Jpeg(commands.Cog):
 		self.settings.setServerStat(server, "LastPicture", int(time.time()))
 		return True
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["jpg"])
 	async def jpeg(self, ctx, *, url = None):
 		"""MOAR JPEG!  Accepts a url - or picks the first attachment."""
 		if not self.canDisplay(ctx.guild):
