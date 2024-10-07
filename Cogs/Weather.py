@@ -64,13 +64,13 @@ class Weather(commands.Cog):
 		return self._check_float(int(temp)/10**round_to,round_to=0)
 
 	def _f_to_c(self, f):
-		return self._check_float((f-32)/1.8,round_to=1)
+		return self._check_float((f-32)/1.8,round_to=2)
 	def _c_to_f(self, c):
-		return self._check_float((c*1.8)+32,round_to=1)
+		return self._check_float((c*1.8)+32,round_to=2)
 	def _c_to_k(self, c):
-		return self._check_float(c+273,round_to=1)
+		return self._check_float(c+273.15,round_to=2)
 	def _k_to_c(self, k):
-		return self._check_float(k-273,round_to=1)
+		return self._check_float(k-273.15,round_to=2)
 	def _f_to_k(self, f):
 		return self._c_to_k(self._f_to_c(f))
 	def _k_to_f(self, k):
