@@ -26,9 +26,16 @@ class Time(commands.Cog):
 		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DST."""
 		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list of available TimeZones with `{}listtz`'.format(ctx.prefix, ctx.prefix)
 		if not tz:
+			# Get our current tz and report it when clearing - or give the usage
+			# if nothing was set
+			current_tz = self.settings.getGlobalUserStat(ctx.author, "TimeZone", None)
+			if not current_tz:
+				return await ctx.send(usage)
 			self.settings.setGlobalUserStat(ctx.author, "TimeZone", None)
-			await ctx.channel.send("*{}*, your TimeZone has been removed!".format(DisplayName.name(ctx.author)))
-			return
+			return await ctx.send("*{}*, your TimeZone (`{}`) has been removed!".format(
+				DisplayName.name(ctx.author),
+				current_tz
+			))
 		
 		not_found = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
 		# Let's get the timezone list
@@ -90,16 +97,16 @@ class Time(commands.Cog):
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
-				return await ctx.channel.send(msg)
+				return await ctx.send(msg)
 
 		# We got one
 		timezone = self.settings.getGlobalUserStat(member, "TimeZone")
 		if timezone is None:
 			msg = '*{}* hasn\'t set their TimeZone yet - they can do so with the `{}settz [Region/City]` command.'.format(DisplayName.name(member), ctx.prefix)
-			return await ctx.channel.send(msg)
+			return await ctx.send(msg)
 
 		msg = '*{}\'s* TimeZone is *{}*'.format(DisplayName.name(member), timezone)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 		
 	@commands.command()
@@ -109,7 +116,7 @@ class Time(commands.Cog):
 		if offset is None:
 			self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", None)
 			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
-			return await ctx.channel.send(msg)
+			return await ctx.send(msg)
 
 		offset = offset.replace('+', '')
 
@@ -121,11 +128,11 @@ class Time(commands.Cog):
 				hours = int(offset)
 				minutes = 0
 			except Exception:
-				return await ctx.channel.send('Offset has to be in +-H:M!')
+				return await ctx.send('Offset has to be in +-H:M!')
 		off = "{}:{}".format(hours, minutes)
 		self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", off)
 		msg = '*{}*, your UTC offset has been set to `{}`!'.format(DisplayName.name(ctx.message.author), off)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
 	@commands.command()
@@ -141,13 +148,13 @@ class Time(commands.Cog):
 			member = DisplayName.memberForName(memberName, ctx.message.guild)
 			if not member:
 				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
-				return await ctx.channel.send(msg)
+				return await ctx.send(msg)
 
 		# We got one
 		offset = self.settings.getGlobalUserStat(member, "UTCOffset")
 		if offset is None:
 			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
-			return await ctx.channel.send(msg)
+			return await ctx.send(msg)
 
 		# Split time string by : and get hour/minute values
 		try:
@@ -157,7 +164,7 @@ class Time(commands.Cog):
 				hours = int(offset)
 				minutes = 0
 			except Exception:
-				return await ctx.channel.send('Offset has to be in +-H:M!')
+				return await ctx.send('Offset has to be in +-H:M!')
 		
 		msg = 'UTC'
 		# Apply offset
@@ -169,7 +176,7 @@ class Time(commands.Cog):
 			msg += '{}'.format(offset)
 
 		msg = '*{}\'s* offset is *{}*'.format(DisplayName.name(member), msg)
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
 	def _process_12_or_24(self,member,yes_no,reverse=False):
@@ -231,7 +238,7 @@ class Time(commands.Cog):
 				ctx.prefix,
 				ctx.prefix,
 				self.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
-			return await ctx.channel.send(msg)
+			return await ctx.send(msg)
 
 		# At this point - we need to determine if we have an offset - or possibly a timezone passed
 		t = self.getTimeFromTZ(offset,strftime=strftime)
@@ -239,7 +246,7 @@ class Time(commands.Cog):
 			# We did not get an offset
 			t = self.getTimeFromOffset(offset,strftime=strftime)
 			if t is None:
-				return await ctx.channel.send("I couldn't find that TimeZone or offset!")
+				return await ctx.send("I couldn't find that TimeZone or offset!")
 		t["time"] = self.getClockForTime(t["time"])
 		if member:
 			msg = '{}; where *{}* is, it\'s currently *{}*'.format(t["zone"], DisplayName.name(member), t["time"])
@@ -247,7 +254,7 @@ class Time(commands.Cog):
 			msg = '{} is currently *{}*'.format(t["zone"], t["time"])
 		
 		# Say message
-		await ctx.channel.send(msg)
+		await ctx.send(msg)
 
 
 	def getClockForTime(self, time_string):
