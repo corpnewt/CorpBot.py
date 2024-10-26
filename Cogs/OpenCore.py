@@ -245,7 +245,7 @@ class OpenCore(commands.Cog):
 		alpha_num = str(alpha.index(alph.lower())).rjust(2, "0")
 		return int(start + alpha_num + end)
 			
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["nvidiaweb","webdrivers","webdriver"])
 	async def nvweb(self, ctx, os_build = None):
 		"""Prints the download url for the passed OS build number (if it exists).  If no build number is passed, prints the newest web driver link."""
 		# Get the current manifest
@@ -362,7 +362,7 @@ class OpenCore(commands.Cog):
 		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
 		return m or message
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def plist(self, ctx, *, url = None):
 		"""Validates plist file structure.  Accepts a url - or picks the first attachment."""
 		# Resolve the message and URL as needed
