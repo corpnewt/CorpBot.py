@@ -1,4 +1,4 @@
-import string, random, json, re
+import string, random, json, re, math
 from   urllib.parse import quote
 from   discord.ext import commands
 from   Cogs import Settings, PickList, Nullify, DL
@@ -18,6 +18,15 @@ class UrbanDict(commands.Cog):
 		self.settings = settings
 		self.ua = 'CorpNewt DeepThoughtBot'
 		self.regex = re.compile(r"\[[^\[\]]+\]")
+
+	def wilson_lower_bound(self, p, n, z=1.96):
+		if n == 0:
+			return 0
+		phat = p / n
+		denominator = 1 + z**2 / n
+		center = phat + z**2 / (2 * n)
+		radical = math.sqrt(phat * (1 - phat) * z**2 / n + z**4 / (4 * n**2))
+		return (center - radical) / denominator
 
 	async def _get_json_list(self, url):
 		try: json_data = await DL.async_json(url, headers = {'User-agent': self.ua})
@@ -46,7 +55,10 @@ class UrbanDict(commands.Cog):
 			words.append({
 				"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 				"value":self._format_definition(x),
-				"sort": float(x["thumbs_up"])/(float(x["thumbs_up"])+float(x["thumbs_down"])) if x["thumbs_up"]+x["thumbs_down"] > 0 else 0
+				"sort": self.wilson_lower_bound(
+					x["thumbs_up"],
+					x["thumbs_up"]+x["thumbs_down"]
+				)
 			})
 		# Sort the words by their "sort" value t_u / (t_u + t_d)
 		words.sort(key=lambda x:x["sort"],reverse=True)
