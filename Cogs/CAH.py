@@ -1285,7 +1285,7 @@ class CAH(commands.Cog):
         self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, newGame)))
         self.games.append(newGame)
         # Tell the user they created a new game and list its ID
-        await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
+        await ctx.channel.send('**You created game id:** ***{0}***\nOthers can join with: `{1}joincah {0}`'.format(gameID,ctx.prefix))
         await self.drawCards(ctx.message.author)
         # await self.showHand(ctx, ctx.message.author)
         # await self.nextPlay(ctx, newGame)
@@ -1372,7 +1372,7 @@ class CAH(commands.Cog):
                     self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, game)))
                     self.games.append(game)
                     # Tell the user they created a new game and list its ID
-                    await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
+                    await ctx.channel.send('**You created game id:** ***{0}***\nOthers can join with: `{1}joincah {0}`'.format(gameID,ctx.prefix))
                     isCreator = True
                 else:
                     # We found games with fewer than 10 members!
@@ -1391,7 +1391,7 @@ class CAH(commands.Cog):
             self.loop_list.append(self.bot.loop.create_task(self.checkCards(ctx, game)))
             self.games.append(game)
             # Tell the user they created a new game and list its ID
-            await ctx.channel.send('**You created game id:** ***{}***'.format(gameID))
+            await ctx.channel.send('**You created game id:** ***{0}***\nOthers can join with: `{1}joincah {0}`'.format(gameID,ctx.prefix))
             isCreator = True
 
         # Tell everyone else you joined
