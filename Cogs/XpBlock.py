@@ -1,13 +1,7 @@
-import asyncio
 import discord
-import time
-import random
-import re
-from   operator import itemgetter
-from   discord.ext import commands
-from   Cogs import Message
-from   Cogs import Nullify
-from   Cogs import DisplayName
+from operator import itemgetter
+from discord.ext import commands
+from Cogs import Message, Nullify, DisplayName
 
 def setup(bot):
 	# Add the bot and deps
@@ -44,7 +38,7 @@ class XpBlock(commands.Cog):
 			if not user_or_role:
 				is_user = False
 				# Check role
-				if roleName.lower() == "everyone" or roleName.lower() == "@everyone":
+				if roleName.lower() in ("everyone","@everyone"):
 					user_or_role = ctx.guild.default_role
 				else:
 					user_or_role = DisplayName.roleForName(roleName, ctx.guild)
@@ -54,22 +48,30 @@ class XpBlock(commands.Cog):
 				await ctx.message.channel.send(msg)
 				return
 		
-		# Check if they're admin or bot admin
-		if Utils.is_bot_admin(user_or_role):
+		# Check if they're admin
+		admin = Utils.is_admin(ctx,user_or_role)
+		if not admin:
+			# Not admin via permissions - check if we're bot admin
+			admin_array = self.settings.getServerStat(ctx.guild,"AdminArray",[])
+			if isinstance(user_or_role,discord.Role):
+				# Got a role, see if they're in the admin array - or have admin
+				admin = any(x["ID"]==user_or_role.id for x in admin_array)
+			elif isinstance(user_or_role,discord.Member):
+				# Got a member, see if they have any 
+				role_ids = [x.id for x in user_or_role.roles]
+				admin = any(x["ID"] in role_ids for x in admin_array)
+		if admin:
+			# Can't block admins - warn and bail
 			return await ctx.send("You can't block other admins with this command.")
-		if is_user:
-			ur_name = DisplayName.name(user_or_role)
-		else:
-			ur_name = Nullify.escape_all(user_or_role.name)
 
 		# Now we see if we already have that role in our list
-		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray", [])
 
 		for aRole in promoArray:
 			# Get the role that corresponds to the id
 			if str(aRole) == str(user_or_role.id):
 				# We found it - throw an error message and return
-				msg = '**{}** is already in the list.'.format(ur_name)
+				msg = '{} is already in the list.'.format(user_or_role.mention)
 				await ctx.message.channel.send(msg)
 				return
 
@@ -77,7 +79,7 @@ class XpBlock(commands.Cog):
 		promoArray.append(user_or_role.id)
 		self.settings.setServerStat(ctx.message.guild, "XpBlockArray", promoArray)
 
-		msg = '**{}** added to list.'.format(ur_name)
+		msg = '{} added to list.'.format(user_or_role.mention)
 		await ctx.message.channel.send(msg)
 		return
 		
@@ -88,7 +90,7 @@ class XpBlock(commands.Cog):
 
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		xparray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
+		xparray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray", [])
 		self.settings.setServerStat(ctx.message.guild, "XpBlockArray", [])
 		if len(xparray) == 1:
 			await ctx.send("*1* user/role unblocked from the xp system.")
@@ -132,7 +134,7 @@ class XpBlock(commands.Cog):
 			ur_name = Nullify.escape_all(user_or_role.name)
 
 		# If we're here - then the role is a real one
-		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray", [])
 
 		for aRole in promoArray:
 			# Check for Name
@@ -159,7 +161,7 @@ class XpBlock(commands.Cog):
 		else:
 			suppress = False
 
-		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray")
+		promoArray = self.settings.getServerStat(ctx.message.guild, "XpBlockArray", [])
 		
 		# rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
 		
