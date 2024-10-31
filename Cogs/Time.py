@@ -1,7 +1,4 @@
-import asyncio
-import discord
-import datetime
-import pytz
+import datetime, pytz
 from discord.ext import commands
 from Cogs import FuzzySearch, Settings, DisplayName, Message, Nullify, PickList
 
@@ -21,60 +18,93 @@ class Time(commands.Cog):
 		DisplayName = self.bot.get_cog("DisplayName")
 
 
+	def getstrftime(self, ctx):
+		use_24 = self.settings.getGlobalUserStat(ctx.author,"Use24HourFormat",False)
+		return "%H:%M" if use_24 else "%I:%M %p"
+
+
 	@commands.command()
 	async def settz(self, ctx, *, tz : str = None):
 		"""Sets your TimeZone - Overrides your UTC offset - and accounts for DST."""
-		usage = 'Usage: `{}settz [Region/City]`\nYou can get a list of available TimeZones with `{}listtz`'.format(ctx.prefix, ctx.prefix)
+		await self._settz(ctx,tz=tz)
+
+
+	@commands.command()
+	async def setbottz(self, ctx, *, tz : str = None):
+		"""Sets the bot's TimeZone - Overrides their UTC offset - and accounts for DST (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._settz(ctx,user=self.bot.user,tz=tz)
+
+
+	async def _settz(self, ctx, user = None, tz = None):
+		user = user or ctx.author
+		bot = "" if user==ctx.author else "bot"
 		if not tz:
-			# Get our current tz and report it when clearing - or give the usage
-			# if nothing was set
-			current_tz = self.settings.getGlobalUserStat(ctx.author, "TimeZone", None)
+			current_tz = self.settings.getGlobalUserStat(user, "TimeZone", None)
 			if not current_tz:
-				return await ctx.send(usage)
-			self.settings.setGlobalUserStat(ctx.author, "TimeZone", None)
-			return await ctx.send("*{}*, your TimeZone (`{}`) has been removed!".format(
-				DisplayName.name(ctx.author),
+				return await ctx.send(
+					'Usage: `{0}set{1}tz [Region/City]`\nYou can get a list of available TimeZones with `{0}listtz`'.format(ctx.prefix,bot)
+				)
+			self.settings.setGlobalUserStat(user, "TimeZone", None)
+			return await ctx.send("{} TimeZone (`{}`) has been removed!".format(
+				"My" if bot else "*{}*, your".format(DisplayName.name(user)),
 				current_tz
 			))
-		
+		strftime = self.getstrftime(ctx)
 		not_found = 'TimeZone `{}` not found!'.format(tz.replace('`', '\\`'))
 		# Let's get the timezone list
 		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
+		index = 0
+		message = None
 		if not tz_list[0]['Ratio'] == 1:
 			# Setup and display the picker
 			msg = not_found + '\nSelect one of the following close matches:'
+			items = []
+			for x in tz_list:
+				time = self.getTimeFromTZ(x["Item"],strftime=strftime)
+				if time: time = time["time"] # Extract the time
+				items.append("{} - {}".format(x["Item"],time or "Unknown"))
 			index, message = await PickList.Picker(
 				title=msg,
-				list=[x["Item"] for x in tz_list],
+				list=items,
 				ctx=ctx
 			).pick()
 			# Check if we errored/cancelled
 			if index < 0:
 				return await message.edit(content=not_found)
-			# We got a time zone
-			self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[index]['Item'])
-			return await message.edit(content="TimeZone set to `{}`!".format(tz_list[index]['Item']))
 		# We got a time zone
-		self.settings.setGlobalUserStat(ctx.author, "TimeZone", tz_list[0]['Item'])
-		msg = "TimeZone set to `{}`!".format(tz_list[0]['Item'])
-		message = await ctx.send(msg)
+		self.settings.setGlobalUserStat(user, "TimeZone", tz_list[index]['Item'])
+		time = self.getTimeFromTZ(tz_list[index]["Item"])
+		if time: time = self.getClockForTime(time["time"])
+		msg = "TimeZone set to `{}` - where it is currently *{}*!".format(
+			tz_list[index]['Item'],
+			time or "`Unknown`"
+		)
+		if message:
+			await message.edit(content=msg)
+		else:
+			await ctx.send(msg)
 
 	
 	@commands.command()
 	async def listtz(self, ctx, *, tz_search = None):
 		"""List all the supported TimeZones."""
-
 		msg = ""
+		strftime = self.getstrftime(ctx)
 		if not tz_search:
 			title = "Available TimeZones"
 			pad = len(str(len(pytz.all_timezones)))
 			for i,tz in enumerate(pytz.all_timezones,start=1):
-				msg += "{}. {}\n".format(str(i).rjust(pad),tz)
+				time = self.getTimeFromTZ(tz,strftime=strftime)
+				if time: time = time["time"] # Extract the time
+				msg += "{}. {} - {}\n".format(str(i).rjust(pad),tz,time or "Unknown")
 		else:
 			tz_list = FuzzySearch.search(tz_search, pytz.all_timezones)
 			title = "Top 3 TimeZone Matches"
 			for i,tz in enumerate(tz_list,start=1):
-				msg += "{}. {}\n".format(i,tz["Item"])
+				time = self.getTimeFromTZ(tz["Item"],strftime=strftime)
+				if time: time = time["time"] # Extract the time
+				msg += "{}. {} - {}\n".format(i,tz["Item"],time or "Unknown")
 
 		return await PickList.PagePicker(
 			title=title,
@@ -89,16 +119,14 @@ class Time(commands.Cog):
 	async def tz(self, ctx, *, member = None):
 		"""See a member's TimeZone."""
 		if member is None:
-			member = ctx.message.author
-
-		if type(member) == str:
+			member = ctx.author
+		if isinstance(member,str):
 			# Try to get a user first
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
 				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
 				return await ctx.send(msg)
-
 		# We got one
 		timezone = self.settings.getGlobalUserStat(member, "TimeZone")
 		if timezone is None:
@@ -112,14 +140,31 @@ class Time(commands.Cog):
 	@commands.command()
 	async def setoffset(self, ctx, *, offset : str = None):
 		"""Set your UTC offset."""
+		await self._setoffset(ctx,offset=offset)
 
+
+	@commands.command()
+	async def setbotoffset(self, ctx, *, offset : str = None):
+		"""Sets the bot's UTC offset (owner only)."""
+		if not await Utils.is_owner_reply(ctx): return
+		await self._setoffset(ctx,user=self.bot.user,offset=offset)
+
+
+	async def _setoffset(self, ctx, user = None, offset = None):
+		user = user or ctx.author
+		bot = "" if user==ctx.author else "bot"
 		if offset is None:
-			self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", None)
-			msg = '*{}*, your UTC offset has been removed!'.format(DisplayName.name(ctx.message.author))
-			return await ctx.send(msg)
-
+			current_offset = self.settings.getGlobalUserStat(user, "UTCOffset", None)
+			if not current_offset:
+				return await ctx.send(
+					'Usage: `{}set{}offset +-H:M`'.format(ctx.prefix,bot)
+				)
+			self.settings.setGlobalUserStat(user, "UTCOffset", None)
+			return await ctx.send("{} UTC offset (`{}`) has been removed!".format(
+				"My" if bot else "*{}*, your".format(DisplayName.name(user)),
+				current_offset
+			))
 		offset = offset.replace('+', '')
-
 		# Split time string by : and get hour/minute values
 		try:
 			hours, minutes = map(int, offset.split(':'))
@@ -129,33 +174,35 @@ class Time(commands.Cog):
 				minutes = 0
 			except Exception:
 				return await ctx.send('Offset has to be in +-H:M!')
+		strftime = self.getstrftime(ctx)
 		off = "{}:{}".format(hours, minutes)
-		self.settings.setGlobalUserStat(ctx.message.author, "UTCOffset", off)
-		msg = '*{}*, your UTC offset has been set to `{}`!'.format(DisplayName.name(ctx.message.author), off)
-		await ctx.send(msg)
+		self.settings.setGlobalUserStat(user, "UTCOffset", off)
+		time = self.getTimeFromOffset(offset,strftime=strftime)
+		if time: time = self.getClockForTime(time["time"])
+		return await ctx.send("{} UTC offset has been set to `{}` - where it is currently *{}*!".format(
+			"My" if bot else "*{}*, your".format(DisplayName.name(user)),
+			off,
+			time or "`Unknown`"
+		))
 
 
 	@commands.command()
 	async def offset(self, ctx, *, member = None):
 		"""See a member's UTC offset."""
-
 		if member is None:
-			member = ctx.message.author
-
+			member = ctx.author
 		if type(member) == str:
 			# Try to get a user first
 			memberName = member
-			member = DisplayName.memberForName(memberName, ctx.message.guild)
+			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
 				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
 				return await ctx.send(msg)
-
 		# We got one
 		offset = self.settings.getGlobalUserStat(member, "UTCOffset")
 		if offset is None:
 			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
 			return await ctx.send(msg)
-
 		# Split time string by : and get hour/minute values
 		try:
 			hours, minutes = map(int, offset.split(':'))
@@ -165,7 +212,6 @@ class Time(commands.Cog):
 				minutes = 0
 			except Exception:
 				return await ctx.send('Offset has to be in +-H:M!')
-		
 		msg = 'UTC'
 		# Apply offset
 		if hours > 0:
@@ -201,14 +247,12 @@ class Time(commands.Cog):
 	@commands.command()
 	async def use24(self, ctx, *, yes_no = None):
 		"""Gets or sets whether or not you'd like time results in 24-hour format."""
-
 		await ctx.send(self._process_12_or_24(ctx.author,yes_no))
 
 
 	@commands.command()
 	async def use12(self, ctx, *, yes_no = None):
 		"""Gets or sets whether or not you'd like time results in 12-hour format."""
-
 		await ctx.send(self._process_12_or_24(ctx.author,yes_no,reverse=True))
 
 
@@ -217,29 +261,24 @@ class Time(commands.Cog):
 		"""Get UTC time +- an offset."""
 		timezone = None
 		if offset is None:
-			member = ctx.message.author
+			member = ctx.author
 		else:
 			# Try to get a user first
-			member = DisplayName.memberForName(offset, ctx.message.guild)
-
-		use_24 = self.settings.getGlobalUserStat(ctx.author,"Use24HourFormat",False)
-		strftime = "%H:%M" if use_24 else "%I:%M %p"
-
+			member = DisplayName.memberForName(offset, ctx.guild)
+		strftime = self.getstrftime(ctx)
 		if member:
 			# We got one
 			# Check for timezone first
 			offset = self.settings.getGlobalUserStat(member, "TimeZone")
 			if offset is None:
 				offset = self.settings.getGlobalUserStat(member, "UTCOffset")
-		
 		if offset is None:
-			msg = '*{}* hasn\'t set their TimeZone or offset yet - they can do so with the `{}setoffset [+-offset]` or `{}settz [Region/City]` command.\nThe current UTC time is *{}*.'.format(
-				DisplayName.name(member),
+			msg = '{0} TimeZone or offset yet - they can do so with the `{1}set{2}offset [+-offset]` or `{1}set{2}tz [Region/City]` command.\nThe current UTC time is *{3}*.'.format(
+				"My owners have not set my" if member.id==self.bot.user.id else "*{}* hasn't set their".format(DisplayName.name(member)),
 				ctx.prefix,
-				ctx.prefix,
+				"bot" if member.id==self.bot.user.id else "",
 				self.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
 			return await ctx.send(msg)
-
 		# At this point - we need to determine if we have an offset - or possibly a timezone passed
 		t = self.getTimeFromTZ(offset,strftime=strftime)
 		if t is None:
@@ -249,10 +288,16 @@ class Time(commands.Cog):
 				return await ctx.send("I couldn't find that TimeZone or offset!")
 		t["time"] = self.getClockForTime(t["time"])
 		if member:
-			msg = '{}; where *{}* is, it\'s currently *{}*'.format(t["zone"], DisplayName.name(member), t["time"])
+			msg = "{}; where {}, it's currently *{}*".format(
+				t["zone"],
+				"I am" if member.id==self.bot.user.id else "*{}* is".format(DisplayName.name(member)),
+				t["time"]
+			)
 		else:
-			msg = '{} is currently *{}*'.format(t["zone"], t["time"])
-		
+			msg = "{} is currently *{}*".format(
+				t["zone"],
+				t["time"]
+			)
 		# Say message
 		await ctx.send(msg)
 
@@ -304,19 +349,23 @@ class Time(commands.Cog):
 		else:
 			# No offset
 			newTime = t
-		return { "zone" : msg, "time" : newTime.strftime(strftime or "%I:%M %p") }
+		return {
+			"zone":msg,
+			"time":newTime.strftime(strftime or "%I:%M %p")
+		}
 
 
-	def getTimeFromTZ(self, tz, t = None, strftime = None):
-		# Assume sanitized zones - as they're pulled from pytz
-		# Let's get the timezone list
-		tz_list = FuzzySearch.search(tz, pytz.all_timezones, None, 3)
-		if not tz_list[0]['Ratio'] == 1:
-			# We didn't find a complete match
+	def getTimeFromTZ(self, tz, t = None, strftime = None, search = True):
+		try:
+			zone = pytz.timezone(tz)
+			assert zone
+		except Exception:
 			return None
-		zone = pytz.timezone(tz_list[0]['Item'])
 		if t is None:
 			zone_now = datetime.datetime.now(zone)
 		else:
 			zone_now = t.astimezone(zone)
-		return { "zone" : tz_list[0]['Item'], "time" : zone_now.strftime(strftime or "%I:%M %p") }
+		return {
+			"zone":tz,
+			"time":zone_now.strftime(strftime or "%I:%M %p")
+		}
