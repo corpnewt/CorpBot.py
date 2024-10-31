@@ -460,7 +460,7 @@ class Bot(commands.Cog):
 		return await ctx.send("Username updated - may take some time to show!")
 
 	# Needs rewrite!
-	@commands.command()
+	@commands.command(aliases=["restart"])
 	async def reboot(self, ctx, *, install_or_update=None):
 		"""Reboots the bot (owner only).  Can optionally take install or update as arguments to clear and install dependencies, or update existing as needed."""
 		if not await Utils.is_owner_reply(ctx): return
