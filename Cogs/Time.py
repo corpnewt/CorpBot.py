@@ -76,7 +76,8 @@ class Time(commands.Cog):
 		self.settings.setGlobalUserStat(user, "TimeZone", tz_list[index]['Item'])
 		time = self.getTimeFromTZ(tz_list[index]["Item"])
 		if time: time = self.getClockForTime(time["time"])
-		msg = "TimeZone set to `{}` - where it is currently *{}*!".format(
+		msg = "{} TimeZone set to `{}` - where it is currently *{}*!".format(
+			"My" if bot else "*{}*, your".format(DisplayName.name(user)),
 			tz_list[index]['Item'],
 			time or "`Unknown`"
 		)
@@ -125,16 +126,25 @@ class Time(commands.Cog):
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
+				msg = "Couldn't find user *{}*.".format(Nullify.escape_all(memberName))
 				return await ctx.send(msg)
 		# We got one
+		strftime = self.getstrftime(ctx)
 		timezone = self.settings.getGlobalUserStat(member, "TimeZone")
 		if timezone is None:
-			msg = '*{}* hasn\'t set their TimeZone yet - they can do so with the `{}settz [Region/City]` command.'.format(DisplayName.name(member), ctx.prefix)
-			return await ctx.send(msg)
-
-		msg = '*{}\'s* TimeZone is *{}*'.format(DisplayName.name(member), timezone)
-		await ctx.send(msg)
+			return await ctx.send('{0} TimeZone yet - they can do so with the `{1}set{2}tz [Region/City]` command.\nYou can get a list of available TimeZones with `{1}listtz`\nThe current UTC time is *{3}*.'.format(
+				"My owners have not set my" if member.id==self.bot.user.id else "*{}* hasn't set their".format(DisplayName.name(member)),
+				ctx.prefix,
+				"bot" if member.id==self.bot.user.id else "",
+				self.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
+			)
+		time = self.getTimeFromTZ(timezone)
+		if time: time = self.getClockForTime(time["time"])
+		await ctx.send("{} TimeZone is *{}* - where it is currently *{}*!".format(
+			"My" if member.id==self.bot.user.id else "*{}'s*".format(DisplayName.name(member)),
+			timezone,
+			time
+		))
 
 		
 	@commands.command()
@@ -164,26 +174,46 @@ class Time(commands.Cog):
 				"My" if bot else "*{}*, your".format(DisplayName.name(user)),
 				current_offset
 			))
-		offset = offset.replace('+', '')
-		# Split time string by : and get hour/minute values
-		try:
-			hours, minutes = map(int, offset.split(':'))
-		except Exception:
-			try:
-				hours = int(offset)
-				minutes = 0
-			except Exception:
-				return await ctx.send('Offset has to be in +-H:M!')
+		off = self._format_offset(offset,utc_prefix=False)
+		if off is None:
+			return await ctx.send('Offset has to be in +-H:M!')
 		strftime = self.getstrftime(ctx)
-		off = "{}:{}".format(hours, minutes)
 		self.settings.setGlobalUserStat(user, "UTCOffset", off)
 		time = self.getTimeFromOffset(offset,strftime=strftime)
 		if time: time = self.getClockForTime(time["time"])
 		return await ctx.send("{} UTC offset has been set to `{}` - where it is currently *{}*!".format(
 			"My" if bot else "*{}*, your".format(DisplayName.name(user)),
-			off,
+			self._format_offset(off,utc_prefix=False),
 			time or "`Unknown`"
 		))
+
+
+	def _format_offset(self, offset, as_string=True, utc_prefix=True):
+		# Formats a +-HH:MM string offset to UTC(+-HH:MM)
+		offset = offset.replace("+","")
+		try:
+			hours,minutes = map(int,offset.split(":"))
+		except Exception:
+			try:
+				hours = int(offset)
+				minutes = 0
+			except:
+				return None
+		# Ensure only hours can be negative
+		if minutes < 0: minutes *= -1
+		if not as_string:
+			# Just getting the hour/minute tuple
+			return (hours,minutes)
+		# Need to format the string
+		if hours == minutes == 0:
+			# Just return UTC
+			return "UTC+0:0" if utc_prefix else "0:0"
+		else:
+			return "{}{}:{}".format(
+				("UTC+" if hours >= 0 else "UTC") if utc_prefix else "",
+				hours,
+				minutes
+			)
 
 
 	@commands.command()
@@ -191,38 +221,36 @@ class Time(commands.Cog):
 		"""See a member's UTC offset."""
 		if member is None:
 			member = ctx.author
-		if type(member) == str:
+		if isinstance(member,str):
 			# Try to get a user first
 			memberName = member
 			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
-				msg = 'Couldn\'t find user *{}*.'.format(Nullify.escape_all(memberName))
+				msg = "Couldn't find user *{}*.".format(Nullify.escape_all(memberName))
 				return await ctx.send(msg)
 		# We got one
 		offset = self.settings.getGlobalUserStat(member, "UTCOffset")
+		if offset:
+			h_m = self._format_offset(offset,as_string=False)
+			if h_m is None:
+				# Bad value saved
+				offset = None
+		strftime = self.getstrftime(ctx)
 		if offset is None:
-			msg = '*{}* hasn\'t set their offset yet - they can do so with the `{}setoffset [+-offset]` command.'.format(DisplayName.name(member), ctx.prefix)
-			return await ctx.send(msg)
-		# Split time string by : and get hour/minute values
-		try:
-			hours, minutes = map(int, offset.split(':'))
-		except Exception:
-			try:
-				hours = int(offset)
-				minutes = 0
-			except Exception:
-				return await ctx.send('Offset has to be in +-H:M!')
-		msg = 'UTC'
-		# Apply offset
-		if hours > 0:
-			# Apply positive offset
-			msg += '+{}'.format(offset)
-		elif hours < 0:
-			# Apply negative offset
-			msg += '{}'.format(offset)
-
-		msg = '*{}\'s* offset is *{}*'.format(DisplayName.name(member), msg)
-		await ctx.send(msg)
+			return await ctx.send('{} offset yet - they can do so with the `{}set{}offset [+-offset]` command.\nThe current UTC time is *{}*.'.format(
+				"My owners have not set my" if member.id==self.bot.user.id else "*{}* hasn't set their".format(DisplayName.name(member)),
+				ctx.prefix,
+				"bot" if member.id==self.bot.user.id else "",
+				self.getClockForTime(datetime.datetime.utcnow().strftime(strftime)))
+			)
+		offset = self._format_offset(offset)
+		time = self.getTimeFromOffset("{}:{}".format(*h_m),strftime=strftime)
+		if time: time = self.getClockForTime(time["time"])
+		await ctx.send("{} offset is *{}* - where it is currently *{}*!".format(
+			"My" if member.id==self.bot.user.id else "*{}'s*".format(DisplayName.name(member)),
+			offset,
+			time or "Unknown"
+		))
 
 
 	def _process_12_or_24(self,member,yes_no,reverse=False):
