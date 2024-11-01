@@ -336,6 +336,8 @@ class Time(commands.Cog):
 			hour,minute = map(int,t.split(":"))
 			if hour > 12:
 				hour -= 12
+			if hour == 0:
+				hour = 12
 		except:
 			return time_string
 		clock_string = ""
