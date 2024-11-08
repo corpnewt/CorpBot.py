@@ -875,7 +875,7 @@ class Xp(commands.Cog):
 		return await self._show_xp(ctx,reverse=False)
 		
 	# List the xp and xp reserve of a user
-	@commands.command(pass_context=True)
+	@commands.command(pass_context=True, aliases=["whois"])
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
 		
