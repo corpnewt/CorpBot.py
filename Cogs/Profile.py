@@ -24,6 +24,8 @@ class Profile(commands.Cog):
 	@commands.command(aliases=["newprofile"])
 	async def addprofile(self, ctx, name = None, *, link = None):
 		"""Add a profile to your profile list."""
+		if not ctx.guild:
+			return await ctx.send("Profiles cannot be set in dm!")
 		# Remove tabs, newlines, and carriage returns and strip leading/trailing spaces from the name
 		name = None if name is None else name.replace("\n"," ").replace("\r","").replace("\t"," ").strip()
 		if name is None or link is None:
