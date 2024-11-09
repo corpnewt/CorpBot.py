@@ -42,6 +42,8 @@ class OpenCore(commands.Cog):
 		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.nv_link = "https://gfe.nvidia.com/mac-update"
+		self.auto_tool_wait_time = 86400 # Default of 24 hours (86400 seconds)
+		self.auto_tool_descriptions = {}
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
@@ -65,9 +67,30 @@ class OpenCore(commands.Cog):
 		self._load_local()
 		self._load_local_sample()
 		self._load_local_alc()
+		self._load_local_atd()
 		# Start the update loops
 		self.bot.loop.create_task(self.update_tex())
 		self.bot.loop.create_task(self.update_alc())
+		self.bot.loop.create_task(self.update_atd())
+
+	async def update_atd(self):
+		print("Starting Auto-Tool Description update loop - repeats every {:,} second{}...".format(
+			self.auto_tool_wait_time,
+			"" if self.auto_tool_wait_time==1 else "s"
+		))
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed():
+			if not self.is_current:
+				# Bail if we're not the current instance
+				return
+			t = time.time()
+			print("Updating AutoToolDescriptions.plist: {}".format(datetime.datetime.now().time().isoformat()))
+			if not await self._dl_atd():
+				print("Could not download AutoToolDescriptions.plist!")
+				if self._load_local_atd():
+					print(" - Falling back on local copy!")
+			print("Auto-Tool Descriptions - took {:,} seconds.".format(time.time()-t))
+			await asyncio.sleep(self.alc_wait_time)
 
 	async def update_tex(self):
 		print("Starting Configuration.tex|Sample.plist update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
@@ -76,6 +99,7 @@ class OpenCore(commands.Cog):
 			if not self.is_current:
 				# Bail if we're not the current instance
 				return
+			t = time.time()
 			print("Updating Configuration.tex|Sample.plist: {}".format(datetime.datetime.now().time().isoformat()))
 			if not await self._dl_tex():
 				print("Could not download Configuration.tex!")
@@ -85,6 +109,7 @@ class OpenCore(commands.Cog):
 				print("Could not download Sample.plist!")
 				if self._load_local_sample():
 					print(" - Falling back on local copy!")
+			print("Configuration.tex|Sample.plist - took {:,} seconds.".format(time.time()-t))
 			await asyncio.sleep(self.wait_time)
 
 	async def update_alc(self):
@@ -135,6 +160,15 @@ class OpenCore(commands.Cog):
 		except: return False
 		return True
 
+	def _load_local_atd(self):
+		if not os.path.exists("AutoToolDescriptions.plist"): return False
+		# Try to load it
+		try:
+			with open("AutoToolDescriptions.plist","rb") as f:
+				self.auto_tool_descriptions = plistlib.load(f)
+		except: return False
+		return True
+
 	async def _dl_tex(self):
 		try: self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
 		except: return False
@@ -178,6 +212,34 @@ class OpenCore(commands.Cog):
 			return False
 		plistlib.dump(codecs,open("AppleALCCodecs.plist","wb"))
 		self.alc_codecs = codecs
+		return True
+
+	async def _dl_atd(self):
+		auto_tool_urls = (
+			(("ACPI","Add"),"https://raw.githubusercontent.com/lzhoang2801/OpCore-Simplify/refs/heads/main/Scripts/datasets/acpi_patch_data.py"),
+			(("Kernel","Add"),"https://raw.githubusercontent.com/lzhoang2801/OpCore-Simplify/refs/heads/main/Scripts/datasets/kext_data.py")
+		)
+		descriptions = {}
+		try:
+			for path,url in auto_tool_urls:
+				try: resources = await DL.async_text(url)
+				except: continue
+				if not resources:
+					continue
+				# Ensure the path in the target
+				last = descriptions
+				for i,p in enumerate(path,start=1):
+					if not p in last:
+						last[p] = {} if i < len(path) else []
+					last = last[p]
+				for line in resources.split("\n"):
+					if 'description' in line and '"' in line:
+						try: last.append(line.split('"')[1])
+						except: continue
+		except:
+			return False
+		plistlib.dump(descriptions,open("AutoToolDescriptions.plist","wb"))
+		self.auto_tool_descriptions = descriptions
 		return True
 
 	def _parse_sample(self):
@@ -427,9 +489,22 @@ class OpenCore(commands.Cog):
 			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers,booter_q,boot_args,boot_args_d)):
 				desc = "\\- Appears to belong to OpenCore"
 				# Regex slightly adjusted from here: https://github.com/ocwebutils/sc_rules
+				names = []
 				if any((re.match(r"^([Vv]\d+\.\d+(\.\d+)?(\s*\|\s*.+)?).*",x["Comment"]) for x in kernel_add if isinstance(x.get("Comment"),str))):
-					foot += " | May have been edited with a configurator"
+					names.append("configurator")
 
+				# Auto-tool detection
+				try: auto_tool_acpi = [x for x in plist_data.get("ACPI",{}).get("Add",[]) if isinstance(x,dict) and x.get("Comment") in self.auto_tool_descriptions["ACPI"]["Add"]]
+				except: auto_tool_acpi = []
+				try: auto_tool_kernel = [x for x in plist_data.get("Kernel",{}).get("Add",[]) if isinstance(x,dict) and x.get("Comment") in self.auto_tool_descriptions["Kernel"]["Add"]]
+				except: auto_tool_kernel = []
+				if auto_tool_acpi or auto_tool_kernel:
+					names.append("auto-tool")
+				if names:
+					name_string = names[0] if len(names)==1 else ", ".join(names[:-1]) + " and " + names[-1]
+					foot += " | Possible {}".format(
+						name_string
+					)
 				# Get the totals as well
 				aa_total = ap_total = ka_total = kp_total = mt_total = ud_total = 0
 				try: aa_total = len(plist_data.get("ACPI",{}).get("Add",[]))
