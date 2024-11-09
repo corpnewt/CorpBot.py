@@ -533,6 +533,9 @@ class Settings(commands.Cog):
 	# User Stats
 
 	def getUserStat(self, user, server, stat, default = None):
+		if any((x is None for x in (user,server,stat))):
+			# Missing info - just return the default
+			return default
 		# Get user stat - but set up a default in case of some settings
 		out = self.pd.get_user(user, server, stat, default)
 		if out != None:
@@ -551,19 +554,27 @@ class Settings(commands.Cog):
 		return test
 
 	def setUserStat(self, user, server, stat, value):
+		if any((x is None for x in (user,server,stat))):
+			# Missing info - just return None
+			return None
 		return self.pd.set_user(user, server, stat, value)
 
 	def delUserStat(self, user, server, stat):
+		if any((x is None for x in (user,server,stat))):
+			# Missing info - just return None
+			return None
 		return self.pd.del_user(user, server, stat)
 					
 	# Increment a specified user stat by a provided amount
 	# returns the stat post-increment, or None if error
 	def incrementStat(self, user, server, stat, incrementAmount):
+		if any((x is None for x in (user,server,stat))) or not isinstance(incrementAmount,(int,float)):
+			# Missing info - just return None
+			return None
 		# Get initial value - set to 0 if doesn't exist
 		out = self.getUserStat(user, server, stat)
-		out = 0 if not out else out
-		self.setUserStat(user, server, stat, out+incrementAmount)
-		return out+incrementAmount
+		out = 0 if not isinstance(out,(int,float)) else out
+		return self.setUserStat(user, server, stat, out + incrementAmount)
 
 	@commands.command(aliases=["recheckdefaultroles"])
 	async def verifydefaultroles(self, ctx):
