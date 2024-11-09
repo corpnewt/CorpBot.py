@@ -424,6 +424,17 @@ class OpenCore(commands.Cog):
 		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
 		return m or message
 
+	@commands.command(aliases=["updateatd"])
+	async def getatd(self, ctx):
+		"""Forces an update of the in-memory AutoToolDescriptions.plist file (owner only)."""
+
+		if not await Utils.is_owner_reply(ctx): return
+		message = await ctx.send("Updating AutoToolDescriptions.plist...")
+		atd_text = "Successfully updated AutoToolDescriptions.plist"
+		if not await self._dl_atd():
+			atd_text = "Failed to update AutoToolDescriptions.plist{}!".format(" - falling back on local copy" if self._load_local_atd() else "")
+		await message.edit(content=atd_text)
+
 	@commands.command()
 	async def plist(self, ctx, *, url = None):
 		"""Validates plist file structure.  Accepts a url - or picks the first attachment."""
