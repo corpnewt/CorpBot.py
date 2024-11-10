@@ -226,7 +226,7 @@ class Admin(commands.Cog):
 		await CheckRoles.checkroles(member, channel, self.settings, self.bot)
 
 
-	@commands.command()
+	@commands.command(aliases=["setxpr"])
 	async def setxpreserve(self, ctx, *, member = None, xpAmount : int = None):
 		"""Set's an absolute value for the member's xp reserve (admin only)."""
 		
