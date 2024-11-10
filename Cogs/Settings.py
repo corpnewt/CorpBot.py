@@ -735,12 +735,13 @@ class Settings(commands.Cog):
 		if stat is None:
 			return await ctx.send(usage)
 		if member is None or (not Utils.is_bot_admin(ctx) and member):
+			if member is not None:
+				stat = "{} {}".format(stat,member)
 			member = ctx.author
-		if type(member) is str:
-			try:
-				member = discord.utils.get(ctx.guild.members, name=member)
-			except:
-				return await ctx.send("That member does not exist")
+		if isinstance(member,str):
+			member = DisplayName.memberForName(member,ctx.guild)
+			if not member:
+				return await ctx.send("I could not find that member")
 		if member is None:
 			return await ctx.send(usage)
 		try:
