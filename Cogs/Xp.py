@@ -937,7 +937,7 @@ class Xp(commands.Cog):
 		created = "Unknown"
 		if getattr(member,"created_at",None) != None:
 			ts = int(member.created_at.timestamp())
-			created = "<t:{}> (<t:{}:R>)".format(ts,ts)
+			created = "<t:{0}> (<t:{0}:R>)".format(ts)
 		stat_embed.description = "Created {}".format(created)
 
 		member_name = getattr(member,"global_name",None) or member.name
@@ -1004,7 +1004,7 @@ class Xp(commands.Cog):
 			joined = join_pos = "Unknown"
 			if getattr(member,"joined_at",None):
 				ts = int(member.joined_at.timestamp())
-				joined = "<t:{}> (<t:{}:R>)".format(ts,ts)
+				joined = "<t:{0}> (<t:{0}:R>)".format(ts)
 				joinedList = sorted([{"ID":mem.id,"Joined":mem.joined_at} for mem in getattr(server,"members",[])], key=lambda x:x["Joined"].timestamp() if x["Joined"] != None else -1)
 				try:
 					check_item = { "ID" : member.id, "Joined" : member.joined_at }
@@ -1023,7 +1023,7 @@ class Xp(commands.Cog):
 
 			if getattr(member,"premium_since",None) != None:
 				ts = int(member.premium_since.timestamp())
-				boosted = "<t:{}> (<t:{}:R>)".format(ts,ts)
+				boosted = "<t:{0}> (<t:{0}:R>)".format(ts)
 				stat_embed.add_field(name="Boosting Since",value=boosted,inline=False)
 
 		# Get User Name (and ID if not migrated)
@@ -1054,6 +1054,15 @@ class Xp(commands.Cog):
 			}
 			play_string = play_dict.get(member.activity.type,"Playing")
 			stat_embed.add_field(name=play_string, value=str(member.activity.name), inline=False)
+			activity_start = getattr(member.activity,"start",None)
+			if activity_start:
+				# Strip out "to" and "in" from the play string for the "Since" value
+				since_string = " ".join([x for x in play_string.split() if len(x) > 2])
+				stat_embed.add_field(
+					name="{} Since".format(since_string),
+					value="<t:{0}> (<t:{0}:R>)".format(int(activity_start.timestamp())),
+					inline=False
+				)
 			if member.activity.type == discord.ActivityType.streaming:
 				# Add the URL too
 				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=False)
