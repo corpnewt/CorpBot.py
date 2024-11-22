@@ -110,8 +110,10 @@ class Roller:
         for roll in rolls:
             out = RollParser(roll=roll).parse()
             if out == INVALID: return INVALID
-            if out["dice"] > self.max_dice: return MAX_DICE
-            if out["sides"] > self.max_sides: return MAX_SIDES
+            # Clamp the dice and side counts to a valid range of
+            # 1 -> max
+            out["dice"]  = max(1,min(out["dice"],self.max_dice))
+            out["sides"] = max(1,min(out["sides"],self.max_sides))
             out["roll_string"] = self._string_from_roll(out)
             # Actually roll the dice
             roll_list = [self._roll(out)]
@@ -159,16 +161,24 @@ class Dice(commands.Cog):
     '''
     The Dice class exists to roll dice for table top games like Dungeons and Dragons.
     '''
-    @commands.command()
+    @commands.command(aliases=["dice"])
     async def roll(self, ctx, *, dice = None):
-        """Performs up to 10 space-delimited dice rolls in NdN±Na|d format."""
+        """Performs up to 10 space-delimited dice rolls in XdY±Za|d format where:
+        X   = The number of dice to roll
+        Y   = The number of faces per die
+        ±Z  = Add or subtract the passed modifier
+        a|d = Advantage (roll twice and take the better rolle) or Disadvantage (roll twice and take the worse roll)
+
+        e.g To roll 2 6-sided dice (with advantage), then subtract 5 from the total, you could do:
+        $roll 2d6-5a
+        """
         # Display the table then wait for a reaction
         d = Roller()
         r = d.roll(dice)
         if r == MAX_ROLLS: return await ctx.send("I can only perform {:,} roll{} at a time!".format(d.max_rolls,"" if d.max_rolls == 1 else "s"))
         if r == MAX_DICE:  return await ctx.send("I can only roll up to {:,} dice per roll!".format(d.max_dice))
         if r == MAX_SIDES: return await ctx.send("I can only roll dice with up to {:,} face{} per roll!".format(d.max_sides,"" if d.max_sides == 1 else "s"))
-        if r == INVALID: return await ctx.send("Dice rolls must be in `NdN±Na|d` format!  Rolling a single d10 with a -5 modifier and disadvantage would look like: `{}roll 1d10-5d`".format(ctx.prefix))
+        if r == INVALID: return await ctx.send("Dice rolls must be in `XdY±Za|d` format!  Rolling a single d10 with a -5 modifier and disadvantage would look like: `{}roll 1d10-5d`".format(ctx.prefix))
         message = None
         while True:
             index, message = await PickList.Picker(list=d.rolls_list(r), title="Pick a roll to show details:", ctx=ctx, timeout=300, message=message).pick()
