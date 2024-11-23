@@ -1,8 +1,4 @@
-import asyncio
-import discord
-import datetime
-import time
-import random
+import asyncio, discord, datetime, time, random
 from   discord.ext import commands
 from   Cogs import Settings, DisplayName, Nullify, CheckRoles, Message, PickList
 
@@ -239,7 +235,7 @@ class Xp(commands.Cog):
 		print("XP Done - took {} seconds.".format(time.time() - t))
 		return responses
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xp(self, ctx, *, member = None, xpAmount : int = None):
 		"""Gift xp to other members."""
 
@@ -503,7 +499,7 @@ class Xp(commands.Cog):
 		msg = 'xp Error: {}'.format(error)
 		await ctx.channel.send(msg)'''
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def defaultrole(self, ctx):
 		"""Lists the default role that new users are assigned."""
 
@@ -528,7 +524,7 @@ class Xp(commands.Cog):
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await ctx.message.channel.send(msg)
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def gamble(self, ctx, bet = None):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
@@ -654,7 +650,7 @@ class Xp(commands.Cog):
 			
 		await ctx.message.channel.send(msg)
 			
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def recheckroles(self, ctx):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
@@ -700,7 +696,7 @@ class Xp(commands.Cog):
 			await message.edit(content='Done checking roles.\n\n*{:,} users* updated.'.format(changeCount))
 			#await channel.send('Done checking roles.\n\n*{} users* updated.'.format(changeCount))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def recheckrole(self, ctx, *, user : discord.Member = None):
 		"""Re-iterate through all members and assign the proper roles based on their xp (admin only)."""
 
@@ -726,7 +722,7 @@ class Xp(commands.Cog):
 
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def listxproles(self, ctx):
 		"""Lists all roles, id's, and xp requirements for the xp promotion/demotion system."""
 		# Get the array
@@ -783,7 +779,7 @@ class Xp(commands.Cog):
 			ctx=ctx
 		).pick()		
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rank(self, ctx, *, member = None):
 		"""Say the highest rank of a listed member."""
 
@@ -863,19 +859,19 @@ class Xp(commands.Cog):
 		).pick()
 
 	# List the top 10 xp-holders
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def leaderboard(self, ctx):
 		"""List the top xp-holders."""
 		return await self._show_xp(ctx,reverse=True)
 		
 	# List the top 10 xp-holders
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def bottomxp(self, ctx):
 		"""List the bottom xp-holders."""
 		return await self._show_xp(ctx,reverse=False)
 		
 	# List the xp and xp reserve of a user
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def stats(self, ctx, *, member= None):
 		"""List the xp and xp reserve of a listed member."""
 		
@@ -1042,30 +1038,60 @@ class Xp(commands.Cog):
 			}.get(member.status,":green_heart: Online")
 			stat_embed.add_field(name="Status", value=status_text, inline=True)
 		
-		if getattr(member,"activity",None) and member.activity.name:
-			# Playing a game!
-			play_dict = {
-				discord.ActivityType.playing:"Playing",
-				discord.ActivityType.streaming:"Streaming",
-				discord.ActivityType.listening:"Listening to",
-				discord.ActivityType.watching:"Watching",
-				discord.ActivityType.custom:"Custom Status",
-				discord.ActivityType.competing:"Competing in"
-			}
-			play_string = play_dict.get(member.activity.type,"Playing")
-			stat_embed.add_field(name=play_string, value=str(member.activity.name), inline=False)
-			activity_start = getattr(member.activity,"start",None)
-			if activity_start:
-				# Strip out "to" and "in" from the play string for the "Since" value
-				since_string = " ".join([x for x in play_string.split() if len(x) > 2])
-				stat_embed.add_field(
-					name="{} Since".format(since_string),
-					value="<t:{0}> (<t:{0}:R>)".format(int(activity_start.timestamp())),
-					inline=False
-				)
-			if member.activity.type == discord.ActivityType.streaming:
-				# Add the URL too
-				stat_embed.add_field(name="Stream URL", value="[Watch Now]({})".format(member.activity.url), inline=False)
+		if getattr(member,"activities",None):
+			for activity in member.activities:
+				if not activity.name: continue
+				# Performing some activity!
+				play_dict = {
+					discord.ActivityType.playing:"Playing",
+					discord.ActivityType.streaming:"Streaming",
+					discord.ActivityType.listening:"Listening to",
+					discord.ActivityType.watching:"Watching",
+					discord.ActivityType.custom:"Custom Status",
+					discord.ActivityType.competing:"Competing in"
+				}
+				play_string = play_dict.get(activity.type,"Playing")
+				play_value  = str(activity.name)
+				if isinstance(activity,discord.Spotify):
+					# Got a Spotify track - let's customize the info
+					artist_list = ", ".join([x for x in (", ".join(activity.artists[:-2]),", and ".join(activity.artists[-2:])) if x])
+					play_value = "[{}]({}) by {} on Spotify".format(
+						activity.title,
+						activity.track_url,
+						artist_list
+					)
+				elif isinstance(activity,discord.CustomActivity):
+					# Try to extract the relevant info
+					play_value = activity.state
+					emoji      = activity.emoji
+					if not play_value or play_value == "Custom Status":
+						# This is the default for no text
+						play_value = None
+					if activity.emoji:
+						# Try to retrieve the emoji, fall back on a question mark
+						emoji_check = self.bot.get_emoji(activity.emoji.id)
+						emoji = str(emoji_check) if emoji_check else "`:{}:`".format(activity.emoji.name)
+					play_value = " ".join([x for x in (emoji,play_value) if x])
+					if not play_value:
+						# Nothing to display - continue
+						continue
+				activity_start = getattr(activity,"start",None)
+				if activity_start:
+					# Strip " to" and " in" from the name
+					suffix = ""
+					if play_string.endswith((" to"," in")):
+						suffix = play_string[-3:]
+						play_string = play_string[:-3]
+					# Format the name to [Status] - Started [timestamp]
+					play_string = "Started {} <t:{}:R>{}".format(
+						play_string,
+						int(activity_start.timestamp()),
+						suffix
+					)
+				if activity.type == discord.ActivityType.streaming:
+					# Prepend the URL
+					play_string = "[Watch Now]({}) - {}".format(activity.url,play_string)
+				stat_embed.add_field(name=play_string, value=play_value, inline=False)
 
 		# Check if server owner
 		if server and server.owner.id == member.id:
@@ -1082,7 +1108,7 @@ class Xp(commands.Cog):
 
 
 	# List the xp and xp reserve of a user
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def xpinfo(self, ctx):
 		"""Gives a quick rundown of the xp system."""
 
