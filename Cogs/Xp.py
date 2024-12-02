@@ -173,7 +173,7 @@ class Xp(commands.Cog):
 						
 						# First we check if we'll hit our limit
 						skip = False
-						if not xprLimit == None:
+						if not xprLimit is None:
 							# Get the current values
 							newxp = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XPReserve")
 							# Make sure it's this xpr boost that's pushing us over
@@ -201,7 +201,7 @@ class Xp(commands.Cog):
 
 						# First we check if we'll hit our limit
 						skip = False
-						if not xpLimit == None:
+						if not xpLimit is None:
 							# Get the current values
 							newxp = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XP")
 							# Make sure it's this xpr boost that's pushing us over
@@ -213,7 +213,7 @@ class Xp(commands.Cog):
 									await self.bot.loop.run_in_executor(None,self.settings.setUserStat,user,server,"XP")
 						if not skip:
 							xpRLeftover = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,user,server,"XPRealLeftover")
-							if xpRLeftover == None:
+							if xpRLeftover is None:
 								xpRLeftover = 0
 							else:
 								xpRLeftover = float(xpRLeftover)
@@ -243,22 +243,20 @@ class Xp(commands.Cog):
 		server  = ctx.guild
 		channel = ctx.message.channel
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
+		if not ctx.guild:
+			# Can only run in a server
+			return await ctx.send("This command cannot be run in dm.")
 
 		usage = 'Usage: `{}xp [role/member] [amount]`'.format(ctx.prefix)
 
 		isRole = False
 
-		if member == None:
-			await ctx.message.channel.send(usage)
+		if member is None:
+			await ctx.send(usage)
 			return
 
 		# Check for formatting issues
-		if xpAmount == None:
+		if xpAmount is None:
 			# Either xp wasn't set - or it's the last section
 			if type(member) is str:
 				# It' a string - the hope continues
@@ -266,7 +264,7 @@ class Xp(commands.Cog):
 				if not roleCheck:
 					# Returned nothing - means there isn't even an int
 					msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
-					await ctx.message.channel.send(msg)
+					await ctx.send(msg)
 					return
 				if roleCheck["Role"]:
 					isRole = True
@@ -276,24 +274,24 @@ class Xp(commands.Cog):
 					# Role is invalid - check for member instead
 					nameCheck = DisplayName.checkNameForInt(member, server)
 					if not nameCheck:
-						await ctx.message.channel.send(usage)
+						await ctx.send(usage)
 						return
 					if not nameCheck["Member"]:
 						msg = 'I couldn\'t find *{}* on the server.'.format(Nullify.escape_all(member))
-						await ctx.message.channel.send(msg)
+						await ctx.send(msg)
 						return
 					member   = nameCheck["Member"]
 					xpAmount = nameCheck["Int"]
 
-		if xpAmount == None:
+		if xpAmount is None:
 			# Still no xp - let's run stats instead
 			if isRole:
-				await ctx.message.channel.send(usage)
+				await ctx.send(usage)
 			else:
 				await ctx.invoke(self.stats, member=member)
 			return
 		if not type(xpAmount) is int:
-			await ctx.message.channel.send(usage)
+			await ctx.send(usage)
 			return
 
 		# Get our user/server stats
@@ -503,14 +501,8 @@ class Xp(commands.Cog):
 	async def defaultrole(self, ctx):
 		"""Lists the default role that new users are assigned."""
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(ctx.guild, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		role = self.settings.getServerStat(ctx.guild, "DefaultRole")
-		if role == None or role == "":
+		if role is None or role == "":
 			msg = 'New users are not assigned a role on joining this server.'
 			await ctx.channel.send(msg)
 		else:
@@ -522,7 +514,7 @@ class Xp(commands.Cog):
 					msg = 'New users will be assigned to **{}**.'.format(Nullify.escape_all(arole.name))
 			if not found:
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
-			await ctx.message.channel.send(msg)
+			await ctx.send(msg)
 		
 	@commands.command()
 	async def gamble(self, ctx, bet = None):
@@ -648,7 +640,7 @@ class Xp(commands.Cog):
 			else:
 				msg = '*{}* bet *{:,}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
 			
-		await ctx.message.channel.send(msg)
+		await ctx.send(msg)
 			
 	@commands.command()
 	async def recheckroles(self, ctx):
@@ -791,7 +783,7 @@ class Xp(commands.Cog):
 			member = DisplayName.memberForName(memberName, ctx.guild)
 			if not member:
 				msg = 'I couldn\'t find *{}*...'.format(Nullify.escape_all(memberName))
-				await ctx.message.channel.send(msg)
+				await ctx.send(msg)
 				return
 			
 		# Create blank embed
@@ -833,8 +825,8 @@ class Xp(commands.Cog):
 			# Add Rank
 			stat_embed.add_field(name="Current Rank", value=highestRole, inline=True)
 			
-		# await ctx.message.channel.send(msg)
-		await ctx.message.channel.send(embed=stat_embed)
+		# await ctx.send(msg)
+		await ctx.send(embed=stat_embed)
 		
 	@rank.error
 	async def rank_error(self, error, ctx):
@@ -869,51 +861,86 @@ class Xp(commands.Cog):
 	async def bottomxp(self, ctx):
 		"""List the bottom xp-holders."""
 		return await self._show_xp(ctx,reverse=False)
+
+	async def _get_member_and_server(self, ctx, value):
+		if not isinstance(value,str):
+			return (value, ctx.guild)
+		# Walk the components split by spaces and see if we can find a member + server
+		parts = value.split(" ")
+		for i in range(len(parts)+1):
+			m = " ".join(parts[:len(parts)-i])
+			s = " ".join([] if i==0 else parts[-i:])
+			server_test = member_test = None # Initialize
+			# Check for a server first
+			if s:
+				for serv in self.bot.guilds:
+					if (serv.name.lower() == s.lower() or str(serv.id) == s):
+						# Make sure the author is in that server
+						if Utils.is_owner(ctx,ctx.author) or serv.get_member(ctx.author.id):
+							# We got a valid server, and are in it
+							server_test = serv
+							break
+				# Didn't find one - don't allow trailing nonsense
+				if not server_test:
+					continue
+				# Got a server - let's see if we have a member to check - or default
+				# to the command author
+				if not m:
+					member_test = server_test.get_member(ctx.author.id)
+			# Check if we got a member
+			if m:
+				# Check if we have a server (either detected or ctx.guild)
+				if server_test or ctx.guild:
+					member_test = DisplayName.memberForName(m,server_test or ctx.guild)
+				else:
+					# No server at all - try to get a user
+					try: member_test = await self.bot.fetch_user(int(m))
+					except: pass
+			# Only bail if we have a member
+			if member_test:
+				return (member_test, server_test or ctx.guild)
+		return (None,None)
+
+	@commands.command(aliases=["statsxp","xps","sxp"])
+	async def xpstats(self, ctx, *, member=None):
+		"""List only the xp and xp reserve of the passed member."""
+
+		member = member or ctx.author
+		m,s = await self._get_member_and_server(ctx,member)
+		if m is None or s is None:
+			return await ctx.send("I couldn't find {}...".format(
+				Nullify.escape_all(member or "that member")
+			))
+		# Gather our XP and XP Reserve here
+		url = Utils.get_avatar(m)
+		# Create blank embed
+		stat_embed = Message.Embed(color=m.color,thumbnail=url,pm_after_fields=20)
+		m_name = getattr(m,"global_name",None) or m.name
+		if getattr(m,"nick",None) and m.nick != m_name:
+			# We have a nickname
+			stat_embed.author = '{}, who currently goes by {}'.format(m_name, m.nick)
+		else:
+			# Add to embed
+			stat_embed.author = m_name
+		# Get user's xp
+		newStat = int(self.settings.getUserStat(m, s, "XP"))
+		newState = int(self.settings.getUserStat(m, s, "XPReserve"))
+		# Add XP and XP Reserve
+		stat_embed.add_field(name="XP", value="{:,}".format(newStat), inline=True)
+		stat_embed.add_field(name="XP Reserve", value="{:,}".format(newState), inline=True)
+		# Add server info if outside the command context
+		if s != ctx.guild:
+			stat_embed.add_field(name="Server Name", value=s.name, inline=True)
+			stat_embed.add_field(name="Server ID", value=s.id, inline=True)
+		await stat_embed.send(ctx)
 		
 	# List the xp and xp reserve of a user
 	@commands.command()
-	async def stats(self, ctx, *, member= None):
-		"""List the xp and xp reserve of a listed member."""
+	async def stats(self, ctx, *, member=None):
+		"""List a number of stats about the passed member."""
 		
-		member = member or ctx.author
-		server = ctx.guild
-
-		if isinstance(member,str):
-			# Walk the components split by spaces and see if we can find a member + server
-			parts = member.split(" ")
-			for i in range(len(parts)+1):
-				m = " ".join(parts[:len(parts)-i])
-				s = " ".join([] if i==0 else parts[-i:])
-				server_test = member_test = None # Initialize
-				# Check for a server first
-				if s:
-					for serv in self.bot.guilds:
-						if (serv.name.lower() == s.lower() or str(serv.id) == s):
-							# Make sure the author is in that server
-							if Utils.is_owner(ctx,ctx.author) or serv.get_member(ctx.author.id):
-								# We got a valid server, and are in it
-								server_test = serv
-								break
-					# Didn't find one - don't allow trailing nonsense
-					if not server_test: continue
-					# Got a server - let's see if we have a member to check - or default
-					# to the command author
-					if not m: member_test = server_test.get_member(ctx.author.id)
-				# Check if we got a member
-				if m:
-					# Check if we have a server (either detected or ctx.guild)
-					if server_test or ctx.guild:
-						member_test = DisplayName.memberForName(m,server_test or ctx.guild)
-					else:
-						# No server at all - try to get a user
-						try: member_test = await self.bot.fetch_user(int(m))
-						except: pass
-				# Only bail if we have a member
-				if member_test:
-					member = member_test
-					server = server_test or ctx.guild
-					break
-
+		m,server = await self._get_member_and_server(ctx,member or ctx.author)
+		if m: member = m
 		if isinstance(member,str) and not server:
 			# Try to resolve the member name to a user as-is
 			m = DisplayName.memberForName(member,server)
@@ -1115,12 +1142,6 @@ class Xp(commands.Cog):
 		server  = ctx.guild
 		channel = ctx.message.channel
 
-		# Check if we're suppressing @here and @everyone mentions
-		if self.settings.getServerStat(server, "SuppressMentions"):
-			suppress = True
-		else:
-			suppress = False
-
 		serverName = Nullify.escape_all(server.name)
 		hourlyXP = int(self.settings.getServerStat(server, "HourlyXP"))
 		hourlyXPReal = int(self.settings.getServerStat(server, "HourlyXPReal"))
@@ -1201,7 +1222,7 @@ class Xp(commands.Cog):
 
 		# Get the required role for using the xp system
 		role = self.settings.getServerStat(server, "RequiredXPRole")
-		if role == None or role == "":
+		if role is None or role == "":
 			msg = '{}Currently, **Everyone** can *give xp*, *gamble*, and *feed* the bot.\n\n'.format(msg)
 		else:
 			# Role is set - let's get its name
@@ -1219,4 +1240,4 @@ class Xp(commands.Cog):
 
 		msg = "{}Hopefully that clears things up!".format(msg)
 
-		await ctx.message.channel.send(msg)
+		await ctx.send(msg)
