@@ -586,7 +586,7 @@ class Mute(commands.Cog):
             return await ctx.send("Mutes do not apply in dm.")
         if member is None:
             member_list = ctx.guild.members # Check all
-            title = "Currently Muted Members:"
+            title = "Currently Muted Members{}:"
         else:
             # Try to resolve the passed member
             member_list = [DisplayName.memberForName(member, ctx.guild)]
@@ -624,7 +624,9 @@ class Mute(commands.Cog):
             muted_members.append({"name":"{}. {} ({})".format(len(muted_members)+1,DisplayName.name(m),m),"value":value})
         desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
         return await PickList.PagePicker(
-            title=title,
+            title=title.format(
+                "" if member else " ({:,} total)".format(len(muted_members))
+            ),
             description=desc,
             list=muted_members,
             color=ctx.author,
