@@ -1,4 +1,4 @@
-import asyncio, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct, shutil, tempfile
+import asyncio, cpuinfo, discord, os, re, psutil, platform, time, sys, fnmatch, subprocess, speedtest, json, struct, shutil, tempfile
 from   PIL         import Image
 from   discord.ext import commands
 from   Cogs import Utils, Settings, DisplayName, ReadableTime, GetImage, ProgressBar, Message, DL
@@ -243,6 +243,7 @@ class Bot(commands.Cog):
 
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
+		cpuName       = cpuinfo.get_cpu_info()['brand_raw']
 		cpuThred      = os.cpu_count()
 		cpuUsage      = psutil.cpu_percent(interval=1)
 		memStats      = psutil.virtual_memory()
@@ -272,11 +273,12 @@ class Bot(commands.Cog):
 
 		msg = '***{}\'s*** **Home:**\n'.format(botName)
 		msg += '```\n'
-		msg += 'OS       : {}\n'.format(currentOS)
+		msg += 'OS        : {}\n'.format(currentOS)
 		if not self.settings.getGlobalStat("HideHostname",False):
-			msg += 'Hostname : {}\n'.format(platform.node())
-		msg += 'Language : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
-		msg += 'Commit   : {}\n\n'.format(git_head_hash.decode("utf-8"))
+			msg += 'Hostname  : {}\n'.format(platform.node())
+		msg += 'Processor : {}\n'.format(cpuName)
+		msg += 'Language  : Python {}.{}.{} {} ({} bit)\n'.format(pythonMajor, pythonMinor, pythonMicro, pythonRelease, pyBit)
+		msg += 'Commit    : {}\n\n'.format(git_head_hash.decode("utf-8"))
 		msg += ProgressBar.center('{}% of {} {}'.format(cpuUsage, cpuThred, threadString), 'CPU') + '\n'
 		msg += ProgressBar.makeBar(int(round(cpuUsage))) + "\n\n"
 		msg += ProgressBar.center('{} ({}%) of {}GB used'.format(memUsedGB, memPerc, memTotalGB), 'RAM') + '\n'
