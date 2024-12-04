@@ -621,8 +621,17 @@ class Mute(commands.Cog):
                 )
             if m.timed_out:
                 value += "\n` Timeout:` Member is currently timed out"
-            muted_members.append({"name":"{}. {} ({})".format(len(muted_members)+1,DisplayName.name(m),m),"value":value})
+            muted_members.append({
+                "name":"{}{} ({})".format(
+                    "{}. ".format(len(muted_members)+1) if member else "",
+                    DisplayName.name(m),m
+                ),
+                "value":value,
+                "time":mute_stat[1] # Cooldown
+            })
         desc = None if muted_members else "{} is not currently muted.".format(member_list[0].mention) if member else "No members are currently muted."
+        max_mute = max([x["time"] or 0 for x in muted_members])
+        muted_members.sort(key=lambda x:x["time"] if x["time"] is not None else max_mute+1)
         return await PickList.PagePicker(
             title=title.format(
                 "" if member else " ({:,} total)".format(len(muted_members))
