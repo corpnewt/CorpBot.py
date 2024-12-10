@@ -274,7 +274,11 @@ class Reddit(commands.Cog):
 		# Check for nsfw - and for now, only allow admins/botadmins to post those
 		if msg['over_18']:
 			# NSFW - check admin
-			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
+			if not Utils.is_bot_admin(ctx):
+				return await Message.Embed(
+					title="Insufficient privileges!",
+					description="You do not have sufficient privileges to access nsfw subreddits."
+				).send(ctx,message)
 		return await PickList.PagePicker(
 			url=msg["url"],
 			title=msg["title"],
@@ -368,7 +372,11 @@ class Reddit(commands.Cog):
 		# Check for nsfw - and for now, only allow admins/botadmins to post those
 		if infoDict['over_18']:
 			# NSFW - check admin
-			if not await Utils.is_bot_admin_reply(ctx,message="You do not have sufficient privileges to access nsfw subreddits."): return
+			if not Utils.is_bot_admin(ctx):
+				return await Message.Embed(
+					title="Insufficient privileges!",
+					description="You do not have sufficient privileges to access nsfw subreddits."
+				).send(ctx,message)
 		return await Message.Embed(
 			title=infoDict["title"], 
 			url="https://www.reddit.com"+infoDict["permalink"], 
