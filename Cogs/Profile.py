@@ -77,6 +77,10 @@ class Profile(commands.Cog):
 			profile_str = ' '.join(parts[i+1:])
 			mem_from_name = DisplayName.memberForName(name_str, ctx.guild)
 			if mem_from_name:
+				if not profile_str:
+					# The whole string passed was a member,
+					# return with no profile to invoke _list_profiles
+					return (mem_from_name,None)
 				# We got a member - let's check for a profile
 				itemList = self.settings.getUserStat(mem_from_name, ctx.guild, "Profiles", [])
 				item = next((x for x in itemList if x["Name"].lower() == profile_str.lower()),None)
@@ -95,6 +99,9 @@ class Profile(commands.Cog):
 		if item is None:
 			return await ctx.send("Sorry, I couldn't find that user/profile.")
 		member,item = item
+		if item is None:
+			# Just got a member - list their profiles
+			return await self._list_profiles(ctx,member.id)
 		msg = '*{}\'s {}{} Profile:*\n\n{}'.format(
 			DisplayName.name(member),
 			"Raw " if raw else "",
@@ -116,7 +123,7 @@ class Profile(commands.Cog):
 		# We have a member here
 		itemList = self.settings.getUserStat(member, ctx.guild, "Profiles")
 		if not itemList or itemList == []:
-			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(ctx.author), ctx.prefix)
+			msg = '*{}* has no profiles set!  They can add some with the `{}addprofile "[profile name]" [link]` command!'.format(DisplayName.name(member), ctx.prefix)
 			return await ctx.send(msg)
 		itemList = sorted(itemList, key=itemgetter('Name'))
 		title="{}'s {}Profiles ({:,} total)".format(
