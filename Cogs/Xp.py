@@ -516,7 +516,7 @@ class Xp(commands.Cog):
 				msg = 'There is no role that matches id: `{}` - consider updating this setting.'.format(role)
 			await ctx.send(msg)
 		
-	@commands.command()
+	@commands.command(aliases=["bet","wager"])
 	async def gamble(self, ctx, bet = None):
 		"""Gamble your xp reserves for a chance at winning xp!"""
 		
