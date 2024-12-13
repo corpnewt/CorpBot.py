@@ -67,6 +67,11 @@ class Profile(commands.Cog):
 		await ctx.send(Utils.suppressed(ctx,"{} removed from {}'s profile list!".format(Nullify.escape_all(item["Name"]),DisplayName.name(ctx.author))))
 
 	def _get_profile(self,ctx,name=None):
+		# Check if the whole string is our profile first
+		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles", [])
+		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
+		if item: return (ctx.author,item)
+		# Iterate the parts looking for member and profile name
 		parts = name.split()
 		for j in range(len(parts)):
 			# Reverse search direction
@@ -85,10 +90,7 @@ class Profile(commands.Cog):
 				itemList = self.settings.getUserStat(mem_from_name, ctx.guild, "Profiles", [])
 				item = next((x for x in itemList if x["Name"].lower() == profile_str.lower()),None)
 				if item: return (mem_from_name,item)
-		# Check if there is no member specified
-		itemList = self.settings.getUserStat(ctx.author, ctx.guild, "Profiles", [])
-		item = next((x for x in itemList if x["Name"].lower() == name.lower()),None)
-		if item: return (ctx.author,item)
+		# If we got here, there were no matches
 		return None
 
 	async def _get_profile_reply(self,ctx,name=None,raw=False):
