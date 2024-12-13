@@ -314,14 +314,11 @@ class Lists(commands.Cog):
 			return await message.edit(content="Invalid {} data :(".format(l_name.lower()))
 		# At this point - we should have a valid json file with our data - let's add it.
 		currentTime = int(time.time())
-		added = 0
-		updated = 0
+		added = updated = 0
 		for i in items:
-			name,value = i["Name"],i[l_key]
 			item = next((x for x in itemList if x["Name"].lower() == i["Name"].lower()),None)
 			if item:
 				updated += 1
-				msg = '{} updated!'.format(Nullify.escape_all(item["Name"]))
 				item[l_key]       = i[l_key]
 				item['UpdatedBy'] = DisplayName.name(ctx.author)
 				item['UpdatedID'] = ctx.author.id

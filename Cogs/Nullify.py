@@ -51,6 +51,8 @@ def resolve_mentions(string, ctx = None, escape = True, escape_links = False, sh
             try: id_match = int(d.search(m.group(0)).group(0))
             except: continue
             check_func = guild.get_role if "@&" in m.group(0) else guild.get_channel if "#" in m.group(0) else guild.get_member
+            if check_func == guild.get_channel and not channel_mentions:
+                continue # Not resolving channel mentions
             check_entry = check_func(id_match)
             if not check_entry: continue
             # Let's replace the indices in the original string - but then also update our adjusted index
