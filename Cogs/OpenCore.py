@@ -67,30 +67,9 @@ class OpenCore(commands.Cog):
 		self._load_local()
 		self._load_local_sample()
 		self._load_local_alc()
-		self._load_local_atd()
 		# Start the update loops
 		self.bot.loop.create_task(self.update_tex())
 		self.bot.loop.create_task(self.update_alc())
-		self.bot.loop.create_task(self.update_atd())
-
-	async def update_atd(self):
-		print("Starting Auto-Tool Description update loop - repeats every {:,} second{}...".format(
-			self.auto_tool_wait_time,
-			"" if self.auto_tool_wait_time==1 else "s"
-		))
-		await self.bot.wait_until_ready()
-		while not self.bot.is_closed():
-			if not self.is_current:
-				# Bail if we're not the current instance
-				return
-			t = time.time()
-			print("Updating AutoToolDescriptions.plist: {}".format(datetime.datetime.now().time().isoformat()))
-			if not await self._dl_atd():
-				print("Could not download AutoToolDescriptions.plist!")
-				if self._load_local_atd():
-					print(" - Falling back on local copy!")
-			print("Auto-Tool Descriptions - took {:,} seconds.".format(time.time()-t))
-			await asyncio.sleep(self.alc_wait_time)
 
 	async def update_tex(self):
 		print("Starting Configuration.tex|Sample.plist update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
@@ -160,15 +139,6 @@ class OpenCore(commands.Cog):
 		except: return False
 		return True
 
-	def _load_local_atd(self):
-		if not os.path.exists("AutoToolDescriptions.plist"): return False
-		# Try to load it
-		try:
-			with open("AutoToolDescriptions.plist","rb") as f:
-				self.auto_tool_descriptions = plistlib.load(f)
-		except: return False
-		return True
-
 	async def _dl_tex(self):
 		try: self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
 		except: return False
@@ -212,34 +182,6 @@ class OpenCore(commands.Cog):
 			return False
 		plistlib.dump(codecs,open("AppleALCCodecs.plist","wb"))
 		self.alc_codecs = codecs
-		return True
-
-	async def _dl_atd(self):
-		auto_tool_urls = (
-			(("ACPI","Add"),"https://raw.githubusercontent.com/lzhoang2801/OpCore-Simplify/refs/heads/main/Scripts/datasets/acpi_patch_data.py"),
-			(("Kernel","Add"),"https://raw.githubusercontent.com/lzhoang2801/OpCore-Simplify/refs/heads/main/Scripts/datasets/kext_data.py")
-		)
-		descriptions = {}
-		try:
-			for path,url in auto_tool_urls:
-				try: resources = await DL.async_text(url)
-				except: continue
-				if not resources:
-					continue
-				# Ensure the path in the target
-				last = descriptions
-				for i,p in enumerate(path,start=1):
-					if not p in last:
-						last[p] = {} if i < len(path) else []
-					last = last[p]
-				for line in resources.split("\n"):
-					if 'description' in line and '"' in line:
-						try: last.append(line.split('"')[1])
-						except: continue
-		except:
-			return False
-		plistlib.dump(descriptions,open("AutoToolDescriptions.plist","wb"))
-		self.auto_tool_descriptions = descriptions
 		return True
 
 	def _parse_sample(self):
@@ -424,17 +366,6 @@ class OpenCore(commands.Cog):
 		m = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
 		return m or message
 
-	@commands.command(aliases=["updateatd"])
-	async def getatd(self, ctx):
-		"""Forces an update of the in-memory AutoToolDescriptions.plist file (owner only)."""
-
-		if not await Utils.is_owner_reply(ctx): return
-		message = await ctx.send("Updating AutoToolDescriptions.plist...")
-		atd_text = "Successfully updated AutoToolDescriptions.plist"
-		if not await self._dl_atd():
-			atd_text = "Failed to update AutoToolDescriptions.plist{}!".format(" - falling back on local copy" if self._load_local_atd() else "")
-		await message.edit(content=atd_text)
-
 	@commands.command()
 	async def plist(self, ctx, *, url = None):
 		"""Validates plist file structure.  Accepts a url - or picks the first attachment."""
@@ -475,60 +406,55 @@ class OpenCore(commands.Cog):
 			).send(ctx, message)
 		else:
 			# Now we walk our entries to list them as needed
-			acpi_add = acpi_patch = kernel_add = kernel_patch = misc_tools = uefi_drivers = []
-			booter_q = {}
+			acpi_add = acpi_patch = kernel_add = kernel_patch = misc_tools = uefi_drivers = None
+			booter_q = None
 			boot_args = boot_args_d = None
-			try: acpi_add     = [x for x in plist_data.get("ACPI",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
+			try: acpi_add     = [x for x in plist_data["ACPI"]["Add"] if isinstance(x,dict) and x["Enabled"]]
 			except: pass
-			try: acpi_patch   = [x for x in plist_data.get("ACPI",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
+			try: acpi_patch   = [x for x in plist_data["ACPI"]["Patch"] if isinstance(x,dict) and x["Enabled"]]
 			except: pass
-			try: kernel_add   = [x for x in plist_data.get("Kernel",{}).get("Add",[]) if isinstance(x,dict) and x.get("Enabled")]
+			try: kernel_add   = [x for x in plist_data["Kernel"]["Add"] if isinstance(x,dict) and x["Enabled"]]
 			except: pass
-			try: kernel_patch = [x for x in plist_data.get("Kernel",{}).get("Patch",[]) if isinstance(x,dict) and x.get("Enabled")]
+			try: kernel_patch = [x for x in plist_data["Kernel"]["Patch"] if isinstance(x,dict) and x["Enabled"]]
 			except: pass
-			try: misc_tools   = [x for x in plist_data.get("Misc",{}).get("Tools",[]) if isinstance(x,dict) and x.get("Enabled")]
+			try: misc_tools   = [x for x in plist_data["Misc"]["Tools"] if isinstance(x,dict) and x["Enabled"]]
 			except: pass
-			try: uefi_drivers = [x for x in plist_data.get("UEFI",{}).get("Drivers",[]) if (isinstance(x,dict) and x.get("Enabled")) or isinstance(x,str)]
+			try: uefi_drivers = [x for x in plist_data["UEFI"]["Drivers"] if (isinstance(x,dict) and x["Enabled"]) or isinstance(x,str)]
 			except: pass
-			try: booter_q     = plist_data.get("Booter",{}).get("Quirks",{})
+			try: booter_q     = plist_data["Booter"]["Quirks"]
 			except: pass
-			try: boot_args    = plist_data.get("NVRAM",{}).get("Add",{}).get("7C436110-AB2A-4BBB-A880-FE41995C9F82",{}).get("boot-args",None)
+			try: boot_args    = plist_data["NVRAM"]["Add"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]["boot-args"]
 			except: pass
-			try: boot_args_d  = "boot-args" in plist_data.get("NVRAM",{}).get("Delete",{}).get("7C436110-AB2A-4BBB-A880-FE41995C9F82",[])
+			try: boot_args_d  = "boot-args" in plist_data["NVRAM"]["Delete"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]
 			except: pass
 
 			if any((acpi_add,acpi_patch,kernel_add,kernel_patch,misc_tools,uefi_drivers,booter_q,boot_args,boot_args_d)):
 				desc = "\\- Appears to belong to OpenCore"
 				# Regex slightly adjusted from here: https://github.com/ocwebutils/sc_rules
 				names = []
-				if any((re.match(r"^([Vv]\d+\.\d+(\.\d+)?(\s*\|\s*.+)?).*",x["Comment"]) for x in kernel_add if isinstance(x.get("Comment"),str))):
-					names.append("configurator")
-
-				# Auto-tool detection
-				try: auto_tool_acpi = [x for x in plist_data.get("ACPI",{}).get("Add",[]) if isinstance(x,dict) and x.get("Comment") in self.auto_tool_descriptions["ACPI"]["Add"]]
-				except: auto_tool_acpi = []
-				try: auto_tool_kernel = [x for x in plist_data.get("Kernel",{}).get("Add",[]) if isinstance(x,dict) and x.get("Comment") in self.auto_tool_descriptions["Kernel"]["Add"]]
-				except: auto_tool_kernel = []
-				if auto_tool_acpi or auto_tool_kernel:
-					names.append("auto-tool")
+				try:
+					if any((re.match(r"^([Vv]\d+\.\d+(\.\d+)?(\s*\|\s*.+)?).*",x["Comment"]) for x in kernel_add if isinstance(x.get("Comment"),str))):
+						names.append("configurator")
+				except:
+					pass
 				if names:
 					name_string = names[0] if len(names)==1 else ", ".join(names[:-1]) + " and " + names[-1]
 					foot += " | Possible {}".format(
 						name_string
 					)
 				# Get the totals as well
-				aa_total = ap_total = ka_total = kp_total = mt_total = ud_total = 0
-				try: aa_total = len(plist_data.get("ACPI",{}).get("Add",[]))
+				aa_total = ap_total = ka_total = kp_total = mt_total = ud_total = None
+				try: aa_total = len(plist_data["ACPI"]["Add"])
 				except: pass
-				try: ap_total = len(plist_data.get("ACPI",{}).get("Patch",[]))
+				try: ap_total = len(plist_data["ACPI"]["Patch"])
 				except: pass
-				try: ka_total = len(plist_data.get("Kernel",{}).get("Add",[]))
+				try: ka_total = len(plist_data["Kernel"]["Add"])
 				except: pass
-				try: kp_total = len(plist_data.get("Kernel",{}).get("Patch",[]))
+				try: kp_total = len(plist_data["Kernel"]["Patch"])
 				except: pass
-				try: mt_total = len(plist_data.get("Misc",{}).get("Tools",[]))
+				try: mt_total = len(plist_data["Misc"]["Tools"])
 				except: pass
-				try: ud_total = len(plist_data.get("UEFI",{}).get("Drivers",[]))
+				try: ud_total = len(plist_data["UEFI"]["Drivers"])
 				except: pass
 				# We'll parse these in order:
 				# names_data -> booter_q -> names_data2 -> boot_args -> names_data3
@@ -544,11 +470,15 @@ class OpenCore(commands.Cog):
 				names_data3 = (
 					("UEFI -> Drivers",uefi_drivers,"Path",ud_total),
 				)
-				driver_warning = " - [Using Older OC Schema]" if all(isinstance(x,str) for x in uefi_drivers) \
-							else " - [Using mixed OC Schema!]" if any(isinstance(x,str) for x in uefi_drivers) else ""
+				try:
+					driver_warning = " - [Using Older OC Schema]" if all(isinstance(x,str) for x in uefi_drivers) \
+								else " - [Using mixed OC Schema!]" if any(isinstance(x,str) for x in uefi_drivers) else ""
+				except:
+					driver_warning = ""
 				# Set up a helper to parse
 				def parse_tuple(n_d,desc,driver_warning=""):
 					for n,d,k,t in n_d:
+						if t is None: continue # Didn't exist in the source, skip
 						desc += "\n### {} ({:,}/{:,} Enabled){}{}\n".format(
 							n,
 							len(d),
@@ -592,8 +522,6 @@ class OpenCore(commands.Cog):
 							v,
 							booter_q[v]
 						)
-				else:
-					desc += "\n### Booter -> Quirks (0)\n"
 				desc = parse_tuple(names_data2,desc)
 				if boot_args:
 					desc += "\n### Boot-args (NVRAM -> Add {}):\n`{}`".format(
