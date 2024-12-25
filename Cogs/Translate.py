@@ -1,4 +1,4 @@
-import functools, string, googletrans
+import functools, string, googletrans, inspect
 from Cogs import DisplayName, Message, PickList, FuzzySearch
 from discord.ext import commands
 
@@ -6,8 +6,6 @@ def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
     bot.add_cog(Translate(bot, settings))
-
-# Requires the mtranslate module be installed
 
 class Translate(commands.Cog):
             
@@ -20,6 +18,11 @@ class Translate(commands.Cog):
         DisplayName = self.bot.get_cog("DisplayName")
         self.langcodes = googletrans.LANGCODES
         self.languages = googletrans.LANGUAGES
+
+    async def run_coro(self, func, *args, **kwargs):
+        if inspect.iscoroutinefunction(func):
+            return await func(*args,**kwargs)
+        return await self.bot.loop.run_in_executor(None,functools.partial(func,*args,**kwargs))
 
     @commands.command(aliases=["listlang","llist","listl"])
     async def langlist(self, ctx, search=None):
@@ -79,7 +82,7 @@ class Translate(commands.Cog):
         if reply: # Use the replied to message content instead
             text = reply
         if text is None: return await ctx.send("Usage: `{}detectlang [text to identify]`".format(ctx.prefix))
-        lang_detect = await self.bot.loop.run_in_executor(None, self.translator.detect, text)
+        lang_detect = await self.run_coro(self.translator.detect,text)
         await Message.EmbedText(
             title="Detected Language",
             description="Detected **{}** ({}) with {:.0%} confidence.".format(
@@ -169,12 +172,7 @@ class Translate(commands.Cog):
                 description="I couldn't find that language!",
                 color=ctx.author
             ).send(ctx)
-
-        if from_lang_name:
-            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=translate, src=from_lang, dest=to_lang))
-        else:
-            # We'll leave Google Translate to figure out the source language if we don't have it
-            result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=translate, dest=to_lang))
+        result = await self.run_coro(self.translator.translate,text=translate,src=from_lang or "auto",dest=to_lang)
 
         # Explore the results!
         result.text = self._unpack(result.text)
@@ -243,7 +241,7 @@ class Translate(commands.Cog):
                 color=ctx.author
             ).send(ctx)
 
-        detect_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.detect, text))  # We are detecting the language of the text
+        detect_result = await self.run_coro(self.translator.detect,text)
 
         if not source_lang:
             if isinstance(detect_result.confidence, list):  # We got multiple results
@@ -257,7 +255,7 @@ class Translate(commands.Cog):
 
         source_lang_name = self.languages.get(source_lang).title() if self.languages.get(source_lang) else 'Unknown'
         
-        pronunciation_result = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest=source_lang))
+        pronunciation_result = await self.run_coro(self.translator.translate,text=text,src=source_lang,dest=source_lang)
         # We don't need to translate to another language, we just get the pronunciation
         if not pronunciation_result.pronunciation or pronunciation_result.pronunciation == pronunciation_result.src:
             return await Message.EmbedText(
@@ -279,7 +277,7 @@ class Translate(commands.Cog):
         embed.add_field(name="Source Text", value=pronunciation_result.text, inline=False)
 
         if source_lang_name.lower() != "english": # Only translate to English if we're not already using it
-            english_translation = await self.bot.loop.run_in_executor(None, functools.partial(self.translator.translate, text=text, src=source_lang, dest="en"))
+            english_translation = await self.run_coro(self.translator.translate,text=text,src=source_lang,dest="en")
             embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
         if int(lang_confidence) != 1:
             embed.footer = {
