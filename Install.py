@@ -225,7 +225,9 @@ if __name__ == '__main__':
         {"name":"speedtest-cli"},
         {"name":"pytz"},
         {"name":"wikipedia"},
-        {"name":"googletrans","item":"git+https://github.com/ssut/py-googletrans"},
+        {"name":"py-googletrans","item":"git+https://github.com/ssut/py-googletrans"},
+        # Temporary downgrade as the latest httpx has issues with py-googletrans 4.0.0
+        {"name":"httpx","item":"httpx==0.27.2"},
         {"name":"giphypop","item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
         {"name":"numpy"},
         {"name":"pymongo"},
