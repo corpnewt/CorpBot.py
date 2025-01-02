@@ -24,16 +24,14 @@ class Search(commands.Cog):
 	async def on_loaded_extension(self, ext):
 		if not self._is_submodule(ext.__name__, self.__module__):
 			return
-		# Check if we have a currency key - and remove the related commands
-		# if we don't
-		if not self.bot.settings_dict.get("currency"):
+		# Maybe we'll warn about this in the future?  Redundancy is nice,
+		# but not sure if the warning is needed.
+		'''if not self.bot.settings_dict.get("currency"):
 			if not self.bot.settings_dict.get("suppress_disabled_warnings"):
-				print("\n!! Search Cog's 'convert' and 'currlist' commands have been disabled !!")
-				print("* Currency Converter API key is missing ('currency' in settings_dict.json)")
+				print("* Fallback Currency Converter API key is missing")
+				print("   ('currency' in settings_dict.json)")
 				print("* You can get a free currency converter API key by signing up at:")
-				print("   https://free.currencyconverterapi.com/free-api-key\n")
-			self.bot.remove_command("currlist")
-			self.bot.remove_command("convert")
+				print("   https://free.currencyconverterapi.com/free-api-key\n")'''
 
 	def quote(self, query):
 		# Strips all spaces, tabs, returns and replaces with + signs, then urllib quotes
@@ -100,93 +98,86 @@ class Search(commands.Cog):
 			return await ctx.send("You need a topic for me to Ask Jeeves.")
 		await ctx.send(await self.get_search(ctx,query,"k"))
 
-
-	'''@commands.command()
-	async def searchsite(self, ctx, category_name = None, *, query = None):
-		"""Search corpnewt.com forums."""
-
-		auth = self.site_auth
-
-		if auth is None:
-			return await ctx.send("Sorry this feature is not supported!")
-
-		if query is None or category_name is None:
-			msg = "Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix)
-			return await ctx.send(msg)
-
-		categories_url = "https://corpnewt.com/api/categories"
-		categories_json = await DL.async_json(categories_url, headers={'Authorization': auth})
-		categories = categories_json["categories"]
-
-		category = await self.find_category(categories, category_name)
-
-		if category is None:
-			return await ctx.send("Usage: `{}searchsite [category] [search term]`\n\n Categories can be found at:\n\nhttps://corpnewt.com/".format(ctx.prefix))
-
-		search_url = "https://corpnewt.com/api/search?term={}&in=titlesposts&categories[]={}&searchChildren=true&showAs=posts".format(query, category["cid"])
-		search_json = await DL.async_json(search_url, headers={'Authorization': auth})
-		posts = search_json["posts"]
-		resultString = 'Results'
-		if len(posts) == 1 :
-			resultString = 'Result'
-		result_string = '**Found {} {} for:** ***{}***\n\n'.format(len(posts), resultString, query)
-		limit = 5
-		ctr = 0
-		for post in posts:
-			if ctr < limit:
-				ctr = ctr + 1
-				result_string += '__{}__\n<https://corpnewt.com/topic/{}>\n\n'.format(post["topic"]["title"], post["topic"]["slug"])
-			
-		await ctx.send(result_string)
-
-
-	async def find_category(self, categories, category_to_search):
-		"""recurse through the categories and sub categories to find the correct category"""
-		result_category = None
-		
-		for category in categories:
-			if str(category["name"].lower()).strip() == str(category_to_search.lower()).strip():
-					return category
-
-			if len(category["children"]) > 0:
-					result_category = await self.find_category(category["children"], category_to_search)
-					if result_category != None:
-							return result_category
-		
-		return result_category'''
-
-
-	async def _get_api_status(self):
+	async def _get_currency_list_fcc(self):
+		# Get the list of currencies
+		r = None
 		try:
-			api_status_html = await DL.async_text("https://www.currencyconverterapi.com/server-status")
-			api_status = api_status_html.split("<td>Free API</td>")[-1].split(">")[1].split("<")[0]
+			r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey={}".format(
+				self.bot.settings_dict.get("currency")
+			))
+		except: pass
+		return r
+
+	async def _get_currency_list_ea(self):
+		# Get the list of currencies - https://github.com/fawazahmed0/exchange-api
+		r = None
+		try:
+			r = await DL.async_json("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.min.json")
+			assert r
 		except:
-			api_status = "UNKNOWN"
-		return api_status
+			# Fallback URL
+			try: r = await DL.async_json("https://latest.currency-api.pages.dev/v1/currencies.min.json")
+			except: pass
+		return r
 
 	async def _get_currency_list(self):
-		# Get the list of currencies
-		api_status = "UNKNOWN"
-		r = None
-		try: r = await DL.async_json("https://free.currconv.com/api/v7/currencies?apiKey={}".format(self.bot.settings_dict.get("currency","")))
+		name_to_id = {}
+		id_to_name = {}
+		r = await self._get_currency_list_ea()
+		if r:
+			# Got the exchange-api
+			for i in r:
+				c_id = i.upper()
+				id_to_name[c_id] = r[i]
+				name_to_id[r[i]] = c_id
+		elif self.bot.settings_dict.get("currency"):
+			r = await self._get_currency_list_fcc()
+			if r:
+				# Got the freecurrencyconverter api
+				for l in r.get("results",{}):
+					if not all((x in r["results"][l] for x in ("id","currencyName"))):
+						continue # Incomplete
+					name = string.capwords(r["results"][l]["currencyName"])
+					c_id = r["results"][l]["id"].upper()
+					name_to_id[name] = c_id
+					id_to_name[c_id] = name
+		return (name_to_id,id_to_name)
+
+	async def _convert(self, frm, to):
+		r = val = None
+		try:
+			r = await DL.async_json("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{}.min.json".format(
+				frm.lower()
+			))
+			assert r
 		except:
-			api_status = await self._get_api_status()
-		return (r,api_status)
+			# Fallback URL
+			try: r = await DL.async_json("https://latest.currency-api.pages.dev/v1/currencies/{}.min.json".format(frm.lower()))
+			except: pass
+		if r:
+			# Got it via the exchange-api
+			val = r.get(frm.lower(),{}).get(to.lower())
+		elif self.bot.settings_dict.get("currency"):
+			# Try the freecurrencyconverter api
+			try:
+				r = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(
+					frm.upper(),
+					to.upper(),
+					self.bot.settings_dict["currency"]
+				))
+				val = float(r[list(r)[0]])
+			except: pass
+		return val
 
 	@commands.command(aliases=["listcurr","lcurr","currl"])
 	async def currlist(self, ctx, *, search = None):
 		"""List currencies for the convert command."""
-		# Get the list of currencies
-		r,api_status = await self._get_currency_list()
-		if not r: return await ctx.send("Something went wrong getting the currency list :(\nThe current status of the API I use is: `{}`".format(api_status))
-		# Gather our currency list
-		name_to_id = {}
-		id_to_name = {}
-		for l in r.get("results",{}):
-			if not all((x in r["results"][l] for x in ("id","currencyName"))): continue # Incomplete
-			name_to_id[r["results"][l]["currencyName"]] = r["results"][l]["id"]
-			id_to_name[r["results"][l]["id"]] = r["results"][l]["currencyName"]
-		if not name_to_id:return await ctx.send("Something went wrong getting the currency list :(")
+		# Get our list of currencies first
+		name_to_id,id_to_name = await self._get_currency_list()
+		if not name_to_id:
+			return await ctx.send("Something went wrong getting the currency list :(")
+		# Get the longest currency abbreviation for padding purposes
+		pad_to = len(max(id_to_name,key=len))
 		# Check if we're searching
 		if search:
 			# Get our fuzzy matched results
@@ -195,9 +186,9 @@ class Search(commands.Cog):
 			full_match  = next((x["Item"] for x in id_search+name_search if x.get("Ratio") == 1),None)
 			if full_match: # Got an exact match - build an embed
 				if full_match in id_to_name:
-					name,code,t = string.capwords(id_to_name[full_match]),full_match,"Currency Code"
+					name,code,t = id_to_name[full_match],full_match,"Currency Code"
 				else:
-					name,code,t = string.capwords(full_match),name_to_id[full_match],"Currency Name"
+					name,code,t = full_match,name_to_id[full_match],"Currency Name"
 				return await Message.Embed(
 					title="Search Results For \"{}\"".format(search),
 					description="Exact {} Match:\n\n`{}` - {}".format(t,code,name),
@@ -208,19 +199,19 @@ class Search(commands.Cog):
 			fields = []
 			if len(name_search):
 				curr_mess = "\n".join(["└─ `{}` - {}".format(
-					name_to_id[x["Item"]],
-					string.capwords(x["Item"])
+					name_to_id[x["Item"]].rjust(pad_to),
+					x["Item"]
 				) for x in name_search])
 				fields.append({"name":"Close Currency Name Matches:","value":curr_mess})
 			if len(id_search):
 				curr_mess = "\n".join(["└─ `{}` - {}".format(
-					x["Item"],
-					string.capwords(id_to_name[x["Item"]])
+					x["Item"].rjust(pad_to),
+					id_to_name[x["Item"]]
 				) for x in id_search])
 				fields.append({"name":"Close Currency Code Matches:","value":curr_mess})
 			return await Message.Embed(title="Search Results For \"{}\"".format(search),description=desc,fields=fields).send(ctx)
 		# We're not searching - list them all
-		curr_list = sorted(["`{}` - {}".format(i,string.capwords(id_to_name[i])) for i in id_to_name])
+		curr_list = ["`{}` - {}".format(i.rjust(pad_to),string.capwords(id_to_name[i])) for i in sorted(id_to_name)]
 		return await PickList.PagePicker(
 			title="Currency List",
 			description="\n".join(curr_list),
@@ -234,11 +225,12 @@ class Search(commands.Cog):
 		
 		if amount is None: # Invoke our currency list
 			return await ctx.invoke(self.currlist,search=amount)
-
-		# Get the list of currencies
-		r,api_status = await self._get_currency_list()
-		if not r: return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
 		
+		# Get the list of currencies
+		name_to_id,id_to_name = await self._get_currency_list()
+		if not name_to_id:
+			return await ctx.send("Something went wrong getting the currency list :(")
+
 		# Set up our args
 		num = frm = to = None
 		vals = amount.split()
@@ -251,7 +243,7 @@ class Search(commands.Cog):
 				except: pass # Not a valid number
 			elif val.lower() in ["from","to"]:
 				last = True if val.lower() == "to" else False
-			elif val.upper() in r.get("results",{}):
+			elif val.upper() in id_to_name:
 				# Should have a valid type - let's add it and the type to the list
 				conv.append([last,val])
 				last = None
@@ -268,28 +260,17 @@ class Search(commands.Cog):
 		to  = conv[0][1] if conv[0][0] == True else conv[1][1]
 
 		# Verify we have a proper from/to type
-		if not frm.upper() in r.get("results",{}):
-			return await ctx.send("Invalid from currency!")
-		if not to.upper() in r.get("results",{}):
-			return await ctx.send("Invalid to currency!")
+		if not frm.upper() in id_to_name:
+			return await ctx.send("Invalid `[from_currency]`!")
+		if not to.upper() in id_to_name:
+			return await ctx.send("Invalid `[to_currency]`!")
 
 		# At this point, we should be able to convert
-		try:
-			o = await DL.async_json("http://free.currconv.com/api/v7/convert?q={}_{}&compact=ultra&apiKey={}".format(
-				frm.upper(),
-				to.upper(),
-				self.bot.settings_dict.get("currency","")
-			))
-		except:
-			api_status = await self._get_api_status()
-			return await ctx.send("Something went wrong getting that conversion :(\nThe current status of the API I use is: `{}`".format(api_status))
-
-		if not o:
-			return await ctx.send("Whoops!  I couldn't get that :(")
+		val = await self._convert(frm,to)
+		if val is None:
+			return await ctx.send("Whoops!  I couldn't get that conversion :(")
 		
-		# Format the numbers
-		val = float(o[list(o)[0]])
 		# Calculate the results
-		inamnt  = "{:,f}".format(num).rstrip("0").rstrip(".")
+		inamnt = "{:,f}".format(num).rstrip("0").rstrip(".")
 		output = "{:,f}".format(num*val).rstrip("0").rstrip(".")
 		await ctx.send("{} {} is {} {}".format(inamnt,frm.upper(), output, to.upper()))
