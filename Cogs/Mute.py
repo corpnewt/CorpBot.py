@@ -504,7 +504,7 @@ class Mute(commands.Cog):
     @commands.command()
     async def mute(self, ctx, *, members = None, cooldown = None, reason = None):
         """Prevents the passed members from sending messages in chat or speaking in voice (bot-admin only).
-        Cooldown expects WwXdHhMmSs format, where:
+        Cooldown expects WwDdHhMmSs format, where:
         w = weeks
         d = days
         h = hours
