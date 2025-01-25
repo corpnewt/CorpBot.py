@@ -66,28 +66,24 @@ class DisplayName(commands.Cog):
             checkid = int(checkid)
         except:
             return None
-        for channel in server.channels:
-            if typeCheck:
-                if typeCheck.lower() == "text" and not isinstance(channel,discord.TextChannel):
-                    continue
-                if typeCheck.lower() == "voice" and not isinstance(channel,discord.VoiceChannel):
-                    continue
-                if typeCheck.lower() == "category" and not isinstance(channel,discord.CategoryChannel):
-                    continue
+        channels = server.channels
+        if hasattr(server,"threads"):
+            channels += server.threads
+        for channel in channels:
+            if typeCheck and not isinstance(channel,typeCheck):
+                continue
             if channel.id == checkid:
                 return channel
         return None
 
     def channelForName(self, name, server, typeCheck = None):
         name = str(name)
-        for channel in server.channels:
-            if typeCheck:
-                if typeCheck.lower() == "text" and not isinstance(channel,discord.TextChannel):
-                    continue
-                if typeCheck.lower() == "voice" and not isinstance(channel,discord.VoiceChannel):
-                    continue
-                if typeCheck.lower() == "category" and not isinstance(channel,discord.CategoryChannel):
-                    continue
+        channels = server.channels
+        if hasattr(server,"threads"):
+            channels += server.threads
+        for channel in channels:
+            if typeCheck and not isinstance(channel,typeCheck):
+                continue
             if channel.name.lower() == name.lower():
                 return channel
         chanID = re.sub(r'\W+', '', name)
