@@ -268,7 +268,7 @@ class VoteKick(commands.Cog):
 			await ctx.send("Removed the vote kick channel.")
 			return
 
-		check_channel = DisplayName.channelForName(channel, ctx.guild, "text")
+		check_channel = DisplayName.channelForName(channel, ctx.guild, typeCheck=discord.TextChannel)
 		if check_channel:
 			self.settings.setServerStat(ctx.guild, "VoteKickChannel", check_channel.id)
 			await ctx.send("Vote kick will now be mentioned in *{}.*".format(check_channel.mention))

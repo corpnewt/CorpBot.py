@@ -930,7 +930,7 @@ class Admin(commands.Cog):
 		usage = 'Usage: `{}settopic [channel] [message]`'.format(ctx.prefix)
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not channel and not message: return await ctx.send(usage)
-		resolved_channel = DisplayName.channelForName(channel,ctx.guild,"text")
+		resolved_channel = DisplayName.channelForName(channel,ctx.guild,typeCheck=discord.TextChannel)
 		if not resolved_channel:
 			# Not a channel - assume it's part of the message
 			message = channel + message
@@ -945,7 +945,7 @@ class Admin(commands.Cog):
 		usage = 'Usage: `{}slowmode [channel] [seconds]`'.format(ctx.prefix)
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if channel == seconds is None: return await ctx.send(usage)
-		resolved_channel = DisplayName.channelForName(channel,ctx.guild,"text")
+		resolved_channel = DisplayName.channelForName(channel,ctx.guild)
 		if not resolved_channel:
 			# Not a channel - assume it's part of the message
 			seconds = channel

@@ -173,7 +173,7 @@ class Quote(commands.Cog):
 			self.settings.setServerStat(ctx.guild, "QuoteChannel", None)
 			msg = 'Quote channel *disabled*.'
 			return await ctx.send(msg)
-		channel = DisplayName.channelForName(channel, ctx.guild, "text")
+		channel = DisplayName.channelForName(channel, ctx.guild)
 		if channel is None:
 			return await ctx.send("I couldn't find that channel :(")
 		self.settings.setServerStat(ctx.guild, "QuoteChannel", channel.id)
@@ -188,7 +188,7 @@ class Quote(commands.Cog):
 		qChan = self.settings.getServerStat(ctx.guild, "QuoteChannel")
 		if not qChan:
 			return await ctx.send("Quoting is currently *disabled*.")
-		channel = DisplayName.channelForName(str(qChan), ctx.guild, "text")
+		channel = DisplayName.channelForName(str(qChan), ctx.guild)
 		if channel:
 			return await ctx.send("The current quote channel is {}".format(channel.mention))
 		await ctx.send("Channel id: *{}* no longer exists on this server.  Consider updating this setting!".format(qChan))

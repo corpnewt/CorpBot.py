@@ -123,7 +123,7 @@ class SecretSanta(commands.Cog):
 		if not category:
 			return await ctx.send('You must supply a category for the Secret Santa channels.')
 		category_name = category # Save for later
-		category = DisplayName.channelForName(category_name,ctx.guild,"category")
+		category = DisplayName.channelForName(category_name,ctx.guild,typeCheck=discord.CategoryChannel)
 		if not category:
 			# Create it
 			category = await ctx.guild.create_category_channel(category_name)
@@ -164,7 +164,7 @@ class SecretSanta(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not category:
 			return await ctx.send('You must supply the category for the Secret Santa channels.')
-		category = DisplayName.channelForName(category,ctx.guild,"category")
+		category = DisplayName.channelForName(category,ctx.guild,typeCheck=discord.CategoryChannel)
 		if not category:
 			return await ctx.send("I couldn't locate that category...")
 		m = await ctx.send("Iterating and removing Secret Santa channels...")
@@ -215,7 +215,7 @@ class SecretSanta(commands.Cog):
 		if not await Utils.is_bot_admin_reply(ctx): return
 		if not category:
 			return await ctx.send('You must supply the category for the Secret Santa channels.')
-		category = DisplayName.channelForName(category,ctx.guild,"category")
+		category = DisplayName.channelForName(category,ctx.guild,typeCheck=discord.CategoryChannel)
 		if not category:
 			return await ctx.send("I couldn't locate that category...")
 		# Get our users by resolving the text channel names to user ids, then shuffle
@@ -326,7 +326,7 @@ class SecretSanta(commands.Cog):
 		# Check if our category exists - if not, create it
 		if not category:
 			return await ctx.send('You must supply a category for the Secret Santa channels.')
-		category = DisplayName.channelForName(category,ctx.guild,"category")
+		category = DisplayName.channelForName(category,ctx.guild,typeCheck=discord.CategoryChannel)
 		if not category:
 			return await ctx.send("I couldn't locate that category...")
 		m = await ctx.send("Iterating and removing Secret Santa channels...")

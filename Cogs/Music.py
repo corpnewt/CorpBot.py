@@ -1400,7 +1400,7 @@ class Music(commands.Cog):
 				return await Message.Embed(title="♫ You need to pass a voice channel for me to join!",color=ctx.author,delete_after=delay).send(ctx)
 			channel = ctx.author.voice.channel
 		else:
-			channel = DisplayName.channelForName(channel,ctx.guild,"voice")
+			channel = DisplayName.channelForName(channel,ctx.guild,typeCheck=discord.VoiceChannel)
 		if not channel:
 			return await Message.Embed(title="♫ I couldn't find that voice channel!",color=ctx.author,delete_after=delay).send(ctx)
 		player = self.get_player(ctx.guild)

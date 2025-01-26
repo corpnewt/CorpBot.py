@@ -70,7 +70,11 @@ class Telephone(commands.Cog):
 	def _gettelechannel(self, server):
 		teleChannel = self.settings.getServerStat(server, "TeleChannel")
 		if teleChannel:
-			teleChannel = DisplayName.channelForName(str(teleChannel), server, "text")
+			teleChannel = DisplayName.channelForName(
+				str(teleChannel),
+				server,
+				typeCheck=discord.TextChannel
+			)
 		if teleChannel == "":
 			return None
 		return teleChannel
@@ -204,7 +208,7 @@ class Telephone(commands.Cog):
 			msg = ':telephone: *disabled*.'
 			await ctx.channel.send(msg)
 			return
-		channel = DisplayName.channelForName(channel, ctx.guild, "text")
+		channel = DisplayName.channelForName(channel, ctx.guild, typeCheck=discord.TextChannel)
 		if channel is None:
 			await ctx.send("I couldn't find that channel :(")
 			return
@@ -222,7 +226,7 @@ class Telephone(commands.Cog):
 		if not teleChan:
 			await ctx.send(":telephone: is currently *disabled*.")
 			return
-		channel = DisplayName.channelForName(str(teleChan), ctx.guild, "text")
+		channel = DisplayName.channelForName(str(teleChan), ctx.guild, typeCheck=discord.TextChannel)
 		if channel:
 			await ctx.send("The current :telephone: channel is {}".format(channel.mention))
 			return
