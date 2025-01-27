@@ -3,8 +3,8 @@ from   discord.ext import commands
 from   Cogs import Message
 
 def setup(bot):
-	# Add the bot and deps
-	bot.add_cog(PickList(bot))
+    # Add the bot and deps
+    bot.add_cog(PickList(bot))
 
 class PickList(commands.Cog):
     def __init__(self, bot):
@@ -101,9 +101,13 @@ class PagePicker(Picker):
         self.max_chars = 1 if self.max_chars < 1 else 2048 if self.max_chars > 2048 else self.max_chars
         self.reactions = ["⏪","◀","▶","⏩","🔢","🛑"] # These will always be in the same order
         self.url = kwargs.get("url",None) # The URL the title of the embed will link to
-        self.thumbnail = kwargs.get("thumbnail",None)
-        self.footer = kwargs.get("footer","")
         self.description = kwargs.get("description", None)
+        self.image = kwargs.get("image", None)
+        self.footer = kwargs.get("footer", None)
+        self.thumbnail = kwargs.get("thumbnail", None)
+        self.timestamp = kwargs.get("timestamp", None)
+        self.author = kwargs.get("author", None)
+        self.color = kwargs.get("color", None)
         # Description-based args
         self.newline_split = kwargs.get("newline_split",True)
         self.d_header = kwargs.get("d_header","")
@@ -154,9 +158,25 @@ class PagePicker(Picker):
             return self.list[start:start+self.max]
         return self._get_desc_page_list()[page_number]
 
+    def _get_footer_text(self, text, page, pages):
+        return "[{:,}/{:,}] - {}".format(page+1,pages,text) if text else "Page {:,} of {:,}".format(page+1,pages)
+
     def _get_footer(self, page, pages):
-        if pages <= 1: return self.footer
-        return "[{:,}/{:,}] - {}".format(page+1,pages,self.footer) if self.footer else "Page {:,} of {:,}".format(page+1,pages)
+        if pages <= 1:
+            return self.footer
+        if isinstance(self.footer,dict):
+            # Shallow copy so we don't override the original values
+            new_footer = {}
+            for key in self.footer:
+                new_footer[key] = self.footer[key]
+            # Update the text
+            new_footer["text"] = self._get_footer_text(
+                self.footer.get("text",""),
+                page,
+                pages
+            )
+            return new_footer
+        return self._get_footer_text(self.footer,page,pages)
 
     async def pick(self):
         # This brings up the page picker and handles the events
@@ -179,12 +199,15 @@ class PagePicker(Picker):
         embed = {
             "title":self.title,
             "url":self.url,
-            "thumbnail": self.thumbnail,
             "description":desc if self.list else self._get_page_contents(page),
-            "color":self.ctx.author,
+            "image":self.image,
+            "footer":self._get_footer(page,pages),
+            "thumbnail":self.thumbnail,
+            "timestamp":self.timestamp,
+            "author":self.author,
+            "color":self.color or self.ctx.author,
             "pm_after_fields":-1, # Disable pm_after entirely
-            "fields":self._get_page_contents(page) if self.list else None,
-            "footer":self._get_footer(page,pages)
+            "fields":self._get_page_contents(page) if self.list else None
         }
         if self.message:
             self.self_message = self.message
