@@ -20,6 +20,11 @@ async def async_post_bytes(url, data = None, headers = None, ssl = None):
         async with session.post(url, data=data, ssl=ssl) as response:
             return await response.read()
 
+async def async_head(url, headers = None, ssl = None):
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.head(url, ssl=ssl) as response:
+            return response.headers
+
 async def async_head_json(url, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.head(url, ssl=ssl) as response:
