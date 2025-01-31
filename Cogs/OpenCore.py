@@ -447,17 +447,8 @@ class OpenCore(commands.Cog):
 						names.append("configurator")
 				except:
 					pass
-
-
-				#
-				###
-				### ATD - Keep in CorpBot-Private Only
-				###
-				#
-				
 				try:
-					# Wrap in a try/except as we expect *all* of these values to be set to
-					# make our claim that an auto-tool was used.
+					# Wrap in a try/except as we expect *all* of these values to be set
 					if plist_data["Misc"]["Boot"]["PickerMode"] == "External" and \
 					plist_data["Misc"]["Boot"]["Timeout"] == 10 and \
 					plist_data["Misc"]["Debug"]["Target"] == 0 and \
@@ -465,13 +456,6 @@ class OpenCore(commands.Cog):
 						names.append("auto-tool")
 				except:
 					pass
-				#
-				###
-				### ATD - Keep in CorpBot-Private Only
-				###
-				#
-
-
 				if names:
 					name_string = names[0] if len(names)==1 else ", ".join(names[:-1]) + " and " + names[-1]
 					foot += " | Possible {}".format(
