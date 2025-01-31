@@ -141,8 +141,11 @@ class OpenCore(commands.Cog):
 		return True
 
 	async def _dl_tex(self):
-		try: self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
-		except: return False
+		try:
+			self.tex = await DL.async_text("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/Configuration.tex")
+			assert self.tex
+		except:
+			return False
 		# Save to a local file
 		with open("Configuration.tex","w") as f:
 			f.write(self.tex)
@@ -152,8 +155,11 @@ class OpenCore(commands.Cog):
 		return True
 
 	async def _dl_sample(self):
-		try: self.sample = plistlib.loads(await DL.async_dl("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/SampleCustom.plist"))
-		except: return False
+		try:
+			self.sample = plistlib.loads(await DL.async_dl("https://github.com/acidanthera/OpenCorePkg/raw/master/Docs/SampleCustom.plist"))
+			assert self.sample
+		except:
+			return False
 		# Save to a local file
 		plistlib.dump(self.sample,open("Sample.plist","wb"))
 		# Gather all paths
@@ -163,9 +169,12 @@ class OpenCore(commands.Cog):
 	async def _dl_alc(self):
 		try:
 			resources = await DL.async_text("https://github.com/acidanthera/AppleALC/tree/master/Resources")
+			assert resources
 			# Attempt to extract the JSON data within
-			try: resources = resources.split('<script type="application/json" data-target="react-app.embeddedData">')[1].split("</script>")[0]
-			except: pass
+			try:
+				resources = resources.split('<script type="application/json" data-target="react-app.embeddedData">')[1].split("</script>")[0]
+			except:
+				pass
 			payload_json = json.loads(resources)
 			codec_list = [x["name"] for x in payload_json["payload"]["tree"]["items"] if x["contentType"] == "directory" and not "/" in x["name"]]
 			codecs = {}
@@ -438,6 +447,31 @@ class OpenCore(commands.Cog):
 						names.append("configurator")
 				except:
 					pass
+
+
+				#
+				###
+				### ATD - Keep in CorpBot-Private Only
+				###
+				#
+				
+				try:
+					# Wrap in a try/except as we expect *all* of these values to be set to
+					# make our claim that an auto-tool was used.
+					if plist_data["Misc"]["Boot"]["PickerMode"] == "External" and \
+					plist_data["Misc"]["Boot"]["Timeout"] == 10 and \
+					plist_data["Misc"]["Debug"]["Target"] == 0 and \
+					plist_data["NVRAM"]["Add"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]["prev-lang:kbd"] == "en:252":
+						names.append("auto-tool")
+				except:
+					pass
+				#
+				###
+				### ATD - Keep in CorpBot-Private Only
+				###
+				#
+
+
 				if names:
 					name_string = names[0] if len(names)==1 else ", ".join(names[:-1]) + " and " + names[-1]
 					foot += " | Possible {}".format(
