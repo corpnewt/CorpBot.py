@@ -95,7 +95,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the channel topic of the passed channel (bot-admin only).
 	  $setxp [member] [xpAmount]
 	   └─ Sets an absolute value for the member's xp (admin only).
-	  $setxpreserve [member] [xpAmount]
+	  $setxpreserve [member] [xpAmount] (AKA: setxpr)
 	   └─ Set's an absolute value for the member's xp reserve (admin only).
 	  $setxprole [role]
 	   └─ Sets the required role ID to give xp, gamble, or feed the bot (admin only).
@@ -103,9 +103,9 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the number of seconds for slow mode for the passed channel - use any num...
 	  $stoprole 
 	   └─ Lists the required role to stop the bot from playing music.
-	  $xplimit [limit]
+	  $xplimit [limit] (AKA: setxplimit)
 	   └─ Gets and sets a limit to the maximum xp a member can get.  Pass a negative va...
-	  $xpreservelimit [limit]
+	  $xpreservelimit [limit] (AKA: xprlimit, setxprlimit, setxpreservelimit)
 	   └─ Gets and sets a limit to the maximum xp reserve a member can get.  Pass a neg...
 	  $xprole 
 	   └─ Lists the required role to give xp, gamble, or feed the bot.
@@ -163,7 +163,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets the playing status of the bot (owner-only).
 	  $pres [playing_type=0] [status_type=online] [game] [url]
 	   └─ Changes the bot's presence (owner-only).
-	  $reboot [install_or_update]
+	  $reboot [install_or_update] (AKA: restart)
 	   └─ Reboots the bot (owner only).  Can optionally take install or update as argum...
 	  $servers 
 	   └─ Lists the number of servers I'm connected to!
@@ -385,8 +385,8 @@ A list of cogs, commands, and descriptions:
 
 ## Dice
 ####	Dice Cog (1 command) - Dice.py Extension:
-	  $roll [dice]
-	   └─ Performs up to 10 space-delimited dice rolls in NdN±Na|d format.
+	  $roll [dice] (AKA: dice)
+	   └─ Performs up to 10 space-delimited dice rolls in XdY±Za|d format where:
 
 ## Dictionary
 ####	Dictionary Cog (1 command) - Dictionary.py Extension:
@@ -655,7 +655,7 @@ A list of cogs, commands, and descriptions:
 
 ## Jpeg
 ####	Jpeg Cog (1 command) - Jpeg.py Extension:
-	  $jpeg [url]
+	  $jpeg [url] (AKA: jpg)
 	   └─ MOAR JPEG!  Accepts a url - or picks the first attachment.
 
 ## LangFilter
@@ -815,7 +815,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Converts morse code to ascii.  Each letter is comprised of "-" or "." and sep...
 
 ## Music
-####	Music Cog (49 commands) - Music.py Extension:
+####	Music Cog (51 commands) - Music.py Extension:
 	  $allowplaynext [yes_no]
 	   └─ Gets or sets whether playnext, shufflenext, radionext, loadplnext, and shuffl...
 	  $autodeleteafter [seconds]
@@ -830,6 +830,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Joins a passed voice channel, or the author's if none passed.
 	  $lasteq [yes_no]
 	   └─ Gets or sets whether the current EQ settings are preserved between music sess...
+	  $lavalink 
+	   └─ Lists info about the Lavalink version connected to.
 	  $leave  (AKA: disconnect, okbye)
 	   └─ Stops and disconnects the bot from voice.
 	  $leavewhenalone [yes_no]
@@ -900,6 +902,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Adds your vote to skip the current song.  50% or more of the non-bot users ne...
 	  $skips [user] (AKA: skipped)
 	   └─ Lists the number of skips for the currently playing song.
+	  $spotifyradio [yes_no]
+	   └─ Gets or sets the whether Spotify is used for radio recommendations.  Requires...
 	  $stop 
 	   └─ Stops and empties the current playlist.
 	  $stopall 
@@ -960,7 +964,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Forces an update of the in-memory Configuration.tex file (owner only).
 	  $listcodecs [search_term] (AKA: codecs)
 	   └─ Lists the codecs in the AppleALCCodecs.plist - can optionally take a codec na...
-	  $nvweb [os_build]
+	  $nvweb [os_build] (AKA: nvidiaweb, webdrivers, webdriver)
 	   └─ Prints the download url for the passed OS build number (if it exists).  If no...
 	  $octex [search_path] (AKA: occonfig, configtex, ocsearch, configsearch, seachtex, tex, occ)
 	   └─ Searches the Configuration.tex file in memory for the passed path.  Must incl...
@@ -986,9 +990,13 @@ A list of cogs, commands, and descriptions:
 	   └─ DOT MATRIX.  Accepts a url - or picks the first attachment.
 
 ## Profile
-####	Profile Cog (7 commands) - Profile.py Extension:
-	  $addprofile [name] [link]
+####	Profile Cog (10 commands) - Profile.py Extension:
+	  $addprofile [name] [link] (AKA: newprofile)
 	   └─ Add a profile to your profile list.
+	  $clearprofiles 
+	   └─ Removes all of your profiles.
+	  $loadprofiles [url]
+	   └─ Loads the passed json attachment or URL into your profiles.
 	  $profile [member] [name]
 	   └─ Retrieve a profile from the passed user's profile list.
 	  $profileinfo [member] [name]
@@ -999,8 +1007,10 @@ A list of cogs, commands, and descriptions:
 	   └─ Retrieve a profile's raw markdown from the passed user's profile list.
 	  $rawprofiles [member]
 	   └─ List all profiles' raw markdown in the passed user's profile list.
-	  $removeprofile [name]
+	  $removeprofile [name] (AKA: remprofile, delprofile, deleteprofile)
 	   └─ Remove a profile from your profile list.
+	  $saveprofiles 
+	   └─ Saves your profiles to a json file and uploads.
 
 ## Promote
 ####	Promote Cog (4 commands) - Promote.py Extension:
@@ -1396,11 +1406,15 @@ A list of cogs, commands, and descriptions:
 	   └─ Removes the passed temp role from the passed user (bot-admin only).
 
 ## Time
-####	Time Cog (6 commands) - Time.py Extension:
+####	Time Cog (10 commands) - Time.py Extension:
 	  $listtz [tz_search]
 	   └─ List all the supported TimeZones.
 	  $offset [member]
 	   └─ See a member's UTC offset.
+	  $setbotoffset [offset]
+	   └─ Sets the bot's UTC offset (owner only).
+	  $setbottz [tz]
+	   └─ Sets the bot's TimeZone - Overrides their UTC offset - and accounts for DST (...
 	  $setoffset [offset]
 	   └─ Set your UTC offset.
 	  $settz [tz]
@@ -1409,6 +1423,10 @@ A list of cogs, commands, and descriptions:
 	   └─ Get UTC time +- an offset.
 	  $tz [member]
 	   └─ See a member's TimeZone.
+	  $use12 [yes_no]
+	   └─ Gets or sets whether or not you'd like time results in 12-hour format.
+	  $use24 [yes_no]
+	   └─ Gets or sets whether or not you'd like time results in 24-hour format.
 
 ## Translate
 ####	Translate Cog (4 commands) - Translate.py Extension:
@@ -1481,7 +1499,7 @@ A list of cogs, commands, and descriptions:
 	   └─ Sets which channel then mention posts to when enough votes against a user are...
 	  $setvkmention [user_or_role]
 	   └─ Sets which user or role is mentioned when enough votes against a user are rea...
-	  $vk [user] [server]
+	  $vk [user] [server] (AKA: votekick)
 	   └─ Places your vote to have the passed user kicked.
 	  $vkanon [yes_no]
 	   └─ Sets whether vote messages are removed after voting (bot-admin only; always o...
@@ -1553,12 +1571,12 @@ A list of cogs, commands, and descriptions:
 	   └─ Search Wikipedia!
 
 ## Xp
-####	Xp Cog (11 commands) - Xp.py Extension:
+####	Xp Cog (12 commands) - Xp.py Extension:
 	  $bottomxp 
 	   └─ List the bottom xp-holders.
 	  $defaultrole 
 	   └─ Lists the default role that new users are assigned.
-	  $gamble [bet]
+	  $gamble [bet] (AKA: bet, wager)
 	   └─ Gamble your xp reserves for a chance at winning xp!
 	  $leaderboard 
 	   └─ List the top xp-holders.
@@ -1571,11 +1589,13 @@ A list of cogs, commands, and descriptions:
 	  $recheckroles 
 	   └─ Re-iterate through all members and assign the proper roles based on their xp ...
 	  $stats [member]
-	   └─ List the xp and xp reserve of a listed member.
+	   └─ List a number of stats about the passed member.
 	  $xp [member] [xpAmount]
 	   └─ Gift xp to other members.
 	  $xpinfo 
 	   └─ Gives a quick rundown of the xp system.
+	  $xpstats [member] (AKA: statsxp, xps, sxp)
+	   └─ List only the xp and xp reserve of the passed member.
 
 ## XpBlock
 ####	XpBlock Cog (4 commands) - XpBlock.py Extension:
