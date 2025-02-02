@@ -24,7 +24,8 @@ class MadLibs(commands.Cog):
 	@commands.command()
 	async def ml(self, ctx, *, word = None):
 		"""Used to choose your words when in the middle of a madlibs."""
-		pass
+		if not self.playing_madlibs.get(str(ctx.guild.id)):
+			await ctx.invoke(self.madlibs,madlib=word)
 
 	@commands.command()
 	async def mleave(self, ctx):
@@ -210,7 +211,6 @@ class MadLibs(commands.Cog):
 			# Only replace the first occurence of each
 			data = re.sub(self.regex, "**{}**".format(Nullify.escape_all(sub)), data, 1)
 
-		self.playing_madlibs.pop(str(ctx.guild.id),None)
-		
 		# Message the output
 		await ctx.send(data)
+		self.playing_madlibs.pop(str(ctx.guild.id),None)
