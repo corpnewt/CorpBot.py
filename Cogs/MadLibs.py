@@ -24,8 +24,7 @@ class MadLibs(commands.Cog):
 	@commands.command()
 	async def ml(self, ctx, *, word = None):
 		"""Used to choose your words when in the middle of a madlibs."""
-		if not self.playing_madlibs.get(str(ctx.guild.id)):
-			await ctx.invoke(self.madlibs,madlib=word)
+		pass
 
 	@commands.command()
 	async def mleave(self, ctx):
