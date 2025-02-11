@@ -110,9 +110,15 @@ class Utils(commands.Cog):
 			new_val = [line+"\n" if complete_codeblocks and line.startswith("```") and line[3:].isalpha() else line for line in value.split("\n")]
 			value = " ".join(new_val)
 		if len(value)>limit: # We need to truncate
-			value = value[:limit-len(suffix)]+suffix
+			# Start with a truncated value
+			value = value[:limit]
 			# Check if we need to complete an orphaned codeblock
-			if complete_codeblocks and value.count("```") % 2: value += "```"
+			if complete_codeblocks and value.count("```") % 2:
+				suffix += "```"
+			if len(value) <= len(suffix):
+				# Skip the suffix - too short to truncate
+				suffix = ""
+			value = value[:-len(suffix)]+suffix
 		return value
 
 	def get_avatar(self,member,server=True):
