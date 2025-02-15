@@ -56,7 +56,7 @@ class Discogs(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def discogs(self, ctx, *, search = None):
-		"""Perform a general discogs.com search. Could return albums, artits, etc.
+		"""Perform a general discogs.com search. Could return albums, artists, etc.
 		By default, all searches are interpreted as song title searches, but you can refine them with the following:
 		
 		track=Song name
