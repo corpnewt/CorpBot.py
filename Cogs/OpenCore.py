@@ -419,17 +419,17 @@ class OpenCore(commands.Cog):
 			acpi_add = acpi_patch = kernel_add = kernel_patch = misc_tools = uefi_drivers = None
 			booter_q = None
 			boot_args = boot_args_d = None
-			try: acpi_add     = [x for x in plist_data["ACPI"]["Add"] if isinstance(x,dict) and x["Enabled"]]
+			try: acpi_add     = [x for x in plist_data["ACPI"]["Add"] if isinstance(x,dict) and x.get("Enabled")]
 			except: pass
-			try: acpi_patch   = [x for x in plist_data["ACPI"]["Patch"] if isinstance(x,dict) and x["Enabled"]]
+			try: acpi_patch   = [x for x in plist_data["ACPI"]["Patch"] if isinstance(x,dict) and x.get("Enabled")]
 			except: pass
-			try: kernel_add   = [x for x in plist_data["Kernel"]["Add"] if isinstance(x,dict) and x["Enabled"]]
+			try: kernel_add   = [x for x in plist_data["Kernel"]["Add"] if isinstance(x,dict) and x.get("Enabled")]
 			except: pass
-			try: kernel_patch = [x for x in plist_data["Kernel"]["Patch"] if isinstance(x,dict) and x["Enabled"]]
+			try: kernel_patch = [x for x in plist_data["Kernel"]["Patch"] if isinstance(x,dict) and x.get("Enabled")]
 			except: pass
-			try: misc_tools   = [x for x in plist_data["Misc"]["Tools"] if isinstance(x,dict) and x["Enabled"]]
+			try: misc_tools   = [x for x in plist_data["Misc"]["Tools"] if isinstance(x,dict) and x.get("Enabled")]
 			except: pass
-			try: uefi_drivers = [x for x in plist_data["UEFI"]["Drivers"] if (isinstance(x,dict) and x["Enabled"]) or isinstance(x,str)]
+			try: uefi_drivers = [x for x in plist_data["UEFI"]["Drivers"] if (isinstance(x,dict) and x.get("Enabled")) or isinstance(x,str)]
 			except: pass
 			try: booter_q     = plist_data["Booter"]["Quirks"]
 			except: pass
