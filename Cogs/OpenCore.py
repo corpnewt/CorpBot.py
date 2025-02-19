@@ -497,7 +497,8 @@ class OpenCore(commands.Cog):
 				# Set up a helper to parse
 				def parse_tuple(n_d,desc,driver_warning=""):
 					for n,d,k,t in n_d:
-						if t is None: continue # Didn't exist in the source, skip
+						if t is None or d is None:
+							continue # Didn't exist in the source, skip
 						desc += "\n### {} ({:,}/{:,} Enabled){}{}\n".format(
 							n,
 							len(d),
