@@ -236,6 +236,14 @@ class Bot(commands.Cog):
 		await botMember.edit(nick=name)
 
 	@commands.command()
+	async def uptime(self, ctx):
+		"""Lists the bot's uptime."""
+		currentTime = int(time.time())
+		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+		msg = 'I\'ve been up for *{}*.'.format(timeString)
+		await ctx.channel.send(msg)
+
+	@commands.command()
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
 
@@ -258,7 +266,7 @@ class Bot(commands.Cog):
 		botMember     = DisplayName.memberForID(self.bot.user.id, ctx.message.guild)
 		botName       = DisplayName.name(botMember)
 		currentTime   = int(time.time())
-		timeString    = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
+		timeString    = ReadableTime.getReadableTimeBetween(psutil.boot_time(), currentTime)
 		pythonMajor   = sys.version_info.major
 		pythonMinor   = sys.version_info.minor
 		pythonMicro   = sys.version_info.micro
