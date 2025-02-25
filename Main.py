@@ -82,6 +82,7 @@ except:
 bot.settings_dict    = settings_dict
 bot.ready_dispatched = False
 bot.local_client     = None
+bot.startup_time     = time.time()
 
 async def return_message():
 	# Set the settings var up

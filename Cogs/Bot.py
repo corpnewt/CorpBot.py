@@ -20,7 +20,7 @@ class Bot(commands.Cog):
 	def __init__(self, bot, settings, path = None, pypath = None):
 		self.bot = bot
 		self.settings = settings
-		self.startTime = int(time.time())
+		self.startTime = time.time()
 		self.path = path
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
@@ -238,16 +238,21 @@ class Bot(commands.Cog):
 	@commands.command()
 	async def uptime(self, ctx):
 		"""Lists the bot's uptime."""
-		currentTime = int(time.time())
-		timeString  = ReadableTime.getReadableTimeBetween(self.startTime, currentTime)
-		msg = 'I\'ve been up for *{}*.'.format(timeString)
-		await ctx.channel.send(msg)
+		try:
+			try:
+				startup_time = int(self.bot.startup_time)
+			except AttributeError:
+				startup_time = int(self.startTime)
+		except:
+			time_string = "too long to count"
+		time_string = ReadableTime.getReadableTimeBetween(startup_time, int(time.time()))
+		await ctx.send("I've been up for *{}*.".format(time_string))
 
 	@commands.command()
 	async def hostinfo(self, ctx):
 		"""List info about the bot's host environment."""
 
-		message = await ctx.channel.send('Gathering info...')
+		message = await ctx.send('Gathering info...')
 
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
