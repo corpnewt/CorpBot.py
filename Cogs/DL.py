@@ -42,7 +42,8 @@ async def async_dl(url, headers=None, ssl=None, return_headers=False, assert_sta
                     # Wrap it in a tuple - as we can check for multiple
                     # using the "in" operator
                     assert_status = (assert_status,)
-                assert response.status in assert_status
+                if response.status not in assert_status:
+                    raise Exception("Got invalid response status: {}".format(response.status))
             while True:
                 chunk = await response.content.read(chunk_size) # Defaults to 4k
                 data += chunk
