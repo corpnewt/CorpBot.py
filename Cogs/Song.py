@@ -46,9 +46,11 @@ class Song(commands.Cog):
             return False
 
     @commands.command(aliases=["songinfo", "music", "musicinfo"])
-    async def song(self, ctx, *, query : str):
+    async def song(self, ctx, *, query : str = None):
         """Get data for a specific song."""
 
+        if query is None:
+            return await ctx.send("Usage: `{}song [query]`".format(ctx.prefix))
         message = await ctx.send("Searching for song...")
         song = await self._getSong(query)
         if song:
@@ -84,9 +86,11 @@ class Song(commands.Cog):
             await message.edit(content="No results found for that query.")
 
     @commands.command(aliases=["lyric"])
-    async def lyrics(self, ctx, *, query : str):
+    async def lyrics(self, ctx, *, query : str = None):
         """Get lyrics for a song."""
 
+        if query is None:
+            return await ctx.send("Usage: `{}song [query]`".format(ctx.prefix))
         message = await ctx.send("Searching for lyrics...")
         song = await self._getSong(query)
         if song:
