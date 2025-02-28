@@ -19,95 +19,92 @@ class Song(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
-        self.ua = 'CorpNewt DeepThoughtBot'
+        self.ua = "CorpNewt DeepThoughtBot"
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
 
     async def _getSong(self, query : str):
-        headers = {"Authorization" : "Bearer " + self.bot.settings_dict.get("song"), "User-agent" : self.ua}
+        headers = {"Authorization" : "Bearer {}".format(self.bot.settings_dict.get("song")), "User-agent" : self.ua}
         song = None
         try:
-            response = await DL.async_json('https://api.genius.com/search?q=' + quote(query), headers=headers)
-            songs = response['response']['hits']
-            for hit in songs:
-                if hit['type'] == "song":
-                    return hit['result']
+            response = await DL.async_json("https://api.genius.com/search?q={}".format(quote(query)), headers=headers)
+            songs = response["response"]["hits"]
+            song = next((x.get("result") for x in songs if x.get("type") == "song"),None)
         except Exception as e:
             print(e)
             return False
         return song
 
     async def _songInfo(self, songid : int):
-        headers = {"Authorization" : "Bearer " + self.bot.settings_dict.get("song"), "User-agent" : self.ua}
+        headers = {"Authorization" : "Bearer {}".format(self.bot.settings_dict.get("song")), "User-agent" : self.ua}
         try:
-            response = await DL.async_json('https://api.genius.com/songs/' + str(songid), headers=headers)
-            song = response['response']
-            return song
+            response = await DL.async_json("https://api.genius.com/songs/{}".format(songid), headers=headers)
+            return response["response"]
         except Exception as e:
             print(e)
             return False
 
-    @commands.command(aliases=['songinfo', 'music', 'musicinfo'])
+    @commands.command(aliases=["songinfo", "music", "musicinfo"])
     async def song(self, ctx, *, query : str):
         """Get data for a specific song."""
 
         message = await ctx.send("Searching for song...")
         song = await self._getSong(query)
-        if song == False:
-            await message.edit(content=f"Error retrieving song data")
-        elif song is not None:
-            title = song['title']
-            artist = song['primary_artist']['name']
-            url = song['url']
-            art = song['song_art_image_thumbnail_url']
+        if song:
+            title = song["title"]
+            artist = song["primary_artist"]["name"]
+            url = song["url"]
+            art = song["song_art_image_thumbnail_url"]
             if art is None:
-                art = song['header_image_thumbnail_url']
+                art = song["header_image_thumbnail_url"]
             link = "Unable to obtain link"
-            detailedsongdata = await self._songInfo(song['id'])
-            detailedsongdata = detailedsongdata['song']
-            if detailedsongdata != False and detailedsongdata is not None:
-                if "media" in detailedsongdata:
-                    link = ""
-                    for media in detailedsongdata['media']:
-                        if "url" in media: # This check should be unnecessary, but it is done just in case
-                            link += f"[{media['provider']}](<{media['url']}>)\n"
-            embed = discord.Embed(
+            await message.edit(content="Gathering song info...")
+            try:
+                detailedsongdata = await self._songInfo(song["id"])
+                detailedsongdata = detailedsongdata["song"]["media"]
+                link = "\n".join([
+                    "[{}]({})".format(x["provider"],x["url"]) \
+                    for x in detailedsongdata if "url" in x \
+                    and "provider" in x
+                ])
+            except:
+                pass
+            await Message.Embed(
                 title = "**{}** by **{}**".format(title, artist),
-                color = ctx.author.color,
+                color = ctx.author,
                 description = link,
-                url = url
-            )
-            embed.set_thumbnail(url=art)
-            embed.set_footer(text="Powered by Genius")
-            await message.edit(content=None, embed=embed)
+                url = url,
+                thumbnail = art,
+                footer="Powered by Genius"
+            ).send(ctx,message)
+        elif song == False:
+            await message.edit(content="Error retrieving song data")
         else:
-            message.edit(content="No results found for that query.")
+            await message.edit(content="No results found for that query.")
 
-    @commands.command(aliases=['lyric'])
+    @commands.command(aliases=["lyric"])
     async def lyrics(self, ctx, *, query : str):
         """Get lyrics for a song."""
 
         message = await ctx.send("Searching for lyrics...")
         song = await self._getSong(query)
-        if song == False:
-            await message.edit(content=f"Error retrieving lyrics data")
-        elif song is not None:
-            response = await DL.async_text(song['url'], headers={"User-agent" : self.ua})
+        if song:
+            response = await DL.async_text(song["url"], headers={"User-agent" : self.ua})
             # Get Lyrics part
             lyrics_parts = re.findall('<div data-lyrics-container="true" class="Lyrics.+?">(.+?)</div><div class="RightSidebar', response)
-            lyrics = '\n'.join(lyrics_parts) # Join all the lyrics parts together with a newline after each part
+            lyrics = "\n".join(lyrics_parts) # Join all the lyrics parts together with a newline after each part
             lyrics = lyrics.replace("<br/>", "\n")
             lyrics = html.unescape(lyrics) # Remove HTML escapes and replaces them with proper characters
-            lyrics = re.sub(r'<[^>]+>', '', lyrics, flags=re.DOTALL) # Remove all HTML tags but keep the text inside
+            lyrics = re.sub(r"<[^>]+>", "", lyrics, flags=re.DOTALL) # Remove all HTML tags but keep the text inside
             if "You might also likeEmbed" in lyrics: # Remove "You might also likeEmbed" if it exists (this may be useful, I don't know if new code has this)
                 lyrics = lyrics.split("You might also likeEmbed")[0].strip() 
-            title = song['title']
-            artist = song['primary_artist']['name']
-            url = song['url']
-            art = song['song_art_image_thumbnail_url']
+            title = song["title"]
+            artist = song["primary_artist"]["name"]
+            url = song["url"]
+            art = song["song_art_image_thumbnail_url"]
             if art is None:
-                art = song['header_image_thumbnail_url']
+                art = song["header_image_thumbnail_url"]
             return await PickList.PagePicker(
                 title="**{}** by **{}**".format(title, artist),
                 ctx=ctx,
@@ -118,5 +115,7 @@ class Song(commands.Cog):
                 message=message,
                 thumbnail=art
             ).pick()
+        elif song == False:
+            await message.edit(content="Error retrieving lyrics data")
         else:
-            message.edit(content="No results found for that query.")
+            await message.edit(content="No results found for that query.")
