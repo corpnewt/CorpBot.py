@@ -177,6 +177,8 @@ class Time(commands.Cog):
 		off = self._format_offset(offset,utc_prefix=False)
 		if off is None:
 			return await ctx.send('Offset has to be in +-H:M!')
+		elif off is False:
+			return await ctx.send("That offset is out of range!")
 		strftime = self.getstrftime(ctx)
 		self.settings.setGlobalUserStat(user, "UTCOffset", off)
 		time = self.getTimeFromOffset(offset,strftime=strftime)
@@ -199,6 +201,14 @@ class Time(commands.Cog):
 				minutes = 0
 			except:
 				return None
+		# Ensure values are within the C int range by applying
+		# the offset via timedelta
+		try:
+			t = datetime.datetime.utcnow()
+			td = datetime.timedelta(hours=hours, minutes=minutes)
+			t + td
+		except OverflowError:
+			return False
 		# Ensure only hours can be negative
 		if minutes < 0: minutes *= -1
 		if not as_string:
@@ -232,7 +242,7 @@ class Time(commands.Cog):
 		offset = self.settings.getGlobalUserStat(member, "UTCOffset")
 		if offset:
 			h_m = self._format_offset(offset,as_string=False)
-			if h_m is None:
+			if h_m in (None,False):
 				# Bad value saved
 				offset = None
 		strftime = self.getstrftime(ctx)
@@ -366,19 +376,19 @@ class Time(commands.Cog):
 		if t is None:
 			t = datetime.datetime.utcnow()
 		# Apply offset
-		if hours > 0:
-			# Apply positive offset
-			msg += '+{}'.format(offset)
-			td = datetime.timedelta(hours=hours, minutes=minutes)
-			newTime = t + td
-		elif hours < 0:
-			# Apply negative offset
-			msg += '{}'.format(offset)
-			td = datetime.timedelta(hours=(-1*hours), minutes=(-1*minutes))
-			newTime = t - td
-		else:
+		if hours == 0:
 			# No offset
 			newTime = t
+		else:
+			msg += "{}{}".format(
+				"+" if hours > 0 else "",
+				offset
+			)
+			try:
+				td = datetime.timedelta(hours=hours, minutes=minutes)
+				newTime = t + td
+			except OverflowError:
+				return None # Overflowed
 		return {
 			"zone":msg,
 			"time":newTime.strftime(strftime or "%I:%M %p")
