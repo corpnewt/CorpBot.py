@@ -248,12 +248,7 @@ class Bot(commands.Cog):
 		time_string = ReadableTime.getReadableTimeBetween(startup_time, int(time.time()))
 		await ctx.send("I've been up for *{}*.".format(time_string))
 
-	@commands.command()
-	async def hostinfo(self, ctx):
-		"""List info about the bot's host environment."""
-
-		message = await ctx.send('Gathering info...')
-
+	def _gather_host_info(self, ctx):
 		# cpuCores    = psutil.cpu_count(logical=False)
 		# cpuThred    = psutil.cpu_count()
 		cpuName       = cpuinfo.get_cpu_info()['brand_raw']
@@ -298,6 +293,14 @@ class Bot(commands.Cog):
 		msg += ProgressBar.makeBar(int(round(memPerc))) + "\n\n"
 		msg += '{} uptime```'.format(timeString)
 
+		return msg
+
+	@commands.command()
+	async def hostinfo(self, ctx):
+		"""List info about the bot's host environment."""
+
+		message = await ctx.send('Gathering info...')
+		msg = await self.bot.loop.run_in_executor(None,self._gather_host_info,ctx)
 		await message.edit(content=msg)
 
 	@commands.command()
