@@ -1,6 +1,6 @@
 import asyncio, discord, base64, binascii, re, os, random
 from   discord.ext import commands
-from   Cogs import Utils, DL, Message, Nullify
+from   Cogs import Utils, DL, Message, Nullify, DisplayName
 from   PIL import Image
 
 def setup(bot):
@@ -65,8 +65,9 @@ class Encode(commands.Cog):
 			"hexl"
 		)
 		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext/(s)tring","(h)ex/bhex/lhex")
-		global Utils
+		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
+		DisplayName = self.bot.get_cog("DisplayName")
 
 	# Helper methods
 	def _to_bytes(self, in_string):
@@ -265,10 +266,24 @@ class Encode(commands.Cog):
 				# Try to convert it to an int
 				try: color_values.append(int(x))
 				except: pass # Bad value - ignore
-		original_type = "hex" if len(color_values) == 1 else "rgb" if len(color_values) == 3 else "cmyk" if len(color_values) == 4 else None
-		if original_type is None: return await ctx.send("Incorrect number of color values!  Hex takes 1, RGB takes 3, CMYK takes 4.")
+		original_type = {
+			1:"hex",
+			3:"rgb",
+			4:"cmyk"
+		}.get(len(color_values),None)
+		if original_type is None:
+			# Try to get a member
+			member = DisplayName.memberForName(value,ctx.guild)
+			if member is None:
+				return await ctx.send("Incorrect number of color values!  Hex takes 1, RGB takes 3, CMYK takes 4.")
+			# We got a member - extract the color
+			original_type = "hex"
+			color_values = [member.color.value]
 		# Verify values
-		max_val = int("FFFFFF",16) if original_type == "hex" else 255 if original_type == "rgb" else 100
+		max_val = {
+			"hex":0xFFFFFF,
+			"rgb":255
+		}.get(original_type,100)
 		if not all((0 <= x <= max_val for x in color_values)):
 			return await ctx.send("Value out of range!  Valid ranges are from `#000000` to `#FFFFFF` for Hex, `0` to `255` for RGB, and `0` to `100` for CMYK.")
 		# Organize the data into the Message format expectations
