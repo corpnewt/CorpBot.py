@@ -135,7 +135,7 @@ class Remind(commands.Cog):
 		# Remove the task from the loop list
 		if task in self.loop_list: self.loop_list.remove(task)
 
-	@commands.command(pass_context=True)
+	@commands.command(aliases=["remind"])
 	async def remindme(self, ctx, message : str = None, *, endtime : str = None):
 		"""Set a reminder.  If the message contains spaces, it must be wrapped in quotes."""
 
@@ -187,7 +187,7 @@ class Remind(commands.Cog):
 		# Confirm the reminder
 		await ctx.send("Okay *{}*, I'll remind you in *{}*.".format(DisplayName.name(ctx.author),readableTime))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def reminders(self, ctx, *, member = None):
 		"""List pending reminders - pass a member to see their reminders in the current guild."""
 
@@ -227,7 +227,7 @@ class Remind(commands.Cog):
 		# Show our list
 		return await PickList.PagePicker(title=title,list=entries,ctx=ctx).pick()
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def clearmind(self, ctx, *, index = None):
 		"""Clear the reminder index passed - or all if none passed."""
 		if ctx.guild:
