@@ -50,7 +50,16 @@ class Encode(commands.Cog):
 			"lhex",
 			"hexl",
 			"lh",
-			"hl"
+			"hl",
+			# - Big endian full hex value
+			"bitb",
+			"bbit",
+			"bb",
+			# - Little endian full hex value
+			"bitl",
+			"lbit",
+			"bl",
+			"lb"
 		)
 		self.padded_prefixes = (
 			"bin",
@@ -62,9 +71,20 @@ class Encode(commands.Cog):
 			"hexb",
 			"lh",
 			"hl",
-			"hexl"
+			"hexl",
+			"bitl",
+			"lb",
+			"bitb",
+			"bb"
 		)
-		self.display_types = ("(d)ecimal/(i)nteger","(b)ase64","(bin)ary","(a)scii/(t)ext/(s)tring","(h)ex/bhex/lhex")
+		self.display_types = (
+			"(d)ecimal/(i)nteger",
+			"(b)ase64",
+			"(bin)ary",
+			"(a)scii/(t)ext/(s)tring",
+			"(h)ex/bhex/lhex",
+			"(lb)it/(bb)it"
+		)
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -115,6 +135,20 @@ class Encode(commands.Cog):
 			val = "0"*(len(val)%2)+val
 			hex_rev = "".join(["".join(x) for x in [val[i:i + 2] for i in range(0,len(val),2)][::-1]])
 			val_adj = binascii.unhexlify(hex_rev)
+		elif from_type.startswith(("bitl","lb","bl")): # Little-endian bit-level
+			val = self._check_hex(val)
+			pad = self._get_pad(from_type, default_pad=0)
+			# Ensure we have pads in 8-bit increments
+			pad = int(8-pad%8+pad if pad%8 else pad)
+			# Can't have a 0 pad
+			pad = max(pad,8)
+			# Convert to binary
+			val = "{:b}".format(int(val,16))
+			# Pad if needed
+			if len(val)%pad:
+				val = "0"*(pad-len(val)%pad)+val
+			val_hex = "{:x}".format(int(val[::-1],2))
+			val_adj = binascii.unhexlify("0"*(len(val_hex)%2)+val_hex)
 		else: # Assume bhex/hex
 			val = self._check_hex(val)
 			val_adj = binascii.unhexlify("0"*(len(val)%2)+val)
@@ -148,6 +182,22 @@ class Encode(commands.Cog):
 			# Ensure it's an even number of elements as well
 			pad_val = "0"*(len(out)%2)+out
 			out = "".join(["".join(x) for x in [pad_val[i:i + 2] for i in range(0,len(pad_val),2)][::-1]]).upper()
+			# Also split into chunks of 8 for readability
+			out = "0x"+" ".join((out[0+i:8+i] for i in range(0,len(out),8)))
+		elif to_type.startswith(("bitl","lb","bl")):
+			pad = self._get_pad(to_type, default_pad=8)
+			# Ensure we have pads in 8-bit increments
+			pad = int(8-pad%8+pad if pad%8 else pad)
+			# Can't have a 0 pad
+			pad = max(pad,8)
+			out = "{:b}".format(int(binascii.hexlify(val_adj).decode(),16)) # Get the hex value in binary
+			if len(out)%pad:
+				# Make sure we pad to the correct amount
+				out = "0"*(pad-len(out)%pad)+out
+			# Reverse the bits and convert to hex
+			out = "{:x}".format(int(out[::-1],2)).upper()
+			# Ensure it's an even number of elements as well
+			out = "0"*(len(out)%2)+out
 			# Also split into chunks of 8 for readability
 			out = "0x"+" ".join((out[0+i:8+i] for i in range(0,len(out),8)))
 		else:
