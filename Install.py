@@ -198,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--clear-venv", help="Clears the venv when accessed with a different python version instead of upgrading", action="store_true")
     parser.add_argument("-f", "--force-update-venv", help="Clears the venv and creates it anew", action="store_true")
     parser.add_argument("-l", "--list-dependencies", help="Prints JSON data showing required dependencies, whether they're installed, and their versions (overrides --no-interaction and --install-missing)", action="store_true")
+    parser.add_argument("-a", "--list-all-packages", help="Prints JSON data showing all installed packages and their versions (overrides --no-interaction, --list-dependencies, and --install-missing)", action="store_true")
     parser.add_argument("-m", "--install-missing", help="Only attmepts to install missing dependencies", action="store_true")
     parser.add_argument("-p", "--skip-pip", help="Skips updating pip in the venv in addition to the other dependencies", action="store_true")
     args = parser.parse_args()
@@ -248,8 +249,12 @@ if __name__ == '__main__':
         raise FileNotFoundError("Could not locate or create a valid virtual env at {}".format(
             os.path.join(os.path.dirname(os.path.realpath(__file__)),"venv")
         ))
+
+    if args.list_all_packages:
+        # Override just listing dependencies
+        args.list_dependencies = False
     
-    if args.list_dependencies or args.install_missing:
+    if args.list_dependencies or args.install_missing or args.list_all_packages:
         # Gather a list of what deps we have, and which are missing
         out = r.run({"args":[py_venv,"-m","pip","list"]})
         if out[2] != 0:
@@ -263,13 +268,15 @@ if __name__ == '__main__':
         for line in out[0].split("\n"):
             try:
                 name,vers = line.lower().split()
+                # Omit lines that are just hyphens
+                assert name.replace("-","") and vers.replace("-","")
             except:
                 continue
-            if name in checks:
+            if args.list_all_packages or name in checks:
                 checks[name]=vers
-        if args.list_dependencies:
+        if args.list_dependencies or args.list_all_packages:
             # Just printing the deps - do that and bail
-            print(json.dumps(checks,indent=2))
+            print(json.dumps(checks,indent=2,sort_keys=True))
             exit()
         elif args.install_missing:
             # Let's replace our modules with the ones that are missing
