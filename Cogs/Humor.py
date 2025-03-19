@@ -553,7 +553,7 @@ class Humor(commands.Cog):
 				l,t,r,b = d.textbbox((0,0),name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
 				t_w,t_h = r-l,b-t
 				t_w = d.textlength(name_text,font=ImageFont.truetype("fonts/stardew.ttf",name_size))
-			d.text((209+(88-t_w)/2,88+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
+			d.text((209+(88-t_w)/2,87.5+(12-t_h)/2),test_user.display_name,font=ImageFont.truetype("fonts/stardew.ttf",name_size),fill=(86,22,12))
 			# Get the response - origin is (10,10), each row height is 14
 			rows = textwrap.wrap(
 				random.choice(self.stardew_responses),
