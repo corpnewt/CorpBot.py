@@ -1,8 +1,5 @@
-import asyncio
-import discord
 import re
-from   discord.ext import commands
-from   Cogs import DisplayName
+from discord.ext import commands
 
 def setup(bot):
 	# Add the bot
@@ -14,28 +11,22 @@ class Heart(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		# compile regex to look for i + hug or hug + me
-		self.regex = re.compile(r"((.*?)\bi\b(.*?)\bhug\b(.*?))|((.*?)\bhug\b(.*?)\bme\b(.*?))")
-		global Utils, DisplayName
-		Utils = self.bot.get_cog("Utils")
-		DisplayName = self.bot.get_cog("DisplayName")
+		self.hug_re = re.compile(r"(?i).*\b(i\b.*\bhug\b.*|hug\b.*\bme)\b.*")
+		self.mention_re = re.compile(".*<@!?{}>.*".format(self.bot.user.id))
 
 	async def message(self, message):
 		# Check the message - and append a heart if a ping exists, but no command
 		context = await self.bot.get_context(message)
 		if context.command:
 			return {}
-		# Check for a mention
-		bot_mentions = ["<@!{}>".format(self.bot.user.id), "<@{}>".format(self.bot.user.id)]
 		react_list = []
 		# Get our hug phrases
-		matches = re.finditer(self.regex, message.content.lower())
-		if len(list(matches)):
+		if self.hug_re.match(message.content):
 			# We need a hug, stat!
 			react_list.append("🤗")
-		for x in bot_mentions:
-			if x in message.content:
-				# We got a mention!
-				react_list.append("❤")
+		if self.mention_re.match(message.content):
+			# We got a mention!
+			react_list.append("❤")
 		# Return our reactions - if any
 		if len(react_list):
-			return { "Reaction" : react_list }
+			return {"Reaction":react_list}
