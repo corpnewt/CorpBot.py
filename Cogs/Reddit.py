@@ -721,7 +721,7 @@ class Reddit(commands.Cog):
 							# Ensure we prefix appropriately
 							quoting = True
 							l = "> "+l
-					if l.lower() in ("-","&nbsp;","&#x200b;"):
+					if l.lower() in ("-","&nbsp;","&#x200b;","#"):
 						l = "" # Just a newline placeholder
 					if self.re_line.match(l):
 						l = "⎯"*10 # Originally a line separator
