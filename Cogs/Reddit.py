@@ -56,7 +56,7 @@ class Reddit(commands.Cog):
 		self.re_single_newline = re.compile(r"(?<!\n)\n(?!\n)")
 		self.re_multi_newline = re.compile(r"\n{2,}")
 		self.re_table_separator = re.compile(r":*\-+:*")
-		self.re_quote_sub = re.compile(r"^(>|\s){2,}!?")
+		self.re_quote_sub = re.compile(r"^\s{,3}(>+!?)")
 		self.re_spoiler_search = re.compile(r"((?:^|[^\\])(?:\\{2})*)(>!|!<)")
 		self.re_vanity_escape_sub = re.compile(r"(?P<prefix>(?:^|[^\\])(?:\\{2})*)\\(?P<escaped>\(|\)|\[|\])")
 		self.re_hyperlink_md = re.compile(r"(?i)\[\s*(?P<vanity>([^\]]|(?<!\\)\\(?:\\{2})*\](?!\\))+)\s*\]\(\s*<?(?P<url>https?:\/\/(www\.)?[^\s\[\]\(\)]+\.[^\s\[\]\(\)]+)>?\s*\)")
@@ -556,6 +556,7 @@ class Reddit(commands.Cog):
 		table_rows = []
 		list_pad   = "" # The pad for the top level list item
 		last_line  = ""
+		quoting    = False
 		text_lines = text.split("\n")
 		line_count = len(text_lines)
 		lines_proc = () # Placeholder for lines to process
@@ -671,6 +672,12 @@ class Reddit(commands.Cog):
 						in_table = True
 						# Now we pass the rows we got
 						line = _row
+			quote_sub = self.re_quote_sub.sub("",line)
+			if quoting and is_whitespace(quote_sub):
+				# No longer quoting - just got some whitespace (even quoted
+				# whitespace counts here)
+				quoting = False
+				line = quote_sub
 			if isinstance(line,str):
 				# Wrap in a tuple to iterate
 				line = (line,)
@@ -706,14 +713,14 @@ class Reddit(commands.Cog):
 						repl = ""
 						group = quote_match.group(0)
 						if group.endswith(">!"):
-							# It's a quote - save that
+							# It's a spoiler - save that
 							repl = ">!"
-						elif group.endswith("!"):
-							# Starts with an exclamation mark - good enough
-							repl = "!"
 						l = self.re_quote_sub.sub(repl,l)
-						# We should only be quoting now - prepend our >
-						l = "> "+l
+						if not quoting and (not l.startswith(">!") or not "!<" in l):
+							# First quoted element that isn't a spoiler
+							# Ensure we prefix appropriately
+							quoting = True
+							l = "> "+l
 					if l.lower() in ("-","&nbsp;","&#x200b;"):
 						l = "" # Just a newline placeholder
 					if self.re_line.match(l):
@@ -798,11 +805,11 @@ class Reddit(commands.Cog):
 		spoilered_lines = []
 		for line in pre_final_lines:
 			# Try to walk the line and replace individual entries
-			spoiler_start = line.startswith(">!") or line.startswith("> >!")
+			spoiler_start = line.startswith((">!","> >!"))
 			matches = []
 			for match in self.re_spoiler_search.finditer(line):
 				if match.group(2) == ">!" and len(matches) % 2 \
-				or match.group(2) == "!<" and len(matches) % 2 == 0:
+				or match.group(2) == "!<" and not len(matches) % 2:
 					# Got an out of order match - skip
 					continue
 				# We got a valid match save it to our matches list
