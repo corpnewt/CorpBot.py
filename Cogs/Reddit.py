@@ -226,6 +226,20 @@ class Reddit(commands.Cog):
 			return None
 		return sub
 
+	def _verify_user_name(self, user):
+		try:
+			# Ensure reddit.com/u(ser)/ is split off from the user name if it
+			# exists - as well as any trailing info after a forward slash
+			user = re.split(r"(?i)reddit\.com",user)[-1]
+			user = re.sub(r"(?i)^/?u(ser)?/","",user).split("/")[0]
+			# User names can only be letters, numbers, underscores, and dashes - and
+			# can only be from 3-20 characters long
+			assert all(x in string.ascii_letters+string.digits+"-_" for x in user)
+			assert 2 < len(user) < 21
+		except:
+			return None
+		return user
+
 	async def _get_sub_about(self, sub, force=False):
 		# Helper to return info about the passed subreddit name
 		if force:
@@ -240,8 +254,8 @@ class Reddit(commands.Cog):
 			sub_data = {}
 		try:
 			sub = self._verify_sub_name(sub)
-			sub_lower = sub.lower()
 			assert sub # Ensure it's a valid name
+			sub_lower = sub.lower()
 			# Check if it's in the cache
 			if sub_lower in self.sub_about_cache:
 				# Check if it has expired (update caches once per day if needed)
@@ -252,6 +266,7 @@ class Reddit(commands.Cog):
 			# Get the subreddit's name and ensure it exists by loading the about endpoint
 			about_url = "https://www.reddit.com/r/{}/about.json".format(sub)
 			about = await self._get_json_data(about_url)
+			sub_data["raw_data"] = about
 			# Set our values - fall back on the favicon if there's no
 			# community icon set
 			sub_data["name_prefixed"] = self.unescape(about["data"]["display_name_prefixed"])
@@ -289,6 +304,8 @@ class Reddit(commands.Cog):
 		else:
 			user_data = {}
 		try:
+			user = self._verify_user_name(user)
+			assert user # Ensure it's a valid name
 			user_lower = user.lower()
 			# Check if it's in the cache
 			if user_lower in self.user_about_cache:
@@ -300,6 +317,7 @@ class Reddit(commands.Cog):
 			# Get the subreddit's name and ensure it exists by loading the about endpoint
 			about_url = "https://www.reddit.com/user/{}/about.json".format(user)
 			about = await self._get_json_data(about_url)
+			user_data["raw_data"] = about
 			# Set our values - fall back on the favicon if there's no
 			# community icon set
 			name = self.unescape(about["data"]["name"])
@@ -1546,12 +1564,10 @@ class Reddit(commands.Cog):
 	@commands.command()
 	async def ruser(self, ctx, *, user_name = None):
 		"""Gets some info on the passed username - attempts to use your username if none provided."""
-		user_name = user_name or ctx.author.display_name
 		# Get the info
-		url = "https://www.reddit.com/user/{}/about.json?raw_json=1".format(quote(user_name))
-		# Giving a 200 response for some things that aren't found
 		try:
-			theJSON = await self._get_json_data(url)
+			about = await self._get_user_about(user_name or ctx.author.display_name)
+			theJSON = about["raw_data"]
 		except:
 			# Assume that we couldn't find that user
 			return await Message.EmbedText(
@@ -1562,24 +1578,31 @@ class Reddit(commands.Cog):
 		# Returns:  {"message": "Not Found", "error": 404}  if not found
 		if "message" in theJSON:
 			error = theJSON.get("error", "An error has occurred.")
-			return await Message.EmbedText(title=theJSON["message"], description=str(error), color=ctx.author).send(ctx)
+			return await Message.EmbedText(
+				title=theJSON["message"],
+				description=str(error),
+				color=ctx.author
+			).send(ctx)
 		# Build our embed
-		e = { 
-			"title" : "/u/" + theJSON["data"]["name"],
-			"url" : "https://www.reddit.com/user/" + theJSON["data"]["name"],
-			"color" : ctx.author, 
-			"fields" : [] }
-
+		e = {
+			"title":about["name"],
+			"url":about["url"],
+			"thumbnail":about["icon_url"],
+			"color":ctx.author,
+			"description":theJSON["data"].get("subreddit",{}).get("public_description") or None,
+			"fields":[]
+		}
 		# Get the unix timestamp for the account creation
-		ts = int(theJSON["data"]["created_utc"])
-		created_string = "<t:{}> (<t:{}:R>)".format(ts,ts)
-
-		e["fields"].append({ "name" : "Created", "value" : created_string, "inline" : True })
-		e["fields"].append({ "name" : "Link Karma", "value" : "{:,}".format(theJSON["data"]["link_karma"]), "inline" : True })
-		e["fields"].append({ "name" : "Comment Karma", "value" : "{:,}".format(theJSON["data"]["comment_karma"]), "inline" : True })
-		e["fields"].append({ "name" : "Has Gold", "value" : str(theJSON["data"]["is_gold"]), "inline" : True })
-		e["fields"].append({ "name" : "Is Mod", "value" : str(theJSON["data"]["is_mod"]), "inline" : True })
-		e["fields"].append({ "name" : "Verified Email", "value" : str(theJSON["data"]["has_verified_email"]), "inline" : True })
+		created_string = "<t:{0}> (<t:{0}:R>)".format(
+			int(theJSON["data"]["created_utc"])
+		)
+		# Populate the fields
+		e["fields"].append({"name":"Created","value":created_string,"inline":True})
+		e["fields"].append({"name":"Link Karma","value":"{:,}".format(theJSON["data"]["link_karma"]),"inline":True})
+		e["fields"].append({"name":"Comment Karma","value":"{:,}".format(theJSON["data"]["comment_karma"]),"inline":True})
+		e["fields"].append({"name":"Has Gold","value":str(theJSON["data"]["is_gold"]),"inline":True})
+		e["fields"].append({"name":"Is Mod","value":str(theJSON["data"]["is_mod"]),"inline":True})
+		e["fields"].append({"name":"Verified Email","value":str(theJSON["data"]["has_verified_email"]),"inline":True})
 		# Send the embed
 		await Message.Embed(**e).send(ctx)
 
