@@ -524,8 +524,8 @@ class Reddit(commands.Cog):
 			elif len(table_rows) == 1:
 				# We're qualifying the separator line
 				# The number of columns *needs* to be >= the column headers.
-				# The considered columns can only contain |, -, and whitespace,
-				# chars, and only in the order of pipe, whitespace, hypen, whitespace
+				# The considered columns can only contain |, :, -, and whitespace,
+				# chars, and only in the order of pipe, whitespace, hypen/colon, whitespace
 				line = trim_row(line)
 				cols = []
 				for col in line.split("|"):
@@ -690,13 +690,14 @@ class Reddit(commands.Cog):
 						in_table = True
 						# Now we pass the rows we got
 						line = _row
-			quote_sub = self.re_quote_sub.sub("",line)
-			if quoting and is_whitespace(quote_sub):
-				# No longer quoting - just got some whitespace (even quoted
-				# whitespace counts here)
-				quoting = False
-				line = quote_sub
 			if isinstance(line,str):
+				# Check if we're quoting
+				quote_sub = self.re_quote_sub.sub("",line)
+				if quoting and is_whitespace(quote_sub):
+					# No longer quoting - just got some whitespace (even quoted
+					# whitespace counts here)
+					quoting = False
+					line = quote_sub
 				# Wrap in a tuple to iterate
 				line = (line,)
 			new_row = []
