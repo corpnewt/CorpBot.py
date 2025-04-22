@@ -81,6 +81,7 @@ except:
 	)
 bot.settings_dict    = settings_dict
 bot.ready_dispatched = False
+bot.ready_time       = None
 bot.local_client     = None
 bot.startup_time     = time.time()
 
@@ -118,10 +119,10 @@ async def on_ready():
 		if len(bot.shards) >= bot.shard_count:
 			print("\nAll shards ready!\n")
 			bot.ready_dispatched = True
+			bot.ready_time = time.time()
 			bot.dispatch("all_shards_ready")
 
 @bot.event
-# async def on_ready():
 async def on_all_shards_ready():
 	if not bot.get_cog("CogManager"):
 		# We need to load shiz!
