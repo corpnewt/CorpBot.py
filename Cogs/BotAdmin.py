@@ -83,14 +83,14 @@ class BotAdmin(commands.Cog):
 		"""Set another user's parts list (owner only)."""
 		# Only allow owner
 		isOwner = self.settings.isOwner(ctx.author)
-		if isOwner == None:
+		if isOwner is None:
 			msg = 'I have not been claimed, *yet*.'
 			return await ctx.send(msg)
 		elif isOwner == False:
 			msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
 			return await ctx.send(msg)
 			
-		if member == None:
+		if member is None:
 			msg = 'Usage: `{}setuserparts [member] "[parts text]"`'.format(ctx.prefix)
 			return await ctx.send(msg)
 
@@ -546,38 +546,59 @@ class BotAdmin(commands.Cog):
 		Use with no user_id to show all bans and reasons (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
-		try: all_bans = [entry async for entry in ctx.guild.bans()]
+		message = await Message.Embed(
+			title="Gathering bans...",
+			color=ctx.author
+		).send(ctx)
+
+		try:
+			all_bans = [entry async for entry in ctx.guild.bans()]
 		except:
-			try: all_bans = await ctx.guild.bans()
-			except: return await ctx.send("I couldn't get the ban list :(")
+			try:
+				all_bans = await ctx.guild.bans()
+			except:
+				return await Message.Embed(
+					title="I couldn't get the ban list :("
+				).send(ctx,message)
 		
-		if not len(all_bans): return await Message.EmbedText(title="Ban List",description="No bans found",color=ctx.author).send(ctx)
+		if not len(all_bans):
+			return await Message.Embed(
+				title="Ban List",
+				description="No bans found"
+			).send(ctx,message)
 
 		orig_user = user_id
-		try: user_id = int(user_id) if user_id != None else None
+		try: user_id = int(user_id) if user_id is not None else None
 		except: user_id = -1 # Use -1 to indicate unresolved
 
 		entries = []
 		for i,ban in enumerate(all_bans,start=1):
 			entries.append({"name":"{}. {} ({})".format(i,ban.user,ban.user.id),"value":ban.reason if ban.reason else "No reason provided"})
-			if user_id != None and user_id == ban.user.id:
+			if user_id and user_id != -1 and user_id == ban.user.id:
 				# Got a match - display it
 				return await Message.Embed(
 					title="Ban Found For {}".format(user_id),
-					fields=[entries[-1]], # Send the last found entry
-					color=ctx.author
-				).send(ctx)
+					fields=[entries[-1]] # Send the last found entry
+				).send(ctx,message)
 		if orig_user is None:
 			# Just passed None - show the whole ban list
-			return await PickList.PagePicker(title="Ban List ({:,} total)".format(len(entries)),list=entries,ctx=ctx).pick()
+			return await PickList.PagePicker(
+				title="Ban List ({:,} total)".format(len(entries)),
+				list=entries,
+				ctx=ctx,
+				message=message
+			).pick()
 		# We searched for something and didn't find it
-		return await Message.Embed(title="Ban List ({:,} total)".format(len(entries)),description="No match found for '{}'.".format(orig_user),color=ctx.author).send(ctx)
+		return await Message.Embed(
+			title="Ban List ({:,} total)".format(len(entries)),
+			description="No match found for '{}'.".format(orig_user)
+		).send(ctx,message)
 
 	@commands.command()
 	async def rembanmessages(self, ctx, number_of_days = None):
 		"""Gets or sets the default number of days worth of messages to remove when banning a user.  Must be between 0-7 and uses a default of 1 (bot-admin only)."""
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if number_of_days == None: # No setting passed, just output the current
+		if number_of_days is None: # No setting passed, just output the current
 			days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1)
 			return await ctx.send("Banning a user will remove {:,} day{} worth of messages.".format(days,"" if days==1 else "s"))
 		# Try to cast the days as an int - and ensure they're between 0 and 7
