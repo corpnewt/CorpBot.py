@@ -2,6 +2,7 @@ import discord, time, tempfile, os, shutil, json
 import regex as re
 from discord.ext import commands
 from datetime import timedelta
+from collections import deque
 from Cogs import Settings, DisplayName, Utils, Nullify, PickList, Message, DL
 
 def setup(bot):
@@ -14,6 +15,10 @@ class Responses(commands.Cog):
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot, settings):
 		self.bot = bot
+		self.latest_url = "https://www.unicode.org/Public/security/latest/"
+		self.confusables_url = "https://www.unicode.org/Public/security/latest/confusables.txt"
+		self.confusables = "confusables.json"
+		self.confusables_dict = {}
 		self.settings = settings
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
@@ -28,6 +33,7 @@ class Responses(commands.Cog):
 		self.regexEveryone = re.compile(r"\[\[everyone\]\]",     re.IGNORECASE)
 		self.regexGroup    = re.compile(r"\[\[group:(.*)\]\]",   re.IGNORECASE)
 		self.regexDelete   = re.compile(r"\[\[delete\]\]",       re.IGNORECASE)
+		self.regexConfuse  = re.compile(r"\[\[(skip)?conf(usables?)?\]\]",re.IGNORECASE)
 		self.regexMute     = re.compile(r"\[\[mute:?(?P<time>\d*)\]\]",re.IGNORECASE)
 		self.regexTimeout  = re.compile(r"\[\[t(ime)?o(ut)?:(?P<time>\d+)\]\]",re.IGNORECASE)
 		self.regexRoleMent = re.compile(r"\[\[(m_role|role_m):\d+\]\]",re.IGNORECASE)
@@ -55,6 +61,386 @@ class Responses(commands.Cog):
 		self.check_comm    = re.compile(r"\[\[(check_)?(in_)?comm{1,2}(and)?s?\]\]",re.IGNORECASE)
 		self.match_time    = 0.025
 
+	def _is_submodule(self, parent, child):
+		return parent == child or child.startswith(parent + ".")
+
+	@commands.Cog.listener()
+	async def on_loaded_extension(self, ext):
+		# See if we were loaded
+		if not self._is_submodule(ext.__name__, self.__module__):
+			return
+		# Get the date and size of the latest confusables.txt
+		print("Checking for latest confusables.txt...")
+		date = size = None
+		try:
+			latest = await DL.async_text(self.latest_url)
+			assert latest
+			# Walk each line looking for confusables.txt
+			for l in latest.split("\n"):
+				if not ">confusables.txt<" in l:
+					continue
+				# Got it - extract the date/size
+				_,date,size = l.split('align="right">')
+				date = date.split("<")[0].strip()
+				size = size.split("<")[0].strip()
+		except:
+			pass
+		if date is None and size is None:
+			print("Could not locate latest confusables.txt")
+		else:
+			print("Located confusables.txt: {} - {}".format(
+				date or "Unknown Date",
+				size or "Unknown Size"
+			))
+		# Try to load the confusables.json if it exists - if not,
+		# try to download and parse a new file
+		if os.path.exists(self.confusables):
+			print("Loading {}...".format(self.confusables))
+			try:
+				self.confusables_dict = json.load(open(self.confusables))
+				local_date = self.confusables_dict.get("date")
+				local_size = self.confusables_dict.get("size")
+				if (date and date != local_date) or (size and size != local_size):
+					print(" - Date or Size mismatch - download instead.")
+					self.confusables_dict = {}
+				else:
+					print(" - Already latest - using local copy")
+			except Exception as e:
+				print("Failed to load {}: {}".format(self.confusables,e))
+		if not self.confusables_dict:
+			file_name = os.path.basename(self.confusables_url)
+			# Try to download a new file
+			print("Attempting to download {}...".format(file_name))
+			try:
+				confusables_string = await DL.async_text(self.confusables_url)
+			except:
+				print("Download of {} failed...".format(file_name))
+				return
+			# We have the file - try to parse it
+			print("Parsing {}...".format(file_name))
+			c_min = ord(" ")
+			c_max = ord("~")
+			for line in confusables_string.split("\n"):
+				if line.strip().startswith("#") or not line.strip():
+					continue # Skip empty lines and comments
+				# TODO: Check for min/max replace values - maybe limit to ASCII?
+				try:
+					f,r = line.split(";")[:2]
+					f_int = int(f.strip(),16)
+					# Make sure it doesn't fall in our range
+					if c_min <= f_int <= c_max:
+						continue # Out of range - skip
+					find = chr(f_int)
+					repl = ""
+					for x in r.split():
+						r_int = int(x,16)
+						if not c_min <= r_int <= c_max:
+							# Out of range
+							repl = ""
+							break
+						repl += chr(r_int)
+					if not repl:
+						continue
+					if repl == "rn":
+						# This doesn't make as much sense to me - it looks closer to an "m"
+						repl = "m"
+					self.confusables_dict[find] = repl
+				except Exception as e:
+					print("Failed with line '{}': {}".format(line,e))
+			# Retain the size and date
+			self.confusables_dict["date"] = date
+			self.confusables_dict["size"] = size
+			print("Saving {}...".format(self.confusables))
+			try:
+				json.dump(self.confusables_dict,open(self.confusables,"w"),indent=2)
+			except Exception as e:
+				print("Failed to save {}: {}".format(self.confusables,e))
+
+	def _replace_confusables(self, content):
+		start_time = time.perf_counter_ns()
+		# Helper to replace all confusables with their expected
+		# values - and to retain l and O specifically due to
+		# them being used for many confusables.
+		if not self.confusables_dict:
+			return content
+		new_content = ""
+		spicy_chars = set()
+		for x in content:
+			new = self.confusables_dict.get(x,x)
+			if new != x and new.lower() in "lo":
+				spicy_chars.add(new)
+			new_content += new
+		return (new_content,spicy_chars)
+
+	def _replace_trigger(self, trigger, spicy_chars):
+
+		if not spicy_chars:
+			return trigger
+
+		def get_until(
+			val,
+			chars=None,
+			not_chars=None,
+			include_not_chars=False,
+			case_insensitive=True,
+			skip_escaped=True
+		):
+			# Returns up to and including passed chars, or up to
+			# (but NOT including - unless specified) not_chars
+			if not val or (not chars and not not_chars):
+				return val
+			if case_insensitive:
+				# Normalize case
+				if chars: chars = chars.lower()
+				if not_chars: not_chars = not_chars.lower()
+			new_val = ""
+			escaped = False
+			for x in val:
+				# Append until we hit our char target
+				new_val += x
+				if x == "\\":
+					escaped ^= True
+				if not skip_escaped or not escaped:
+					if case_insensitive:
+						x = x.lower()
+					if not_chars and x in not_chars:
+						if include_not_chars:
+							return new_val, False
+						# Omit any "not" chars in the return
+						return new_val[:-1], False
+					if chars and not x in chars:
+						if include_not_chars:
+							return new_val, False
+						return new_val[:-1], False
+				if x != "\\":
+					# Unset the escaped bool
+					escaped = False
+			return new_val, True
+
+		def check_spice(chars,spicy_chars,case_insensitive=False):
+			if case_insensitive:
+				chars = chars.lower()
+				spicy_chars = [x.lower() for x in spicy_chars]
+			return any(x in spicy_chars for x in chars)
+
+		def current_ci(ci_stack):
+			if ci_stack:
+				return ci_stack[-1]
+			return False
+		
+		# Initialize state vars
+		new_trigger = ""
+		last_letter = ""
+		next_letter = ""
+		escaped     = False
+		in_list     = False
+		mod_chars   = "-imsxUJn:"
+		label_chars = "P<'&="
+		label_close = "'>)"
+		ci_stack    = deque()
+		i_adj       = 0
+
+		for i in range(len(trigger)):
+			cur_i = i+i_adj
+			if cur_i >= len(trigger):
+				break # Out of chars
+			c = trigger[cur_i]
+			new_trigger += c # Add the char
+			next_letter = "" if cur_i+1 >= len(trigger) else trigger[cur_i+1]
+			last_letter = "" if cur_i-1 < 0 else trigger[cur_i-1]
+			if c == "\\":
+				escaped ^= True
+			elif c == "[" and not escaped:
+				# Check if we got a character class
+				if len(trigger)-cur_i > 1 and trigger[cur_i+1:cur_i+3] == "[:":
+					if cur_i >= len(trigger):
+						# Out of chars
+						break
+					# Time to find the end
+					close_text, ended = get_until(
+						trigger[cur_i+3:],
+						not_chars="]"
+					)
+					if close_text.endswith(":"):
+						if close_text[:-1] in ("xdigit","digit") and check_spice("lO",spicy_chars):
+							new_trigger += "\\dlO" if close_text[:-1] == "digit" else "\\da-fA-FlO"
+							i_adj += len(close_text)+3
+							continue
+						# Got a character - update the trigger
+						new_trigger += "[:"+close_text
+						i_adj += 3
+						cur_i += 3
+						if ended:
+							break
+						# Update our indices
+						i_adj += len(close_text)
+						cur_i += len(close_text)
+						new_trigger += trigger[cur_i:cur_i+2]
+						# Check only > as we're using it as the
+						# ending anchor point
+						if cur_i+2 > len(trigger):
+							# Out of chars
+							break
+						# Increment our adjustment a final time
+						# and continue into the next loop
+						i_adj += 1
+						continue
+				# Not a character
+				in_list = True
+			elif c == "]" and not escaped:
+				in_list = False
+			elif c in ("0","1") and check_spice({"1":"l"}.get(c,"O"),spicy_chars):
+				if in_list:
+					# Only update if we're NOT in a range (manage ranges
+					# elsewhere)
+					if not "-" in (next_letter,last_letter):
+						# We're in a list, and not in a range
+						new_trigger = new_trigger[:-1]+{"1":"l"}.get(c,"O")+c
+				else:
+					# Not in a list - set up a capture group
+					new_trigger = new_trigger[:-1]+"({}|{})".format(
+						c,
+						"l" if c == "1" else "O"
+					)
+			elif c == "d" and escaped and check_spice("lO",spicy_chars):
+				# Need to override digits to include l and O
+				if in_list:
+					# Already in a list - just append the values
+					new_trigger += "lO"
+				else:
+					# Not in a list - need to create one
+					new_trigger = new_trigger[:-2]+"[\\dlO]"
+			elif (c == "I" or (c == "i" and current_ci(ci_stack))) and check_spice("l",spicy_chars):
+				# Got an "I" and "l" is spicy
+				if in_list:
+					new_trigger += "l"
+				else:
+					new_trigger = new_trigger[:-1]+"({}|l)".format(c)
+			elif c == "-" and not escaped and in_list:
+				# Got a list range indicator - let's see if we need to
+				# append any additional chars
+				try:
+					first,last = int(last_letter),int(next_letter)
+				except:
+					# Not numbers
+					first = last = None
+				if first is not None:
+					# We got numbers - get the spicy chars
+					spicy = ""
+					if check_spice("O",spicy_chars) and first <= 0 <= last:
+						spicy += "O"
+					if check_spice("l",spicy_chars) and first <= 1 <= last:
+						spicy += "l"
+					if spicy:
+						new_trigger += next_letter+spicy
+						i_adj += 1
+						continue
+				elif check_spice("l",spicy_chars):
+					# We got letters - check for I without L - or i without l
+					ll,nl = last_letter, next_letter # Ease of use placeholders
+					# Check for capitals - only consider "L" if case-insensitive
+					I_without_L = ll.isupper() and ll <= "I" <= nl and (nl < "L" or current_ci(ci_stack)) 
+					# Check lowercase - only consider "i" if case-insensitive
+					i_without_l = ll.islower() and current_ci(ci_stack) and ll <= "i" <= nl < "l"
+					if I_without_L or i_without_l:
+						# Got a range that contains an I, but not an L
+						new_trigger += nl+"l"
+						i_adj += 1
+						continue
+			elif c == "(" and not escaped and not in_list:
+				# We need to figure out if this parenthetical
+				# is a modifier or named capture group
+				# Keep track of our current case-sensitivity at
+				# this level
+				ci = current_ci(ci_stack)
+				if next_letter == "?":
+					# Increment the new trigger and "pretend" to
+					# be in the next loop
+					new_trigger += "?"
+					i_adj += 2
+					cur_i += 2
+					if cur_i >= len(trigger):
+						# Out of chars
+						break
+					# Get the text up to a known-break
+					next_text, ended = get_until(
+						trigger[cur_i:],
+						chars=mod_chars+label_chars,
+						case_insensitive=False,
+						include_not_chars=True
+					)
+					if ended:
+						# Ran out of chars
+						new_trigger += next_text
+						break
+					if next_text.startswith(("P<","P>","P=","<","'","&")):
+						# Named group of some kind - go until we hit a name closure
+						close_text, ended = get_until(
+							trigger[cur_i+len(next_text):],
+							not_chars=label_close,
+							include_not_chars=True
+						)
+						# Update our text and adjustment value
+						new_trigger += next_text+close_text
+						if ended:
+							# Ran out of chars
+							break
+						i_adj += len(next_text+close_text)-1
+					elif all(x in mod_chars for x in next_text[:-1]):
+						# Got a modifier - let's check our case-insensitivity
+						try:
+							before,after = next_text[:-1].split("-")
+						except:
+							before,after = next_text[:-1],""
+						if "i" in after:
+							ci = False
+						elif "i" in before:
+							ci = True
+						# Set up our index adjustment - minus the last
+						# char
+						if next_text.endswith(")"):
+							# This *shouldn't* be a localized state change,
+							# include the last char
+							i_adj += len(next_text)-1
+							new_trigger += next_text
+						else:
+							# Localized state change
+							i_adj += len(next_text)-2
+							new_trigger += next_text[:-1]
+					else:
+						# Not something we need to keep track of
+						# but we do want to include whatever char
+						# was omitted - so walk cur_i and i_adj back
+						cur_i -= 1
+						i_adj -= 1
+				elif next_letter == "*":
+					new_trigger += "*"
+					i_adj += 2
+					cur_i += 2
+					# Get the text up to the closing parenthesis
+					close_text, ended = get_until(
+						trigger[cur_i:],
+						not_chars=")",
+						include_not_chars=True
+					)
+					# Update our text and adjustment value
+					new_trigger += close_text
+					if ended:
+						# Ran out of chars
+						break
+					i_adj += len(close_text)-1
+				# Append the state change
+				ci_stack.append(ci)
+				continue
+			# Make sure we unescape if needed
+			if c != "\\":
+				escaped = False
+			if c == ")" and not escaped:
+				# Closing parenthesis - pop scope
+				if ci_stack:
+					ci_stack.pop()
+		return new_trigger
+
 	async def _get_response(self, ctx, message, check_chan=True, check_roles=True, is_command=False):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if is_command and message_responses:
@@ -68,18 +454,45 @@ class Responses(commands.Cog):
 			message_responses = new_mr
 		if not message_responses: return {}
 		# Check for matching response triggers here
-		content = message.replace("\n"," ") # Remove newlines for better matching
+		original_content = message.replace("\n"," ") # Remove newlines for better matching
+		replaced_content, spicy_chars = self._replace_confusables(original_content)
+		# Prevent checking this every loop - just for speed
+		original_is_replaced = original_content == replaced_content
 		response = {}
 		start_time = time.perf_counter_ns()
-		for i,(trigger,m) in enumerate(message_responses.items(),start=1):
+		for i,(original_trigger,m) in enumerate(message_responses.items(),start=1):
+			# Check if we're replacing content or not
+			if original_is_replaced or self.regexConfuse.search(m):
+				content = original_content
+				trigger = original_trigger
+			else:
+				# We need to normalize some things
+				content = replaced_content
+				if spicy_chars:
+					# We have spicy chars - let's update the trigger
+					replaced_trigger = self._replace_trigger(original_trigger, spicy_chars)
+					try:
+						re.compile(replaced_trigger)
+						trigger = replaced_trigger
+						# print("\nOld: {}\nNew: {}\n".format(original_trigger,replaced_trigger))
+					except Exception as e:
+						print("\nFailed to replace trigger: {}\n{}\n{}\n".format(
+							e,
+							original_trigger,
+							replaced_trigger
+						))
+						trigger = original_trigger # Fall back to the original
+				else:
+					# No spice chars to worry about - use the original trigger
+					trigger = original_trigger
 			check_time = time.perf_counter_ns()
 			try:
 				full_match = re.fullmatch(trigger, content, timeout=self.match_time)
 				if not full_match: continue
 			except TimeoutError:
-				response["catastrophies"] = response.get("catastrophies",[])+[trigger]
+				response["catastrophies"] = response.get("catastrophies",[])+[original_trigger]
 				continue
-			response["matched"] = trigger
+			response["matched"] = original_trigger
 			response["index"] = i
 			response["match_time_ms"] = (time.perf_counter_ns()-check_time)/1000000
 			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
@@ -241,7 +654,7 @@ class Responses(commands.Cog):
 				# We have at least one match - get some default values
 				one_role = self.settings.getServerStat(ctx.guild,"OnlyOneUserRole",True)
 				ur_block = self.settings.getServerStat(ctx.guild,"UserRoleBlock",[])
-			for c in (self.toggle_ur,self.add_ur,self.set_ur,self.rem_ur):
+			for c in (self.toggle_ur,self.add_ur,self.rem_ur,self.set_ur):
 				ur = c.search(m)
 				if not ur: continue
 				# Got one - let's verify it's valid, and apply if needed
@@ -378,7 +791,8 @@ class Responses(commands.Cog):
 				self.out_chan,
 				self.reply,
 				self.preply,
-				self.check_comm
+				self.check_comm,
+				self.regexConfuse
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
@@ -504,6 +918,7 @@ Mention options:
 Substitution options:
 
 [[group:#]] = is replaced by the named or numbered group in the match (mentions and URLs are deadened)
+[[skipconfusables]] = prevent replacing confusable unicode characters with ASCII equivalents for homoglyph attack mitigation
 
 Reaction options:
 
@@ -628,6 +1043,7 @@ Mention options:
 Substitution options:
 
 [[group:#]] = is replaced by the named or numbered group in the match (mentions and URLs are deadened)
+[[skipconfusables]] = prevent replacing confusable unicode characters with ASCII equivalents for homoglyph attack mitigation
 
 Reaction options:
 
