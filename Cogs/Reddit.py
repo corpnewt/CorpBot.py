@@ -1584,19 +1584,26 @@ class Reddit(commands.Cog):
 				description=str(error),
 				color=ctx.author
 			).send(ctx)
-		# Build our embed
-		e = {
-			"title":about["name"],
-			"url":about["url"],
-			"thumbnail":about["icon_url"],
-			"color":ctx.author,
-			"description":theJSON["data"].get("subreddit",{}).get("public_description") or None,
-			"fields":[]
-		}
-		# Get the unix timestamp for the account creation
-		created_string = "<t:{0}> (<t:{0}:R>)".format(
-			int(theJSON["data"]["created_utc"])
-		)
+		try:
+			# Build our embed
+			e = {
+				"title":about["name"],
+				"url":about["url"],
+				"thumbnail":about["icon_url"],
+				"color":ctx.author,
+				"description":theJSON["data"].get("subreddit",{}).get("public_description") or None,
+				"fields":[]
+			}
+			# Get the unix timestamp for the account creation
+			created_string = "<t:{0}> (<t:{0}:R>)".format(
+				int(theJSON["data"]["created_utc"])
+			)
+		except KeyError:
+			return await Message.EmbedText(
+				title="Could not resolve that user",
+				description="The response was missing keys needed to resolve that user's info.",
+				color=ctx.author
+			).send(ctx)
 		# Populate the fields
 		e["fields"].append({"name":"Created","value":created_string,"inline":True})
 		e["fields"].append({"name":"Link Karma","value":"{:,}".format(theJSON["data"]["link_karma"]),"inline":True})
