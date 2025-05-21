@@ -17,30 +17,6 @@ class CogManager(commands.Cog):
 		self.preloads = ("Cogs.Utils","Cogs.DisplayName","Cogs.Settings","Cogs.Mute")
 		self.bot = bot
 		self.settings = settings
-		self.colors = [ 
-				discord.Color.teal(),
-				discord.Color.dark_teal(),
-				discord.Color.green(),
-				discord.Color.dark_green(),
-				discord.Color.blue(),
-				discord.Color.dark_blue(),
-				discord.Color.purple(),
-				discord.Color.dark_purple(),
-				discord.Color.magenta(),
-				discord.Color.dark_magenta(),
-				discord.Color.gold(),
-				discord.Color.dark_gold(),
-				discord.Color.orange(),
-				discord.Color.dark_orange(),
-				discord.Color.red(),
-				discord.Color.dark_red(),
-				discord.Color.lighter_grey(),
-				discord.Color.dark_grey(),
-				discord.Color.light_grey(),
-				discord.Color.darker_grey(),
-				discord.Color.blurple(),
-				discord.Color.greyple()
-				]
 
 	@commands.Cog.listener()
 	async def on_ready(self):
@@ -48,20 +24,19 @@ class CogManager(commands.Cog):
 		return
 
 	def _get_imports(self, file_name):
-		if not os.path.exists("Cogs/" + file_name):
+		file_path = os.path.join("Cogs",file_name)
+		if not os.path.exists(file_path):
 			return []
-		file_string = open("Cogs/" + file_name, "rb").read().decode("utf-8")
+		with open(file_path,"rb") as f:
+			file_string = f.read().decode()
 		instructions = dis.get_instructions(file_string)
-		imports = [__ for __ in instructions if 'IMPORT' in __.opname]
-		i = []
-		for instr in imports:
-			if not instr.opname == "IMPORT_FROM":
-				continue
-			i.append(instr.argval)
 		cog_imports = []
-		for f in i:
-			if os.path.exists("Cogs/" + f + ".py"):
-				cog_imports.append(f)
+		for inst in instructions:
+			if not inst.opname == "IMPORT_FROM":
+				continue
+			if not os.path.exists(os.path.join("Cogs","{}.py".format(inst.argval))):
+				continue
+			cog_imports.append(inst.argval)
 		return cog_imports
 
 	def _get_imported_by(self, file_name):
@@ -187,7 +162,6 @@ class CogManager(commands.Cog):
 				return
 		await cxt.send("I couldn't find that extension...")
 
-
 	@commands.command(aliases=["extensions","ext"])
 	async def extension(self, ctx, *, extension = None):
 		"""Outputs the cogs and command count for the passed extension - or all extensions and their corresponding cogs if none passed."""
@@ -270,7 +244,6 @@ class CogManager(commands.Cog):
 			ctx=ctx,
 			max=24
 		).pick()
-		
 	
 	@commands.command(pass_context=True)
 	async def reload(self, ctx, *, extension = None):
@@ -344,4 +317,3 @@ class CogManager(commands.Cog):
 			await Message.EmbedText(title="{}Update Results:".format("Reset and " if reset else ""), description=msg, color=ctx.author).edit(ctx, message)
 		except:
 			await Message.EmbedText(title="Something went wrong!", description="Make sure you have `git` in your PATH var.", color=ctx.author).edit(ctx, message)
-		
