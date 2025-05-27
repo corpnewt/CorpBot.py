@@ -249,9 +249,7 @@ class Bot(commands.Cog):
 		await ctx.send("I've been up for *{}*.".format(time_string))
 
 	def _gather_host_info(self, ctx):
-		# cpuCores    = psutil.cpu_count(logical=False)
-		# cpuThred    = psutil.cpu_count()
-		cpuName       = cpuinfo.get_cpu_info()['brand_raw']
+		cpuName       = cpuinfo.get_cpu_info().get("brand_raw","Unknown")
 		cpuThred      = os.cpu_count()
 		cpuUsage      = psutil.cpu_percent(interval=1)
 		memStats      = psutil.virtual_memory()
