@@ -157,7 +157,6 @@ class Responses(commands.Cog):
 				print("Failed to save {}: {}".format(self.confusables,e))
 
 	def _replace_confusables(self, content):
-		start_time = time.perf_counter_ns()
 		# Helper to replace all confusables with their expected
 		# values - and to retain l and O specifically due to
 		# them being used for many confusables.
