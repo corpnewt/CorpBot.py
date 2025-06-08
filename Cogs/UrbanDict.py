@@ -39,7 +39,7 @@ class UrbanDict(commands.Cog):
 			lines = ["*{}*".format(x.strip()) if len(x.strip()) else "" for x in entry["example"].replace("*","").split("\n")]
 			value += "\n\n__Example(s):__\n\n{}".format("\n".join(lines))
 		for match in set([match.group(0) for match in re.finditer(self.regex,value)]):
-			value = value.replace(match,"__{}({})__".format(match,"https://www.urbandictionary.com/define.php?term={}".format(quote(match[1:-1]))))
+			value = value.replace(match,"{}({})".format(match,"https://www.urbandictionary.com/define.php?term={}".format(quote(match[1:-1]))))
 		return value
 
 	@commands.command(pass_context=True)
