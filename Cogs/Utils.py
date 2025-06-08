@@ -145,13 +145,13 @@ class Utils(commands.Cog):
 			return guild.icon.url
 		return self.get_default_avatar()
 
-	async def get_message_content(self,message,ctx=None):
+	async def get_message_content(self,message,ctx=None,strip_prefix=True):
 		# Returns the adjusted content of a message - stripping any command
 		# call prefix if needed
 		if not isinstance(message,discord.Message): return ""
 		if not ctx:
 			ctx = await self.bot.get_context(message)
-		if not ctx or not ctx.command:
+		if not ctx or not ctx.command or not strip_prefix:
 			return message.content
 		# We have a command - check names and aliases
 		for check in [ctx.command.name]+list(ctx.command.aliases):

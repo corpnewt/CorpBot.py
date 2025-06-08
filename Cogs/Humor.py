@@ -152,6 +152,13 @@ class Humor(commands.Cog):
 	@commands.command()
 	async def mock(self, ctx, *, message = None):
 		"""i'M nOt MoCkInG yOu, YoU'rE mOcKiNg Me."""
+		if ctx.message.reference:
+			# Resolve the replied to reference to a message object
+			try:
+				replied_message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+				message = await Utils.get_message_content(replied_message,strip_prefix=False)
+			except:
+				pass
 		if not message:
 			return await ctx.send("Usage: `{}mock [message]`".format(ctx.prefix))
 		message = Nullify.resolve_mentions(message, ctx=ctx, escape=True, escape_links=True,show_mentions=True)
