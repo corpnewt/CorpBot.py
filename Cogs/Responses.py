@@ -161,7 +161,7 @@ class Responses(commands.Cog):
 		# values - and to retain l and O specifically due to
 		# them being used for many confusables.
 		if not self.confusables_dict:
-			return content
+			return (content,content)
 		new_content = ""
 		spicy_chars = set()
 		for x in content:
