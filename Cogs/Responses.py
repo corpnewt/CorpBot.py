@@ -500,13 +500,31 @@ class Responses(commands.Cog):
 			try:
 				channel_list = [int(x) for x in self.in_chan.search(m).group("ids").split(",") if x]
 				check_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
+				# Ensure we check channels and threads within categories as well
+				category_channels = []
+				for check in check_channels:
+					if getattr(check,"channels",[]):
+						category_channels.extend(check.channels)
+					if getattr(check,"threads",[]):
+						category_channels.extend(check.threads)
+				check_channels.extend(category_channels)
+				check_channels = set(check_channels)
 			except:
-				check_channels = []
+				check_channels = set()
 			try:
 				channel_list = [int(x) for x in self.not_in_chan.search(m).group("ids").split(",") if x]
 				skip_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
+				# Ensure we check channels and threads within categories as well
+				category_channels = []
+				for skip in skip_channels:
+					if getattr(skip,"channels",[]):
+						category_channels.extend(skip.channels)
+					if getattr(skip,"threads",[]):
+						category_channels.extend(skip.threads)
+				skip_channels.extend(category_channels)
+				skip_channels = set(skip_channels)
 			except:
-				skip_channels = []
+				skip_channels = set()
 			if skip_channels:
 				# Ensure we have either our restricted channels, or all of them
 				check_channels = check_channels or ctx.guild.channels
