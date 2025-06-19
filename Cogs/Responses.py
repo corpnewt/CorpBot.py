@@ -495,42 +495,39 @@ class Responses(commands.Cog):
 			response["index"] = i
 			response["match_time_ms"] = (time.perf_counter_ns()-check_time)/1000000
 			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
+			
+			def expand_channels(channel_list):
+				channels = []
+				for c in channel_list:
+					channels.append(c)
+					if getattr(c,"channels",[]):
+						channels.extend(expand_channels(c.channels))
+					if getattr(c,"threads",[]):
+						channels.extend(expand_channels(c.threads))
+				return channels
+
 			# Got a full match - build the message, send it and bail
 			# Let's check for a channel - and make sure we're searching there
 			try:
-				channel_list = [int(x) for x in self.in_chan.search(m).group("ids").split(",") if x]
-				check_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
-				# Ensure we check channels and threads within categories as well
-				category_channels = []
-				for check in check_channels:
-					if getattr(check,"channels",[]):
-						category_channels.extend(check.channels)
-					if getattr(check,"threads",[]):
-						category_channels.extend(check.threads)
-				check_channels.extend(category_channels)
-				check_channels = set(check_channels)
+				channel_list   = [int(x) for x in self.in_chan.search(m).group("ids").split(",") if x]
+				user_check     = set([x for x in map(self.bot.get_channel,channel_list) if x])
+				check_channels = set(expand_channels(user_check))
 			except:
-				check_channels = set()
+				check_channels = user_check = set()
 			try:
-				channel_list = [int(x) for x in self.not_in_chan.search(m).group("ids").split(",") if x]
-				skip_channels = [x for x in map(self.bot.get_channel,channel_list) if x]
-				# Ensure we check channels and threads within categories as well
-				category_channels = []
-				for skip in skip_channels:
-					if getattr(skip,"channels",[]):
-						category_channels.extend(skip.channels)
-					if getattr(skip,"threads",[]):
-						category_channels.extend(skip.threads)
-				skip_channels.extend(category_channels)
-				skip_channels = set(skip_channels)
+				channel_list  = [int(x) for x in self.not_in_chan.search(m).group("ids").split(",") if x]
+				user_skip     = set([x for x in map(self.bot.get_channel,channel_list) if x])
+				skip_channels = set(expand_channels(user_skip))
 			except:
-				skip_channels = set()
+				skip_channels = user_skip = set()
 			if skip_channels:
 				# Ensure we have either our restricted channels, or all of them
 				check_channels = check_channels or ctx.guild.channels
 				# Restrict to only those we don't plan to skip
-				check_channels = [x for x in check_channels if not x in skip_channels]
+				check_channels = set([x for x in check_channels if not x in skip_channels])
 			response["channels"] = check_channels
+			response["user_check_channels"] = user_check
+			response["user_skip_channels"]  = user_skip
 			if check_chan and check_channels and not ctx.channel in check_channels: # Need to be in the right channel, no match
 				continue
 			# Now do the same with the roles
@@ -1311,8 +1308,34 @@ This would edit the first response trigger to respond by pinging the user and sa
 		entries = []
 		# Let's walk the reponse and add values
 		entries.append({"name":"Output Suppressed for Admin/Bot-Admin:","value":"Yes" if response.get("suppress") else "No"})
-		if response.get("channels"):
-			entries.append({"name":"Limited To:","value":"\n".join([x.mention for x in response["channels"]])})
+
+		def order_channels(channel_list):
+			new_order = []
+			for category,channels in ctx.guild.by_category():
+				if category and category in channel_list:
+					new_order.append(category)
+				for channel in channels:
+					if channel in channel_list:
+						new_order.append(channel)
+					for thread in getattr(channel,"threads",[]):
+						if thread in channel_list:
+							new_order.append(thread)
+			return new_order
+
+		if response.get("user_check_channels"):
+			entries.append({
+				"name":"Limited To:",
+				"value":"\n".join(
+					[x.mention for x in order_channels(response["user_check_channels"])]
+				)
+			})
+		if response.get("user_skip_channels"):
+			entries.append({
+				"name":"Omitted From:",
+				"value":"\n".join(
+					[x.mention for x in order_channels(response["user_skip_channels"])]
+				)
+			})
 		if response.get("roles"):
 			entries.append({"name":"Requires {} of the Following Roles:".format("Any" if response.get("any_roles") else "All"),"value":"\n".join([x.mention for x in response["roles"]])})
 		if response.get("roles_skip"):
