@@ -514,7 +514,7 @@ class BotAdmin(commands.Cog):
 		eg:  $ban last=10m30s raid"""
 		await self.kick_ban(ctx,members,"ban")
 
-	@commands.command(aliases=["scam"])
+	@commands.command(aliases=["scam","softban","sban"])
 	async def klean(self, ctx, *, members = None, reason = None):
 		"""Bans the passed members for the specified reason, then unbans them in order to remove messages without permanently banning the account.
 		All klean targets must be mentions or ids to avoid ambiguity (bot-admin only).
