@@ -75,15 +75,28 @@ class Weather(commands.Cog):
 		return self._c_to_k(self._f_to_c(f))
 	def _k_to_f(self, k):
 		return self._c_to_f(self._k_to_c(k))
+	def _f_to_r(self, f):
+		return self._check_float(f+459.67)
+	def _r_to_f(self, r):
+		return self._check_float(r-459.67)
+	def _c_to_r(self, c):
+		return self._f_to_r(self._c_to_f(c))
+	def _r_to_c(self, r):
+		return self._f_to_c(self._r_to_f(r))
+	def _k_to_r(self, k):
+		return self._f_to_r(self._k_to_f(k))
+	def _r_to_k(self, r):
+		return self._f_to_k(self._r_to_f(r))
 
 	@commands.command(aliases=["tcon","tconv"])
 	async def tconvert(self, ctx, *, temp = None, from_type = None, to_type = None):
 		"""Converts between Fahrenheit, Celsius, and Kelvin.  From/To types can be:
 		(F)ahrenheit
 		(C)elsius
-		(K)elvin"""
+		(K)elvin
+		(R)ankine"""
 		
-		types = [ "Fahrenheit", "Celsius", "Kelvin" ]
+		types = [ "Fahrenheit", "Celsius", "Kelvin", "Rankine" ]
 		usage = "Usage: `{}tconvert [temp] [from_type] [to_type]`".format(ctx.prefix)
 		if not temp:
 			return await ctx.send(usage)
@@ -108,16 +121,29 @@ class Weather(commands.Cog):
 			if f == "Fahrenheit":
 				if t == "Celsius":
 					out_val = self._f_to_c(m)
+				elif t == "Rankine":
+					out_val = self._f_to_r(m)
 				else:
 					out_val = self._f_to_k(m)
 			elif f == "Celsius":
 				if t == "Fahrenheit":
 					out_val = self._c_to_f(m)
+				elif t == "Rankine":
+					out_val = self._c_to_r(m)
 				else:
 					out_val = self._c_to_k(m)
+			elif f == "Rankine":
+				if t == "Fahrenheit":
+					out_val = self._r_to_f(m)
+				elif t == "Celsius":
+					out_val = self._r_to_c(m)
+				else:
+					out_val = self._r_to_k(m)
 			else:
 				if t == "Celsius":
 					out_val = self._k_to_c(m)
+				elif t == "Rankine":
+					out_val = self._k_to_r(m)
 				else:
 					out_val = self._k_to_f(m)
 			output = "{:,} {}{} is {:,} {}{}".format(
