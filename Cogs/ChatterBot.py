@@ -1,4 +1,4 @@
-import asyncio, discord, time, os
+import asyncio, discord, time, os, random
 from discord.ext import commands
 from aiml import Kernel
 from Cogs import Utils, DisplayName
@@ -24,10 +24,26 @@ class ChatterBot(commands.Cog):
 		self.botList = []
 		self.lastChat = None
 		self.timeout = 3
+		# Monkey patch the Kernel _respond() function to ensure we work
+		# around "0" related issues
+		_original_respond = getattr(Kernel,"_respond",None)
+		if callable(_original_respond):
+			# It's a valid, callable method - redirect it
+			Kernel._original_respond = _original_respond
+			Kernel._respond = self._respond
 		self.chatBot = Kernel()
+		# Set up our globals
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
+	
+	def _respond(self, input_, sessionID):
+		# Make sure we don't end up in a define 0 loop
+		if not callable(getattr(self.chatBot,"_original_respond",None)) \
+		or input_.startswith(u"DEFINE 0 "):
+			return u""
+		# Call the original method
+		return self.chatBot._original_respond(input_, sessionID)
 
 	def _load(self):
 		# We're ready - let's load the bots
@@ -98,7 +114,7 @@ class ChatterBot(commands.Cog):
 		"""Sets the channel for bot chatter."""
 		if not await Utils.is_admin_reply(ctx): return
 
-		if channel == None:
+		if channel is None:
 			self.settings.setServerStat(ctx.guild, "ChatChannel", "")
 			msg = 'Chat channel removed - must use the `{}chat [message]` command to chat.'.format(ctx.prefix)
 			await ctx.send(msg)
@@ -121,11 +137,25 @@ class ChatterBot(commands.Cog):
 		"""Chats with the bot."""
 		await self._chat(ctx, message)
 
+	async def _get_response(self, message):
+		try:
+			msg = await self.bot.loop.run_in_executor(None,self.chatBot.respond,message)
+		except Exception as e:
+			print(e)
+			msg = None
+		return msg or random.choice([
+			"I don't know what to say...",
+			"You've certainly got a *unique* way of thinking...",
+			"I don't think that makes sense...",
+			"Please rephrase that?",
+			"Why don't we talk about something else?",
+			"I can't focus on that right now..."
+		])
 
 	async def _chat(self, ctx, message):
 		# Check if we're suppressing @here and @everyone mentions
 		message = Utils.suppressed(ctx,message,force=True)
-		if message == None or not self.canChat(ctx.guild):
+		if message is None or not self.canChat(ctx.guild):
 			return
 		await ctx.trigger_typing()
 
@@ -133,10 +163,10 @@ class ChatterBot(commands.Cog):
 		# and retain that info as needed.
 		if ctx.author != self.lastChat:
 			self.lastChat = ctx.author
-			self.chatBot.respond("My name is {}".format(DisplayName.name(ctx.author)))
-			self.chatBot.respond("I am genderless")
+			await self._get_response("My name is {}".format(DisplayName.name(ctx.author)))
+			await self._get_response("I am genderless")
 		
-		msg = self.chatBot.respond(message)
-		msg = msg if msg else "I don't know what to say..."
-		if len(msg) > 2000: msg = msg[:1997]+"..." # Fix for > 2000 chars
+		msg = await self._get_response(message)
+		if len(msg) > 2000:
+			msg = msg[:1997]+"..." # Fix for > 2000 chars
 		await ctx.send(msg)
