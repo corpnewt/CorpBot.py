@@ -31,6 +31,7 @@ class ChatterBot(commands.Cog):
 			# It's a valid, callable method - redirect it
 			Kernel._original_respond = _original_respond
 			Kernel._respond = self._respond
+		Kernel._maxRecursionDepth = 5 # Override for a very short max recursion
 		self.chatBot = Kernel()
 		# Set up our globals
 		global Utils, DisplayName
@@ -40,7 +41,7 @@ class ChatterBot(commands.Cog):
 	def _respond(self, input_, sessionID):
 		# Make sure we don't end up in a define 0 loop
 		if not callable(getattr(self.chatBot,"_original_respond",None)) \
-		or input_.startswith(u"DEFINE 0 "):
+		or input_.startswith(u"DEFINE 0 ") or input_.lower() in (u"find characters",u"characters"):
 			return u""
 		# Call the original method
 		return self.chatBot._original_respond(input_, sessionID)
