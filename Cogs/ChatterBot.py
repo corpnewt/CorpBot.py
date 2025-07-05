@@ -9,7 +9,6 @@ def setup(bot):
 	c_bot = ChatterBot(bot, settings)
 	c_bot._load()
 	bot.add_cog(c_bot)
-	
 
 class ChatterBot(commands.Cog):
 
@@ -28,10 +27,14 @@ class ChatterBot(commands.Cog):
 		# around "0" related issues
 		_original_respond = getattr(Kernel,"_respond",None)
 		if callable(_original_respond):
-			# It's a valid, callable method - redirect it
-			Kernel._original_respond = _original_respond
+			if not getattr(Kernel,"_original_respond",None):
+				# Retain the original _respond endpoint, but only
+				# if we haven't already done that
+				Kernel._original_respond = _original_respond
+			# Redirect to our local _respond method
 			Kernel._respond = self._respond
-		Kernel._maxRecursionDepth = 5 # Override for a very short max recursion
+		# Override for a very short max recursion
+		Kernel._maxRecursionDepth = 5
 		self.chatBot = Kernel()
 		# Set up our globals
 		global Utils, DisplayName
