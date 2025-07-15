@@ -1,6 +1,10 @@
 import discord, asyncio, re, io, os, datetime, plistlib, difflib, json, time, tempfile, shutil, math
 from   discord.ext import commands
 from   Cogs import Settings, DL, PickList, Message, FuzzySearch
+try:
+	from . import OCD
+except ImportError:
+	OCD = None
 
 def setup(bot):
 	# Add the bot and deps
@@ -453,12 +457,9 @@ class OpenCore(commands.Cog):
 				except:
 					pass
 				try:
-					# Wrap in a try/except as we expect *all* of these values to be set
-					if plist_data["Misc"]["Boot"]["PickerMode"] == "External" and \
-					plist_data["Misc"]["Boot"]["Timeout"] == 10 and \
-					plist_data["Misc"]["Debug"]["Target"] == 0 and \
-					plist_data["NVRAM"]["Add"]["7C436110-AB2A-4BBB-A880-FE41995C9F82"]["prev-lang:kbd"] == "en:252":
-						names.append("auto-tool")
+					name = OCD.check_match(plist_data)
+					if name:
+						names.append(name)
 				except:
 					pass
 				if names:
