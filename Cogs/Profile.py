@@ -116,7 +116,7 @@ class Profile(commands.Cog):
 			DisplayName.name(member),
 			"Raw " if raw else "",
 			Nullify.escape_all(item['Name']),
-			"```markdown\n{}\n```".format(item['URL']) if raw else item['URL']
+			"```markdown\n{}\n```".format(item['URL'].replace("```", "`\u200b``")) if raw else item['URL']
 		)
 		return await ctx.send(Utils.suppressed(ctx,msg))
 
