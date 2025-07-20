@@ -1,4 +1,5 @@
 import asyncio, discord, time, shutil, os, tempfile, json
+import re
 from   operator import itemgetter
 from   discord.ext import commands
 from   Cogs import Utils, Settings, ReadableTime, DisplayName, Message, Nullify, PickList, DL
@@ -112,11 +113,28 @@ class Profile(commands.Cog):
 		if item is None:
 			# Just got a member - list their profiles
 			return await self._list_profiles(ctx,member.id)
+		def _format_codeblock(contents=""):
+			return "```markdown\n{}\n```".format(contents.replace("```", "`\uFEFF`\uFEFF`"))
+		def _format_raw(contents=""): # Format the contents to properly display all characters without letting Discord format it.
+			contents = discord.utils.escape_markdown(item['URL'])
+			pattern = re.compile(r"(#{1,3}|-#|-\s*|>(>>)?) ")
+			number_prefix_pattern = re.compile(r"\d+\. [^\n]+")
+			lines = []
+			for line in contents.splitlines():
+				if number_prefix_pattern.search(line):
+					i = line.find(".")
+					if i != -1:
+						line = line[:i] + "\\" + line[i:] # Escape number lists manually
+				elif pattern.search(line):
+					line = "\\" + line
+				lines.append(line)
+			contents = "\n".join(lines)
+			return contents
 		msg = '*{}\'s {}{} Profile:*\n\n{}'.format(
 			DisplayName.name(member),
 			"Raw " if raw else "",
 			Nullify.escape_all(item['Name']),
-			"```markdown\n{}\n```".format(item['URL'].replace("```", "`\u200b``")) if raw else item['URL']
+			_format_raw(item['URL']) if raw else item['URL']
 		)
 		return await ctx.send(Utils.suppressed(ctx,msg))
 
