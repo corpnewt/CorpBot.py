@@ -33,10 +33,7 @@ class Utils(commands.Cog):
 	def is_admin(self,ctx,member=None,guild=None):
 		# Checks if the user in the passed context is admin
 		member = member or ctx.author
-		guild  = guild  or ctx.guild
-		if not member or not guild: return False
-		# Get the first channel we can
-		channel = next((c for c in guild.channels),None)
+		channel = next((c for c in guild.channels),None) if guild else ctx.channel
 		if not channel: return False
 		if hasattr(channel,"permissions_for"):
 			return channel.permissions_for(member).administrator
