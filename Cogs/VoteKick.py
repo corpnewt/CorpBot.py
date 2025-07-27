@@ -277,7 +277,8 @@ class VoteKick(commands.Cog):
 
 	@commands.command()
 	async def vkmutetime(self, ctx, *, the_time = None):
-		"""Sets the number of time a user is muted when the mute votes are reached - 0 or less will disable the system."""
+		"""Sets the length of time a user is muted when the mute votes are reached - 0 or less will disable the system.
+		e.g. $vkmutetime 2h"""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if the_time is None:
@@ -319,7 +320,8 @@ class VoteKick(commands.Cog):
 
 	@commands.command()
 	async def vkexpiretime(self, ctx, *, the_time = None):
-		"""Sets the amount of time before a vote expires.  0 or less will make them permanent."""
+		"""Sets the length of time before a vote expires.  0 or less will make them permanent.
+		e.g. $vkexpiretime 6h"""
 		if not await Utils.is_bot_admin_reply(ctx): return
 
 		if the_time is None:
@@ -456,7 +458,11 @@ class VoteKick(commands.Cog):
 			await ctx.send("You should probably find a way to be okay with yourself.  Kicking yourself will get you nowhere.")
 			return
 
-		if Utils.is_bot_admin(ctx,check_user):
+		# Override the guild in our ctx check to ensure
+		# we check for correct perms/admin status.
+		check_ctx = ctx
+		check_ctx.guild = guild
+		if Utils.is_bot_admin(check_ctx,check_user):
 			return await ctx.channel.send('You cannot vote to kick the admins.  Please work out any issues you may have with them in a civil manner.')
 
 		vote_list = self.settings.getServerStat(guild, "VoteKickArray")
