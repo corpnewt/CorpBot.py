@@ -30,24 +30,31 @@ class Utils(commands.Cog):
 		member = ctx.author if not member else member
 		return settings.isOwner(member)
 
-	def is_admin(self,ctx,member=None):
+	def is_admin(self,ctx,member=None,guild=None):
 		# Checks if the user in the passed context is admin
-		member = ctx.author if not member else member
-		if hasattr(ctx.channel,"permissions_for"):
-			return ctx.channel.permissions_for(member).administrator
-		return member.permissions_in(ctx.channel).administrator
+		member = member or ctx.author
+		guild  = guild  or ctx.guild
+		if not member or not guild: return False
+		# Get the first channel we can
+		channel = next((c for c in guild.channels),None)
+		if not channel: return False
+		if hasattr(channel,"permissions_for"):
+			return channel.permissions_for(member).administrator
+		return member.permissions_in(channel).administrator
 
-	def is_bot_admin_only(self,ctx,member=None):
+	def is_bot_admin_only(self,ctx,member=None,guild=None):
 		# Checks only if we're bot admin
 		settings = self.bot.get_cog("Settings")
 		if not settings: return False
-		member = ctx.author if not member else member
+		member = member or ctx.author
+		guild  = guild  or ctx.guild
+		if not member or not guild: return False
 		if not hasattr(member,"roles"): return False # No roles to iterate - can't be bot admin
-		return any(role for role in member.roles for check in settings.getServerStat(ctx.guild, "AdminArray", []) if str(role.id) == str(check["ID"]))
+		return any(role for role in member.roles for check in settings.getServerStat(guild, "AdminArray", []) if str(role.id) == str(check["ID"]))
 
-	def is_bot_admin(self,ctx,member=None):
+	def is_bot_admin(self,ctx,member=None,guild=None):
 		# Checks if the user in the passed context is admin or bot admin
-		return self.is_admin(ctx,member) or self.is_bot_admin_only(ctx,member)
+		return self.is_admin(ctx,member,guild=guild) or self.is_bot_admin_only(ctx,member,guild=guild)
 
 	async def is_owner_reply(self,ctx,member=None,not_claimed="I have not been claimed, *yet*.",not_owner="You are not the *true* owner of me.  Only the rightful owner can use this command."):
 		# Auto-replies if the user isn't an owner

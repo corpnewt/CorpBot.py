@@ -458,11 +458,9 @@ class VoteKick(commands.Cog):
 			await ctx.send("You should probably find a way to be okay with yourself.  Kicking yourself will get you nowhere.")
 			return
 
-		# Override the guild in our ctx check to ensure
+		# Override the guild in our bot-admin check to ensure
 		# we check for correct perms/admin status.
-		check_ctx = ctx
-		check_ctx.guild = guild
-		if Utils.is_bot_admin(check_ctx,check_user):
+		if Utils.is_bot_admin(ctx,check_user,guild=guild):
 			return await ctx.channel.send('You cannot vote to kick the admins.  Please work out any issues you may have with them in a civil manner.')
 
 		vote_list = self.settings.getServerStat(guild, "VoteKickArray")
