@@ -364,7 +364,10 @@ class OpenCore(commands.Cog):
 		if message.reference:
 			# Resolve the replied to reference to a message object
 			try:
-				m = await Utils.get_replied_to(message)
+				m = await Utils.get_replied_to(
+					message,
+					at_least_one_key=("content","attachments")
+				)
 				if m.content or m.attachments:
 					message = m
 			except: pass			

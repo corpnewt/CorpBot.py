@@ -165,17 +165,37 @@ class Utils(commands.Cog):
 		# If we got here, nothing was found - return the original content
 		return message.content
 
-	async def get_replied_to(self,message,ctx=None):
+	async def _get_replied_to(self,message,ctx=None):
 		# Returns the replied-to message first by checking the cache, then
 		# by fetching it.
-		if not isinstance(message,discord.Message): return None
-		if not message.reference: return None
+		if not isinstance(message,discord.Message) or not message.reference:
+			return None
 		replied_to = self.bot.get_message(message.reference.message_id)
 		if not replied_to: # Not in the cache, try to retrieve it
 			if not ctx: # First retrieve the context if needed
 				ctx = await self.bot.get_context(message)
 			replied_to = await ctx.channel.fetch_message(message.reference.message_id)
 		return replied_to
+
+	async def get_replied_to(self,message,ctx=None,max_depth=5,required_keys=None,at_least_one_key=None):
+		# Get nested replies/forwards matching the passed keys
+		m = message
+		for depth in range(max_depth):
+			m_check = await self._get_replied_to(m,ctx)
+			if not m_check:
+				# Return the last valid message
+				return m
+			m = m_check
+			# See if we have requirements - otherwise keep iterating
+			# until we exceed the max depth
+			if isinstance(required_keys,(list,tuple)) and required_keys:
+				if all((getattr(m,k,None) for k in required_keys)):
+					return m
+			elif isinstance(at_least_one_key,(list,tuple)) and at_least_one_key:
+				if any((getattr(m,k,None) for k in at_least_one_key)):
+					return m
+		# If we exceeded the max depth, return the last message
+		return m
 
 	async def get_message_from_url(self,message_url,ctx=None):
 		# Attempts to resolve the passed URL to the message object using the passed
