@@ -169,6 +169,14 @@ class Utils(commands.Cog):
 		# If we got here, nothing was found - return the original content
 		return message.content
 
+	def _is_forwarded(self,message,no_content=False):
+		if not isinstance(message,discord.Message):
+			return False
+		if getattr(message.reference,"type","") == getattr(MessageReferenceType,"forward",None):
+			if not no_content or (no_content and not message.content):
+				return True
+		return False
+
 	async def get_replied_to(self,message,ctx=None,current_depth=1,max_depth=5):
 		# Returns the replied-to message first by checking the cache, then
 		# by fetching it.
@@ -181,12 +189,12 @@ class Utils(commands.Cog):
 				ctx = await self.bot.get_context(message)
 			replied_to = await ctx.channel.fetch_message(message.reference.message_id)
 		# Check for forwarding here - and recurse
-		if getattr(getattr(replied_to,"reference",None),"type","") == getattr(MessageReferenceType,"forward",None):
+		if self._is_forwarded(replied_to):
 			# Forwarded - return the result of another check
 			return await self.get_replied_to(replied_to,current_depth=current_depth+1,max_depth=max_depth)
 		return replied_to
 
-	async def get_message_from_url(self,message_url,ctx=None):
+	async def get_message_from_url(self,message_url,ctx=None,resolve_forwards=True):
 		# Attempts to resolve the passed URL to the message object using the passed
 		# context as needed.
 		try:
@@ -201,6 +209,11 @@ class Utils(commands.Cog):
 				channel = self.bot.get_channel(int(channel_id))
 			message = await channel.fetch_message(int(message_id))
 			assert message # Force a failure if the message wasn't found
+			# Check if we're resolving forwards
+			if resolve_forwards and self._is_forwarded(message):
+				# Resolve the forwarded message and increase the current depth
+				# preemptively
+				return await self.get_replied_to(message,current_depth=2)
 			return message
 		except:
 			pass
