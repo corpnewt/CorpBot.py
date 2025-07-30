@@ -14,6 +14,7 @@ class Utils(commands.Cog):
 	def __init__(self,bot):
 		self.bot = bot
 		self.url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
+		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 
 	def suppressed(self,ctx,msg,force=False):
 		# Checks if the passed server is suppressing user/role mentions and adjust the msg accordingly
@@ -177,25 +178,54 @@ class Utils(commands.Cog):
 			replied_to = await ctx.channel.fetch_message(message.reference.message_id)
 		return replied_to
 
-	async def get_replied_to(self,message,ctx=None,max_depth=5,required_keys=None,at_least_one_key=None):
+	async def get_replied_to(
+		self,
+		message,
+		ctx=None,
+		max_depth=5,
+		required_keys=None,
+		at_least_one_key=None,
+		follow_message_urls=True,
+		prioritize_urls=False
+	):
+		def verify_message(m, required_keys, at_least_one_key):
+			# Returns True if we passed a check, False if we failed a check,
+			# and None if there was nothing to check
+			if m:
+				for r,f in ((required_keys,all),(at_least_one_key,any)):
+					if r and isinstance(r,(list,tuple)):
+						if f((getattr(m,k,None) for k in r)):
+							return True
+						return False
+			return None
+		# Keep a list of messages we've seen
+		messages = [message]
 		# Get nested replies/forwards matching the passed keys
 		m = message
 		for depth in range(max_depth):
+			# First check if we're following URLs
+			if follow_message_urls and m.content and (prioritize_urls or not m.reference):
+				# Check for a message URL in the content
+				m_match = self.message_regex.search(m.content)
+				if m_match:
+					ctx = await self.bot.get_context(m)
+					m = await self.get_message_from_url(m_match.group(),ctx=ctx)
 			m_check = await self._get_replied_to(m,ctx)
-			if not m_check:
-				# Return the last valid message
-				return m
+			if not m_check or m_check in messages:
+				# We didn't get a valid message, or we've already
+				# seen this one - bail
+				break
 			m = m_check
+			messages.append(m)
 			# See if we have requirements - otherwise keep iterating
 			# until we exceed the max depth
-			if isinstance(required_keys,(list,tuple)) and required_keys:
-				if all((getattr(m,k,None) for k in required_keys)):
-					return m
-			elif isinstance(at_least_one_key,(list,tuple)) and at_least_one_key:
-				if any((getattr(m,k,None) for k in at_least_one_key)):
-					return m
-		# If we exceeded the max depth, return the last message
-		return m
+			if verify_message(m,required_keys,at_least_one_key) is True:
+				return m
+		# If we exceeded the max depth, return the last message if
+		# it passes our checks
+		if verify_message(m,required_keys,at_least_one_key) in (True,None):
+			return m
+		return None
 
 	async def get_message_from_url(self,message_url,ctx=None):
 		# Attempts to resolve the passed URL to the message object using the passed
