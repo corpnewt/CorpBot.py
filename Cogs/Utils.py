@@ -1,6 +1,10 @@
 import asyncio, discord, re
 from   discord.ext import commands
 from   Cogs import Nullify
+try:
+	from discord.enums import MessageReferenceType
+except ImportError:
+	MessageReferenceType = None
 
 # bot = None
 # url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
@@ -14,7 +18,6 @@ class Utils(commands.Cog):
 	def __init__(self,bot):
 		self.bot = bot
 		self.url_regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 
 	def suppressed(self,ctx,msg,force=False):
 		# Checks if the passed server is suppressing user/role mentions and adjust the msg accordingly
@@ -166,66 +169,22 @@ class Utils(commands.Cog):
 		# If we got here, nothing was found - return the original content
 		return message.content
 
-	async def _get_replied_to(self,message,ctx=None):
+	async def get_replied_to(self,message,ctx=None,current_depth=1,max_depth=5):
 		# Returns the replied-to message first by checking the cache, then
 		# by fetching it.
-		if not isinstance(message,discord.Message) or not message.reference:
-			return None
+		if not isinstance(message,discord.Message): return None
+		if current_depth >= max_depth: return message
+		if not message.reference: return None
 		replied_to = self.bot.get_message(message.reference.message_id)
 		if not replied_to: # Not in the cache, try to retrieve it
 			if not ctx: # First retrieve the context if needed
 				ctx = await self.bot.get_context(message)
 			replied_to = await ctx.channel.fetch_message(message.reference.message_id)
+		# Check for forwarding here - and recurse
+		if getattr(getattr(replied_to,"reference",None),"type","") == getattr(MessageReferenceType,"forward",None):
+			# Forwarded - return the result of another check
+			return await self.get_replied_to(replied_to,current_depth=current_depth+1,max_depth=max_depth)
 		return replied_to
-
-	async def get_replied_to(
-		self,
-		message,
-		ctx=None,
-		max_depth=5,
-		required_keys=None,
-		at_least_one_key=None,
-		follow_message_urls=True,
-		prioritize_urls=False
-	):
-		def verify_message(m, required_keys, at_least_one_key):
-			# Returns True if we passed a check, False if we failed a check,
-			# and None if there was nothing to check
-			if m:
-				for r,f in ((required_keys,all),(at_least_one_key,any)):
-					if r and isinstance(r,(list,tuple)):
-						if f((getattr(m,k,None) for k in r)):
-							return True
-						return False
-			return None
-		# Keep a list of messages we've seen
-		messages = [message]
-		# Get nested replies/forwards matching the passed keys
-		m = message
-		for depth in range(max_depth):
-			# First check if we're following URLs
-			if follow_message_urls and m.content and (prioritize_urls or not m.reference):
-				# Check for a message URL in the content
-				m_match = self.message_regex.search(m.content)
-				if m_match:
-					ctx = await self.bot.get_context(m)
-					m = await self.get_message_from_url(m_match.group(),ctx=ctx)
-			m_check = await self._get_replied_to(m,ctx)
-			if not m_check or m_check in messages:
-				# We didn't get a valid message, or we've already
-				# seen this one - bail
-				break
-			m = m_check
-			messages.append(m)
-			# See if we have requirements - otherwise keep iterating
-			# until we exceed the max depth
-			if verify_message(m,required_keys,at_least_one_key) is True:
-				return m
-		# If we exceeded the max depth, return the last message if
-		# it passes our checks
-		if verify_message(m,required_keys,at_least_one_key) in (True,None):
-			return m
-		return None
 
 	async def get_message_from_url(self,message_url,ctx=None):
 		# Attempts to resolve the passed URL to the message object using the passed
