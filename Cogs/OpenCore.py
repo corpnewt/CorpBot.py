@@ -47,8 +47,6 @@ class OpenCore(commands.Cog):
 		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
 		self.nv_link = "https://gfe.nvidia.com/mac-update"
-		self.auto_tool_wait_time = 86400 # Default of 24 hours (86400 seconds)
-		self.auto_tool_descriptions = {}
 		global Utils
 		Utils = self.bot.get_cog("Utils")
 
