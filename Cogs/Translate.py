@@ -199,9 +199,11 @@ class Translate(commands.Cog):
             force_pm=True,
             color=ctx.author,
             description=result.text,
-            footer="{} --> {}".format(
+            footer="{} ({}) --> {} ({})".format(
                 self.languages.get(result.src.lower(), "Unknown").title(),
-                self.languages.get(result.dest.lower(), "Unknown").title()
+                result.src.lower(),
+                self.languages.get(result.dest.lower(), "Unknown").title(),
+                result.dest.lower()
             )
         )
 
@@ -281,12 +283,16 @@ class Translate(commands.Cog):
             embed.add_field(name="Translated to English", value=english_translation.text, inline=False)
         if int(lang_confidence) != 1:
             embed.footer = {
-                "text": "Language: {} (Confidence: {}%)".format(
+                "text": "Language: {} ({}) - Confidence: {}%".format(
                     source_lang_name,
+                    source_lang,
                     round(lang_confidence * 100, 2))
             }
         else:
             embed.footer = {
-                "text": "Language: {}".format(source_lang_name)
+                "text": "Language: {} ({})".format(
+                    source_lang_name,
+                    source_lang
+                )
             }
         await embed.send(ctx)
