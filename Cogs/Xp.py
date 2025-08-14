@@ -1,4 +1,4 @@
-import asyncio, discord, datetime, time, random
+import asyncio, discord, datetime, time, random, re
 from   discord.ext import commands
 from   Cogs import Settings, DisplayName, Nullify, CheckRoles, Message, PickList
 
@@ -17,6 +17,7 @@ class Xp(commands.Cog):
 		self.settings = settings
 		self.is_current = False # Used for stopping loops
 		self.loop_time = 600 # Default is 10 minutes (600 seconds)
+		self.emoji_name = re.compile(r"(?i)[a-z\d_]+")
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
 		DisplayName = self.bot.get_cog("DisplayName")
@@ -1097,7 +1098,15 @@ class Xp(commands.Cog):
 					if activity.emoji:
 						# Try to retrieve the emoji, fall back on a question mark
 						emoji_check = self.bot.get_emoji(activity.emoji.id)
-						emoji = str(emoji_check) if emoji_check else "`:{}:`".format(activity.emoji.name)
+						if emoji_check:
+							# Got a match - use it
+							emoji = str(emoji_check)
+						elif self.emoji_name.match(activity.emoji.name):
+							# Got an emoji name
+							emoji = "`:{}:`".format(activity.emoji.name)
+						else:
+							# It's unicode - use it as-is
+							emoji = activity.emoji.name
 					play_value = " ".join([x for x in (emoji,play_value) if x])
 					if not play_value:
 						# Nothing to display - continue
