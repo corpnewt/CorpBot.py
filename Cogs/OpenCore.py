@@ -455,6 +455,11 @@ class OpenCore(commands.Cog):
 				except:
 					pass
 				try:
+					if any((re.match(r"(?i).*(mald(o|0)n|olarila).*\.(aml|dat|bin)",x["Path"]) for x in acpi_add if isinstance(x.get("Path"),str))):
+						names.append("distro")
+				except:
+					pass
+				try:
 					name = OCD.check_match(plist_data)
 					if name:
 						names.append(name)
