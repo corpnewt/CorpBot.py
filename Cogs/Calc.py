@@ -57,7 +57,10 @@ class Calc(commands.Cog):
                     except:
                         pass
                 result = await self.bot.loop.run_in_executor(None,parser.evaluate,line)
-                clean_lines.append("{} = {}".format(line.replace("`","").replace("\\",""),result))
+                clean_lines.append("{} = {}".format(
+                    " ".join(line.split()).replace("`","").replace("\\",""),
+                    result
+                ))
         except Exception as e:
             msg  = 'I couldn\'t parse that formula :(\n'
             msg += "```\n{}\n```\n".format(str(e).replace("`","back tick"))
