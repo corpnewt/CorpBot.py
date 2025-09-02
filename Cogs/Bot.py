@@ -763,7 +763,7 @@ class Bot(commands.Cog):
 		msg = '**My insides are located at:**\n\n{}'.format(source)
 		await ctx.send(msg)
 
-	@commands.command(aliases=["deldm","dmdel","dmdelete"])
+	@commands.command(aliases=["deldm","dmdel","dmdelete","rmdm","dmrm","remdm","dmrem"])
 	async def deletedm(self, ctx, *, message_link = None):
 		"""Deletes the passed message link if sent from the bot in dms."""
 
