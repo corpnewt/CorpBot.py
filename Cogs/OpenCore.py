@@ -1004,6 +1004,8 @@ class OpenCore(commands.Cog):
 		# back ticks surrounded by newlines
 		fixed_string = re.sub("`{2,}","`",fixed_string)
 		fixed_string = re.sub("\\n`\\n","",fixed_string)
+		# Replace triple hyphens with an em dash
+		fixed_string = fixed_string.replace("---","—")
 		# Return the built string
 		return fixed_string
 
@@ -1176,18 +1178,18 @@ class OpenCore(commands.Cog):
 						line = line.replace("\\item", replace_str)
 						enum += 1
 					elif itemize == 1: # first level item
-						line = line.replace("\\item", u"\u2022")
+						line = line.replace("\\item","*")
 					else:
 						line = line.replace("\\item", "-")
 					# fix indenting
-					line = "    "*itemize + line
+					line = "  "*(itemize-1) + line
 					if enum != 0:
-						line = "    " + line
+						line = "  " + line
 			else:
 				if itemize > 0 or enum > 0: # inside multi line item
 					if last_line_had_forced_return:
-						line = "    "*itemize + line
-						line = "       " + line # indent
+						line = "  "*(itemize-1) + line
+						line = "   " + line # indent
 			if "section{" in line: # stop when next section is found
 	# let's try only checking for "section{" instead of 3 checks
 	#        if "\\section{" in line or "\\subsection{" in line or "\\subsubsection{" in line:
