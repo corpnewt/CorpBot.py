@@ -397,93 +397,171 @@ class Xp(commands.Cog):
 		if approve:
 
 			self.bot.dispatch("xp", member, ctx.author, xpAmount)
+			# Decrement as needed
+			if decrement:
+				self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 
 			if isRole:
 				# XP was approved - let's iterate through the users of that role,
 				# starting with the lowest xp
 				#
-				# Work through our members
-				memberList = []
-				sMemberList = self.settings.getServerStat(server, "Members")
-				for amem in server.members:
-					if amem == author:
-						continue
-					if amem.id in xpblock:
-						# Blocked - only if not admin sending it
-						continue
-					roles = amem.roles
-					if member in roles:
-						# This member has our role
-						# Add to our list
-						for smem in sMemberList:
-							# Find our server entry
-							if str(smem) == str(amem.id):
-								# Add it.
-								sMemberList[smem]["ID"] = smem
-								memberList.append(sMemberList[smem])
-				memSorted = sorted(memberList, key=lambda x:int(x['XP']))
-				if len(memSorted):
-					# There actually ARE members in said role
-					totalXP = xpAmount
-					# Gather presets
-					xp_p = self.settings.getServerStat(server,"XPPromote")
-					xp_d = self.settings.getServerStat(server,"XPDemote")
-					xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
-					xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
-					xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
-					if xpAmount > len(memSorted):
-						# More xp than members
-						leftover = xpAmount % len(memSorted)
-						eachXP = (xpAmount-leftover)/len(memSorted)
-						for i in range(0, len(memSorted)):
-							# Make sure we have anything to give
-							if leftover <= 0 and eachXP <= 0:
-								break
-							# Carry on with our xp distribution
-							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
-							if leftover>0:
-								self.settings.incrementStat(cMember, server, "XP", eachXP+1)
-								leftover -= 1
-							else:
-								self.settings.incrementStat(cMember, server, "XP", eachXP)
-							await CheckRoles.checkroles(
-								cMember,
-								channel,
-								self.settings,
-								self.bot,
-								xp_promote=xp_p,
-								xp_demote=xp_d,
-								suppress_promotions=xp_sp,
-								suppress_demotions=xp_sd,
-								only_one_role=xp_oo)
-					else:
-						for i in range(0, xpAmount):
-							cMember = DisplayName.memberForID(memSorted[i]['ID'], server)
-							self.settings.incrementStat(cMember, server, "XP", 1)
-							await CheckRoles.checkroles(
-								cMember,
-								channel,
-								self.settings,
-								self.bot,
-								xp_promote=xp_p,
-								xp_demote=xp_d,
-								suppress_promotions=xp_sp,
-								suppress_demotions=xp_sd,
-								only_one_role=xp_oo)
-
-					# Decrement if needed
-					if decrement:
-						self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
-					msg = '*{:,} collective xp* was given to *{}!*'.format(totalXP, Nullify.escape_all(member.name))
-					await channel.send(msg)
+				# Gather a list of members who are not the author, are not xp blocked,
+				# and have the role we're giving xp to
+				eligible_members = [m for m in server.members if m != author and m.id not in xpblock and member in m.roles]
+				if not eligible_members:
+					return await ctx.send("There are no eligible members in *{}!*".format(Nullify.escape_all(member.name)))
+				
+				async def update_progress(
+					last_time,
+					update_interval,
+					current_step,
+					total_steps,
+					message,
+					message_text
+				):
+					# Helper to update the progress as needed
+					# Returns the last_time value, updated or
+					# not.
+					check_time = time.time()
+					if check_time - last_time >= update_interval:
+						try:
+							await message.edit(content="{} ({}%)".format(
+								message_text,
+								round(int(current_step/total_steps*100))
+							))
+						except:
+							pass
+						last_time = check_time
+					return last_time
+				
+				# Send a progress message
+				last_time = time.time()
+				update_freq = 5 # Minimum number of seconds between status updates
+				total_members = len(eligible_members)
+				total_records = total_members+min(total_members,xpAmount) # First sweep is to read, second to update
+				progress_text = "Processing xp for {:,} member{} in *{}*...".format(
+					len(eligible_members),
+					"" if len(eligible_members) == 1 else "s",
+					Nullify.escape_all(member.name)
+				)
+				progress = await ctx.send(progress_text)
+				# Walk the eligible members and gather their current xp
+				eligible_members_xp = []
+				for i,e in enumerate(eligible_members,start=1):
+					# Get the member's xp, and check if we're past our
+					# update threshold
+					try:
+						xp = int(await self.bot.loop.run_in_executor(
+							None,
+							self.settings.getUserStat,
+							e,
+							server,
+							"XP",
+							0
+						))
+					except:
+						# Bad settings?
+						xp = 0
+					eligible_members_xp.append((
+						e,
+						xp
+					))
+					# Update the message with progress as needed
+					last_time = await update_progress(
+						last_time,
+						update_freq,
+						i,
+						total_records,
+						progress,
+						progress_text
+					)
+				# Get the members sorted by xp in ascending order
+				memSorted = sorted(eligible_members_xp, key=lambda x:x[1])
+				# Gather presets
+				xp_p = self.settings.getServerStat(server,"XPPromote")
+				xp_d = self.settings.getServerStat(server,"XPDemote")
+				xp_sp = self.settings.getServerStat(server,"SuppressPromotions")
+				xp_sd = self.settings.getServerStat(server,"SuppressDemotions")
+				xp_oo = self.settings.getServerStat(server,"OnlyOneRole")
+				if xpAmount > len(memSorted):
+					# More xp than members
+					leftover = xpAmount % len(memSorted)
+					eachXP = (xpAmount-leftover)/len(memSorted)
+					for i in range(0, len(memSorted)):
+						# Make sure we have anything to give
+						if leftover <= 0 and eachXP <= 0:
+							break
+						# Carry on with our xp distribution
+						cMember = memSorted[i][0]
+						amount = int(eachXP)
+						if leftover > 0:
+							amount += 1
+							leftover -= 1
+						await self.bot.loop.run_in_executor(
+							None,
+							self.settings.incrementStat,
+							cMember,
+							server,
+							"XP",
+							amount
+						)
+						await CheckRoles.checkroles(
+							cMember,
+							channel,
+							self.settings,
+							self.bot,
+							xp_promote=xp_p,
+							xp_demote=xp_d,
+							suppress_promotions=xp_sp,
+							suppress_demotions=xp_sd,
+							only_one_role=xp_oo
+						)
+						# Update the message with progress as needed
+						last_time = await update_progress(
+							last_time,
+							update_freq,
+							i+total_members+1,
+							total_records,
+							progress,
+							progress_text
+						)
 				else:
-					msg = 'There are no eligible members in *{}!*'.format(Nullify.escape_all(member.name))
-					await channel.send(msg)
+					for i in range(0, xpAmount):
+						cMember = memSorted[i][0]
+						await self.bot.loop.run_in_executor(
+							None,
+							self.settings.incrementStat,
+							cMember,
+							server,
+							"XP",
+							1
+						)
+						await CheckRoles.checkroles(
+							cMember,
+							channel,
+							self.settings,
+							self.bot,
+							xp_promote=xp_p,
+							xp_demote=xp_d,
+							suppress_promotions=xp_sp,
+							suppress_demotions=xp_sd,
+							only_one_role=xp_oo
+						)
+						# Update the message with progress as needed
+						last_time = await update_progress(
+							last_time,
+							update_freq,
+							i+total_members+1,
+							total_records,
+							progress,
+							progress_text
+						)
+				return await progress.edit(content="*{:,} collective xp* was given to the *{}* role!".format(
+					xpAmount,
+					Nullify.escape_all(member.name)
+				))
 
 			else:
-				# Decrement if needed
-				if decrement:
-					self.settings.incrementStat(author, server, "XPReserve", (-1*xpAmount))
 				# XP was approved!  Let's say it - and check decrement from gifter's xp reserve
 				msg = '*{}* was given *{:,} xp!*'.format(DisplayName.name(member), xpAmount)
 				await channel.send(msg)
@@ -493,10 +571,6 @@ class Xp(commands.Cog):
 		else:
 			await channel.send(msg)
 			
-	'''@xp.error
-	async def xp_error(self, ctx, error):
-		msg = 'xp Error: {}'.format(error)
-		await ctx.channel.send(msg)'''
 
 	@commands.command()
 	async def defaultrole(self, ctx):
