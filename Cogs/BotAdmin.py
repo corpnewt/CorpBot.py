@@ -326,10 +326,24 @@ class BotAdmin(commands.Cog):
 		skipped = []
 		last = []
 		reason = ""
-		days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1) if command_name.lower() in ("ban","klean") else None
-		try: days = int(days)
-		except: days = None
-		footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s") if command_name.lower() in ("ban","klean") else None
+		footer = None
+		days = None
+		if command_name.lower() in ("ban","klean"):
+			# Need to set a days value
+			if command_name.lower() == "klean" and self.settings.getServerStat(ctx.guild,"UseRemKleanMessages",False):
+				# We're kleaning, and have a separate klean message remove days value
+				days = self.settings.getServerStat(ctx.guild,"KleanMessageRemoveDays",1)
+			else:
+				# We're using the ban message remove days value
+				days = self.settings.getServerStat(ctx.guild,"BanMessageRemoveDays",1)
+			try:
+				# Ensure we have a valid int between 0-7 days
+				days = min(7,max(0,int(days)))
+			except:
+				# Default to 0 if we get a bogus value
+				days = 0
+			# Setup our footer to reflect the number of days of messages to remove
+			footer = "Message Removal: {:,} day{}".format(days,"" if days==1 else "s")
 		# Let the author know we're resolving members
 		status_message = await Message.Embed(
 			title="Resolving passed members...",
@@ -610,6 +624,45 @@ class BotAdmin(commands.Cog):
 		# At this point, we should have the default number of days - let's tell the user!
 		self.settings.setServerStat(ctx.guild,"BanMessageRemoveDays",days)
 		return await ctx.send("Banning a user will now remove {:,} day{} worth of messages.".format(days,"" if days==1 else "s"))
+
+	@commands.command()
+	async def remkleanmessages(self, ctx, number_of_days = None):
+		"""Gets or sets the default number of days worth of messages to remove when kleaning a user.  Must be between 0-7 and uses a default of 1 (bot-admin only)."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		setting_is_active = self.settings.getServerStat(ctx.guild,"UseRemKleanMessages",False)
+		footnote = "" if setting_is_active else "\n**NOTE:** This setting is not active.  Send `{}useremkleanmessages yes` to activate.".format(ctx.prefix)
+		if number_of_days is None: # No setting passed, just output the current
+			days = self.settings.getServerStat(ctx.guild,"KleanMessageRemoveDays",1)
+			return await ctx.send("Kleaning a user will remove {:,} day{} worth of messages.{}".format(
+				days,
+				"" if days==1 else "s",
+				footnote
+			))
+		# Try to cast the days as an int - and ensure they're between 0 and 7
+		try:
+			days = int(number_of_days)
+			assert 0<=days<8
+		except:
+			return await ctx.send("Number of days must be an integer between 0 and 7!")
+		# At this point, we should have the default number of days - let's tell the user!
+		self.settings.setServerStat(ctx.guild,"KleanMessageRemoveDays",days)
+		return await ctx.send("Kleaning a user will now remove {:,} day{} worth of messages.{}".format(
+			days,
+			"" if days==1 else "s",
+			footnote
+		))
+
+	@commands.command()
+	async def useremkleanmessages(self, ctx, *, yes_no = None):
+		"""Gets or sets whether the klean command uses its own number of days worth of messages to remove, or if it uses the same as the ban command (bot-admin only).
+		Default is no, which uses the value set by the rembanmessages command.  If set to yes, you can configure the days using the remkleanmessages command."""
+		if not await Utils.is_bot_admin_reply(ctx): return
+		await ctx.send(Utils.yes_no_setting(
+			ctx,
+			"Use `{0}remkleanmessages` for the `{0}klean` command instead of `{0}rembanmessages`".format(ctx.prefix),
+			"UseRemKleanMessages",
+			yes_no
+		))
 
 	@commands.command()
 	async def botowneroveradmin(self, ctx, *, yes_no = None):
