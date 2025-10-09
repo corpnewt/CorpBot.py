@@ -209,7 +209,7 @@ class MadLibs(commands.Cog):
 		# Let's replace
 		for sub in subs:
 			# Only replace the first occurence of each
-			data = re.sub(self.regex, "**{}**".format(Nullify.escape_all(sub)), data, 1)
+			data = re.sub(self.regex, "**{}**".format(Nullify.resolve_mentions(sub,ctx=ctx)), data, 1)
 
 		# Message the output
 		await ctx.send(data)
