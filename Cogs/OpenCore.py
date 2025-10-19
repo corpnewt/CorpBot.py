@@ -823,99 +823,149 @@ class OpenCore(commands.Cog):
 		if not self.fbs:
 			return await ctx.send("It looks like I was unable to get the WhateverGreenFBs.plist :(")
 
-		if search_term is None:
-			return await ctx.send("Usage: `{}weg [search_term]`".format(ctx.prefix))
+		def list_ids(id_list, cols=4):
+			id_list = ["`0x{}`".format(d) for d in id_list]
+			id_rows = [" ".join(id_list[0+i:cols+i]) for i in range(0, len(id_list), cols)]
+			return "\n".join(id_rows)
 
-		# We have a search term - let's find out if it's a device-id, or AAPL,(ig|snb)-platform-id
-		# and list relevant info accordingly
-		# Normalize the search term display - make sure we strip <>, 0x, spaces, and commmas - and
-		# convert it to a number
-		search_adj = search_term.lower().replace("<","").replace(">","").replace("0x","").replace(" ","").replace(",","")
-		try:
-			search_int = int(search_adj,16)
-		except:
-			return await ctx.send("That doesn't appear to be a valid hexadecimal value.")
-		search_adj = hex(search_int)[2:].upper() # More normalization
-		# Pad to 8 chars as everything is justified that way
-		search_adj = search_adj.rjust(8,"0")
-		search_rev = "{}{}{}{}".format(
-			search_adj[6:],
-			search_adj[4:6],
-			search_adj[2:4],
-			search_adj[:2]
-		)
-		# Walk our data and search for any matches
-		search_tuple = (search_adj,search_rev)
-		title = desc = None
+		title = desc = ""
 		url = "https://github.com/acidanthera/WhateverGreen/blob/master/Manual/FAQ.IntelHD.en.md"
-		for proc in self.fbs:
-			kext = self.fbs[proc].get("kext")
-			gpus = self.fbs[proc].get("model")
-			name = "AAPL,{}-platform-id".format(
-				"ig" if not kext or not "SNB" in kext else "snb"
+		if search_term is not None:
+			# We have a search term - let's find out if it's a device-id, or AAPL,(ig|snb)-platform-id
+			# and list relevant info accordingly
+			# Normalize the search term display - make sure we strip <>, 0x, spaces, and commmas - and
+			# convert it to a number
+			search_adj = search_term.lower().replace("<","").replace(">","").replace("0x","").replace(" ","").replace(",","")
+			try:
+				search_int = int(search_adj,16)
+			except:
+				return await ctx.send("That doesn't appear to be a valid hexadecimal value.")
+			search_adj = hex(search_int)[2:].upper() # More normalization
+			# Pad to 8 chars as everything is justified that way
+			search_adj = search_adj.rjust(8,"0")
+			search_rev = "{}{}{}{}".format(
+				search_adj[6:],
+				search_adj[4:6],
+				search_adj[2:4],
+				search_adj[:2]
 			)
-			# Check connectors - then device-ids
-			for con in self.fbs[proc].get("connectors",{}):
-				# Extract the big endian and little endian values
-				try:
-					big,lil,info = self.fbs[proc]["connectors"][con]
-				except:
-					# Broken or missing info - skip
-					continue
-				if big in search_tuple or lil in search_tuple:
-					title = "Connector Match for 0x{}".format(search_adj)
-					desc = "### Architecture\n{}".format(proc)
-					if gpus:
-						desc += "\n### GPUs\n{}".format(gpus)
-					desc += "\n### {}\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
-						name,
-						big,
-						lil
-					)
-					if kext:
-						desc += "\n### Framebuffer Kext\n`{}`".format(kext)
-					if self.fbs[proc].get("device-ids"):
-						# List the platforms as well
-						dev_list = ["`0x{}`".format(d) for d in self.fbs[proc]["device-ids"]]
-						dev_rows = [" ".join(dev_list[0+i:4+i]) for i in range(0, len(dev_list), 4)]
-						desc += "\n### Supported Device-IDs\n{}".format("\n".join(dev_rows))
-					desc += "\n### Connector Info\n```\n{}```".format(info)
-					break
-			# Try the device-ids
-			for dev in self.fbs[proc].get("device-ids"):
-				try:
-					big,lil = self.fbs[proc]["device-ids"][dev]
-				except:
-					continue
-				if big in search_tuple or lil in search_tuple:
-					title = "Device-ID Match for 0x{}".format(search_adj)
-					desc = "### Architecture\n{}".format(proc)
-					if gpus:
-						desc += "\n### GPUs\n{}".format(gpus)
-					desc += "\n### Device-ID\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
-						big,
-						lil
-					)
-					if kext:
-						desc += "\n### Framebuffer Kext\n`{}`".format(kext)
-					if self.fbs[proc].get("connectors"):
-						# List the platforms as well
-						con_list = ["`0x{}`".format(c) for c in self.fbs[proc]["connectors"]]
-						con_rows = [" ".join(con_list[0+i:2+i]) for i in range(0, len(con_list), 2)]
-						desc += "\n### {} List\n{}".format(
+			# Walk our data and search for any matches
+			search_tuple = (search_adj,search_rev)
+			for proc in self.fbs:
+				kext = self.fbs[proc].get("kext")
+				gpus = self.fbs[proc].get("model")
+				name = "AAPL,{}-platform-id".format(
+					"ig" if not kext or not "SNB" in kext else "snb"
+				)
+				# Check connectors - then device-ids
+				for con in sorted(self.fbs[proc].get("connectors",{})):
+					# Extract the big endian and little endian values
+					try:
+						big,lil,info = self.fbs[proc]["connectors"][con]
+					except:
+						# Broken or missing info - skip
+						continue
+					if big in search_tuple or lil in search_tuple:
+						title = "Connector Match for 0x{}".format(search_adj)
+						desc = "### Architecture\n{}".format(proc)
+						if gpus:
+							desc += "\n### GPUs\n{}".format(gpus)
+						desc += "\n### {}\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
 							name,
-							"\n".join(con_rows)
+							big,
+							lil
 						)
-					break
-		if title and desc:
-			return await Message.Embed(
-				title=title,
+						if kext:
+							desc += "\n### Framebuffer Kext\n`{}`".format(kext)
+						if self.fbs[proc].get("device-ids"):
+							# List the platforms as well
+							desc += "\n### Supported Device-IDs\n{}".format(
+								list_ids(self.fbs[proc]["device-ids"],cols=4)	
+							)
+						desc += "\n### Connector Info\n```\n{}```".format(info)
+						break
+				# Try the device-ids
+				for dev in sorted(self.fbs[proc].get("device-ids",{})):
+					try:
+						big,lil = self.fbs[proc]["device-ids"][dev]
+					except:
+						continue
+					if big in search_tuple or lil in search_tuple:
+						title = "Device-ID Match for 0x{}".format(search_adj)
+						desc = "### Architecture\n{}".format(proc)
+						if gpus:
+							desc += "\n### GPUs\n{}".format(gpus)
+						desc += "\n### Device-ID\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
+							big,
+							lil
+						)
+						if kext:
+							desc += "\n### Framebuffer Kext\n`{}`".format(kext)
+						if self.fbs[proc].get("connectors"):
+							# List the platforms as well
+							desc += "\n### {} List\n{}".format(
+								name,
+								list_ids(self.fbs[proc]["connectors"],cols=3)
+							)
+						break
+			# Send our message accordingly
+			if title and desc:
+				return await Message.Embed(
+					title=title,
+					url=url,
+					description=desc,
+					color=ctx.author
+				).send(ctx)
+			else:
+				return await ctx.send("Nothing was found for that search term.")
+		else:
+			# No search term - just gather a list of arch, gpus, kexts, device-ids, and platform-ids
+			arch_sort = []
+			for proc in self.fbs:
+				dec_devs = []
+				for dev in self.fbs[proc].get("device_ids",{}):
+					try:
+						dec_devs.append(int(dev,16))
+					except:
+						continue
+				if not dec_devs:
+					# Append 0xFFFF for sorting purposes
+					dec_devs.append(0xFFFF)
+				arch_sort.append((proc,max(dec_devs)))
+			for proc,i in sorted(arch_sort,key=lambda x:x[1]):
+				kext = self.fbs[proc].get("kext")
+				gpus = self.fbs[proc].get("model")
+				name = "AAPL,{}-platform-id".format(
+					"ig" if not kext or not "SNB" in kext else "snb"
+				)
+				desc = "" if not desc else desc+"\n" # Ensure padding
+				desc += "### {}:".format(proc)
+				if gpus:
+					desc += "\n### GPUs\n{}".format(gpus)
+				if kext:
+					desc += "\n### Framebuffer Kext\n`{}`".format(kext)
+				if self.fbs[proc].get("device-ids"):
+					# List the platforms as well
+					desc += "\n### Supported Device-IDs\n{}".format(
+						list_ids(self.fbs[proc]["device-ids"],cols=4)
+					)
+				if self.fbs[proc].get("connectors"):
+					# List the platforms as well
+					desc += "\n### {} List\n{}".format(
+						name,
+						list_ids(self.fbs[proc]["connectors"],cols=3)
+					)
+			if not desc:
+				return await ctx.send("Something went wrong gathering data... :(")
+			return await PickList.PagePicker(
+				title="Framebuffer List from WEG's IntelHD FAQ",
 				url=url,
 				description=desc,
-				color=ctx.author
-			).send(ctx)
-		else:
-			return await ctx.send("Nothing was found for that search term.")
+				timeout=300, # Allow 5 minutes before we stop watching the picker
+				ctx=ctx
+			).pick()
+		# If we got here - something went wrong - just report a general error
+		await ctx.send("Something went wrong :(")
 
 	async def download(self, url):
 		url = url.strip("<>")
