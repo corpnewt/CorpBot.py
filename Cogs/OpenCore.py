@@ -24,6 +24,8 @@ class OpenCore(commands.Cog):
 		self.wait_time = 21600 # Default of 6 hours (21600 seconds)
 		self.alc_codecs = None
 		self.alc_wait_time = 86400 # Default of 24 hours (86400 seconds)
+		self.fbs = None
+		self.fb_wait_time = 86400 # Default of 24 hours (86400 seconds)
 		self.alc_alternate = { # Alternate codec names pulled from: https://github.com/acidanthera/AppleALC/wiki/Supported-codecs
 			"ALC225":["ALC3253"],
 			"ALC233":["ALC3236"],
@@ -70,9 +72,11 @@ class OpenCore(commands.Cog):
 		self._load_local()
 		self._load_local_sample()
 		self._load_local_alc()
+		self._load_local_fb()
 		# Start the update loops
 		self.bot.loop.create_task(self.update_tex())
 		self.bot.loop.create_task(self.update_alc())
+		self.bot.loop.create_task(self.update_fb())
 
 	async def update_tex(self):
 		print("Starting Configuration.tex|Sample.plist update loop - repeats every {:,} second{}...".format(self.wait_time,"" if self.wait_time==1 else "s"))
@@ -110,6 +114,25 @@ class OpenCore(commands.Cog):
 			print("AppleALCCodecs - took {:,} seconds.".format(time.time()-t))
 			await asyncio.sleep(self.alc_wait_time)
 
+	async def update_fb(self):
+		print("Starting WhateverGreen framebuffer loop - repeats every {:,} second{}...".format(
+			self.fb_wait_time,
+			"" if self.fb_wait_time==1 else "s"
+		))
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed():
+			if not self.is_current:
+				# Bail if we're not the current instance
+				return
+			t = time.time()
+			print("Updating WhateverGreenFBs.plist: {}".format(datetime.datetime.now().time().isoformat()))
+			if not await self._dl_fb():
+				print("Could not download WhateverGreenFBs.plist!")
+				if self._load_local_fb():
+					print(" - Falling back on local copy!")
+			print("WhateverGreenFBs - took {:,} seconds.".format(time.time()-t))
+			await asyncio.sleep(self.alc_wait_time)
+
 	def _load_local(self):
 		if not os.path.exists("Configuration.tex"): return False
 		# Try to load it
@@ -139,6 +162,15 @@ class OpenCore(commands.Cog):
 		try:
 			with open("AppleALCCodecs.plist","rb") as f:
 				self.alc_codecs = plistlib.load(f)
+		except: return False
+		return True
+	
+	def _load_local_fb(self):
+		if not os.path.exists("WhateverGreenFBs.plist"): return False
+		# Try to load it
+		try:
+			with open("WhateverGreenFBs.plist","rb") as f:
+				self.fbs = plistlib.load(f)
 		except: return False
 		return True
 
@@ -194,6 +226,99 @@ class OpenCore(commands.Cog):
 			return False
 		plistlib.dump(codecs,open("AppleALCCodecs.plist","wb"))
 		self.alc_codecs = codecs
+		return True
+
+	async def _dl_fb(self):
+		try:
+			weg_faq_html = await DL.async_text("https://github.com/acidanthera/WhateverGreen/raw/master/Manual/FAQ.IntelHD.en.md")
+			# We need to walk the markdown and look for some landmarks for organizing elements
+			# Generation headers use a prefix of ##, then the graphics name, then ([codename](link) processors)
+			framebuffer_dict = {}
+			current_gen = current_url = current_gpu = None
+			connector_string = ""
+			dev_id_primed = connector_primed = False
+			for line in weg_faq_html.split("\n"):
+				line = line.strip()
+				if line.startswith("## ") and line.endswith("processors)"):
+					current_gpu = line.split("## ")[1].split("([")[0].strip()
+					current_gen = "["+"([".join(line.split("([")[1:])[:-1].replace(" processors","")
+					framebuffer_dict[current_gen] = {}
+					framebuffer_dict[current_gen]["model"] = current_gpu
+					# Reset any primed values
+					dev_id_primed = connector_primed = False
+					continue
+				if current_gen is not None and line.startswith("***Native supported DevID"):
+					# Got to the device id list - prime it
+					dev_id_primed = True
+					connector_primed = False
+					continue
+				if current_gen is not None and line.endswith("connectors</summary>"):
+					# Got to the connectors list - prime it
+					connector_primed = True
+					dev_id_primed = False
+					continue
+				if dev_id_primed:
+					# We got a potential device-id
+					if not line or not line.startswith("- `0x") or not line.endswith("`"):
+						continue # Not valid
+					dev_id = line.split("`")[1]
+					if len(dev_id) > 6:
+						continue # Too long - maybe it was a connector instead?
+					# Should have a device-id here - save it in a few formats
+					device_ids = framebuffer_dict[current_gen].get("device-ids",{})
+					dev_id = dev_id[2:].upper() # Normalize case
+					device_ids[dev_id] = [
+						"0000"+dev_id, # 32-bit big endian format
+						dev_id[2:]+dev_id[:2]+"0000", # 32-bit little endian format
+					]
+					framebuffer_dict[current_gen]["device-ids"] = device_ids
+					continue
+				if connector_primed:
+					# Looking for connector data
+					if not line:
+						# Empty - if we have connector data, add it
+						if connector_string:
+							connectors = framebuffer_dict[current_gen].get("connectors",{})
+							# Gather all entries that are hex-only
+							id_string = connector_string.split("ID: ")[1].split(", ")[0]
+							connector_id_list = list(re.finditer(
+								r"(?i)\b(0x)?([\da-f]+)\b",
+								id_string
+							))
+							for connector_match in connector_id_list:
+								# Extract the full match sans 0x prefix
+								connector_id = connector_match.group(2).upper()
+								# Ensure our id is padded to 32-bits
+								if len(connector_id) < 8:
+									connector_id = connector_id.rjust(8,"0")
+								connectors[connector_id] = [
+									connector_id, # 32-bit big endian
+									"{}{}{}{}".format(
+										connector_id[6:],
+										connector_id[4:6],
+										connector_id[2:4],
+										connector_id[:2]
+									), # 32-bit little endian
+									connector_string
+								]
+								framebuffer_dict[current_gen]["connectors"] = connectors
+							connector_string = ""
+						continue
+					if line.endswith("kext`"):
+						# Got the framebuffer kext we're looking for
+						framebuffer_dict[current_gen]["kext"] = line.split("`")[1]
+						continue
+					if not connector_string and not line.startswith("ID: "):
+						continue # Not a valid starter
+					# Gather lines until we hit an empty one
+					if not connector_string:
+						connector_string = line
+					else:
+						connector_string += "\n"+line
+		except:
+			return False
+		plistlib.dump(framebuffer_dict,open("WhateverGreenFBs.plist","wb"))
+		self.fbs = framebuffer_dict
 		return True
 
 	def _parse_sample(self):
@@ -689,6 +814,108 @@ class OpenCore(commands.Cog):
 			max=5,
 			ctx=ctx
 		).pick()
+
+	@commands.command(aliases=["fb","whatevergreen","framebuffer"])
+	async def weg(self, ctx, *, search_term = None):
+		"""Search the WhateverGreen IntelHD FAQ for device-id and connector info.
+		Can take a big or little endian device-id, AAPL,ig-platform-id, or AAPL,snb-platform-id as a search term."""
+
+		if not self.fbs:
+			return await ctx.send("It looks like I was unable to get the WhateverGreenFBs.plist :(")
+
+		if search_term is None:
+			return await ctx.send("Usage: `{}weg [search_term]`".format(ctx.prefix))
+
+		# We have a search term - let's find out if it's a device-id, or AAPL,(ig|snb)-platform-id
+		# and list relevant info accordingly
+		# Normalize the search term display - make sure we strip <>, 0x, spaces, and commmas - and
+		# convert it to a number
+		search_adj = search_term.lower().replace("<","").replace(">","").replace("0x","").replace(" ","").replace(",","")
+		try:
+			search_int = int(search_adj,16)
+		except:
+			return await ctx.send("That doesn't appear to be a valid hexadecimal value.")
+		search_adj = hex(search_int)[2:].upper() # More normalization
+		# Pad to 8 chars as everything is justified that way
+		search_adj = search_adj.rjust(8,"0")
+		search_rev = "{}{}{}{}".format(
+			search_adj[6:],
+			search_adj[4:6],
+			search_adj[2:4],
+			search_adj[:2]
+		)
+		# Walk our data and search for any matches
+		search_tuple = (search_adj,search_rev)
+		title = desc = None
+		url = "https://github.com/acidanthera/WhateverGreen/blob/master/Manual/FAQ.IntelHD.en.md"
+		for proc in self.fbs:
+			kext = self.fbs[proc].get("kext")
+			gpus = self.fbs[proc].get("model")
+			name = "AAPL,{}-platform-id".format(
+				"ig" if not kext or not "SNB" in kext else "snb"
+			)
+			# Check connectors - then device-ids
+			for con in self.fbs[proc].get("connectors",{}):
+				# Extract the big endian and little endian values
+				try:
+					big,lil,info = self.fbs[proc]["connectors"][con]
+				except:
+					# Broken or missing info - skip
+					continue
+				if big in search_tuple or lil in search_tuple:
+					title = "Connector Match for 0x{}".format(search_adj)
+					desc = "### Architecture\n{}".format(proc)
+					if gpus:
+						desc += "\n### GPUs\n{}".format(gpus)
+					desc += "\n### {}\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
+						name,
+						big,
+						lil
+					)
+					if kext:
+						desc += "\n### Framebuffer Kext\n`{}`".format(kext)
+					if self.fbs[proc].get("device-ids"):
+						# List the platforms as well
+						dev_list = ["`0x{}`".format(d) for d in self.fbs[proc]["device-ids"]]
+						dev_rows = [" ".join(dev_list[0+i:4+i]) for i in range(0, len(dev_list), 4)]
+						desc += "\n### Supported Device-IDs\n{}".format("\n".join(dev_rows))
+					desc += "\n### Connector Info\n```\n{}```".format(info)
+					break
+			# Try the device-ids
+			for dev in self.fbs[proc].get("device-ids"):
+				try:
+					big,lil = self.fbs[proc]["device-ids"][dev]
+				except:
+					continue
+				if big in search_tuple or lil in search_tuple:
+					title = "Device-ID Match for 0x{}".format(search_adj)
+					desc = "### Architecture\n{}".format(proc)
+					if gpus:
+						desc += "\n### GPUs\n{}".format(gpus)
+					desc += "\n### Device-ID\n`0x{}` (Big Endian)\n`0x{}` (Little Endian)".format(
+						big,
+						lil
+					)
+					if kext:
+						desc += "\n### Framebuffer Kext\n`{}`".format(kext)
+					if self.fbs[proc].get("connectors"):
+						# List the platforms as well
+						con_list = ["`0x{}`".format(c) for c in self.fbs[proc]["connectors"]]
+						con_rows = [" ".join(con_list[0+i:2+i]) for i in range(0, len(con_list), 2)]
+						desc += "\n### {} List\n{}".format(
+							name,
+							"\n".join(con_rows)
+						)
+					break
+		if title and desc:
+			return await Message.Embed(
+				title=title,
+				url=url,
+				description=desc,
+				color=ctx.author
+			).send(ctx)
+		else:
+			return await ctx.send("Nothing was found for that search term.")
 
 	async def download(self, url):
 		url = url.strip("<>")
