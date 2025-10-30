@@ -110,7 +110,7 @@ class Lockdown(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not message.guild or not message.content or message.author.bot:
+        if not message.guild or message.author.bot:
             # We need a guild, some message contents, and for the author to be a person
             return
         # Check if we have an admin/bot-admin author and bail - they should be trusted
@@ -129,7 +129,11 @@ class Lockdown(commands.Cog):
             return # broken somehow
         author_messages = self.settings.getUserStat(message.author,message.guild,"MessageHashes",[])
         valid_messages  = [x for x in author_messages if timestamp-x.get("timestamp",-1) <= max_time]
-        message_check = {"hash":hash(message.content),"timestamp":timestamp,"channel":message.channel.id}
+        # Ensure we hash attachments too in order to catch upload spam - only get the name of the file though,
+        # as individual uploads will have unique URLs
+        message_hashes = [str(hash(message.content))]+[str(hash(a.filename)) for a in message.attachments]
+        message_hash = ":".join(message_hashes)
+        message_check = {"hash":message_hash,"timestamp":timestamp,"channel":message.channel.id}
         # Walk the valid messages and check our rules
         for rule in spam_rules:
             # Spam rules are a dict with the following:
