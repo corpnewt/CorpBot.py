@@ -1442,7 +1442,7 @@ This would edit the first response trigger to respond by pinging the user and sa
 		Attachments are formatted as a space-delimited list of file names.  Do remember that Discord will sanitize file names on upload too."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if check_attachments is None: return await ctx.send("Usage: `{}checkresponse [check_attachments]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		if check_attachments is None: return await ctx.send("Usage: `{}chkattach [check_attachments]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		await self._check_response(ctx,check_attachments=check_attachments)
 
 	@commands.command(aliases=["getresponse"])
