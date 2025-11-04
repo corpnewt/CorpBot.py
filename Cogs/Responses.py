@@ -51,7 +51,7 @@ class Responses(commands.Cog):
 		self.add_r         = re.compile(r"\[\[add_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
 		self.rem_r         = re.compile(r"\[\[rem_r(ole)?:[\d,]+\]\]", re.IGNORECASE)
 		self.react_r       = re.compile(r"\[\[react_r(ole)?:.*\]\]",   re.IGNORECASE)
-		self.in_chan       = re.compile(r"\[\[in:(?P<ids>[\d,]+)\]\]",       re.IGNORECASE)
+		self.in_chan       = re.compile(r"\[\[in:(?P<ids>[\d,]+)\]\]", re.IGNORECASE)
 		self.not_in_chan   = re.compile(r"\[\[(!|not)in:(?P<ids>[\d,]+)\]\]",re.IGNORECASE)
 		self.role          = re.compile(r"\[\[role:(?P<ids>[\d,]+)(:(?P<any_all>a(ny|ll)))?\]\]",re.IGNORECASE)
 		self.not_role      = re.compile(r"\[\[(!|not)role:(?P<ids>[\d,]+)\]\]",re.IGNORECASE)
@@ -59,6 +59,8 @@ class Responses(commands.Cog):
 		self.reply         = re.compile(r"\[\[reply\]\]",        re.IGNORECASE)
 		self.preply        = re.compile(r"\[\[(p|ping)reply\]\]",re.IGNORECASE)
 		self.check_comm    = re.compile(r"\[\[(check_)?(in_)?comm{1,2}(and)?s?\]\]",re.IGNORECASE)
+		self.check_attach  = re.compile(r"\[\[(check_)?(in_)?attach(ment)?s?\]\]",re.IGNORECASE)
+		self.empty_message = re.compile(r"\[\[empty(_message)?\]\]",re.IGNORECASE)
 		self.match_time    = 0.025
 
 	def _is_submodule(self, parent, child):
@@ -440,7 +442,7 @@ class Responses(commands.Cog):
 					ci_stack.pop()
 		return new_trigger
 
-	async def _get_response(self, ctx, message, check_chan=True, check_roles=True, is_command=False):
+	async def _get_response(self, ctx, message, attachments=[], check_chan=True, check_roles=True, is_command=False):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if is_command and message_responses:
 			# We have a valid command - let's check only
@@ -455,13 +457,33 @@ class Responses(commands.Cog):
 		# Check for matching response triggers here
 		original_content = message.replace("\n"," ") # Remove newlines for better matching
 		replaced_content, spicy_chars = self._replace_confusables(original_content)
+		attach = ""
+		try:
+			if isinstance(attachments,str):
+				attach = attachments # Already a string, use as-is
+			elif isinstance(attachments,(list,tuple)):
+				attach = " ".join([getattr(a,"filename",a) for a in attachments])
+		except:
+			pass
 		# Prevent checking this every loop - just for speed
 		original_is_replaced = original_content == replaced_content
 		response = {}
 		start_time = time.perf_counter_ns()
 		for i,(original_trigger,m) in enumerate(message_responses.items(),start=1):
-			# Check if we're replacing content or not
-			if original_is_replaced or self.regexConfuse.search(m):
+			check_attach = False
+			empty_message = False
+			# Check if we're only checking attachments, and replacing content or not
+			if self.check_attach.search(m):
+				if not attach:
+					continue # Nothing to check
+				if self.empty_message.search(m):
+					empty_message = True
+					if original_content:
+						continue # Only checking empty messages
+				check_attach = True
+				content = attach
+				trigger = original_trigger
+			elif original_is_replaced or self.regexConfuse.search(m):
 				content = original_content
 				trigger = original_trigger
 			else:
@@ -587,6 +609,9 @@ class Responses(commands.Cog):
 					response["ping_reply"] = True
 			if self.regexSuppress.search(m): response["suppress"] = True
 			if self.check_comm.search(m): response["check_commands"] = True
+			if check_attach:
+				response["check_attachments"] = True
+				response["empty_message"] = empty_message
 			# Set our action with ban -> kick -> mute -> timeout priorty
 			if self.regexBan.search(m):
 				action = "ban"
@@ -806,10 +831,13 @@ class Responses(commands.Cog):
 				self.reply,
 				self.preply,
 				self.check_comm,
+				self.check_attach,
+				self.empty_message,
 				self.regexConfuse
 			):
 				m = re.sub(sub,"",m)
 			response["message"] = m
+			if attach: response["attachments"] = attach
 			break
 		if not "total_time_ms" in response: # Get the total time to check
 			response["total_time_ms"] = (time.perf_counter_ns()-start_time)/1000000
@@ -822,7 +850,12 @@ class Responses(commands.Cog):
 		if not message.guild: return
 		ctx = await self.bot.get_context(message)
 		# Gather the response info - if any
-		response = await self._get_response(ctx,message.content,is_command=ctx.command)
+		response = await self._get_response(
+			ctx,
+			message.content,
+			attachments=message.attachments,
+			is_command=ctx.command
+		)
 		if not response or not response.get("matched"): return
 		# See if we're admin/bot-admin - and bail if suppressed
 		if Utils.is_bot_admin(ctx) and response.get("suppress"): return
@@ -966,6 +999,10 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
                           - can also accept "dm" to dm the author, and "original" to send in
                             the original channel where the response was triggered
 [[check_commands]]       = checks within commands as well
+[[check_attachments]]    = checks a list of attachment names separated by spaces instead of
+                           the message contents.  Discord automatically replaces spaces in names
+						   with underscores for attached files.
+[[empty_message]]        = used with [[check_attachments]], requires the message content be empty.
 
 User role options (roles must be setup per the UserRole cog):
 
@@ -1091,6 +1128,10 @@ Standard user behavioral flags (do not apply to admin/bot-admin):
                           - can also accept "dm" to dm the author, and "original" to send in
                             the original channel where the response was triggered
 [[check_commands]]       = checks within commands as well
+[[check_attachments]]    = checks a list of attachment names separated by spaces instead of
+                           the message contents.  Discord automatically replaces spaces in names
+						   with underscores for attached files.
+[[empty_message]]        = used with [[check_attachments]], requires the message content be empty.
 
 User role options (roles must be setup per the UserRole cog):
 
@@ -1252,7 +1293,7 @@ This would edit the first response trigger to respond by pinging the user and sa
 		"""Moves the passed response index to the target index (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if response_index == None or target_index == None:
+		if response_index is None or target_index is None:
 			return await ctx.send("Usage: `{}mvresponse [response_index] [target_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
@@ -1272,15 +1313,17 @@ This would edit the first response trigger to respond by pinging the user and sa
 		self.settings.setServerStat(ctx.guild,"MessageResponses",ordered_responses)
 		return await ctx.send("Moved response from {:,} to {:,}!".format(response_index,target_index))
 
-	@commands.command(aliases=["checkresponse"])
-	async def chkresponse(self, ctx, *, check_string = None):
-		"""Reports a breakdown of the first match (if any) in the responses for the passed check string (bot-admin only)."""
-
-		if not await Utils.is_bot_admin_reply(ctx): return
-		if check_string == None: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+	async def _check_response(self, ctx, check_string = "", check_attachments = []):
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
-		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
-		response = await self._get_response(ctx,check_string,check_chan=False,check_roles=False)
+		if not message_responses:
+			return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
+		response = await self._get_response(
+			ctx,
+			check_string,
+			attachments=check_attachments,
+			check_chan=False,
+			check_roles=False
+		)
 		catastrophies = None
 		if response.get("catastrophies"):
 			catastrophies = "\n".join(["**{}.** {}".format(i,Nullify.escape_all(x)) for i,x in enumerate(response["catastrophies"],start=1)])
@@ -1349,6 +1392,9 @@ This would edit the first response trigger to respond by pinging the user and sa
 		else:
 			entries.append({"name":"Action:","value":str(response.get("action")).capitalize()})
 		entries.append({"name":"Check In Commands:","value":"Yes" if response.get("check_commands") else "No"})
+		entries.append({"name":"Only Check Attachments:","value":"Yes" if response.get("check_attachments") else "No"})
+		if response.get("check_attachments"):
+			entries.append({"name":"Message Content Must Be Empty:","value":"Yes" if response.get("empty_message") else "No"})
 		entries.append({"name":"Delete:","value":"Yes" if response.get("delete") else "No"})
 		entries.append({"name":"Output Message:","value":"None" if not response.get("message","").strip() else response["message"]})
 		if response.get("message","").strip():
@@ -1381,12 +1427,30 @@ This would edit the first response trigger to respond by pinging the user and sa
 				response["total_time_ms"]
 			)).pick()
 
+
+	@commands.command(aliases=["checkresponse"])
+	async def chkresponse(self, ctx, *, check_string = None):
+		"""Reports a breakdown of the first match (if any) in the responses for the passed check string (bot-admin only)."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if check_string is None: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		await self._check_response(ctx,check_string=check_string)
+
+	@commands.command(aliases=["checkattach"])
+	async def chkattach(self, ctx, *, check_attachments = None):
+		"""Reports a breakdown of the first match (if any) in the responses for the passed attachment string (bot-admin only).
+		Attachments are formatted as a space-delimited list of file names.  Do remember that Discord will sanitize file names on upload too."""
+
+		if not await Utils.is_bot_admin_reply(ctx): return
+		if check_attachments is None: return await ctx.send("Usage: `{}checkresponse [check_attachments]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		await self._check_response(ctx,check_attachments=check_attachments)
+
 	@commands.command(aliases=["getresponse"])
 	async def viewresponse(self, ctx, response_index = None):
 		"""Displays the response in full which corresponds to the target index (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if response_index == None: return await ctx.send("Usage: `{}viewresponse [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		if response_index is None: return await ctx.send("Usage: `{}viewresponse [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
 		# Make sure we got a number, and it's within our list range
@@ -1406,7 +1470,7 @@ This would edit the first response trigger to respond by pinging the user and sa
 		"""Displays the regex trigger in full which corresponds to the target index (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if response_index == None: return await ctx.send("Usage: `{}viewtrigger [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		if response_index is None: return await ctx.send("Usage: `{}viewtrigger [response_index]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
 		message_responses = self.settings.getServerStat(ctx.guild, "MessageResponses", {})
 		if not message_responses: return await ctx.send("No responses setup!  You can use the `{}addresponse` command to add some.".format(ctx.prefix))
 		# Make sure we got a number, and it's within our list range
