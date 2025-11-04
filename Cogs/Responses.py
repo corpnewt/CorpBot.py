@@ -1433,8 +1433,8 @@ This would edit the first response trigger to respond by pinging the user and sa
 		"""Reports a breakdown of the first match (if any) in the responses for the passed check string (bot-admin only)."""
 
 		if not await Utils.is_bot_admin_reply(ctx): return
-		if check_string is None: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
-		await self._check_response(ctx,check_string=check_string)
+		if check_string is None and not ctx.message.attachments: return await ctx.send("Usage: `{}checkresponse [check_string]`\nYou can get a numbered list with `{}responses`".format(ctx.prefix,ctx.prefix))
+		await self._check_response(ctx,check_string=check_string or "",check_attachments=ctx.message.attachments)
 
 	@commands.command(aliases=["checkattach"])
 	async def chkattach(self, ctx, *, check_attachments = None):
