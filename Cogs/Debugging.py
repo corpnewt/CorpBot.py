@@ -545,10 +545,20 @@ class Debugging(commands.Cog):
 				try:
 					last = await self.get_latest_log(after.guild, after, (discord.AuditLogAction.member_update,))
 					if hasattr(last.changes.after,"communication_disabled_until"):
-						timestamp = datetime.strptime(
-							last.changes.after.communication_disabled_until.split(".")[0],
-							"%Y-%m-%dT%H:%M:%S"
-						).replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
+						timestamp = None
+						if isinstance(last.changes.after.communication_disabled_until, datetime):
+							# It's already a datetime object - just get the timestamp in UTC
+							timestamp = last.changes.after.communication_disabled_until.replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
+						elif isinstance(last.changes.after.communication_disabled_until, str):
+							# It's a string - try to extract a datetime object from it, and
+							# gather the timestamp in UTC
+							try:
+								timestamp = datetime.strptime(
+									last.changes.after.communication_disabled_until.split(".")[0],
+									"%Y-%m-%dT%H:%M:%S"
+								).replace(tzinfo=timezone.utc).astimezone(tz=None).timestamp()
+							except:
+								pass
 						self.bot.dispatch("timed_out",last.target,after.guild,timestamp,last.user,last.reason)
 				except:
 					# Dispatch a generic event

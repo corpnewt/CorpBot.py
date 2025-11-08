@@ -133,7 +133,7 @@ class Lockdown(commands.Cog):
         # as individual uploads will have unique URLs
         message_hashes = [str(hash(message.content))]+[str(hash(a.filename)) for a in message.attachments]
         message_hash = ":".join(message_hashes)
-        message_check = {"hash":message_hash,"timestamp":timestamp,"channel":message.channel.id}
+        message_check = {"hash":message_hash,"timestamp":timestamp,"channel":message.channel.id,"message":message.id}
         # Walk the valid messages and check our rules
         for rule in spam_rules:
             # Spam rules are a dict with the following:
@@ -143,6 +143,7 @@ class Lockdown(commands.Cog):
             # "time_out"   : number of seconds (float) to time the user out for spamming
             # "same"       : bool that denotes if the messages considered have to be the same
             # "in_a_row"   : bool that denotes if the messages have to be the same, and sent in a row
+            # "delete"     : bool that denotes if all messages checked should be deleted - not just the last
             #
             # Verify we have what we need and then parse the messages in this rule's context
             if not (isinstance(rule.get("messages"),int) and rule["messages"] > 1):
@@ -207,6 +208,22 @@ class Lockdown(commands.Cog):
             except: pass
             try: await message.delete()
             except: pass
+            if rule.get("delete"):
+                # We need to delete the other messages sent too - let's iterate them,
+                # resolve by id, and try to delete
+                for mess in valid_messages:
+                    try:
+                        # Resolve to the message if possible
+                        m_id = int(mess.get("message"))
+                        m = self.bot.get_message(m_id)
+                        if m is None:
+                            # Try to fetch it instead
+                            channel = self.bot.get_channel(int(mess.get("channel")))
+                            m = await channel.fetch_message(m_id)
+                        assert m
+                        await m.delete()
+                    except:
+                        continue
             # Leave the loop - we had a match
             break
         # Ensure we update our message hashes
@@ -224,7 +241,7 @@ class Lockdown(commands.Cog):
         # Walk the entries in order of time_out severity
         for i,rule in enumerate(sorted(spam_rules,key=lambda x:x.get("time_out",0),reverse=True),start=1):
             name = "{}. {:,} second time-out:".format(i,rule.get("time_out",0))
-            val  = "**Trigger:** {:,}{} message{} sent{}{} within {:,} second{}\n**Args:** `{}`".format(
+            val  = "**Trigger:** {:,}{} message{} sent{}{} within {:,} second{} - delete {}\n**Args:** `{}`".format(
                 rule.get("messages",0),
                 " identical" if rule.get("same") else "",
                 "" if rule.get("messages",0) == 1 else "s",
@@ -235,12 +252,14 @@ class Lockdown(commands.Cog):
                 ),
                 rule.get("time_frame",0),
                 "" if rule.get("time_frame",0) == 1 else "s",
-                "-messages {} -channels {} -timeframe {} -timeout {}{}".format(
+                "all messages considered" if rule.get("delete") else "only the message triggering the filter",
+                "-messages {} -channels {} -timeframe {} -timeout {}{}{}".format(
                     rule.get("messages",-1),
                     rule.get("channels",-1),
                     rule.get("time_frame",-1),
                     rule.get("time_out",-1),
-                    " -inarow" if rule.get("in_a_row") else " -same" if rule.get("same") else ""
+                    " -inarow" if rule.get("in_a_row") else " -same" if rule.get("same") else "",
+                    " -delete" if rule.get("delete") else ""
                 )
             )
             entries.append({"name":name,"value":val})
@@ -283,7 +302,8 @@ class Lockdown(commands.Cog):
         -timeframe #   (# = the number of seconds for the rule to consider; > 0)
         -timeout #     (# = the number of seconds to time the user out for spamming; > 0)
         -same          (only consider messages that have the same hash)
-        -inarow        (only consider messages taht have the same hash in a row; implies -same)
+        -inarow        (only consider messages that have the same hash in a row; implies -same)
+        -delete        (delete all detected messages, not just the one that triggered the filter)
 
         e.g. To create a spam filter rule that watches for a user sending 2 or more idential
         messages in a row across 2 or more channels within 5 seconds - resulting in them being
@@ -293,7 +313,7 @@ class Lockdown(commands.Cog):
 
         if not await Utils.is_bot_admin_reply(ctx): return
         if rule is None:
-            return await ctx.send("Usage: `{}addspam -messages # -channels # -timeframe # -timeout # -same/-inarow`".format(ctx.prefix))
+            return await ctx.send("Usage: `{}addspam -messages # -channels # -timeframe # -timeout # -same/-inarow/-delete`".format(ctx.prefix))
         # Set up some regex arg parsing
         match_dict = {
             "messages"  : re.compile(r"(?i)-?m(ess(age|ages)?)?"),
@@ -301,7 +321,8 @@ class Lockdown(commands.Cog):
             "time_frame": re.compile(r"(?i)-?(tf|time-?f(rame)?)"),
             "time_out"  : re.compile(r"(?i)-?(to|time-?o(ut)?)"),
             "same"      : re.compile(r"(?i)-?s(ame)?"),
-            "in_a_row"  : re.compile(r"(?i)-?i(ar|n-?a-?row)?")
+            "in_a_row"  : re.compile(r"(?i)-?i(ar|n-?a-?row)?"),
+            "delete"    : re.compile(r"(?i)-?d(elete)?")
         }
         # Get the arg order for those that don't *require* the switches
         arg_order = list(match_dict)[:-2]
@@ -312,7 +333,8 @@ class Lockdown(commands.Cog):
             "time_frame": 0,
             "time_out"  : 0,
             "same"      : False,
-            "in_a_row"  : False
+            "in_a_row"  : False,
+            "delete"    : False
         }
         # Walk our args
         last_arg = None
@@ -344,6 +366,8 @@ class Lockdown(commands.Cog):
                 arg_dict["same"] = True
             elif resolved == "in_a_row":
                 arg_dict["same"] = arg_dict["in_a_row"] = True
+            elif resolved == "delete":
+                arg_dict["delete"] = True
             elif arg_float is None:
                 # No value - just the arg - set it and continue
                 last_arg = resolved
@@ -363,7 +387,7 @@ class Lockdown(commands.Cog):
             return await ctx.send("`-timeout` must be greater than 0")
         spam_rules = self.settings.getServerStat(ctx.guild,"SpamRules",[])
         # Let's see if we have the same requirements in another rule - and just replace it
-        spam_rules_checked = [x for x in spam_rules if not all((x.get(y)==arg_dict[y] for y in ("messages","channels","time_frame","same","in_a_row")))]
+        spam_rules_checked = [x for x in spam_rules if not all((x.get(y)==arg_dict[y] for y in ("messages","channels","time_frame","same","in_a_row","delete")))]
         self.settings.setServerStat(ctx.guild,"SpamRules",spam_rules_checked+[arg_dict])
         if len(spam_rules) != len(spam_rules_checked):
             await ctx.send("Spam filter rule updated!")
