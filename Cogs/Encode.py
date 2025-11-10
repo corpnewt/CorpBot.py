@@ -503,17 +503,18 @@ class Encode(commands.Cog):
 		if from_type is None or to_type is None:
 			return await ctx.send(usage)
 
-		# Find out if we're replying to another message
-		reply = None
-		if ctx.message.reference:
-			# Resolve the replied to reference to a message object
-			try:
-				message = await Utils.get_replied_to(ctx.message,ctx=ctx)
-				reply = await Utils.get_message_content(message)
-			except:
-				pass
-		if reply: # Use the replied to message content instead
-			value = reply
+		if value is None:
+			# No value passed, see if we're replying to another message
+			reply = None
+			if ctx.message.reference:
+				# Resolve the replied to reference to a message object
+				try:
+					message = await Utils.get_replied_to(ctx.message,ctx=ctx)
+					reply = await Utils.get_message_content(message)
+				except:
+					pass
+			if reply: # Use the replied to message content instead
+				value = reply
 
 		if not value:
 			return await ctx.send(usage)
