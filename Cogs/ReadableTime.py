@@ -68,23 +68,10 @@ def getReadableTimeBetween(first, last, reverse=False):
     minutes = int((timeBetween-(hours*3600 + days*86400 + weeks*604800))/60)
     seconds = int(timeBetween-(minutes*60 + hours*3600 + days*86400 + weeks*604800))
     msg = ""
-    
-    if years > 0:
-        msg += "1 year, " if years == 1 else "{:,} years, ".format(years)
-    if months > 0:
-        msg += "1 month, " if months == 1 else "{:,} months, ".format(months)
-    if weeks > 0:
-        msg += "1 week, " if weeks == 1 else "{:,} weeks, ".format(weeks)
-    if days > 0:
-        msg += "1 day, " if days == 1 else "{:,} days, ".format(days)
-    if hours > 0:
-        msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
-    if minutes > 0:
-        msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
-    if seconds > 0:
-        msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
 
-    if msg == "":
-        return "0 seconds"
-    else:
-        return msg[:-2]	
+    parts = []
+    for v,t in ((years,"year"),(months,"month"),(weeks,"week"),(days,"day"),(hours,"hour"),(minutes,"minute"),(seconds,"second")):
+        if v <= 0: continue
+        parts.append("{:,} {}{}".format(v,t,"" if v==1 else "s"))
+
+    return ", ".join(parts) or "0 seconds"
