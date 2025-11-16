@@ -172,7 +172,12 @@ class AmdArk(commands.Cog):
                 for entry in json_data.get("elements",{}).values():
                     if entry.get("title") and entry.get("formatValue"):
                         name = unescape(entry["title"])
-                        value = unescape(entry["formatValue"]).replace(" , ",", ")
+                        if isinstance(entry["formatValue"],list):
+                            value = ", ".join([unescape(x) for x in entry["formatValue"]]).strip()
+                        else:
+                            value = unescape(str(entry["formatValue"])).replace(" , ",", ").strip()
+                        # Strip paragraph tags and enclosing whitespace as well
+                        value = value.replace("<p>","").replace("</p>","").strip()
                         # Let's see if the value is JSON data
                         try:
                             value_json = json.loads(value)
