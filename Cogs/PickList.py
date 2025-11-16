@@ -11,12 +11,12 @@ class PickList(commands.Cog):
         self.bot = bot
     # Fluff class to post the reactions we need
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        self.bot.dispatch("picklist_reaction", reaction, user)
+    async def on_raw_reaction_add(self, payload):
+        self.bot.dispatch("picklist_reaction", payload.message_id, payload.emoji, payload.user_id)
 
     @commands.Cog.listener()
-    async def on_reaction_remove(self, reaction, user):
-        self.bot.dispatch("picklist_reaction", reaction, user)
+    async def on_raw_reaction_remove(self, payload):
+        self.bot.dispatch("picklist_reaction", payload.message_id, payload.emoji, payload.user_id)
 
 class Picker:
     def __init__(self, **kwargs):
@@ -74,10 +74,10 @@ class Picker:
         # Add our reactions
         await self._add_reactions(self.self_message, current_reactions)
         # Now we would wait...
-        def check(reaction, user):
-            return reaction.message.id == self.self_message.id and user == self.ctx.author and str(reaction.emoji) in current_reactions
+        def check(message_id, emoji, user_id):
+            return message_id == self.self_message.id and user_id == self.ctx.author.id and str(emoji) in current_reactions
         try:
-            reaction, user = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
+            message_id, reaction_emoji, user = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
         except:
             # Didn't get a reaction
             await self._remove_reactions(current_reactions)
@@ -85,7 +85,7 @@ class Picker:
         
         await self._remove_reactions(current_reactions)
         # Get the adjusted index
-        ind = current_reactions.index(str(reaction.emoji))
+        ind = current_reactions.index(str(reaction_emoji))
         if ind == len(current_reactions)-1:
             ind = -1
         return (ind, self.self_message)
@@ -220,17 +220,17 @@ class PagePicker(Picker):
         # Add our reactions
         await self._add_reactions(self.self_message, self.reactions)
         # Now we would wait...
-        def check(reaction, user):
-            return reaction.message.id == self.self_message.id and user == self.ctx.author and str(reaction.emoji) in self.reactions
+        def check(message_id, emoji, user_id):
+            return message_id == self.self_message.id and user_id == self.ctx.author.id and str(emoji) in self.reactions
         while True:
             try:
-                reaction, user = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
+                message_id, reaction_emoji, user_id = await self.ctx.bot.wait_for('picklist_reaction', timeout=self.timeout, check=check)
             except:
                 # Didn't get a reaction
                 await self._remove_reactions(self.reactions)
                 return (page, self.self_message)
             # Got a reaction - let's process it
-            ind = self.reactions.index(str(reaction.emoji))
+            ind = self.reactions.index(str(reaction_emoji))
             if ind == 5:
                 # We bailed - let's clear reactions and close it down
                 await self._remove_reactions(self.reactions)
@@ -244,7 +244,7 @@ class PagePicker(Picker):
                         int(message.content)
                     except:
                         return False
-                    return message.channel == self.self_message.channel and user == message.author
+                    return message.channel == self.self_message.channel and user_id == message.author.id
                 try:
                     page_message = await self.ctx.bot.wait_for('message', timeout=self.timeout, check=check_page)
                     page = int(page_message.content)-1
