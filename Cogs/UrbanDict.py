@@ -81,6 +81,11 @@ class UrbanDict(commands.Cog):
 			signature = page_html.split('data-vote-signature="')[1].split('"')[0]
 		except:
 			signature = None
+		try:
+			def_ids   = [str(x) for x in json.loads(page_html.split('data-vote-defids="')[1].split('"')[0])]
+		except:
+			def_ids   = []
+		
 		entries = page_html.split('<div class="definition ')[1:]
 		for entry in entries:
 			try:
@@ -107,7 +112,7 @@ class UrbanDict(commands.Cog):
 		if formatted and signature:
 			# Try to load the votes via the api
 			api_url = "https://www.urbandictionary.com/api/vote?defids={}&signature={}".format(
-				",".join(list(formatted)),
+				",".join(def_ids) if def_ids else ",".join(list(formatted)),
 				signature
 			)
 			try:
