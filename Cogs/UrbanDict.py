@@ -138,7 +138,7 @@ class UrbanDict(commands.Cog):
 		words = []
 		for x in data.values():
 			words.append({
-				"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
+				"name":"{} - by {} ({:,} 👍 / {:,} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 				"value":"{}{}".format(
 					x["definition"],
 					"\n\n__Example(s):__\n\n{}".format(x["example"]) if x["example"] else ""
@@ -168,7 +168,7 @@ class UrbanDict(commands.Cog):
 			return await ctx.send("I couldn't find any definitions...")
 		x = random.choice(list(data.values()))
 		words = [{
-			"name":"{} - by {} ({} 👍 / {} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
+			"name":"{} - by {} ({:,} 👍 / {:,} 👎)".format(string.capwords(x["word"]),x["author"],x["thumbs_up"],x["thumbs_down"]),
 			"value":"{}{}".format(
 				x["definition"],
 				"\n\n__Example(s):__\n\n{}".format(x["example"]) if x["example"] else ""
