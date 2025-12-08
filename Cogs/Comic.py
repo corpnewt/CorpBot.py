@@ -113,12 +113,12 @@ class Comic(commands.Cog):
 					{"find":'"',"index":0}
 				],
 				"comic_desc": [
-					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next commic
+					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next comic
 					{"find":'class="figure-caption">',"index":1},
 					{"find":"</figcaption","index":0}
 				],
 				"comic_title": [
-					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next commic
+					{"find":'data-src="',"index":1}, # Don't accidentally pull from the next comic
 					{"find":'alt="',"index":1},
 					{"find":'"',"index":0}
 				]
