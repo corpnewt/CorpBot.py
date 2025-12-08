@@ -29,6 +29,9 @@ class Comic(commands.Cog):
 		self.bot = bot
 		self.settings = settings
 		self.max_tries = 10
+		self.ua = {
+			"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+		}
 		self.comic_data = {
 			"beetle-bailey": {
 				"name": "Beetle Bailey",
@@ -47,7 +50,7 @@ class Comic(commands.Cog):
 				"keys": ["year","month","day"],
 				"first_date": "11-18-1985",
 				"comic_url": [
-					{"find":'data-image="',"index":-1},
+					{"find":'"og:image" content="',"index":-1},
 					{"find":'"',"index":0}
 				]
 			},
@@ -126,7 +129,7 @@ class Comic(commands.Cog):
 				"keys": ["year","month","day"],
 				"first_date": "06-19-1978",
 				"comic_url": [
-					{"find":'data-image="',"index":-1},
+					{"find":'"og:image" content="',"index":-1},
 					{"find":'"',"index":0}
 				]
 			},
@@ -147,7 +150,7 @@ class Comic(commands.Cog):
 				"keys": ["year","month","day"],
 				"first_date": "10-02-1950",
 				"comic_url": [
-					{"find":'data-image="',"index":-1},
+					{"find":'"og:image" content="',"index":-1},
 					{"find":'"',"index":0}
 				]
 			},
@@ -167,7 +170,8 @@ class Comic(commands.Cog):
 				"comic_desc": [
 					{"find":'<img title="',"index":1},
 					{"find":'" src=',"index":0}
-				]
+				],
+				"padded": False
 			},
 			"xkcd": {
 				"name": "XKCD",
@@ -235,34 +239,42 @@ class Comic(commands.Cog):
 		return {"month":m,"day":d,"year":y,"month_name":month_name}
 
 	async def _get_last_comic_number(self,comic_data,date=None,month_adjust=0):
-		if month_adjust >= 10: return (None,None) # Adjusted too far :(
+		if month_adjust >= 10:
+			return (None,None) # Adjusted too far :(
 		today = dt.datetime.today()
 		if month_adjust: # We need to adjust months
 			today = dt.datetime(today.year-1,12,1) if today.month == 1 else dt.datetime(today.year,today.month-1,1)
 		# Helper to return the highest comic number for a given comic and source html
 		date_dict = self._date_dict(today.strftime("%m-%d-%Y") if date is None else date,padded=comic_data.get("padded",True))
-		try: 
+		try:
 			archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
 			archive_html = await DL.async_text(archive_url)
 		except:
 			return (None,None)
 		latest_comic = self._walk_replace(archive_html,comic_data["latest_url"])
-		if not latest_comic: return (None,None)
+		if not latest_comic:
+			return (None,None)
 		# Try to cast the number as int - if not possible, set the month back by one
-		try: latest_comic = int(latest_comic)
-		except: return await self._get_last_comic_number(comic_data,date,month_adjust+1)
+		try:
+			latest_comic = int(latest_comic)
+		except:
+			return await self._get_last_comic_number(comic_data,date,month_adjust+1)
 		return (latest_comic,archive_html)
 
 	def _resolve_first_date(self,comic_data):
 		first_date = comic_data.get("first_date")
-		if first_date is None: return # borked
+		if first_date is None:
+			return # borked
 		if isinstance(first_date,str) and first_date.lower().startswith("today"):
 			# First date is a reference to today - pull an offset if needed
-			try: offset = int(first_date[len("today"):])
-			except: offset = 0
+			try:
+				offset = int(first_date[len("today"):])
+			except:
+				offset = 0
 			# Set it to the actual date +- the offset as needed
 			fd = dt.datetime.today()
-			if offset: fd += dt.timedelta(days=offset)
+			if offset:
+				fd += dt.timedelta(days=offset)
 			# Get it formatted as MM-DD-YYYY
 			first_date = fd.strftime("%m-%d-%Y")
 		return first_date
@@ -274,57 +286,71 @@ class Comic(commands.Cog):
 		if use_number:
 			# We're using numbers - not dates
 			latest_tuple = await self._get_last_comic_number(comic_data)
-			if latest_tuple[0] is None: return None # borken
+			if latest_tuple[0] is None:
+				return None # borken
 			first = comic_data["first_date"]
 			last  = latest_tuple[0]
 		else:
 			# Using dates, organize them into julian days
 			first_date = self._resolve_first_date(comic_data)
-			if first_date is None: return # Borken
+			if first_date is None:
+				return # Borken
 			first = self._julian_day(first_date)
 			last  = self._julian_day(comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")))
 			# Make sure we keep the archive if needed
 			if comic_data.get("archive_url"):
 				# We need to load the archive first - then find our target date within
-				try: 
+				try:
 					archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
-					archive_html = await DL.async_text(archive_url)
+					archive_html = await DL.async_text(archive_url, headers=self.ua, assert_status=(200,500))
 				except:
 					return None
 		for x in range(self.max_tries):
 			# Generate a random date
 			date = random.randint(int(first),int(last))
-			if not use_number: date = self._gregorian_day(date+0.5)
+			if not use_number:
+				date = self._gregorian_day(date+0.5)
 			comic = await self._get_comic(comic_data,date,latest_tuple,archive_html=archive_html)
-			if comic: return comic
+			if comic:
+				return comic
 		return None
 
 	def _walk_replace(self,search_text,steps,key_dict=None):
 		text = search_text
 		for step in steps:
 			try:
-				if key_dict: text = text.split(step["find"].format(*[key_dict[x] for x in step.get("keys",[])]))[step["index"]]
-				else: text = text.split(step["find"])[step["index"]]
-			except: return None
+				if key_dict:
+					text = text.split(step["find"].format(*[key_dict[x] for x in step.get("keys",[])]))[step["index"]]
+				else:
+					text = text.split(step["find"])[step["index"]]
+			except:
+				return None
 		return text
 
 	async def _get_comic(self,comic_data,date=None,latest_tuple=None,archive_html=None):
 		# Attempts to retrieve the comic at the passed date
 		first_date = self._resolve_first_date(comic_data)
-		if first_date is None: return None # Malformed comic data - first date must be defined
+		if first_date is None:
+			return None # Malformed comic data - first date must be defined
 		if comic_data.get("comic_number",False):
 			# Gather the latest comic number and archive info
-			if latest_tuple: latest,archive_html = latest_tuple
-			else: latest,archive_html = await self._get_last_comic_number(comic_data, date if not isinstance(date,int) else None)
-			if latest is None: return None # Failed to get the info
+			if latest_tuple:
+				latest,archive_html = latest_tuple
+			else:
+				latest,archive_html = await self._get_last_comic_number(comic_data, date if not isinstance(date,int) else None)
+			if latest is None:
+				return None # Failed to get the info
 			date = latest if date is None else date # Set it to the latest if None
 			if not isinstance(date,int):
 				date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
 				# We have a date to check for
 				date = self._walk_replace(archive_html, comic_data["date_url"], date_dict)
-				if not date: return None
-				try: date = int(date)
-				except: pass
+				if not date:
+					return None
+				try:
+					date = int(date)
+				except:
+					pass
 			# We got a comic number - let's use that in our url
 			url = comic_data["url"].format(date)
 		else:
@@ -334,15 +360,16 @@ class Comic(commands.Cog):
 			last_date = comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")) # Last supplied date, or today
 			# Gather our julian days for comparison
 			first_julian,last_julian,date_julian = [self._julian_day(x) for x in (first_date,last_date,date)]
-			if not first_julian <= date_julian <= last_julian: return None # Out of our date range
+			if not first_julian <= date_julian <= last_julian:
+				return None # Out of our date range
 			# We have a valid date - let's format the url and gather the html
 			date_dict = self._date_dict(date,padded=comic_data.get("padded",True))
 			if comic_data.get("archive_url"):
 				# We need to load the archive first - then find our target date within
 				if not archive_html:
-					try: 
+					try:
 						archive_url = comic_data["archive_url"].format(*[date_dict[x] for x in comic_data.get("archive_keys",[])])
-						archive_html = await DL.async_text(archive_url)
+						archive_html = await DL.async_text(archive_url, headers=self.ua, assert_status=(200,500))
 					except:
 						return None
 				# Let's walk the archive for the date info
@@ -352,14 +379,20 @@ class Comic(commands.Cog):
 				url = comic_data["url"].format(date_url)
 			else:
 				url = comic_data["url"].format(*[date_dict[x] for x in comic_data["keys"]])
-		try: html = await DL.async_text(url, {'User-Agent': ''})
-		except: return None # Failed to get the HTML, bail
+		try:
+			html = await DL.async_text(url, headers=self.ua)
+		except:
+			return None # Failed to get the HTML, bail
 		# Let's locate our comic by walking the search steps
 		comic_url = self._walk_replace(html, comic_data["comic_url"])
-		if not comic_url: return None
-		if comic_url.startswith("//"): comic_url = "https:"+comic_url
-		if comic_url.startswith(("http%3A%2F%2F","https%3A%2F%2F")): comic_url = unquote(comic_url)
-		if not comic_url.lower().startswith(("http://","https://")): return None
+		if not comic_url:
+			return None
+		if comic_url.startswith("//"):
+			comic_url = "https:"+comic_url
+		if comic_url.startswith(("http%3A%2F%2F","https%3A%2F%2F")):
+			comic_url = unquote(comic_url)
+		if not comic_url.lower().startswith(("http://","https://")):
+			return None
 		try:
 			u = unescape
 		except NameError:
@@ -372,7 +405,8 @@ class Comic(commands.Cog):
 			return s.get_data()
 		# Check if we need to get title text
 		comic_title = self._walk_replace(html, comic_data["comic_title"]) if len(comic_data.get("comic_title",[])) else comic_data["name"]
-		if not comic_title: comic_title = comic_data["name"]
+		if not comic_title:
+			comic_title = comic_data["name"]
 		comic_title += " ({}{})".format("#" if isinstance(date,int) else "", date)
 		comic_title = strip_tags(unquote(comic_title))
 		# Check if we need to get a description
@@ -392,12 +426,15 @@ class Comic(commands.Cog):
 			date= "-".join([x.rjust(2,"0") for x in date.split("-") if x][:3])
 		if random:
 			desc = "a random {} comic".format(self.comic_data[comic]["name"])
-			try: comic_out = await self._get_random_comic(self.comic_data[comic])
-			except: comic_out = None
+			try:
+				comic_out = await self._get_random_comic(self.comic_data[comic])
+			except:
+				comic_out = None
 		else:
 			desc = "{} comic {}".format(self.comic_data[comic]["name"],date if isinstance(date,int) else "for today" if date==None else "for "+date)
-			try: comic_out = await self._get_comic(self.comic_data[comic],date)
-			except Exception as e:
+			try:
+				comic_out = await self._get_comic(self.comic_data[comic],date)
+			except:
 				comic_out = None
 		if not comic_out:
 			return await Message.EmbedText(
@@ -448,8 +485,10 @@ class Comic(commands.Cog):
 	'''@commands.command()
 	async def cyanide(self, ctx, *, date=None):
 		"""Displays the Cyanide & Happiness comic for the passed date (MM-DD-YYYY) from 01-26-2005 to today or comic number if found."""
-		try: date = int(date)
-		except: pass
+		try:
+			date = int(date)
+		except:
+			pass
 		await self._display_comic(ctx, "cyanide", date=date)
 
 	@commands.command()
@@ -520,8 +559,10 @@ class Comic(commands.Cog):
 	@commands.command()
 	async def xkcd(self, ctx, *, date=None):
 		"""Displays the XKCD comic for the passed date (MM-DD-YYYY) from 01-01-2006 to today or comic number if found."""
-		try: date = int(date)
-		except: pass
+		try:
+			date = int(date)
+		except:
+			pass
 		await self._display_comic(ctx, "xkcd", date=date)
 
 	@commands.command()
