@@ -445,6 +445,8 @@ async def watchinput():
 			print("   - 'reboot' or 'restart': reboot the bot (returns 2)")
 			print("   - 'install': reboot the bot and install dependencies (returns 4)")
 			print("   - 'update': reboot the bot and update dependencies (returns 5)")
+			print("   - 'latency': reports the bot's current latency")
+			print("   - 'reconnect': attempt to reconnect to discord")
 		elif i.lower() in ("shutdown","exit","quit","reboot","restart","install","update"):
 			try:
 				task_list = asyncio.Task.all_tasks()
@@ -477,7 +479,23 @@ async def watchinput():
 				returncode = 4
 			elif i.lower() == "update":
 				returncode = 5
-			os._exit(returncode)
+			os._exit(returncode) 
+		elif i.lower().split()[0] == "reconnect":
+			# TODO: Allow reloading specific shard ids
+			print("Attempting to reconnect all shards...")
+			for s in bot.shards:
+				print(" - Shard ID: {}...".format(s))
+				shard = bot.get_shard(s)
+				if shard is None:
+					print(" --> Shard ID not located - skipping...")
+					continue
+				print(" --> Reconnecting...")
+				await shard.reconnect()
+			print("Done reconnecting shards.")
+		elif i.lower() == "latency":
+			print("Current gateway latency: {}".format(
+				"infininte" if bot.latency == float("inf") else "{:,}ms".format(round(bot.latency*1000))
+			))
 
 # Run the bot
 print("Starting up {} shard{}...".format(bot.shard_count,"" if bot.shard_count == 1 else "s"))
