@@ -24,7 +24,7 @@ class Bot(commands.Cog):
 		self.path = path
 		self.pypath = pypath
 		self.regex = re.compile(r"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?")
-		self.message_regex = re.compile(r"(?i)https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/\d+")
+		self.message_regex = re.compile(r"(?i)(https:\/\/(www\.)?(\w+\.)*discord(app)?\.com\/channels\/(@me|\d+)\/\d+\/)?(?P<message_id>\d+)")
 		self.is_current = False
 		global Utils, DisplayName
 		Utils = self.bot.get_cog("Utils")
@@ -764,23 +764,39 @@ class Bot(commands.Cog):
 		await ctx.send(msg)
 
 	@commands.command(aliases=["deldm","dmdel","dmdelete","rmdm","dmrm","remdm","dmrem"])
-	async def deletedm(self, ctx, *, dm_message_link = None):
-		"""Deletes the passed message link if sent from the bot in dms."""
+	async def deletedm(self, ctx, *, dm_message_ids = None):
+		"""Deletes the passed message ids if sent from the bot in dms.
+		Reacts with a thumbs up if all passed ids were deleted, ok hand if at least one, and thumbs down if none."""
 
+		if dm_message_ids is None and not ctx.message.reference:
+			# Nothing passed, just print usage and bail
+			return await ctx.send("Usage: `{}deletedm [dm_message_link]`".format(ctx.prefix))
 		messages = []
-		if dm_message_link:
+		message_ids = []
+		if dm_message_ids:
 			# Try to resolve to any passed messages
-			m_matches = list(self.message_regex.finditer(dm_message_link))
+			m_matches = list(self.message_regex.finditer(dm_message_ids))
 			for m in m_matches:
-				message = await Utils.get_message_from_url(m.group(),ctx=ctx)
+				try:
+					m_id = int(m.group("message_id"))
+				except:
+					continue
+				if m_id in message_ids:
+					continue # Already considering that id
+				message_ids.append(m_id)
+				try:
+					message = await ctx.author.fetch_message(m_id)
+				except:
+					continue # Failed to retrieve it
 				if message:
 					messages.append(message)
 		if ctx.message.reference:
 			# Resolve the replied-to reference to a message object
 			try:
 				message = await Utils.get_replied_to(ctx.message)
-				if message:
+				if message and not message.id in message_ids:
 					messages.append(message)
+					message_ids.append(message.id)
 			except:
 				pass
 		# Only include messages where the bot is the author that were
@@ -789,8 +805,12 @@ class Bot(commands.Cog):
 			m for m in messages if m.author.id == self.bot.user.id and isinstance(m.channel,discord.DMChannel)
 		]
 		if not messages:
-			# Nothing valid was passed
-			return await ctx.send("Usage: `{}deletedm [dm_message_link]`".format(ctx.prefix))
+			# Nothing valid was passed let's react with a thumbs down
+			try:
+				await ctx.message.add_reaction("👎")
+			except:
+				pass
+			return
 		deleted = 0
 		for m in messages:
 			try:
