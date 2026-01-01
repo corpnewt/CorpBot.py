@@ -764,33 +764,47 @@ class Bot(commands.Cog):
 		await ctx.send(msg)
 
 	@commands.command(aliases=["deldm","dmdel","dmdelete","rmdm","dmrm","remdm","dmrem"])
-	async def deletedm(self, ctx, *, message_link = None):
+	async def deletedm(self, ctx, *, dm_message_link = None):
 		"""Deletes the passed message link if sent from the bot in dms."""
 
-		message = None
-		if message_link:
-			# Try to resolve to a message
-			m_match = self.message_regex.search(message_link)
-			if m_match:
-				message = await Utils.get_message_from_url(m_match.group(),ctx=ctx)
-		elif ctx.message.reference:
-			# Resolve the replied to reference to a message object
-			try: message = await Utils.get_replied_to(ctx.message)
-			except: pass
-		else:
-			# Nothing passed, and not replying to anything
-			return await ctx.send("Usage: `{}deletedm [message_link]`".format(ctx.prefix))
-		if not message:
-			return await ctx.send("I couldn't resolve that message.")
-		if not message.author.id == self.bot.user.id:
-			return await ctx.send("The message resolved wasn't sent by me.")
-		if not isinstance(message.channel,discord.DMChannel):
-			return await ctx.send("That message was not sent in dms.")
+		messages = []
+		if dm_message_link:
+			# Try to resolve to any passed messages
+			m_matches = list(self.message_regex.finditer(dm_message_link))
+			for m in m_matches:
+				message = await Utils.get_message_from_url(m.group(),ctx=ctx)
+				if message:
+					messages.append(message)
+		if ctx.message.reference:
+			# Resolve the replied-to reference to a message object
+			try:
+				message = await Utils.get_replied_to(ctx.message)
+				if message:
+					messages.append(message)
+			except:
+				pass
+		# Only include messages where the bot is the author that were
+		# sent in dm
+		messages = [
+			m for m in messages if m.author.id == self.bot.user.id and isinstance(m.channel,discord.DMChannel)
+		]
+		if not messages:
+			# Nothing valid was passed
+			return await ctx.send("Usage: `{}deletedm [dm_message_link]`".format(ctx.prefix))
+		deleted = 0
+		for m in messages:
+			try:
+				await m.delete()
+				deleted += 1
+			except:
+				continue
 		try:
-			await message.delete()
-			await ctx.message.add_reaction("👍")
+			# Send a reaction to indicate the results - thumbs up for all, down for none, and ok hand for at least one
+			await ctx.message.add_reaction(
+				"👍" if deleted == len(messages) else "👎" if not deleted else "👌"
+			)
 		except:
-			return await ctx.send("I couldn't delete that message :(")
+			pass
 
 	@commands.command()
 	async def cloc(self, ctx):
@@ -854,3 +868,4 @@ class Bot(commands.Cog):
 			fields=fields,
 			thumbnail=Utils.get_avatar(bot_member)
 		).edit(ctx,message)
+
