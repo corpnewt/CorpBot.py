@@ -354,10 +354,10 @@ class Comic(commands.Cog):
 			# We got a comic number - let's use that in our url
 			url = comic_data["url"].format(date)
 		else:
-			# Use today's date if none passed
-			date = dt.datetime.today().strftime("%m-%d-%Y") if date is None else date
 			# We're using date-oriented urls
 			last_date = comic_data.get("last_date",dt.datetime.today().strftime("%m-%d-%Y")) # Last supplied date, or today
+			# Use today's/the last date if none passed
+			date = last_date if date is None else date
 			# Gather our julian days for comparison
 			first_julian,last_julian,date_julian = [self._julian_day(x) for x in (first_date,last_date,date)]
 			if not first_julian <= date_julian <= last_julian:
