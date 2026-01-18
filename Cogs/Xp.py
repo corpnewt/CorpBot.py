@@ -616,20 +616,24 @@ class Xp(commands.Cog):
 		xpblock    = self.settings.getServerStat(server, "XpBlockArray")
 
 		approve = True
-		decrement = True
-
+		decrement = True	
+		betAll = False
+		roundDown = False
 		# Check Bet
 		if bet == "all":
+			betAll = True
 			bet = reserveXP
 
 		try:
 			bet = int(float(bet))
 		except:
 			return await ctx.send(msg)			
-		if not bet % 10 == 0:
+		if not bet % 10 == 0 and not betAll:
 			approve = False
 			msg = 'Bets must be in multiples of *10!*'
-			
+		elif not bet % 10 == 0 and betAll:
+			roundDown = True
+			bet = (bet // 10) * 10
 		if bet > int(reserveXP):
 			approve = False
 			msg = 'You can\'t bet *{:,}*, you only have *{:,}* xp reserve!'.format(bet, reserveXP)
@@ -712,11 +716,11 @@ class Xp(commands.Cog):
 			if randnum == 1:
 				# YOU WON!!
 				self.settings.incrementStat(author, server, "XP", int(payout))
-				msg = '*{}* bet *{:,}* and ***WON*** *{:,} xp!*'.format(DisplayName.name(author), bet, int(payout))
+				msg = '*{}* bet *{:,}* and ***WON*** *{:,} xp!* **{}**'.format(DisplayName.name(author), bet, int(payout), f"Note that you betted all but it was not a multiple of 10, so you were rounded to the nearest 10. You did not lose the spare." if betAll and roundDown else "")
 				# Now we check for promotions
 				await CheckRoles.checkroles(author, channel, self.settings, self.bot)
 			else:
-				msg = '*{}* bet *{:,}* and.... *didn\'t* win.  Better luck next time!'.format(DisplayName.name(author), bet)
+				msg = '*{}* bet *{:,}* and.... *didn\'t* win.  Better luck next time! **{}**'.format(DisplayName.name(author), bet, f"Note that you betted all but it was not a multiple of 10, so you were rounded to the nearest 10. You did not lose the spare." if betAll and roundDown else "")
 			
 		await ctx.send(msg)
 			
