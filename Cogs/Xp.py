@@ -602,10 +602,7 @@ class Xp(commands.Cog):
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
 		msg = 'Usage: `{}gamble [xp reserve bet] (must be multiple of 10)`'.format(ctx.prefix)
 
-		try:
-			bet = int(float(bet))
-		except:
-			return await ctx.send(msg)
+
 
 		isAdmin    = Utils.is_admin(ctx)
 		checkAdmin = self.settings.getServerStat(ctx.guild, "AdminArray")
@@ -622,7 +619,13 @@ class Xp(commands.Cog):
 		decrement = True
 
 		# Check Bet
-			
+		if bet == "all":
+			bet = reserveXP
+
+		try:
+			bet = int(float(bet))
+		except:
+			return await ctx.send(msg)			
 		if not bet % 10 == 0:
 			approve = False
 			msg = 'Bets must be in multiples of *10!*'
