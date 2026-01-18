@@ -620,9 +620,10 @@ class Xp(commands.Cog):
 		betAll = False
 		roundDown = False
 		# Check Bet
-		if bet == "all":
-			betAll = True
-			bet = reserveXP
+		if type(bet) == str:
+			if bet.upper() == "all":
+				betAll = True
+				bet = reserveXP
 
 		try:
 			bet = int(float(bet))
