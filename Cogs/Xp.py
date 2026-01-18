@@ -600,7 +600,7 @@ class Xp(commands.Cog):
 		channel = ctx.message.channel
 		
 		# bet must be a multiple of 10, member must have enough xpreserve to bet
-		msg = 'Usage: `{}gamble [xp reserve bet] (must be multiple of 10)`'.format(ctx.prefix)
+		msg = 'Usage: `{}gamble [xp reserve bet/all] (must be multiple of 10)`'.format(ctx.prefix)
 
 
 
