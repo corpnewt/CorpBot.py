@@ -1,7 +1,7 @@
 import asyncio, discord, json, os, string
 from   urllib.parse import quote
 from   discord.ext import commands
-from   Cogs import Settings, DisplayName, TinyURL, Message, DL, PickList, FuzzySearch
+from   Cogs import Settings, DisplayName, Message, DL, PickList, FuzzySearch
 
 def setup(bot):
 	# Add the bot and deps
@@ -41,13 +41,7 @@ class Search(commands.Cog):
 		# Searches in the passed service
 		service = "s={}&".format(service) if service else ""
 		lmgtfy = "https://lmgtfy2.com/?{}q={}".format(service, self.quote(query))
-		try:
-			lmgtfyT = await TinyURL.tiny_url(lmgtfy, self.bot)
-		except Exception as e:
-			print(e)
-			msg = "It looks like I couldn't search for that... :("
-		else:
-			msg = '*{}*, you can find your answers here:\n<{}>'.format(DisplayName.name(ctx.message.author), lmgtfyT)
+		msg = '*{}*, you can find your answers [here](<{}>).'.format(DisplayName.name(ctx.message.author), lmgtfy)
 		return msg
 
 	@commands.command()
