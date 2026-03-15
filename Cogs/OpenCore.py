@@ -210,7 +210,7 @@ class OpenCore(commands.Cog):
 			except:
 				pass
 			payload_json = json.loads(resources)
-			codec_list = [x["name"] for x in payload_json["payload"]["tree"]["items"] if x["contentType"] == "directory" and not "/" in x["name"]]
+			codec_list = [x["name"] for x in payload_json["payload"]["codeViewTreeRoute"]["tree"]["items"] if x["contentType"] == "directory" and not "/" in x["name"]]
 			codecs = {}
 			for codec in codec_list:
 				codec_url = "https://raw.githubusercontent.com/acidanthera/AppleALC/master/Resources/{}/Info.plist".format(codec)

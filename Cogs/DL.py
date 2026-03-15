@@ -1,33 +1,38 @@
-import aiohttp, json
+import aiohttp, json, certifi, ssl
 
 def setup(bot):
 	# Not a cog
 	pass
 
+def ssl_context():
+    # Return a default SSL context to work around issues with
+    # certificates on some machines.
+    return ssl.create_default_context(cafile=certifi.where())
+
 async def async_post_json(url, data = None, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.post(url, data=data, ssl=ssl) as response:
+        async with session.post(url, data=data, ssl=ssl or ssl_context()) as response:
             return await response.json()
 
 async def async_post_text(url, data = None, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.post(url, data=data, ssl=ssl) as response:
+        async with session.post(url, data=data, ssl=ssl or ssl_context()) as response:
             res = await response.read()
             return res.decode("utf-8", "replace")
 
 async def async_post_bytes(url, data = None, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.post(url, data=data, ssl=ssl) as response:
+        async with session.post(url, data=data, ssl=ssl or ssl_context()) as response:
             return await response.read()
 
 async def async_head(url, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.head(url, ssl=ssl) as response:
+        async with session.head(url, ssl=ssl or ssl_context()) as response:
             return response.headers
 
 async def async_head_json(url, headers = None, ssl = None):
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.head(url, ssl=ssl) as response:
+        async with session.head(url, ssl=ssl or ssl_context()) as response:
             return await response.json()
 
 async def async_dl(url, headers=None, ssl=None, return_headers=False, assert_status=200, chunk_size=4096, max_size=8000000):
@@ -35,7 +40,7 @@ async def async_dl(url, headers=None, ssl=None, return_headers=False, assert_sta
     data = b""
     response_headers = None
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.get(url, ssl=ssl) as response:
+        async with session.get(url, ssl=ssl or ssl_context()) as response:
             response_headers = response.headers
             if assert_status:
                 if isinstance(assert_status,int):
