@@ -81,10 +81,10 @@ class Remind(commands.Cog):
 					# We have a list
 					for reminder in reminders:
 						if reminder.get("bot_id") is None or reminder["bot_id"] == self.bot.user.id:
-							self.loop_list.append(self.bot.loop.create_task(self.check_remind(member,reminder)))
+							self.loop_list.append(self.bot.loop.create_task(self.check_remind(member,reminder,server)))
 		print("Reminders checked - took {} seconds.".format(time.time() - t))
 
-	async def check_remind(self, member, reminder):
+	async def check_remind(self, member, reminder, reminding_server=None):
 		# Get our current task
 		try:
 			task = asyncio.Task.current_task()
@@ -96,8 +96,9 @@ class Remind(commands.Cog):
 			# We have a positive countdown - let's wait
 			await asyncio.sleep(countDown)
 
-		if getattr(member,"guild",None):
-			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		member_guild = getattr(member,"guild",None)
+		if member_guild:
+			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,member_guild,"Reminders",[])
 		else:
 			guild_reminders = []
 		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
@@ -106,7 +107,12 @@ class Remind(commands.Cog):
 		if not any((reminder in x for x in (guild_reminders,global_reminders))):
 			return
 
-		server  = reminder.get("Server")
+		# Extract the name from the server if possible - or fall back on the name
+		# at the time the reminder was set
+		if getattr(reminding_server,"name",None):
+			server = Nullify.escape_all(reminding_server.name)
+		else:
+			server = reminder.get("Server")
 		message = reminder.get("Message","I know it was something, but I forgot...")
 		link    = reminder.get("Link")
 
@@ -118,8 +124,8 @@ class Remind(commands.Cog):
 		except: pass # No perms :(
 
 		# Recheck reminders after sending the message
-		if getattr(member,"guild",None):
-			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,getattr(member,"guild",None),"Reminders",[])
+		if member_guild:
+			guild_reminders = await self.bot.loop.run_in_executor(None,self.settings.getUserStat,member,member_guild,"Reminders",[])
 		else:
 			guild_reminders = []
 		global_reminders = await self.bot.loop.run_in_executor(None,self.settings.getGlobalUserStat,member,"Reminders",[])
@@ -182,7 +188,7 @@ class Remind(commands.Cog):
 			self.settings.setGlobalUserStat(ctx.author,"Reminders",reminders)
 
 		# Start timer for reminder
-		self.loop_list.append(self.bot.loop.create_task(self.check_remind(ctx.author,reminder)))
+		self.loop_list.append(self.bot.loop.create_task(self.check_remind(ctx.author,reminder,ctx.guild)))
 		
 		# Confirm the reminder
 		await ctx.send("Okay *{}*, I'll remind you in *{}*.".format(DisplayName.name(ctx.author),readableTime))
