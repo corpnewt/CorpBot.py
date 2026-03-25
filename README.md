@@ -453,6 +453,8 @@ A list of cogs, commands, and descriptions:
 	   └─ Byte swaps the passed hex value.
 	  $intbin [input_int]
 	   └─ Converts the input integer to its binary representation.
+	  $mem [input] (AKA: fbmem, stolenmem, unifiedmem, cursormem)
+	   └─ Converts between MiB and little-endian hexadecimal (lhex) for calculating fbm...
 	  $randomcolor 
 	   └─ Selects a random color.
 	  $strbin [input_string]
