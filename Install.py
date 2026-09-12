@@ -215,7 +215,7 @@ if __name__ == '__main__':
         # Get the latest commit of pomice to ensure we have Lavalink v4 changes
         {"name":"pomice","item":"git+https://github.com/cloudwithax/pomice.git"},
         # Get the latest commit of py-cord to ensure we have python 3.12 changes
-        {"name":"py-cord","item":"git+https://github.com/Pycord-Development/pycord"},
+        {"name":"py-cord","item":"py-cord[voice] @ git+https://github.com/Pycord-Development/pycord"},
         {"name":"pillow"},
         {"name":"requests"},
         {"name":"parsedatetime"},
