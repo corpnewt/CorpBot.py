@@ -150,44 +150,51 @@ class IntelArk(commands.Cog):
 		text = await DL.async_text(data["url"])
 		
 		current_key = None
+		key_primed = val_primed = False
 		data["list"] = []
-		for line in text.split("<h3>Essentials</h3>")[-1].split("\n"):
-			if '<div class="disclaimer">' in line:
+		html_tags = re.compile(r"<\/?\w+>")
+		for line in text.split('<h2 class="cmp-title__text">Essentials</h2>')[-1].split("\n"):
+			line = line.strip()
+			if '<div class="dynamicdisclaimers">' in line:
 				break # Got to the end
-			if "<span>" in line and current_key is None:
-				# Got a new key
-				if "t<sub>junction</sub>" in line.lower():
-					# Special handling to avoid dropping "junction"
+			if '<div class="row-key">' in line:
+				key_primed = True
+			elif key_primed and line:
+				# Get the new key from the next line, then
+				# un-prime
+				current_key = re.sub(html_tags, "", line)
+				# Special checks for Tjunction and Tcase Max
+				if current_key.lower() == "tjunction":
 					current_key = "Tjunction Max"
-				elif "t<sub>case</sub>" in line.lower():
-					# Special handling to avoid dropping "case"
+				elif current_key.lower() == "tcase":
 					current_key = "Tcase Max"
-				else:
-					current_key = line.split("<span>")[1].split("<")[0].strip()
-				continue
-			if current_key is None:
-				# We don't have a key yet - skip until we do
-				continue
-			if "<span>" in line or "</a>" in line:
-				# We have a current key, and what seems to be the results - save them
-				if "</a>" in line and "<a href=" in line:
-					# It's got a link in it - let's rip that out as well
-					url = line.split('<a href="')[1].split('"')[0] # Get the URL referenced
-					if url.startswith("/"):
-						# It's referencing a local value - prepend
-						url = "https://www.intel.com"+url
-					val = "[{}]({})".format(
-						line.split('">')[1].split("<")[0], # Get the name of the value
-						url
-					)
-				else:
-					val = line.split(">")[1].split("<")[0]
-				data["list"].append({
-					"name":current_key,
-					"value":val.strip(),
-					"inline":True
-				})
-				current_key = None # Reset the key
+				key_primed = False
+			elif current_key is not None:
+				if '<div class="row-value">' in line:
+					val_primed = True
+				elif val_primed and line:
+					# Get the new value from the next line, then
+					# un-prime it and set the key to none
+					if '<a href=' in line and '</a>' in line:
+						# It's got a link in it - let's rip that out as well
+						url = line.split('<a href="')[1].split('"')[0] # Get the URL referenced
+						if url.startswith("/"):
+							# It's referencing a local value - prepend
+							url = "https://www.intel.com"+url
+						val = "[{}]({})".format(
+							re.sub(html_tags, "", line.split('">')[1].split("<")[0]), # Get the name of the value and strip other tags
+							url
+						)
+					else:
+						# Not a URL - just get the value
+						val = re.sub(html_tags, "", line)
+					data["list"].append({
+						"name":current_key,
+						"value":val.strip(),
+						"inline":True
+					})
+					val_primed = False # un-prime
+					current_key = None # Reset the key
 		# Try to pull the thumbnail as well
 		# Omit this for now - it seems there's some inconsistencies, and trouble loading
 		'''try:
