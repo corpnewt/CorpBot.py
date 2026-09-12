@@ -1,4 +1,5 @@
 @echo off
+setlocal enableDelayedExpansion
 
 cls
 echo   ###                   ###
@@ -7,8 +8,10 @@ echo ###                   ###
 echo.
 
 set "thisDir=%~dp0"
-set "rd=Redis-x64-5.0.14.1"
-set "rdold=Redis-x64-3.2.100"
+set "rdold1=Redis-x64-5.0.14.1"
+set "rdold2=Redis-x64-3.2.100"
+set "rd=Redis"
+set "rdpath="
 set "redis=redis-server.exe"
 set "start=Start.bat"
 set "ld=Lavalink"
@@ -34,7 +37,7 @@ if EXIST "%thisDir%\%lud%\%lava%" (
         echo.
     ) else (
         if EXIST "%thisDir%\%ld%\%lavajar%" (
-            echo !! WARNING: Located older Lavalink install, consider using Lavalink-Updater:
+            echo ** WARNING: Located older Lavalink install, consider using Lavalink-Updater:
             echo   https://github.com/corpnewt/Lavalink-Updater
             echo.
             echo Starting Lavalink server...
@@ -44,8 +47,8 @@ if EXIST "%thisDir%\%lud%\%lava%" (
             echo Waiting %wait% seconds...
             echo.
         ) else (
-            echo "%thisDir%\%lud%\%lava%"
-            echo does not exist!
+            echo "%thisDir%%lud%\%lava%"
+            echo does not exist
             echo.
             echo You can get it from:
             echo   https://github.com/corpnewt/Lavalink-Updater
@@ -68,22 +71,35 @@ if EXIST "%thisDir%\Cogs\PandorasDB.py" (
         echo Waiting %wait% seconds...
         echo.
     ) else (
-        if EXIST "%thisDir%\%rdold%\%redis%" (
-            echo !! WARNING: Located older redis install, consider updating via the following link:
-            echo   https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip
+        if EXIST "%thisDir%\%rdold1%\%redis%" (
+            set "rdpath=%thisDir%\%rdold1%"
+        ) else (
+            if EXIST "%thisDir%\%rdold2%\%redis%" (
+                set "rdpath=%thisDir%\%rdold2%"
+            )
+        )
+        if NOT "!rdpath!" == "" (
+            echo ** WARNING: Located older redis install, consider updating via the following link:
+            echo   https://github.com/redis-windows/redis-windows/releases
+            echo.
+            echo   and extract the files to:
+            echo   %thisDir%%rd%
             echo.
             echo Starting database...
-            pushd "%thisDir%\%rdold%"
+            pushd "!rdpath!"
             start "" "%redis%"
             popd
             echo Waiting %wait% seconds...
             echo.
         ) else (
-            echo "%thisDir%\%rd%\%redis%"
-            echo does not exist!
+            echo "%thisDir%%rd%\%redis%"
+            echo does not exist
             echo.
             echo You can get it from:
-            echo   https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip
+            echo   https://github.com/redis-windows/redis-windows/releases
+            echo.
+            echo   and extract the files to:
+            echo   %thisDir%%rd%
             echo.
             pause
             exit /b
@@ -97,11 +113,17 @@ if EXIST "%thisDir%\%start%" (
     start cmd /c "%thisDir%\%start%"
     echo.
 ) else (
-    echo "%thisDir%\%start%"
-    echo does not exist!
+    echo "%thisDir%%start%"
+    echo does not exist
     pause
     exit /b
 )
 echo.
 echo Done.
-timeout %wait%
+if "!rdpath!" == "" (
+    timeout %wait%
+) else (
+    echo.
+    echo Press [enter] to close...
+    pause > nul
+)
