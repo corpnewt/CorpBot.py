@@ -412,9 +412,19 @@ class Music(commands.Cog):
 		if not ctx: return # Nowhere to post our error message.
 		# Attempt to format the dict as json if needed
 		if isinstance(error,dict):
-			try: error = "```json\n{}\n```".format(json.dumps(error,indent=2))
-			except: pass
-		desc = "Something went wrong playing \"{}\".\n\n{}".format(self.get_track_title(track),error)
+			message = error.get("message","")
+			cause = error.get("cause","")
+			stack = error.get("causeStackTrace","")
+			error_parts = [
+				message,
+				"```\n{}```".format(cause) if cause else "",
+				"```java\n{}```".format(stack) if stack else ""
+			]
+			error = "\n\n".join([e for e in error_parts if e])
+		desc = "Something went wrong playing \"{}\".{}".format(
+			self.get_track_title(track),
+			"\n\n{}".format(error) if error else ""
+		)
 		if len(desc) > 2048:
 			# Truncate
 			if desc.endswith("\n```"):
