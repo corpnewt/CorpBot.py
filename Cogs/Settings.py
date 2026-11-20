@@ -262,6 +262,7 @@ class Settings(commands.Cog):
 				"QuoteChannel"			: None,		# Channel id for quotes
 				"QuoteAdminOnly"		: True,		# Only admins/bot-admins can quote?
 				"StreamChannel"			: None, 	# None or channel id
+				"FixupX"				: True,		# Default behavior for FixupX
 				"StreamList"			: [],		# List of user id's to watch for
 				"StreamMessage"			: "Hey everyone! *[[user]]* started streaming *[[game]]!* Check it out here: [[url]]",
 				"MuteList"				: []}		# List of muted members
