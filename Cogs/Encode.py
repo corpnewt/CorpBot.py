@@ -530,3 +530,33 @@ class Encode(commands.Cog):
 			return await ctx.send(Nullify.escape_all(self._convert_value(value,from_type,to_type)))
 		except Exception as e:
 			return await ctx.send(Nullify.escape_all("I couldn't make that conversion:\n{}".format(e)))
+
+	@commands.command(aliases=["fbmem", "stolenmem", "unifiedmem", "cursormem"])
+	async def mem(self, ctx, *, input=None):
+		"""Converts between MiB and little-endian hexadecimal (lhex) for calculating stolenmem, fbmem, etc. values."""
+
+		usage = 'Usage: `{}mem [input] (e.g. 26MB or 0000A001)`'.format(ctx.prefix)
+		if input is None:
+			return await ctx.send(usage)
+
+		try:
+			val = input.strip()
+			# Determine if the input value is MiB. If not MiB, will assume the input is lhex and will catch bad input with the try/except.
+			is_mib = "m" in val.lower()
+
+			# Convert MiB to lhex:
+			if is_mib:
+				# Store as a float and only store "0-9" and "." - ignoring other characters.
+				num = float("".join([x for x in val if x in "01234596789."]))
+				# Convert to bytes:
+				bytes_val = int(num * 1024 ** 2)
+				# Convert from decimal to lhex (using _check_hex to omit `0x` in the output). Using lhex32 which will auto-pad.
+				return await ctx.send(self._check_hex(self._convert_value(bytes_val, "decimal", "lhex32")))
+			else:
+				# Convert from lhex to decimal:
+				dec_val = self._convert_value(val, "lhex32", "decimal")
+				# Convert to MiB (using abs to ensure we always get a positive value):
+				mib_val = round(abs(int(dec_val)) / (1024 ** 2), 4)
+				return await ctx.send(f"{mib_val} MiB")
+		except Exception:
+			return await ctx.send("I couldn't make that conversion!")
