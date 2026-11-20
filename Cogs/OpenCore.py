@@ -591,7 +591,15 @@ class OpenCore(commands.Cog):
 				except:
 					pass
 				if names:
-					name_string = names[0] if len(names)==1 else ", ".join(names[:-1]) + " and " + names[-1]
+					len_names = len(names)
+					name_string = ""
+					if len_names == 1:
+						name_string = names[0]
+					elif len_names == 2:
+						name_string = names[0] + " and " + names[1]
+					elif len_names >= 3:
+						name_string = ", ".join(names[:-1]) + ", and " + names[-1]
+							
 					foot += " | Possible {}".format(
 						name_string
 					)
